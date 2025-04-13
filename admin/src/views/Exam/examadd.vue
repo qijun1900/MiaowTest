@@ -212,8 +212,6 @@ const submitForm = ()=>{
     })
 }
 </script>
-
-
 <style scoped>
 /* 页面容器调整 */
 :deep(.el-page-header__header) {
