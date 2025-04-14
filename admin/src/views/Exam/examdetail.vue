@@ -1,0 +1,3 @@
+<template>
+    examdetail.vue
+</template>

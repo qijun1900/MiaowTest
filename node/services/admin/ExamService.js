@@ -10,7 +10,10 @@ const ExamService ={
             cover,
             createdTime
         })
-    }
+    },
+    getexamList:async({_id})=>{
+        return _id?ExamModel.find({_id:id}):ExamModel.find({}).sort({createdTime:-1})
+    },
 
 }
 module.exports = ExamService

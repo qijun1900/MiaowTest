@@ -130,7 +130,6 @@ const router  = useRouter()
 
 onMounted(async () => {
   const res = await axios.get("/webapi/news/list")
-  // console.log(res.data.data)
   newList.value = res.data.data
   // console.log(_.groupBy(newList.value,item=>item.category))
  

@@ -17,7 +17,14 @@ const ExamController ={
         })
         res.send({
             ActionType: "OK",
-        })
+        }) 
+    },
+    getexamList:async (req,res)=>{
+        const result = await ExamService.getexamList({_id:req.params.id})
+        res.send({
+            ActionType: "OK",
+            data: result
+        })    
     }
 }
 module.exports = ExamController

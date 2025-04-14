@@ -11,6 +11,7 @@ import  NewsEdit from '../views/News/NewsEdit.vue'
 import  ProductEdit from "../views/Products/editproduct.vue"
 import  Examadd from "../views/Exam/examadd.vue"
 import  Examlist from "../views/Exam/examlist.vue"
+import  ExamDetail from "../views/Exam/examdetail.vue"
 
 
 
@@ -74,5 +75,9 @@ const routes = [
         path:'/exam/examlist',
         component:Examlist,
     },
+    {
+       path:'/exam/:id', 
+       component:ExamDetail,    
+    }
 ]
 export default routes
