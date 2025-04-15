@@ -126,11 +126,12 @@ const options = [
         value:3
     },
 ]
+//上传图片回调
 const handleChange = (file)=>{
     newsForm.cover = URL.createObjectURL(file)
     newsForm.file = file
-    // console.log('@@@@',file)
 }
+//submitForm 提交表单
 const submitForm = ()=>{
     newsFormRef.value.validate( async(valid)=>{
         if(valid){

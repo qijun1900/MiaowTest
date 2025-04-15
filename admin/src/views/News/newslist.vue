@@ -99,7 +99,6 @@ const categoryFromat = (category)=>{
 }
 //开关回调
 const handleSwitchange =async (item)=>{
-    console.log(item)
     await axios.put(`/adminapi/news/publish`,{
         _id:item._id,
         isPublish:item.isPublish
@@ -118,7 +117,6 @@ const handleDelete = async (item)=>{
 }
 //编辑回调
 const handleEdit = (item)=>{
-    //跳转到   /news/editnews
     router.push(`/news/editnews/${item._id}`)
 
 }

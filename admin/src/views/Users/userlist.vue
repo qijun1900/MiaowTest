@@ -181,7 +181,7 @@ const handleDelete = async (data) => {
     getTableData()//再次加载一下tableData，实现数据及时更新
 }
 </script>
-<style>
+<style scoped>
 .box-card {
     margin-top: 20px;
     border-radius: 15px;

@@ -76,7 +76,7 @@ const routes = [
         component:Examlist,
     },
     {
-       path:'/exam/:id', 
+       path:'/exam/editexam:id', 
        component:ExamDetail,    
     }
 ]
