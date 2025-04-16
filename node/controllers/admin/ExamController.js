@@ -25,6 +25,24 @@ const ExamController ={
             ActionType: "OK",
             data: result
         })    
-    }
+    },
+    updateInfo:async(req,res)=>{
+        const cover = req.file?`/examcoveruploads/${req.file.filename}`:""   
+        const {name,code,category,year,isPublish,_id} = req.body
+        const parsedCategory = JSON.parse(category).map(Number)
+        await ExamService.updateInfo({
+            name,
+            code,
+            category: parsedCategory, 
+            year,
+            isPublish:Number(isPublish),
+            createdTime:new Date(),
+            cover,
+            _id
+        })
+        res.send({
+            ActionType: "OK",
+        })
+    },
 }
 module.exports = ExamController

@@ -1,6 +1,8 @@
 <template>
  <div>
-    <el-page-header content="创建科目" icon="" title="考试管理">
+    <el-page-header 
+      icon="" 
+      title="考试管理">
       <template #content>
         <div class="flex items-center">
           <el-icon class="mr-2"><DocumentAdd /></el-icon>
@@ -119,8 +121,7 @@
 
 <script setup>
 import { DocumentAdd, User, Document, List, Calendar, Picture, Plus } from '@element-plus/icons-vue'
-
-import { ref,reactive } from 'vue';
+import { ref,reactive,onMounted } from 'vue';
 import Upload from '@/components/upload/Upload.vue';
 import upload from '@/util/upload'
 import { useRouter } from 'vue-router';
@@ -136,6 +137,7 @@ const subjectForm  = reactive({
     cover:"",
     file:null,
 })
+//规则
 const subjectFormrules = reactive({
     name:[
         {
@@ -173,7 +175,7 @@ const subjectFormrules = reactive({
         } 
     ]
 })
-
+//下拉框
 const options = [
   {
     label: '选择类题',
@@ -192,11 +194,12 @@ const options = [
     value: 4,
   },
 ]
-
+//文件上传
 const handleChange = (file)=>{
     subjectForm.cover = URL.createObjectURL(file)
     subjectForm.file = file
 }
+//提交后端
 const submitForm = ()=>{
     subjectFormRef.value.validate(async(valid)=>{
         if(valid){
@@ -205,13 +208,16 @@ const submitForm = ()=>{
                 ...subjectForm,
                 category: JSON.stringify(subjectForm.category) // 序列化数组
             }
-            console.log(formData)
             await upload("/adminapi/exam/add", formData)
             router.push('/exam/examlist')
         }
     })
 }
+
+
 </script>
+
+
 <style scoped>
 /* 页面容器调整 */
 :deep(.el-page-header__header) {

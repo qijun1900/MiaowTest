@@ -157,7 +157,6 @@ onMounted(() => {
 //编辑回调
 const handleEdit = async (data) => {
     const res= await axios.get(`/adminapi/user/list/${data._id}`)
-    // console.log(res.data.data[0])
     Object.assign(userForm,res.data.data[0])
     dialogVisible.value = true
  

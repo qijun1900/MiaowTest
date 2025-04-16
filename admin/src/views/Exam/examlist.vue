@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="exam-page-container">
     <el-page-header content="科目列表" icon="" title="考试管理"></el-page-header>
     <div class="search-container">
       <el-popover 
@@ -41,7 +41,7 @@
               <el-col :span="10" class="image-col">
                 <div class="image-wrapper" @mouseenter="hoverImage = item._id" @mouseleave="hoverImage = null">
                   <el-image 
-                    :src="`https://bpic.588ku.com/back_origin_min_pic/19/04/12/d4f979a6c21beabf313eda783269afe5.jpg`" 
+                    :src="`http://${escconfig.serverHost}:${escconfig.serverPort}` + item.cover" 
                     class="exam-image"/>
                   <div v-if="hoverImage === item._id" class="image-overlay" @click="handleEditExam(item._id)">
                     <el-icon class="edit-icon"><Edit /></el-icon>
@@ -62,11 +62,16 @@
                       <span class="text-purple-500">{{ item.code }}</span>
                     </div>
                     <div class="info-item">
+                      <el-icon class="text-info"><Document /></el-icon>
+                      <span class="text-info">创建时间:</span><br>
+                      <span class="text-purple-500">{{formatTime.getTime(item.createdTime) }}</span>
+                    </div>
+                    <div class="info-item">
                       <div style="display: inline-block" class="text-warning">
                         <el-icon><PriceTag /></el-icon>
                         题目类型:
                       </div>
-                      <div style="margin-top: 8px; min-height: 120px">
+                      <div style="margin-top: 8px; min-height:96px">
                         <el-check-tag 
                           type="success"
                           v-for="(value, index) in item.category" 
@@ -91,7 +96,8 @@ import { Search, Collection, Document, PriceTag, Histogram, Edit } from '@elemen
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-
+import formatTime from '@/util/formatTime'
+import escconfig  from '@/config/esc.config';
 
 const searchText = ref('')
 const visible = ref(false)
@@ -100,7 +106,7 @@ const router = useRouter()
 const hoverImage = ref(null)
 
 
-//后端api   
+//后端api，获取科目列表   
 onMounted(async () => {
   const res = await axios.get("/adminapi/exam/list")
   examList.value = res.data.data
@@ -112,9 +118,9 @@ const searchexamlist = computed(() => {
   return searchText.value ? examList.value.filter(item => item.name?.includes(searchText.value)) : []
 })
 
-//点击跳转考试详情页
+//点击跳转考试详情页（搜索框内）
 const handleDetail = (id) => {
-  router.push(`/exam/${id}`)
+  router.push(`/exam/editexam/${id}`)
 
 }
 
@@ -129,11 +135,10 @@ const getCategoryName = (val) => {
   return CategoryName[val] || '其他类型'// 返回映射后的类型名称，如果值不存在于map中则返回'未知类型'
 }
 
-//exam编辑
+//考试编辑跳转
 const handleEditExam = (id) => {
-  router.push(`/exam/editexam:${id}`)
+  router.push(`/exam/editexam/${id}`)
 }
-
 
 
 </script>
@@ -221,7 +226,7 @@ const handleEditExam = (id) => {
   color: #696a6c;
 }
 .text-primary {
-  color: #278ef5;
+  color: #0062ff;
 }
 .text-info {
   color: #696a6c;
@@ -310,4 +315,6 @@ const handleEditExam = (id) => {
 .image-wrapper:hover .edit-icon {
   transform: scale(1);
 }
+
 </style>
+

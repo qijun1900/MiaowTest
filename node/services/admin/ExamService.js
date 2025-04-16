@@ -12,8 +12,27 @@ const ExamService ={
         })
     },
     getexamList:async({_id})=>{
-        return _id?ExamModel.find({_id:id}):ExamModel.find({}).sort({createdTime:-1})
+        return _id?ExamModel.find({_id}):ExamModel.find({}).sort({createdTime:-1})
     },
-
+    updateInfo:async({name,code,category,year,isPublish,createdTime,cover,_id})=>{
+        if(cover){
+            return ExamModel.updateOne({_id},{
+                name,
+                code,
+                category,
+                year,
+                isPublish,
+                createdTime,
+                cover}) 
+        }else{
+            return ExamModel.updateOne({_id},{
+                name,
+                code,
+                category,
+                year,
+                isPublish,
+                createdTime})
+        }
+    },
 }
 module.exports = ExamService

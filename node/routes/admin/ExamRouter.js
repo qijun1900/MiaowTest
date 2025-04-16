@@ -8,4 +8,8 @@ const upload = multer({ dest: 'public/examcoveruploads/' })
 ExamRouter.post('/adminapi/exam/add',upload.single('file'),ExamController.add)
 ExamRouter.get('/adminapi/exam/list',ExamController.getexamList)
 ExamRouter.get('/adminapi/exam/list/:id',ExamController.getexamList)
+ExamRouter.post("/adminapi/exam/update",upload.single('file'),ExamController.updateInfo)
+
+
+
 module.exports = ExamRouter; 
