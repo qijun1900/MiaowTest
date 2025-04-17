@@ -75,7 +75,8 @@
                         <el-check-tag 
                           type="success"
                           v-for="(value, index) in item.category" 
-                          :key="index">
+                          :key="item._id"
+                          @click="handelquestion(index,item._id)">
                           <el-icon style="margin-right:4px"><Histogram /></el-icon>
                           {{ getCategoryName(value) }}
                         </el-check-tag>
@@ -90,6 +91,7 @@
       </el-row>
     </div>
   </div>
+  <el-backtop :right="100" :bottom="100" />
 </template>
 <script setup>
 import { Search, Collection, Document, PriceTag, Histogram, Edit } from '@element-plus/icons-vue'
@@ -140,9 +142,28 @@ const handleEditExam = (id) => {
   router.push(`/exam/editexam/${id}`)
 }
 
+//类题页面跳转
+const handelquestion = (index, id) => {
+  console.log(index, id)
+  const routeNames = [
+    'selectquestion',
+    'blankquestion',
+    'judgequestion',
+    'shortquestion'
+  ]
+  // 通过索引获取对应的路由名称，未匹配时使用'otherquestion'
+  const routeName = routeNames[index] || 'otherquestion'
+  router.push(`/exam/${routeName}/${id}`)
+}
+
+
+
 
 </script>
 <style scoped>
+:deep(.el-page-header__content) {
+  color: #2c94fd;
+}
 .image-wrapper {
   position: relative;
   width: 100%;

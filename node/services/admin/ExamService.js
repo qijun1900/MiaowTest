@@ -34,5 +34,8 @@ const ExamService ={
                 createdTime})
         }
     },
+    deleteInfo:async({_id})=>{
+        return ExamModel.deleteOne({_id})
+    }
 }
 module.exports = ExamService

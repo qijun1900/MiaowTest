@@ -12,7 +12,7 @@ import  ProductEdit from "../views/Products/editproduct.vue"
 import  Examadd from "../views/Exam/examadd.vue"
 import  Examlist from "../views/Exam/examlist.vue"
 import  ExamDetail from "../views/Exam/examdetail.vue"
-
+import SelectionQuestion from "../views/Exam/selectquestion.vue"
 
 
 const routes = [
@@ -78,6 +78,10 @@ const routes = [
     {
        path:'/exam/editexam/:id', 
        component:ExamDetail,    
-    }
+    },
+    {
+        path:'/exam/selectquestion/:id', 
+        component:SelectionQuestion,    
+     }
 ]
 export default routes

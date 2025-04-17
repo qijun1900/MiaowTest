@@ -4,9 +4,9 @@
       icon="" 
       title="考试管理">
       <template #content>
-        <div class="flex items-center">
+        <div >
           <el-icon class="mr-2"><DocumentAdd /></el-icon>
-          <span class="text-xl font-bold">创建考试科目</span>
+          <span>创建考试科目</span>
         </div>
       </template>
     </el-page-header>
@@ -193,6 +193,10 @@ const options = [
     label: '简答类题',
     value: 4,
   },
+  {
+    label: '其他类题',
+    value: 5, 
+  }
 ]
 //文件上传
 const handleChange = (file)=>{
@@ -225,7 +229,7 @@ const submitForm = ()=>{
 }
 
 :deep(.el-page-header__content) {
-  color: #409eff;
+  color: #2c94fd;
 }
 
 /* 原有最后两个重复的样式声明合并 */

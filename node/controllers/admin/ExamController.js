@@ -44,5 +44,11 @@ const ExamController ={
             ActionType: "OK",
         })
     },
+    deleteInfo:async(req,res)=>{
+        await ExamService.deleteInfo({_id:req.params.id})
+        res.send({
+            ActionType: "OK",
+        })
+    }
 }
 module.exports = ExamController

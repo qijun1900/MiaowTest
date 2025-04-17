@@ -104,28 +104,57 @@
         </el-form-item>
         
         <el-form-item>
-            <el-button 
-                type="primary" 
-                @click="submitForm" 
-                class="w-full mt-4"
-                size="large"
-                :icon="Plus">
-                更新信息
-            </el-button>
+            <el-row :gutter="20" class="w-full">
+                <el-col :span="12">
+                    <el-button 
+                        type="primary" 
+                        @click="submitForm" 
+                        class="w-full"
+                        size="large"
+                        :icon="Plus">
+                        更新信息
+                    </el-button>
+                </el-col>
+                <el-col :span="12">
+                    <el-button
+                        type="danger"
+                        @click="dialogVisible = true"
+                        class="w-full"
+                        size="large"
+                        :icon="Delete">
+                        删除科目
+                    </el-button>
+                </el-col>
+            </el-row>
         </el-form-item>
-    </el-form>  
-    </div>
+    </el-form> 
+      <el-dialog
+      v-model="dialogVisible"
+      title="Tips"
+      width="500">
+      <span>你确定要删除吗?(此操作不可逆！)</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleDelete">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog> 
+</div>
 </template>
    
 <script setup>
-import { DocumentAdd, User, Document, List, Calendar, Picture, Plus } from '@element-plus/icons-vue'
+import { DocumentAdd, User, Document, List, Calendar, Picture, Plus, Delete } from '@element-plus/icons-vue'
 import { ref,reactive, onMounted } from 'vue';
 import Upload from '@/components/upload/Upload.vue';
 import upload from '@/util/upload'
 import { useRouter,useRoute } from 'vue-router'; 
 import axios from 'axios';
+import { ElMessage } from 'element-plus'
 
-
+const dialogVisible = ref(false)
 const router = useRouter()
 const route = useRoute()  // 添加这行获取路由参数
 const subjectFormRef = ref()
@@ -193,6 +222,10 @@ const options = [
     label: '简答类题',
     value: 4,
     },
+    {
+    label: '其他类型',
+    value: 5, 
+    }
 ]
 
 const handleChange = (file)=>{
@@ -204,15 +237,18 @@ const handleChange = (file)=>{
 const handleBack = () => {
     router.back()
 }
-//向后端请求数据
+
+//向后端请求数据加载数据
 const getData = async () => {
     const res = await axios.get(`/adminapi/exam/list/${route.params.id}`)
     Object.assign(subjectForm, res.data.data[0])//将 res.data.data[0] 对象的所有可枚举属性复制到 subjectForm 对象中
 }
+
 //数据加载
 onMounted(async ()=>{
     getData()
 })
+
 //数据更新,使用upload函数
 const submitForm = ()=>{
     subjectFormRef.value.validate( async(valid)=>{
@@ -227,7 +263,18 @@ const submitForm = ()=>{
     })
 }
 
-
+//添加删除方法
+const handleDelete = async () => {
+  try {
+    await axios.delete(`/adminapi/exam/list/${route.params.id}`)
+    ElMessage.success('删除成功')
+    router.back()
+  } catch (err) {
+    ElMessage.error('删除失败')
+  } finally {
+    dialogVisible.value = false
+  }
+}
 </script>
 
 
