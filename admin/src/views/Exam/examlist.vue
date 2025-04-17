@@ -62,8 +62,8 @@
                       <span class="text-purple-500">{{ item.code }}</span>
                     </div>
                     <div class="info-item">
-                      <el-icon class="text-info"><Document /></el-icon>
-                      <span class="text-info">创建时间:</span><br>
+                      <el-icon class="text-info"><Timer /></el-icon>
+                      <span class="text-info">更新时间:</span><br>
                       <span class="text-purple-500">{{formatTime.getTime(item.createdTime) }}</span>
                     </div>
                     <div class="info-item">
@@ -94,7 +94,7 @@
   <el-backtop :right="100" :bottom="100" />
 </template>
 <script setup>
-import { Search, Collection, Document, PriceTag, Histogram, Edit } from '@element-plus/icons-vue'
+import { Search, Collection, Document, PriceTag,Timer, Histogram, Edit } from '@element-plus/icons-vue'
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -112,7 +112,7 @@ const hoverImage = ref(null)
 onMounted(async () => {
   const res = await axios.get("/adminapi/exam/list")
   examList.value = res.data.data
-  console.log(examList.value)
+  // console.log(examList.value)
 })
 
 //搜索功能
@@ -145,15 +145,15 @@ const handleEditExam = (id) => {
 //类题页面跳转
 const handelquestion = (index, id) => {
   console.log(index, id)
-  const routeNames = [
-    'selectquestion',
-    'blankquestion',
-    'judgequestion',
-    'shortquestion'
-  ]
-  // 通过索引获取对应的路由名称，未匹配时使用'otherquestion'
-  const routeName = routeNames[index] || 'otherquestion'
-  router.push(`/exam/${routeName}/${id}`)
+  // const routeNames = [
+  //   'selectquestion',
+  //   'blankquestion',
+  //   'judgequestion',
+  //   'shortquestion'
+  // ]
+  // // 通过索引获取对应的路由名称，未匹配时使用'otherquestion'
+  // const routeName = routeNames[index] || 'otherquestion'
+  router.push(`/exam/questionpnael/${id}`)
 }
 
 

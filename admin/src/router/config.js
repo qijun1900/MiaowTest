@@ -12,7 +12,7 @@ import  ProductEdit from "../views/Products/editproduct.vue"
 import  Examadd from "../views/Exam/examadd.vue"
 import  Examlist from "../views/Exam/examlist.vue"
 import  ExamDetail from "../views/Exam/examdetail.vue"
-import SelectionQuestion from "../views/Exam/selectquestion.vue"
+import QuestionPnael from "../components/Exam/QuestionPnael.vue"
 
 
 const routes = [
@@ -80,8 +80,8 @@ const routes = [
        component:ExamDetail,    
     },
     {
-        path:'/exam/selectquestion/:id', 
-        component:SelectionQuestion,    
+        path:'/exam/questionpnael/:id', 
+        component:QuestionPnael,    
      }
 ]
 export default routes

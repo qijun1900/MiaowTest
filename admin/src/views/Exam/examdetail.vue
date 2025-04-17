@@ -105,6 +105,7 @@
         
         <el-form-item>
             <el-row :gutter="20" class="w-full">
+              <el-space :size="30" spacer="|">      
                 <el-col :span="12">
                     <el-button 
                         type="primary" 
@@ -125,6 +126,7 @@
                         删除科目
                     </el-button>
                 </el-col>
+              </el-space>
             </el-row>
         </el-form-item>
     </el-form> 
@@ -153,6 +155,7 @@ import upload from '@/util/upload'
 import { useRouter,useRoute } from 'vue-router'; 
 import axios from 'axios';
 import { ElMessage } from 'element-plus'
+
 
 const dialogVisible = ref(false)
 const router = useRouter()
