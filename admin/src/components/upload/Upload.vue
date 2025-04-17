@@ -18,16 +18,20 @@ import { defineEmits, defineProps, computed } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 import escconfig  from '@/config/esc.config';
 
+// 接收父组件传递的avatar属性(图片URL)
 const props = defineProps({
   avatar: String,
 });
 
+// 定义事件发射器
 const emit = defineEmits(['AvatarChange']);
 
+// 处理文件变化事件
 const handleChange = (file) => {
-  emit('AvatarChange', file.raw);
+  emit('AvatarChange', file.raw); // 将原始文件对象发送给父组件
 };
 
+// 计算属性处理图片URL
 const uploadAvatar = computed(() =>
   props.avatar.includes('blob')
     ? props.avatar
