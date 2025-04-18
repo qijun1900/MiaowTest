@@ -142,28 +142,29 @@
         </el-row>
     </div>
 </template>
-
-
 <script setup>
 import { onMounted ,ref} from 'vue';   
 import { useRoute,useRouter } from 'vue-router';
 import axios from 'axios';
 import{DocumentAdd,Collection,Document,Timer,CirclePlusFilled,List,Upload,Histogram ,TrendCharts} from '@element-plus/icons-vue'
 import formatTime from '@/util/formatTime';
-import { } from '@element-plus/icons-vue'
 
 
 const route = useRoute();
 const router = useRouter();
 const examinfo = ref([])
+const questionType = ref(route.query.questionType) // 获取传递的index参数，默认为0
 
+//可以根据questionType.value来显示不同的题目类型
 //向后端请求数据加载数据
 const getData = async () => {
     const res = await axios.get(`/adminapi/exam/list/${route.params.id}`)
     examinfo.value = res.data.data[0]
 }
+
 onMounted(() => {
     getData()
+    console.log("@@@index",questionType.value);
     console.log("@@@ID",route.params.id);
 });
 // 添加返回方法
@@ -173,7 +174,15 @@ const handleBack = () => {
 //添加题目方法
 const handelAddqe =()=> {
     console.log("添加题目");
- 
+    const routeNames = [
+    'selectquestion',
+    'blankquestion',
+    'judgequestion',
+    'shortquestion'
+  ]
+  // 通过索引获取对应的路由名称，未匹配时使用'otherquestion'
+  const routeName = routeNames[questionType.value] || 'otherquestion'
+  router.push(`/exam/${routeName}/${route.params.id}`)
 }
 //查看题目列表
 const  checkListqe =()=>{

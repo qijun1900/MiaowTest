@@ -13,6 +13,11 @@ import  Examadd from "../views/Exam/examadd.vue"
 import  Examlist from "../views/Exam/examlist.vue"
 import  ExamDetail from "../views/Exam/examdetail.vue"
 import QuestionPnael from "../components/Exam/QuestionPnael.vue"
+import Selectquestion from '../components/Exam/SelectQu.vue'
+import Blankquestion from '../components/Exam/BlankQu.vue'
+import Judgequestion from '../components/Exam/JudgeQu.vue'
+import Shortquestion from '../components/Exam/ShortQu.vue'
+import Otherquestion from '../components/Exam/OtherQu.vue'
 
 
 const routes = [
@@ -82,6 +87,29 @@ const routes = [
     {
         path:'/exam/questionpnael/:id', 
         component:QuestionPnael,    
-     }
+     },
+     {
+        path:'/exam/selectquestion/:id',
+        component:Selectquestion,
+     },
+     {
+        path:'/exam/blankquestion/:id',
+        component:Blankquestion, 
+     },
+     {
+        path:'/exam/judgequestion/:id',
+        component:Judgequestion,
+     },
+     {
+        path:'/exam/shortquestion/:id',
+        component:Shortquestion,
+     },
+     {
+        path:'/exam/otherquestion/:id',
+        component:Otherquestion,
+     },
+
+
+
 ]
 export default routes

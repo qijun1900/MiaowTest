@@ -144,18 +144,11 @@ const handleEditExam = (id) => {
 
 //类题页面跳转
 const handelquestion = (index, id) => {
-  console.log(index, id)
-  // const routeNames = [
-  //   'selectquestion',
-  //   'blankquestion',
-  //   'judgequestion',
-  //   'shortquestion'
-  // ]
-  // // 通过索引获取对应的路由名称，未匹配时使用'otherquestion'
-  // const routeName = routeNames[index] || 'otherquestion'
-  router.push(`/exam/questionpnael/${id}`)
+  router.push({
+    path: `/exam/questionpnael/${id}`,
+    query: { questionType: index }
+  })
 }
-
 
 
 
