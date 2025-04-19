@@ -1,4 +1,5 @@
 const ExamModel = require('../../models/ExamModel')
+const SelectModel =require('../../models/SelectModel')
 const ExamService ={
     add:async({name,code,category,year,isPublish,cover,createdTime})=>{
         return ExamModel.create({
@@ -36,6 +37,17 @@ const ExamService ={
     },
     deleteInfo:async({_id})=>{
         return ExamModel.deleteOne({_id})
+    },
+    AddSelectQuestion:async({examId,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
+        return SelectModel.create({
+            examId,
+            stem,
+            options, 
+            isPublish,
+            analysis,
+            isAIanswer,
+            createdTime
+        })
     }
 }
 module.exports = ExamService

@@ -49,6 +49,22 @@ const ExamController ={
         res.send({
             ActionType: "OK",
         })
+    },
+    AddSelectQuestion:async(req,res)=>{
+        const {examId,stem,options,isPublish,analysis,isAIanswer} = req.body
+        await ExamService.AddSelectQuestion({
+            examId,
+            stem,
+            options,
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date()
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
     }
 }
 module.exports = ExamController

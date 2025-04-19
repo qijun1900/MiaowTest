@@ -1,11 +1,9 @@
 <template>
     <div>
-        <el-page-header @back="handleBack" title="选择类题">
+        <el-page-header @back="handleBack" title="考试列表">
             <template #content>
                 <div class="flex items-center">
-                    <el-icon class="mr-2">
-                        <DocumentAdd />
-                    </el-icon>
+                    <el-icon><SetUp /></el-icon>
                     <span class="text-xl font-bold">考试题目编辑</span>
                 </div>
             </template>
@@ -146,7 +144,7 @@
 import { onMounted ,ref} from 'vue';   
 import { useRoute,useRouter } from 'vue-router';
 import axios from 'axios';
-import{DocumentAdd,Collection,Document,Timer,CirclePlusFilled,List,Upload,Histogram ,TrendCharts} from '@element-plus/icons-vue'
+import{Collection,Document,Timer,CirclePlusFilled,List,Histogram ,TrendCharts,SetUp} from '@element-plus/icons-vue'
 import formatTime from '@/util/formatTime';
 
 
@@ -189,11 +187,8 @@ const  checkListqe =()=>{
     console.log("查看题目列表");
 
 } 
-
-
-
-
 </script>
+
 <style lang="css" scoped>
 :deep(.el-page-header__content) {
   color: #2c94fd;
