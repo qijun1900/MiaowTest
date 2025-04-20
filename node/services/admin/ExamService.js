@@ -1,5 +1,8 @@
 const ExamModel = require('../../models/ExamModel')
-const SelectModel =require('../../models/SelectModel')
+const ExamSelectModel =require('../../models/SelectModel')
+const ExamBlankModel =require('../../models/BlankModel')
+const ExamJudgeModel =require('../../models/JudgeModel')
+const ExamShortModel =require('../../models/ShortModel')
 const ExamService ={
     add:async({name,code,category,year,isPublish,cover,createdTime})=>{
         return ExamModel.create({
@@ -39,7 +42,7 @@ const ExamService ={
         return ExamModel.deleteOne({_id})
     },
     AddSelectQuestion:async({examId,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
-        return SelectModel.create({
+        return ExamSelectModel.create({
             examId,
             stem,
             options, 
@@ -48,6 +51,39 @@ const ExamService ={
             isAIanswer,
             createdTime
         })
+    },
+    AddBlankQuestion :async({examId,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
+        return ExamBlankModel.create({
+            examId,
+            stem,
+            options,
+            isPublish,
+            analysis,
+            isAIanswer,
+            createdTime 
+        }) 
+    },
+    AddJudgeQuestion :async({examId,stem,answer,isPublish,analysis,isAIanswer,createdTime})=>{
+        return ExamJudgeModel.create({
+            examId,
+            stem,
+            answer, 
+            isPublish,
+            analysis,
+            isAIanswer,
+            createdTime
+        }) 
+    },
+    AddShortQuestionList :async({examId,stem,answer,isPublish,analysis,isAIanswer,createdTime})=>{
+        return ExamShortModel.create({
+            examId,
+            stem,
+            answer, 
+            isPublish,
+            analysis,
+            isAIanswer,
+            createdTime
+        }) 
     }
 }
 module.exports = ExamService

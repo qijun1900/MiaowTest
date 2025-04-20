@@ -65,6 +65,54 @@ const ExamController ={
             code:200,
             ActionType:"OK",
         })
+    },
+    AddBlankQuestion:async(req,res)=>{
+        const {examId,stem,options,isPublish,analysis,isAIanswer} = req.body
+        await ExamService.AddBlankQuestion({
+            examId,
+            stem,
+            options,
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date()
+        }) 
+        res.send({
+            code:200,
+            ActionType:"OK", 
+        })
+    },
+    AddJudgeQuestion:async(req,res)=>{
+        const {examId,stem,answer,isPublish,analysis,isAIanswer} = req.body 
+        await ExamService.AddJudgeQuestion({
+            examId,
+            stem,
+            answer:Number(answer),
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date()
+        })
+        res.send({
+            code:200,
+            ActionType:"OK", 
+        })
+    },
+    AddShortQuestionList:async(req,res)=>{
+        const {examId,stem,content,isPublish,analysis,isAIanswer} = req.body
+        await ExamService.AddShortQuestionList({
+            examId,
+            stem,
+            content,  
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date()
+        }) 
+        res.send({
+            code:200,
+            ActionType:"OK", 
+        })
     }
 }
 module.exports = ExamController

@@ -23,10 +23,10 @@
                 v-model="form.stem"
                 placeholder="请输入题目内容"
                 type="textarea"
-                :rows="4"
+                :rows="3"
                 clearable
                 show-word-limit
-                maxlength="1000"
+                maxlength="5000"
               />
             </el-form-item>
           </el-col>
@@ -82,13 +82,13 @@
             prop="analysis">
             <el-input
             v-model="form.analysis"
-            placeholder="请输入题目解析内容(如没有请忽略)   |  (题目为Ai生成请务必勾选下方选项)"
+            placeholder="请输入题目解析内容(如没有请忽略)   |   (答案如果为Ai生成请务必勾选下方选项)"
             type="textarea"
-            :rows="4"/>
+            :rows="3"/>
         </el-form-item>
         <el-form-item>
             <el-checkbox v-model="form.isAIanswer" :true-value="1" :false-value="0">
-            是否为AI生成的解析
+              是否由AI生成的解析
             </el-checkbox>
         </el-form-item>
       </el-form>
@@ -173,8 +173,6 @@ const submitForm = async () => {
             }
         }
     })
-
-  
 };
 </script>
 

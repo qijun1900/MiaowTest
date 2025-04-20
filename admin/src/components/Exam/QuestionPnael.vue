@@ -179,7 +179,7 @@ const handelAddqe =()=> {
     'shortquestion'
   ]
   // 通过索引获取对应的路由名称，未匹配时使用'otherquestion'
-  const routeName = routeNames[questionType.value] || 'otherquestion'
+  const routeName = routeNames[Number(questionType.value-1)] || 'otherquestion'
   router.push(`/exam/${routeName}/${route.params.id}`)
 }
 //查看题目列表

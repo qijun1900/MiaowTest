@@ -49,7 +49,7 @@
                 </div>
               </el-col>
               <el-col :span="14">
-                <el-card shadow="hover" style="height: 100%">
+                <el-card shadow="hover" style="height: 100%" class="card-info">
                   <div class="examinfo">
                     <div class="info-item">
                       <el-icon class="text-success"><Collection /></el-icon>
@@ -66,26 +66,26 @@
                       <span class="text-info">更新时间:</span><br>
                       <span class="text-purple-500">{{formatTime.getTime(item.createdTime) }}</span>
                     </div>
-                    <div class="info-item">
-                      <div style="display: inline-block" class="text-warning">
-                        <el-icon><PriceTag /></el-icon>
-                        题目类型:
-                      </div>
-                      <div style="margin-top: 8px; min-height:96px">
-                        <el-check-tag 
-                          type="success"
-                          v-for="(value, index) in item.category" 
-                          :key="item._id"
-                          @click="handelquestion(index,item._id)">
-                          <el-icon style="margin-right:4px"><Histogram /></el-icon>
-                          {{ getCategoryName(value) }}
-                        </el-check-tag>
-                      </div>
-                    </div>
                   </div>
                 </el-card>
               </el-col>
             </el-row>
+            <div class="info-item">
+              <div style="display: inline-block" class="text-warning">
+                <el-icon><PriceTag /></el-icon>
+                题目类型:
+              </div>
+              <div style="margin-top: 8px; min-height:96px">
+                <el-check-tag 
+                  type="success"
+                  v-for="(value, index) in item.category" 
+                  :key="item._id"
+                  @click="handelquestion(value,item._id)">
+                  <el-icon style="margin-right:4px"><Histogram /></el-icon>
+                  {{ getCategoryName(value) }}
+                </el-check-tag>
+              </div>
+            </div>
           </el-card>
         </el-col>
       </el-row>
@@ -112,7 +112,7 @@ const hoverImage = ref(null)
 onMounted(async () => {
   const res = await axios.get("/adminapi/exam/list")
   examList.value = res.data.data
-  // console.log(examList.value)
+  console.log(examList.value)
 })
 
 //搜索功能
@@ -143,14 +143,12 @@ const handleEditExam = (id) => {
 }
 
 //类题页面跳转
-const handelquestion = (index, id) => {
+const handelquestion = (value, id) => {
   router.push({
     path: `/exam/questionpnael/${id}`,
-    query: { questionType: index }
+    query: { questionType: value }
   })
 }
-
-
 
 </script>
 <style scoped>
@@ -211,6 +209,10 @@ const handelquestion = (index, id) => {
   flex: 1; 
   display: flex; 
   flex-direction: column;
+  border-radius: 15px;
+}
+.card-info{
+  border-radius: 1px;
 }
 
 .exam-row {
@@ -231,8 +233,8 @@ const handelquestion = (index, id) => {
 }
 
 .info-item {
-  margin-bottom: 16px;
-  font-size: 14px;
+  margin-bottom: 1px;
+  font-size: 15px;
   line-height: 1.8;
 }
 
@@ -240,7 +242,7 @@ const handelquestion = (index, id) => {
   color: #696a6c;
 }
 .text-primary {
-  color: #0062ff;
+  color: #0022ff;
 }
 .text-info {
   color: #696a6c;
@@ -275,10 +277,6 @@ const handelquestion = (index, id) => {
   transform: translateY(-2px);
   background-color: #90cef7;  /* 悬停时加深背景色 */
 }
-
-
-
-
 
 /* 优化图片相关样式 */
 .image-wrapper {
