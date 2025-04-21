@@ -1,3 +1,4 @@
+// 填空题模型 route.query.questionType ==2
 const mongoose = require('mongoose');
 const BlankSchema  = new mongoose.Schema({
     examId:String,

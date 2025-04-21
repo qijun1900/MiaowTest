@@ -1,3 +1,4 @@
+// 填空题模型 route.query.questionType ==4
 const mongoose = require('mongoose');
 const ShortSchema  = new mongoose.Schema({
     examId:String,

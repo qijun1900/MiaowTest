@@ -24,7 +24,7 @@ const ExamController ={
         res.send({
             ActionType: "OK",
             data: result
-        })    
+        })   
     },
     updateInfo:async(req,res)=>{
         const cover = req.file?`/examcoveruploads/${req.file.filename}`:""   
@@ -112,6 +112,27 @@ const ExamController ={
         res.send({
             code:200,
             ActionType:"OK", 
+        })
+    },
+    getQuestionList:async(req,res)=>{
+        const result = await ExamService.getQuestionList({examId:req.params.id,questionType:req.query.questionType})
+        res.send({
+            ActionType: "OK",
+            data: result
+        })
+    },
+    updateoneQuestion:async(req,res)=>{
+        const {_id,isPublish} = req.body
+        const  questionType = req.query.questionType
+        await ExamService.updateoneQuestion({
+            _id, 
+            isPublish:Number(isPublish),
+            questionType,
+        })
+            
+        res.send({
+            code:200,
+            ActionType:"OK",
         })
     }
 }

@@ -84,6 +84,24 @@ const ExamService ={
             isAIanswer,
             createdTime
         }) 
+    },
+    getQuestionList:async({examId,questionType})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        return modelMap[questionType]?.find({examId}) || null;
+    },
+    updateoneQuestion:async({_id,isPublish,questionType})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        }; 
+        return modelMap[questionType]?.updateOne({_id},{isPublish}) || null;
     }
 }
 module.exports = ExamService

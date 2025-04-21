@@ -184,8 +184,12 @@ const handelAddqe =()=> {
 }
 //查看题目列表
 const  checkListqe =()=>{
-    console.log("查看题目列表");
-
+    router.push({
+        path:`/exam/questionlist/${route.params.id}`,
+        query:{
+            questionType:questionType.value
+        }
+    })
 } 
 </script>
 

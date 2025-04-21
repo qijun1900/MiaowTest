@@ -1,3 +1,4 @@
+// 选择题模型 route.query.questionType ==1
 const mongoose = require('mongoose');
 const SelectSchema  = new mongoose.Schema({
     examId:String,

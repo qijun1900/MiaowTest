@@ -14,5 +14,8 @@ ExamRouter.post("/adminapi/exam/selectquestion",ExamController.AddSelectQuestion
 ExamRouter.post("/adminapi/exam/blankquestion",ExamController.AddBlankQuestion)//添加填空题
 ExamRouter.post("/adminapi/exam/judgequestion",ExamController.AddJudgeQuestion)//添加判断题
 ExamRouter.post("/adminapi/exam/shortquestion",ExamController.AddShortQuestionList)//添加简答题
+ExamRouter.get("/adminapi/exam/questionlist/:id",ExamController.getQuestionList)//获取不同类型的题目
+ExamRouter.post("/adminapi/exam/updatePublish",ExamController.updateoneQuestion)////更新单条发布状态
+
 
 module.exports = ExamRouter; 

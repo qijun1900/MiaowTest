@@ -1,3 +1,4 @@
+//  判断题模型 route.query.questionType ==3
 const mongoose = require('mongoose');
 const JudgeSchema  = new mongoose.Schema({
     examId:String,

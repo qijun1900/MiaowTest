@@ -18,7 +18,7 @@ import Blankquestion from '../components/Exam/BlankQu.vue'
 import Judgequestion from '../components/Exam/JudgeQu.vue'
 import Shortquestion from '../components/Exam/ShortQu.vue'
 import Otherquestion from '../components/Exam/OtherQu.vue'
-
+import QuestionList from '@/components/Exam/QuestionList.vue'
 
 const routes = [
     {
@@ -108,6 +108,10 @@ const routes = [
         path:'/exam/otherquestion/:id',
         component:Otherquestion,
      },
+     {
+        path:'/exam/questionlist/:id',
+        component:QuestionList,
+     }
 
 
 
