@@ -121,15 +121,28 @@ const ExamController ={
             data: result
         })
     },
-    updateoneQuestion:async(req,res)=>{
+    UpdateOneQuestion:async(req,res)=>{
         const {_id,isPublish} = req.body
-        const  questionType = req.query.questionType
-        await ExamService.updateoneQuestion({
-            _id, 
+        const questionType = req.query.questionType
+        await ExamService.UpdateOneQuestion({
+            _id,
+            isPublish:Number(isPublish),
+            questionType
+        })
+            
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
+    UpdateBatchQuestion:async(req,res)=>{
+        const {ids,isPublish} = req.body
+        const questionType = req.query.questionType
+        await ExamService.UpdateBatchQuestion({
+            ids,
             isPublish:Number(isPublish),
             questionType,
         })
-            
         res.send({
             code:200,
             ActionType:"OK",

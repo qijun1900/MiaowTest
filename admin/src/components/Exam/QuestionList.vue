@@ -34,10 +34,18 @@
           <span>{{ questionType(route.query.questionType) }}</span>
         </div>
       </template>
-      <el-table ref="multipleTableRef" :data="examQuestion" stripe  style="width: 100%"
+      <div class="table-search">
+        <el-input
+          v-model="tableSearchText"
+          placeholder="搜索表格题目"
+          clearable
+          style="width: 300px; margin-bottom: 20px"
+          :prefix-icon="Search"
+        />
+      </div>
+      <el-table ref="multipleTableRef" :data="filteredExamQuestion" stripe style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="selectable" width="55" />
-
         <el-table-column label="批量操作" width="120">
           <template #header>
             <el-button type="primary" size="small" @click="handleBatchPublish">
@@ -52,10 +60,23 @@
         <el-table-column prop="stem" label="题目" width="150" />
         <el-table-column label="答案" width="120">
           <template #default="scope">
-            {{ formatTime.getTime(scope.row.editTime) }}
+            <template v-if="route.query.questionType == 1">
+              {{ formatSelectAnswer(scope.row.options) }}
+            </template>
+            <template v-else-if="route.query.questionType == 2">
+              {{ formatFillAnswer(scope.row.options) }}
+            </template>
+            <template v-else-if="route.query.questionType == 3">
+              <el-tag :type="scope.row.answer == 1 ? 'success' : 'danger'">
+                {{ scope.row.answer === 1 ? '正确' : '错误' }}
+              </el-tag>
+            </template>
+            <template v-else-if="route.query.questionType == 4">
+              <el-tag type="info" @click="chekShortAnswer">查看答案</el-tag>
+            </template>
           </template>
         </el-table-column>
-        <el-table-column prop="" label="更新时间" with="120">
+        <el-table-column prop="" label="更新时间" with="100">
           <template #default="scope">
             {{ formatTime.getTime(scope.row.createdTime) }}
           </template>
@@ -104,6 +125,22 @@ const searchText = ref('')
 const visible = ref(false)
 const examQuestion = ref([])
 const selectedQuestions = ref([]) // 新增选中项存储
+const tableSearchText = ref('')
+
+
+//搜索功能
+const SearchexamStem = computed(() => {
+  return searchText.value ? examQuestion.value.filter(item => item.stem?.includes(searchText.value)) : []
+})
+// 处理表格搜索
+const filteredExamQuestion = computed(() => {
+  return tableSearchText.value
+    ? examQuestion.value.filter(item => 
+        item.stem?.toLowerCase().includes(tableSearchText.value.toLowerCase())
+      )
+    : examQuestion.value
+})
+
 
 // 处理选中项变化
 const handleSelectionChange = (rows) => {
@@ -122,10 +159,6 @@ onMounted(async () => {
 const handleBack = () => {
   router.back();
 };
-//搜索功能
-const SearchexamStem = computed(() => {
-  return searchText.value ? examQuestion.value.filter(item => item.stem?.includes(searchText.value)) : []
-})
 
 //卡片标题，问题的种类
 const questionType = (vale) => {
@@ -163,22 +196,48 @@ const handleSinglePublish = async (row) => {
     ElMessage.error('更新失败')
   }
 }
+//全部选择未发布的题目
+const selectable = (row) => {
+  return row.isPublish !== 1
+}
 // 批量发布
 const handleBatchPublish = async () => {
   try {
     await axios.post('/adminapi/exam/batchPublish', {
       ids: selectedQuestions.value.map(item => item._id),
       isPublish: 1
+    },{
+      params: {  
+        questionType: route.query.questionType
+      }
     })
     // 更新本地数据
     selectedQuestions.value.forEach(item => item.isPublish = 1)
     ElMessage.success('批量发布成功')
   } catch (error) {
-    ElMessage.error('发布失败')
+    ElMessage.error('批量发布失败')
   }
 }
+// 格式化选择题答案
+const formatSelectAnswer = (options) => {
+  return options
+    .map((opt, index) => ({ opt, index }))  // 保留原始索引
+    .filter(item => item.opt.isCorrect)     // 筛选正确选项
+    .map(item => String.fromCharCode(65 + item.index)) // 转字母
+    .join(', ');                            // 逗号分隔
+};
 
+// 格式化填空题答案 
+const formatFillAnswer = (options) => {
+  return options
+    .map(opt => opt.content)  // 提取内容
+    .join(', ');              // 逗号连接
+};
 
+// 点击查看简答题答案
+const chekShortAnswer = () => {
+  ElMessage.info('简答题答案为：' + '这是一个示例答案')
+}
 </script>
 <style scoped>
 :deep(.el-page-header__content) {

@@ -153,7 +153,6 @@ const router = useRouter();
 const examinfo = ref([])
 const questionType = ref(route.query.questionType) // 获取传递的index参数，默认为0
 
-//可以根据questionType.value来显示不同的题目类型
 //向后端请求数据加载数据
 const getData = async () => {
     const res = await axios.get(`/adminapi/exam/list/${route.params.id}`)
@@ -162,8 +161,6 @@ const getData = async () => {
 
 onMounted(() => {
     getData()
-    console.log("@@@index",questionType.value);
-    console.log("@@@ID",route.params.id);
 });
 // 添加返回方法
 const handleBack = () => {

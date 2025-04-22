@@ -74,11 +74,11 @@ const ExamService ={
             createdTime
         }) 
     },
-    AddShortQuestionList :async({examId,stem,answer,isPublish,analysis,isAIanswer,createdTime})=>{
+    AddShortQuestionList :async({examId,stem,content,isPublish,analysis,isAIanswer,createdTime})=>{
         return ExamShortModel.create({
             examId,
             stem,
-            answer, 
+            content, 
             isPublish,
             analysis,
             isAIanswer,
@@ -94,7 +94,7 @@ const ExamService ={
         };
         return modelMap[questionType]?.find({examId}) || null;
     },
-    updateoneQuestion:async({_id,isPublish,questionType})=>{
+    UpdateOneQuestion:async({_id,isPublish,questionType})=>{
         const modelMap = {
             1: ExamSelectModel,
             2: ExamBlankModel,
@@ -102,6 +102,15 @@ const ExamService ={
             4: ExamShortModel
         }; 
         return modelMap[questionType]?.updateOne({_id},{isPublish}) || null;
+    },
+    UpdateBatchQuestion:async({ids,isPublish,questionType})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        return modelMap[questionType]?.updateMany({_id: {$in: ids}},{isPublish}) || null;
     }
 }
 module.exports = ExamService
