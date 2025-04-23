@@ -137,7 +137,7 @@ const ExamController ={
     },
     UpdateBatchQuestion:async(req,res)=>{
         const {ids,isPublish} = req.body
-        const questionType = req.query.questionType
+        const questionType = Number(req.query.questionType)
         await ExamService.UpdateBatchQuestion({
             ids,
             isPublish:Number(isPublish),
@@ -147,6 +147,31 @@ const ExamController ={
             code:200,
             ActionType:"OK",
         })
+    },
+    DeleteQuestion:async(req,res)=>{
+        const questionType = Number(req.query.questionType)
+        await ExamService.DeleteQuestion({
+            _id: req.params.id,
+            questionType
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
+    getQuestionInfo:async(req,res)=>{
+        const questionType = Number(req.query.questionType)
+        console.log(req.params.id,questionType)
+        const result = await ExamService.getQuestionInfo({
+            _id:req.params.id,
+            questionType}) 
+        res.send({
+            code:200,
+            ActionType:"OK",
+            data:result, 
+        })
     }
+  
+
 }
 module.exports = ExamController

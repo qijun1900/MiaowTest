@@ -111,6 +111,25 @@ const ExamService ={
             4: ExamShortModel
         };
         return modelMap[questionType]?.updateMany({_id: {$in: ids}},{isPublish}) || null;
+    },
+    DeleteQuestion:async({_id,questionType})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        return modelMap[questionType]?.deleteOne({_id}) || null;
+    },
+    getQuestionInfo:async({_id,questionType})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        }; 
+        return modelMap[questionType]?.find({_id}) || null;
     }
+    
 }
 module.exports = ExamService

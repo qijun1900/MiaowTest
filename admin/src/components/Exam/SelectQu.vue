@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-page-header @back="handleBack" title="题目面板" class="page-header">
+    <el-page-header @back="handleBack" title="题目面板" class="page-header" v-show="!props.questionId">
       <template #content>
         <div class="flex items-center">
           <el-icon class="mr-2">
@@ -130,10 +130,25 @@ const removeOption = (index) => {
     form.options.splice(index, 1);
   }
 };
-
-onMounted(()=>{
-    console.log("@@@ID",route.params.id);
+const props = defineProps({
+  questionId: String
 })
+
+onMounted(async() => {
+    if(props.questionId){
+      const res = await axios.get(`/adminapi/exam/whichOneQuestion/${props.questionId}`,{
+        params: {  
+        questionType: route.query.questionType
+      }
+      })
+      const data = res.data.data
+      form.stem = data.stem
+      form.options = data.options
+      form.analysis = data.analysis
+      form.isAIanswer = data.isAIanswer
+      console.log(res.data.data)
+    } 
+  })
 // 返回上一页
 const handleBack = () => {
   router.back();

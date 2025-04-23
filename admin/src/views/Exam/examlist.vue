@@ -73,7 +73,7 @@
             <div class="info-item">
               <div style="display: inline-block" class="text-warning">
                 <el-icon><PriceTag /></el-icon>
-                题目类型:
+                添加或查看题目:
               </div>
               <div style="margin-top: 8px; min-height:96px">
                 <el-check-tag 
@@ -112,7 +112,6 @@ const hoverImage = ref(null)
 onMounted(async () => {
   const res = await axios.get("/adminapi/exam/list")
   examList.value = res.data.data
-  console.log(examList.value)
 })
 
 //搜索功能

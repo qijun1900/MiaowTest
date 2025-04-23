@@ -168,7 +168,6 @@ const handleBack = () => {
 }
 //添加题目方法
 const handelAddqe =()=> {
-    console.log("添加题目");
     const routeNames = [
     'selectquestion',
     'blankquestion',

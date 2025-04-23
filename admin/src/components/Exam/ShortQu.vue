@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-page-header @back="handleBack" title="题目面板" class="page-header">
+        <el-page-header @back="handleBack" title="题目面板" class="page-header" v-show="!props.questionId">
         <template #content>
           <div class="flex items-center">
             <el-icon class="mr-2">
@@ -72,23 +72,45 @@
     </div>
 </template>
 <script setup>
-  import { DocumentAdd, Checked } from '@element-plus/icons-vue'; // 移除未使用的图标
-  import { reactive, ref } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import { ElMessage } from 'element-plus';
-  import axios from 'axios';
-  import editor from '@/components/editor/Editor.vue'
-  
-  const router = useRouter();
-  const route = useRoute();
-  const formRef = ref();
-  const form = reactive({
-    stem: '',
-    content:"",
-    isPublish: 0,
-    analysis: '',
-    isAIanswer: 0,
-  });
+import { DocumentAdd, Checked } from '@element-plus/icons-vue'; // 移除未使用的图标
+import { reactive, ref ,onMounted} from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import axios from 'axios';
+import editor from '@/components/editor/Editor.vue'
+
+const router = useRouter();
+const route = useRoute();
+const formRef = ref();
+const form = reactive({
+  stem: '',
+  content:"",
+  isPublish: 0,
+  analysis: '',
+  isAIanswer: 0,
+});
+const props = defineProps({
+  questionId: String
+})
+
+onMounted(async() => {
+    if(props.questionId){
+      const res = await axios.get(`/adminapi/exam/whichOneQuestion/${props.questionId}`,{
+        params: {  
+        questionType: route.query.questionType
+      }
+      })
+      const data = res.data.data
+      form.stem = data.stem
+      form.content = data.content
+      form.analysis = data.analysis
+      form.isAIanswer = data.isAIanswer
+      console.log(res.data.data)
+    }
+      
+  })
+
+
 // 返回上一页
 const handleBack = () => {
   router.back();

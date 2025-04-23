@@ -6,8 +6,8 @@ const upload = multer({ dest: 'public/examcoveruploads/' })
 
 //涉及文件上传
 ExamRouter.post('/adminapi/exam/add',upload.single('file'),ExamController.add)//添加
-ExamRouter.get('/adminapi/exam/list',ExamController.getexamList)//获取多个
-ExamRouter.get('/adminapi/exam/list/:id',ExamController.getexamList)//获取单个
+ExamRouter.get('/adminapi/exam/list',ExamController.getexamList)//获取多个考试
+ExamRouter.get('/adminapi/exam/list/:id',ExamController.getexamList)//获取单个考试
 ExamRouter.post("/adminapi/exam/update",upload.single('file'),ExamController.updateInfo)//更新
 ExamRouter.delete("/adminapi/exam/list/:id",ExamController.deleteInfo)//删除
 ExamRouter.post("/adminapi/exam/selectquestion",ExamController.AddSelectQuestion)//添加选择题
@@ -17,5 +17,9 @@ ExamRouter.post("/adminapi/exam/shortquestion",ExamController.AddShortQuestionLi
 ExamRouter.get("/adminapi/exam/questionlist/:id",ExamController.getQuestionList)//获取不同类型的所有题目
 ExamRouter.post("/adminapi/exam/updatePublish",ExamController.UpdateOneQuestion)//更新单条发布状态
 ExamRouter.post("/adminapi/exam/batchPublish",ExamController.UpdateBatchQuestion)//更新多条发布状态
+ExamRouter.delete("/adminapi/exam/deletequestion/:id",ExamController.DeleteQuestion)//删除题目
+ExamRouter.get("/adminapi/exam/whichOneQuestion/:id",ExamController.getQuestionInfo)//获取题目信息
+
+
 
 module.exports = ExamRouter; 

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-      <el-page-header @back="handleBack" title="题目面板" class="page-header">
+      <el-page-header @back="handleBack" title="题目面板" class="page-header"  v-show="!props.questionId">
         <template #content>
           <div class="flex items-center">
             <el-icon class="mr-2">
@@ -37,7 +37,7 @@
             <el-col :span="24">
               <el-form-item
                 prop="answer"
-                :rules="[{ required: true, message: '请选择正确答案', trigger: 'change' }]">
+                :rules="[{ required: true, message: '请选择正确答案', trigger: 'blur' }]">
                 <el-radio-group v-model="form.answer">
                     <div>
                         <el-radio :value="1" size="large">正确</el-radio>
@@ -80,7 +80,7 @@
   
   <script setup>
   import { DocumentAdd, Checked } from '@element-plus/icons-vue'; // 移除未使用的图标
-  import { reactive, ref } from 'vue';
+  import { reactive, ref ,onMounted} from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { ElMessage } from 'element-plus';
   import axios from 'axios';
@@ -99,7 +99,31 @@
 const handleBack = () => {
   router.back();
 };
+
+const props = defineProps({
+  questionId: String
+})
   
+onMounted(async() => {
+    if(props.questionId){
+      const res = await axios.get(`/adminapi/exam/whichOneQuestion/${props.questionId}`,{
+        params: {  
+        questionType: route.query.questionType
+      }
+      })
+      const data = res.data.data
+      form.stem = data.stem
+      form.answer = data.answer
+      form.analysis = data.analysis
+      form.isAIanswer = data.isAIanswer
+      console.log(res.data.data)
+    }
+      
+  })
+
+
+
+
   const submitForm = async () => {
     formRef.value.validate(async(valid) => {
       if(valid){

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-      <el-page-header @back="handleBack" title="题目面板" class="page-header">
+      <el-page-header @back="handleBack" title="题目面板" class="page-header" v-show="!props.questionId">
         <template #content>
           <div class="flex items-center">
             <el-icon class="mr-2">
@@ -95,40 +95,63 @@
       <el-backtop :right="100" :bottom="100" />
     </div>
   </template>
-  
-  <script setup>
-  import { DocumentAdd, CirclePlusFilled, Checked, Delete } from '@element-plus/icons-vue';
-  import { onMounted, reactive, ref } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import { ElMessage } from 'element-plus';
-  import axios from 'axios';
-  
-  const router = useRouter();
-  const route = useRoute();
-  const formRef = ref();
-  const form = reactive({
-    stem: '',
-    options: [
-        { content:"" },
-    ],
-    isPublish:0,//0:未发布，1：发布
-    analysis:'', // 题目解析/答案解释
-    isAIanswer:0,//0:不是，1：是
-  });
+
+<script setup>
+import { DocumentAdd, CirclePlusFilled, Checked, Delete } from '@element-plus/icons-vue';
+import { onMounted, reactive, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import axios from 'axios';
+
+const router = useRouter();
+const route = useRoute();
+const formRef = ref();
+const form = reactive({
+  stem: '',
+  options: [
+      { content:"" },
+  ],
+  isPublish:0,//0:未发布，1：发布
+  analysis:'', // 题目解析/答案解释
+  isAIanswer:0,//0:不是，1：是
+});
   // 添加选项
-  const addOption = () => {
+const addOption = () => {
     form.options.push({ content: ''});
   };
   
-  const removeOption = (index) => {
+const removeOption = (index) => {
     if (form.options.length > 1) {
       form.options.splice(index, 1);
     }
-  };
+};
+const props = defineProps({
+  questionId: String
+})
+
+
   // 返回上一页
   const handleBack = () => {
     router.back();
   };
+
+  onMounted(async() => {
+    if(props.questionId){
+      const res = await axios.get(`/adminapi/exam/whichOneQuestion/${props.questionId}`,{
+        params: {  
+        questionType: route.query.questionType
+      }
+      })
+      const data = res.data.data
+      form.stem = data.stem
+      form.options = data.options
+      form.analysis = data.analysis
+      form.isAIanswer = data.isAIanswer
+      console.log(res.data.data)
+    }
+      
+  })
+
   // 向后端提交表单
   const submitForm = async () => {
       formRef.value.validate(async(valid)=>{
