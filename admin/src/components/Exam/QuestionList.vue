@@ -164,6 +164,7 @@
         <el-button type="primary" @click="dialogVisible = false" class="close-btn">关闭</el-button>
       </template>
     </el-dialog>
+    <el-backtop :right="100" :bottom="100" />
   </div>
 </template>
 

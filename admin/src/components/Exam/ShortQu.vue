@@ -6,7 +6,7 @@
             <el-icon class="mr-2">
               <DocumentAdd />
             </el-icon>
-            <span class="text-xl font-bold">添加判断类题</span>
+            <span class="text-xl font-bold">添加简答类题</span>
           </div>
         </template>
       </el-page-header>
@@ -38,7 +38,8 @@
                 <el-form-item 
                     prop="content"
                     :rules="[{ required: true, message: '答案不能为空', trigger: 'blur' }]">
-                    <editor @event="handlechange" :content="form.content" />
+                    <editor @event="handlechange" :content="form.content"  v-if="form.content"/>
+                    <editor @event="handlechange" :content="form.content"  v-else/>
                 </el-form-item>
             </el-col>
           </el-row>
@@ -49,7 +50,7 @@
                   type="success" 
                   @click="submitForm"
                   :icon="Checked">
-                  提交题目
+                  {{ props.questionId? '更新题目' : '添加题目' }}
                 </el-button>
             </el-col>
           </el-row>
@@ -92,60 +93,69 @@ const form = reactive({
 const props = defineProps({
   questionId: String
 })
-
-onMounted(async() => {
-    if(props.questionId){
-      const res = await axios.get(`/adminapi/exam/whichOneQuestion/${props.questionId}`,{
-        params: {  
-        questionType: route.query.questionType
-      }
-      })
-      const data = res.data.data
-      form.stem = data.stem
-      form.content = data.content
-      form.analysis = data.analysis
-      form.isAIanswer = data.isAIanswer
-      console.log(res.data.data)
-    }
-      
-  })
-
-
-// 返回上一页
-const handleBack = () => {
-  router.back();
-};
 //editor内容改变的回调
 const handlechange = (data)=>{
     form.content = data
 }
+// 返回上一页
+const handleBack = () => {
+  router.back();
+};
 
-  const submitForm = async () => {
-    formRef.value.validate(async(valid) => {
-      if(valid){
-        const payload = {
-          examId: route.params.id,
-          stem: form.stem,
-          content: form.content,
-          isPublish: 0,
-          analysis: form.analysis,
-          isAIanswer: form.isAIanswer,
-        };
-        const res = await axios.post('/adminapi/exam/shortquestion', payload); 
-        console.log(payload)
-        console.log("@@@",res);
-        if(res.data.code  === 200) {
-        ElMessage.success('题目提交成功');
-        // 重置表单
-            form.stem = '';
-            form.content = '';
-            form.analysis = '';
-            form.isAIanswer = 0;
-        } else {
-        ElMessage.error('提交失败');
-        }
-    }
+onMounted(async() => {
+    if(props.questionId){
+      try{
+        const res = await axios.get(`/adminapi/exam/whichOneQuestion/${props.questionId}`,{
+          params: {
+            questionType: route.query.questionType 
+          } 
+        }) 
+        const data = res.data.data[0]
+        console.log(data)
+        Object.assign(form,data)
+      }
+      catch(error){
+        console.error(ElMessage.error('获取题目详情失败')); 
+      }
+    }  
   })
+// 根据props 更新或者添加问题，向后端提交表单
+const submitForm = async () => {
+  try {
+    const valid = await formRef.value.validate()
+    if(!valid) return
+    
+    const payload = {
+      examId: route.params.id,
+      stem: form.stem,
+      content: form.content,
+      isPublish: 0,
+      analysis: form.analysis,
+      isAIanswer: form.isAIanswer,
+    };
+    
+    const url = props.questionId
+      ? `/adminapi/exam/shortquestionUpdate/${props.questionId}`
+      : '/adminapi/exam/shortquestion'
+    const res = await axios.post(url, payload)
+
+    if(res.data.code === 200) {
+      ElMessage.success(props.questionId ? '题目更新成功' : '题目提交成功')
+      if(!props.questionId) {
+        form.stem = '';
+        form.content = '';
+        form.analysis = '';
+        form.isAIanswer = 0;
+      }else{
+        router.back()
+      }
+    } else {
+      ElMessage.error(res.data.message || '操作失败')
+    }
+  } catch(error) {
+    console.error('提交失败:', error);
+    ElMessage.error(error.response?.data?.message || '提交失败，请稍后重试')
+  }
 };
   </script>
   

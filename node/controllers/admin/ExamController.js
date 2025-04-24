@@ -161,7 +161,6 @@ const ExamController ={
     },
     getQuestionInfo:async(req,res)=>{
         const questionType = Number(req.query.questionType)
-        console.log(req.params.id,questionType)
         const result = await ExamService.getQuestionInfo({
             _id:req.params.id,
             questionType}) 
@@ -170,8 +169,75 @@ const ExamController ={
             ActionType:"OK",
             data:result, 
         })
-    }
-  
+    },
+    UpdateSelectQuestion:async(req,res)=>{
+        const _id = req.params.id
+        const {stem,options,isPublish,analysis,isAIanswer} = req.body
+        await ExamService.UpdateSelectQuestion({
+            _id,
+            stem,
+            options,
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date(),
+        }) 
+        res.send({
+            code:200,
+            ActionType:"OK", 
+        })
+    },
+    UpdateBlankQuestion:async(req,res)=>{
+        const _id = req.params.id
+        const {stem,options,isPublish,analysis,isAIanswer} = req.body
+        await ExamService.UpdateBlankQuestion({
+            _id,
+            stem,
+            options, 
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date(),
+        })
+        res.send({
+            code:200,
+            ActionType:"OK", 
+        })
+    },
+    UpdateJudgeQuestion:async(req,res)=>{
+        const _id = req.params.id
+        const {stem,answer,isPublish,analysis,isAIanswer} = req.body
+        await ExamService.UpdateJudgeQuestion({
+            _id,
+            stem,
+            answer:Number(answer), 
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date(),  
+        })
+        res.send({
+            code:200,
+            ActionType:"OK", 
+        })
+    },
+    UpdateShortQuestionList:async(req,res)=>{
+        const _id = req.params.id
+        const {stem,content,isPublish,analysis,isAIanswer} = req.body
+        await ExamService.UpdateShortQuestionList({
+            _id,
+            stem,
+            content,
+            isPublish:Number(isPublish),
+            analysis,
+            isAIanswer:Number(isAIanswer),
+            createdTime:new Date(),
+        })
+        res.send({
+            code:200,
+            ActionType:"OK", 
+        })
+    },
 
 }
 module.exports = ExamController

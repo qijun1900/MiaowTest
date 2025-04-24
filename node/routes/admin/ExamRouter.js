@@ -19,7 +19,9 @@ ExamRouter.post("/adminapi/exam/updatePublish",ExamController.UpdateOneQuestion)
 ExamRouter.post("/adminapi/exam/batchPublish",ExamController.UpdateBatchQuestion)//更新多条发布状态
 ExamRouter.delete("/adminapi/exam/deletequestion/:id",ExamController.DeleteQuestion)//删除题目
 ExamRouter.get("/adminapi/exam/whichOneQuestion/:id",ExamController.getQuestionInfo)//获取题目信息
-
-
+ExamRouter.post("/adminapi/exam/selectquestionUpdate/:id",ExamController.UpdateSelectQuestion)//更新选择题
+ExamRouter.post("/adminapi/exam/blankquestionUpdate/:id",ExamController.UpdateBlankQuestion)//更新填空题
+ExamRouter.post("/adminapi/exam/judgequestionUpdate/:id",ExamController.UpdateJudgeQuestion)//更新判断题
+ExamRouter.post("/adminapi/exam/shortquestionUpdate/:id",ExamController.UpdateShortQuestionList)//更新简答题
 
 module.exports = ExamRouter; 

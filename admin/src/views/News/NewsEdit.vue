@@ -107,8 +107,6 @@ const newsFormrules = reactive({
 })
 //editor内容改变的回调
 const handlechange = (data)=>{
-    //console.log(data)
-
     newsForm.content = data
 }
 //类别选择字段

@@ -129,7 +129,49 @@ const ExamService ={
             4: ExamShortModel
         }; 
         return modelMap[questionType]?.find({_id}) || null;
-    }
+    },
+    UpdateSelectQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
+        return ExamSelectModel.updateOne({_id},{
+            stem,
+            options,
+            isPublish, 
+            analysis,
+            isAIanswer,
+            createdTime
+        }) 
+    },
+    UpdateBlankQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
+        return ExamBlankModel.updateOne({_id},{
+            stem,
+            options,
+            isPublish, 
+            analysis,
+            isAIanswer,
+            createdTime
+        }) 
+    },
+    UpdateJudgeQuestion:async({_id,stem,answer,isPublish,analysis,isAIanswer,createdTime})=>{
+        return ExamJudgeModel.updateOne({_id},{
+            stem,
+            answer,
+            isPublish, 
+            analysis,
+            isAIanswer,
+            createdTime
+        }) 
+    },
+    UpdateShortQuestionList:async({_id,stem,content,isPublish,analysis,isAIanswer,createdTime})=>{
+        return ExamShortModel.updateOne({_id},{
+            stem,
+            content,
+            isPublish, 
+            analysis,
+            isAIanswer,
+            createdTime,
+        }) 
+    },
+    
+
     
 }
 module.exports = ExamService

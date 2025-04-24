@@ -116,7 +116,7 @@ const routes = [
      {
         path: '/exam/:id/edit/:questionId',
         component: QuestionEdit,
-        props: true
+        props: true// 传递路由参数
       }
 
 
