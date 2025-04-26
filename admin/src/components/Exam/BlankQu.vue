@@ -142,7 +142,7 @@ onMounted(async() => {
           questionType: route.query.questionType
         }
         })
-        const data = res.data.data[0]//   单一数据我们取第一个元素
+        const data = res.data.data[0]//单一数据我们取第一个元素
         form.stem = data.stem
         form.options = (data.options || []).map(opt => ({ content: opt.content || opt }))
         form.analysis = data.analysis || ''

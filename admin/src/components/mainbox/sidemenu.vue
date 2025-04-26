@@ -33,15 +33,6 @@
             <el-menu-item index="/new/newslist">信息列表</el-menu-item>
         </el-sub-menu>
          
-        <el-sub-menu index="/product-manage ">
-          <template #title>
-            <el-icon><Reading/></el-icon>
-            <span>XX管理</span>
-          </template>
-            <el-menu-item index="/product/productadd">添加XX</el-menu-item>
-            <el-menu-item index="/product/productlist">产品XX</el-menu-item>
-        </el-sub-menu> 
-
         <el-sub-menu index="/exam-manage ">
           <template #title>
             <el-icon><DocumentRemove/></el-icon>
@@ -57,7 +48,7 @@
 
 <script setup>
 import { useStore } from 'vuex';
-import {HomeFilled,Avatar,UserFilled,MessageBox,Reading,DocumentRemove} from '@element-plus/icons-vue'
+import {HomeFilled,Avatar,UserFilled,MessageBox,DocumentRemove} from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
 
 const router  =useRoute()

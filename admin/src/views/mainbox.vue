@@ -9,7 +9,6 @@
       </el-container>
     </el-container>
 </template>
- 
 <script setup>
 import topheader from '@/components/mainbox/topheader.vue';
 import sidemenu from '@/components/mainbox/sidemenu.vue';

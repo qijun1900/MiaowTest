@@ -20,6 +20,7 @@ import Shortquestion from '../components/Exam/ShortQu.vue'
 import Otherquestion from '../components/Exam/OtherQu.vue'
 import QuestionList from '@/components/Exam/QuestionList.vue'
 import QuestionEdit from '@/components/Exam/QuestionEdit.vue'
+import CreateExam from '@/views/Exam/CreateExam.vue'
 
 const routes = [
     {
@@ -117,6 +118,10 @@ const routes = [
         path: '/exam/:id/edit/:questionId',
         component: QuestionEdit,
         props: true// 传递路由参数
+      },
+      {
+        path: '/exam/createExam/:id',
+        component: CreateExam, 
       }
 
 

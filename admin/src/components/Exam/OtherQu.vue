@@ -10,7 +10,7 @@
           </div>
         </template>
       </el-page-header>
-        如果遇到不可添加的题目,请联系管理员18756810208。
+        如果遇到不可添加的题目,请联系管理员18756810208/微信同号。
     </div>
 </template>
 <script setup>

@@ -66,6 +66,9 @@
                       <span class="text-info">更新时间:</span><br>
                       <span class="text-purple-500">{{formatTime.getTime(item.createdTime) }}</span>
                     </div>
+                    <div>
+                      <el-button type="success" :icon="Check" @click="CreateExam(item)">创建题库</el-button>
+                    </div>
                   </div>
                 </el-card>
               </el-col>
@@ -94,7 +97,7 @@
   <el-backtop :right="100" :bottom="100" />
 </template>
 <script setup>
-import { Search, Collection, Document, PriceTag,Timer, Histogram, Edit } from '@element-plus/icons-vue'
+import { Search, Collection, Document, PriceTag,Timer, Histogram, Edit ,Check} from '@element-plus/icons-vue'
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -106,7 +109,6 @@ const visible = ref(false)
 const examList = ref([])
 const router = useRouter()
 const hoverImage = ref(null)
-
 
 //后端api，获取科目列表   
 onMounted(async () => {
@@ -146,6 +148,13 @@ const handelquestion = (value, id) => {
   router.push({
     path: `/exam/questionpnael/${id}`,
     query: { questionType: value }
+  })
+}
+//题库创建跳转
+const CreateExam = (item) => {
+  router.push({
+    path: `/exam/createexam/${item._id}`,
+    query: {examData: JSON.stringify(item)}
   })
 }
 
@@ -211,7 +220,7 @@ const handelquestion = (value, id) => {
   border-radius: 15px;
 }
 .card-info{
-  border-radius: 1px;
+  border-radius: 9px;
 }
 
 .exam-row {
@@ -254,11 +263,15 @@ const handelquestion = (value, id) => {
 }
 
 .examinfo {
-  height: 100%;
+  height: 86%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 16px;
+  padding: 13px;
+}
+.el-button{
+  border-radius: 6px;
+  margin-top: 2px;
 }
 
 /* 修改标签样式 */

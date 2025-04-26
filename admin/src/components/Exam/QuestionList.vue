@@ -18,12 +18,23 @@
             :prefix-icon="Search" type="search" @input="visible = true" @blur="visible = false" />
         </template>
         <div v-if="SearchexamStem.length" class="search-results">
-          <div v-for="data in SearchexamStem" :key="data._id" class="result-item" @click="handleDetail(data._id)">
-            {{data.stem}}
+          <div 
+            v-for="data in SearchexamStem" 
+            :key="data._id" 
+            class="result-item" 
+            @click="handleEdit(data)"
+            @mouseenter="hoverIndex = data._id"
+            @mouseleave="hoverIndex = null"
+            :class="{ 'hover-item': hoverIndex === data._id }"
+          >
+            <div class="result-content">
+              <el-icon class="result-icon"><Document /></el-icon>
+              <span class="result-text">{{ data.stem }}</span>
+            </div>
           </div>
         </div>
         <div v-else>
-          <el-empty description="空空如也" :image-size="50" />
+          <el-empty description="暂无搜索结果" :image-size="50" />
         </div>
       </el-popover>
     </div>
@@ -171,7 +182,7 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { List, Search, Star, Edit, Delete } from '@element-plus/icons-vue';
+import { List, Search, Star, Edit, Delete,Document } from '@element-plus/icons-vue';
 import axios from 'axios';
 import formatTime from '@/util/formatTime'
 import { ElMessage } from 'element-plus';
@@ -449,4 +460,57 @@ const handleEdit = (item) => {
 .close-btn {
   width: 100px;
 }
+.search-results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.result-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hover-item {
+  background-color: #f5f7fa;
+  transform: translateX(2px);
+}
+
+.result-content {
+  display: flex;
+  align-items: center;
+}
+
+.result-icon {
+  margin-right: 10px;
+  color: #409eff;
+}
+
+.result-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  color: #606266;
+}
+
+/* 滚动条样式 */
+.search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 3px;
+}
+
+.search-results::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
 </style>
+
+
+

@@ -85,14 +85,18 @@ const ExamService ={
             createdTime
         }) 
     },
-    getQuestionList:async({examId,questionType})=>{
+    getQuestionList:async({examId,questionType,isPublish})=>{
         const modelMap = {
             1: ExamSelectModel,
             2: ExamBlankModel,
             3: ExamJudgeModel,
             4: ExamShortModel
         };
-        return modelMap[questionType]?.find({examId}) || null;
+        if(isPublish){
+            return modelMap[questionType]?.find({examId,isPublish}) || null;
+        }else{
+            return modelMap[questionType]?.find({examId}) || null;
+        }
     },
     UpdateOneQuestion:async({_id,isPublish,questionType})=>{
         const modelMap = {

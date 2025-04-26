@@ -4,7 +4,7 @@
             <template #content>
                 <div class="flex items-center">
                     <el-icon><SetUp /></el-icon>
-                    <span class="text-xl font-bold">考试题目编辑</span>
+                    <span class="text-xl font-bold">题目面板</span>
                 </div>
             </template>
         </el-page-header>
@@ -50,7 +50,7 @@
                                 <el-card shadow="hover" style="max-width: 480px">
                                     <el-statistic 
                                         title="已发布题目数量" 
-                                        :value="268500"
+                                        :value="PublishedQuestionNumber"
                                         class="statistic-card">
                                         <template #prefix>
                                             <el-icon class="statistic-icon" color="#67C23A">
@@ -64,7 +64,7 @@
                                 <el-card shadow="hover">
                                     <el-statistic 
                                         title="已添加题目数量" 
-                                        :value="268500"
+                                        :value="QuestionNumber"
                                         class="statistic-card">
                                         <template #prefix>
                                             <el-icon class="statistic-icon" color="#409EFF">
@@ -146,22 +146,54 @@ import { useRoute,useRouter } from 'vue-router';
 import axios from 'axios';
 import{Collection,Document,Timer,CirclePlusFilled,List,Histogram ,TrendCharts,SetUp} from '@element-plus/icons-vue'
 import formatTime from '@/util/formatTime';
+import { ElMessage } from 'element-plus';
 
 
 const route = useRoute();
 const router = useRouter();
 const examinfo = ref([])
-const questionType = ref(route.query.questionType) // 获取传递的index参数，默认为0
+const questionType = ref(route.query.questionType)
+const QuestionNumber = ref(0)
+const PublishedQuestionNumber = ref(0)  // 更清晰的命名
 
-//向后端请求数据加载数据
+onMounted(() => {
+  getData()
+  fetchQuestionCounts()  // 替换原来的两个调用
+})
+
+// 获取题目数量的函数
+const fetchQuestionCounts = async () => {
+  try {
+    // 获取已发布题目数量
+    const [publishedRes, totalRes] = await Promise.all([
+      axios.get(`/adminapi/exam/questionlist/${route.params.id}`, {
+        params: {
+          questionType: route.query.questionType,
+          isPublish: 1
+        }
+      }),
+      axios.get(`/adminapi/exam/questionlist/${route.params.id}`, {
+        params: {
+          questionType: route.query.questionType
+        }
+      })
+    ])
+    
+    PublishedQuestionNumber.value = publishedRes.data.data.length
+    QuestionNumber.value = totalRes.data.data.length
+  } catch (error) {
+    console.error('获取题目数量失败:', error)
+    ElMessage.error('获取题目数量失败')
+  }
+}
+
+
+//向后端请求数据加载考试科目信息数据
 const getData = async () => {
     const res = await axios.get(`/adminapi/exam/list/${route.params.id}`)
     examinfo.value = res.data.data[0]
 }
 
-onMounted(() => {
-    getData()
-});
 // 添加返回方法
 const handleBack = () => {
     router.back()

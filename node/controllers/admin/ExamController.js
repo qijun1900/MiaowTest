@@ -115,7 +115,11 @@ const ExamController ={
         })
     },
     getQuestionList:async(req,res)=>{
-        const result = await ExamService.getQuestionList({examId:req.params.id,questionType:req.query.questionType})
+        const result = await ExamService.getQuestionList({
+            examId:req.params.id,
+            questionType:req.query.questionType,
+            isPublish:req.query.isPublish
+        })
         res.send({
             ActionType: "OK",
             data: result
