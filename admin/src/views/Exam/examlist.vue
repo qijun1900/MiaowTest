@@ -67,7 +67,7 @@
                       <span class="text-purple-500">{{formatTime.getTime(item.createdTime) }}</span>
                     </div>
                     <div>
-                      <el-button type="success" :icon="Check" @click="CreateExam(item)">创建题库</el-button>
+                      <el-button type="success" :icon="Check" @click="CreateExam(item)">创建考试</el-button>
                     </div>
                   </div>
                 </el-card>
@@ -103,6 +103,7 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 import formatTime from '@/util/formatTime'
 import escconfig  from '@/config/esc.config';
+
 
 const searchText = ref('')
 const visible = ref(false)
@@ -154,7 +155,8 @@ const handelquestion = (value, id) => {
 const CreateExam = (item) => {
   router.push({
     path: `/exam/createexam/${item._id}`,
-    query: {examData: JSON.stringify(item)}
+    query: {examData: JSON.stringify(item)},
+    
   })
 }
 

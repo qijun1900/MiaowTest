@@ -2,9 +2,9 @@
     <div>
         <el-page-header @back="handleBack" title="考试列表">
             <template #content>
-                <div class="flex items-center">
+                <div>
                     <el-icon><SetUp /></el-icon>
-                    <span class="text-xl font-bold">题目面板</span>
+                    <span>题目面板</span>
                 </div>
             </template>
         </el-page-header>

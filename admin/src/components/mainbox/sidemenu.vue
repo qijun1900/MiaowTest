@@ -38,8 +38,8 @@
             <el-icon><DocumentRemove/></el-icon>
             <span>考试管理</span>
           </template>
-            <el-menu-item index="/exam/addexam">添加科目</el-menu-item>
-            <el-menu-item index="/exam/examlist">科目列表</el-menu-item>
+            <el-menu-item index="/exam/addexam">添加考试科目</el-menu-item>
+            <el-menu-item index="/exam/examlist">考试科目列表</el-menu-item>
         </el-sub-menu> 
         
         </el-menu>
