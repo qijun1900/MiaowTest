@@ -106,6 +106,9 @@
       </el-col>
       <el-col :span="14">
         <el-card shadow="hover">
+            <div>
+              
+            </div>
         </el-card>
       </el-col>
     </el-row>
