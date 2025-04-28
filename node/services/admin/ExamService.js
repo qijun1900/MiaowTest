@@ -4,6 +4,7 @@ const ExamBlankModel =require('../../models/BlankModel')
 const ExamJudgeModel =require('../../models/JudgeModel')
 const ExamShortModel =require('../../models/ShortModel')
 const  UserExamModel = require('../../models/UserExamModel')
+
 const ExamService ={
     add:async({name,code,category,year,isPublish,cover,createdTime})=>{
         return ExamModel.create({
@@ -176,8 +177,16 @@ const ExamService ={
         }) 
     },
     UpdateExamStatus:async({examId,isPublish})=>{
-        return ExamModel.updateOne({_id: examId},{isPublish}) // 修改查询字段为_id: examId
-    } ,
+        const [examUpdate, userExamUpdate] = await Promise.all([
+            ExamModel.updateOne({_id: examId}, {isPublish}),
+            UserExamModel.updateOne({examId}, {isPublish})
+        ]);
+        
+        return {
+            matchedCount: examUpdate.matchedCount + userExamUpdate.matchedCount,
+            modifiedCount: examUpdate.modifiedCount + userExamUpdate.modifiedCount
+        }
+    },
     AddUserExamInfo:async({name,questionTitle,code,isPublish,category,examId,createdTime})=>{
         return UserExamModel.create({
             name,
@@ -188,6 +197,29 @@ const ExamService ={
             examId,
             createdTime
         }) 
+    },
+    UpdateUserExamInfo:async({name,questionTitle,code,isPublish,category,examId,createdTime})=>{
+        return UserExamModel.updateOne(
+            { examId }, 
+            { 
+                $set: { // 覆盖更新普通字段
+                    name,
+                    code,
+                    isPublish,
+                    category,
+                    createdTime 
+                },
+                $push: { // 追加数组字段
+                    questionTitle: {
+                        $each: questionTitle // 将新数组元素逐个追加
+                    }
+                }
+            },
+            { new: true }//推荐添加该配置返回更新后的文档
+        ) 
+    },
+    getUserExamInfo:async({examId})=>{
+        return UserExamModel.find({examId}) 
     }
 }
 module.exports = ExamService

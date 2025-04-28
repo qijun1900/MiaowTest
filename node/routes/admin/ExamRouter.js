@@ -25,6 +25,8 @@ ExamRouter.post("/adminapi/exam/judgequestionUpdate/:id",ExamController.UpdateJu
 ExamRouter.post("/adminapi/exam/shortquestionUpdate/:id",ExamController.UpdateShortQuestionList)//更新单条简答题
 ExamRouter.post("/adminapi/exam/updateExamStatus",ExamController.UpdateExamStatus)//更新考试状态
 ExamRouter.post("/adminapi/exam/AddUserExamInfo",ExamController.AddUserExamInfo)//用户端的考试信息
+ExamRouter.post("/adminapi/exam/UpdateUserExamInfo",ExamController.UpdateUserExamInfo)//更新用户端的考试信息，不再是新增
+ExamRouter.get("/adminapi/exam/getUserExamInfo/:id",ExamController.getUserExamInfo)//用户端的考试信息
 
 
 module.exports = ExamRouter; 
