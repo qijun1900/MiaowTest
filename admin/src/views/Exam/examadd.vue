@@ -65,7 +65,7 @@
                     v-model="subjectForm.category"
                     multiple
                     value-format="number"  
-                    placeholder="请选择题目类型"
+                    placeholder="请选择题库题目类型"
                     style="width: 100%">
                     <el-option
                         v-for="item in options"

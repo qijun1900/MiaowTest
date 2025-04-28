@@ -242,6 +242,33 @@ const ExamController ={
             ActionType:"OK", 
         })
     },
+    UpdateExamStatus:async(req,res)=>{
+        const {examId,isPublish} = req.body
+        await ExamService.UpdateExamStatus({
+            examId,
+            isPublish:Number(isPublish),
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
+    AddUserExamInfo:async(req,res)=>{
+        const {name,questionTitle,code,isPublish,category,examId} = req.body
+        await ExamService.AddUserExamInfo({
+            name,
+            questionTitle,
+            code,
+            isPublish:Number(isPublish),
+            category,
+            examId,
+            createdTime:new Date()
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    }
 
 }
 module.exports = ExamController

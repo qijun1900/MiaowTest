@@ -3,6 +3,7 @@ const ExamSelectModel =require('../../models/SelectModel')
 const ExamBlankModel =require('../../models/BlankModel')
 const ExamJudgeModel =require('../../models/JudgeModel')
 const ExamShortModel =require('../../models/ShortModel')
+const  UserExamModel = require('../../models/UserExamModel')
 const ExamService ={
     add:async({name,code,category,year,isPublish,cover,createdTime})=>{
         return ExamModel.create({
@@ -174,8 +175,19 @@ const ExamService ={
             createdTime,
         }) 
     },
-    
-
-    
+    UpdateExamStatus:async({examId,isPublish})=>{
+        return ExamModel.updateOne({_id: examId},{isPublish}) // 修改查询字段为_id: examId
+    } ,
+    AddUserExamInfo:async({name,questionTitle,code,isPublish,category,examId,createdTime})=>{
+        return UserExamModel.create({
+            name,
+            questionTitle,
+            code,
+            isPublish,
+            category,
+            examId,
+            createdTime
+        }) 
+    }
 }
 module.exports = ExamService
