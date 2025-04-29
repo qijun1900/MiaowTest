@@ -54,8 +54,7 @@
           :prefix-icon="Search"
         />
       </div>
-      <el-table ref="multipleTableRef" :data="filteredExamQuestion" stripe style="width: 100%"
-        @selection-change="handleSelectionChange">
+      <el-table ref="multipleTableRef" :data="filteredExamQuestion" stripe highlight-current-row style="width: 100%">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column label="批量操作" width="120">
           <template #header>

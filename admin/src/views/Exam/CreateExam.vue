@@ -71,7 +71,8 @@
               :key="index"
               :prop="'questionTitle.' + index + '.content'"
               :rules="{ required: true, message: '题型名称不能为空', trigger: 'submit' }" 
-              class="form-item-container">
+              class="form-item-container"
+              >
               <div class="input-group">
                 <span class="index-badge">题型{{ index + 1 }}</span>
                 <el-input 
@@ -105,25 +106,45 @@
       </el-col>
       <el-col :span="14">
         <el-card shadow="hover">
-            <!-- <div v-for="data in UserExamInfo" :key="data_id">
-              {{ data.questionTitle
-                .map((item, index) => `题型${index + 1}: ${item.content}`)
-                .join(',')
-              }}
-            </div> -->
             <el-table
             ref="singleTableRef"
-            :data="tableData"
+            :data="UserExamInfo?.questionTitle || []" 
             highlight-current-row
-            style="width: 100%"
-            @current-change="handleCurrentChange">
+            style="width:100%"
+            stripe
+            max-height="593">
             <el-table-column type="index" width="50" />
-            <el-table-column property="date" label="题型" width="120" />
-            <el-table-column property="name" label="是否发布" width="100" />
-            <el-table-column property="address" label="题目数量"  width="100"/>
+            <el-table-column label="题型" width="200">
+              <template #default="scope">
+                {{ scope.row.content }} 
+              </template>
+            </el-table-column>
+            <el-table-column label="是否发布" width="120">
+              <template #default="scope">
+                <el-switch 
+                  v-model="scope.row.isPublishType"
+                  :active-value="1" 
+                  :inactive-value="0"
+                  @change="updateQuestionTitleStatus(scope.row)"/>
+              </template>
+            </el-table-column>
+            <el-table-column label="题目数量" width="120">
+              <template #default="scope">
+                {{ scope.row.questionIdS.length }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作">
+              <template #default="scope">
+                <el-popconfirm title="你确定要删除吗" confirm-button-text="确定" cancel-button-text="取消"
+                  @confirm="handleDelete(scope.row)">
+                  <template #reference>
+                    <el-button size="small" circle :icon="Delete" type="danger">
+                    </el-button>
+                  </template>
+                </el-popconfirm>
+              </template>
+          </el-table-column>
           </el-table>
-
-
         </el-card>
       </el-col>
     </el-row>
@@ -156,11 +177,17 @@ const isChange = ref(false)//判断是否再此提交，如果是则重新获取
 
 
 onMounted(async () => {
-  getUserExamInfo()//获取用户端使用的考试信息
+  await getUserExamInfo()//获取用户端使用的考试信息
 })
+watch(isChange, (newValue) => {
+  if(newValue) {
+    getUserExamInfo()
+  }
+},{ immediate: true }) //添加立即执行选项
+
 // 添加题目类型
 const addquestionTitle = () => {
-  createExamFrom.value.questionTitle.push({ content: '' ,questionIdS:[] });
+  createExamFrom.value.questionTitle.push({ content: '' ,questionIdS:[] ,isPublishType:0});
 };
 
 // 新增删除方法
@@ -186,7 +213,6 @@ const updateExamStatus = async () => {
     isPublish: isPublish.value,
    } 
     const res = await axios.post('/adminapi/exam/updateExamStatus', payload)
-    console.log(res.data)
     if(res.data.code === 200) {
       ElMessage.success('更新考试状态成功') 
     }
@@ -199,11 +225,10 @@ const updateExamStatus = async () => {
 const getUserExamInfo = async () => {
   try {
     const res = await axios.get(`/adminapi/exam/getUserExamInfo/${examData.value._id}`)
-    UserExamInfo.value = res.data.data
+    UserExamInfo.value = res.data.data[0]
     if(res.data.code === 200) {
       ElMessage.success('获取用户端使用的考试信息成功')
       isChange.value = false //重置状态 
-      console.log(UserExamInfo.value)
     }
   }
   catch(error) {
@@ -214,19 +239,19 @@ const getUserExamInfo = async () => {
 //向后端提交添加用户端使用的考试信息
 const handlesubmit = async () => {
   try {
-    const url = UserExamInfo.value.length ? `/adminapi/exam/UpdateUserExamInfo`: '/adminapi/exam/AddUserExamInfo'
+    const url = UserExamInfo.value? `/adminapi/exam/UpdateUserExamInfo`: '/adminapi/exam/AddUserExamInfo'
     const res = await axios.post(url, createExamFrom.value)
     if(res.data.code === 200) {
       ElMessage.success('创建成功')
       isChange.value = true//改变状态
       createExamFrom.value.questionTitle = [
-        { content: '',questionIdS:[],questionType:[]},
+        { content: '',questionIdS:[],questionType:[],isPublishType:0},
       ]
     }else if(res.data.code === 302){
       ElMessage.success('更新成功')
       isChange.value = true//改变状态
       createExamFrom.value.questionTitle = [
-        { content: '',questionIdS:[],questionType:[]},
+        { content: '',questionIdS:[],questionType:[],isPublishType:0},
       ]
     }
   }catch(error) {
@@ -235,14 +260,39 @@ const handlesubmit = async () => {
     console.error('提交失败:', error)
   }
 }
-
-watch(isChange, (newValue) => {
-  if(newValue) {
-    getUserExamInfo()
+//更新题型状态
+const updateQuestionTitleStatus = async (row) => {
+  try {
+    const res = await axios.post('/adminapi/exam/updateQuestionTitleStatus', {
+      examId: examData.value._id,
+      titleId: row._id,
+      isPublishType: row.isPublishType
+    });
+    if(res.data.code === 200) {
+      ElMessage.success('题型状态更新成功');
+    }
+  } catch(error) {
+    ElMessage.error('状态更新失败');
+    console.error('更新失败:', error);
   }
-},{ immediate: true }) //添加立即执行选项
+}
 
-
+//删除
+const handleDelete = async (data) => {
+  try {
+    const res = await axios.post('/adminapi/exam/deleteQuestionTitle', {
+      examId: examData.value._id,
+      titleId: data._id,
+    })
+    if(res.data.code === 200) {
+      ElMessage.success('删除成功')
+      isChange.value = true//改变状态,再次获取数据，函数getUserExamInfo()
+    }
+  }catch(error) {
+    console.log(error) 
+    ElMessage.error('删除失败')
+  }
+}
 
 </script>
 <style scoped>
@@ -379,3 +429,4 @@ watch(isChange, (newValue) => {
 }
 
 </style>
+

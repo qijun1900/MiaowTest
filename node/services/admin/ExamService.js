@@ -220,6 +220,28 @@ const ExamService ={
     },
     getUserExamInfo:async({examId})=>{
         return UserExamModel.find({examId}) 
+    },
+    updateQuestionTitleStatus:async({examId,titleId,isPublishType})=>{
+        return  UserExamModel.updateMany(
+            { examId, "questionTitle._id": titleId },
+            { 
+                $set: {
+                    "questionTitle.$.isPublishType": isPublishType
+                }
+            },
+            { new: true }
+        );
+    },
+    deleteQuestionTitle:async({examId,titleId})=>{
+        return  UserExamModel.updateMany(
+            { examId },
+            {
+                $pull: {
+                    questionTitle: { _id: titleId }
+                }
+            },
+            { new: true }
+        ); 
     }
 }
 module.exports = ExamService

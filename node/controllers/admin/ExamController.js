@@ -292,8 +292,30 @@ const ExamController ={
             ActionType:"OK",
             data:result, 
         })
+    },
+    updateQuestionTitleStatus:async(req,res)=>{
+        const {examId,titleId,isPublishType} = req.body 
+        await ExamService.updateQuestionTitleStatus({
+            examId,
+            titleId,
+            isPublishType
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
+    deleteQuestionTitle:async(req,res)=>{
+        const {examId,titleId} = req.body
+        await ExamService.deleteQuestionTitle({
+            examId,
+            titleId,
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
     }
-
 
 }
 module.exports = ExamController
