@@ -31,8 +31,8 @@ ExamRouter.post("/adminapi/exam/updateQuestionTitleStatus",ExamController.update
 ExamRouter.post("/adminapi/exam/deleteQuestionTitle",ExamController.deleteQuestionTitle)//删除题目标题
 ExamRouter.post("/adminapi/exam/AddSingUserList",ExamController.AddSingUserList)//更新单条用户题目添加状态
 ExamRouter.post("/adminapi/exam/RemoveSingUserList",ExamController.RemoveSingUserList)//更新单条用户题目删除状态
-
-
+ExamRouter.get("/adminapi/exam/publishedUserQuestionsList/:id",ExamController.getUserQuestionsList)//获取用户已发布的题目
+ExamRouter.post("/adminapi/exam/UserquestionlistDown/:id",ExamController.UserquestionlistDown)//不同类型题目用户端的题目全部下架操作
 
 
 module.exports = ExamRouter; 

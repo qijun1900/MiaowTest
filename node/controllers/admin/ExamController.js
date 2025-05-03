@@ -126,7 +126,8 @@ const ExamController ={
         const result = await ExamService.getQuestionList({
             examId:req.params.id,
             questionType:req.query.questionType,
-            isPublish:req.query.isPublish
+            isPublish:req.query.isPublish,
+            isAddUserList:req.query.isAddUserList
         })
         res.send({
             code:200,
@@ -355,6 +356,35 @@ const ExamController ={
             code:200,
             ActionType:"OK",
         })
+    },
+    getUserQuestionsList:async(req,res)=>{
+        console.log(req.params.id,req.query.titleId)
+        const result = await ExamService.getUserQuestionsList(
+            {
+                examId: req.params.id,  // 从URL参数获取examId
+                titleId: req.query.titleId,  // 从查询参数获取titleId
+            }
+        )
+        console.log(result)
+        res.send({
+            code:200,
+            ActionType:"OK",
+            data:result,
+        })
+    },
+    UserquestionlistDown:async(req,res)=>{
+        const {questionType,isAddUserList} = req.body
+        const result = await ExamService.UserquestionlistDown({
+            examId:req.params.id,
+            questionType,
+            isAddUserList,
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+            data:result, 
+        })
+
     }
 }
 module.exports = ExamController

@@ -4,7 +4,7 @@
       <template #content>
         <div>
           <el-icon>
-            <Connection />
+            <Connection/>
           </el-icon>
           <span>题目面板</span>
         </div>
@@ -178,15 +178,23 @@
         :append-to-body="true"
         size="40%">
         <el-card shadow="hover" >
+          <el-radio-group v-model="treeProps.checkStrictly">
+            <el-radio-button :value="true" label="该题型所有已发布题目" />
+            <el-radio-button :value="false" label="未发布" />
+          </el-radio-group>
           <el-table
           ref="multipleTableRef"
-          :data="questionListTbledata"
-          stripe>
+          :data="filteredQuestionList"
+          stripe
+          v-if="filteredQuestionList.length > 0">
           <el-table-column type="selection" width="55" />
           <el-table-column prop="stem" label="题目名称" width="150" />
           <el-table-column label="添加状态" width="120">
             <template #default="scope">
-            <el-switch v-model="scope.row.isAddUserList" :active-value="1" :inactive-value="0"
+            <el-switch 
+              v-model="scope.row.isAddUserList" 
+              :active-value="1" 
+              :inactive-value="0"
               @change="handleSinglePublish(scope.row)" />
             </template>
           </el-table-column>
@@ -196,13 +204,14 @@
           </template>
         </el-table-column>
           </el-table>
+          <el-empty v-else description="暂无题目数据" />
         </el-card>
       </el-drawer>
     </div>
   </el-drawer>
 </template>
 <script setup>
-import { ref, onMounted,computed, watch} from 'vue'
+import { ref, onMounted,computed, watch,reactive} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Connection, Collection, Document, Timer, View, Hide, Delete, Plus, CircleCloseFilled, List, Edit, Check } from '@element-plus/icons-vue'
 import formatTime from '@/util/formatTime'
@@ -213,7 +222,7 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const route = useRoute()
 const examData = ref(JSON.parse(route.query.examData))
-const isPublish = ref(examData.value.isPublish)
+const isPublish = ref(examData.value?.isPublish ?? 0)
 const createExamFrom = ref({
   name: examData.value.name,
   questionTitle: [
@@ -230,6 +239,18 @@ const visible = ref(false)
 const innerDrawer = ref(false)
 const questionListTbledata = ref([])
 const questionTitleID = ref()
+const treeProps = reactive({
+  checkStrictly: false,
+})
+const stopWatch = ref(null)// 顶部添加一个 ref 来存储 stopWatch 函数
+
+const filteredQuestionList = computed(() => {
+  return questionListTbledata.value?.filter(item => 
+    treeProps.checkStrictly ? item.isAddUserList === 1 : item.isAddUserList === 0
+  ) || []
+})
+
+
 
 onMounted(async () => {
   await getUserExamInfo()//获取用户端使用的考试信息
@@ -240,6 +261,8 @@ watch(isChange, (newValue) => {
     getUserExamInfo()
   }
 },{ immediate: true }) //添加立即执行选项
+
+
 
 // 添加题目类型
 const addquestionTitle = () => {
@@ -352,32 +375,57 @@ const handleDelete = async (data) => {
 
 //添加题目
 const handleAddquestion  = (data) => {
-  visible.value = true
-  console.log(data._id) 
+  visible.value = true 
   questionTitleID.value = data._id
 }
 
-//加载题目
-const handelquestion = async(data,id) => {
-innerDrawer.value = true
-try{
-    const res = await axios.get(`/adminapi/exam/questionlist/${id}`,{
-        params:{
-        questionType:data,
-        isPublish: 1
+//加载题目列表
+const handelquestion = async (data, id) => {
+  innerDrawer.value = true
+  
+  // 先停止之前的监听
+  if (stopWatch.value) {
+    stopWatch.value()
+  }
+  
+  // 保存新的监听函数
+  stopWatch.value = watch(treeProps, async(newValue) => {
+    try {
+      if (newValue.checkStrictly === false) {
+        const res = await axios.get(`/adminapi/exam/questionlist/${id}`, {
+          params: {
+            questionType: data,
+            isPublish: 1,
+            isAddUserList: treeProps.checkStrictly ? 1 : 0
+          }
+        })
+        if (res.data.code === 200) {
+          questionListTbledata.value = res.data.data
+          ElMessage.success('获取题目列表成功')
+          console.log(res.data.data)
+        }
+      } else if (newValue.checkStrictly === true) {
+        const res = await axios.get(`/adminapi/exam/publishedUserQuestionsList/${id}`, {
+          params: {
+            questionType: data,
+            isPublish: 1,
+            titleId: questionTitleID.value,
+            isAddUserList: treeProps.checkStrictly? 1 : 0 
+          }
+        })
+        if (res.data.code === 200) {
+          questionListTbledata.value = res.data.data.flat()
+          console.log(questionListTbledata.value)
+        }
       }
-    })
-    if(res.data.code === 200) {
-      questionListTbledata.value = res.data.data
-      ElMessage.success('获取题目列表成功') 
-      console.log(res.data.data)
+    } catch (error) {
+      console.log(error)
+      ElMessage.error('获取题目列表失败')
     }
-  }
-  catch(error) {
-    console.log(error)
-    ElMessage.error('获取题目列表失败')
-  }
+  }, { immediate: true }) // 添加 immediate 选项确保立即执行
 }
+
+
 // 合并后的类型映射方法，返回包含名称和图标的对象
 const getCategoryInfo = (val) => {
   const CategoryMap = {
@@ -390,7 +438,6 @@ const getCategoryInfo = (val) => {
 }
 //添加单个用户题目列表
 const handleSinglePublish = async (row) => {
-  console.log(row.isAddUserList)
   try {
     const url = row.isAddUserList === 1 
       ? '/adminapi/exam/AddSingUserList' 
@@ -602,4 +649,3 @@ const handleSinglePublish = async (row) => {
   border-color: #d6c2ff;
 }
 </style>
-

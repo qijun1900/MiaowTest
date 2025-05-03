@@ -95,7 +95,7 @@ const ExamService ={
             createdTime
         }) 
     },
-    getQuestionList:async({examId,questionType,isPublish})=>{
+    getQuestionList:async({examId,questionType,isPublish,isAddUserList})=>{
         const modelMap = {
             1: ExamSelectModel,
             2: ExamBlankModel,
@@ -104,7 +104,10 @@ const ExamService ={
         };
         if(isPublish){
             return modelMap[questionType]?.find({examId,isPublish}) || null;
-        }else{
+        }else if(isAddUserList){
+            return modelMap[questionType]?.find({examId,isAddUserList}) || null; 
+        }
+        else{
             return modelMap[questionType]?.find({examId}) || null;
         }
     },
@@ -311,7 +314,31 @@ const ExamService ={
             updateResult,
             deleteResult 
         }
-    }
+    },
+    getUserQuestionsList: async ({ examId, titleId }) => {
+        // 1. 查询匹配的考试文档并投影出对应的questionTitle条目
+        const userExamInfo = await UserExamModel.findOne(
+            { 
+                examId,
+                "questionTitle._id": titleId 
+            },
+            { 
+                "questionTitle.$": 1  // 使用$投影操作符获取匹配的数组元素
+            }
+        );
+        return userExamInfo.questionTitle[0].questionIdS || [];
+    },
     
+    UserquestionlistDown:async({examId,questionType,isAddUserList})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        return modelMap[questionType]?.updateMany({examId,isAddUserList},{isAddUserList:0}) || null;
+        
+    }
+   
 }
 module.exports = ExamService

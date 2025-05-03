@@ -3,7 +3,9 @@
         <el-page-header @back="handleBack" title="考试列表">
             <template #content>
                 <div>
-                    <el-icon><SetUp /></el-icon>
+                    <el-icon>
+                        <SetUp />
+                    </el-icon>
                     <span>题目面板</span>
                 </div>
             </template>
@@ -37,20 +39,44 @@
                                 </el-icon>
                                 <span class="text-info info-label">最近更新时间:</span>
                             </div>
-                            <span class="text-purple-500 info-value">{{ formatTime.getTime(examinfo.createdTime) }}</span>
+                            <span class="text-purple-500 info-value">{{ formatTime.getTime(examinfo.createdTime)
+                                }}</span>
                         </div>
                     </div>
+                </el-card>
+                <el-card shadow="hover" class="UserDonw">
+                    <el-statistic title="用户端题目数量" :value="UserpublishedQuestionNumber" class="statistic-card">
+                        <template #prefix>
+                            <el-icon class="statistic-icon" color="#67C23A">
+                                <User />
+                            </el-icon>
+                        </template>
+                    </el-statistic>
+                    <el-button color="#626aef" @click="centerDialogVisible = true">题目重置|适用于题型删除添加暂无题目数据</el-button>
+                    <el-dialog v-model="centerDialogVisible" title="注意" width="500" center>
+                        <span>
+                            确定要将用户端题目全部下架吗？
+                            <br />
+                            此操可适用于题型删除后,添加暂无题目数据的情况。
+                        </span>
+                        <template #footer>
+                        <div class="dialog-footer">
+                            <el-button @click="centerDialogVisible = false"> 取消</el-button>
+                            <el-button type="primary" @click="handleConfirm">
+                                确定
+                            </el-button>
+                        </div>
+                        </template>
+                    </el-dialog>
                 </el-card>
             </el-col>
             <el-col :span="16">
                 <el-card shadow="hover">
-                   <div>
-                      <el-row :gutter="10">
+                    <div>
+                        <el-row :gutter="10">
                             <el-col :span="12">
                                 <el-card shadow="hover" style="max-width: 480px">
-                                    <el-statistic 
-                                        title="已发布题目数量" 
-                                        :value="PublishedQuestionNumber"
+                                    <el-statistic title="已发布题目数量" :value="PublishedQuestionNumber"
                                         class="statistic-card">
                                         <template #prefix>
                                             <el-icon class="statistic-icon" color="#67C23A">
@@ -58,83 +84,63 @@
                                             </el-icon>
                                         </template>
                                     </el-statistic>
-                                </el-card>  
+                                </el-card>
                             </el-col>
                             <el-col :span="12">
                                 <el-card shadow="hover">
-                                    <el-statistic 
-                                        title="已添加题目数量" 
-                                        :value="QuestionNumber"
-                                        class="statistic-card">
+                                    <el-statistic title="已添加题目数量" :value="QuestionNumber" class="statistic-card">
                                         <template #prefix>
                                             <el-icon class="statistic-icon" color="#409EFF">
                                                 <TrendCharts />
                                             </el-icon>
                                         </template>
                                     </el-statistic>
-                                </el-card>  
+                                </el-card>
                             </el-col>
-                      </el-row>  
-                   </div> 
+                        </el-row>
+                    </div>
                 </el-card>
                 <el-card shadow="hover" class="add_list">
-                   <div class="flex justify-center">
-                      <el-row :gutter="0" class="w-full">
+                    <div class="flex justify-center">
+                        <el-row :gutter="0" class="w-full">
                             <el-col :span="12" class="flex justify-center p-4">
-                                <el-card 
-                                    shadow="hover" 
-                                    class="square-card"
-                                    :body-style="{ 
+                                <el-card shadow="hover" class="square-card" :body-style="{ 
                                         height: '100%',
                                         display: 'flex', 
                                         alignItems: 'center', 
                                         justifyContent: 'center',
                                         padding: '0' 
                                     }">
-                                    <el-tooltip 
-                                        effect="dark"
-                                        content="立即添加题目" 
-                                        placement="top"
-                                        :popper-options="{ offset: 10 }"
-                                        popper-class="custom-tooltip">
-                                        <el-button 
-                                            type="primary" 
-                                            class="full-btn"
-                                            size="large"
-                                            @click="handelAddqe">
-                                            <el-icon size="50"><CirclePlusFilled /></el-icon>
+                                    <el-tooltip effect="dark" content="立即添加题目" placement="top"
+                                        :popper-options="{ offset: 10 }" popper-class="custom-tooltip">
+                                        <el-button type="primary" class="full-btn" size="large" @click="handelAddqe">
+                                            <el-icon size="50">
+                                                <CirclePlusFilled />
+                                            </el-icon>
                                         </el-button>
                                     </el-tooltip>
-                                </el-card>  
+                                </el-card>
                             </el-col>
                             <el-col :span="12" class="flex justify-center p-4">
-                                <el-card 
-                                    shadow="hover" 
-                                    class="square-card"
-                                    :body-style="{ 
+                                <el-card shadow="hover" class="square-card" :body-style="{ 
                                         height: '100%',
                                         display: 'flex', 
                                         alignItems: 'center', 
                                         justifyContent: 'center',
                                         padding: '0' 
                                     }">
-                                    <el-tooltip 
-                                        effect="dark"
-                                        content="立即查看题目" 
-                                        placement="top"
+                                    <el-tooltip effect="dark" content="立即查看题目" placement="top"
                                         popper-class="custom-tooltip">
-                                        <el-button 
-                                            type="success" 
-                                            class="full-btn"
-                                            size="large"
-                                            @click="checkListqe">
-                                            <el-icon size="50"><List /></el-icon>
+                                        <el-button type="success" class="full-btn" size="large" @click="checkListqe">
+                                            <el-icon size="50">
+                                                <List />
+                                            </el-icon>
                                         </el-button>
                                     </el-tooltip>
-                                </el-card>  
+                                </el-card>
                             </el-col>
-                      </el-row>  
-                   </div> 
+                        </el-row>
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
@@ -144,7 +150,7 @@
 import { onMounted ,ref} from 'vue';   
 import { useRoute,useRouter } from 'vue-router';
 import axios from 'axios';
-import{Collection,Document,Timer,CirclePlusFilled,List,Histogram ,TrendCharts,SetUp} from '@element-plus/icons-vue'
+import{Collection,Document,Timer,CirclePlusFilled,List,Histogram ,TrendCharts,SetUp,User} from '@element-plus/icons-vue'
 import formatTime from '@/util/formatTime';
 import { ElMessage } from 'element-plus';
 
@@ -154,7 +160,9 @@ const router = useRouter();
 const examinfo = ref([])
 const questionType = ref(route.query.questionType)
 const QuestionNumber = ref(0)
-const PublishedQuestionNumber = ref(0)  // 更清晰的命名
+const PublishedQuestionNumber = ref(0)
+const UserpublishedQuestionNumber = ref(0) 
+const centerDialogVisible = ref(false)
 
 onMounted(() => {
   getData()
@@ -163,28 +171,36 @@ onMounted(() => {
 
 // 获取题目数量的函数
 const fetchQuestionCounts = async () => {
-  try {
-    // 获取已发布题目数量
-    const [publishedRes, totalRes] = await Promise.all([
-      axios.get(`/adminapi/exam/questionlist/${route.params.id}`, {
-        params: {
-          questionType: route.query.questionType,
-          isPublish: 1
-        }
-      }),
-      axios.get(`/adminapi/exam/questionlist/${route.params.id}`, {
-        params: {
-          questionType: route.query.questionType
-        }
-      })
-    ])
-    
-    PublishedQuestionNumber.value = publishedRes.data.data.length
-    QuestionNumber.value = totalRes.data.data.length
-  } catch (error) {
-    console.error('获取题目数量失败:', error)
-    ElMessage.error('获取题目数量失败')
-  }
+    try {
+        // 获取已发布题目数量
+        const [publishedRes, totalRes, UserpublishedRes] = await Promise.all([
+            axios.get(`/adminapi/exam/questionlist/${route.params.id}`, {
+                params: {
+                    questionType: route.query.questionType,
+                    isPublish: 1
+                }
+            }),
+            // 获取总题目数量
+            axios.get(`/adminapi/exam/questionlist/${route.params.id}`, {
+                params: {
+                    questionType: route.query.questionType
+                }
+            }),
+            // 获取用户端总题目数量
+            axios.get(`/adminapi/exam/questionlist/${route.params.id}`, {
+                params: {
+                    questionType: route.query.questionType,
+                    isAddUserList: 1
+                }
+            })
+        ])
+        PublishedQuestionNumber.value = publishedRes.data.data.length
+        QuestionNumber.value = totalRes.data.data.length
+        UserpublishedQuestionNumber.value = UserpublishedRes.data.data.length
+    } catch (error) {
+        console.error('获取题目数量失败:', error)
+        ElMessage.error('获取题目数量失败')
+    }
 }
 
 
@@ -219,6 +235,26 @@ const  checkListqe =()=>{
         }
     })
 } 
+//用户端题目全部下架
+const handleConfirm = async () => {
+    centerDialogVisible.value = false
+    try {
+        const res = await axios.post(`/adminapi/exam/UserquestionlistDown/${route.params.id}`,
+            {
+                questionType: questionType.value,
+                isAddUserList: 1 
+            }
+        )
+        if (res.data.code === 200) {
+            ElMessage.success('下架成功')
+            fetchQuestionCounts()  // 刷新题目数量 
+        }
+      
+    }catch (error) {
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败') 
+    }
+}
 </script>
 
 <style lang="css" scoped>
@@ -362,4 +398,8 @@ const  checkListqe =()=>{
 .custom-tooltip[data-popper-placement^=top] .el-popper__arrow::before {
     background: linear-gradient(45deg, #26c1dc, #79bbff) !important;
     box-shadow: -2px -2px 4px rgba(0,0,0,0.05);
-}</style>
+}
+.UserDonw{
+    margin-top: 20px;
+}
+</style>

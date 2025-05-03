@@ -11,3 +11,20 @@ createApp(App)
 .use(store)
 .use(router)
 .mount('#app')
+
+// 添加这段代码忽略ResizeObserver警告
+const debounce = (fn, delay) => {
+  let timer
+  return function() {
+    if(timer) clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, arguments), delay)
+  }
+}
+
+const _ResizeObserver = window.ResizeObserver
+window.ResizeObserver = class extends _ResizeObserver {
+  constructor(callback) {
+    callback = debounce(callback, 16)
+    super(callback)
+  }
+}
