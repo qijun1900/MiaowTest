@@ -81,7 +81,7 @@
               <div style="margin-top: 8px; min-height:96px">
                 <el-check-tag 
                   type="success"
-                  v-for="(value, index) in item.category" 
+                  v-for="value in item.category" 
                   :key="item._id"
                   @click="handelquestion(value,item._id)">
                   <el-icon style="margin-right:4px"><Histogram /></el-icon>
@@ -151,7 +151,7 @@ const handelquestion = (value, id) => {
     query: { questionType: value }
   })
 }
-//题库创建跳转
+//考试创建跳转
 const CreateExam = (item) => {
   router.push({
     path: `/exam/createexam/${item._id}`,

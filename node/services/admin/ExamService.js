@@ -43,7 +43,7 @@ const ExamService ={
     deleteInfo:async({_id})=>{
         return ExamModel.deleteOne({_id})
     },
-    AddSelectQuestion:async({examId,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
+    AddSelectQuestion:async({examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type})=>{
         return ExamSelectModel.create({
             examId,
             stem,
@@ -51,10 +51,12 @@ const ExamService ={
             isPublish,
             analysis,
             isAIanswer,
+            isAddUserList,
+            Type,
             createdTime
         })
     },
-    AddBlankQuestion :async({examId,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
+    AddBlankQuestion :async({examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type})=>{
         return ExamBlankModel.create({
             examId,
             stem,
@@ -62,10 +64,12 @@ const ExamService ={
             isPublish,
             analysis,
             isAIanswer,
+            isAddUserList,
+            Type,
             createdTime 
         }) 
     },
-    AddJudgeQuestion :async({examId,stem,answer,isPublish,analysis,isAIanswer,createdTime})=>{
+    AddJudgeQuestion :async({examId,stem,answer,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type})=>{
         return ExamJudgeModel.create({
             examId,
             stem,
@@ -73,10 +77,12 @@ const ExamService ={
             isPublish,
             analysis,
             isAIanswer,
+            isAddUserList,
+            Type,
             createdTime
         }) 
     },
-    AddShortQuestionList :async({examId,stem,content,isPublish,analysis,isAIanswer,createdTime})=>{
+    AddShortQuestionList :async({examId,stem,content,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type})=>{
         return ExamShortModel.create({
             examId,
             stem,
@@ -84,6 +90,8 @@ const ExamService ={
             isPublish,
             analysis,
             isAIanswer,
+            isAddUserList,
+            Type,
             createdTime
         }) 
     },
@@ -242,6 +250,68 @@ const ExamService ={
             },
             { new: true }
         ); 
+    },
+    AddSingUserList:async({examId,questionId,isAddUserList,Type,titleId,row})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        
+        const [updateResult, insertResult] = await Promise.all([
+            modelMap[Type]?.updateOne(
+                { examId, _id: questionId },
+                { $set: { isAddUserList } }
+            ) || null,
+            UserExamModel.updateOne(
+                {   
+                    examId,
+                    "questionTitle._id": titleId 
+                },
+                { 
+                    $push: {
+                        'questionTitle.$.questionIdS': { $each: [row] }
+                    }
+                },
+                { upsert: true }
+            )
+        ]);
+        return {
+            updateResult,
+            insertResult
+        };
+    },
+    RemoveSingUserList:async({examId,questionId,isAddUserList,Type,titleId,row})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        }; 
+        const [updateResult, deleteResult] = await Promise.all([
+            modelMap[Type]?.updateOne(
+                { examId, _id: questionId },
+                { $set: { isAddUserList } }
+            ) || null, 
+            //三次匹配更新，第一次匹配examId，第二次匹配questionTitle._id，第三次匹配questionIdS._id，删除符合条件的元素
+            UserExamModel.updateOne(
+                {
+                    examId,
+                    "questionTitle._id": titleId,
+                },
+                {
+                    $pull: {
+                        "questionTitle.$.questionIdS": { _id: row._id}
+                    }
+                }
+            )
+        ])
+        return {
+            updateResult,
+            deleteResult 
+        }
     }
+    
 }
 module.exports = ExamService

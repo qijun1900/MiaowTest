@@ -94,6 +94,8 @@
     isPublish: 0,
     analysis: '',
     isAIanswer: 0,
+    isAddUserList: 0,
+    Type:3, // 题目类型
   });
 // 返回上一页
 const handleBack = () => {
@@ -132,6 +134,8 @@ const submitForm = async () => {
       isPublish: 0,
       analysis: form.analysis,
       isAIanswer: form.isAIanswer,
+      isAddUserList: 0,
+      Type: 3,
     };
     
     const url = props.questionId
@@ -146,6 +150,8 @@ const submitForm = async () => {
         form.answer = null
         form.analysis = ''
         form.isAIanswer = 0
+        form.isAddUserList = 0
+        form.Type = 3 // 重置表单
       }else{
         router.back()
       }

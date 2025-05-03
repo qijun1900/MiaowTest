@@ -9,7 +9,7 @@ const UserController = {
                 code: "-1",
                 err: "用户名或密码不匹配"
             });
-        } else {
+        }else {
             //生成token
             const token = JWT.generate({
                 _id:result[0].id,

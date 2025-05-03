@@ -89,6 +89,8 @@ const form = reactive({
   isPublish: 0,
   analysis: '',
   isAIanswer: 0,
+  isAddUserList:0,//0:不是，1：是
+  Type:4, // 题目类型
 });
 const props = defineProps({
   questionId: String
@@ -132,6 +134,8 @@ const submitForm = async () => {
       isPublish: 0,
       analysis: form.analysis,
       isAIanswer: form.isAIanswer,
+      isAddUserList: 0,
+      Type:4,
     };
     
     const url = props.questionId
@@ -146,6 +150,8 @@ const submitForm = async () => {
         form.content = '';
         form.analysis = '';
         form.isAIanswer = 0;
+        form.isAddUserList = 0;
+        form.Type = 4;
       }else{
         router.back()
       }

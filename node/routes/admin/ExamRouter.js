@@ -29,8 +29,8 @@ ExamRouter.post("/adminapi/exam/UpdateUserExamInfo",ExamController.UpdateUserExa
 ExamRouter.get("/adminapi/exam/getUserExamInfo/:id",ExamController.getUserExamInfo)//用户端的考试信息
 ExamRouter.post("/adminapi/exam/updateQuestionTitleStatus",ExamController.updateQuestionTitleStatus)//更新题目标题状态
 ExamRouter.post("/adminapi/exam/deleteQuestionTitle",ExamController.deleteQuestionTitle)//删除题目标题
-
-
+ExamRouter.post("/adminapi/exam/AddSingUserList",ExamController.AddSingUserList)//更新单条用户题目添加状态
+ExamRouter.post("/adminapi/exam/RemoveSingUserList",ExamController.RemoveSingUserList)//更新单条用户题目删除状态
 
 
 

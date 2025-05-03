@@ -114,7 +114,7 @@
             stripe
             max-height="593">
             <el-table-column type="index" width="50" />
-            <el-table-column label="题型" width="200">
+            <el-table-column label="题型名称" width="200">
               <template #default="scope">
                 {{ scope.row.content }} 
               </template>
@@ -135,6 +135,7 @@
             </el-table-column>
             <el-table-column label="操作">
               <template #default="scope">
+                <el-button size="small" circle :icon="Plus" @click="handleAddquestion(scope.row)" type="success"></el-button>
                 <el-popconfirm title="你确定要删除吗" confirm-button-text="确定" cancel-button-text="取消"
                   @confirm="handleDelete(scope.row)">
                   <template #reference>
@@ -149,14 +150,65 @@
       </el-col>
     </el-row>
   </div>
+  <el-drawer v-model="visible" :show-close="false" size="30%">
+    <template #header="{ close, titleId, titleClass }">
+      <h4 :id="titleId" :class="titleClass">选择题目类型</h4>
+      <el-button type="danger" @click="close">
+        <el-icon class="el-icon--left"><CircleCloseFilled /></el-icon>
+        关闭
+      </el-button>
+    </template>
+    <div>
+      <div class="category-buttons">
+      <el-button
+        v-for="data in examData.category" 
+        :key="data._id"
+        @click="handelquestion(data,examData._id)"
+        class="category-button"
+        :class="`type-${data}`">
+        <el-icon class="button-icon">
+          <component :is="getCategoryInfo(data).icon" />
+        </el-icon>
+        {{ getCategoryInfo(data).name}}
+      </el-button>
+    </div>
+      <el-drawer
+        v-model="innerDrawer"
+        title="题目列表"
+        :append-to-body="true"
+        size="40%">
+        <el-card shadow="hover" >
+          <el-table
+          ref="multipleTableRef"
+          :data="questionListTbledata"
+          stripe>
+          <el-table-column type="selection" width="55" />
+          <el-table-column prop="stem" label="题目名称" width="150" />
+          <el-table-column label="添加状态" width="120">
+            <template #default="scope">
+            <el-switch v-model="scope.row.isAddUserList" :active-value="1" :inactive-value="0"
+              @change="handleSinglePublish(scope.row)" />
+            </template>
+          </el-table-column>
+          <el-table-column prop="" label="更新时间" with="100">
+          <template #default="scope">
+            {{ formatTime.getTime(scope.row.createdTime) }}
+          </template>
+        </el-table-column>
+          </el-table>
+        </el-card>
+      </el-drawer>
+    </div>
+  </el-drawer>
 </template>
 <script setup>
 import { ref, onMounted,computed, watch} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Connection, Collection, Document, Timer, View, Hide,Plus,Delete } from '@element-plus/icons-vue'
+import { Connection, Collection, Document, Timer, View, Hide, Delete, Plus, CircleCloseFilled, List, Edit, Check } from '@element-plus/icons-vue'
 import formatTime from '@/util/formatTime'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+
 
 const router = useRouter()
 const route = useRoute()
@@ -174,10 +226,14 @@ const createExamFrom = ref({
 })
 const UserExamInfo = ref()
 const isChange = ref(false)//判断是否再此提交，如果是则重新获取
-
+const visible = ref(false)
+const innerDrawer = ref(false)
+const questionListTbledata = ref([])
+const questionTitleID = ref()
 
 onMounted(async () => {
   await getUserExamInfo()//获取用户端使用的考试信息
+  console.log(examData.value)
 })
 watch(isChange, (newValue) => {
   if(newValue) {
@@ -245,13 +301,13 @@ const handlesubmit = async () => {
       ElMessage.success('创建成功')
       isChange.value = true//改变状态
       createExamFrom.value.questionTitle = [
-        { content: '',questionIdS:[],questionType:[],isPublishType:0},
+        { content: '',questionIdS:[],isPublishType:0},
       ]
     }else if(res.data.code === 302){
       ElMessage.success('更新成功')
       isChange.value = true//改变状态
       createExamFrom.value.questionTitle = [
-        { content: '',questionIdS:[],questionType:[],isPublishType:0},
+        { content: '',questionIdS:[],isPublishType:0},
       ]
     }
   }catch(error) {
@@ -294,6 +350,71 @@ const handleDelete = async (data) => {
   }
 }
 
+//添加题目
+const handleAddquestion  = (data) => {
+  visible.value = true
+  console.log(data._id) 
+  questionTitleID.value = data._id
+}
+
+//加载题目
+const handelquestion = async(data,id) => {
+innerDrawer.value = true
+try{
+    const res = await axios.get(`/adminapi/exam/questionlist/${id}`,{
+        params:{
+        questionType:data,
+        isPublish: 1
+      }
+    })
+    if(res.data.code === 200) {
+      questionListTbledata.value = res.data.data
+      ElMessage.success('获取题目列表成功') 
+      console.log(res.data.data)
+    }
+  }
+  catch(error) {
+    console.log(error)
+    ElMessage.error('获取题目列表失败')
+  }
+}
+// 合并后的类型映射方法，返回包含名称和图标的对象
+const getCategoryInfo = (val) => {
+  const CategoryMap = {
+    1: { name: '选择类题', icon: List },
+    2: { name: '填空类题', icon: Edit },
+    3: { name: '判断类题', icon: Check },
+    4: { name: '简答类题', icon: Document }
+  }
+  return CategoryMap[val] || { name: '其他类型', icon: Collection }
+}
+//添加单个用户题目列表
+const handleSinglePublish = async (row) => {
+  console.log(row.isAddUserList)
+  try {
+    const url = row.isAddUserList === 1 
+      ? '/adminapi/exam/AddSingUserList' 
+      : '/adminapi/exam/RemoveSingUserList';
+      
+    const res = await axios.post(url, {
+      examId: examData.value._id,
+      questionId: row._id,
+      isAddUserList: row.isAddUserList,
+      Type: row.Type,
+      titleId: questionTitleID.value,
+      row: row,
+    });
+    
+    if(res.data.code === 200) {
+      const message = row.isAddUserList === 1 ? '添加成功' : '删除成功';
+      ElMessage.success(message);
+      isChange.value = true;
+    }
+  } catch(error) {
+    console.log(error);
+    ElMessage.error('操作失败');
+  }
+}
 </script>
 <style scoped>
 :deep(.el-page-header__content) {
@@ -427,6 +548,58 @@ const handleDelete = async (data) => {
   font-weight: bold;
   color: #409eff;
 }
+.category-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 20px;
+}
 
+.category-button {
+  height: 100px;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.category-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.button-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+/* 不同类型按钮的颜色 */
+.category-button.type-1 {
+  color: #409EFF;
+  background-color: #ecf5ff;
+  border-color: #b3d8ff;
+}
+
+.category-button.type-2 {
+  color: #67C23A;
+  background-color: #f0f9eb;
+  border-color: #c2e7b0;
+}
+
+.category-button.type-3 {
+  color: #E6A23C;
+  background-color: #fdf6ec;
+  border-color: #f5dab1;
+}
+
+.category-button.type-4 {
+  color: #8B5CF6;
+  background-color: #f3f0ff;
+  border-color: #d6c2ff;
+}
 </style>
 

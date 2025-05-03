@@ -25,8 +25,7 @@
             @click="handleEdit(data)"
             @mouseenter="hoverIndex = data._id"
             @mouseleave="hoverIndex = null"
-            :class="{ 'hover-item': hoverIndex === data._id }"
-          >
+            :class="{ 'hover-item': hoverIndex === data._id }">
             <div class="result-content">
               <el-icon class="result-icon"><Document /></el-icon>
               <span class="result-text">{{ data.stem }}</span>
@@ -201,13 +200,11 @@ const tableSearchText = ref('')
 const previewData = ref({})
 const dialogVisible = ref(false)
 
-
-
 //搜索功能
 const SearchexamStem = computed(() => {
   return searchText.value ? examQuestion.value.filter(item => item.stem?.includes(searchText.value)) : []
 })
-// 处理表格搜索
+// 处理表格内搜索
 const filteredExamQuestion = computed(() => {
   return tableSearchText.value
     ? examQuestion.value.filter(item => 
@@ -215,7 +212,6 @@ const filteredExamQuestion = computed(() => {
       )
     : examQuestion.value
 })
-
 
 // 处理选中项变化
 const handleSelectionChange = (rows) => {

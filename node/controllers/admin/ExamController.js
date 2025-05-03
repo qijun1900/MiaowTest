@@ -51,7 +51,7 @@ const ExamController ={
         })
     },
     AddSelectQuestion:async(req,res)=>{
-        const {examId,stem,options,isPublish,analysis,isAIanswer} = req.body
+        const {examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,Type} = req.body
         await ExamService.AddSelectQuestion({
             examId,
             stem,
@@ -59,6 +59,8 @@ const ExamController ={
             isPublish:Number(isPublish),
             analysis,
             isAIanswer:Number(isAIanswer),
+            isAddUserList:Number(isAddUserList),
+            Type:Number(Type),
             createdTime:new Date()
         })
         res.send({
@@ -67,7 +69,7 @@ const ExamController ={
         })
     },
     AddBlankQuestion:async(req,res)=>{
-        const {examId,stem,options,isPublish,analysis,isAIanswer} = req.body
+        const {examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,Type} = req.body
         await ExamService.AddBlankQuestion({
             examId,
             stem,
@@ -75,6 +77,8 @@ const ExamController ={
             isPublish:Number(isPublish),
             analysis,
             isAIanswer:Number(isAIanswer),
+            isAddUserList:Number(isAddUserList),
+            Type:Number(Type),
             createdTime:new Date()
         }) 
         res.send({
@@ -83,7 +87,7 @@ const ExamController ={
         })
     },
     AddJudgeQuestion:async(req,res)=>{
-        const {examId,stem,answer,isPublish,analysis,isAIanswer} = req.body 
+        const {examId,stem,answer,isPublish,analysis,isAIanswer,isAddUserList,Type} = req.body 
         await ExamService.AddJudgeQuestion({
             examId,
             stem,
@@ -91,6 +95,8 @@ const ExamController ={
             isPublish:Number(isPublish),
             analysis,
             isAIanswer:Number(isAIanswer),
+            isAddUserList:Number(isAddUserList),
+            Type:Number(Type),
             createdTime:new Date()
         })
         res.send({
@@ -99,7 +105,7 @@ const ExamController ={
         })
     },
     AddShortQuestionList:async(req,res)=>{
-        const {examId,stem,content,isPublish,analysis,isAIanswer} = req.body
+        const {examId,stem,content,isPublish,analysis,isAIanswer,isAddUserList,Type} = req.body
         await ExamService.AddShortQuestionList({
             examId,
             stem,
@@ -107,6 +113,8 @@ const ExamController ={
             isPublish:Number(isPublish),
             analysis,
             isAIanswer:Number(isAIanswer),
+            isAddUserList:Number(isAddUserList),
+            Type:Number(Type),
             createdTime:new Date()
         }) 
         res.send({
@@ -121,6 +129,7 @@ const ExamController ={
             isPublish:req.query.isPublish
         })
         res.send({
+            code:200,
             ActionType: "OK",
             data: result
         })
@@ -315,7 +324,37 @@ const ExamController ={
             code:200,
             ActionType:"OK",
         })
+    },
+    AddSingUserList:async(req,res)=>{
+        const {examId,questionId,isAddUserList,Type,titleId,row} = req.body 
+        const result = await ExamService.AddSingUserList({
+            examId,
+            questionId,
+            isAddUserList ,
+            Type:Number(Type),
+            titleId,
+            row,
+        })
+        res.send({
+            code:200,
+            ActionType:"OK", 
+            data:result,
+        })
+    },
+    RemoveSingUserList:async(req,res)=>{
+        const {examId,questionId,isAddUserList,Type,titleId,row} = req.body 
+         await ExamService.RemoveSingUserList({
+            examId,
+            questionId,
+            isAddUserList ,
+            Type:Number(Type),
+            titleId,
+            row,
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
     }
-
 }
 module.exports = ExamController

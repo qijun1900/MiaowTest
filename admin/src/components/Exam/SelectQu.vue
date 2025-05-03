@@ -119,6 +119,8 @@ const form = reactive({
     isPublish:0,//0:未发布，1：发布
     analysis:'', // 题目解析/答案解释
     isAIanswer:0,//0:不是，1：是
+    isAddUserList:0,//0:不是，1：是
+    Type:1 // 题目类型
 });
 // 添加选项
 const addOption = () => {
@@ -147,11 +149,12 @@ onMounted(async() => {
           } 
         })
         const data = res.data.data[0]
-        console.log(data)
         form.stem = data.stem
         form.options = (data.options || []).map(opt => ({ content: opt.content || opt, isCorrect: opt.isCorrect || false }))
         form.analysis = data.analysis
         form.isAIanswer = data.isAIanswer
+        form.isAddUserList = data.isAddUserList
+        form.Type = data.Type
       }
       catch(error){
         console.error(ElMessage.error('获取题目详情失败')); 
@@ -177,6 +180,8 @@ const submitForm = async () => {
         isPublish: 0,
         analysis: form.analysis,
         isAIanswer: form.isAIanswer,
+        isAddUserList: 0,
+        Type: 1,
       };
       
       const url = props.questionId
@@ -196,6 +201,8 @@ const submitForm = async () => {
           ];
           form.analysis = '';
           form.isAIanswer = 0;
+          form.isAddUserList = 0;
+          form.Type = 1;
         }else{
           router.back()
         }

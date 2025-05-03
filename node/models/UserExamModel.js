@@ -3,9 +3,8 @@ const UserSchema = new mongoose.Schema({
   name: String ,   // 考试名称
   questionTitle: [{
     content: String,                           // 题型名称
-    questionIdS: [{ type: String }],           // 关联的题目ID集合
-    questionType:[{type:Number}],
-    isPublishType:Number,                         // 发布状态
+    questionIdS: [{ type: Array }],           // 关联的题目ID集合
+    isPublishType:Number,                     // 发布状态
     }],
   code: String ,       
   isPublish: Number,     
