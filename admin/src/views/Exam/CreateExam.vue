@@ -216,7 +216,12 @@
               @change="handleSinglePublish(scope.row)" />
             </template>
           </el-table-column>
-          <el-table-column prop="" label="更新时间" with="100">
+          <el-table-column prop="" label="题目类型" with="100"  v-if="treeProps.checkStrictly">
+            <template #default="scope">
+              <el-tag type="info">{{getCategoryInfo(scope.row.Type).name }}</el-tag> 
+            </template>
+          </el-table-column>
+          <el-table-column prop="" label="更新时间" with="100" v-else>
             <template #default="scope">
               {{ formatTime.getTime(scope.row.createdTime) }}
             </template>
@@ -275,7 +280,6 @@ const filteredQuestionList = computed(() => {
 
 onMounted(async () => {
   await getUserExamInfo()//获取用户端使用的考试信息
-  console.log(examData.value)
 })
 watch(isChange, (newValue) => {
   if(newValue) {
@@ -324,7 +328,6 @@ const getUserExamInfo = async () => {
   try {
     const res = await axios.get(`/adminapi/exam/getUserExamInfo/${examData.value._id}`)
     UserExamInfo.value = res.data.data[0]
-    console.log(UserExamInfo.value)
     if(res.data.code === 200) {
       isChange.value = false //重置状态 
     }
@@ -419,7 +422,6 @@ const handelquestion = async (data, id) => {
         })
         if (res.data.code === 200) {
           questionListTbledata.value = res.data.data
-          console.log(res.data.data)
         }
       } else if (newValue.checkStrictly === true) {
         const res = await axios.get(`/adminapi/exam/publishedUserQuestionsList/${id}`, {
@@ -431,7 +433,6 @@ const handelquestion = async (data, id) => {
         })  
         if (res.data.code === 200) {
           questionListTbledata.value = res.data.data.flat()
-          console.log(questionListTbledata.value)
         }
       }
     } catch (error) {
@@ -525,7 +526,6 @@ const handleBatchPublish = async () => {
             questionType: questionType,
             isPublish: 1,
             titleId: questionTitleID.value,
-            isAddUserList: treeProps.checkStrictly ? 1 : 0
           }
         })
         questionListTbledata.value = response.data.data.flat()
@@ -535,6 +535,8 @@ const handleBatchPublish = async () => {
     ElMessage.error('批量发布失败')
   }
 }
+
+
 
 </script>
 <style scoped>
