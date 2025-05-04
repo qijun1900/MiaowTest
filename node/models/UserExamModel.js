@@ -9,7 +9,9 @@ const UserSchema = new mongoose.Schema({
   code: String ,       
   isPublish: Number,     
   category:Array, 
-  examId:String, 
+  examId:String,
+  cover:String,
+  year:String,
   createdTime: Date,     
 });
 const UserExamModel = mongoose.model("userExam", UserSchema);

@@ -264,7 +264,7 @@ const ExamController ={
         })
     },
     AddUserExamInfo:async(req,res)=>{
-        const {name,questionTitle,code,isPublish,category,examId} = req.body
+        const {name,questionTitle,code,isPublish,category,examId,cover,year} = req.body
         await ExamService.AddUserExamInfo({
             name,
             questionTitle,
@@ -272,6 +272,8 @@ const ExamController ={
             isPublish:Number(isPublish),
             category,
             examId,
+            cover,
+            year,
             createdTime:new Date()
         })
         res.send({
@@ -280,7 +282,7 @@ const ExamController ={
         })
     },
     UpdateUserExamInfo:async(req,res)=>{
-        const {name,questionTitle,code,isPublish,category,examId} = req.body
+        const {name,questionTitle,code,isPublish,category,examId,cover,year} = req.body
         await ExamService.UpdateUserExamInfo({
             name,
             questionTitle,
@@ -288,6 +290,8 @@ const ExamController ={
             isPublish:Number(isPublish),
             category,
             examId,
+            cover,
+            year,
             createdTime:new Date()
         }) 
         res.send({
@@ -357,15 +361,27 @@ const ExamController ={
             ActionType:"OK",
         })
     },
+    batchPublishedUserQuestionsList:async(req,res)=>{
+        const {examId,Type,titleId,questionId,questionIdS} = req.body
+        await ExamService.batchPublishedUserQuestionsList({
+            examId,
+            Type,
+            titleId,
+            questionId,//用于题库的更新，二次匹配
+            questionIdS,
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
     getUserQuestionsList:async(req,res)=>{
-        console.log(req.params.id,req.query.titleId)
         const result = await ExamService.getUserQuestionsList(
             {
                 examId: req.params.id,  // 从URL参数获取examId
                 titleId: req.query.titleId,  // 从查询参数获取titleId
             }
         )
-        console.log(result)
         res.send({
             code:200,
             ActionType:"OK",

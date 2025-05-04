@@ -198,7 +198,7 @@ const ExamService ={
             modifiedCount: examUpdate.modifiedCount + userExamUpdate.modifiedCount
         }
     },
-    AddUserExamInfo:async({name,questionTitle,code,isPublish,category,examId,createdTime})=>{
+    AddUserExamInfo:async({name,questionTitle,code,isPublish,category,examId,cover,year,createdTime})=>{
         return UserExamModel.create({
             name,
             questionTitle,
@@ -206,10 +206,12 @@ const ExamService ={
             isPublish,
             category,
             examId,
+            cover,
+            year,
             createdTime
         }) 
     },
-    UpdateUserExamInfo:async({name,questionTitle,code,isPublish,category,examId,createdTime})=>{
+    UpdateUserExamInfo:async({name,questionTitle,code,isPublish,category,examId,cover,year,createdTime})=>{
         return UserExamModel.updateOne(
             { examId }, 
             { 
@@ -218,7 +220,9 @@ const ExamService ={
                     code,
                     isPublish,
                     category,
-                    createdTime 
+                    cover,
+                    year,
+                    createdTime
                 },
                 $push: { // 追加数组字段
                     questionTitle: {
@@ -315,17 +319,42 @@ const ExamService ={
             deleteResult 
         }
     },
+    batchPublishedUserQuestionsList:async({examId,Type,titleId,questionId,questionIdS})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel, 
+            4: ExamShortModel
+        }
+        const [updateResult, insertResult] = await Promise.all([
+            modelMap[Type]?.updateMany(
+                { examId, _id: { $in: questionId } },
+                {  $set: { isAddUserList: 1 }}
+            ) || null, 
+            UserExamModel.updateOne(
+                { examId, "questionTitle._id": titleId },
+                { $push: { "questionTitle.$.questionIdS": { $each: questionIdS } } } 
+            )
+        ]) 
+        return {
+            updateResult,
+            insertResult
+        }
+    },
     getUserQuestionsList: async ({ examId, titleId }) => {
         // 1. 查询匹配的考试文档并投影出对应的questionTitle条目
         const userExamInfo = await UserExamModel.findOne(
             { 
-                examId,
-                "questionTitle._id": titleId 
+                examId,  // 根据考试ID筛选
+                "questionTitle._id": titleId  // 同时筛选questionTitle数组中_id匹配的条目
             },
             { 
-                "questionTitle.$": 1  // 使用$投影操作符获取匹配的数组元素
+                "questionTitle.$": 1  // 使用$投影操作符只返回匹配的questionTitle数组元素
+                // 1表示包含该字段，0表示排除其他字段
             }
         );
+        // 返回匹配的questionTitle条目中的questionIdS数组，如果没有则返回空数组
+        // questionTitle[0]是因为$投影操作符确保只返回一个匹配的数组元素
         return userExamInfo.questionTitle[0].questionIdS || [];
     },
     
@@ -337,7 +366,6 @@ const ExamService ={
             4: ExamShortModel
         };
         return modelMap[questionType]?.updateMany({examId,isAddUserList},{isAddUserList:0}) || null;
-        
     }
    
 }

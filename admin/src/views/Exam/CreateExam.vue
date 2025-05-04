@@ -130,7 +130,7 @@
             </el-table-column>
             <el-table-column label="题目数量" width="120">
               <template #default="scope">
-                {{ scope.row.questionIdS.length }}
+                {{scope.row.questionIdS.length }}
               </template>
             </el-table-column>
             <el-table-column label="操作">
@@ -178,15 +178,33 @@
         :append-to-body="true"
         size="40%">
         <el-card shadow="hover" >
+          <div class="table-search">
+            <el-input
+              v-model="tableSearchText"
+              placeholder="搜索表格题目"
+              clearable
+              style="width: 300px; margin-bottom: 20px"
+              :prefix-icon="Search"
+            />
+          </div>
           <el-radio-group v-model="treeProps.checkStrictly">
             <el-radio-button :value="true" label="该题型所有已发布题目" />
             <el-radio-button :value="false" label="未发布" />
           </el-radio-group>
+            <el-button 
+              type="success"  
+              size="small" 
+              @click="handleBatchPublish" 
+              class="manyUpdate"
+              :disabled="treeProps.checkStrictly"> 
+              全部发布
+            </el-button>
           <el-table
           ref="multipleTableRef"
-          :data="filteredQuestionList"
+          :data="SearchTextfilteredQuestionListData"
           stripe
-          v-if="filteredQuestionList.length > 0">
+          v-if="filteredQuestionList.length > 0"
+          @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" />
           <el-table-column prop="stem" label="题目名称" width="150" />
           <el-table-column label="添加状态" width="120">
@@ -199,10 +217,10 @@
             </template>
           </el-table-column>
           <el-table-column prop="" label="更新时间" with="100">
-          <template #default="scope">
-            {{ formatTime.getTime(scope.row.createdTime) }}
-          </template>
-        </el-table-column>
+            <template #default="scope">
+              {{ formatTime.getTime(scope.row.createdTime) }}
+            </template>
+          </el-table-column>
           </el-table>
           <el-empty v-else description="暂无题目数据" />
         </el-card>
@@ -213,7 +231,7 @@
 <script setup>
 import { ref, onMounted,computed, watch,reactive} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Connection, Collection, Document, Timer, View, Hide, Delete, Plus, CircleCloseFilled, List, Edit, Check } from '@element-plus/icons-vue'
+import { Connection, Collection, Document, Timer, View, Hide, Delete, Plus, CircleCloseFilled, List, Edit, Check ,Search} from '@element-plus/icons-vue'
 import formatTime from '@/util/formatTime'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
@@ -232,6 +250,8 @@ const createExamFrom = ref({
   isPublish: isPublish.value,
   category:examData.value.category,
   examId:examData.value._id,
+  cover:examData.value.cover,
+  year:examData.value.year,
 })
 const UserExamInfo = ref()
 const isChange = ref(false)//判断是否再此提交，如果是则重新获取
@@ -243,14 +263,15 @@ const treeProps = reactive({
   checkStrictly: false,
 })
 const stopWatch = ref(null)// 顶部添加一个 ref 来存储 stopWatch 函数
+const tableSearchText = ref('')//搜索框
+const selectedQuestions = ref([]) // 新增选中项存储
+
 
 const filteredQuestionList = computed(() => {
   return questionListTbledata.value?.filter(item => 
     treeProps.checkStrictly ? item.isAddUserList === 1 : item.isAddUserList === 0
   ) || []
 })
-
-
 
 onMounted(async () => {
   await getUserExamInfo()//获取用户端使用的考试信息
@@ -261,8 +282,6 @@ watch(isChange, (newValue) => {
     getUserExamInfo()
   }
 },{ immediate: true }) //添加立即执行选项
-
-
 
 // 添加题目类型
 const addquestionTitle = () => {
@@ -305,8 +324,8 @@ const getUserExamInfo = async () => {
   try {
     const res = await axios.get(`/adminapi/exam/getUserExamInfo/${examData.value._id}`)
     UserExamInfo.value = res.data.data[0]
+    console.log(UserExamInfo.value)
     if(res.data.code === 200) {
-      ElMessage.success('获取用户端使用的考试信息成功')
       isChange.value = false //重置状态 
     }
   }
@@ -339,7 +358,7 @@ const handlesubmit = async () => {
     console.error('提交失败:', error)
   }
 }
-//更新题型状态
+//更新题型发布状态
 const updateQuestionTitleStatus = async (row) => {
   try {
     const res = await axios.post('/adminapi/exam/updateQuestionTitleStatus', {
@@ -396,12 +415,10 @@ const handelquestion = async (data, id) => {
           params: {
             questionType: data,
             isPublish: 1,
-            isAddUserList: treeProps.checkStrictly ? 1 : 0
           }
         })
         if (res.data.code === 200) {
           questionListTbledata.value = res.data.data
-          ElMessage.success('获取题目列表成功')
           console.log(res.data.data)
         }
       } else if (newValue.checkStrictly === true) {
@@ -410,9 +427,8 @@ const handelquestion = async (data, id) => {
             questionType: data,
             isPublish: 1,
             titleId: questionTitleID.value,
-            isAddUserList: treeProps.checkStrictly? 1 : 0 
           }
-        })
+        })  
         if (res.data.code === 200) {
           questionListTbledata.value = res.data.data.flat()
           console.log(questionListTbledata.value)
@@ -425,7 +441,6 @@ const handelquestion = async (data, id) => {
   }, { immediate: true }) // 添加 immediate 选项确保立即执行
 }
 
-
 // 合并后的类型映射方法，返回包含名称和图标的对象
 const getCategoryInfo = (val) => {
   const CategoryMap = {
@@ -436,24 +451,24 @@ const getCategoryInfo = (val) => {
   }
   return CategoryMap[val] || { name: '其他类型', icon: Collection }
 }
-//添加单个用户题目列表
+//添加或者移除单个用户题目列表题目
 const handleSinglePublish = async (row) => {
   try {
     const url = row.isAddUserList === 1 
       ? '/adminapi/exam/AddSingUserList' 
       : '/adminapi/exam/RemoveSingUserList';
-      
+
     const res = await axios.post(url, {
       examId: examData.value._id,
       questionId: row._id,
       isAddUserList: row.isAddUserList,
       Type: row.Type,
       titleId: questionTitleID.value,
-      row: row,
+      row:row,
     });
     
     if(res.data.code === 200) {
-      const message = row.isAddUserList === 1 ? '添加成功' : '删除成功';
+      const message = row.isAddUserList === 1 ? '单次添加成功' : '单次删除成功';
       ElMessage.success(message);
       isChange.value = true;
     }
@@ -462,6 +477,65 @@ const handleSinglePublish = async (row) => {
     ElMessage.error('操作失败');
   }
 }
+// 处理表格内搜索
+const SearchTextfilteredQuestionListData = computed(() => {
+  return tableSearchText.value
+    ? filteredQuestionList.value.filter(item => 
+        item.stem?.toLowerCase().includes(tableSearchText.value.toLowerCase())
+      )
+    : filteredQuestionList.value
+})
+// 处理选中项变化
+const handleSelectionChange = (rows) => {
+  selectedQuestions.value = rows
+}
+// 添加批量发布用户题目列表题目
+const handleBatchPublish = async () => {
+  try {
+    const res = await axios.post('/adminapi/exam/batchPublishedUserQuestionsList', {
+      examId: examData.value._id,
+      Type: selectedQuestions.value[0].Type,
+      titleId: questionTitleID.value,
+      questionId: selectedQuestions.value.map(item => item._id),
+      questionIdS: selectedQuestions.value.map(item => ({
+        _id: item._id,
+        Type: item.Type, 
+        stem: item.stem,
+        options: item.options,
+        answer: item.answer,
+        isAIanswer: item.isAIanswer,
+        analysis: item.analysis,
+        examId: examData.value._id,
+        isAddUserList: 1,
+        createdTime: item.createdTime,
+        isPublish: item.isPublish,
+        Type:item.Type,
+        __v: item.__v,
+      })),      
+    })
+    if(res.data.code === 200) {
+      ElMessage.success('批量发布成功')
+      isChange.value = true // 触发考试信息更新
+      // 新增：手动刷新题目列表数据
+      if (selectedQuestions.value.length > 0) {
+        const questionType = selectedQuestions.value[0].Type
+        // 重新调用获取题目列表的接口
+        const response = await axios.get(`/adminapi/exam/publishedUserQuestionsList/${examData.value._id}`, {
+          params: {
+            questionType: questionType,
+            isPublish: 1,
+            titleId: questionTitleID.value,
+            isAddUserList: treeProps.checkStrictly ? 1 : 0
+          }
+        })
+        questionListTbledata.value = response.data.data.flat()
+      }
+    }
+  } catch (error) {
+    ElMessage.error('批量发布失败')
+  }
+}
+
 </script>
 <style scoped>
 :deep(.el-page-header__content) {
@@ -647,5 +721,9 @@ const handleSinglePublish = async (row) => {
   color: #8B5CF6;
   background-color: #f3f0ff;
   border-color: #d6c2ff;
+}
+.manyUpdate{
+  margin-left: 40px;
+  margin-top: 10px;
 }
 </style>

@@ -26,12 +26,13 @@ ExamRouter.post("/adminapi/exam/shortquestionUpdate/:id",ExamController.UpdateSh
 ExamRouter.post("/adminapi/exam/updateExamStatus",ExamController.UpdateExamStatus)//更新考试状态
 ExamRouter.post("/adminapi/exam/AddUserExamInfo",ExamController.AddUserExamInfo)//用户端的考试信息
 ExamRouter.post("/adminapi/exam/UpdateUserExamInfo",ExamController.UpdateUserExamInfo)//更新用户端的考试信息，不再是新增
-ExamRouter.get("/adminapi/exam/getUserExamInfo/:id",ExamController.getUserExamInfo)//用户端的考试信息
+ExamRouter.get("/adminapi/exam/getUserExamInfo/:id",ExamController.getUserExamInfo)//获取用户端的考试信息
 ExamRouter.post("/adminapi/exam/updateQuestionTitleStatus",ExamController.updateQuestionTitleStatus)//更新题目标题状态
 ExamRouter.post("/adminapi/exam/deleteQuestionTitle",ExamController.deleteQuestionTitle)//删除题目标题
 ExamRouter.post("/adminapi/exam/AddSingUserList",ExamController.AddSingUserList)//更新单条用户题目添加状态
 ExamRouter.post("/adminapi/exam/RemoveSingUserList",ExamController.RemoveSingUserList)//更新单条用户题目删除状态
-ExamRouter.get("/adminapi/exam/publishedUserQuestionsList/:id",ExamController.getUserQuestionsList)//获取用户已发布的题目
+ExamRouter.post("/adminapi/exam/batchPublishedUserQuestionsList",ExamController.batchPublishedUserQuestionsList)//批量发布用户端的题目
+ExamRouter.get("/adminapi/exam/publishedUserQuestionsList/:id",ExamController.getUserQuestionsList)//获取用户端已发布的题目
 ExamRouter.post("/adminapi/exam/UserquestionlistDown/:id",ExamController.UserquestionlistDown)//不同类型题目用户端的题目全部下架操作
 
 

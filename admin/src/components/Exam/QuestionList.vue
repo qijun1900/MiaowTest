@@ -53,7 +53,8 @@
           :prefix-icon="Search"
         />
       </div>
-      <el-table ref="multipleTableRef" 
+      <el-table 
+        ref="multipleTableRef" 
         :data="filteredExamQuestion" 
         stripe 
         highlight-current-row 
