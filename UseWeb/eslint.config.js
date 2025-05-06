@@ -21,4 +21,12 @@ export default defineConfig([
 
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
+
+  // 新增规则覆盖，关闭特定规则
+  {
+    rules: {
+      'vue/multi-word-component-names': 'off', // 关闭组件名必须多单词的限制
+      'vue/valid-template-root': 'off',        // 关闭模板必须单根元素的限制
+    },
+  },
 ])
