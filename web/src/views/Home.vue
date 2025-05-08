@@ -10,8 +10,6 @@
   </template>
 <script setup>
 
-
-
 </script>
 <style scoped>
 .el-carousel__item h3 {
