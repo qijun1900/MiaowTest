@@ -1,35 +1,68 @@
 <template>
-    <div class="ticker-container">
+    <!-- 原生横向滚动<div class="ticker-container">
         <div class="ticker-content">
             <span v-for="(item, index) in notices" :key="index" class="ticker-item">
                 {{ item }} <span v-if="index !== notices.length -1" class="divider">|</span>
             </span>
         </div>
-    </div>
+    </div> -->
+    <van-notice-bar 
+        left-icon="volume-o" 
+        :scrollable="false"
+        color="rgb(255, 255, 255)"
+        background="rgb(250, 195, 75)"
+        >
+    <van-swipe
+        vertical
+        class="notice-swipe"
+        :autoplay="3000"
+        :touchable="false"
+        :show-indicators="false"
+    >
+        <van-swipe-item v-for="(item, index) in notices" :key="index"  > 
+                {{ item }}
+        </van-swipe-item>
+    </van-swipe>
+    </van-notice-bar>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 // 临时占位数据，后续替换为后端API获取
 const notices = ref([
-    '系统维护通知：本周五凌晨进行系统升级',
-    '欢迎使用在线答题系统',
-    '最新题库已更新，快来挑战吧！'
+    "明月直入，无心可猜。",
+    "仙人抚我顶，结发受长生。",
+    "今人不见古时月，今月曾经照古人。",
+    "明月出天山，苍茫云海间。",
+    "长风破浪会有时，直挂云帆济沧海。",
 ])
 </script>
 <style scoped>
-.ticker-container {
-    background-color: rgb(253, 195, 67); /* 橙色背景 */
-    color: rgb(255, 255, 255); /* 白色字体 */
-    padding: 3px 0px; /* 上下内边距 */
-    overflow: hidden; /* 溢出隐藏 */
-    border-radius: 4px; /* 圆角 */;
+.van-notice-bar{
+    overflow: hidden; 
+    border-radius: 5px; 
+    height: 36px;
+    line-height: 36px;
 }
+.notice-swipe {
+    height: 40px;
+    line-height: 40px;
+    font-size: 15px;
+  }
+/*
+.ticker-container {
+    background-color: rgb(254, 190, 51); /* 橙色背景 
+    color: rgb(255, 255, 255); /* 白色字体 
+    padding: 3px 0px; 上下内边距 
+    overflow: hidden;  溢出隐藏 
+    border-radius: 4px;  圆角;
+}
+
 
 .ticker-content {
     display: inline-block;
-    white-space: nowrap; /* 不换行 */
-    animation: marquee 20s linear infinite;/* 滚动动画 */
+    white-space: nowrap;  不换行 
+   animation: marquee 20s linear infinite; 滚动动画 
 }
 
 .ticker-item {
@@ -46,4 +79,5 @@ const notices = ref([
     0% { transform: translateX(100%); }
     100% { transform: translateX(-100%); }
 }
+*/
 </style>
