@@ -5,11 +5,21 @@
         <div><Navbar/></div>
         <div class="SwipeContainer"><Swipe/></div>
         <div class="icon_font">
-            <van-icon name="fire" color="#ee0a24" size="24" class="icon"/>
-            <span class="font">大家都在练习</span>
-            <div> <ExamContainer/></div>
+            <div class="title-row">
+                <van-icon name="fire" color="#ee0a24" size="24" class="icon"/>
+                <span class="font">大家都在练习</span>
+                <div class="right-container" @click="RouterPush($event, '/ExamList')">
+                    <span class="font_right">更多考试</span>
+                    <van-icon name="arrow" />
+                </div>
+            </div>
+            <div> 
+                <HotExamContainer 
+                :IsHotExamContainer="true" 
+                :Ishasborder="false"
+                :GutterNumber="6"/>
+            </div>
         </div>
-        <van-floating-bubble icon="chat" />
     </div>
 </template>
 <script setup>
@@ -17,7 +27,8 @@ import Search from '@/components/Index/Search.vue';
 import ScrollingText from '@/components/Index/ScrollingText.vue';
 import Navbar from '@/components/Index/Navbar.vue';
 import Swipe from '@/components/Index/Swipe.vue';
-import ExamContainer from '@/components/Index/ExamContainer.vue';
+import HotExamContainer from '@/components/Index/ExamContainer.vue';
+import RouterPush from '@/util/RouterPush';
 
 
 </script>
@@ -42,7 +53,19 @@ margin-top: 4px;
     font-family: "Arial", "Helvetica", sans-serif;
     font-weight: 550;/* 设置字体粗细 */
     line-height: 2;
-
 }
-
+.title-row {
+    display: flex;
+    align-items: center;
+}
+.right-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 15px;
+}
+.font_right{
+    font-size: 14px;
+    color: #6b6969;
+}
 </style>

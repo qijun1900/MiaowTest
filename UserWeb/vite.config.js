@@ -19,7 +19,6 @@ export default defineConfig({
       '/webapi': {
         target: `http://${escconfig.serverHost}:${escconfig.serverPort}`,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/webapi/, '') // 可选路径重写
       }
     }
   }

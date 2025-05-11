@@ -14,8 +14,13 @@
     <div class="search-container">
       <el-popover placement="bottom" title="搜索结果" width="50%" :visible="visible" :show-arrow="false">
         <template #reference>
-          <el-input v-model="searchText" style="width: 100%; margin: 20px auto" size="large" placeholder="请输入搜索的题目"
-            :prefix-icon="Search" type="search" @input="visible = true" @blur="visible = false" />
+          <el-input 
+            v-model="searchText" 
+            style="width: 100%; margin: 20px auto" size="large" 
+            placeholder="请输入搜索的题目"
+            :prefix-icon="Search" type="search" 
+            @input="visible = true" 
+            @blur="visible = false" />
         </template>
         <div v-if="SearchexamStem.length" class="search-results">
           <div 

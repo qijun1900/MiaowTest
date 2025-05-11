@@ -12,6 +12,7 @@ const ProductRouter = require('./routes/admin/ProductRouter')
 const WebNewsRouter = require('./routes/web/NewsRouter');
 const WebProductRouter = require('./routes/web/ProductRouter');
 const AdminExamRouter = require('./routes/admin/ExamRouter');
+const WebUserExamRouter = require('./routes/web/ExamRouter');
 
 var app = express();
 
@@ -24,11 +25,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");  // 允许所有域名访问
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );  // 允许的请求头
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE"); // 允许的HTTP方法
+  next();
+});
 
 app.use('/', indexRouter);
 app.use('/users',UserRouter)
 app.use(WebNewsRouter)
 app.use(WebProductRouter)
+app.use(WebUserExamRouter)
 
 /*
 adminapi===后台

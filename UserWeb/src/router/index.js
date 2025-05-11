@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css' // 需要添加的样式文件
 import Home from '../views/Home/Home.vue'
+import ExamList from '@/views/Exam/ExamList.vue'
 
 const routes = [
   {
@@ -9,6 +10,11 @@ const routes = [
     name: 'home',
     component: Home
   },
+  {
+    path: '/ExamList',
+    name: 'exam',
+    component: ExamList
+  }
 ]
 
 

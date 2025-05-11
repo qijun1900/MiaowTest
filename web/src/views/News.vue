@@ -132,7 +132,7 @@ onMounted(async () => {
   const res = await axios.get("/webapi/news/list")
   newList.value = res.data.data
   // console.log(_.groupBy(newList.value,item=>item.category))
- 
+
 })
 
 const searchnewslist = computed(() => {
