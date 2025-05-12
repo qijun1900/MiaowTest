@@ -31,6 +31,7 @@
           </template>
             <el-menu-item index="/new/addnews">添加信息</el-menu-item>
             <el-menu-item index="/new/newslist">信息列表</el-menu-item>
+            <el-menu-item index="/new/noticeBar">通知栏信息</el-menu-item>
         </el-sub-menu>
          
         <el-sub-menu index="/exam-manage ">

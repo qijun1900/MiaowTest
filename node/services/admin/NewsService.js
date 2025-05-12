@@ -1,4 +1,5 @@
 const NewsModel = require('../../models/NewsModel')
+const NoticebarModel = require('../../models/NoticebarModel')
 const NewsService ={
     add: async ({tittle,content,category,isPublish,cover,editTime})=>{
         return NewsModel.create({
@@ -30,6 +31,15 @@ const NewsService ={
                 tittle,content,category,isPublish,editTime 
             })
         }
+    },
+    addNoticebar: async ({content,isPublish,editTime})=>{
+        return NoticebarModel.create({content,isPublish,editTime})
+    },
+    getNoticebar: async ()=>{
+        return NoticebarModel.find({})
+    },
+    ChangeStateNoticebar: async ({_id,isPublish,editTime})=>{
+        return NoticebarModel.updateOne({_id},{isPublish,editTime})
     }
 }
 

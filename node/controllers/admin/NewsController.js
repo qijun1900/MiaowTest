@@ -54,6 +54,31 @@ const NewsController ={
         res.send({
             ActionType: "OK",
         })
+    },
+    addNoticebar: async (req,res)=>{
+        await NewsService.addNoticebar({
+            ...req.body,
+            editTime:new Date()
+        }) 
+        res.send({
+            code:200,
+            ActionType: "OK", 
+        })
+    },
+    getNoticebar: async (req,res)=>{
+        const result = await NewsService.getNoticebar()
+        res.send({
+            code:200,
+            ActionType: "OK",
+            data: result
+        })
+    },
+    ChangeStateNoticebar: async (req,res)=>{
+        await NewsService.ChangeStateNoticebar({...req.body,editTime:new Date()})
+        res.send({
+            code:200,
+            ActionType: "OK",
+        })
     }
 }
 

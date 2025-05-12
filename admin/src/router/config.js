@@ -21,6 +21,7 @@ import Otherquestion from '../components/Exam/OtherQu.vue'
 import QuestionList from '@/components/Exam/QuestionList.vue'
 import QuestionEdit from '@/components/Exam/QuestionEdit.vue'
 import CreateExam from '@/views/Exam/CreateExam.vue'
+import NoticeBar from '../views/News/NoticeBar .vue'
 
 const routes = [
     {
@@ -122,6 +123,10 @@ const routes = [
       {
         path: '/exam/createExam/:id',
         component: CreateExam, 
+      },
+      {
+        path: '/new/noticeBar',
+        component: NoticeBar,
       }
 
 

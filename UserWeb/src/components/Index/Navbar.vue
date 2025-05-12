@@ -1,29 +1,37 @@
 <template>
     <div class="nav-container">
-        <van-grid :border="false">
-            <van-grid-item 
-                v-for="(item, index) in navItems"
-                :key="index"
-                :icon="item.icon"
-                :text="item.text"
-                icon-size="28px"
-                class="nav-item"
-                :to="item.to"
-            />
-        </van-grid>
+        <van-config-provider :theme-vars="themeVars">
+            <van-grid :border="false">
+                <van-grid-item 
+                    v-for="(item, index) in navItems"
+                    :key="index"
+                    :icon="item.icon"
+                    :text="item.text"
+                    icon-size="28px"
+                    class="nav-item"
+                    :to="item.to"/>
+            </van-grid>
+        </van-config-provider>
+
     </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 // 导航项配置数据
 const navItems = [
-    { icon: 'home-o', text: '首页占位' , to: '/'},
-    { icon: 'bar-chart-o', text: '题库占位' ,  to: '/questionbank'},
-    { icon: 'medal-o', text: '竞赛占位' , to: '/contest'},
-    { icon: 'bar-chart-o', text: '排名占位' , to: '/ranking'},
+    { icon: 'wap-home', text: '开源地址' , to: '/'},
+    { icon: 'column', text: '所有考试' ,  to: '/ExamList'},
+    { icon: 'medal', text: '竞赛占位' , to: '/contest'},
+    { icon: 'wechat-pay', text: '赞助项目' , to: '/ranking'},
     { icon: 'user-o', text: '我的占位', to: '/mine' },
     { icon: 'comment-o', text: '消息占位' , to: '/message'}
 ]
+// 定制 Grid 组件主题
+const themeVars = ref({
+    gridItemIconSize:"32px",// 图标大小
+})
+
 
 </script>
 
@@ -31,7 +39,6 @@ const navItems = [
 .nav-container {
     padding: 12px 0;
     background: #fff;
-    overflow-x: auto; /* 允许水平滚动 */
 }
 
 /* 隐藏滚动条 */

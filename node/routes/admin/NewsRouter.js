@@ -13,7 +13,7 @@ NewsRouter.put('/adminapi/news/publish',NewsController.publish,upload.single('fi
 NewsRouter.delete('/adminapi/news/list/:id',NewsController.delList)
 NewsRouter.get('/adminapi/news/list/:id',NewsController.getList)
 NewsRouter.post('/adminapi/news/list',upload.single('file'),NewsController.updatelist)
-
-
-
+NewsRouter.post("/adminapi/new/noticebar",NewsController.addNoticebar)//添加公告栏信息
+NewsRouter.get("/adminapi/new/noticebar",NewsController.getNoticebar)//获取公告栏信息
+NewsRouter.put("/adminapi/new/noticebar",NewsController.ChangeStateNoticebar)//修改公告栏信息状态
 module.exports = NewsRouter; 
