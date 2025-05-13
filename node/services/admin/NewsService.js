@@ -40,6 +40,12 @@ const NewsService ={
     },
     ChangeStateNoticebar: async ({_id,isPublish,editTime})=>{
         return NoticebarModel.updateOne({_id},{isPublish,editTime})
+    },
+    delNoticebar: async ({_id})=>{
+        return NoticebarModel.deleteOne({_id})
+    },
+    getUpdatNoticebar:async ({content,_id,editTime})=>{
+        return NoticebarModel.updateOne({_id},{content,editTime})
     }
 }
 

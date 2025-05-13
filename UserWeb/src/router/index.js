@@ -3,6 +3,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css' // 需要添加的样式文件
 import Home from '../views/Home/Home.vue'
 import ExamList from '@/views/Exam/ExamList.vue'
+import SearchInfo from '@/components/ViewsComponents/SearchInfoViews.vue'
 
 const routes = [
   {
@@ -14,6 +15,11 @@ const routes = [
     path: '/ExamList',
     name: 'exam',
     component: ExamList
+  },
+  {
+    path: '/SearchInfo',
+    name: 'search',
+    component: SearchInfo
   }
 ]
 

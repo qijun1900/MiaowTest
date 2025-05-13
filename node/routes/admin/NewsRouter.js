@@ -16,4 +16,9 @@ NewsRouter.post('/adminapi/news/list',upload.single('file'),NewsController.updat
 NewsRouter.post("/adminapi/new/noticebar",NewsController.addNoticebar)//添加公告栏信息
 NewsRouter.get("/adminapi/new/noticebar",NewsController.getNoticebar)//获取公告栏信息
 NewsRouter.put("/adminapi/new/noticebar",NewsController.ChangeStateNoticebar)//修改公告栏信息状态
+NewsRouter.delete("/adminapi/new/noticebar/:id",NewsController.delNoticebar)//删除公告栏信息
+NewsRouter.post("/adminapi/new/UpdatNoticebar",NewsController.getUpdatNoticebar)//修改公告栏信息内容
+
+
+
 module.exports = NewsRouter; 

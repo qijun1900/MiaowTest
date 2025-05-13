@@ -21,6 +21,6 @@ const height = ref(165)
     font-size: 20px;
     line-height: 150px;
     text-align: center;
-    background-color: #62bbf1;
+    background-color: #3ed80f;
   }
 </style>

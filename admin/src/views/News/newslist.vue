@@ -118,7 +118,6 @@ const handleDelete = async (item)=>{
 //编辑回调
 const handleEdit = (item)=>{
     router.push(`/news/editnews/${item._id}`)
-
 }
 
 </script>

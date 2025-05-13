@@ -19,23 +19,31 @@
         :touchable="false"
         :show-indicators="false"
     >
-        <van-swipe-item v-for="(item, index) in notices" :key="index"  > 
-                {{ item }}
+        <van-swipe-item v-for="(item,index) in notices" :key="index"  > 
+                {{  item.content || item }}
         </van-swipe-item>
     </van-swipe>
     </van-notice-bar>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-// 临时占位数据，后续替换为后端API获取
-const notices = ref([
-    "明月直入，无心可猜。",
-    "仙人抚我顶，结发受长生。",
-    "今人不见古时月，今月曾经照古人。",
-    "明月出天山，苍茫云海间。",
-    "长风破浪会有时，直挂云帆济沧海。",
-])
+import getNoticeInfo from '@/API/Index/getNoticeInfo';
+import { ref,onMounted } from 'vue'
+const props = defineProps({
+    defaultText:{
+        type:String,
+    }
+})
+const notices = ref([])
+onMounted(async () => {
+    const res = await getNoticeInfo()
+    if(res.length == 0){
+        notices.value = props.defaultText
+    }else{
+        notices.value = res 
+    } 
+})
+
 </script>
 <style scoped>
 .van-notice-bar{

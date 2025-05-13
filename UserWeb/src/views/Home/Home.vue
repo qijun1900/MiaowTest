@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="search"><Search/></div>
-        <div class="scrollingtext"><ScrollingText/></div>
+        <div class="scrollingtext" ><ScrollingText :defaultText="'欢迎访问本站'"/></div>
         <div><Navbar/></div>
         <div class="SwipeContainer"><Swipe/></div>
         <div class="icon_font">
@@ -10,7 +10,7 @@
                 <span class="font">大家都在练习</span>
                 <div class="right-container" @click="RouterPush($event, '/ExamList')">
                     <span class="font_right">更多考试</span>
-                    <van-icon name="arrow" />
+                    <van-icon name="arrow"/>
                 </div>
             </div>
             <div> 
@@ -23,14 +23,12 @@
     </div>
 </template>
 <script setup>
-import Search from '@/components/Index/Search.vue';
+import Search from '@/components/Index/SearchOverlay.vue';
 import ScrollingText from '@/components/Index/ScrollingText.vue';
 import Navbar from '@/components/Index/Navbar.vue';
 import Swipe from '@/components/Index/Swipe.vue';
 import HotExamContainer from '@/components/Index/ExamContainer.vue';
 import RouterPush from '@/util/RouterPush';
-
-
 </script>
 <style scoped> 
 .search{

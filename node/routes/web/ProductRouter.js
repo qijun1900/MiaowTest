@@ -4,7 +4,7 @@ var ProductRouter = express.Router();
 
 
 
-ProductRouter.get('/webapi/product/list',ProductController.getList)
+
 
 
 

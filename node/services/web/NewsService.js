@@ -1,13 +1,10 @@
 const NewsModel = require('../../models/NewsModel')
+const NoticebarModel = require('../../models/NoticebarModel')
 
 const NewsService ={
-    getlist:async ({_id})=>{
-        return _id?NewsModel.find({_id,isPublish:1}):NewsModel.find({isPublish:1}).sort({editTime:-1})
-    },
-    getToplist: async({limit})=>{
-      return  NewsModel.find({isPublish:1}).sort({editTime:-1}).limit(limit)  
-
-    },
+    getNoticeInfo:async()=>{
+        return NoticebarModel.find({isPublish:1}).sort({createdTime:-1})
+    }
 }
 
 module.exports = NewsService

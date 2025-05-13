@@ -79,6 +79,27 @@ const NewsController ={
             code:200,
             ActionType: "OK",
         })
+    },
+    delNoticebar:async(req,res)=>{
+        await NewsService.delNoticebar({_id:req.params.id})
+        res.send({
+            code:200,
+            ActionType: "OK",
+        })
+    },
+    getUpdatNoticebar:async(req,res)=>{
+        const {content,_id} = req.body
+        console.log(content,_id)
+        const result = await NewsService.getUpdatNoticebar({
+            content,
+            _id,
+            editTime:new Date()
+        }) 
+        res.send({
+            code:200,
+            ActionType: "OK",
+            data: result 
+        })
     }
 }
 

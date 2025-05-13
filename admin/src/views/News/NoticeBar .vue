@@ -43,6 +43,28 @@
                 </el-table-column>
             </el-table>
         </el-card>
+        <el-dialog v-model="centerDialogVisible"  width="800" center>
+            <span class="dialogtitle">
+            编辑通知栏信息
+            </span>
+            <div class="dialoginput">
+                <el-input 
+                v-model="dialogText" 
+                style="width: 600px" 
+                clearable autosize
+                size="large" 
+                :prefix-icon="CirclePlusFilled" />
+            </div>
+            <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="centerDialogVisible = false">取消编辑</el-button>
+                <el-button type="primary" @click="handleUpdate">
+                更新信息
+                </el-button>
+            </div>
+            </template>
+        </el-dialog>
+        <el-backtop :right="100" :bottom="100" />
     </div>
 </template>
 <script setup>
@@ -58,7 +80,9 @@ const payload = reactive({
     isPublish: 0,//0:未发布，1：发布
 })
 const tableData = ref([])
-
+const centerDialogVisible = ref(false)
+const dialogText = ref('')
+const UpdateId = ref('')
 
 const submitFrom = async () => {
     try {
@@ -87,11 +111,54 @@ const getTableData = async () => {
 }
 //开关回调
 const handleSwitchange = async (item) => {
-    await axios.put('/adminapi/new/noticebar', {
-        _id: item._id,
-        isPublish: item.isPublish
-    })
-    await getTableData()//挂载时候就加载数据
+    try {
+        const res =await axios.put('/adminapi/new/noticebar',{
+             _id: item._id,
+            isPublish:item.isPublish
+        })
+        if (res.data.code === 200) {
+            ElMessage.success('更改状态成功')
+            await getTableData() 
+        }
+    }catch (error) {
+        ElMessage.error('更改状态失败')     
+
+    }
+}
+//删除
+const handleDelete = async (item) => {
+    try {
+        const res = await axios.delete(`/adminapi/new/noticebar/${item._id}` ) 
+        if (res.data.code === 200) {
+            ElMessage.success('删除成功')
+            await getTableData() 
+        }
+    }catch (error) {
+        ElMessage.error('删除失败') 
+    }
+}
+//编辑
+const handleEdit = (item) => {
+    centerDialogVisible.value = true
+    dialogText.value = item.content
+    UpdateId.value = item._id
+    console.log(dialogText.value,UpdateId.value)
+}
+//更新
+const handleUpdate = async () => {
+    try{
+        const res = await axios.post('/adminapi/new/UpdatNoticebar',{
+            content:dialogText.value,
+            _id: UpdateId.value,
+        })    
+        if (res.data.code === 200) {
+            ElMessage.success('更新成功')
+            centerDialogVisible.value = false
+            await getTableData() 
+        }
+    }catch (error) {
+        ElMessage.error('更新失败')
+    }
 }
 
 </script>
@@ -108,5 +175,19 @@ const handleSwitchange = async (item) => {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.dialogtitle{
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.dialoginput{
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px
 }
 </style>

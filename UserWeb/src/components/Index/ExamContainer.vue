@@ -38,7 +38,7 @@ const gridItems = ref([])
 
 // 定义 props, 接受不同属性
 const props = defineProps({
-    IsHotExamContainer: {// 是否是热门考试容器
+    IsHotExamContainer: {//是否是热门考试容器
         type: Boolean,
         required: true
     },
@@ -54,6 +54,7 @@ const props = defineProps({
 })
 border.value = props.Ishasborder
 gutter.value = props.GutterNumber
+
 // 获取考试数据
 const fetchData = async () => {
     try {
@@ -63,7 +64,6 @@ const fetchData = async () => {
         }else{
           gridItems.value = res
         }
-        console.log('获取的考试数据:', gridItems.value)
     } catch (error) {
         console.error('获取考试数据失败:', error)
     }

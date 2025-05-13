@@ -31,7 +31,6 @@
         </van-overlay>
     </div>
 </template>
-
 <script setup>
 import { ref, computed } from 'vue'
 import getExamDetails from '@/API/Index/getExamDetails'
@@ -56,18 +55,16 @@ const SearchexamStem = computed(() => {
         item.name?.toLowerCase().includes(SearchText.value.toLowerCase())
     )
 })
-
 const selectItem = (item) => {
     SearchText.value = item.name
     showResults.value = false
     // 这里可以添加选中后的处理逻辑
     console.log('选中的项目:', item)
 }
-
 const onSearch = () => {
     console.log('点击了搜索，关于搜索的逻辑...')
 }
-
+// 失去焦点时隐藏搜索结果
 const onBlur = () => {
     setTimeout(() => {
         if (!SearchText.value) {
