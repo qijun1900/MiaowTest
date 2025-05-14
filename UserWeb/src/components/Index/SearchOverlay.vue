@@ -6,9 +6,12 @@
             shape="round"
             clearable
             show-action
-            @search="onSearch"
+            @search="onSearch(SearchexamStem)"
             @focus="showResults = true"
             @blur="onBlur"
+            @clear="showResults = false"
+            @input="showResults = true"
+            @action-click="showResults = false"
         />
         <!-- 添加搜索结果悬浮窗口 -->
         <van-overlay 
@@ -24,7 +27,7 @@
                     class="result-item"
                     @click.stop="selectItem(data)">
                     <div class="result-content">
-                        <span class="result-text">{{ data.name }}</span>
+                        <van-icon name="search" /><span class="result-text">{{ data.name }}</span>
                     </div>
                 </div>
             </div>
@@ -32,8 +35,10 @@
     </div>
 </template>
 <script setup>
-import { ref, computed } from 'vue'
-import getExamDetails from '@/API/Index/getExamDetails'
+import { ref ,onMounted } from 'vue'
+import getExamDetails from '@/API/getExamDetails'
+import  useSearchFilter  from '@/util/SearchFilter'
+import UseonSearch from '@/util/onSearch'
 
 const SearchText = ref('')
 const ExamData = ref([])
@@ -49,21 +54,18 @@ const fetchData = async () => {
 }
 
 // 搜索逻辑
-const SearchexamStem = computed(() => {
-    if (!SearchText.value) return []
-    return ExamData.value.filter(item => 
-        item.name?.toLowerCase().includes(SearchText.value.toLowerCase())
-    )
-})
+const SearchexamStem = useSearchFilter(ExamData, SearchText)
+
 const selectItem = (item) => {
     SearchText.value = item.name
     showResults.value = false
-    // 这里可以添加选中后的处理逻辑
     console.log('选中的项目:', item)
 }
-const onSearch = () => {
-    console.log('点击了搜索，关于搜索的逻辑...')
-}
+// 搜索事件处理(按下回车触发，或者点击搜索按钮)
+const onSearch = (item) => {
+    UseonSearch('/SearchDeatil',SearchText.value,item,)  
+}   
+
 // 失去焦点时隐藏搜索结果
 const onBlur = () => {
     setTimeout(() => {
@@ -73,8 +75,9 @@ const onBlur = () => {
     }, 200)
 }
 
-// 初始化时获取数据
-fetchData()
+onMounted(() => {
+    fetchData() 
+})
 </script>
 
 <style scoped>
@@ -117,7 +120,7 @@ fetchData()
 }
 
 /* 保留原有样式 */
-:deep(.van-search) {
+.van-search {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border-radius: 15px;
 }

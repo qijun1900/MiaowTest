@@ -3,22 +3,13 @@
     <div class="container">
         <van-grid 
             :column-num="2"
-            :gutter="gutter"
-            :border="border">
-            <van-grid-item v-for="item in gridItems" :key="item._id">
-                <van-image 
-                :src="`http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`" 
-                lazy-load>
-                <template v-slot:loading>
-                    <van-loading type="spinner" size="20" />
-                </template>
-                <template v-slot:error>
-                    <div class="image-error">
-                        <van-icon name="photo-fail" size="40" />
-                        <p>图片加载失败</p>
-                    </div>
-                </template>
-                </van-image>
+            :gutter="props.GutterNumber"
+            :border="props.Ishasborder">
+            <van-grid-item 
+                v-for="item in gridItems" 
+                :key="item._id"
+                @click="handlClick(item._id)">
+                    <LoadImage :src="`http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`" />
                 <span class="van-grid-item__text"><van-icon name="good-job-o"/>{{ item.name }}</span>
             </van-grid-item>
         </van-grid>
@@ -28,46 +19,61 @@
 </template>
 
 <script setup>
-import {  ref } from 'vue'
-import getExamDetails from '@/API/Index/getExamDetails'
+import {  ref,onMounted,watch } from 'vue'
+import getExamDetails from '@/API/getExamDetails'
 import escconfig from '@/config/esc.config'
+import LoadImage from '../FuntionComponents/LoadImage.vue'
+import RouterPush from '@/util/RouterPush'
 
-const border  = ref(false)
-const gutter = ref(10)
 const gridItems = ref([])
 
 // 定义 props, 接受不同属性
 const props = defineProps({
-    IsHotExamContainer: {//是否是热门考试容器
+    IsHotExamContainer: {
         type: Boolean,
         required: true
     },
-    Ishasborder:{// 是否有边框
-        type:Boolean,
-        required:true
+    Ishasborder: {
+        type: Boolean,
+        default: true,
+        required: true
     },
-    GutterNumber:{//间距
-        type:Number,
-        required:true 
+    GutterNumber: {
+        type: Number,
+        default: 10,
+        required: true 
+    },
+    // 新增接收数据的prop
+    UseData: {
+        type: Array,
+        default: null
     }
-
 })
-border.value = props.Ishasborder
-gutter.value = props.GutterNumber
 
-// 获取考试数据
+
+// 修改获取数据的逻辑
 const fetchData = async () => {
     try {
+        if (props.UseData) {  // 优先使用传入的数据
+            gridItems.value = props.UseData
+            return
+        }
         const res = await getExamDetails()
         if (props.IsHotExamContainer) {
-            gridItems.value = res.slice(0, 4) 
-        }else{
-          gridItems.value = res
+            gridItems.value = res.slice(0, 4)
+        } else {
+            gridItems.value = res
         }
     } catch (error) {
         console.error('获取考试数据失败:', error)
     }
 }
+ //点击跳转
+ const handlClick = (itme) => {
+    RouterPush(`/ExamReady/${itme}`)
+}
+
+
 
 // 定制 Grid 组件主题
 const themeVars = ref({
@@ -76,8 +82,16 @@ const themeVars = ref({
   gridItemBackground: '#ffffff',   // 背景颜色
   gridItemContentPadding: '16px'   // 内边距
 })
-// 初始化时获取数据
-fetchData()
+
+onMounted(() => {
+    fetchData()
+})
+
+watch(() => props.UseData, (newVal) => {
+    if(newVal && newVal.length > 0) {
+        gridItems.value = newVal
+    }
+})
 </script>
 <style scoped>
 .van-grid-item__text {
@@ -90,7 +104,6 @@ fetchData()
     height: 185px;
     border-radius: 6px;
     overflow: hidden;
-
 }
 /* 新增图片加载失败样式 */
 .image-error {

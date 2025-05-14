@@ -1,14 +1,22 @@
 <template>
     <div>
-        <div class="search"><Search/></div>
-        <div class="scrollingtext" ><ScrollingText :defaultText="'欢迎访问本站'"/></div>
-        <div><Navbar/></div>
-        <div class="SwipeContainer"><Swipe/></div>
+        <div class="search">
+            <SearchOverlay/>
+        </div>
+        <div class="scrollingtext" >
+            <ScrollingText :defaultText="'欢迎访问本站'"/>
+        </div>
+        <div>
+            <Navbar/>
+        </div>
+        <div class="SwipeContainer">
+            <Swipe/>
+        </div>
         <div class="icon_font">
             <div class="title-row">
                 <van-icon name="fire" color="#ee0a24" size="24" class="icon"/>
                 <span class="font">大家都在练习</span>
-                <div class="right-container" @click="RouterPush($event, '/ExamList')">
+                <div class="right-container" @click="RouterPush('/ExamList')">
                     <span class="font_right">更多考试</span>
                     <van-icon name="arrow"/>
                 </div>
@@ -23,7 +31,7 @@
     </div>
 </template>
 <script setup>
-import Search from '@/components/Index/SearchOverlay.vue';
+import SearchOverlay from '@/components/Index/SearchOverlay.vue';
 import ScrollingText from '@/components/Index/ScrollingText.vue';
 import Navbar from '@/components/Index/Navbar.vue';
 import Swipe from '@/components/Index/Swipe.vue';

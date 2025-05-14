@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div>
-            <TopBack 
+            <TopBack
             title="搜索" 
             :iconSize="27"
             navBarHeight="47px"/>
@@ -14,4 +14,5 @@
 <script setup>
 import TopBack from '@/components/FuntionComponents/TopBack.vue';
 import Search from '../FuntionComponents/Search.vue';
+
 </script>

@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import getNoticeInfo from '@/API/Index/getNoticeInfo';
+import getNoticeInfo from '@/API/getNoticeInfo';
 import { ref,onMounted } from 'vue'
 const props = defineProps({
     defaultText:{

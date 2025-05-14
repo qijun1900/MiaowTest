@@ -8,7 +8,7 @@
         <div class="statistic">
             <el-statistic :value="outputValue" size="large">
                 <template #title>
-                    <span class="statistic-title">总科目数量:</span>
+                    <span class="statistic-title">科目总数量:</span>
                 </template>
                 <template #suffix>
                     <el-icon size="34"><Tickets /></el-icon>
@@ -29,7 +29,7 @@ import HotExamContainer from '@/components/Index/ExamContainer.vue';
 import { ref } from 'vue'
 import { useTransition } from '@vueuse/core'
 import { Tickets } from '@element-plus/icons-vue'
-import getExamDetails from '@/API/Index/getExamDetails';
+import getExamDetails from '@/API/getExamDetails';
 
 const gridItems = ref([])
 const source = ref(0)

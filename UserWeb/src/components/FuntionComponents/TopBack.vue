@@ -10,7 +10,6 @@
                 </template>
         </van-nav-bar>
     </van-config-provider>
-    
 </template>
 <script setup>
 import RouterBack from '@/util/RouterBack';
@@ -21,7 +20,6 @@ import RouterPush from '@/util/RouterPush';
 const props = defineProps({
     title: { // 标题
         type: String,
-        required: true,
     } ,
     iconName: { // 图标名称
         type: String,
@@ -51,7 +49,7 @@ const onClickLeft = () => {
 // 点击右侧图标
 const onClickRight = () => {
     if (iconName.value === 'search') { // 如果图标名称是 search，则跳转到 SearchInfo 页面
-        RouterPush(event, '/SearchInfo')
+        RouterPush('/SearchInfo')
     }else { 
         console.log('点击了右侧图标，其他处理逻辑');
     }
@@ -69,4 +67,7 @@ const themeVars = ref({
 .van-hairline--bottom:after {
   border-bottom-width: 0;
 } 
+.container {
+color: #3b3c3d;
+}
 </style>

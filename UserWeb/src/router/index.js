@@ -4,7 +4,8 @@ import 'nprogress/nprogress.css' // 需要添加的样式文件
 import Home from '../views/Home/Home.vue'
 import ExamList from '@/views/Exam/ExamList.vue'
 import SearchInfo from '@/components/ViewsComponents/SearchInfoViews.vue'
-
+import SearchDeatil from '@/components/ViewsComponents/SearchDeatil.vue'
+import ExamReady from '@/components/ViewsComponents/ExamReady.vue'
 const routes = [
   {
     path: '/',
@@ -20,9 +21,18 @@ const routes = [
     path: '/SearchInfo',
     name: 'search',
     component: SearchInfo
+  },
+  {
+    path: '/SearchDeatil',
+    name:'searchDeatil',
+    component: SearchDeatil
+  },
+  {
+    path: '/ExamReady/:id',
+    name:'examReady',
+    component: ExamReady
   }
 ]
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -6,6 +6,11 @@
             shape="round"
             clearable
             @focus="showResults = true"
+            @blur="showResults = false"
+            @clear="showResults = false"
+            @input="showResults = true"
+            @search="onSearch(SearchexamStem)"
+            @action-click="showResults = false"
         />
         <!-- 搜索结果列表 -->
         <div 
@@ -17,7 +22,7 @@
                 :key="data._id" 
                 class="result-item"
             >
-                <span class="result-text">{{ data.name }}</span>
+                <van-icon name="search" /><span class="result-text">{{ data.name }}</span>
             </div>
         </div>
         
@@ -34,9 +39,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import getExamDetails from '@/API/Index/getExamDetails'
+import { ref,onMounted } from 'vue'
+import getExamDetails from '@/API/getExamDetails'
 import Empty from '@/components/FuntionComponents/Empty.vue'
+import useSearchFilter from '@/util/SearchFilter'
+import UseonSearch from '@/util/onSearch'
 
 const SearchText = ref('')
 const ExamData = ref([])
@@ -51,14 +58,14 @@ const fetchData = async () => {
     }
 }
 // 搜索逻辑
-const SearchexamStem = computed(() => {
-    if (!SearchText.value) return []
-    return ExamData.value.filter(item => 
-        item.name?.toLowerCase().includes(SearchText.value.toLowerCase())
-    )
+const SearchexamStem = useSearchFilter(ExamData, SearchText)
+// 搜索事件处理(按下回车触发，或者点击搜索按钮)
+const onSearch = (item) => {
+    UseonSearch('/SearchDeatil',SearchText.value,item,)
+}
+onMounted(() => {
+    fetchData() 
 })
-
-fetchData()// 初始化时获取数据
 </script>
 
 <style scoped>
@@ -108,6 +115,7 @@ fetchData()// 初始化时获取数据
     margin-top: 12px;
     font-size: 14px;
 }
-
-
+.van-icon-search{
+     color: #13c4e7;
+}
 </style>
