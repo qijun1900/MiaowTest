@@ -39,10 +39,12 @@ import { ref ,onMounted } from 'vue'
 import getExamDetails from '@/API/getExamDetails'
 import  useSearchFilter  from '@/util/SearchFilter'
 import UseonSearch from '@/util/onSearch'
+import RouterPush from '@/util/RouterPush'
 
 const SearchText = ref('')
 const ExamData = ref([])
 const showResults = ref(false)
+
 
 // 获取考试数据
 const fetchData = async () => {
@@ -59,13 +61,12 @@ const SearchexamStem = useSearchFilter(ExamData, SearchText)
 const selectItem = (item) => {
     SearchText.value = item.name
     showResults.value = false
-    console.log('选中的项目:', item)
+    RouterPush(`/ExamReady/${item._id}`)  
 }
 // 搜索事件处理(按下回车触发，或者点击搜索按钮)
 const onSearch = (item) => {
     UseonSearch('/SearchDeatil',SearchText.value,item,)  
-}   
-
+} 
 // 失去焦点时隐藏搜索结果
 const onBlur = () => {
     setTimeout(() => {

@@ -13,7 +13,7 @@
                 :GutterNumber="15"
                 :UseData="searchResult"
             />
-           <Empty  v-else Description="正在加载搜索结果..."/>
+           <Empty  v-else Description="搜索结果为空"/>
         </div>
     </div>
 </template>
