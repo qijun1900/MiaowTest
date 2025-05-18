@@ -12,7 +12,7 @@
     </van-config-provider>
     <ReflectIssue 
         :Isshow="Isshow" 
-        issuetitle="反馈问题"
+        issuetitle="问题反馈"
         @update:Isshow="val =>Isshow = val"/>
 </template>
 <script setup>

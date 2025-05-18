@@ -6,23 +6,24 @@
             shape="round"
             clearable
             @focus="showResults = true"
-            @blur="showResults = false"
+            @blur="onBlur"
             @clear="showResults = false"
             @input="showResults = true"
             @search="onSearch(SearchexamStem)"
             @action-click="showResults = false"
+
         />
         <!-- 搜索结果列表 -->
         <div 
             v-show="showResults && SearchexamStem.length"
             class="search-results"
-        >
+           >
             <div 
                 v-for="data in SearchexamStem" 
                 :key="data._id" 
                 class="result-item"
-            >
-                <van-icon name="search" /><span class="result-text">{{ data.name }}</span>
+                @click="handleClick(data)"> 
+                <van-icon name="search" /><span class="result-text" >{{ data.name }}</span>
             </div>
         </div>
         
@@ -44,6 +45,7 @@ import getExamDetails from '@/API/getExamDetails'
 import Empty from '@/components/FuntionComponents/Empty.vue'
 import useSearchFilter from '@/util/SearchFilter'
 import UseonSearch from '@/util/onSearch'
+import RouterPush from '@/util/RouterPush'
 
 const SearchText = ref('')
 const ExamData = ref([])
@@ -62,6 +64,20 @@ const SearchexamStem = useSearchFilter(ExamData, SearchText)
 // 搜索事件处理(按下回车触发，或者点击搜索按钮)
 const onSearch = (item) => {
     UseonSearch('/SearchDeatil',SearchText.value,item,)
+}
+// 点击搜索结果触发
+const handleClick = (item) => { 
+    RouterPush(`/ExamReady/${item._id}`)
+   
+  
+}
+// 失去焦点时隐藏搜索结果
+const onBlur = () => {
+    setTimeout(() => {
+        if (!SearchText.value) {        // 检查搜索框是否为空
+            showResults.value = false   // 隐藏搜索结果
+        }
+    }, 200)                             // 200ms延迟
 }
 onMounted(() => {
     fetchData() 

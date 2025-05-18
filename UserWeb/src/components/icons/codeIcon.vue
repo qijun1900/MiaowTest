@@ -1,4 +1,4 @@
-<!-- components/CustomIcon.vue -->
+<!-- icon.sucai999.com 版权所有 -->
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -11,6 +11,10 @@
     <path fill="currentColor" :d="pathData" />
   </svg>
 </template>
+
+
+
+
 
 <script setup>
 import { computed } from 'vue';

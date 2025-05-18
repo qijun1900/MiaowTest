@@ -4,11 +4,7 @@
             title="题目练习"  
             :iconSize="27"
             navBarHeight="54px"
-            navBarIconColor="#3b3c3d"/>
-
-
-
-            
+            navBarIconColor="#3b3c3d"/>       
     </div>
 </template>
 <script setup>
