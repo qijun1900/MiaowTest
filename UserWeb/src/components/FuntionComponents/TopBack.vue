@@ -10,11 +10,17 @@
                 </template>
         </van-nav-bar>
     </van-config-provider>
+    <ReflectIssue 
+        :Isshow="Isshow" 
+        issuetitle="反馈问题"
+        @update:Isshow="val =>Isshow = val"/>
 </template>
 <script setup>
 import RouterBack from '@/util/RouterBack';
 import { computed ,ref} from 'vue'
 import RouterPush from '@/util/RouterPush';
+import ReflectIssue from '../Index/ReflectIssue.vue';
+const Isshow = ref(false);
 
 // 定义 props，接收 不同 属性
 const props = defineProps({
@@ -48,15 +54,15 @@ const onClickLeft = () => {
 }
 // 点击右侧图标
 const onClickRight = () => {
-    if (iconName.value === 'search') { // 如果图标名称是 search，则跳转到 SearchInfo 页面
+    if(iconName.value === 'search') { // 如果图标名称是 search，则跳转到 SearchInfo 页面
         RouterPush('/SearchInfo')
-    }else { 
-        console.log('点击了右侧图标，其他处理逻辑');
+    }if(iconName.value ==='question'){ // 如果图标名称是 question，则显示 反馈问题 弹窗
+        Isshow.value=true;
     }
 }
 // 定制 NavBar 组件主题
 const themeVars = ref({
-    navBarArrowSize: "25px", // 箭头大小
+    navBarArrowSize: "26px", // 箭头大小
     navBarHeight:props.navBarHeight,// 导航栏高度
     navBarTitleFontSize: "18px", // 标题字体大小
     navBarIconColor:props.navBarIconColor, // 图标颜色

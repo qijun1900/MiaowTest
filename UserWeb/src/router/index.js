@@ -6,6 +6,7 @@ import ExamList from '@/views/Exam/ExamList.vue'
 import SearchInfo from '@/components/ViewsComponents/SearchInfoViews.vue'
 import SearchDeatil from '@/components/ViewsComponents/SearchDeatil.vue'
 import ExamReady from '@/components/ViewsComponents/ExamReady.vue'
+import ExamSetting from '@/components/ViewsComponents/ExamSetting.vue'
 const routes = [
   {
     path: '/',
@@ -31,7 +32,13 @@ const routes = [
     path: '/ExamReady/:id',
     name:'examReady',
     component: ExamReady
+  },
+  {
+    path: '/ExamSetting/:id',
+    name:'examSetting',
+    component: ExamSetting
   }
+  
 ]
 
 const router = createRouter({

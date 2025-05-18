@@ -40,7 +40,7 @@ import getOneExamDtail from '@/API/getOneExamDtail';
 import LoadImage from '../FuntionComponents/LoadImage.vue';
 import escconfig from '@/config/esc.config';
 import formatTime from '@/util/formatTime';
-import codeIcon from '@/assets/codeIcon.vue';
+import codeIcon from '@/components/icons/codeIcon.vue';
 
 const examDtail = ref({});
 const props = defineProps({

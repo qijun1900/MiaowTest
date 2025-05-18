@@ -12,7 +12,7 @@ const props = defineProps({
     },
     ImageSize: {
         type: Number, 
-        default: 80
+        default: 90
     },
     Description: {
         type: String,
