@@ -28,10 +28,9 @@ const props = defineProps({
 const emit = defineEmits(['hasData']); 
 
 const handleClick = (item) => {
-    // 这里可以添加跳转逻辑
-    console.log('跳转到考试详情', item);
-    store.setCurrentQuestion(item.questionIdS)
+    console.log(item)
     store.setCurrentTitle(item.content)
+    store.setCurrentQuestion(item.questionIdS)
     RouterPush(`/ExamSetting/${item._id}`)
 }
 

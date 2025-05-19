@@ -11,7 +11,6 @@
             @input="showResults = true"
             @search="onSearch(SearchexamStem)"
             @action-click="showResults = false"
-
         />
         <!-- 搜索结果列表 -->
         <div 
@@ -68,8 +67,6 @@ const onSearch = (item) => {
 // 点击搜索结果触发
 const handleClick = (item) => { 
     RouterPush(`/ExamReady/${item._id}`)
-   
-  
 }
 // 失去焦点时隐藏搜索结果
 const onBlur = () => {

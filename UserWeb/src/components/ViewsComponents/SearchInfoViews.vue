@@ -9,6 +9,9 @@
             <div class="search">
                 <Search/>
             </div>
+            <div>
+                标签：//待开发
+            </div>
     </div>
 </template>
 <script setup>

@@ -13,7 +13,7 @@
             :ExamID="route.params.id"/>
         </div>
         <van-divider content-position="left" :style="{ color: '#1989fa', borderColor: '#1989fa',padding: '0 16px' }">考试题型</van-divider> 
-        <div class="title"> 
+        <div class="title">
             <ExamTitle 
             :UserExamID="route.params.id"
             @hasData="onHasData"/>

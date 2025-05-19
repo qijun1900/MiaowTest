@@ -39,6 +39,25 @@ const ExamController ={
         catch (error) {
             console.error('Error fetching getUserExamInfo details:', error); // 处理错误 
         }
+    },
+    postUserExamIssuse:async (req,res)=>{
+        try {
+            const ExamId =req.params.id; // 从请求参数中获取ExamId
+            const { ExamtagId,Type } = req.body; // 从请求体中获取ExamtagId
+            await ExamService.postUserExamIssuse(
+                ExamId, 
+                ExamtagId,
+                Type,
+                new Date()
+            )
+            res.send({
+                code:200,
+                ActionType: "OK",
+            })
+        }catch (error) {
+            console.error('Error fetching postUserExamIssuse details:', error); // 处理错误
+        }
+
     }
 }
 

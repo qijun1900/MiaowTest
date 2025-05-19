@@ -1,8 +1,8 @@
 import axios from "axios";
-const postUserExamIssuse = async (examId, tagId,) => {
+const postUserExamIssuse = async (examId, ExamtagId,) => {
     try {
-        const response = await axios.post(`/webapi/UserExam/postUserExamIssuse/${examId}`, { tagId });
-        return response.data;
+        const res = await axios.post(`/webapi/UserExam/postUserExamIssuse/${examId}`, {ExamtagId,Type:1});
+        return res.data
     }catch (error) {
         console.log(error);
     }

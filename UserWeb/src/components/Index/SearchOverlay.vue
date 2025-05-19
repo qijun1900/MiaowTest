@@ -5,7 +5,6 @@
             placeholder="请输入搜索关键词"
             shape="round"
             clearable
-            show-action
             @search="onSearch(SearchexamStem)"
             @focus="showResults = true"
             @blur="onBlur"
