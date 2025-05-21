@@ -7,6 +7,7 @@ import SearchInfo from '@/components/ViewsComponents/SearchInfoViews.vue'
 import SearchDeatil from '@/components/ViewsComponents/SearchDeatil.vue'
 import ExamReady from '@/components/ViewsComponents/ExamReady.vue'
 import ExamSetting from '@/components/ViewsComponents/ExamSetting.vue'
+import PractisePage from '@/components/ViewsComponents/PractisePage.vue'
 const routes = [
   {
     path: '/',
@@ -37,6 +38,11 @@ const routes = [
     path: '/ExamSetting/:id',
     name:'examSetting',
     component: ExamSetting
+  },
+  {
+    path: '/PractisePage/:id',
+    name:'practisePage',
+    component: PractisePage
   }
   
 ]

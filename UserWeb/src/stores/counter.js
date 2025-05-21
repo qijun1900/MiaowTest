@@ -31,10 +31,18 @@ export const useExamStore = defineStore('exam', {
       // 只存储到 localStorage，不更新 store 状态
       localStorage.setItem('exam_currentQuestion', JSON.stringify(question))  // 同步更新到localStorage本地存储仍需序列化
     },
+    setSelectedQuestions(questions) {
+      this.selectedQuestions = questions
+      localStorage.setItem('exam_selectedQuestions', JSON.stringify(questions))
+    },
     // 新增获取方法,用于从localStorage获取当前题目内容,保持数据的同步性
     getCurrentQuestion() {
       const question = localStorage.getItem('exam_currentQuestion')
       return question ? JSON.parse(question) : null
+    },
+    getSelectedQuestions() {
+      const questions = localStorage.getItem('exam_selectedQuestions')
+      return questions ? JSON.parse(questions) : null
     }
   }
 })
