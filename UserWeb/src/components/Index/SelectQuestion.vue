@@ -1,6 +1,6 @@
 <template>
     <div>
-        {{ props.index }}//Select//{{ props.questionID }}
+        第{{ props.index }}题 (选择题) ID:{{ props.questionID }}
     </div>
 </template>
 <script setup>
@@ -13,6 +13,5 @@ const props = defineProps({
         type: String,
         required: true,
     }
-
 })
 </script>

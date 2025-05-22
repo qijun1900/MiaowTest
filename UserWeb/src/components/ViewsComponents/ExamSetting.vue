@@ -108,7 +108,7 @@ const questions = ref([])
 const route = useRoute()
 const examStore = useExamStore()
 const store = useExamStore()
-const IsnowAnswer = ref(false)
+const IsnowAnswer = ref(true)
 const IsRandom = ref(false)
 const practiceCount = ref(1) // 修改为数字类型，设置默认值为1
 
