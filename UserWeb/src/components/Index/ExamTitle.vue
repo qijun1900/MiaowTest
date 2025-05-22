@@ -28,7 +28,6 @@ const props = defineProps({
 const emit = defineEmits(['hasData']); 
 
 const handleClick = (item) => {
-    console.log(item)
     store.setCurrentTitle(item.content)
     store.setCurrentQuestion(item.questionIdS)
     RouterPush(`/ExamSetting/${item._id}`)

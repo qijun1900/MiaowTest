@@ -2,7 +2,7 @@
 <van-config-provider :theme-vars="themeVars">
     <div class="container">
         <TopBack
-        title="题目练习"  
+        title="题目设置"  
         :iconSize="27"
         navBarHeight="54px"
         navBarIconColor="#3b3c3d"/>
@@ -120,9 +120,7 @@ onMounted(() => {
 
 // 处理立即练习逻辑
 const HandleGoPractice = () => {
-    console.log("练习数量:", practiceCount.value)
     const selectedQuestions = questions.value.slice(0, practiceCount.value)
-    console.log("选中的题目:", selectedQuestions)
     store.setSelectedQuestions(selectedQuestions)// 将选中的题目存储到store中
     RouterPush(`/PractisePage/${route.params.id}`)// 跳转到练习页面
 }

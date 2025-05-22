@@ -47,7 +47,7 @@ import TagInfo1 from '@/util/TagInfo';
 import { useRoute } from 'vue-router';
 import postUserExamIssuse from '@/API/postUserExamIssuse';
 import SuccessSimleIcon from '../icons/SuccessSimleIcon.vue';
-import { showFailToast } from 'vant';
+import { showToast } from 'vant';
 const route = useRoute();
 const props = defineProps({
     Isshow: {
@@ -71,7 +71,11 @@ const onChange = (value) => {
 const handleSubmit = async () => {
     try {
         if (!checked.value) {
-            return showFailToast('请选择问题类型') ; 
+            return showToast({
+            message: '请选择问题类型',
+            position: 'top',
+            icon: 'warning-o'
+            });
         }
         const res = await postUserExamIssuse(route.params.id, checked.value);
         if (res.code === 200) {
