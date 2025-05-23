@@ -1,17 +1,19 @@
 <template>
     <div>
-      {{ props.index }}  //short//{{ props.questionID }}
+      {{ props.index }}//short//{{ question._id }}
     </div>
 </template>
 <script setup>
+import {computed} from 'vue';
 const props = defineProps({
     index: {
         type: Number,
         required: true,
     },
-    questionID: {
-        type: String,
+    questionData: { 
         required: true,
     }
 })
+const question = computed(() => props.questionData)
+
 </script>

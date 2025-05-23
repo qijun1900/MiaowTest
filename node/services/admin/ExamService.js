@@ -43,7 +43,7 @@ const ExamService ={
     deleteInfo:async({_id})=>{
         return ExamModel.deleteOne({_id})
     },
-    AddSelectQuestion:async({examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type})=>{
+    AddSelectQuestion:async({examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type,isMultiple})=>{
         return ExamSelectModel.create({
             examId,
             stem,
@@ -53,6 +53,7 @@ const ExamService ={
             isAIanswer,
             isAddUserList,
             Type,
+            isMultiple,
             createdTime
         })
     },

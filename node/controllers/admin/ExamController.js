@@ -51,7 +51,7 @@ const ExamController ={
         })
     },
     AddSelectQuestion:async(req,res)=>{
-        const {examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,Type} = req.body
+        const {examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,isMultiple,Type} = req.body
         await ExamService.AddSelectQuestion({
             examId,
             stem,
@@ -61,6 +61,7 @@ const ExamController ={
             isAIanswer:Number(isAIanswer),
             isAddUserList:Number(isAddUserList),
             Type:Number(Type),
+            isMultiple:Number(isMultiple),
             createdTime:new Date()
         })
         res.send({

@@ -48,7 +48,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="6" class="flex items-center">
-            <el-checkbox v-model="option.isCorrect">正确答案</el-checkbox>
+            <el-checkbox v-model="option.isCorrect" @change="updateMultipleStatus">正确答案</el-checkbox>
             <el-button
               type="danger"
               @click="removeOption(index)"
@@ -120,17 +120,27 @@ const form = reactive({
     analysis:'', // 题目解析/答案解释
     isAIanswer:0,//0:不是，1：是
     isAddUserList:0,//0:不是，1：是
-    Type:1 // 题目类型
+    Type:1, // 题目类型
+    isMultiple:0 // 0:单选，1:多选
 });
+
 // 添加选项
 const addOption = () => {
   form.options.push({ content: '', isCorrect: false });
+  updateMultipleStatus();
 };
 
 const removeOption = (index) => {
   if (form.options.length > 2) {
     form.options.splice(index, 1);
+    updateMultipleStatus();
   }
+};
+
+// 更新多选状态
+const updateMultipleStatus = () => {
+  const correctCount = form.options.filter(o => o.isCorrect).length;
+  form.isMultiple = correctCount > 1 ? 1 : 0;
 };
 const props = defineProps({
   questionId: String
@@ -182,6 +192,7 @@ const submitForm = async () => {
         isAIanswer: form.isAIanswer,
         isAddUserList: 0,
         Type: 1,
+        isMultiple: form.isMultiple
       };
       
       const url = props.questionId

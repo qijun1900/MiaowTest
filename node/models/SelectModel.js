@@ -9,6 +9,7 @@ const SelectSchema  = new mongoose.Schema({
     isAIanswer:Number,// 新增字段，用于存储是否AI回答 
     isAddUserList:Number,//0:不是，1：是
     Type:Number, // 题目类型
+    isMultiple:Number,//是否多选
     createdTime:Date,
     
 })

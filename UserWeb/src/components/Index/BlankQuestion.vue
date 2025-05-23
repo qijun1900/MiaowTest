@@ -1,18 +1,20 @@
 <template>
     <div>
-      {{ props.index }}  //balank//{{ props.questionID }}
+      {{ props.index }}  //balank//{{ question._id }}
     </div>
 
 </template>
 <script setup>
+import {computed} from 'vue';
 const props = defineProps({
     index: {
         type: Number,
         required: true,
     },
-    questionID: {
-        type: String,
+    questionData: { 
         required: true,
     }
 })
+const question = computed(() => props.questionData)
+
 </script>

@@ -8,8 +8,7 @@
                         :is="questionComponents[question.Type]" 
                         :index="currentPage"
                         v-if="question.Type in questionComponents" 
-                        :key="question._id" 
-                        :questionID="question._id" />
+                        :questionData="question" />
                 </template>
             </div>
             <div class="pagination-container">
