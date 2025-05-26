@@ -1,67 +1,55 @@
 <template>
-<van-config-provider :theme-vars="themeVars">
-    <div class="question-container">
-        <div class="stem">
-            <el-check-tag 
-                checked 
-                type="primary"
-                class="type-tag"
-            >
-                {{ question.isMultiple === 1 ? '多选' : '单选' }}
-            </el-check-tag>
-            <span class="question-index">【{{ index }}】</span>
-            <span class="question-stem">{{ question.stem }}</span>
-        </div>
-        <div class="option-list">
-            <div 
-                v-for="(option, index) in question.options" 
-                :key="index"
-                class="option-item"
-                :class="{
+    <van-config-provider :theme-vars="themeVars">
+        <div class="question-container">
+            <div class="stem">
+                <el-check-tag checked type="primary" class="type-tag">
+                    {{ question.isMultiple === 1 ? '多选' : '单选' }}
+                </el-check-tag>
+                <span class="question-index">【{{ index }}】</span>
+                <span class="question-stem">{{ question.stem }}</span>
+            </div>
+            <div class="option-list">
+                <div 
+                    v-for="(option, index) in question.options" 
+                    :key="index" class="option-item" 
+                    :class="{
                     'correct-option': answer && option.isCorrect,
                     'wrong-option': answer && !option.isCorrect && (
                         (question.isMultiple === 0 && selectedOption === index) ||
                         (question.isMultiple === 1 && selectedOptions.includes(index))
                     ),
                     'selected-option': question.isMultiple === 1 && selectedOptions.includes(index)
-                }"
-                @click="handleClickOption(option, index)">
-                <el-tag round class="option-tag">
-                    {{ String.fromCharCode(65 + index) }}
-                </el-tag>
-                <span class="option-content">{{ option.content }}</span>
-            </div>
-        </div>
-        <div class="multiple-button" v-if="question.isMultiple === 1">
-            <van-button 
-                icon="checked" 
-                type="primary"      
-                :round="true" 
-                color="#2e66ff"
-                size="normal"
-                @click="handleSumitMultiple">
-                查看答案
-            </van-button>
-        </div>
-        <div v-if="answer" class="answer-container">
-            <div class="answer-content">
-                <span class="answer-label">答案：</span>
-                <template v-for="(option, index) in question.options" :key="index">
-                    <span 
-                        v-if="option.isCorrect === true"
-                        class="answer-option">
+                    }" 
+                    @click="handleClickOption(option, index)">
+                    <el-tag round class="option-tag">
                         {{ String.fromCharCode(65 + index) }}
-                    </span>
-                </template>
+                    </el-tag>
+                    <span class="option-content">{{ option.content }}</span>
+                </div>
+            </div>
+            <div class="multiple-button" v-if="question.isMultiple === 1">
+                <van-button icon="checked" type="primary" :round="true" color="#2e66ff" size="normal"
+                    @click="handleSumitMultiple">
+                    查看答案
+                </van-button>
+            </div>
+            <div v-if="answer" class="answer-container">
+                <div class="answer-content">
+                    <span class="answer-label">答案：</span>
+                    <template 
+                        v-for="(option, index) in question.options" 
+                        :key="index">
+                        <span v-if="option.isCorrect === true" class="answer-option">
+                            {{ String.fromCharCode(65 + index) }}
+                        </span>
+                    </template>
+                </div>
+            </div>
+            <div class="analyse-container" v-if="answer">
+                <Analyse :analysis="question.analysis" :isAIanswer="question.isAIanswer" />
             </div>
         </div>
-        <div class="analyse-container" v-if="answer">
-           <Analyse 
-           :analysis="question.analysis"
-           :isAIanswer="question.isAIanswer"/>
-        </div>  
-    </div>
-</van-config-provider>
+    </van-config-provider>
 </template>
 <script setup>
 import { computed, reactive, ref } from 'vue';
@@ -90,33 +78,33 @@ const selectedOptions = ref([]) // 数组存储多选题的选择
 
 
 const handleClickOption = (option, index) => {
-    if(isShowAnswer.value && !answer.value && question.value.isMultiple === 0) {
+    if (isShowAnswer.value && !answer.value && question.value.isMultiple === 0) {
         selectedOption.value = index // 记录用户选择的选项
         answer.value = true;
     }
     if (isShowAnswer.value && question.value.isMultiple === 1) {
         const selectedIndex = selectedOptions.value.indexOf(index)
-        if(selectedIndex === -1) {
+        if (selectedIndex === -1) {
             selectedOptions.value.push(index) // 添加选择
         } else {
             selectedOptions.value.splice(selectedIndex, 1) // 取消选择
         }
-    } 
+    }
 };
-const handleSumitMultiple = ()=>{
+const handleSumitMultiple = () => {
     // 获取所有正确答案的索引
     const correctOptions = question.value.options
         .map((option, index) => option.isCorrect ? index : -1)
         .filter(index => index !== -1);
-    
+
     // 校验答案是否正确
-    const isCorrect = 
+    const isCorrect =
         selectedOptions.value.length === correctOptions.length &&
         selectedOptions.value.every(option => correctOptions.includes(option));
-    
+
     // 显示答案
     answer.value = true;
-    
+
     // 可以在这里添加其他逻辑，如记录答题结果等
     console.log('提交答案', {
         selected: selectedOptions.value,
@@ -125,9 +113,9 @@ const handleSumitMultiple = ()=>{
     });
 }
 
-const themeVars =reactive({
+const themeVars = reactive({
     buttonNormalFontSize: '16px',
-    buttonIconSize:"22px",
+    buttonIconSize: "22px",
 })
 </script>
 <style scoped>
@@ -145,20 +133,19 @@ const themeVars =reactive({
 
 .type-tag {
     margin-right: 1px;
-    font-size: 15px; 
     padding: 4px 7px;
 }
 
 .question-index {
     margin-right: 0px;
     color: #1e97ee;
-    font-size: 19px;
+    font-size: 16px;
     font-weight: bold;
 }
 
 .question-stem {
-    flex: 1; 
-    font-size: 20px; 
+    flex: 1;
+    font-size: 20px;
     color: #222;
     word-break: break-all;
 }
@@ -177,19 +164,19 @@ const themeVars =reactive({
     padding: 18px 18px 18px 18px;
     cursor: pointer;
     transition: background 0.2s, box-shadow 0.2s;
-    font-size: 22px; 
     user-select: none;
 }
 
 .selected-option {
-    background: #d7f2ff ;
-    box-shadow: 0 2px 8px rgba(64,158,255,0.2) 
+    background: #d7f2ff;
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2)
 }
+
 .option-tag {
     margin-right: 20px;
     background: #4d9ef0;
     color: #fff;
-    font-size: 20px; 
+    font-size: 20px;
     border: none;
 }
 
@@ -209,11 +196,13 @@ const themeVars =reactive({
     background: hsl(0, 100%, 86%) !important;
     box-shadow: 0 2px 8px rgba(255, 0, 0, 0.1);
 }
-.multiple-button{
+
+.multiple-button {
     display: flex;
     justify-content: center;
     margin-top: 70px;
 }
+
 .answer-container {
     background-color: #f7f7f7;
     border-radius: 10px;
@@ -234,10 +223,12 @@ const themeVars =reactive({
 
 .answer-option {
     font-size: 25px;
-    color: #67c23a; /* 浅绿色 */
+    color: #67c23a;
+    /* 浅绿色 */
     margin-right: 8px;
 }
-.analyse-container{
+
+.analyse-container {
     margin-top: 20px;
 }
 </style>

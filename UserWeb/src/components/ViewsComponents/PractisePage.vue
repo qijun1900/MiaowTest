@@ -10,7 +10,7 @@
                         v-if="question.Type in questionComponents" 
                         :questionData="question" 
                         :IsShowAnswer="IsShowAnswer"
-                        :IsRandom="IsRandom"/>
+                        />
 
                 </template>
             </div>
