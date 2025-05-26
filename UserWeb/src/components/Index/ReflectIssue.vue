@@ -43,7 +43,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import simleIcon from '../icons/simleIcon.vue';
-import TagInfo1 from '@/util/TagInfo';
+import {TagInfo1} from '@/util/TagInfo';
 import { useRoute } from 'vue-router';
 import postUserExamIssuse from '@/API/postUserExamIssuse';
 import SuccessSimleIcon from '../icons/SuccessSimleIcon.vue';

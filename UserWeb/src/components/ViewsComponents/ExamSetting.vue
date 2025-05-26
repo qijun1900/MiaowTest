@@ -15,7 +15,7 @@
                     icon="description"
                     class="info-cell">
                     <template #value>
-                        <span class="info-value">{{ examStore.currentTitle }}</span>
+                        <span class="info-value">{{ store.currentTitle }}</span>
                     </template>
                 </van-cell>
                 <van-cell 
@@ -56,12 +56,12 @@
             <div class="set-group"> 
                 <span class="set-label">是否立即显示答案：</span>
                 <van-switch 
-                    v-model="IsnowAnswer"
+                    v-model="IsshowAnswer"
                     size="24px"
                     active-color="#1a86e4">
                     <template #node>
                         <div class="icon-wrapper">
-                            <van-icon :name="IsnowAnswer ? 'success' : 'cross'" />
+                            <van-icon :name="IsshowAnswer ? 'success' : 'cross'" />
                         </div>
                     </template>
                 </van-switch>
@@ -106,22 +106,22 @@ import { useRoute } from 'vue-router'
 
 const questions = ref([])
 const route = useRoute()
-const examStore = useExamStore()
 const store = useExamStore()
-const IsnowAnswer = ref(true)
+const IsshowAnswer = ref(true)
 const IsRandom = ref(false)
 const practiceCount = ref(1) // 修改为数字类型，设置默认值为1
 
 onMounted(() => {
     questions.value = store.getCurrentQuestion()// 获取当前题型的题目
     practiceCount.value = questions.value.length // 初始化为题目总数
-    console.log('当前题目:', questions.value)
 })
 
 // 处理立即练习逻辑
 const HandleGoPractice = () => {
     const selectedQuestions = questions.value.slice(0, practiceCount.value)
     store.setSelectedQuestions(selectedQuestions)// 将选中的题目存储到store中
+    store.setIsShowAnswer(IsshowAnswer.value)// 设置是否显示答案
+    store.setIsRandom(IsRandom.value)// 设置题目顺序是否随机
     RouterPush(`/PractisePage/${route.params.id}`)// 跳转到练习页面
 }
 

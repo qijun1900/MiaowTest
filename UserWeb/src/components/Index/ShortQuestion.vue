@@ -12,8 +12,17 @@ const props = defineProps({
     },
     questionData: { 
         required: true,
+    },
+    isShowAnswer: {
+        type: Boolean, 
+    },
+    isRandom: {
+        type: Boolean, 
     }
 })
 const question = computed(() => props.questionData)
+const index = computed(() => props.index)
+const isShowAnswer = computed(() => props.isShowAnswer)
+const isRandom = computed(() => props.isRandom)
 
 </script>

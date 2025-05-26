@@ -1,14 +1,17 @@
 <template>
     <van-config-provider :theme-vars="themeVars">
         <div class="container">
-            <TopBack title="题目练习" />
+            <TopBack title="题目练习" iconName="question" :iconSize="29" navBarIconColor="#3b3c3d"/>
             <div v-if="currentQuestion">
                 <template v-for="question in currentQuestion" :key="question._id">
                     <component 
                         :is="questionComponents[question.Type]" 
                         :index="currentPage"
                         v-if="question.Type in questionComponents" 
-                        :questionData="question" />
+                        :questionData="question" 
+                        :IsShowAnswer="IsShowAnswer"
+                        :IsRandom="IsRandom"/>
+
                 </template>
             </div>
             <div class="pagination-container">
@@ -54,8 +57,11 @@ import RightIcon from '../icons/RightIcon.vue';
 import AnsweSheetIcon from '../icons/AnsweSheetIcon.vue';
 
 const store = useExamStore()
+
 const practiceQuestion = ref([]);
 const currentPage = ref(1); // 添加当前页码
+const IsShowAnswer = computed(() => store.IsShowAnswer);
+const IsRandom = computed(() => store.IsRandom);
 
 // 计算当前显示的题目
 const currentQuestion = computed(() => {
@@ -65,18 +71,24 @@ const currentQuestion = computed(() => {
     return null;
 });
 
+onMounted(() => {
+    const questions = store.getSelectedQuestions();
+    if (IsRandom.value) {
+        // 随机打乱题目顺序
+        practiceQuestion.value = [...questions].sort(() => Math.random() - 0.5);
+    } else {
+        practiceQuestion.value = questions;
+    }
+    console.log("练习题目：", practiceQuestion.value);
+});
+// 定义组件映射关系
 const questionComponents = {
     1: SelectQuestion,
-    2: JudgeQuestion,
-    3: BlankQuestion,
+    2: BlankQuestion,
+    3: JudgeQuestion,
     4: ShortQuestion
 }
 
-
-onMounted(() => {
-    practiceQuestion.value = store.getSelectedQuestions();
-    console.log(practiceQuestion.value)
-});
 const themeVars = ref({
     actionBarBackground: "#ededed",
     actionBarHeight: "64px"
@@ -144,5 +156,6 @@ const themeVars = ref({
 .container {
     padding-bottom: 150px; /* 为固定元素预留空间，防止内容被遮挡 */
 }
+
 </style>
 
