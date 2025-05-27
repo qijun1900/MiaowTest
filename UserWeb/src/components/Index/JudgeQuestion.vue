@@ -89,7 +89,7 @@ const handleClickOption = (index) => {
 
 .stem {
     margin-bottom: 28px;
-    font-weight: 500;
+    font-weight: 530;
     color: #333;
 }
 
@@ -176,11 +176,12 @@ const handleClickOption = (index) => {
     font-size: 20px;
     color: #666;
     margin-right: 8px;
+    font-weight: 700;
 }
 
 .answer-option {
     font-size: 25px;
-    color: #67c23a;
+    color: #6cd537;
     margin-right: 8px;
 }
 </style>

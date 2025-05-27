@@ -1,6 +1,5 @@
 <template>
-    <van-config-provider :theme-vars="themeVars">
-        <div class="question-container">
+    <div class="question-container">
             <div class="stem">
                 <el-check-tag checked type="primary" class="type-tag">
                     {{ question.isMultiple === 1 ? '多选' : '单选' }}
@@ -28,10 +27,13 @@
                 </div>
             </div>
             <div class="multiple-button" v-if="question.isMultiple === 1">
-                <van-button icon="checked" type="primary" :round="true" color="#2e66ff" size="normal"
-                    @click="handleSumitMultiple">
-                    查看答案
-                </van-button>
+                <CheckanswerButton 
+                    v-if="isShowAnswer"
+                    :isMultiple="question.isMultiple === 1"
+                    :selectedOptions="selectedOptions"
+                    :questionOptions="question.options"
+                    @submit="handleSumitMultiple"
+                    @show="answer = true"/>
             </div>
             <div v-if="answer" class="answer-container">
                 <div class="answer-content">
@@ -48,13 +50,12 @@
             <div class="analyse-container" v-if="answer">
                 <Analyse :analysis="question.analysis" :isAIanswer="question.isAIanswer" />
             </div>
-        </div>
-    </van-config-provider>
+    </div>
 </template>
 <script setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
 import Analyse from './Analyse.vue';
-
+import CheckanswerButton from '../FuntionComponents/CheckanswerButton.vue';
 
 const props = defineProps({
     index: {//题目索引
@@ -96,12 +97,10 @@ const handleSumitMultiple = () => {
     const correctOptions = question.value.options
         .map((option, index) => option.isCorrect ? index : -1)
         .filter(index => index !== -1);
-
     // 校验答案是否正确
     const isCorrect =
         selectedOptions.value.length === correctOptions.length &&
         selectedOptions.value.every(option => correctOptions.includes(option));
-
     // 显示答案
     answer.value = true;
 
@@ -113,10 +112,7 @@ const handleSumitMultiple = () => {
     });
 }
 
-const themeVars = reactive({
-    buttonNormalFontSize: '16px',
-    buttonIconSize: "22px",
-})
+
 </script>
 <style scoped>
 .question-container {
@@ -127,7 +123,7 @@ const themeVars = reactive({
 
 .stem {
     margin-bottom: 28px;
-    font-weight: 500;
+    font-weight: 530;
     color: #333;
 }
 
@@ -200,7 +196,7 @@ const themeVars = reactive({
 .multiple-button {
     display: flex;
     justify-content: center;
-    margin-top: 70px;
+    margin-top: 40px;
 }
 
 .answer-container {
@@ -219,6 +215,7 @@ const themeVars = reactive({
     font-size: 20px;
     color: #666;
     margin-right: 8px;
+    font-weight: 700;
 }
 
 .answer-option {

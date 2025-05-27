@@ -23,6 +23,5 @@ const props = defineProps({
 const question = computed(() => props.questionData)
 const index = computed(() => props.index)
 const isShowAnswer = computed(() => props.isShowAnswer)
-const isRandom = computed(() => props.isRandom)
 
 </script>
