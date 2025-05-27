@@ -74,4 +74,7 @@ const isAIanswer = computed(() => {
     font-weight: 600;
     margin-left: 2px;
 }
+.analyse-container {
+    margin-top: 20px;
+}
 </style>

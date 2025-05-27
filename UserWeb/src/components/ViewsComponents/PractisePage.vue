@@ -91,7 +91,7 @@ const questionComponents = {
 
 const themeVars = ref({
     actionBarBackground: "#ededed",
-    actionBarHeight: "64px"
+    actionBarHeight: "54px"
 })
 </script>
 <style scoped>
@@ -138,7 +138,7 @@ const themeVars = ref({
 }
 .pagination-container {
     position: fixed;
-    bottom: 85px; /* 操作栏高度64px + 间距25px */
+    bottom: 75px; 
     left: 0;
     right: 0;
     padding: 0 16px;

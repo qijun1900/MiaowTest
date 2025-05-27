@@ -17,8 +17,8 @@
                     :style="{
                         background: (answer && (option.isCorrect || selectedOption === index)) ? 'transparent' : '#4d9ef0'
                     }">
-                    <RightIcon v-if="answer && option.isCorrect" />
-                    <ErrorIcon v-else-if="answer && selectedOption === index && !option.isCorrect" />
+                    <RightIcon v-if="answer && option.isCorrect"  size="31"/>
+                    <ErrorIcon v-else-if="answer && selectedOption === index && !option.isCorrect"  size="28.5"/>
                     <span v-else>{{ String.fromCharCode(65 + index) }}</span>
                 </el-tag>
                 <span class="option-content" :class="{
@@ -37,12 +37,16 @@
                 </span>
             </div>
         </div>
+        <div class="analyse-container" v-if="answer">
+            <Analyse :analysis="question.analysis" :isAIanswer="question.isAIanswer" />
+        </div>
     </div>
 </template>
 <script setup>
 import { computed, ref } from 'vue';
 import ErrorIcon from '../icons/ErrorIcon.vue';
 import RightIcon from '../icons/RightIcon.vue';
+import Analyse from './Analyse.vue';
 
 const props = defineProps({
     index: {
@@ -140,6 +144,12 @@ const handleClickOption = (index) => {
     color: #fff;
     font-size: 20px;
     border: none;
+    width: 27px;           /* 固定宽度，根据图标实际宽度调整 */
+    height: 27px;          /* 可选：高度也固定 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;            /* 去除内边距 */
 }
 
 .option-content {
