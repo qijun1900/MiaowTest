@@ -29,8 +29,7 @@
         <!-- 空白页面 -->
         <div 
             v-if="SearchText && !SearchexamStem.length"
-            class="empty-state"
-        >
+            class="empty-state">
             <Empty 
             :ImageSize="80"
             Description="暂无相关科目"/>

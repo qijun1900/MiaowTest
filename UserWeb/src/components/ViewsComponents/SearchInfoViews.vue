@@ -16,6 +16,6 @@
 </template>
 <script setup>
 import TopBack from '@/components/FuntionComponents/TopBack.vue';
-import Search from '../Search.vue';
+import Search from '../Index/Search.vue';
 
 </script>
