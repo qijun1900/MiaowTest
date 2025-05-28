@@ -23,7 +23,7 @@ const navItems = [
     { icon: 'wap-home', text: '开源地址' , to: '/'},
     { icon: 'column', text: '所有考试' ,  to: '/ExamList'},
     { icon: 'medal', text: '竞赛占位' , to: '/contest'},
-    { icon: 'wechat-pay', text: '赞助项目' , to: '/ranking'},
+    { icon: 'wechat-pay', text: '占位置在' , to: '/ranking'},
     { icon: 'user-o', text: '我的占位', to: '/mine' },
     { icon: 'comment-o', text: '消息占位' , to: '/message'}
 ]

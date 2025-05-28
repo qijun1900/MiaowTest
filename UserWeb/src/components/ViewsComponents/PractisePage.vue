@@ -1,7 +1,7 @@
 <template>
     <van-config-provider :theme-vars="themeVars">
         <div class="container">
-            <TopBack title="题目练习" iconName="question" :iconSize="29" navBarIconColor="#3b3c3d"/>
+            <TopBack title="练习设置" iconName="question" :iconSize="29" navBarIconColor="#3b3c3d"/>
             <div v-if="currentQuestion">
                 <template v-for="question in currentQuestion" :key="question._id">
                     <component 
@@ -11,7 +11,6 @@
                         :questionData="question" 
                         :IsShowAnswer="IsShowAnswer"
                         />
-
                 </template>
             </div>
             <div class="pagination-container">

@@ -219,7 +219,7 @@ const handleSumitMultiple = () => {
 }
 
 .answer-option {
-    font-size: 25px;
+    font-size: 23px;
     color: #67c23a;
     /* 浅绿色 */
     margin-right: 8px;

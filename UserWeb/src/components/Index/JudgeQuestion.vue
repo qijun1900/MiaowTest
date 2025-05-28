@@ -180,7 +180,7 @@ const handleClickOption = (index) => {
 }
 
 .answer-option {
-    font-size: 25px;
+    font-size: 23px;
     color: #6cd537;
     margin-right: 8px;
 }
