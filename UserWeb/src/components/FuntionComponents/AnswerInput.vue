@@ -7,12 +7,15 @@
                 v-model="userAnswers[index]"
                 clearable
                 :label="'空' + (index + 1)"
-                left-icon="eye"
+                left-icon="award"
                 :placeholder="'请输入答案'"
                 autosize
                 type="textarea"
                 :colon="true"
-                size="large"/>
+                size="large"
+                maxlength="1000"
+                show-word-limit
+                label-width="2.3em"/>
             </van-cell-group>
         </div>
         <div class="checkbutton--container">
@@ -40,7 +43,7 @@ const emit = defineEmits(['submit']);
 const userAnswers = ref(props.options.map(() => ''));
 const themeVars = reactive({
     fieldLabelColor:"#1874ff",
-    fieldIconSize:"23px",
+    fieldIconSize:"25px",
     fieldClearIconColor:"#ff5775",
     cellBackground:"#f7f8fa",
 })
@@ -57,6 +60,6 @@ const submitAnswers = () => {
     gap: 22px;
 }
 .checkbutton--container{
-    margin-top: 40px;
+    margin-top: 30px;
 }
 </style>

@@ -502,6 +502,7 @@ const handleBatchPublish = async () => {
         _id: item._id,
         Type: item.Type, 
         stem: item.stem,
+        content: item.content,
         options: item.options,
         answer: item.answer,
         isAIanswer: item.isAIanswer,

@@ -7,13 +7,12 @@
             <span class="question-index">【{{ index }}】</span>
             <span class="question-stem">{{ question.stem}}</span>
         </div>
-   
-    <div class="option-list">
-        <AnswerInput 
-            :options="question.options" 
-            @submit="handleSubmit"
-        />
-    </div>
+        <div class="option-list">
+            <AnswerInput 
+                :options="question.options" 
+                @submit="handleSubmit"
+            />
+        </div>
         <div v-if="answer" class="answer-container">
         <div>
             <span class="answer-font">答案：</span>
@@ -21,7 +20,7 @@
                 v-for="(answer,index) in question.options" 
                 :key="index"
                 class="answer-option">
-                <span class="index-lable">空{{ index+1 }}</span><span class="answer-lable">{{ answer.content }}</span>
+                <span class="index-lable">空{{ index+1 }}:</span><span class="answer-lable">{{ answer.content }}</span>
             </div>
         </div>
     </div>
@@ -53,7 +52,6 @@ const answer = ref(false)
 const handleSubmit = (answers) => {
     answer.value = true;
     console.log('用户提交的答案:', answers);
-    // 这里可以添加提交答案的逻辑  
 }
 </script>
 <style scoped>
@@ -102,7 +100,6 @@ const handleSubmit = (answers) => {
     border-radius: 10px;
     padding: 16px 18px;
     margin-top: 25px;
-
 }
 .answer-option{
     margin-top: 9px;
@@ -110,12 +107,16 @@ const handleSubmit = (answers) => {
 .index-lable{
     font-size: 18px;
     color: #666;
-    margin-right: 8px;
+    margin-right:7px;
+    line-height: 1.35;
 }
 .answer-lable{
-    font-size: 18px;
-    color: #70e635;
+    font-size: 19px;
+    color: #42c600f1;
     margin-right: 9px;
+    line-height: 1.35;
+    word-break: break-all;
+    font-weight: 600;
 }
 .answer-font{
     font-size: 20px;

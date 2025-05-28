@@ -138,7 +138,7 @@ const themeVars = ref({
 }
 .pagination-container {
     position: fixed;
-    bottom: 75px; 
+    bottom: 54px; 
     left: 0;
     right: 0;
     padding: 0 16px;

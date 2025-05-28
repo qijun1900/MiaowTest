@@ -13,7 +13,6 @@
     </div>
 </van-config-provider>
 </template>
-
 <script setup>
 import { computed ,reactive} from 'vue';
 const props = defineProps({
@@ -59,7 +58,6 @@ const themeVars = reactive({
     buttonIconSize: "25px",
 })
 </script>
-
 <style scoped>
 .multiple-button {
     display: flex;
