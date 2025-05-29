@@ -42,13 +42,43 @@
                     </van-button>
                 </van-action-bar>
             </div>
-
         </div>
+        <van-popup
+            class="answer-sheet-popup"
+            v-model:show="show"
+            closeable
+            close-icon="close"
+            position="bottom"
+            :style="{ height: '70%'}">
+            <div class="action-but-container">
+                <van-space :size="25">
+                <van-button  type="primary" round color="#5DADE2" @click="ResetAnswerSheet">
+                    <template #icon>
+                        <ResetIcon color="#00d2d3"/>
+                    </template>
+                    清空答题记录
+                </van-button>
+                <van-button  type="primary" round color="#5DADE2">
+                    <template #icon>
+                        <SubmitIcon color="#00d2d3"/>
+                    </template>
+                    提交题目{待开发}
+                </van-button>
+                </van-space>
+            </div>
+            <div>
+                <span class="answer-sheet-font">答题卡</span>
+                <div class="answer-sheet-content">
+                    <span>题目答题记录及其题序{待开发}</span>
+                </div>
+            </div>
+        </van-popup>
     </van-config-provider>
 </template>
 
 <script setup>
 import { useExamStore } from '@/stores/counter'
+import { useAnswerStore } from '@/stores/answerStore'
 import { onMounted, ref, computed } from 'vue';
 import TopBack from '../FuntionComponents/TopBack.vue';
 import SelectQuestion from '../Index/SelectQuestion.vue';
@@ -58,13 +88,18 @@ import BlankQuestion from '../Index/BlankQuestion.vue';
 import ErrorIcon from '../icons/ErrorIcon.vue';
 import RightIcon from '../icons/RightIcon.vue';
 import AnsweSheetIcon from '../icons/AnsweSheetIcon.vue';
+import ResetIcon from '../icons/ResetIcon.vue';
+import SubmitIcon from '../icons/SubmitIcon.vue';
+import { showConfirmDialog } from 'vant';
 
 const store = useExamStore()
+const answerStore = useAnswerStore()
 
 const practiceQuestion = ref([]);
 const currentPage = ref(1); // 添加当前页码
 const IsShowAnswer = computed(() => store.IsShowAnswer);
 const IsRandom = computed(() => store.IsRandom);
+const show = ref(false);// 控制答题卡弹窗的显示状态
 
 // 计算当前显示的题目
 const currentQuestion = computed(() => {
@@ -76,10 +111,19 @@ const currentQuestion = computed(() => {
 
 // 检查答题卡
 const CheckAnswerSheet = () => {
-    console.log("查看答题卡");
+    show.value = true;
 }
-
-
+// 重置答题卡
+const ResetAnswerSheet = () => {
+    showConfirmDialog({
+        message: '是否清空答题记录？',
+        confirmButtonText: '清空',
+        cancelButtonText: '取消',
+        onConfirm: () => {
+            answerStore.clearAnswers(); // 清空答题记录
+        }
+    })
+}
 
 onMounted(() => {
     const questions = store.getSelectedQuestions();
@@ -164,6 +208,22 @@ const themeVars = ref({
 }
 .container {
     padding-bottom: 150px; /* 为固定元素预留空间，防止内容被遮挡 */
+}
+.answer-sheet-popup{
+    background-color: #ececec;
+    border-radius: 16px;
+}
+.action-but-container{
+    margin: 20px 20px;
+    padding: 12px;
+    background-color: #e3e3e3;
+    border-radius: 16px;
+}
+.answer-sheet-font{
+    font-size: 17.5px;
+    font-weight: bold;
+    color: #46484a;
+    margin-left: 20px;
 }
 
 </style>
