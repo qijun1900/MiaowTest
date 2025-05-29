@@ -53,30 +53,44 @@
     </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Analyse from './Analyse.vue';
 import CheckanswerButton from '../FuntionComponents/CheckanswerButton.vue';
+import { useAnswerStore } from '@/stores/answerStore';
+
+const answerStore = useAnswerStore();
 
 const props = defineProps({
-    index: {//题目索引
+    index: {
         type: Number,
         required: true,
     },
-    questionData: {//题目数据 
+    questionData: {
         required: true,
     },
-    IsShowAnswer: {//是否显示答案
+    IsShowAnswer: {
         type: Boolean,
     },
-
 })
+
 const question = computed(() => props.questionData)
 const index = computed(() => props.index)
 const isShowAnswer = computed(() => props.IsShowAnswer)
-const answer = ref(false)
-const selectedOption = ref(null) // 记录用户单选的选项索引
-const selectedOptions = ref([]) // 数组存储多选题的选择
 
+// 从store中初始化答题状态
+const answer = ref(answerStore.getAnswerState(question.value._id)?.answer || false)
+const selectedOption = ref(answerStore.getAnswerState(question.value._id)?.selectedOption || null)
+const selectedOptions = ref(answerStore.getAnswerState(question.value._id)?.selectedOptions || [])
+
+// 监听答题状态变化并保存
+watch([answer, selectedOption, selectedOptions], () => {
+    answerStore.saveAnswerState({
+        questionId: question.value._id,
+        answer: answer.value,
+        selectedOption: selectedOption.value,
+        selectedOptions: [...selectedOptions.value]
+    })
+}, { deep: true })
 
 const handleClickOption = (option, index) => {
     if (isShowAnswer.value && !answer.value && question.value.isMultiple === 0) {

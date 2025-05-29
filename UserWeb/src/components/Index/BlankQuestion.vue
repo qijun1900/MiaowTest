@@ -10,6 +10,7 @@
         <div class="option-list">
             <AnswerInput 
                 :options="question.options" 
+                v-model="userAnswers"
                 @submit="handleSubmit"
             />
         </div>
@@ -30,9 +31,13 @@
  </div>
 </template>
 <script setup>
-import {computed,ref} from 'vue';
+import {computed,ref, watch} from 'vue';
 import AnswerInput from '../FuntionComponents/AnswerInput.vue';
 import Analyse from './Analyse.vue';
+import { useAnswerStore } from '@/stores/answerStore';
+
+const answerStore = useAnswerStore();
+
 const props = defineProps({
     index: {
         type: Number,
@@ -47,11 +52,25 @@ const props = defineProps({
 })
 const question = computed(() => props.questionData)
 const index = computed(() => props.index)
-const answer = ref(false)
+
+
+// 从store中初始化答题状态
+const answer = ref(answerStore.getAnswerState(question.value._id)?.answer || false)
+const userAnswers = ref(answerStore.getAnswerState(question.value._id)?.userAnswers || question.value.options.map(() => ''))
+
+
+// 监听答题状态变化并保存
+watch([answer, userAnswers], () => {
+    answerStore.saveAnswerState({
+        questionId: question.value._id,
+        answer: answer.value,
+        userAnswers: [...userAnswers.value]
+    })
+}, { deep: true })
 
 const handleSubmit = (answers) => {
+    userAnswers.value = answers;
     answer.value = true;
-    console.log('用户提交的答案:', answers);
 }
 </script>
 <style scoped>

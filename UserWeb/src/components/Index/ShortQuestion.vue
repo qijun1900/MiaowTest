@@ -8,7 +8,10 @@
             <span class="question-stem">{{ question.stem }}</span>
         </div>
         <div class="option-list">
-            <ShortAnswerInput @submit="handleSubmit" />
+            <ShortAnswerInput 
+                v-model="userAnswer"
+                @submit="handleSubmit" 
+            />
         </div>
         <div v-if="answer" class="answer-container">
             <div>
@@ -21,13 +24,16 @@
         <div class="analyse-container" v-if="answer">
             <Analyse :analysis="question.analysis" :isAIanswer="question.isAIanswer" />
         </div>
-
     </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import ShortAnswerInput from '../FuntionComponents/ShortAnswerInput.vue';
 import Analyse from './Analyse.vue';
+import { useAnswerStore } from '@/stores/answerStore';
+
+const answerStore = useAnswerStore();
+
 const props = defineProps({
     index: {
         type: Number,
@@ -39,16 +45,27 @@ const props = defineProps({
     isShowAnswer: {
         type: Boolean,
     },
-    isRandom: {
-        type: Boolean,
-    }
 })
+
 const question = computed(() => props.questionData)
 const index = computed(() => props.index)
-const answer = ref(false)
-const handleSubmit = (answers) => {
+
+// 从store中初始化答题状态
+const answer = ref(answerStore.getAnswerState(question.value._id)?.answer || false)
+const userAnswer = ref(answerStore.getAnswerState(question.value._id)?.userAnswer || '')
+
+// 监听答题状态变化并保存
+watch([answer, userAnswer], () => {
+    answerStore.saveAnswerState({
+        questionId: question.value._id,
+        answer: answer.value,
+        userAnswer: userAnswer.value
+    })
+}, { deep: true })
+
+const handleSubmit = (answerText) => {
+    userAnswer.value = answerText;
     answer.value = true;
-    console.log('用户提交的答案:', answers);
 }
 </script>
 <style scoped>

@@ -28,19 +28,30 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import CheckanswerButton from './CheckanswerButton.vue';
 
 const props = defineProps({
     options: {
         type: Array,
         default: () => []
+    },
+    modelValue: {
+        type: Array,
+        default: () => []
+    }
+})
+
+const emit = defineEmits(['update:modelValue', 'submit'])
+
+const userAnswers = ref(props.modelValue.length > 0 ? [...props.modelValue] : props.options.map(() => ''))
+
+watch(() => props.modelValue, (newVal) => {
+    if (newVal.length > 0) {
+        userAnswers.value = [...newVal]
     }
 });
 
-const emit = defineEmits(['submit']);
-
-const userAnswers = ref(props.options.map(() => ''));
 const themeVars = reactive({
     fieldLabelColor:"#1874ff",
     fieldIconSize:"25px",
@@ -48,9 +59,9 @@ const themeVars = reactive({
     cellBackground:"#f7f8fa",
 })
 
-// 添加提交答案的方法
 const submitAnswers = () => {
-    emit('submit', userAnswers.value);
+    emit('update:modelValue', userAnswers.value)
+    emit('submit', userAnswers.value)
 }
 </script>
 <style>

@@ -43,10 +43,13 @@
     </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import ErrorIcon from '../icons/ErrorIcon.vue';
 import RightIcon from '../icons/RightIcon.vue';
 import Analyse from './Analyse.vue';
+import { useAnswerStore } from '@/stores/answerStore';
+
+const answerStore = useAnswerStore();
 
 const props = defineProps({
     index: {
@@ -61,12 +64,23 @@ const props = defineProps({
     },
 })
 
-const answer = ref(false)
-const selectedOption = ref(null)
 const question = computed(() => props.questionData)
 const index = computed(() => props.index)
 const IsShowAnswer = computed(() => props.IsShowAnswer)
 const rightAnswer = computed(() => question.value.answer)
+
+// 从store中初始化答题状态
+const answer = ref(answerStore.getAnswerState(question.value._id)?.answer || false)
+const selectedOption = ref(answerStore.getAnswerState(question.value._id)?.selectedOption || null)
+
+// 监听答题状态变化并保存
+watch([answer, selectedOption], () => {
+    answerStore.saveAnswerState({
+        questionId: question.value._id,
+        answer: answer.value,
+        selectedOption: selectedOption.value
+    })
+}, { deep: true })
 
 const options = computed(() => [
     { text: '正确', isCorrect: rightAnswer.value === 1 },

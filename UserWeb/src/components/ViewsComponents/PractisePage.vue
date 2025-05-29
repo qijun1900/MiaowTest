@@ -19,8 +19,7 @@
                     :page-count="practiceQuestion.length" 
                     mode="simple" 
                     prev-text="上一题"
-                    next-text="下一题"
-                    />
+                    next-text="下一题"/>
             </div>
             <div class="action-bar-container">
                 <van-action-bar class="bottom">
@@ -32,8 +31,13 @@
                         <RightIcon />
                         <span class="count-badge2">5</span>
                     </div>
-                    <van-button type="primary" :round='true' color="#4f6beb" class="bottom-button">
-                        <AnsweSheetIcon />
+                    <van-button 
+                        @click="CheckAnswerSheet"
+                        type="primary" 
+                        :round='true' 
+                        color="#4f6beb" 
+                        class="bottom-button">
+                        <AnsweSheetIcon/>
                         查看答题卡
                     </van-button>
                 </van-action-bar>
@@ -70,11 +74,17 @@ const currentQuestion = computed(() => {
     return null;
 });
 
+// 检查答题卡
+const CheckAnswerSheet = () => {
+    console.log("查看答题卡");
+}
+
+
+
 onMounted(() => {
     const questions = store.getSelectedQuestions();
     if (IsRandom.value) {
-        // 随机打乱题目顺序
-        practiceQuestion.value = [...questions].sort(() => Math.random() - 0.5);
+        practiceQuestion.value = [...questions].sort(() => Math.random() - 0.5);// 随机打乱题目顺序
     } else {
         practiceQuestion.value = questions;
     }
