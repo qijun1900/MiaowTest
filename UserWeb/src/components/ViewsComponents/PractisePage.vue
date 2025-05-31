@@ -1,69 +1,52 @@
 <template>
     <van-config-provider :theme-vars="themeVars">
         <div class="container">
-            <TopBack title="练习设置" iconName="question" :iconSize="29" navBarIconColor="#3b3c3d"/>
+            <TopBack title="练习设置" iconName="question" :iconSize="29" navBarIconColor="#3b3c3d" :isclearAnswer="true" />
             <div v-if="currentQuestion">
                 <template v-for="question in currentQuestion" :key="question._id">
-                    <component  
-                        :is="questionComponents[question.Type]" 
-                        :index="currentPage"
-                        v-if="question.Type in questionComponents" 
-                        :questionData="question" 
-                        :IsShowAnswer="IsShowAnswer"
-                        />
+                    <component :is="questionComponents[question.Type]" :index="currentPage"
+                        v-if="question.Type in questionComponents" :questionData="question"
+                        :IsShowAnswer="IsShowAnswer" />
                 </template>
             </div>
             <div class="pagination-container">
-                <van-pagination 
-                    v-model="currentPage" 
-                    :page-count="practiceQuestion.length" 
-                    mode="simple" 
-                    prev-text="上一题"
-                    next-text="下一题"/>
+                <van-pagination v-model="currentPage" :page-count="practiceQuestion.length" mode="simple"
+                    prev-text="上一题" next-text="下一题" />
             </div>
             <div class="action-bar-container">
                 <van-action-bar class="bottom">
                     <div class="error-item">
                         <ErrorIcon />
-                        <span class="count-badge1">5</span>
+                        <span class="count-badge1">{{ errorCount }}</span>
                     </div>
                     <div class="right-item">
                         <RightIcon />
-                        <span class="count-badge2">5</span>
+                        <span class="count-badge2">{{ rightCount }}</span>
                     </div>
-                    <van-button 
-                        @click="CheckAnswerSheet"
-                        type="primary" 
-                        :round='true' 
-                        color="#4f6beb" 
+                    <van-button @click="CheckAnswerSheet" type="primary" :round='true' color="#4f6beb"
                         class="bottom-button">
-                        <AnsweSheetIcon/>
+                        <AnsweSheetIcon />
                         查看答题卡
                     </van-button>
                 </van-action-bar>
             </div>
         </div>
-        <van-popup
-            class="answer-sheet-popup"
-            v-model:show="show"
-            closeable
-            close-icon="close"
-            position="bottom"
-            :style="{ height: '70%'}">
+        <van-popup class="answer-sheet-popup" v-model:show="show" closeable close-icon="close" position="bottom"
+            :style="{ height: '70%' }">
             <div class="action-but-container">
                 <van-space :size="25">
-                <van-button  type="primary" round color="#5DADE2" @click="ResetAnswerSheet">
-                    <template #icon>
-                        <ResetIcon color="#00d2d3"/>
-                    </template>
-                    清空答题记录
-                </van-button>
-                <van-button  type="primary" round color="#5DADE2">
-                    <template #icon>
-                        <SubmitIcon color="#00d2d3"/>
-                    </template>
-                    提交题目{待开发}
-                </van-button>
+                    <van-button type="primary" round color="#5DADE2" @click="ResetAnswerSheet">
+                        <template #icon>
+                            <ResetIcon color="#00d2d3" />
+                        </template>
+                        清空答题记录
+                    </van-button>
+                    <van-button type="primary" round color="#5DADE2">
+                        <template #icon>
+                            <SubmitIcon color="#00d2d3" />
+                        </template>
+                        提交题目{待开发}
+                    </van-button>
                 </van-space>
             </div>
             <div>
@@ -75,6 +58,7 @@
         </van-popup>
     </van-config-provider>
 </template>
+
 <script setup>
 import { useExamStore } from '@/stores/counter'
 import { useAnswerStore } from '@/stores/answerStore'
@@ -114,15 +98,31 @@ const CheckAnswerSheet = () => {
 }
 // 重置答题卡
 const ResetAnswerSheet = () => {
-    showConfirmDialog({
-        message: '是否清空答题记录？',
-        confirmButtonText: '清空',
-        cancelButtonText: '取消',
-        onConfirm: () => {
-            answerStore.clearAnswers(); // 清空答题记录
-        }
+    showConfirmDialog({ // 显示确认对话框
+        message: '您确定要清空答题记录吗，此操作不可恢复！', // 提示消息
+        confirmButtonText: '确定', // 确认按钮文本
+        cancelButtonText: '取消', // 取消按钮文本
+    })
+    .then(() => {
+        answerStore.clearAnswers(); // 清空答题记录
+    })
+    .catch(() => {
+        // 用户点击取消按钮，不执行任何操作
     })
 }
+
+// 添加计算属性，计算错误和正确的题目数量
+const errorCount = computed(() => {
+    return Object.values(answerStore.answerStates).filter(
+        state => state.answer && state.isCorrect === false
+    ).length
+})
+
+const rightCount = computed(() => {
+    return Object.values(answerStore.answerStates).filter(
+        state => state.answer && state.isCorrect === true
+    ).length
+})
 onMounted(() => {
     const questions = store.getSelectedQuestions();
     if (IsRandom.value) {
@@ -187,9 +187,10 @@ const themeVars = ref({
 .bottom-button {
     margin-bottom: 4px;
 }
+
 .pagination-container {
     position: fixed;
-    bottom: 54px; 
+    bottom: 54px;
     left: 0;
     right: 0;
     padding: 0 16px;
@@ -204,25 +205,28 @@ const themeVars = ref({
     right: 0;
     z-index: 100;
 }
+
 .container {
-    padding-bottom: 150px; /* 为固定元素预留空间，防止内容被遮挡 */
+    padding-bottom: 150px;
+    /* 为固定元素预留空间，防止内容被遮挡 */
 }
-.answer-sheet-popup{
+
+.answer-sheet-popup {
     background-color: #ececec;
     border-radius: 16px;
 }
-.action-but-container{
+
+.action-but-container {
     margin: 20px 20px;
     padding: 12px;
     background-color: #e3e3e3;
     border-radius: 16px;
 }
-.answer-sheet-font{
+
+.answer-sheet-font {
     font-size: 17.5px;
     font-weight: bold;
     color: #46484a;
     margin-left: 20px;
 }
-
 </style>
-

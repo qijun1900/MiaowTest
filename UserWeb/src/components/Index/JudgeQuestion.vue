@@ -40,6 +40,7 @@
         <div class="analyse-container" v-if="answer">
             <Analyse :analysis="question.analysis" :isAIanswer="question.isAIanswer" />
         </div>
+        
     </div>
 </template>
 <script setup>
@@ -78,21 +79,29 @@ watch([answer, selectedOption], () => {
     answerStore.saveAnswerState({
         questionId: question.value._id,
         answer: answer.value,
-        selectedOption: selectedOption.value
+        selectedOption: selectedOption.value,
+        isCorrect: selectedOption.value !== null && options.value[selectedOption.value].isCorrect // 新增正确状态判断
     })
 }, { deep: true })
-
-const options = computed(() => [
-    { text: '正确', isCorrect: rightAnswer.value === 1 },
-    { text: '错误', isCorrect: rightAnswer.value === 0 }  
-])
 
 const handleClickOption = (index) => {
     if (IsShowAnswer.value && !answer.value) {
         selectedOption.value = index
         answer.value = true
+        
+        // 立即更新存储状态
+        answerStore.saveAnswerState({
+            questionId: question.value._id,
+            answer: true,
+            selectedOption: index,
+            isCorrect: options.value[index].isCorrect // 直接保存正确状态
+        })
     }
 }
+const options = computed(() => [
+    { text: '正确', isCorrect: rightAnswer.value === 1 },
+    { text: '错误', isCorrect: rightAnswer.value === 0 }  
+])
 </script>
 <style scoped>
 .question-container {

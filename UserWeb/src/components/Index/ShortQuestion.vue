@@ -21,6 +21,9 @@
                 </div>
             </div>
         </div>
+        <div class="T-F"  v-if="answer">
+            <JudgeTF :questionId="question._id"/>
+        </div>
         <div class="analyse-container" v-if="answer">
             <Analyse :analysis="question.analysis" :isAIanswer="question.isAIanswer" />
         </div>
@@ -31,6 +34,7 @@ import { computed, ref, watch } from 'vue';
 import ShortAnswerInput from '../FuntionComponents/ShortAnswerInput.vue';
 import Analyse from './Analyse.vue';
 import { useAnswerStore } from '@/stores/answerStore';
+import JudgeTF from '../FuntionComponents/JudgeTF.vue';
 
 const answerStore = useAnswerStore();
 
@@ -126,6 +130,8 @@ const handleSubmit = (answerText) => {
     word-break: break-all;
     line-height: 1.5;
     font-weight: 500;
-
+}
+.T-F {
+    margin-top: 20px;
 }
 </style>

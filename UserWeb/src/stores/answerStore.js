@@ -8,10 +8,11 @@ export const useAnswerStore = defineStore('answer', () => {
     function saveAnswerState(state) {
         answerStates.value[state.questionId] = {
             answer: state.answer,//判断是否已答题
-            selectedOption: state.selectedOption,// 单选题支持
+            selectedOption: state.selectedOption,// 单选题判断题支持
             selectedOptions: state.selectedOptions,// 多选题支持
             userAnswers: state.userAnswers || [],// 填空题支持
-            userAnswer: state.userAnswer || ''  // 添加简答题支持
+            userAnswer: state.userAnswer || '', // 添加简答题支持
+            isCorrect: state.isCorrect // 新增：是否正确，布尔值
         }
     }
     // 获取指定问题的答案状态（id查找）
@@ -27,5 +28,11 @@ export const useAnswerStore = defineStore('answer', () => {
         localStorage.setItem('answerStates', JSON.stringify(newVal))
     }, { deep: true })
 
-    return { answerStates, saveAnswerState, getAnswerState, clearAnswers }// 返回需要的状态和方法
+    // 新增方法：获取所有答题状态
+    function getAllAnswerStates() {
+        return answerStates.value
+    }
+
+    // 修改返回对象，添加新方法
+    return { answerStates, saveAnswerState, getAnswerState, clearAnswers, getAllAnswerStates }// 返回需要的状态和方法
 })

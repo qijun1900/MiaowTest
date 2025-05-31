@@ -84,18 +84,26 @@ const selectedOptions = ref(answerStore.getAnswerState(question.value._id)?.sele
 
 // 监听答题状态变化并保存
 watch([answer, selectedOption, selectedOptions], () => {
+    const existingState = answerStore.getAnswerState(question.value._id) || {};
     answerStore.saveAnswerState({
         questionId: question.value._id,
         answer: answer.value,
         selectedOption: selectedOption.value,
-        selectedOptions: [...selectedOptions.value]
+        selectedOptions: [...selectedOptions.value],
+        isCorrect: existingState.isCorrect // 保留已存在的正确状态
     })
 }, { deep: true })
 
 const handleClickOption = (option, index) => {
     if (isShowAnswer.value && !answer.value && question.value.isMultiple === 0) {
-        selectedOption.value = index // 记录用户选择的选项
+        selectedOption.value = index
         answer.value = true;
+        answerStore.saveAnswerState({
+            questionId: question.value._id,
+            answer: true,
+            selectedOption: index,
+            isCorrect: option.isCorrect
+        })
     }
     if (isShowAnswer.value && question.value.isMultiple === 1) {
         const selectedIndex = selectedOptions.value.indexOf(index)
@@ -106,16 +114,26 @@ const handleClickOption = (option, index) => {
         }
     }
 };
+
 const handleSumitMultiple = () => {
     // 获取所有正确答案的索引
     const correctOptions = question.value.options
         .map((option, index) => option.isCorrect ? index : -1)
         .filter(index => index !== -1);
-    // 校验答案是否正确
-        selectedOptions.value.length === correctOptions.length &&
+    
+    // 确保正确判断多选题
+    const isCorrect = selectedOptions.value.length === correctOptions.length &&
         selectedOptions.value.every(option => correctOptions.includes(option));
-    // 显示答案
+    
     answer.value = true;
+    // 显式保存答题状态
+    answerStore.saveAnswerState({
+        questionId: question.value._id,
+        answer: true,
+        selectedOptions: [...selectedOptions.value],
+        selectedOption: null,
+        isCorrect: isCorrect
+    })
 }
 
 
