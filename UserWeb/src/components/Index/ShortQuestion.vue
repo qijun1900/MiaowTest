@@ -60,9 +60,7 @@ const userAnswer = ref(answerStore.getAnswerState(question.value._id)?.userAnswe
 
 // 监听答题状态变化并保存
 watch([answer, userAnswer], () => {
-    const currentState = answerStore.getAnswerState(question.value._id) || {};
     answerStore.saveAnswerState({
-        ...currentState,  // 保留原有状态
         questionId: question.value._id,
         answer: answer.value,
         userAnswer: userAnswer.value

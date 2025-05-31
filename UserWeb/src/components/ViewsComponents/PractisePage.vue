@@ -31,8 +31,13 @@
                 </van-action-bar>
             </div>
         </div>
-        <van-popup class="answer-sheet-popup" v-model:show="show" closeable close-icon="close" position="bottom"
-            :style="{ height: '70%' }">
+        <van-popup 
+            class="answer-sheet-popup" 
+            v-model:show="show" 
+            closeable 
+            close-icon="close" 
+            position="bottom"
+            :style="{ height: '60%' }">
             <div class="action-but-container">
                 <van-space :size="25">
                     <van-button type="primary" round color="#5DADE2" @click="ResetAnswerSheet">
@@ -52,7 +57,14 @@
             <div>
                 <span class="answer-sheet-font">答题卡</span>
                 <div class="answer-sheet-content">
-                    <span>题目答题记录及其题序{待开发}</span>
+                    <van-grid :column-num="5" :gutter="10">
+                        <van-grid-item 
+                            v-for="(question, index) in practiceQuestion" 
+                            :key="question._id"
+                            @click="currentPage = index + 1; show = false">
+                            <div class="grid-item-number">{{ index + 1 }}</div>
+                        </van-grid-item>
+                    </van-grid>
                 </div>
             </div>
         </van-popup>
@@ -219,7 +231,7 @@ const themeVars = ref({
 .action-but-container {
     margin: 20px 20px;
     padding: 12px;
-    background-color: #e3e3e3;
+    background-color: #ffffff;
     border-radius: 16px;
 }
 
@@ -228,5 +240,17 @@ const themeVars = ref({
     font-weight: bold;
     color: #46484a;
     margin-left: 20px;
+}
+
+.answer-sheet-content {
+    margin: 15px 20px;
+    padding: 12px;
+    background-color: #ffffff;
+    border-radius: 12px;
+}
+.grid-item-number{
+    font-size: 16px;
+    font-weight: 800;
+    color: #3e4042;
 }
 </style>
