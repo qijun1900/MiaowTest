@@ -6,13 +6,28 @@ export const useAnswerStore = defineStore('answer', () => {
     const answerStates = ref(JSON.parse(localStorage.getItem('answerStates')) || {})
     // 保存答案状态的方法    
     function saveAnswerState(state) {
-        answerStates.value[state.questionId] = {
+        const currentState = answerStates.value[state.questionId] || {};
+        
+        if (state.isJudgeTF) {
+            // 如果是判断题操作，保留原有的用户答案数据
+            answerStates.value[state.questionId] = {
+                ...currentState,  // 保留原有状态
+                answer: state.answer,
+                selectedOption: state.selectedOption,
+                selectedOptions: state.selectedOptions,
+                isCorrect: state.isCorrect
+            }
+        } else {
+            // 正常更新所有状态
+            answerStates.value[state.questionId] = {
+             ...currentState,  // 保留原有状态
             answer: state.answer,//判断是否已答题
             selectedOption: state.selectedOption,// 单选题判断题支持
             selectedOptions: state.selectedOptions,// 多选题支持
             userAnswers: state.userAnswers || [],// 填空题支持
             userAnswer: state.userAnswer || '', // 添加简答题支持
             isCorrect: state.isCorrect // 新增：是否正确，布尔值
+            }
         }
     }
     // 获取指定问题的答案状态（id查找）

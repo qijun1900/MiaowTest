@@ -25,7 +25,7 @@ const props = defineProps({
     questionId: {
         type: String,
         required: true
-    }
+    },
 });
 
 const answerStore = useAnswerStore();
@@ -38,7 +38,8 @@ const handleClick = (type) => {
         questionId: props.questionId,
         answer: true,
         selectedOption: type,
-        isCorrect: type === 'correct' // 直接根据用户选择设置正确状态（布尔），无需额外判断
+        isCorrect: type === 'correct',
+        isJudgeTF: true  // 添加标记表示这是判断是否为用户自己的判断
     });
 }
 </script>
