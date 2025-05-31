@@ -12,7 +12,6 @@
                     :to="item.to"/>
             </van-grid>
         </van-config-provider>
-
     </div>
 </template>
 
@@ -24,8 +23,6 @@ const navItems = [
     { icon: 'column', text: '所有考试' ,  to: '/ExamList'},
     { icon: 'medal', text: '竞赛占位' , to: '/contest'},
     { icon: 'wechat-pay', text: '占位置在' , to: '/ranking'},
-    { icon: 'user-o', text: '我的占位', to: '/mine' },
-    { icon: 'comment-o', text: '消息占位' , to: '/message'}
 ]
 // 定制 Grid 组件主题
 const themeVars = ref({

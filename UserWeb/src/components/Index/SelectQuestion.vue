@@ -112,18 +112,10 @@ const handleSumitMultiple = () => {
         .map((option, index) => option.isCorrect ? index : -1)
         .filter(index => index !== -1);
     // 校验答案是否正确
-    const isCorrect =
         selectedOptions.value.length === correctOptions.length &&
         selectedOptions.value.every(option => correctOptions.includes(option));
     // 显示答案
     answer.value = true;
-
-    // 可以在这里添加其他逻辑，如记录答题结果等
-    console.log('提交答案', {
-        selected: selectedOptions.value,
-        correct: correctOptions,
-        isCorrect: isCorrect
-    });
 }
 
 

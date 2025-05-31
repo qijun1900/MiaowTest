@@ -4,7 +4,7 @@
             <TopBack title="练习设置" iconName="question" :iconSize="29" navBarIconColor="#3b3c3d"/>
             <div v-if="currentQuestion">
                 <template v-for="question in currentQuestion" :key="question._id">
-                    <component 
+                    <component  
                         :is="questionComponents[question.Type]" 
                         :index="currentPage"
                         v-if="question.Type in questionComponents" 
@@ -124,7 +124,6 @@ const ResetAnswerSheet = () => {
         }
     })
 }
-
 onMounted(() => {
     const questions = store.getSelectedQuestions();
     if (IsRandom.value) {
