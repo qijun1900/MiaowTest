@@ -75,7 +75,6 @@
         </van-popup>
     </van-config-provider>
 </template>
-
 <script setup>
 import { useExamStore } from '@/stores/counter'
 import { useAnswerStore } from '@/stores/answerStore'
