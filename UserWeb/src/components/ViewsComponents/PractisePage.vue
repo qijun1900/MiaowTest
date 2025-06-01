@@ -142,7 +142,6 @@ onMounted(() => {
     } else {
         practiceQuestion.value = questions;
     }
-    console.log("练习题目：", practiceQuestion.value);
 });
 // 定义组件映射关系
 const questionComponents = {
