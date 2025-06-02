@@ -1,8 +1,8 @@
 <template>
      <van-empty
-                :image="props.ImageSrc"
-                :image-size="props.ImageSize"
-                :description="props.Description"/>
+        :image="props.ImageSrc"
+        :image-size="props.ImageSize"
+        :description="props.Description"/>
 </template>
 <script setup>
 const props = defineProps({

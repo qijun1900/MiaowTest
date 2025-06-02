@@ -6,8 +6,8 @@
             <div class="search">
                 <SearchOverlay/>
             </div>
-            <div class="scrollingtext" >
-                <ScrollingText :defaultText="'欢迎访问本站'"/>
+            <div class="ScrollingText">
+                <ScrollingText/>
             </div>
             <div>
                 <Navbar/>
@@ -87,11 +87,10 @@ margin-top: 2px;
     font-size: 14px;
     color: #6b6969;
 }
-</style>
-
-<style scoped>
-/* 添加下拉刷新区域的最小高度 */
 .van-pull-refresh {
     min-height: 100vh;
+}
+.ScrollingText{
+    padding: 0px 5px 0px 5px;/* 上右下左内边距 */
 }
 </style>
