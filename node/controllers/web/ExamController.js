@@ -70,6 +70,22 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getSwipeNews details:', error); // 处理错误
         }
+    },
+    chat:async (req,res)=>{
+        try {
+            const { message } = req.body; // 从请求体中获取问题
+            console.log("用户输入的问题:",message)
+            const result = await ExamService.chat(message) // 调用服务层的chat方法
+            console.log(result) // 打印服务层的响应结果
+            res.send({
+                code:200,
+                ActionType: "OK",
+                data: result // 返回服务层的响应结果
+            })
+
+        }catch (error) {
+            console.error('Error fetching chat details:', error); // 处理错误
+        }
     }
 }
 

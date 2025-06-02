@@ -6,6 +6,7 @@ import escconfig from './src/config/esc.config'; // 导入配置文件
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import { AntDesignXVueResolver } from 'ant-design-x-vue/resolver';
 
 export default defineConfig({
   plugins: [
@@ -17,6 +18,9 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
+    Components({
+      resolvers: [AntDesignXVueResolver()],
+    })
   ],
   resolve: {
     alias: {

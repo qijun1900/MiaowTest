@@ -34,6 +34,7 @@ const navItems = [
     { icon: 'column', text: '所有考试' ,  to: '/ExamList'},
     { icon: 'medal', text: '私有部署' , to: '/contest'},
     { icon: 'wechat', text: '问题反馈' , to: '/ranking'},
+    { icon: 'test', text: '测试', to: '/test' } // 添加测试项,
 ]
 const Icon = {
     'home': GithubCatIcon, // 替换为你的自定义图标组件

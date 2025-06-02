@@ -11,5 +11,5 @@ ExamRouter.get("/webapi/Exam/getOneExam/:id",ExamController.getOneExam)//获取�
 ExamRouter.get("/webapi/Exam/getUserExamInfo/:id",ExamController.getUserExamInfo)//获取用户要使用单个考试信息
 ExamRouter.post("/webapi/UserExam/postUserExamIssuse/:id",ExamController.postUserExamIssuse)//用户端提交考试错误信息
 ExamRouter.get("/webapi/News/getSwipeNews",ExamController.getSwipeNews)//获取轮播图
-
+ExamRouter.post("/webapi/testapi/chat",ExamController.chat)//测试接口
 module.exports = ExamRouter; 

@@ -2,6 +2,8 @@ const ExamModel = require('../../models/ExamModel')
 const  UserExamModel = require('../../models/UserExamModel')
 const  UserIssuseModel = require('../../models/UserIssuse.js')
 const NewsModel = require('../../models/NewsModel')
+const testapi = require('../../AIServices/test.js')
+
 
 const ExamService = {
     getExamList: async () => {
@@ -18,6 +20,9 @@ const ExamService = {
     },
     getSwipeNews: async () => {
         return NewsModel.find({isPublish:1}).sort({createdTime:-1})
+    },
+    chat: async (message) => {
+        return await testapi.chat(message);
     }
 }
 module.exports = ExamService
