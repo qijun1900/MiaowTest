@@ -2,7 +2,7 @@ const ExamModel = require('../../models/ExamModel')
 const  UserExamModel = require('../../models/UserExamModel')
 const  UserIssuseModel = require('../../models/UserIssuse.js')
 const NewsModel = require('../../models/NewsModel')
-const testapi = require('../../AIServices/test.js')
+const testapi = require('../../llm/test.js')
 
 
 const ExamService = {
