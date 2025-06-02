@@ -20,7 +20,7 @@
 const props = defineProps({
     src: { // 图片的 URL
             type: String,
-             required: true 
+            required: true 
     }, 
     alt: { 
             type: String, 

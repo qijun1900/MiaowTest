@@ -58,6 +58,18 @@ const ExamController ={
             console.error('Error fetching postUserExamIssuse details:', error); // 处理错误
         }
 
+    },
+    getSwipeNews:async (req,res)=>{
+        try {
+            const result = await ExamService.getSwipeNews()
+            res.send({
+                code:200,
+                ActionType: "OK",
+                data: result
+            })
+        }catch (error) {
+            console.error('Error fetching getSwipeNews details:', error); // 处理错误
+        }
     }
 }
 

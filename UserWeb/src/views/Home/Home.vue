@@ -86,6 +86,7 @@ margin-top: 2px;
 .font_right{
     font-size: 14px;
     color: #6b6969;
+    font-weight: 600;
 }
 .van-pull-refresh {
     min-height: 100vh;

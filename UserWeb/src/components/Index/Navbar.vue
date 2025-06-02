@@ -24,16 +24,23 @@
 <script setup>
 import { ref } from 'vue'
 import GithubCatIcon from '../icons/GithubCatIcon.vue'
+import AllExamIcon from '../icons/AllExamIcon.vue'
+import HomeProblemIcon from '../icons/HomeProblemIcon.vue'
+import HomeDockerIcon from '../icons/HomeDockerIcon.vue'
 
 // 导航项配置数据
 const navItems = [
-    { icon: 'home', text: '开源地址' , to: '/'},
+    { icon: 'home', text: '项目地址' , to: '/address'},
     { icon: 'column', text: '所有考试' ,  to: '/ExamList'},
-    { icon: 'medal', text: '竞赛占位' , to: '/contest'},
-    { icon: 'wechat', text: '占位置在' , to: '/ranking'},
+    { icon: 'medal', text: '私有部署' , to: '/contest'},
+    { icon: 'wechat', text: '问题反馈' , to: '/ranking'},
 ]
 const Icon = {
     'home': GithubCatIcon, // 替换为你的自定义图标组件
+    'column': AllExamIcon, 
+    "medal":HomeDockerIcon,
+    "wechat": HomeProblemIcon,
+
 }
 // 定制 Grid 组件主题
 const themeVars = ref({
@@ -51,7 +58,7 @@ const themeVars = ref({
 
 /* 新增自定义文字样式 */
 .custom-text {
-    color: #666;
+    color: #555555;
     font-size: 12px;
     margin-top: 6px;
     font-weight: 800;

@@ -43,7 +43,7 @@ const props = defineProps({
         default: 10,
         required: true 
     },
-    // 新增接收数据的prop
+    // 新增接收数据的prop,搜索组件传入的UseData
     UseData: {
         type: Array,
         default: null
