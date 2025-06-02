@@ -60,7 +60,6 @@ import { h } from 'vue';
 import { ref } from 'vue';
 import axios from 'axios';
 
-
 const loading = ref(true);
 const fooAvatar = {
     color: '#f56a00',
