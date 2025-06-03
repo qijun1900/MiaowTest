@@ -9,6 +9,7 @@ import ExamReady from '@/components/ViewsComponents/ExamReady.vue'
 import ExamSetting from '@/components/ViewsComponents/ExamSetting.vue'
 import PractisePage from '@/components/ViewsComponents/PractisePage.vue'
 import Test1 from '@/views/Test/Test1.vue'
+
 const routes = [
   {
     path: '/',
@@ -23,7 +24,8 @@ const routes = [
   {
     path: '/SearchInfo',
     name: 'search',
-    component: SearchInfo
+    component: SearchInfo,
+    
   },
   {
     path: '/SearchDeatil',
@@ -42,15 +44,14 @@ const routes = [
   },
   {
     path: '/PractisePage/:id',
-    name:'practisePage',
-    component: PractisePage
+    name: 'practisePage',
+    component: PractisePage,
   },
   {
     path: '/test',
     name:'test1',
     component: Test1
-  }
-  
+  },
 ]
 
 const router = createRouter({
@@ -66,7 +67,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach(() => {
   NProgress.done();
-  window.scrollTo(0, 0) // 建议添加页面回顶
+  window.scrollTo(0, 0) 
 })
 
 

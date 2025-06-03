@@ -18,7 +18,7 @@
             <div class="icon_font">
                 <div class="title-row">
                     <van-icon name="fire" color="#ee0a24" size="24" class="icon"/>
-                    <span class="font">大家都在练习</span>
+                    <span class="font">推荐练习</span>
                     <div class="right-container" @click="RouterPush('/ExamList')">
                         <span class="font_right">更多考试</span>
                         <van-icon name="arrow"/>

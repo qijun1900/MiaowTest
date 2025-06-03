@@ -1,17 +1,29 @@
 <template>
     <van-config-provider :theme-vars="themeVars">
         <div class="container">
-            <TopBack title="练习设置" iconName="question" :iconSize="29" navBarIconColor="#3b3c3d" :isclearAnswer="true" />
+            <TopBack 
+                title="练习设置" 
+                iconName="question" 
+                :iconSize="29" 
+                navBarIconColor="#3b3c3d" 
+                :isclearAnswer="true" />
             <div v-if="currentQuestion">
                 <template v-for="question in currentQuestion" :key="question._id">
-                    <component :is="questionComponents[question.Type]" :index="currentPage"
-                        v-if="question.Type in questionComponents" :questionData="question"
+                    <component 
+                        :is="questionComponents[question.Type]" 
+                        :index="currentPage"
+                        v-if="question.Type in questionComponents" 
+                        :questionData="question"
                         :IsShowAnswer="IsShowAnswer" />
                 </template>
             </div>
             <div class="pagination-container">
-                <van-pagination v-model="currentPage" :page-count="practiceQuestion.length" mode="simple"
-                    prev-text="上一题" next-text="下一题" />
+                <van-pagination 
+                    v-model="currentPage" 
+                    :page-count="practiceQuestion.length" 
+                    mode="simple"
+                    prev-text="上一题" 
+                    next-text="下一题" />
             </div>
             <div class="action-bar-container">
                 <van-action-bar class="bottom">
@@ -31,43 +43,29 @@
                 </van-action-bar>
             </div>
         </div>
-        <van-popup 
-            class="answer-sheet-popup" 
-            v-model:show="show" 
-            closeable 
-            close-icon="close" 
-            position="bottom"
-            :style="{ height: '60%' }">
-            <div class="action-but-container">
-                <van-space :size="25">
-                    <van-button type="primary" round color="#5DADE2" @click="ResetAnswerSheet">
-                        <template #icon>
-                            <ResetIcon color="#00d2d3" />
-                        </template>
-                        清空答题记录
-                    </van-button>
-                    <van-button type="primary" round color="#5DADE2">
-                        <template #icon>
-                            <SubmitIcon color="#00d2d3" />
-                        </template>
-                        提交题目{待开发}
-                    </van-button>
-                </van-space>
-            </div>
-            <div>
-                <span class="answer-sheet-font">答题卡</span>
-                <div class="answer-sheet-content">
-                    <van-grid :column-num="5" :gutter="10">
-                        <van-grid-item 
-                            v-for="(question, index) in practiceQuestion" 
-                            :key="question._id"
-                            @click="currentPage = index + 1; show = false">
-                            <div class="grid-item-number">{{ index + 1 }}</div>
-                        </van-grid-item>
-                    </van-grid>
-                </div>
-            </div>
-        </van-popup>
+        <div>
+            <AnswerSheet 
+                v-model:show="show" 
+                :questions="practiceQuestion"
+                @reset="ResetAnswerSheet"
+                @itemClick="(index) => currentPage = index + 1" />
+        </div>
+    <van-floating-bubble 
+        @click="onClick" 
+        v-model:offset="offset"
+        v-if="IsOPenAI">
+        <div class="bubble-content">
+            <van-icon>
+                <AIHelpIcon color="#ffffff" size="30"/>
+            </van-icon>
+        </div>
+    </van-floating-bubble>
+    <div v-if="IsShoAIwAnswerHelp">
+        <AIanalysisHelper
+            v-model:show="IsShoAIwAnswerHelp" 
+            :questionData="currentQuestion"
+        />
+    </div>
     </van-config-provider>
 </template>
 
@@ -83,26 +81,34 @@ import BlankQuestion from '../Index/BlankQuestion.vue';
 import ErrorIcon from '../icons/ErrorIcon.vue';
 import RightIcon from '../icons/RightIcon.vue';
 import AnsweSheetIcon from '../icons/AnsweSheetIcon.vue';
-import ResetIcon from '../icons/ResetIcon.vue';
-import SubmitIcon from '../icons/SubmitIcon.vue';
 import { showConfirmDialog } from 'vant';
+import AIHelpIcon from '../icons/AIHelpIcon.vue';
+import AnswerSheet from '../Index/AnswerSheet.vue';
+import AIanalysisHelper from '../Index/AIanalysisHelper.vue';
+
+
 
 const store = useExamStore()
 const answerStore = useAnswerStore()
 
+
 const practiceQuestion = ref([]);
-const currentPage = ref(1); // 添加当前页码
+const currentPage = ref(1) // 添加当前页码
 const IsShowAnswer = computed(() => store.IsShowAnswer);
 const IsRandom = computed(() => store.IsRandom);
 const show = ref(false);// 控制答题卡弹窗的显示状态
+const IsOPenAI = computed(() => store.IsOPenAI);// 是否开启AI解析助手
+const IsShoAIwAnswerHelp = ref(false); // 控制AI解析助手的显示状态  
 
 // 计算当前显示的题目
 const currentQuestion = computed(() => {
     if (practiceQuestion.value.length > 0) {
-        return practiceQuestion.value[currentPage.value - 1];
+        return practiceQuestion.value[currentPage.value - 1]; // 返回单个题目对象
     }
     return null;
 });
+
+
 
 // 检查答题卡
 const CheckAnswerSheet = () => {
@@ -135,10 +141,19 @@ const rightCount = computed(() => {
         state => state.answer && state.isCorrect === true
     ).length
 })
+
+//AI解析助手跳转
+const offset = ref({ x: 330, y: 630 });
+const onClick = () => {
+    console.log('AI解析助手被点击',currentQuestion.value);
+    IsShoAIwAnswerHelp.value = true;
+
+}
+// 在组件挂载时获取题目
 onMounted(() => {
     const questions = store.getSelectedQuestions();
     if (IsRandom.value) {
-        practiceQuestion.value = [...questions].sort(() => Math.random() - 0.5);// 随机打乱题目顺序
+        practiceQuestion.value = [...questions].sort(() => Math.random() - 0.5);
     } else {
         practiceQuestion.value = questions;
     }
@@ -253,3 +268,10 @@ const themeVars = ref({
     color: #3e4042;
 }
 </style>
+
+// 替换原来的van-popup部分为：
+<AnswerSheet 
+    v-model:show="show" 
+    :questions="practiceQuestion"
+    @reset="ResetAnswerSheet"
+    @itemClick="(index) => currentPage = index + 1" />

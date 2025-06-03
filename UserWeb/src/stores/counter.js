@@ -11,14 +11,14 @@ export const useExamStore = defineStore('exam', {
     IsShowAnswer: localStorage.getItem('exam_showAnswer') === "false" || true,
     //是否随机显示
     IsRandom: localStorage.getItem('exam_random') === "true" || false,
+    //是否开启AI解析
+    IsOPenAI: localStorage.getItem('exam_openAI') === "false" || true,
+
   }),
   
   // 定义store的操作方法
   actions: {
-    /**
-     * 设置当前题目类型名称
-     * @param {string} title - 题目类型名称
-     */
+
     setCurrentTitle(title) {
       this.currentTitle = title  // 更新store中的状态
       localStorage.setItem('exam_currentTitle', title)  // 同步更新到localStorage
@@ -31,18 +31,19 @@ export const useExamStore = defineStore('exam', {
       this.IsRandom = random
       localStorage.setItem('exam_random', random)
     },
-    /**
-     * 设置当前题目内容
-     * @param {string|object} question - 题目内容
-     */
+    setIsOpenAI(openAI) {
+      this.IsOPenAI = openAI
+      localStorage.setItem('exam_openAI', openAI)
+    },
+    // 新增设置方法,用于设置当前题目
     setCurrentQuestion(question) {
       localStorage.setItem('exam_currentQuestion', JSON.stringify(question))  // 同步更新到localStorage本地存储仍需序列化
     },
+    // 新增设置方法,用于设置当前选择题目类型题目
     setSelectedQuestions(questions) {
       this.selectedQuestions = questions
       localStorage.setItem('exam_selectedQuestions', JSON.stringify(questions))
     },
-
 
     // 新增获取方法,用于从localStorage获取当前所有题目
     getCurrentQuestion() {
@@ -54,6 +55,5 @@ export const useExamStore = defineStore('exam', {
       const questions = localStorage.getItem('exam_selectedQuestions')
       return questions ? JSON.parse(questions) : null
     },
-    
   }
 })

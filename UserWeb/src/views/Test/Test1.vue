@@ -7,9 +7,8 @@
                 <Bubble 
                     placement="start" 
                     :content="content1"
-                    :typing="{ step:1 ,interval: 50,suffix: `<>💗</>`}"
-                    variant="shadow"
-                    >
+                    :typing="{ step:2 ,interval: 50,suffix: '🐱'}"
+                    variant="shadow">
                     <template #avatar>
                         <Avatar :icon="h(UserOutlined)" :style="fooAvatar" />
                     </template>
@@ -41,7 +40,7 @@
                 <Bubble 
                     placement="start" 
                     :content="Aidata"
-                    :typing="{ step:1 ,interval: 50,suffix: `<>💗</>`}"
+                    :typing="{ step:2 ,interval: 50,suffix:'💗'}"
                     variant="shadow"
                     >
                     <template #avatar>
@@ -59,6 +58,7 @@ import { Flex, Avatar, Switch } from 'ant-design-vue';
 import { h } from 'vue';
 import { ref } from 'vue';
 import axios from 'axios';
+
 
 const loading = ref(true);
 const fooAvatar = {

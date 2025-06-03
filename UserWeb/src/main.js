@@ -9,6 +9,8 @@ import Vant from 'vant'
 import 'vant/lib/index.css' // 引入vant组件样式
 
 
+
+
 const app = createApp(App)
 
 app.use(createPinia())

@@ -79,6 +79,19 @@
                     </template>
                 </van-switch>
             </div>
+            <div class="set-group"> 
+                <span class="set-label">是否开启AI解析助手:</span>
+                <van-switch 
+                    v-model="IsOPenAI"
+                    size="24px"
+                    active-color="#1a86e4">
+                    <template #node>
+                        <div class="icon-wrapper">
+                            <van-icon :name="IsOPenAI ? 'success' : 'cross'" />
+                        </div>
+                    </template>
+                </van-switch>
+            </div>
             <div class="goexam-button">
                 <van-button 
                     icon="bulb-o"
@@ -110,6 +123,7 @@ const store = useExamStore()
 const IsshowAnswer = ref(true)
 const IsRandom = ref(false)
 const practiceCount = ref(1) // 修改为数字类型，设置默认值为1
+const IsOPenAI = ref(true)
 
 onMounted(() => {
     questions.value = store.getCurrentQuestion()// 获取当前题型的题目
@@ -122,6 +136,7 @@ const HandleGoPractice = () => {
     store.setSelectedQuestions(selectedQuestions)// 将选中的题目存储到store中
     store.setIsShowAnswer(IsshowAnswer.value)// 设置是否显示答案
     store.setIsRandom(IsRandom.value)// 设置题目顺序是否随机
+    store.setIsOpenAI(IsOPenAI.value)// 设置是否开启AI解析助手
     RouterPush(`/PractisePage/${route.params.id}`)// 跳转到练习页面
 }
 

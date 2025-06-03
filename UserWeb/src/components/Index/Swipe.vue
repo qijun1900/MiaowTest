@@ -25,7 +25,6 @@ const SwipeNews = ref([])
 const fetchData = async () => {
    const res = await getSwipeNews()
    SwipeNews.value = res
-   console.log(res)
 }
 
 onMounted(() => {
