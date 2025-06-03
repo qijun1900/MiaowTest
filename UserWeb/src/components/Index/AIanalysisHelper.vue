@@ -4,7 +4,7 @@
         closeable
         position="bottom" 
         :round="true"
-        :style="{ height: '80%' }">
+        :style="{ height: '85%' }">
         <div>
             <Divider 
                 title="AI题目解析"
@@ -12,6 +12,13 @@
                 dividerFontSize="20px"
                 padding="0 80px"
                 borderColor="#00ddff"/>
+                <div class="welcome-container">
+                    <Welcome
+                    :style="{ backgroundImage: background, borderStartStartRadius: 4 }"
+                    icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+                    title="Hello, 我是你的AI解题小助手"
+                    description="Base on Ant Design, I can provide you with a detailed explanation of the problem 🐱"/>
+                </div>
             <div 
                 v-for="item in questionData" 
                 :key="item._id" 
@@ -40,7 +47,7 @@
                         v-for="(answer,index) in item.options" 
                         :key="index"
                         class="blank-item">
-                        <span class="blank-label">空{{ index + 1 }}：</span>
+                        <span class="blank-label">空{{ index + 1 }}:</span>
                         <span class="blank-content">{{ answer.content }}</span>
                     </div>
                 </div>
@@ -59,14 +66,47 @@
                     <div class="answer-content" v-html="item.content"></div>
                 </div>
             </div>
+            <div class="talk-container">
+                <Flex gap="middle" vertical>
+                    <Bubble 
+                        placement="end" 
+                        :content="request"
+                        :typing="{ step:1 ,interval: 50,suffix: '🐱'}"
+                        variant="shadow">
+                        <template #avatar>
+                            <TalkUserIcon/>
+                        </template>
+                    </Bubble>
+                    <Bubble 
+                        placement="start" 
+                        :content="LlaRes"
+                        :typing="{ step:2 ,interval: 120,suffix: '😺'}"
+                        :messageRender="renderMarkdown"
+                        variant="shadow">
+                        <template #avatar>
+                           <TalkAIIcon/>
+                        </template>
+                    </Bubble>
+                 </Flex>
+            </div>
+            <button @click="handleClick">发送</button>
         </div>
     </van-popup>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref ,onMounted} from 'vue';
 import Divider from '../FuntionComponents/Divider.vue';
+import { Welcome, Bubble } from 'ant-design-x-vue';
+import { theme, Flex, Typography } from 'ant-design-vue';
+import TalkAIIcon from '../icons/TalkAIIcon.vue';
+import TalkUserIcon from '../icons/TalkUserIcon.vue';
+import axios from 'axios';
+import markdownit from 'markdown-it';
+import { h } from 'vue';
 
+const request = ref("请给我此题解析");
+const LlaRes = ref("");
 
 const props = defineProps({
     modelValue: Boolean,
@@ -77,17 +117,69 @@ const show = computed({
     get: () => props.modelValue,
     set: (value) => emit('update:modelValue', value)
 });
-
+//接受数据
 const questionData = computed(() => {
     return typeof props.questionData === 'function' 
         ? props.questionData() 
         : props.questionData;
 });
-
+// 定义事件
 const emit = defineEmits(['update:modelValue']);
+// 定义背景样式
+const items = [
+  {
+    algorithm: theme.defaultAlgorithm,
+    background: 'linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)',
+  },
+];
+// 提取背景样式
+const background = items[0].background;
+
+const md = markdownit({ html: true, breaks: true });
+
+const renderMarkdown = (content) => {
+    return h(Typography, null, {
+        default: () => h('div', { 
+            innerHTML: md.render(content),
+            class: 'markdown-content'
+        })
+    });
+};
+
+const sendRequest = async () => {
+    try {
+        const response = await axios.post('/webapi/testapi/chat', { message: questionData.value[0].stem });
+        LlaRes.value = response.data.data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+const handleClick = () => {
+    console.log("发送请求",questionData.value[0].stem);
+    sendRequest();
+};
+
+onMounted(() => {
+    console.log("AI解析助手已加载");
+
+});
+
+
+
+
+
+
 </script>
 
 <style scoped>
+.welcome-container{
+    margin-top: 10px;
+    margin-left: 12px;
+    margin-right: 12px;
+    margin-bottom: 10px;
+}
 .question-item {
     padding: 16px;
     margin-bottom: 20px;
@@ -172,5 +264,9 @@ const emit = defineEmits(['update:modelValue']);
     padding: 8px;
     background: #f7f8fa;
     border-radius: 4px;
+}
+.talk-container{
+    margin-left: 12px;
+    margin-right: 12px;
 }
 </style>
