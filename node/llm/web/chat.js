@@ -7,7 +7,7 @@ const openai = new OpenAI(
     }
 );
 
-async function chat(message) {
+async function postExamAIanalyse(message) {
     const messages = [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: message }
@@ -19,5 +19,4 @@ async function chat(message) {
     return completion.choices[0].message.content;
 }
 
-module.exports = { chat };
-
+module.exports = { postExamAIanalyse };

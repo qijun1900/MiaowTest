@@ -12,4 +12,8 @@ ExamRouter.get("/webapi/Exam/getUserExamInfo/:id",ExamController.getUserExamInfo
 ExamRouter.post("/webapi/UserExam/postUserExamIssuse/:id",ExamController.postUserExamIssuse)//用户端提交考试错误信息
 ExamRouter.get("/webapi/News/getSwipeNews",ExamController.getSwipeNews)//获取轮播图
 ExamRouter.post("/webapi/testapi/chat",ExamController.chat)//测试接口
+ExamRouter.post("/webapi/chat/ExamAIanalyse/psotExamAIanalyse",ExamController.sendExamAIanalyse)//调用大模型获得题目解析
+
+
+
 module.exports = ExamRouter; 

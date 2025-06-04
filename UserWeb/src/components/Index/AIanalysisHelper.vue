@@ -80,9 +80,10 @@
                     <Bubble 
                         placement="start" 
                         :content="LlaRes"
-                        :typing="{ step:2 ,interval: 120,suffix: '😺'}"
+                        :typing="{ step:4 ,interval: 50,suffix: '😺'}"
                         :messageRender="renderMarkdown"
-                        variant="shadow">
+                        variant="shadow"
+                        :loading="loading">
                         <template #avatar>
                            <TalkAIIcon/>
                         </template>
@@ -98,15 +99,15 @@
 import { computed, ref ,onMounted} from 'vue';
 import Divider from '../FuntionComponents/Divider.vue';
 import { Welcome, Bubble } from 'ant-design-x-vue';
-import { theme, Flex, Typography } from 'ant-design-vue';
+import { theme, Flex } from 'ant-design-vue';
 import TalkAIIcon from '../icons/TalkAIIcon.vue';
 import TalkUserIcon from '../icons/TalkUserIcon.vue';
-import axios from 'axios';
-import markdownit from 'markdown-it';
-import { h } from 'vue';
+import postExamAIanalyse from '@/API/postExamAIanalyse';
+import { renderMarkdown } from '@/utils/formatInfo';
 
 const request = ref("请给我此题解析");
 const LlaRes = ref("");
+const loading = ref(true);
 
 const props = defineProps({
     modelValue: Boolean,
@@ -135,23 +136,20 @@ const items = [
 // 提取背景样式
 const background = items[0].background;
 
-const md = markdownit({ html: true, breaks: true });
-
-const renderMarkdown = (content) => {
-    return h(Typography, null, {
-        default: () => h('div', { 
-            innerHTML: md.render(content),
-            class: 'markdown-content'
-        })
-    });
-};
-
 const sendRequest = async () => {
     try {
-        const response = await axios.post('/webapi/testapi/chat', { message: questionData.value[0].stem });
-        LlaRes.value = response.data.data;
+        const response = await postExamAIanalyse(questionData.value[0].stem, questionData.value[0]._id);
+        if (response.code === 200) {
+            loading.value = false;
+            console.log("请求成功:", response.data);
+            LlaRes.value = response.data;
+        } else {
+            LlaRes.value = "服务器繁忙，请稍后再试";
+        }
     } catch (error) {
-        console.error(error);
+        console.error("请求失败:", error);
+        loading.value = false;
+        LlaRes.value = "服务器繁忙，请稍后再试";
     }
 };
 
@@ -163,13 +161,7 @@ const handleClick = () => {
 
 onMounted(() => {
     console.log("AI解析助手已加载");
-
 });
-
-
-
-
-
 
 </script>
 
