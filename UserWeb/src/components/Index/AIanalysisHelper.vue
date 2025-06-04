@@ -80,7 +80,7 @@
                     <Bubble 
                         placement="start" 
                         :content="LlaRes"
-                        :typing="{ step:4 ,interval: 50,suffix: '😺'}"
+                        :typing="{ step:4 ,interval: 30,suffix: '😺'}"
                         :messageRender="renderMarkdown"
                         variant="shadow"
                         :loading="loading">
@@ -90,8 +90,8 @@
                     </Bubble>
                  </Flex>
             </div>
-            <button @click="handleClick">发送</button>
         </div>
+        <van-back-top :offset="200" />
     </van-popup>
 </template>
 
@@ -138,10 +138,9 @@ const background = items[0].background;
 
 const sendRequest = async () => {
     try {
-        const response = await postExamAIanalyse(questionData.value[0].stem, questionData.value[0]._id);
+        const response = await postExamAIanalyse(questionData.value[0].stem, questionData.value[0]._id,questionData.value[0].Type);
         if (response.code === 200) {
             loading.value = false;
-            console.log("请求成功:", response.data);
             LlaRes.value = response.data;
         } else {
             LlaRes.value = "服务器繁忙，请稍后再试";
@@ -154,13 +153,10 @@ const sendRequest = async () => {
 };
 
 
-const handleClick = () => {
-    console.log("发送请求",questionData.value[0].stem);
-    sendRequest();
-};
-
 onMounted(() => {
     console.log("AI解析助手已加载");
+    sendRequest();
+    console.log("发送请求",questionData.value[0].stem);
 });
 
 </script>

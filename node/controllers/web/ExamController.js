@@ -89,9 +89,9 @@ const ExamController ={
     },
     sendExamAIanalyse:async (req,res)=>{
         try {
-            const { message, QuestionID } = req.body; // 从请求体中获取问题和题目ID,如果QuestionID不存在，则调用大模型api获得
-            console.log("用户输入的问题:", message, "题目ID:", QuestionID);
-            const result = await ExamService.sendExamAIanalyse(message, QuestionID); // 调用服务层的sendExamAIanalyse方法
+            const { message, QuestionID ,Type} = req.body; // 从请求体中获取问题和题目ID,如果QuestionID不存在，则调用大模型api获得
+            console.log("用户输入的问题:", message, "题目ID:", QuestionID, "题目类型:", Type);
+            const result = await ExamService.sendExamAIanalyse(message, QuestionID,Type); // 调用服务层的sendExamAIanalyse方法
             console.log(result); // 打印服务层的响应结果
             res.send({
                 code: 200,

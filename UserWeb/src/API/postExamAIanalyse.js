@@ -1,8 +1,8 @@
 //调用大模型获得题目解析
 import axios from "axios";
-const postExamAIanalyse = async (message,QuestionID) => {
+const postExamAIanalyse = async (message,QuestionID,Type) => {
     try {
-        const res = await axios.post('/webapi/chat/ExamAIanalyse/psotExamAIanalyse',{message,QuestionID});
+        const res = await axios.post('/webapi/chat/ExamAIanalyse/psotExamAIanalyse',{message,QuestionID,Type});
         if (res.data.code === 200) {
             return res.data; 
         }
