@@ -36,7 +36,10 @@ const ExamService = {
         // 先查询数据库
         const existingAnalysis = await AianalysisModel.findOne({ questionId });
         if (existingAnalysis) {
-            return existingAnalysis.analysecontent;
+            return {
+               Aidata: existingAnalysis.analysecontent ,
+               modelName:existingAnalysis.modelName,
+            }// 如果存在，直接返回分析结果
         }
         
         // 如果没有找到，调用AI接口
@@ -47,9 +50,9 @@ const ExamService = {
             questionId,
             questionType: Type, // 添加题目类型
             questionContent: message, // 添加题目内容
-            analysecontent: result,// 添加分析内容
+            analysecontent: result.Aidata,// 添加分析内容
             createdTime: new Date(),
-            modelName: 'deepseek-v3' // 添加模型名称
+            modelName: result.modelName // 添加模型名称
         });
         return result;
     },

@@ -2,8 +2,8 @@
     <van-notice-bar 
         left-icon="volume-o" 
         :scrollable="false"
-        color="rgb(255, 255, 255)"
-        background="rgb(250, 195, 75)"
+        color=" #f0f6ff"
+        background="#75b2ff"
         >
     <van-swipe
         vertical
@@ -41,7 +41,7 @@ onMounted(async () => {
 <style scoped>
 .van-notice-bar{
     overflow: hidden; 
-    border-radius: 5px; 
+    border-radius: 7px; 
     height: 36px;
     line-height: 36px;
 }

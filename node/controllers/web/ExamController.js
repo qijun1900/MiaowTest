@@ -97,7 +97,8 @@ const ExamController ={
             res.send({
                 code: 200,
                 ActionType: "OK",
-                data: result // 返回服务层的响应结果
+                data: result ,// 返回服务层的响应结果
+               
             });
         } 
         catch (error) {

@@ -14,15 +14,14 @@
     <div class="analyse-content">
         <span class="font-analyse">{{ analysis }}</span>
     </div>
-    <div v-if="isAIanswer === 1" class="ai-answer-notice">
-        <WarnIcon size="18"/><span class="ai-answer-notice-font">本解析由 AI 生成，内容仅供参考，请仔细甄别</span>
+    <div v-if="isAIanswer === 1">
+       <AiWarn/>
     </div>
-
 </template>
 <script setup>
 import Divider from '../FuntionComponents/Divider.vue';
 import AnalysisIcon from '../icons/AnalysisIcon.vue';
-import WarnIcon from '../icons/WarnIcon.vue';
+import AiWarn from '../FuntionComponents/AiWarn.vue';
 import { computed } from 'vue';
 
 const props = defineProps({
@@ -56,23 +55,6 @@ const isAIanswer = computed(() => {
 }
 .analyse-content{
     margin-top: 10px;
-}
- .ai-answer-notice {
-    background-color: #fdebce ;
-    border-radius: 5px;
-    padding: 12px 7px;
-    margin: 16px 0;
-    font-size: 14px;
-    color: #666;
-    position: relative;
-    line-height: 1.8;
-}
-
-.ai-answer-notice-font{
-    color: #f4ae2c;
-    font-size: 15px;
-    font-weight: 600;
-    margin-left: 2px;
 }
 .analyse-container {
     margin-top: 20px;

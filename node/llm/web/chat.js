@@ -13,10 +13,13 @@ async function postExamAIanalyse(message) {
         { role: "user", content: message }
     ];
     const completion = await openai.chat.completions.create({
-        model: "deepseek-v3",
+        model: "qwen-turbo",
         messages: messages, 
     });
-    return completion.choices[0].message.content;
+    return {
+        Aidata:completion.choices[0].message.content,
+        modelName:completion.model
+    } ;
 }
 
 module.exports = { postExamAIanalyse };
