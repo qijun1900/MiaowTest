@@ -17,7 +17,8 @@
                     :style="{ backgroundImage: background, borderStartStartRadius: 4 }"
                     icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
                     title="Hello, 我是你的AI解题小助手"
-                    description="Base on Ant Design, I can provide you with a detailed explanation of the problem 🐱"/>
+                    description="Base on Ant Design, I can provide you with a detailed explanation of the problem 🐱"
+                    class="welcome-animation"/>
                 </div>
             <div 
                 v-for="item in questionData" 
@@ -111,7 +112,8 @@ const loading = ref(true);
 
 const props = defineProps({
     modelValue: Boolean,
-    questionData: [Object, Function]  // 修改为接受对象或函数
+    questionData: [Object, Function],  // 修改为接受对象或函数
+   
 });
 
 const show = computed({
@@ -256,5 +258,29 @@ onMounted(() => {
 .talk-container{
     margin-left: 12px;
     margin-right: 12px;
+}
+.welcome-animation {
+    animation: 
+        fadeInUp 0.6s ease-out forwards,
+        pulse 2s infinite 0.6s; /* 0.6s延迟，等淡入动画完成后再开始 */
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
 </style>

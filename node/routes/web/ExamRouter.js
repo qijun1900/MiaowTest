@@ -13,7 +13,7 @@ ExamRouter.post("/webapi/UserExam/postUserExamIssuse/:id",ExamController.postUse
 ExamRouter.get("/webapi/News/getSwipeNews",ExamController.getSwipeNews)//获取轮播图
 ExamRouter.post("/webapi/testapi/chat",ExamController.chat)//测试接口
 ExamRouter.post("/webapi/chat/ExamAIanalyse/psotExamAIanalyse",ExamController.sendExamAIanalyse)//调用大模型获得题目解析
-
+ExamRouter.post("/webapi/user/postUserAdvice",ExamController.UserFeedbackAdvice)//用户反馈接口
 
 
 module.exports = ExamRouter; 

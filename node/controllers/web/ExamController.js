@@ -47,6 +47,7 @@ const ExamController ={
             await ExamService.postUserExamIssuse(
                 ExamId, 
                 ExamtagId,
+                IsSolved=1,
                 Type,
                 new Date()
             )
@@ -102,7 +103,27 @@ const ExamController ={
         catch (error) {
             console.error('Error fetching sendExamAIanalyse details:', error); // 处理错误
         }
+    },
+    UserFeedbackAdvice:async (req,res)=>{
+        try {
+            const {useradvice,userinfo,type} = req.body; // 从请求体中获取问题和题目ID,如果QuestionID不存在，则调用大模型api获得
+            console.log("用户输入的问题:", useradvice, "用户信息:", userinfo, "类型:", type);
+            const result = await ExamService.UserFeedbackAdvice({
+                useradvice,
+                userinfo,
+                type,
+                IsSolved: 1,
+                createtime: new Date()
 
+            }) // 调用服务层的sendExamAIanalyse方法
+           res.send({
+                code: 200,
+                ActionType: "OK",
+                data: result 
+            });
+        }catch (error) {
+            console.error('Error fetching UserFeedbackAdvice details:', error); // 处理错误 
+        } 
     }
 }
 

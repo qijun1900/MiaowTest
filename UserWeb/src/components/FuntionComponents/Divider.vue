@@ -37,7 +37,7 @@ const props = defineProps({
         type: String,
         default:"var(--van-font-size-md)"
     },
-    dividerContentLeftWidth:{
+    dividerContentLeftWidth:{// 内容宽度
         type: String,
         default:"10%"
     }

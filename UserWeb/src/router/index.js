@@ -9,6 +9,7 @@ import ExamReady from '@/components/ViewsComponents/ExamReady.vue'
 import ExamSetting from '@/components/ViewsComponents/ExamSetting.vue'
 import PractisePage from '@/components/ViewsComponents/PractisePage.vue'
 import Test1 from '@/views/Test/Test1.vue'
+import UserAdvice from '@/views/User/UserAdvice.vue'
 
 const routes = [
   {
@@ -52,6 +53,11 @@ const routes = [
     name:'test1',
     component: Test1
   },
+  {
+    path: '/useradvice',
+    name:'userAdvice',
+    component: UserAdvice
+  }
 ]
 
 const router = createRouter({

@@ -1,6 +1,10 @@
 <template>
     <van-config-provider :theme-vars="themeVars">
-        <van-nav-bar :title="title" left-arrow @click-left="onClickLeft" @click-right="onClickRight">
+        <van-nav-bar 
+            :title="title" 
+            left-arrow 
+            @click-left="onClickLeft" 
+            @click-right="onClickRight">
             <template #right>
                 <van-icon :name="iconName" :size="iconSize" />
             </template>
@@ -38,10 +42,10 @@ const props = defineProps({
         type: String,
         default: '#62bbf1',
     },
-    isclearAnswer: { // 是否清空答题记录
+    isclearAnswer: { //如果是练习页面 是否清空答题记录
         type: Boolean,
         default: false, // 默认不清空
-    }
+    },
 })
 // 计算属性，返回 title
 const title = computed(() => props.title)

@@ -33,7 +33,7 @@ const navItems = [
     { icon: 'home', text: '项目地址' , to: '/address'},
     { icon: 'column', text: '所有考试' ,  to: '/ExamList'},
     { icon: 'medal', text: '私有部署' , to: '/contest'},
-    { icon: 'wechat', text: '问题反馈' , to: '/ranking'},
+    { icon: 'wechat', text: '意见反馈' , to: '/useradvice'},
     { icon: 'test', text: '测试', to: '/test' } // 添加测试项,
 ]
 const Icon = {
