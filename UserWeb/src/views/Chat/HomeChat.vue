@@ -20,8 +20,6 @@
 import TopBack from '@/components/FuntionComponents/TopBack.vue';
 import AntWelcome  from '@/components/Index/AntWelcome.vue';
 
-
-
 </script>
 <style scoped>
 .page-container {
