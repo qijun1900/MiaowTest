@@ -112,7 +112,7 @@ const postExamAIanalyse = async (message, QuestionID, Type) => {
 `node/services/web/ExamService.js` 负责业务逻辑：
 
 - 首先在数据库（AianalysisModel）查找该题的 AI 解析，若已存在直接返回，避免重复调用大模型。
-- 若不存在，则调用大模型 API（如 OpenAI/自研大模型），获取解析结果。
+- 若不存在，则调用大模型 API，获取解析结果。
 - 解析结果保存入库供后续复用，并返回前端。
 
 ```js
@@ -141,8 +141,17 @@ sendExamAIanalyse: async (message, questionId, Type) => {
 `chat.postExamAIanalyse(message)` 封装了对大模型推理 API 的调用，通过 HTTP POST 请求，将题干 message 发送给大模型并获取解析。
 
 ---
+## 六、未来计划
 
-## 六、总结
+- **题库内容丰富化**：持续扩充题库题型，并支持图片、音频等多媒体题目。
+- **多端适配**：用户端使用uinapp重构。
+- **数据可视化分析**：为用户和管理员提供更丰富的考试与学习数据报表。
+- **开放 API**：为第三方系统或合作伙伴提供数据接口和题库能力。
+- **多大模型适配**：支持多种主流大模型，灵活切换和集成。
+- **后台端重构**：使用vite+vue3重构后台管理端。
+- **后台端接入AI**：后台端加入AI功能使其导入题目更方便。
+
+## 七、总结
 
 MiaoTest 项目以现代前后端分离架构，实现了题库、考试、资讯、公告、AI智能解析等丰富功能，采用主流技术栈（Vue3、Node.js、MongoDB、JWT、AI API 等），并通过服务端集成大模型能力赋能教育应用场景，为用户带来智能化的考试与学习体验。
 
