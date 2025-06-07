@@ -21,7 +21,7 @@
 import { Welcome } from 'ant-design-x-vue';
 import { theme } from 'ant-design-vue';
 import { Button, Space } from 'ant-design-vue';
-import { EllipsisOutlined } from '@ant-design/icons-vue';
+import {  EllipsisOutlined } from '@ant-design/icons-vue';
 const props = defineProps({
     title:{
         type:String,

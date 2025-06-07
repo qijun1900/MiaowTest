@@ -52,7 +52,9 @@
         </div>
     <van-floating-bubble 
         @click="onClick" 
-        v-model:offset="offset"
+         axis="xy"
+         magnetic="x"
+         v-model:offset="offset"
         v-if="IsOPenAI">
         <div class="bubble-content">
             <van-icon>
@@ -99,6 +101,7 @@ const IsRandom = computed(() => store.IsRandom);
 const show = ref(false);// 控制答题卡弹窗的显示状态
 const IsOPenAI = computed(() => store.IsOPenAI);// 是否开启AI解析助手
 const IsShoAIwAnswerHelp = ref(false); // 控制AI解析助手的显示状态  
+const offset = ref({ x: 320, y: 600 }); // 初始偏移量
 
 // 计算当前显示的题目
 const currentQuestion = computed(() => {
@@ -143,7 +146,6 @@ const rightCount = computed(() => {
 })
 
 //AI解析助手跳转
-const offset = ref({ x: 330, y: 630 });
 const onClick = () => {
     console.log('AI解析助手被点击',currentQuestion.value);
     IsShoAIwAnswerHelp.value = true;

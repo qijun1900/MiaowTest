@@ -4,8 +4,9 @@
             <Divider title="AI题目解析" position="center" dividerFontSize="20px" padding="0 80px" borderColor="#00ddff" />
             <div class="welcome-container">
                 <AntWelcome
-                   title="我是你的AI解题小助手" 
-                   description="Base on Ant Design, I can provide you with a detailed explanation of the problem 🐱"/>
+                title="我是你的AI解题小助手" 
+                description="基于Ant Design X Vue，我可以为您提供问题的详细解释,点击我可前往AI问答界面！🐱"
+                @click="handlePush"/>
             </div>
             <div v-for="item in questionData" :key="item._id" class="question-item">
 
@@ -99,7 +100,8 @@ import { renderMarkdown } from '@/util/formatInfo';
 import AiWarn from '../FuntionComponents/AiWarn.vue';
 import { CopyOutlined, } from '@ant-design/icons-vue';
 import Copy from '@/util/Copy';
-import AntWelcome from './AntWelcome.vue';
+import AntWelcome from '../FuntionComponents/AntWelcome.vue';
+import RouterPush from '@/util/RouterPush';
 
 
 const request = ref("请给我此题解析");
@@ -142,6 +144,13 @@ const sendRequest = async () => {
         loading.value = false;
         LlaRes.value = "服务器繁忙，请稍后再试";
     }
+};
+
+//页面跳转
+const handlePush = () => {
+    show.value = false;// 关闭弹窗
+    emit('update:modelValue', false);// 关闭弹窗，触发父组件的更新
+    RouterPush("/homechat");
 };
 
 onMounted(() => {

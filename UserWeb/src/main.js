@@ -6,15 +6,16 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
 import Vant from 'vant'
+import Antd from 'ant-design-vue';
 import 'vant/lib/index.css' // 引入vant组件样式
-
-
+import 'ant-design-vue/dist/reset.css';// 引入antd组件样式
 
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(Vant)
+app.use(Antd)
 app.use(router)
 app.use(Lazyload)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

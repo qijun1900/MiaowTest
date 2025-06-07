@@ -35,7 +35,7 @@ const navItems = [
     { icon: 'AllExamIcon', text: '所有考试' ,  to: '/ExamList'},
     { icon: 'HomeDockerIcon', text: '私有部署' , to: '/contest'},
     { icon: 'HomeProblemIcon', text: '意见反馈' , to: '/useradvice'},
-    { icon: 'HomeChatIcon', text: 'AI智答', to: '/homechat' } 
+    { icon: 'HomeChatIcon', text: '喵喵智答', to: '/homechat' } 
 ]
 const Icon = {
     'GithubCatIcon': GithubCatIcon, 
@@ -55,15 +55,15 @@ const themeVars = ref({
 
 <style scoped>
 .nav-container {
-    padding: 10px 0;
+    padding: 0.625rem 0; /* 10px -> 0.625rem */
     background: #ffffff;
 }
 
 /* 新增自定义文字样式 */
 .custom-text {
     color: #555555;
-    font-size: 12px;
-    margin-top: 6px;
+    font-size: 0.75rem; /* 12px -> 0.75rem */
+    margin-top: 0.375rem; /* 6px -> 0.375rem */
     font-weight: 800;
 }
 
@@ -73,8 +73,6 @@ const themeVars = ref({
 }
 
 :deep(.van-grid-item__content) {
-    padding: 8px 10px;
+    padding: 0.5rem 0.625rem; /* 8px 10px -> 0.5rem 0.625rem */
 }
-
-
 </style>
