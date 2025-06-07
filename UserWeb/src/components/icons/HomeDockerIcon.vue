@@ -36,7 +36,7 @@
 defineProps({
   size: {
     type: [Number, String],
-    default: 42
+    default: 44
   }
 })
 </script>

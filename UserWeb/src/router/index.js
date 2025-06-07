@@ -8,8 +8,12 @@ import SearchDeatil from '@/components/ViewsComponents/SearchDeatil.vue'
 import ExamReady from '@/components/ViewsComponents/ExamReady.vue'
 import ExamSetting from '@/components/ViewsComponents/ExamSetting.vue'
 import PractisePage from '@/components/ViewsComponents/PractisePage.vue'
-import Test1 from '@/views/Test/Test1.vue'
+// import Test1 from '@/views/Test/Test1.vue'
 import UserAdvice from '@/views/User/UserAdvice.vue'
+import HomeChat from '@/views/Chat/HomeChat.vue'
+
+
+
 
 const routes = [
   {
@@ -48,15 +52,20 @@ const routes = [
     name: 'practisePage',
     component: PractisePage,
   },
-  {
-    path: '/test',
-    name:'test1',
-    component: Test1
-  },
+  // {
+  //   path: '/test',
+  //   name:'test1',
+  //   component: Test1
+  // },
   {
     path: '/useradvice',
     name:'userAdvice',
     component: UserAdvice
+  },
+  {
+    path: '/homechat',
+    name:'homeChat',
+    component: HomeChat
   }
 ]
 

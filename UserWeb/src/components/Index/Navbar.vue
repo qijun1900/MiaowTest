@@ -25,22 +25,24 @@
 import { ref } from 'vue'
 import GithubCatIcon from '../icons/GithubCatIcon.vue'
 import AllExamIcon from '../icons/AllExamIcon.vue'
-import HomeProblemIcon from '../icons/HomeProblemIcon.vue'
 import HomeDockerIcon from '../icons/HomeDockerIcon.vue'
+import HomeProblemIcon from '../icons/HomeProblemIcon.vue'
+import HomeChatIcon from '../icons/HomeChatIcon.vue'
 
 // 导航项配置数据
 const navItems = [
-    { icon: 'home', text: '项目地址' , to: '/address'},
-    { icon: 'column', text: '所有考试' ,  to: '/ExamList'},
-    { icon: 'medal', text: '私有部署' , to: '/contest'},
-    { icon: 'wechat', text: '意见反馈' , to: '/useradvice'},
-    { icon: 'test', text: '测试', to: '/test' } // 添加测试项,
+    { icon: 'GithubCatIcon', text: '项目地址' , to: '/address'},
+    { icon: 'AllExamIcon', text: '所有考试' ,  to: '/ExamList'},
+    { icon: 'HomeDockerIcon', text: '私有部署' , to: '/contest'},
+    { icon: 'HomeProblemIcon', text: '意见反馈' , to: '/useradvice'},
+    { icon: 'HomeChatIcon', text: 'AI智答', to: '/homechat' } 
 ]
 const Icon = {
-    'home': GithubCatIcon, // 替换为你的自定义图标组件
-    'column': AllExamIcon, 
-    "medal":HomeDockerIcon,
-    "wechat": HomeProblemIcon,
+    'GithubCatIcon': GithubCatIcon, 
+    'AllExamIcon': AllExamIcon, 
+    "HomeDockerIcon":HomeDockerIcon,
+    "HomeProblemIcon": HomeProblemIcon,
+    "HomeChatIcon" : HomeChatIcon
 
 }
 // 定制 Grid 组件主题

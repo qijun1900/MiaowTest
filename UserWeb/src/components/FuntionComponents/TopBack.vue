@@ -1,6 +1,6 @@
 <template>
     <van-config-provider :theme-vars="themeVars">
-        <van-nav-bar 
+        <van-nav-bar
             :title="title" 
             left-arrow 
             @click-left="onClickLeft" 
@@ -46,6 +46,10 @@ const props = defineProps({
         type: Boolean,
         default: false, // 默认不清空
     },
+    navBarBackground: { // 导航栏背景颜色
+        type: String,
+        default: '#ffffff', // 默认白色
+    }
 })
 // 计算属性，返回 title
 const title = computed(() => props.title)
@@ -86,6 +90,7 @@ const themeVars = ref({
     navBarHeight: props.navBarHeight,// 导航栏高度
     navBarTitleFontSize: "18px", // 标题字体大小
     navBarIconColor: props.navBarIconColor, // 图标颜色
+    navBarBackground: props.navBarBackground, // 导航栏背景颜色
 })
 </script>
 <style scoped>
@@ -94,7 +99,4 @@ const themeVars = ref({
     border-bottom-width: 0;
 }
 
-.container {
-    color: #3b3c3d;
-}
 </style>

@@ -3,11 +3,9 @@
         <div>
             <Divider title="AI题目解析" position="center" dividerFontSize="20px" padding="0 80px" borderColor="#00ddff" />
             <div class="welcome-container">
-                <Welcome :style="{ backgroundImage: background, borderStartStartRadius: 4 }"
-                    icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-                    title="Hello, 我是你的AI解题小助手"
-                    description="Base on Ant Design, I can provide you with a detailed explanation of the problem 🐱"
-                    class="welcome-animation" />
+                <AntWelcome
+                   title="我是你的AI解题小助手" 
+                   description="Base on Ant Design, I can provide you with a detailed explanation of the problem 🐱"/>
             </div>
             <div v-for="item in questionData" :key="item._id" class="question-item">
 
@@ -49,14 +47,22 @@
             </div>
             <div class="talk-container">
                 <Flex gap="middle" vertical>
-                    <Bubble placement="end" :content="request" :typing="{ step: 1, interval: 50, suffix: '🐱' }"
+                    <Bubble 
+                        placement="end" 
+                        :content="request" 
+                        :typing="{ step: 1, interval: 50, suffix: '🐱' }"
                         variant="shadow">
                         <template #avatar>
                             <TalkUserIcon />
                         </template>
                     </Bubble>
-                    <Bubble :header="modelName" placement="start" :content="LlaRes"
-                        :typing="{ step: 4, interval: 30, suffix: '😺' }" :messageRender="renderMarkdown" variant="shadow"
+                    <Bubble 
+                        :header="modelName" 
+                        placement="start" 
+                        :content="LlaRes"
+                        :typing="{ step: 4, interval: 30, suffix: '😺' }" 
+                        :messageRender="renderMarkdown" 
+                        variant="shadow"
                         :loading="loading">
                         <template #avatar>
                             <TalkAIIcon />
@@ -75,7 +81,6 @@
                 <div v-show="!loading">
                     <AiWarn />
                 </div>
-
             </div>
         </div>
         <van-back-top :offset="200" />
@@ -85,8 +90,8 @@
 <script setup>
 import { computed, ref, onMounted, h } from 'vue';
 import Divider from '../FuntionComponents/Divider.vue';
-import { Welcome, Bubble } from 'ant-design-x-vue';
-import { theme, Flex, Button, Space } from 'ant-design-vue';
+import { Bubble } from 'ant-design-x-vue';
+import { Flex, Button, Space } from 'ant-design-vue';
 import TalkAIIcon from '../icons/TalkAIIcon.vue';
 import TalkUserIcon from '../icons/TalkUserIcon.vue';
 import postExamAIanalyse from '@/API/postExamAIanalyse';
@@ -94,6 +99,7 @@ import { renderMarkdown } from '@/util/formatInfo';
 import AiWarn from '../FuntionComponents/AiWarn.vue';
 import { CopyOutlined, } from '@ant-design/icons-vue';
 import Copy from '@/util/Copy';
+import AntWelcome from './AntWelcome.vue';
 
 
 const request = ref("请给我此题解析");
@@ -118,15 +124,7 @@ const questionData = computed(() => {
 });
 // 定义事件
 const emit = defineEmits(['update:modelValue']);
-// 定义背景样式
-const items = [
-    {
-        algorithm: theme.defaultAlgorithm,
-        background: 'linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)',
-    },
-];
-// 提取背景样式
-const background = items[0].background;
+
 
 const sendRequest = async () => {
     try {
@@ -259,40 +257,5 @@ onMounted(() => {
 .talk-container {
     margin-left: 12px;
     margin-right: 12px;
-}
-
-.welcome-animation {
-    animation:
-        fadeInUp 0.6s ease-out forwards,
-        pulse 2s infinite 0.6s;
-    /* 0.6s延迟，等淡入动画完成后再开始 */
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.02);
-    }
-
-    100% {
-        transform: scale(1);
-    }
 }
 </style>

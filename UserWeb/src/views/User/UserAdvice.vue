@@ -2,7 +2,8 @@
     <div class="page-container">
         <TopBack 
             title="意见反馈" 
-            navBarIconColor="#000000" />
+            navBarIconColor="#000000" 
+            navBarBackground="#f7fcff"/>
         <div>
             <div class="icon" :class="{'success-animation': IsShowSuccessIcon}">
                 <UserAdviceSimleIcon size="100" />
@@ -46,7 +47,7 @@
                         round
                         size="large"
                         @click="handSendInfo">
-                        按钮
+                        提交
                     </van-button>
                 </div>
             </div>
