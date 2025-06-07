@@ -31,7 +31,7 @@ import HomeChatIcon from '../icons/HomeChatIcon.vue'
 
 // 导航项配置数据
 const navItems = [
-    { icon: 'GithubCatIcon', text: '项目地址' , to: '/address'},
+    { icon: 'GithubCatIcon', text: '项目地址' , to: '/projectintroduce'},
     { icon: 'AllExamIcon', text: '所有考试' ,  to: '/ExamList'},
     { icon: 'HomeDockerIcon', text: '私有部署' , to: '/contest'},
     { icon: 'HomeProblemIcon', text: '意见反馈' , to: '/useradvice'},

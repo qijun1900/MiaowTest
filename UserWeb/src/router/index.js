@@ -11,7 +11,7 @@ import PractisePage from '@/components/ViewsComponents/PractisePage.vue'
 // import Test1 from '@/views/Test/Test1.vue'
 import UserAdvice from '@/views/User/UserAdvice.vue'
 import HomeChat from '@/views/Chat/HomeChat.vue'
-
+import Introduce from '@/views/Home/Introduce.vue'
 
 
 
@@ -66,6 +66,11 @@ const routes = [
     path: '/homechat',
     name:'homeChat',
     component: HomeChat
+  },
+  {
+    path: '/projectintroduce',
+    name:'introduce',
+    component: Introduce
   }
 ]
 
