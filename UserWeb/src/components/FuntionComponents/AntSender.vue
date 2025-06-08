@@ -1,16 +1,13 @@
 <template>
     <div>
         <Sender
+            ref="senderRef"
             v-model:value="userinput"
             :loading="loading"
             :auto-size="{ minRows: 1, maxRows: 6 }"
-            @submit="() => {
-                value = ''
-                loading = true
-            }"
-            @cancel="() => {
-                loading = false
-            }"
+            @submit="handleUserInput()"
+            @cancel="handleCancel()"
+            @focus="handleFocus()"
         />
     </div>
 </template>
@@ -20,6 +17,34 @@ import  {ref} from 'vue'
 
 const loading = ref(false)
 const userinput = ref('')
+const isShowBubble = ref(false)
+const senderRef = ref(null)  // 新增 Sender 组件引用
+
+const props = defineProps({
+    isfinishloading: {
+        type: Boolean,
+        default: false,
+    }
+})
+const emit = defineEmits(['userinputsubmit','isHidePrompts','isShowBubble'])
+
+const handleUserInput = () => {
+    emit('userinputsubmit', userinput.value)
+    userinput.value = ''
+    loading.value = true
+    isShowBubble.value = true
+    emit('isShowBubble', isShowBubble.value)
+    senderRef.value?.blur() //提交后收起键盘
+}
+
+const handleCancel = () => { 
+    userinput.value = ''
+    loading.value = false
+}
+const handleFocus = () => {
+    emit('isHidePrompts', true)
+}
+
 
 </script>
 <style scoped>

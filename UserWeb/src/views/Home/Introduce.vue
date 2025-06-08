@@ -6,7 +6,7 @@
         </div>
       <div class="title-block">
         <h1 class="main-title">题喵喵|MiaoTest</h1>
-        <p class="subtitle">基于大模型AI的智能题库与自主题目练习平台</p>
+        <p class="subtitle">基于AI大模型的智能题库与自主题目练习平台</p>
         <a 
           class="github-link"
           href="https://github.com/qijun1900/MiaoTest"
@@ -14,17 +14,21 @@
         >
           <span class="iconfont"><GithubIcon/></span> 开源地址 @qijun1900/MiaoTest
         </a>
+        <Button
+            type="text" 
+            size="small" 
+            :icon="h(CopyOutlined)"
+            @click="Copy(`https://github.com/qijun1900/MiaoTest`)"/>
       </div>
     </header>
 
     <section class="features">
       <h2>核心功能</h2>
       <ul>
-        <li>🖥︎前后端分离架构</li>
+        <li>📚 题库管理与分类</li>
         <li>📃多题型在线考试与错题练习</li>
         <li>🤖AI智能解析，题目一键解答</li>
         <li>🎶批量题库管理与导入</li>
-        <li>📰公告、轮播与资讯中心</li>
         <li>📱多端适配，移动端友好体验</li>
         <li>🙋‍♀️基于 AI 大语言模型 API 实现的解析与问答</li>
       </ul>
@@ -41,6 +45,9 @@
         <div class="tech-item">AI大模型API</div>
         <div class="tech-item">Ant Design X Vue</div>
         <div class="tech-item">Axios</div>
+        <div class="tech-item">Vue Router</div>
+        <div class="tech-item">前后端分离架构</div>
+        <div class="tech-item">Vite</div>
       </div>
     </section>
 
@@ -48,10 +55,10 @@
       <h2>未来计划</h2>
       <ul>
         <li>🎨 题库内容丰富化，包括图片/音频题型</li>
-        <li>📱 多端适配，支持UniApp重构</li>
+        <li>📱 多端平台适配，使用UniApp重构</li>
         <li>📊 数据可视化分析与报表</li>
-        <li>🤖 多大模型灵活接入与后台AI功能</li>
-        <li>🚀 后台重构，提升体验与可读性</li>
+        <li>🤖 大模型灵活接入与实现后台AI功能</li>
+        <li>🚀 后台重构，提升体验与代码可读性</li>
         <li>🗂 加入更多解题辅助功能优化答题</li>
       </ul>
     </section>
@@ -63,9 +70,13 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted ,h} from 'vue'
 import LogoIcon from '@/components/icons/LogoIcon.vue'
 import GithubIcon from '@/components/icons/GithubIcon.vue'
+import {  Button } from 'ant-design-vue';
+import { CopyOutlined, } from '@ant-design/icons-vue';
+import Copy from '@/util/Copy';
+
 
 // 动画效果
 onMounted(() => {

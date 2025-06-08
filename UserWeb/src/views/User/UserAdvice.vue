@@ -10,7 +10,7 @@
             </div>
             <div v-show="!IsShowSuccessIcon">
                 <Divider 
-                title="具体建议*"
+                title="具体意见*"
                 dividerFontSize="18px"
                 borderColor="#a0c9ff"/>
                 <div class="useradvice">
@@ -21,7 +21,7 @@
                             autosize
                             type="textarea"
                             maxlength="120"
-                            placeholder="请具体描述您的建议与问题，您的建议和反馈是我最大的动力!"
+                            placeholder="请具体描述您的建议与问题，可填遇到的bug、不好用的功能、期待加入的功能等，您的建议和反馈是我最大的动力，谢谢！"
                             show-word-limit
                         />
                     </van-cell-group>
