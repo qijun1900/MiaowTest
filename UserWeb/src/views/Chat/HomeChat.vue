@@ -12,10 +12,13 @@
                     description="基于组件Ant Design X Vue 与百炼大模型服务平台，实现多种大模型自由轻松调用!🐱" />
                 </div>
                 <div class="prompts" v-show="!PromptsHiden">
-                    <AntPrompts  @userpromptsubmit="handleuserPrompt" />
+                    <AntPrompts 
+                     title="✨使用请注意以下下问题："
+                    />
                 </div>
                 <div class="sender" >
                     <AntSender 
+                        ref="antSender"
                         @userinputsubmit="handleuserSend" 
                         @isHidePrompts="handleisHidePrompts"
                         @isShowBubble="handleIsloading"/>
@@ -40,7 +43,8 @@
                                 :typingstep="4" 
                                 :typinginterval="30" 
                                 typingsuffix="😺"
-                                v-show="isShowAIBubble">
+                                v-show="isShowAIBubble"
+                                :isloading="isAIloading">
                                 <template #bubbleAvatar>
                                     <TalkAIIcon/>
                                 </template>
@@ -60,47 +64,75 @@ import AntSender from '@/components/FuntionComponents/AntSender.vue';
 import AntBubble from '@/components/FuntionComponents/AntBubble.vue';
 import TalkUserIcon from '@/components/icons/TalkUserIcon.vue';
 import TalkAIIcon from '@/components/icons/TalkAIIcon.vue';
-import { Flex,} from 'ant-design-vue';
+import { Flex} from 'ant-design-vue';
+import postUserUserChat from '@/API/postUserChat';
 
 const userSendData = ref('');
 const LlaResponse = ref('');
 const PromptsHiden = ref(false);
 const isShowUserBubble = ref(false);
 const isShowAIBubble = ref(false);
+const isAIloading = ref(true);
+const antSender = ref(null); // 添加AntSender组件引用，用于重置loading状态
 
 //处理用户提交的问题
 const handleuserSend = (data) => {
     console.log('用户提交了问题:',data) 
+    LlaResponse.value = ''; // 清空之前的回复
+    isAIloading.value = true; // 强制进入加载状态
     userSendData.value = data;
+    sendRequest(data)
 }
 //处理用户提交的提示词
-const handleuserPrompt = (data) => {
-    console.log('用户提交了提示词:',data)
-    userSendData.value = data; 
+// const handleuserPrompt = (data) => {
+    // console.log('用户提交了提示词:',data)
+    // userSendData.value = data; 
+    // isShowUserBubble.value = true;
+// }
 
-}
 //处理是否隐藏提示词
 const handleisHidePrompts = (data) => {
     PromptsHiden.value = data;
 }
-//处理是否显示用户气泡
+//处理是否显示气泡
 const handleIsloading = (data) => {
     console.log('是否显示用户气泡:',data)
     isShowUserBubble.value = data;
+    isShowAIBubble.value = data;
 }
-
-
+//发送请求到服务器
+const sendRequest = async (data) => {
+    console.log('用户提交了问题到服务器:',data)
+    try {
+        const response = await postUserUserChat(data);
+        console.log('返回的内容:',response)
+        if (response.code === 200) {
+            LlaResponse.value = response.data.Aidata;
+            isShowAIBubble.value = true;
+        } else {
+            LlaResponse.value = '网络错误，请稍后重试！';
+        }
+    } catch (error) {
+        LlaResponse.value = '请求异常，请检查网络';
+        console.error('API请求错误:', error);
+    } finally { 
+        isAIloading.value = false;
+        antSender.value?.resetLoading();
+    }
+}
 </script>
+
 <style scoped>
 .page-container {
-    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    height: 100vh; /* 新增视口高度 */
     background-color: #f7fcff;
     display: flex;
     flex-direction: column;
+    overflow-y: auto; /* 启用垂直滚动 */
 }
 
 .welcome{
@@ -130,6 +162,12 @@ const handleIsloading = (data) => {
     margin-left: 10px;
     margin-right: 10px;
 
+}
+.aibubble{
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px; 
+    margin-bottom: 100px;
 }
 
 

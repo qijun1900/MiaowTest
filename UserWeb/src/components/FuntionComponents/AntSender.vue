@@ -20,12 +20,7 @@ const userinput = ref('')
 const isShowBubble = ref(false)
 const senderRef = ref(null)  // 新增 Sender 组件引用
 
-const props = defineProps({
-    isfinishloading: {
-        type: Boolean,
-        default: false,
-    }
-})
+
 const emit = defineEmits(['userinputsubmit','isHidePrompts','isShowBubble'])
 
 const handleUserInput = () => {
@@ -46,6 +41,15 @@ const handleFocus = () => {
 }
 
 
+
+// 暴露重置loading方法
+const resetLoading = () => {
+    loading.value = false;
+};
+
+defineExpose({
+    resetLoading
+});
 </script>
 <style scoped>
 </style>

@@ -4,7 +4,7 @@
         :content="props.content" 
         :typing="{ step: props.typingstep, interval: props.typinginterval, suffix: props.typingsuffix }"
         :variant="props.shadow"
-        :loading="loading"
+        :loading="isloading"
         :messageRender="renderMarkdown"
         :shape="props.corner">
         <template #avatar>
@@ -31,8 +31,9 @@ import Copy from '@/util/Copy';
 import {h,ref} from 'vue'
 import { CopyOutlined } from '@ant-design/icons-vue';
 
-const loading = ref(false)
+
 const isShow = ref(false)
+
 
 const props = defineProps({
     placement: { 
@@ -60,11 +61,20 @@ const props = defineProps({
     corner: {
         type: String,
         default: 'round' 
+    } ,
+    isloading: {
+        type: Boolean,
+        default: false 
     }
+
 })
 setTimeout(() => {
     isShow.value = true
 },2000)
+
+
+
+
 
 </script>
 <style scoped>

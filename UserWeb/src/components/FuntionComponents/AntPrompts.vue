@@ -3,7 +3,7 @@
         <transition name="slide-fade">
             <Prompts
                 v-if="show"
-                title="✨例如你可以问下面问题："
+                :title="props.title"
                 :items="items"
                 wrap 
                 vertical
@@ -16,16 +16,22 @@
 <script setup>  
 import { Prompts } from 'ant-design-x-vue'
 import { ref, onMounted } from 'vue'
+const props = defineProps({
+  title: {
+    type: String,
+    default: '✨例如你可以问下面问题：' 
+  }
+})
 
 const items = [
   {
-    label: '如何使用Ant Design X Vue？',
+    label: '不支持多轮调用请注意及时保存内容！',
   },
   {
-    label: '英语中的名词"computer"是什么意思？'
+    label: '不支持历史对话请复制内容以便保存！',
   },
   {
-    label: '介绍一下Vue.js的生命周期？',
+    label: '不支持存储内容请及时保存对话内容！',
   },
 ]
 const emit = defineEmits(['userpromptsubmit'])

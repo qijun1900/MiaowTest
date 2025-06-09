@@ -65,6 +65,9 @@ const ExamService = {
             createdTime:createtime
         })
         
+    },
+    UserChat: async (message) => {
+        return await chat.postUserChat(message)
     }
 }
 module.exports = ExamService

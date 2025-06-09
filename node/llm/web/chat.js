@@ -21,5 +21,20 @@ async function postExamAIanalyse(message) {
         modelName:completion.model
     } ;
 }
+async function postUserChat(message) {
+    const messages = [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: message } 
+    ]
+    const completion = await openai.chat.completions.create({
+        model: "qwen-plus",
+        messages: messages,
+    });
+    return {
+        Aidata:completion.choices[0].message.content,
+        modelName:completion.model 
+    } 
+}
 
-module.exports = { postExamAIanalyse };
+
+module.exports = { postExamAIanalyse,postUserChat };
