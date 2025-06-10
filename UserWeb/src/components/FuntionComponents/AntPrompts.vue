@@ -25,13 +25,13 @@ const props = defineProps({
 
 const items = [
   {
-    label: '不支持多轮调用请注意及时保存内容！',
+    label: '不支持对话记忆！',
   },
   {
-    label: '不支持历史对话请复制内容以便保存！',
+    label: '不支持历史对话找回请及时复制内容！',
   },
   {
-    label: '不支持存储内容请及时保存对话内容！',
+    label: '新的问题出现历史记录将清空！',
   },
 ]
 const emit = defineEmits(['userpromptsubmit'])

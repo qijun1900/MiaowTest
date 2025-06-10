@@ -21,13 +21,13 @@ async function postExamAIanalyse(message) {
         modelName:completion.model
     } ;
 }
-async function postUserChat(message) {
+async function postUserChat(message,model) {
     const messages = [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: message } 
     ]
     const completion = await openai.chat.completions.create({
-        model: "qwen-plus",
+        model:model,
         messages: messages,
     });
     return {

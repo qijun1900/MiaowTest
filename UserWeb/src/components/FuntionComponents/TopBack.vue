@@ -7,6 +7,8 @@
             @click-right="onClickRight">
             <template #right>
                 <van-icon :name="iconName" :size="iconSize" />
+                <!-- 添加插槽位置 -->
+                <slot name="chooseBut"></slot>
             </template>
         </van-nav-bar>
     </van-config-provider>

@@ -2,8 +2,8 @@
     <div>
         <Welcome :style="{ backgroundImage: background, borderStartStartRadius: 4 }"
             icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-            :title="props.title"
-            :description="props.description"
+            :title="title"
+            :description="welcomedescription"
             class="welcome-animation" >
             <template #extra>
                 <Space>
@@ -22,6 +22,7 @@ import { Welcome } from 'ant-design-x-vue';
 import { theme } from 'ant-design-vue';
 import { Button, Space } from 'ant-design-vue';
 import {  EllipsisOutlined } from '@ant-design/icons-vue';
+import {  computed } from 'vue';
 const props = defineProps({
     title:{
         type:String,
@@ -30,9 +31,15 @@ const props = defineProps({
     description:{
         type:String,
         required:true,
+    },
+    chooseModelName:{ // 选择模型的名称
+        type:String,
     }
-   
 });
+
+// 使用computed实现响应式标题
+const welcomedescription = computed(() => `${props.description}${props.chooseModelName || ''}`);
+
 // 定义背景样式
 const items = [
     {
@@ -42,7 +49,6 @@ const items = [
 ];
 // 提取背景样式
 const background = items[0].background;
-
 </script>
 <style scoped>
 .welcome-animation {

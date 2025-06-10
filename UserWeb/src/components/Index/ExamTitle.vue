@@ -7,8 +7,7 @@
             :title="item.content"
             is-link
             @click="handleClick(item)"
-            class="exam-title-cell"
-        />
+            class="exam-title-cell"/>
     </van-cell-group>
     </div>
 </template>

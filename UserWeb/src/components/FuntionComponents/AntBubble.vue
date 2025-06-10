@@ -18,7 +18,7 @@
                     size="small" 
                     :icon="h(CopyOutlined)"
                     @click="Copy(content)"
-                    v-if="props.showButton"/>
+                    v-if="showButton"/>
             </Space>
         </template>
 </Bubble>
@@ -77,7 +77,7 @@ const props = defineProps({
 onMounted(() => {
     setTimeout(() => {
         showButton.value = props.isShowButton
-    }, 3000)
+    }, 2000)
 })
 
 

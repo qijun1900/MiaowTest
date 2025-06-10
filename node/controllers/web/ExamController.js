@@ -128,9 +128,9 @@ const ExamController ={
     },
     UserChat:async (req,res)=>{
         try {
-            const {message} = req.body; // 从请求体中获取问题和题目ID,如果QuestionID不存在，则调用大模型api获得
-            console.log("用户输入的问题:", message);
-            const result = await ExamService.UserChat(message) 
+            const {message,model} = req.body; // 从请求体中获取问题和题目ID,如果QuestionID不存在，则调用大模型api获得
+            console.log("用户输入的问题:", message, "模型:", model);
+            const result = await ExamService.UserChat(message,model) 
             res.send({
                 code: 200,
                 ActionType: "OK",

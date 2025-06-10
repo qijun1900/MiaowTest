@@ -14,7 +14,7 @@
         </div>
         <Divider
         position="left"
-        title="考试题型"
+        title="| 考试题型 |"
         color="#1989fa"/>
         <div class="title">
             <ExamTitle 

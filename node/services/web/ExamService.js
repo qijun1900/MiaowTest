@@ -66,8 +66,8 @@ const ExamService = {
         })
         
     },
-    UserChat: async (message) => {
-        return await chat.postUserChat(message)
+    UserChat: async (message,model) => {
+        return await chat.postUserChat(message,model)
     }
 }
 module.exports = ExamService
