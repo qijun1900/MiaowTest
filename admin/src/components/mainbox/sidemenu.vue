@@ -42,6 +42,14 @@
             <el-menu-item index="/exam/addexam">添加考试科目</el-menu-item>
             <el-menu-item index="/exam/examlist">考试科目列表</el-menu-item>
         </el-sub-menu> 
+
+        <el-sub-menu index="/model-manage">
+          <template #title>
+            <el-icon><Cpu/></el-icon>
+            <span>模型管理</span>
+          </template>
+            <el-menu-item index="/llm/addmodel&modelinfo">模型列表</el-menu-item>
+        </el-sub-menu> 
         
         </el-menu>
     </el-aside>
@@ -49,7 +57,7 @@
 
 <script setup>
 import { useStore } from 'vuex';
-import {HomeFilled,Avatar,UserFilled,MessageBox,DocumentRemove} from '@element-plus/icons-vue'
+import {HomeFilled,Avatar,UserFilled,MessageBox,DocumentRemove,Cpu} from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
 
 const router  =useRoute()

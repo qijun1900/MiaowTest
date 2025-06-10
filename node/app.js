@@ -12,6 +12,7 @@ const ProductRouter = require('./routes/admin/ProductRouter')
 const WebNewsRouter = require('./routes/web/NewsRouter');
 const AdminExamRouter = require('./routes/admin/ExamRouter');
 const WebUserExamRouter = require('./routes/web/ExamRouter');
+const AdminLLMRouter = require('./routes/admin/LLMRouter');
 
 var app = express();
 
@@ -38,6 +39,7 @@ app.use('/', indexRouter);
 app.use('/users',UserRouter)
 app.use(WebNewsRouter)
 app.use(WebUserExamRouter)
+app.use(AdminLLMRouter)
 
 /*
 adminapi===后台

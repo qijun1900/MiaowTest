@@ -76,8 +76,7 @@
                     v-model="selectedValues"
                     :columns="modelOtions"
                     @cancel="showPicker = false"
-                    @confirm="handelConfirm"
-                />
+                    @confirm="handelConfirm"/>
             </van-popup>
         </div>
     </div>

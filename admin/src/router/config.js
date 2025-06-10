@@ -22,6 +22,8 @@ import QuestionList from '@/components/Exam/QuestionList.vue'
 import QuestionEdit from '@/components/Exam/QuestionEdit.vue'
 import CreateExam from '@/views/Exam/CreateExam.vue'
 import NoticeBar from '../views/News/NoticeBar .vue'
+import AddModel from '@/views/LLM/AddModel.vue'
+
 
 const routes = [
     {
@@ -127,6 +129,10 @@ const routes = [
       {
         path: '/new/noticeBar',
         component: NoticeBar,
+      },
+      {
+        path: '/llm/addmodel&modelinfo',
+        component: AddModel, 
       }
 
 

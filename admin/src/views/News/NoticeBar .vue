@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <el-page-header content="通知栏信息" icon="" title="信息管理"></el-page-header>
+        <el-page-header content="通知栏信息"  title="信息管理"></el-page-header>
         <el-card shadow="hover">
             <div class="input_button">
                 <el-space :size="size" spacer="|">
