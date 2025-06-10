@@ -38,13 +38,14 @@
                         </div>
                         <div class="aibubble"> 
                             <AntBubble
+                                :header="modelName"
                                 :content="LlaResponse"
                                 placement="start"
                                 :typingstep="4" 
                                 :typinginterval="30" 
                                 typingsuffix="😺"
                                 v-show="isShowAIBubble"
-                                :isloading="isAIloading">
+                                :loading="isAIloading">
                                 <template #bubbleAvatar>
                                     <TalkAIIcon/>
                                 </template>
@@ -74,13 +75,13 @@ const isShowUserBubble = ref(false);
 const isShowAIBubble = ref(false);
 const isAIloading = ref(true);
 const antSender = ref(null); // 添加AntSender组件引用，用于重置loading状态
+const modelName = ref(''); // 新增模型名称变量
 
 //处理用户提交的问题
 const handleuserSend = (data) => {
-    console.log('用户提交了问题:',data) 
     LlaResponse.value = ''; // 清空之前的回复
     isAIloading.value = true; // 强制进入加载状态
-    userSendData.value = data;
+    userSendData.value = data;// 保存用户输入的问题
     sendRequest(data)
 }
 //处理用户提交的提示词
@@ -96,21 +97,20 @@ const handleisHidePrompts = (data) => {
 }
 //处理是否显示气泡
 const handleIsloading = (data) => {
-    console.log('是否显示用户气泡:',data)
     isShowUserBubble.value = data;
     isShowAIBubble.value = data;
 }
 //发送请求到服务器
 const sendRequest = async (data) => {
-    console.log('用户提交了问题到服务器:',data)
     try {
         const response = await postUserUserChat(data);
         console.log('返回的内容:',response)
         if (response.code === 200) {
             LlaResponse.value = response.data.Aidata;
+            modelName.value = response.data.modelName;
             isShowAIBubble.value = true;
         } else {
-            LlaResponse.value = '网络错误，请稍后重试！';
+            LlaResponse.value = '服务器繁忙，请稍后重试！';
         }
     } catch (error) {
         LlaResponse.value = '请求异常，请检查网络';

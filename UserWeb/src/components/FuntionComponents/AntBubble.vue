@@ -1,10 +1,11 @@
 <template>
-    <Bubble 
+    <Bubble
+        :header="props.header" 
         :placement="props.placement" 
         :content="props.content" 
         :typing="{ step: props.typingstep, interval: props.typinginterval, suffix: props.typingsuffix }"
         :variant="props.shadow"
-        :loading="isloading"
+        :loading="props.loading"
         :messageRender="renderMarkdown"
         :shape="props.corner">
         <template #avatar>
@@ -17,7 +18,7 @@
                     size="small" 
                     :icon="h(CopyOutlined)"
                     @click="Copy(content)"
-                    v-if="isShow"/>
+                    v-if="props.showButton"/>
             </Space>
         </template>
 </Bubble>
@@ -28,14 +29,13 @@ import { Bubble } from 'ant-design-x-vue';
 import { renderMarkdown } from '@/util/formatInfo';
 import { Button, Space } from 'ant-design-vue';
 import Copy from '@/util/Copy';
-import {h,ref} from 'vue'
+import {h,onMounted,ref} from 'vue'
 import { CopyOutlined } from '@ant-design/icons-vue';
-
-
-const isShow = ref(false)
-
-
+const showButton = ref(false) // 新增响应式变量
 const props = defineProps({
+    header: {
+        type: String,
+    },
     placement: { 
         type: String, 
         default: 'end'
@@ -62,18 +62,23 @@ const props = defineProps({
         type: String,
         default: 'round' 
     } ,
-    isloading: {
+    loading: {
         type: Boolean,
         default: false 
+    },
+    isShowButton: {
+        type: Boolean,
+        default: true
     }
-
 })
-setTimeout(() => {
-    isShow.value = true
-},2000)
 
 
-
+// 组件挂载时，延迟3秒显示按钮
+onMounted(() => {
+    setTimeout(() => {
+        showButton.value = props.isShowButton
+    }, 3000)
+})
 
 
 </script>

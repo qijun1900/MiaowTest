@@ -27,15 +27,6 @@
                         <span class="info-value">{{ questions.length }}</span>
                     </template>
                 </van-cell>
-                <van-cell 
-                    title="解析数量"   
-                    size="large" 
-                    icon="smile"
-                    class="info-cell">
-                    <template #value>
-                        <span class="info-value">{{ questions.length }}</span>
-                    </template>
-                </van-cell>
             </van-cell-group>
         </div>
         <Divider position="left" title="练习设置"/>

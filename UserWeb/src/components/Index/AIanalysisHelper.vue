@@ -48,36 +48,31 @@
             </div>
             <div class="talk-container">
                 <Flex gap="middle" vertical>
-                    <Bubble 
-                        placement="end" 
-                        :content="request" 
-                        :typing="{ step: 1, interval: 50, suffix: '🐱' }"
-                        variant="shadow">
-                        <template #avatar>
+                    <AntBubble
+                        placement="end"
+                        :content="request"
+                        :typingstep="1"
+                        :typinginterval="50"
+                        typingsuffix="🐱"
+                        variant="shadow"
+                        :isShowButton="false">
+                        <template #bubbleAvatar>
                             <TalkUserIcon />
                         </template>
-                    </Bubble>
-                    <Bubble 
-                        :header="modelName" 
-                        placement="start" 
+                     </AntBubble>   
+                    <AntBubble
+                        :header="modelName"
+                        placement="start"
                         :content="LlaRes"
-                        :typing="{ step: 4, interval: 30, suffix: '😺' }" 
-                        :messageRender="renderMarkdown" 
+                        :typingstep="4"
+                        :typinginterval="30"
+                        typingsuffix="😺"
                         variant="shadow"
                         :loading="loading">
-                        <template #avatar>
+                        <template #bubbleAvatar>
                             <TalkAIIcon />
                         </template>
-                        <template #footer="{ content }">
-                            <Space>
-                                <Button 
-                                    type="text" 
-                                    size="small" 
-                                    :icon="h(CopyOutlined)"
-                                    @click="Copy(content)"/>
-                            </Space>
-                        </template>
-                    </Bubble>
+                    </AntBubble>
                 </Flex>
                 <div v-show="!loading">
                     <AiWarn />
@@ -89,19 +84,16 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, h } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import Divider from '../FuntionComponents/Divider.vue';
-import { Bubble } from 'ant-design-x-vue';
-import { Flex, Button, Space } from 'ant-design-vue';
+import { Flex} from 'ant-design-vue';
 import TalkAIIcon from '../icons/TalkAIIcon.vue';
 import TalkUserIcon from '../icons/TalkUserIcon.vue';
 import postExamAIanalyse from '@/API/postExamAIanalyse';
-import { renderMarkdown } from '@/util/formatInfo';
 import AiWarn from '../FuntionComponents/AiWarn.vue';
-import { CopyOutlined, } from '@ant-design/icons-vue';
-import Copy from '@/util/Copy';
 import AntWelcome from '../FuntionComponents/AntWelcome.vue';
 import RouterPush from '@/util/RouterPush';
+import AntBubble from '../FuntionComponents/AntBubble.vue';
 
 
 const request = ref("请给我此题解析");
@@ -137,7 +129,7 @@ const sendRequest = async () => {
             modelName.value = response.data.modelName
             console.log("解析结果", response);
         } else {
-            LlaRes.value = "服务器繁忙，请稍后再试";
+            LlaRes.value = "服务器繁忙，请稍后再试！";
         }
     } catch (error) {
         console.error("请求失败:", error);
