@@ -13,7 +13,7 @@ const WebNewsRouter = require('./routes/web/NewsRouter');
 const AdminExamRouter = require('./routes/admin/ExamRouter');
 const WebUserExamRouter = require('./routes/web/ExamRouter');
 const AdminLLMRouter = require('./routes/admin/LLMRouter');
-
+const WebLLMRouter = require('./routes/web/LLMRouter');
 var app = express();
 
 // view engine setup
@@ -39,7 +39,8 @@ app.use('/', indexRouter);
 app.use('/users',UserRouter)
 app.use(WebNewsRouter)
 app.use(WebUserExamRouter)
-app.use(AdminLLMRouter)
+app.use(WebLLMRouter)
+
 
 /*
 adminapi===后台
@@ -72,6 +73,7 @@ app.use(UserRouter);
 app.use(NewsRouter)
 app.use(ProductRouter)
 app.use(AdminExamRouter)
+app.use(AdminLLMRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

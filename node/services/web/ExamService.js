@@ -32,30 +32,6 @@ const ExamService = {
     chat: async (message) => {
         return await testapi.chat(message);
     },
-    sendExamAIanalyse: async (message, questionId,Type) => { 
-        // 先查询数据库
-        const existingAnalysis = await AianalysisModel.findOne({ questionId });
-        if (existingAnalysis) {
-            return {
-               Aidata: existingAnalysis.analysecontent ,
-               modelName:existingAnalysis.modelName,
-            }// 如果存在，直接返回分析结果
-        }
-        
-        // 如果没有找到，调用AI接口
-        const result = await chat.postExamAIanalyse(message);
-        
-        // 将结果存入数据库
-        await AianalysisModel.create({
-            questionId,
-            questionType: Type, // 添加题目类型
-            questionContent: message, // 添加题目内容
-            analysecontent: result.Aidata,// 添加分析内容
-            createdTime: new Date(),
-            modelName: result.modelName // 添加模型名称
-        });
-        return result;
-    },
     UserFeedbackAdvice: async ({useradvice,userinfo,type,IsSolved,createtime}) => {
         return await UserFeedbackModel.create({
             userAdvice:useradvice,
@@ -66,8 +42,6 @@ const ExamService = {
         })
         
     },
-    UserChat: async (message,model) => {
-        return await chat.postUserChat(message,model)
-    }
+
 }
 module.exports = ExamService

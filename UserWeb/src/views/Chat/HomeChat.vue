@@ -70,7 +70,7 @@
             v-model:show="showPicker" 
             round 
             position="bottom"
-            :style="{height:'50%'}">
+            :style="{height:'45%'}">
                 <van-picker
                     title="模型列表"
                     v-model="selectedValues"
@@ -82,7 +82,7 @@
     </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import TopBack from '@/components/FuntionComponents/TopBack.vue';
 import AntWelcome  from '@/components/FuntionComponents/AntWelcome.vue';
 import AntPrompts from '@/components/FuntionComponents/AntPrompts.vue';
@@ -92,6 +92,7 @@ import TalkUserIcon from '@/components/icons/TalkUserIcon.vue';
 import TalkAIIcon from '@/components/icons/TalkAIIcon.vue';
 import { Flex} from 'ant-design-vue';
 import postUserUserChat from '@/API/postUserChat';
+import getLLMList from '@/API/getLLMList'; 
 
 const userSendData = ref('');
 const LlaResponse = ref('');
@@ -102,22 +103,15 @@ const isAIloading = ref(true);
 const antSender = ref(null); // 添加AntSender组件引用，用于重置loading状态
 const modelName = ref(''); // 新增模型名称变量
 const showPicker = ref(false); // 新增弹出框显示状态变量
-const modelOtions = [ // 新增选项数据,后面由后端请求后返回，而不是写死
-    { text: '通义千问-Plus', value: 'qwen-plus' },
-    { text: '通义千问-Plus-Latest', value: 'qwen-plus-latest' },
-    { text: '通义千问-Plus-2025-04-28', value: 'qwen-plus-2025-04-28' },
-    { text: 'DeepSeek-R1', value: 'deepseek-r1' },
-    { text: 'DeepSeek-V3', value: 'deepseek-v3' },
-    { text: 'DeepSeek-R1-0528', value: 'deepseek-r1-0528' },
-]
-const selectedValues = ref(['通义千问-Plus']);
-const selectedmodelvalue = ref('qwen-plus'); // 新增选择的模型值变量,默认选择通义千问-Plus
+const modelOtions = ref([]) // 新增选项数据,后面由后端请求后返回，而不是写死
+const selectedValues = ref(['DeepSeek-R1-Distill-Qwen-1.5B']);// 新增选择的模型值变量,默认选择通义千问-Plus
+const selectedmodelvalue = ref('deepseek-r1-distill-qwen-1.5b'); // 新增选择的模型值变量,默认选择通义千问-Plus
+
 //处理用户提交的问题
 const handleuserSend = (data) => {
     LlaResponse.value = ''; // 清空之前的回复
     isAIloading.value = true; // 强制进入加载状态
     userSendData.value = data;// 保存用户输入的问题
-    console.log('用户提交的问题:',data,selectedmodelvalue.value)
     sendRequest(data,selectedmodelvalue.value)
 }
 //处理用户提交的提示词
@@ -154,7 +148,6 @@ const handelConfirm = (data) => {
 const sendRequest = async (data,model) => {
     try {
         const response = await postUserUserChat(data,model);
-        console.log('返回的内容:',response)
         if (response.code === 200) {
             LlaResponse.value = response.data.Aidata;
             modelName.value = response.data.modelName;
@@ -170,6 +163,26 @@ const sendRequest = async (data,model) => {
         antSender.value?.resetLoading();
     }
 }
+// 发送请求到服务器,获取模型列表,提供给用户选择
+const getModelList = async () => {
+    try {
+        const response = await getLLMList();
+        if (response.code === 200) {
+            modelOtions.value = response.data.map(item => ({
+                text: item.modelName,
+                value: item.modelValue
+            }));
+        }
+    } catch (error) {
+        console.error('API请求错误:', error); 
+    }
+}
+
+
+// 组件挂载后，发送请求到服务器,获取模型列表,提供给用户选择
+onMounted(() => {
+    getModelList(); // 发送请求获取模型列表
+})
 
 </script>
 
