@@ -109,6 +109,30 @@ const ExamController ={
             console.error('Error fetching UserFeedbackAdvice details:', error); // 处理错误 
         } 
     }, 
+    postUserQuestionIssuse:async (req,res)=>{
+        try {
+            const {ExamtagId,Type,userQuestion,stem,questionId,ExamId} = req.body; // 从请求体中获取问题和题目ID,如果QuestionID不存在，则调用大模型api获得
+            console.log("用户输入的问题:", userQuestion, "题目ID:", questionId, "类型:", Type, "考试ID:", ExamId, "标签ID:", ExamtagId);
+            const result = await ExamService.postUserQuestionIssuse({
+                ExamtagId,
+                Type,
+                userQuestion,
+                stem,
+                questionId,
+                ExamId,
+                IsSolved:1,
+                createdTime:new Date()
+            })
+            res.send({
+                code: 200,
+                ActionType: "OK",
+                data: result 
+            })
+        }catch (error) {
+            console.error('Error fetching postUserQuestionIssuse details:', error); // 处理错误 
+        }
+        
+    }
 }
 
 module.exports = ExamController

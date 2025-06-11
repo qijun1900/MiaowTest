@@ -1,9 +1,9 @@
 <template>
     <van-popup class="answer-sheet-popup" 
-        :show="props.show" 
         @update:show="(val) => emit('update:show', val)" 
         closeable
-        close-icon="close" position="bottom" :style="{ height: '60%' }">
+        close-icon="close" 
+        position="bottom" :style="{ height: '60%' }">
         <div class="action-but-container">
             <van-space :size="25">
                 <van-button type="primary" round color="#5DADE2" @click="handleReset">
@@ -40,7 +40,6 @@ import SubmitIcon from '../icons/SubmitIcon.vue';
 
 
 const props = defineProps({
-    modelValue: Boolean, 
     questions: Array
 });
 
@@ -53,6 +52,7 @@ const handleReset = () => {
 const handleItemClick = (index) => {
     emit('itemClick', index);
     emit('update:show', false);
+    
 }
 </script>
 
