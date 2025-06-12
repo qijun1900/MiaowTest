@@ -21,10 +21,23 @@
                     label="性别" 
                     prop="gender">
                         <el-select
+                            v-model="userForm.gender"
+                            placeholder="Select">
+                            <el-option
+                            v-for="item in genderOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"/>
+                        </el-select>
+                </el-form-item>
+                <el-form-item 
+                    label="权限" 
+                    prop="role">
+                        <el-select
                             v-model="userForm.role"
                             placeholder="Select">
                             <el-option
-                            v-for="item in options"
+                            v-for="item in roleOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"/>
@@ -85,6 +98,13 @@ const userFormrules = reactive({
         trigger: 'blur'    
         }
     ],
+    gender: [
+        { 
+        required: true,
+        message: '请选择性别', 
+        trigger: 'blur'    
+        }
+    ],
     role: [
         { 
         required: true,
@@ -108,7 +128,7 @@ const userFormrules = reactive({
     ],
 })
 //角色选择字段
-const options = [
+const roleOptions = [
     {
         label:'管理员',
         value:1
@@ -118,6 +138,22 @@ const options = [
         value:2
     }
 ]
+//性别选择字段
+const genderOptions = [
+    {
+        label:'保密',
+        value:0
+    },
+    {
+        label:'男',
+        value:1
+    },
+    {
+        label:'女',
+        value:2
+    }
+]
+
 
 const handleChange = (file)=>{
     userForm.avatar = URL.createObjectURL(file)
