@@ -155,14 +155,12 @@ const rightCount = computed(() => {
 
 //AI解析助手跳转
 const onClick = () => {
-    console.log('AI解析助手被点击',currentQuestion.value);
     IsShoAIwAnswerHelp.value = true;
 
 }
 // 处理反馈问题
 const handelReflectquestionIssue = (data) => {
     IsShowReflectquestionIssue.value = data;
-     console.log('问题反馈题目',currentQuestion.value);
 }
 
 // 在组件挂载时获取题目

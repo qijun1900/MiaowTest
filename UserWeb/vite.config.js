@@ -9,7 +9,6 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { AntDesignXVueResolver } from 'ant-design-x-vue/resolver'
 import pxtorem from 'postcss-pxtorem'
 import autoprefixer from 'autoprefixer'
-
 export default defineConfig({
   plugins: [
     vue(),
@@ -49,5 +48,5 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
-  }
+  },
 })

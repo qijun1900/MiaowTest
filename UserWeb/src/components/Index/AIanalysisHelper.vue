@@ -94,9 +94,11 @@ import AiWarn from '../FuntionComponents/AiWarn.vue';
 import AntWelcome from '../FuntionComponents/AntWelcome.vue';
 import RouterPush from '@/util/RouterPush';
 import AntBubble from '../FuntionComponents/AntBubble.vue';
+import QuestionMap from '@/util/QuestionMap';
 
 
-const request = ref("请给我此题解析");
+
+const request = ref("请你给我此题目解析");
 const LlaRes  =  ref("");
 const loading = ref(true);
 const modelName = ref("");
@@ -122,7 +124,9 @@ const emit = defineEmits(['update:modelValue']);
 
 const sendRequest = async () => {
     try {
-        const response = await postExamAIanalyse(questionData.value[0].stem, questionData.value[0]._id, questionData.value[0].Type);
+        const QuestionMapData = QuestionMap(questionData.value[0]);
+        console.log("QuestionMapData", QuestionMapData);
+        const response = await postExamAIanalyse(QuestionMapData, questionData.value[0]._id, questionData.value[0].Type,request.value);
         if (response.code === 200) {
             loading.value = false;
             LlaRes.value = response.data.Aidata;
@@ -147,7 +151,8 @@ const handlePush = () => {
 
 onMounted(() => {
     sendRequest();
-    console.log("发送请求", questionData.value[0].stem);
+    console.log("questionData", questionData.value);
+
 });
 
 </script>

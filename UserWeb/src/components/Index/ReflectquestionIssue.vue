@@ -1,5 +1,5 @@
 <template>
-    <div page-container>
+    <div>
         <van-popup
         v-model:show="showValue"
         closeable
@@ -8,7 +8,7 @@
         round
         :style="{ height: '60%' }"
         @closed="handelClosed">
-            <div>
+            <template v-if="!isSubmitted">
                 <div class="header">
                     <span class="title">题目问题反馈</span>
                     <simleIcon size="80"/>
@@ -42,10 +42,20 @@
                         提交问题
                     </van-button>
                 </div>
-                <div>
-                    {{ questionData[0]._id }}
+            </template>
+            <template v-else>
+                <div class="success-content">
+                    <div class="success-icon">
+                        <SuccessSimleIcon size="100"/>
+                    </div>
+                    <br>
+                    <div>
+                        <span class="success-text">
+                            谢谢，您对的问题已经提交成功!
+                        </span>
+                    </div>
                 </div>
-            </div>
+            </template>
         </van-popup>
     </div>
 </template>
@@ -62,7 +72,7 @@ const props = defineProps({
 })
 const checked = ref(null);
 const userinfo = ref(''); // 新增用户信息
-
+const isSubmitted = ref(false); // 新增提交状态
 //接受数据
 const questionData = computed(() => {
     return typeof props.questionData === 'function'
@@ -102,10 +112,8 @@ const handleSubmit = async () => {
     console.log(data);
         const response = await postUserQuestionIssuse(data); // 提交问题
         if (response.code === 200) {
+            isSubmitted.value = true;
             showToast({ message: '问题提交成功', icon: 'success' });
-            setTimeout(() => {
-                handelClosed(); // 关闭弹窗
-            }, 5000);
         }
     }catch (error) {
         console.error('提交问题失败:', error);
@@ -174,5 +182,20 @@ const handelClosed = () => {
     margin-right: 10px;
     margin-bottom: 10px;
     margin-top: 10px; 
+}
+.success-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.success-icon{
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+.success-text{
+    font-size: 22px;
+    color: #181c1e;
+    font-weight: bold;
 }
 </style>
