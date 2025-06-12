@@ -21,11 +21,14 @@ async function postExamAIanalyse(message) {
         modelName:completion.model
     } ;
 }
-async function postUserChat(message,model) {
-    const messages = [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: message } 
-    ]
+async function postUserChat(messages, model) {
+    // 确保消息数组包含系统提示
+    if (!messages || !messages.length || messages[0].role !== 'system') {
+        messages = [
+            { role: "system", content: "You are a helpful assistant." },
+            ...messages
+        ];
+    }
     const completion = await openai.chat.completions.create({
         model:model,
         messages: messages,
