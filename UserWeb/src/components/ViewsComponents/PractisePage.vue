@@ -3,10 +3,11 @@
         <div class="container">
             <TopBack 
                 title="练习设置" 
-                iconName="question" 
+                iconName="warning-o"
                 :iconSize="29" 
                 navBarIconColor="#3b3c3d" 
-                :isclearAnswer="true" />
+                :isclearAnswer="true"
+                @showReflectquestionIssue="handelReflectquestionIssue" />
             <div v-if="currentQuestion">
                 <template v-for="question in currentQuestion" :key="question._id">
                     <component 
@@ -35,7 +36,11 @@
                         <RightIcon />
                         <span class="count-badge2">{{ rightCount }}</span>
                     </div>
-                    <van-button @click="CheckAnswerSheet" type="primary" :round='true' color="#4f6beb"
+                    <van-button 
+                        @click="CheckAnswerSheet" 
+                        type="primary" 
+                        :round='true' 
+                        color="#4f6beb"
                         class="bottom-button">
                         <AnsweSheetIcon />
                         查看答题卡
@@ -68,6 +73,11 @@
             :questionData="currentQuestion"
         />
     </div>
+    <div>
+        <ReflectquestionIssue
+        v-model:show="IsShowReflectquestionIssue"
+        :questionData="currentQuestion"/>
+    </div>
     </van-config-provider>
 </template>
 
@@ -87,21 +97,20 @@ import { showConfirmDialog } from 'vant';
 import AIHelpIcon from '../icons/AIHelpIcon.vue';
 import AnswerSheet from '../Index/AnswerSheet.vue';
 import AIanalysisHelper from '../Index/AIanalysisHelper.vue';
-
-
+import ReflectquestionIssue from '../Index/ReflectquestionIssue.vue';
 
 const store = useExamStore()
 const answerStore = useAnswerStore()
 
-
 const practiceQuestion = ref([]);
 const currentPage = ref(1) // 添加当前页码
-const IsShowAnswer = computed(() => store.IsShowAnswer);
-const IsRandom = computed(() => store.IsRandom);
+const IsShowAnswer = computed(() => store.IsShowAnswer);// 是否立即显示答案
+const IsRandom = computed(() => store.IsRandom);// 是否随机
 const show = ref(false);// 控制答题卡弹窗的显示状态
 const IsOPenAI = computed(() => store.IsOPenAI);// 是否开启AI解析助手
 const IsShoAIwAnswerHelp = ref(false); // 控制AI解析助手的显示状态  
 const offset = ref({ x: 320, y: 600 }); // 初始偏移量
+const IsShowReflectquestionIssue = ref(false); // 控制反馈问题的显示状态
 
 // 计算当前显示的题目
 const currentQuestion = computed(() => {
@@ -138,7 +147,6 @@ const errorCount = computed(() => {
         state => state.answer && state.isCorrect === false
     ).length
 })
-
 const rightCount = computed(() => {
     return Object.values(answerStore.answerStates).filter(
         state => state.answer && state.isCorrect === true
@@ -151,6 +159,12 @@ const onClick = () => {
     IsShoAIwAnswerHelp.value = true;
 
 }
+// 处理反馈问题
+const handelReflectquestionIssue = (data) => {
+    IsShowReflectquestionIssue.value = data;
+     console.log('问题反馈题目',currentQuestion.value);
+}
+
 // 在组件挂载时获取题目
 onMounted(() => {
     const questions = store.getSelectedQuestions();
@@ -270,10 +284,3 @@ const themeVars = ref({
     color: #3e4042;
 }
 </style>
-
-// 替换原来的van-popup部分为：
-<AnswerSheet 
-    v-model:show="show" 
-    :questions="practiceQuestion"
-    @reset="ResetAnswerSheet"
-    @itemClick="(index) => currentPage = index + 1" />

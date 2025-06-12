@@ -24,6 +24,9 @@ import { useAnswerStore } from '@/stores/answerStore'
 
 const Isshow = ref(false);
 const answerStore = useAnswerStore()
+const emit = defineEmits(['showReflectquestionIssue'])
+
+
 // 定义 props，接收 不同 属性
 const props = defineProps({
     title: { // 标题
@@ -82,8 +85,11 @@ const onClickLeft = () => {
 const onClickRight = () => {
     if (iconName.value === 'search') { // 如果图标名称是 search，则跳转到 SearchInfo 页面
         RouterPush('/SearchInfo')
-    } if (iconName.value === 'question') { // 如果图标名称是 question，则显示 反馈问题 弹窗
+    } if (iconName.value === 'question') { // 如果图标名称是 question，则显示 反馈科目问题 弹窗
         Isshow.value = true;
+    }if (iconName.value === 'warning-o') {  // 如果图标名称是 warning-o，则跳转到 题目问题反馈 页面
+        emit('showReflectquestionIssue', true)
+       
     }
 }
 // 定制 NavBar 组件主题

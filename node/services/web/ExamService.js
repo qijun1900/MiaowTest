@@ -1,10 +1,8 @@
 const ExamModel = require('../../models/ExamModel')
 const  UserExamModel = require('../../models/UserExamModel')
-const  UserIssuseModel = require('../../models/UserIssuse.js')
+const  UserIssuseModel = require('../../models/UserIssuseModel.js')
 const NewsModel = require('../../models/NewsModel')
 const testapi = require('../../llm/test.js')
-const  chat = require('../../llm/web/chat.js')
-const AianalysisModel = require('../../models/AianalysisModel')
 const UserFeedbackModel = require('../../models/UserFeedbackModel')
 
 
@@ -42,6 +40,11 @@ const ExamService = {
         })
         
     },
+    postUserQuestionIssuse: async ({ExamtagId,Type,userQuestion,stem,questionId,ExamId,IsSolved,createdTime}) => {
+        return await UserIssuseModel.create({
+            ExamtagId,Type,userQuestion,stem,questionId,ExamId,IsSolved,createdTime
+        })
+    }
 
 }
 module.exports = ExamService

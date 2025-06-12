@@ -8,6 +8,7 @@
             @submit="handleUserInput()"
             @cancel="handleCancel()"
             @focus="handleFocus()"
+            placeholder="例如你可以问我：你是什么模型？"
         />
     </div>
 </template>

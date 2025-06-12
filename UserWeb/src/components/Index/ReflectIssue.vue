@@ -73,7 +73,6 @@ const handleSubmit = async () => {
         if (!checked.value) {
             return showToast({
             message: '请选择问题类型',
-            position: 'top',
             icon: 'warning-o'
             });
         }

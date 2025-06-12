@@ -10,9 +10,9 @@
             </div>
             <div v-show="!IsShowSuccessIcon">
                 <Divider 
-                title="具体意见*"
-                dividerFontSize="18px"
-                borderColor="#a0c9ff"/>
+                    title="具体意见*"
+                    dividerFontSize="18px"
+                    borderColor="#a0c9ff"/>
                 <div class="useradvice">
                     <van-cell-group inset>
                         <van-field
@@ -27,9 +27,9 @@
                     </van-cell-group>
                 </div>
                 <Divider 
-                title="联系方式"
-                dividerFontSize="18px"
-                borderColor="#a0c9ff"/>
+                    title="联系方式"
+                    dividerFontSize="18px"
+                    borderColor="#a0c9ff"/>
                 <div class="useradvice">
                     <van-cell-group inset>
                         <van-field 
