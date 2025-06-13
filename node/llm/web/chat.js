@@ -2,7 +2,7 @@ const OpenAI = require("openai");
 
 const openai = new OpenAI(
     {
-        apiKey:"sk-3149977d78e74b2ea8b6f41d2ee16adb", 
+        apiKey:process.env.DASHSCOPE_API_KEY, 
         baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
     }
 );
@@ -13,7 +13,7 @@ async function postExamAIanalyse(message) {
         { role: "user", content: message }
     ];
     const completion = await openai.chat.completions.create({
-        model: "qwen-turbo",
+        model: "deepseek-r1-distill-llama-70b",
         messages: messages, 
     });
     return {
