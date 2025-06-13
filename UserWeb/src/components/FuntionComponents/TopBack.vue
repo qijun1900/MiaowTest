@@ -21,10 +21,12 @@ import RouterPush from '@/util/RouterPush';
 import ReflectIssue from '../Index/ReflectIssue.vue';
 import { showConfirmDialog } from 'vant';
 import { useAnswerStore } from '@/stores/answerStore'
+import { useRoute } from 'vue-router' // 新增导入
 
 const Isshow = ref(false);
 const answerStore = useAnswerStore()
 const emit = defineEmits(['showReflectquestionIssue'])
+const route = useRoute() // 获取当前路由信息
 
 
 // 定义 props，接收 不同 属性
@@ -63,6 +65,20 @@ const iconSize = computed(() => props.iconSize)
 
 // 点击返回
 const onClickLeft = () => {
+    // 如果是/homechat路由，执行特定功能
+    if (route.path === '/homechat') {
+        showConfirmDialog({
+            message: '确定要离开此页面吗？离开对话将清空！',
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+        }).then(() => {
+            RouterBack()
+        }).catch(() => {
+            // 取消操作
+        })
+        return // 直接返回，不执行后续逻辑
+    }
+    
     if (props.isclearAnswer) { // 如果 isclearAnswer 为 true，则清空答题记录
         showConfirmDialog({ // 显示确认对话框
             message: '您确定要返回吗？此操作将清空答题记录', // 提示消息
@@ -83,28 +99,31 @@ const onClickLeft = () => {
 }
 // 点击右侧图标
 const onClickRight = () => {
-    if (iconName.value === 'search') { // 如果图标名称是 search，则跳转到 SearchInfo 页面
+    if (iconName.value === 'search') {
         RouterPush('/SearchInfo')
-    } if (iconName.value === 'question') { // 如果图标名称是 question，则显示 反馈科目问题 弹窗
+    } else if (iconName.value === 'question') {  
         Isshow.value = true;
-    }if (iconName.value === 'warning-o') {  // 如果图标名称是 warning-o，则跳转到 题目问题反馈 页面
+    } else if (iconName.value === 'warning-o') {  
         emit('showReflectquestionIssue', true)
-       
     }
 }
-// 定制 NavBar 组件主题
-const themeVars = ref({
-    navBarArrowSize: "26px", // 箭头大小
-    navBarHeight: props.navBarHeight,// 导航栏高度
-    navBarTitleFontSize: "18px", // 标题字体大小
-    navBarIconColor: props.navBarIconColor, // 图标颜色
-    navBarBackground: props.navBarBackground, // 导航栏背景颜色
-})
+// 定制 NavBar 组件主题， 改为计算属性，确保响应式
+
+const themeVars = computed(() => ({
+    navBarArrowSize: "26px",
+    navBarHeight: props.navBarHeight,
+    navBarTitleFontSize: "18px", 
+    navBarIconColor: props.navBarIconColor,
+    navBarBackground: props.navBarBackground
+}))
 </script>
 <style scoped>
-/* 去除导航栏底部边框 */
+/* 添加过渡效果 */
+.van-nav-bar {
+    transition: all 0.3s ease;
+}
+/* 保持现有的去除边框样式 */
 .van-hairline--bottom:after {
     border-bottom-width: 0;
 }
-
 </style>

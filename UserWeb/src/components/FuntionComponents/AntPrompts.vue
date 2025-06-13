@@ -31,7 +31,7 @@ const items = [
     label: '不支持历史对话找回请及时复制内容！',
   },
   {
-    label: '新的问题出现当前对话内容将清空！',
+    label: '离开此页面对话内容将清空！',
   },
 ]
 const emit = defineEmits(['userpromptsubmit'])

@@ -10,7 +10,7 @@
                 <Search/>
             </div>
             <div>
-                标签：//待开发
+                标签：//待开发{{ "WFB" }}
             </div>
     </div>
 </template>

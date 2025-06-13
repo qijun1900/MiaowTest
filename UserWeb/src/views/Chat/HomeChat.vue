@@ -83,7 +83,6 @@ import postUserUserChat from '@/API/postUserChat';
 import getLLMList from '@/API/getLLMList'; 
 
 const chatHistory = ref([]);
-const userInput = ref('');
 const PromptsHiden = ref(false);
 const isShowUserBubble = ref(false);
 const isShowAIBubble = ref(false);
