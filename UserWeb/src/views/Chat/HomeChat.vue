@@ -36,29 +36,17 @@
             </div>
             <div>
                 <Flex gap="middle" vertical>
-                    <div class="userbubble">
+                    <div v-for="(message, index) in chatHistory" :key="index" :class="message.role === 'user' ? 'userbubble' : 'aibubble'">
                         <AntBubble
-                            :content="userSendData"
-                            :typingstep="2"
+                            :header="message.role === 'assistant' ? message.modelName : ''"
+                            :content="message.content"
+                            :placement="message.role === 'user' ? 'end' : 'start'"
+                            :typingstep="message.role === 'user' ? 2 : 4"
                             :typinginterval="30"
-                            v-show="isShowUserBubble">
+                            :typingsuffix="message.role === 'assistant' ? '😺' : ''"
+                            :loading="index === chatHistory.length - 1 && message.role === 'assistant' && isAIloading">
                             <template #bubbleAvatar>
-                                <TalkUserIcon/>
-                            </template>
-                        </AntBubble>
-                    </div>
-                    <div class="aibubble"> 
-                        <AntBubble
-                            :header="modelName"
-                            :content="LlaResponse"
-                            placement="start"
-                            :typingstep="4" 
-                            :typinginterval="30" 
-                            typingsuffix="😺"
-                            v-show="isShowAIBubble"
-                            :loading="isAIloading">
-                            <template #bubbleAvatar>
-                                <TalkAIIcon/>
+                                <component :is="message.role === 'user' ? TalkUserIcon : TalkAIIcon"/>
                             </template>
                         </AntBubble>
                     </div>
@@ -94,8 +82,8 @@ import { Flex} from 'ant-design-vue';
 import postUserUserChat from '@/API/postUserChat';
 import getLLMList from '@/API/getLLMList'; 
 
-const userSendData = ref('');
-const LlaResponse = ref('');
+const chatHistory = ref([]);
+const userInput = ref('');
 const PromptsHiden = ref(false);
 const isShowUserBubble = ref(false);
 const isShowAIBubble = ref(false);
@@ -109,10 +97,9 @@ const selectedmodelvalue = ref('deepseek-r1-distill-qwen-1.5b'); // 新增选择
 
 //处理用户提交的问题
 const handleuserSend = (data) => {
-    LlaResponse.value = ''; // 清空之前的回复
-    isAIloading.value = true; // 强制进入加载状态
-    userSendData.value = data;// 保存用户输入的问题
-    sendRequest(data,selectedmodelvalue.value)
+    chatHistory.value.push({ role: 'user', content: data });
+    isAIloading.value = true;
+    sendRequest(chatHistory.value, selectedmodelvalue.value);
 }
 //处理用户提交的提示词
 // const handleuserPrompt = (data) => {
@@ -145,20 +132,28 @@ const handelConfirm = (data) => {
 }
 
 //发送请求到服务器
-const sendRequest = async (data,model) => {
+const sendRequest = async (messages, model) => {
     try {
-        const response = await postUserUserChat(data,model);
+        const response = await postUserUserChat(messages, model);
         if (response.code === 200) {
-            LlaResponse.value = response.data.Aidata;
-            modelName.value = response.data.modelName;
-            isShowAIBubble.value = true;
+            chatHistory.value.push({
+                role: 'assistant',
+                content: response.data.Aidata,
+                modelName: response.data.modelName
+            });
         } else {
-            LlaResponse.value = '服务器繁忙，请稍后重试！';
+            chatHistory.value.push({
+                role: 'assistant',
+                content: '服务器繁忙，请稍后重试！'
+            });
         }
     } catch (error) {
-        LlaResponse.value = '请求异常，请检查网络';
+        chatHistory.value.push({
+            role: 'assistant',
+            content: '请求异常，请检查网络'
+        });
         console.error('API请求错误:', error);
-    }finally {
+    } finally {
         isAIloading.value = false;
         antSender.value?.resetLoading();
     }
