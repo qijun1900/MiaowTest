@@ -79,6 +79,9 @@
                 </div>
             </div>
         </div>
+        <div>
+            
+        </div>
         <van-back-top :offset="200" />
     </van-popup>
 </template>
@@ -96,9 +99,7 @@ import RouterPush from '@/util/RouterPush';
 import AntBubble from '../FuntionComponents/AntBubble.vue';
 import QuestionMap from '@/util/QuestionMap';
 
-
-
-const request = ref("请你给我此题目解析");
+const request = ref("请你给我此题目详细解析");
 const LlaRes  =  ref("");
 const loading = ref(true);
 const modelName = ref("");

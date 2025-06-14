@@ -55,18 +55,15 @@
                 @reset="ResetAnswerSheet"
                 @itemClick="(index) => currentPage = index + 1" />
         </div>
-    <van-floating-bubble 
-        @click="onClick" 
-         axis="xy"
-         magnetic="x"
-         v-model:offset="offset"
-        v-if="IsOPenAI">
-        <div class="bubble-content">
-            <van-icon>
-                <AIHelpIcon color="#ffffff" size="30"/>
-            </van-icon>
+        <div>
+            <VanFloatingBubble
+                :isShow="IsOPenAI"
+                @handelClick="handelClickFloatingBubble">
+                <template #FloatingIcon>
+                    <AIHelpIcon color="#ffffff" size="30"/>
+                </template>
+            </VanFloatingBubble>
         </div>
-    </van-floating-bubble>
     <div v-if="IsShoAIwAnswerHelp">
         <AIanalysisHelper
             v-model:show="IsShoAIwAnswerHelp" 
@@ -98,6 +95,7 @@ import AIHelpIcon from '../icons/AIHelpIcon.vue';
 import AnswerSheet from '../Index/AnswerSheet.vue';
 import AIanalysisHelper from '../Index/AIanalysisHelper.vue';
 import ReflectquestionIssue from '../Index/ReflectquestionIssue.vue';
+import VanFloatingBubble from '../FuntionComponents/VanFloatingBubble.vue';
 
 const store = useExamStore()
 const answerStore = useAnswerStore()
@@ -109,8 +107,8 @@ const IsRandom = computed(() => store.IsRandom);// 是否随机
 const show = ref(false);// 控制答题卡弹窗的显示状态
 const IsOPenAI = computed(() => store.IsOPenAI);// 是否开启AI解析助手
 const IsShoAIwAnswerHelp = ref(false); // 控制AI解析助手的显示状态  
-const offset = ref({ x: 320, y: 600 }); // 初始偏移量
 const IsShowReflectquestionIssue = ref(false); // 控制反馈问题的显示状态
+
 
 // 计算当前显示的题目
 const currentQuestion = computed(() => {
@@ -119,8 +117,6 @@ const currentQuestion = computed(() => {
     }
     return null;
 });
-
-
 
 // 检查答题卡
 const CheckAnswerSheet = () => {
@@ -153,10 +149,10 @@ const rightCount = computed(() => {
     ).length
 })
 
-//AI解析助手跳转
-const onClick = () => {
+//AI解析助手显示
+const handelClickFloatingBubble = () => {
     IsShoAIwAnswerHelp.value = true;
-
+    
 }
 // 处理反馈问题
 const handelReflectquestionIssue = (data) => {
