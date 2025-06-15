@@ -4,18 +4,21 @@ const LLMsModel = require('../../models/LLMsModel')
 
 
 const LLMService = {
-    sendExamAIanalyse: async (message, questionId,Type) => { 
-        // 先查询数据库
-        const existingAnalysis = await AianalysisModel.findOne({ questionId });
+    sendExamAIanalyse: async (message, questionId,Type,model) => { 
+        // 先查询数据库，同时匹配questionId和modelName，如果存在，直接返回分析结果
+        const existingAnalysis = await AianalysisModel.findOne({ 
+            questionId,
+            modelName: model 
+        });
         if (existingAnalysis) {
             return {
                 Aidata: existingAnalysis.analysecontent ,
                 modelName:existingAnalysis.modelName,
-            }// 如果存在，直接返回分析结果
+            }
         }
         
         // 如果没有找到，调用AI接口
-        const result = await chat.postExamAIanalyse(message);
+        const result = await chat.postExamAIanalyse(message,model);
         
         // 将结果存入数据库
         await AianalysisModel.create({

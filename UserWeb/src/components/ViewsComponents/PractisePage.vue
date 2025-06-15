@@ -7,7 +7,7 @@
                 :iconSize="29" 
                 navBarIconColor="#3b3c3d" 
                 :isclearAnswer="true"
-                @showReflectquestionIssue="handelReflectquestionIssue" />
+                @showReflectquestionIssue="handleReflectquestionIssue" />
             <div v-if="currentQuestion">
                 <template v-for="question in currentQuestion" :key="question._id">
                     <component 
@@ -58,7 +58,7 @@
         <div>
             <VanFloatingBubble
                 :isShow="IsOPenAI"
-                @handelClick="handelClickFloatingBubble">
+                @handelClick="handleClickFloatingBubble">
                 <template #FloatingIcon>
                     <AIHelpIcon color="#ffffff" size="30"/>
                 </template>
@@ -150,12 +150,12 @@ const rightCount = computed(() => {
 })
 
 //AI解析助手显示
-const handelClickFloatingBubble = () => {
+const handleClickFloatingBubble = () => {
     IsShoAIwAnswerHelp.value = true;
     
 }
 // 处理反馈问题
-const handelReflectquestionIssue = (data) => {
+const handleReflectquestionIssue = (data) => {
     IsShowReflectquestionIssue.value = data;
 }
 

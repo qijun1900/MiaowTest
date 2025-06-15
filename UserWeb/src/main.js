@@ -2,11 +2,12 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { Lazyload } from 'vant';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
+import 'vant/lib/index.css' // 引入vant组件样式
 import App from './App.vue'
 import router from './router'
 import Vant from 'vant'
-import 'vant/lib/index.css' // 引入vant组件样式
+
+import 'tdesign-mobile-vue/es/style/index.css';// 引入tDesign组件样式
 
 
 

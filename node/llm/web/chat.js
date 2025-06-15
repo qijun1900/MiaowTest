@@ -7,13 +7,13 @@ const openai = new OpenAI(
     }
 );
 
-async function postExamAIanalyse(message) {
+async function postExamAIanalyse(message,model) {
     const messages = [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: message }
     ];
     const completion = await openai.chat.completions.create({
-        model: "deepseek-r1-distill-llama-70b",
+        model: model,
         messages: messages, 
     });
     return {

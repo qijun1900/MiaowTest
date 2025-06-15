@@ -4,7 +4,7 @@
             <Divider title="AI题目解析" position="center" dividerFontSize="20px" padding="0 80px" borderColor="#00ddff" />
             <div class="welcome-container">
                 <AntWelcome
-                title="我是你的AI解题小助手" 
+                :title="selectedValues[0]" 
                 description="基于Ant Design X Vue，我可以为您提供问题的详细解释,点击我可前往AI问答界面！🐱"
                 @click="handlePush"/>
             </div>
@@ -80,7 +80,15 @@
             </div>
         </div>
         <div>
-            
+            <TDFab @handleClick="HandleClick" text="切换解析模型"/>
+        </div>
+        <div>
+            <VanPicker  
+                v-model:show="showPicker" 
+                :options="modelOtions"
+                @confirm="handelConfirm"
+                PickTitle="选择解析模型"
+                />
         </div>
         <van-back-top :offset="200" />
     </van-popup>
@@ -98,11 +106,19 @@ import AntWelcome from '../FuntionComponents/AntWelcome.vue';
 import RouterPush from '@/util/RouterPush';
 import AntBubble from '../FuntionComponents/AntBubble.vue';
 import QuestionMap from '@/util/QuestionMap';
+import TDFab from '../FuntionComponents/TDFab.vue';
+import VanPicker from '../FuntionComponents/VanPicker.vue';
+import getLLMList from '@/API/getLLMList'; 
+
 
 const request = ref("请你给我此题目详细解析");
 const LlaRes  =  ref("");
 const loading = ref(true);
 const modelName = ref("");
+const showPicker = ref(false);
+const modelOtions = ref([]) 
+const selectedValues = ref(['DeepSeek-R1-Distill-Qwen-1.5B']);
+const selectedmodelvalue = ref('deepseek-r1-distill-qwen-1.5b'); 
 
 const props = defineProps({
     modelValue: Boolean,
@@ -126,8 +142,14 @@ const emit = defineEmits(['update:modelValue']);
 const sendRequest = async () => {
     try {
         const QuestionMapData = QuestionMap(questionData.value[0]);
-        console.log("QuestionMapData", QuestionMapData);
-        const response = await postExamAIanalyse(QuestionMapData, questionData.value[0]._id, questionData.value[0].Type,request.value);
+        const response = await postExamAIanalyse(
+            QuestionMapData, 
+            questionData.value[0]._id, 
+            questionData.value[0].Type,
+            request.value,
+            selectedmodelvalue.value
+        );
+        console.log("modelValue",selectedmodelvalue.value)
         if (response.code === 200) {
             loading.value = false;
             LlaRes.value = response.data.Aidata;
@@ -150,10 +172,42 @@ const handlePush = () => {
     RouterPush("/homechat");
 };
 
+//点击按钮
+const HandleClick = (data) => {
+    showPicker.value  = data; 
+}
+// 处理确认选择事件,选择模型后，关闭弹出框
+const handelConfirm = (data) => {
+    console.log('选择的模型:', data.selectedOptions[0]);
+    showPicker.value = false;
+    selectedValues.value = [data.selectedOptions[0].text]; 
+    selectedmodelvalue.value = data.selectedOptions[0].value; 
+    
+    // 重置加载状态和内容
+    loading.value = true;
+    LlaRes.value = "";
+    modelName.value = "";
+    
+    sendRequest();
+}
+// 发送请求到服务器,获取模型列表,提供给用户选择
+const getModelList = async () => {
+    try {
+        const response = await getLLMList();
+        if (response.code === 200) {
+            modelOtions.value = response.data.map(item => ({
+                text: item.modelName,
+                value: item.modelValue
+            }));
+        }
+    } catch (error) {
+        console.error('API请求错误:', error); 
+    }
+}
+
 onMounted(() => {
     sendRequest();
-    console.log("questionData", questionData.value);
-
+    getModelList();
 });
 
 </script>

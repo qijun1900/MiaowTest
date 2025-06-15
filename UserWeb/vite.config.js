@@ -7,6 +7,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { AntDesignXVueResolver } from 'ant-design-x-vue/resolver'
+import { TDesignResolver } from 'unplugin-vue-components/resolvers';
 import pxtorem from 'postcss-pxtorem'
 import autoprefixer from 'autoprefixer'
 export default defineConfig({
@@ -21,6 +22,16 @@ export default defineConfig({
     }),
     Components({
       resolvers: [AntDesignXVueResolver()],
+    }),
+    AutoImport({
+      resolvers: [TDesignResolver({
+        library: 'mobile-vue'
+      })],
+    }),
+    Components({
+      resolvers: [TDesignResolver({
+        library:'mobile-vue'
+      })],
     })
   ],
   css: {

@@ -10,7 +10,7 @@
                     plain
                     color="#626aef"
                     size="small"
-                    @click="handelChooseModel">
+                    @click="handleChooseModel">
                     选择对话模型
                 </van-button>
             </template>
@@ -54,18 +54,12 @@
             </div>
         </div>
         <div>
-            <van-popup 
-            v-model:show="showPicker" 
-            round 
-            position="bottom"
-            :style="{height:'45%'}">
-                <van-picker
-                    title="模型列表"
-                    v-model="selectedValues"
-                    :columns="modelOtions"
-                    @cancel="showPicker = false"
-                    @confirm="handelConfirm"/>
-            </van-popup>
+            <VanPicker
+                v-model:show="showPicker"
+                :options="modelOtions"
+                @confirm="handelConfirm"
+                PickTitle="选择对话模型"
+            />
         </div>
     </div>
 </template>
@@ -81,6 +75,7 @@ import TalkAIIcon from '@/components/icons/TalkAIIcon.vue';
 import { Flex} from 'ant-design-vue';
 import postUserUserChat from '@/API/postUserChat';
 import getLLMList from '@/API/getLLMList'; 
+import VanPicker from '@/components/FuntionComponents/VanPicker.vue';
 
 const chatHistory = ref([]);
 const PromptsHiden = ref(false);
@@ -118,16 +113,16 @@ const handleIsloading = (data) => {
     isShowAIBubble.value = data;
 }
 // 处理功能按钮点击事件
-const handelChooseModel = () => {
+const handleChooseModel = () => {
     showPicker.value = true; // 显示弹出框
 }
 // 处理确认选择事件,选择模型后，关闭弹出框
 const handelConfirm = (data) => {
     console.log('选择的模型:', data.selectedOptions[0]);
     showPicker.value = false;
-    selectedValues.value = [data.selectedOptions[0].text]; // 保持数组形式
-    modelName.value = data.selectedOptions[0].text; // 更新模型名称
-    selectedmodelvalue.value = data.selectedOptions[0].value; // 保存选择的模型值
+    selectedValues.value = [data.selectedOptions[0].text]; 
+    selectedmodelvalue.value = data.selectedOptions[0].value; 
+    modelName.value = data.selectedOptions[0].text;
 }
 
 //发送请求到服务器
@@ -171,7 +166,6 @@ const getModelList = async () => {
         console.error('API请求错误:', error); 
     }
 }
-
 
 // 组件挂载后，发送请求到服务器,获取模型列表,提供给用户选择
 onMounted(() => {
