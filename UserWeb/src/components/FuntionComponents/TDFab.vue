@@ -4,8 +4,7 @@
             :icon="iconFunc" 
             :text="props.text" 
             @click="onClick" 
-            draggable="true"
-            :style="'right: 30px; bottom: 45px'"
+            :style="'right: 30px; bottom: 45px'" 
             /> 
     </div>
 </template>

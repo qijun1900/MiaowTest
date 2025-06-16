@@ -117,8 +117,8 @@ const loading = ref(true);
 const modelName = ref("");
 const showPicker = ref(false);
 const modelOtions = ref([]) 
-const selectedValues = ref(['DeepSeek-R1-Distill-Qwen-1.5B']);
-const selectedmodelvalue = ref('deepseek-r1-distill-qwen-1.5b'); 
+const selectedValues = ref(['DeepSeek-R1-Distill-Qwen-1.5B']);// 初始值为 'DeepSeek-R1-Distill-Qwen-1.5B'
+const selectedmodelvalue = ref('deepseek-r1-distill-qwen-1.5b'); // 初始值为 'deepseek-r1-distill-qwen-1.5b'
 
 const props = defineProps({
     modelValue: Boolean,
@@ -149,12 +149,12 @@ const sendRequest = async () => {
             request.value,
             selectedmodelvalue.value
         );
-        console.log("modelValue",selectedmodelvalue.value)
+        // console.log("modelValue",selectedmodelvalue.value)
         if (response.code === 200) {
             loading.value = false;
             LlaRes.value = response.data.Aidata;
             modelName.value = response.data.modelName
-            console.log("解析结果", response);
+            // console.log("解析结果", response);
         } else {
             LlaRes.value = "服务器繁忙，请稍后再试！";
         }
@@ -178,7 +178,7 @@ const HandleClick = (data) => {
 }
 // 处理确认选择事件,选择模型后，关闭弹出框
 const handelConfirm = (data) => {
-    console.log('选择的模型:', data.selectedOptions[0]);
+    // console.log('选择的模型:', data.selectedOptions[0]);
     showPicker.value = false;
     selectedValues.value = [data.selectedOptions[0].text]; 
     selectedmodelvalue.value = data.selectedOptions[0].value; 

@@ -2,7 +2,7 @@
     <div class="search-container">
         <van-search 
             v-model="SearchText"
-            placeholder="请输入搜索关键词"
+            placeholder="试着搜索考试名称~"
             shape="round"
             clearable
             @search="onSearch(SearchexamStem)"

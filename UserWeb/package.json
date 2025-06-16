@@ -15,6 +15,7 @@
     "ant-design-vue": "^4.2.6",
     "ant-design-x-vue": "^1.2.4",
     "axios": "^1.9.0",
+    "default-passive-events": "^4.0.0",
     "element-plus": "^2.9.10",
     "katex": "^0.16.22",
     "markdown-it": "^14.1.0",

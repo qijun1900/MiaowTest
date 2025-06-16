@@ -118,7 +118,7 @@ const handleChooseModel = () => {
 }
 // 处理确认选择事件,选择模型后，关闭弹出框
 const handelConfirm = (data) => {
-    console.log('选择的模型:', data.selectedOptions[0]);
+    // console.log('选择的模型:', data.selectedOptions[0]);
     showPicker.value = false;
     selectedValues.value = [data.selectedOptions[0].text]; 
     selectedmodelvalue.value = data.selectedOptions[0].value; 

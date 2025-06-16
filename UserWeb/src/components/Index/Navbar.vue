@@ -25,7 +25,7 @@
 import { ref } from 'vue'
 import GithubCatIcon from '../icons/GithubCatIcon.vue'
 import AllExamIcon from '../icons/AllExamIcon.vue'
-import HomeDockerIcon from '../icons/HomeDockerIcon.vue'
+// import HomeDockerIcon from '../icons/HomeDockerIcon.vue'
 import HomeProblemIcon from '../icons/HomeProblemIcon.vue'
 import HomeChatIcon from '../icons/HomeChatIcon.vue'
 
@@ -33,14 +33,14 @@ import HomeChatIcon from '../icons/HomeChatIcon.vue'
 const navItems = [
     { icon: 'GithubCatIcon', text: '项目地址' , to: '/projectintroduce'},
     { icon: 'AllExamIcon', text: '所有考试' ,  to: '/ExamList'},
-    { icon: 'HomeDockerIcon', text: '私有部署' , to: '/contest'},
+    // { icon: 'HomeDockerIcon', text: '私有部署' , to: '/contest'},
     { icon: 'HomeProblemIcon', text: '意见反馈' , to: '/useradvice'},
     { icon: 'HomeChatIcon', text: '喵喵智答', to: '/homechat' } 
 ]
 const Icon = {
     'GithubCatIcon': GithubCatIcon, 
     'AllExamIcon': AllExamIcon, 
-    "HomeDockerIcon":HomeDockerIcon,
+    // "HomeDockerIcon":HomeDockerIcon,
     "HomeProblemIcon": HomeProblemIcon,
     "HomeChatIcon" : HomeChatIcon
 

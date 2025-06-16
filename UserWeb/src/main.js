@@ -6,8 +6,9 @@ import 'vant/lib/index.css' // 引入vant组件样式
 import App from './App.vue'
 import router from './router'
 import Vant from 'vant'
-
 import 'tdesign-mobile-vue/es/style/index.css';// 引入tDesign组件样式
+// 解决非被动事件监听警告，提升滚动性能  
+import "default-passive-events";
 
 
 
