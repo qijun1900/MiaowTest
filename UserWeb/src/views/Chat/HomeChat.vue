@@ -27,12 +27,24 @@
                     title="✨使用请注意以下下问题："
                 />
             </div>
-            <div class="sender" >
-                <AntSender 
-                    ref="antSender"
-                    @userinputsubmit="handleuserSend" 
-                    @isHidePrompts="handleisHidePrompts"
-                    @isShowBubble="handleIsloading"/>
+            <div class="sender">
+                <Affix :offset-bottom="bottom">
+                    <div class="button-sender-container">
+                        <van-button 
+                            color="#7232dd" 
+                            plain round 
+                            size="small" 
+                            icon="replay"
+                            @click="handleCreNewChat">
+                            创建新对话
+                        </van-button>
+                    </div>
+                    <AntSender 
+                        ref="antSender"
+                        @userinputsubmit="handleuserSend" 
+                        @isHidePrompts="handleisHidePrompts"
+                        @isShowBubble="handleIsloading"/>
+                </Affix>
             </div>
             <div>
                 <Flex gap="middle" vertical>
@@ -61,6 +73,9 @@
                 PickTitle="选择对话模型"
             />
         </div>
+        <div>
+           
+        </div>
     </div>
 </template>
 <script setup>
@@ -76,6 +91,9 @@ import { Flex} from 'ant-design-vue';
 import postUserUserChat from '@/API/postUserChat';
 import getLLMList from '@/API/getLLMList'; 
 import VanPicker from '@/components/FuntionComponents/VanPicker.vue';
+import { Affix } from 'ant-design-vue';
+import { showConfirmDialog } from 'vant';
+
 
 const chatHistory = ref([]);
 const PromptsHiden = ref(false);
@@ -88,6 +106,8 @@ const showPicker = ref(false); // 新增弹出框显示状态变量
 const modelOtions = ref([]) // 新增选项数据,后面由后端请求后返回，而不是写死
 const selectedValues = ref(['DeepSeek-R1-Distill-Qwen-1.5B']);
 const selectedmodelvalue = ref('deepseek-r1-distill-qwen-1.5b'); 
+const bottom = ref(12); // 新增底部距离变量
+
 
 //处理用户提交的问题
 const handleuserSend = (data) => {
@@ -123,6 +143,23 @@ const handelConfirm = (data) => {
     selectedValues.value = [data.selectedOptions[0].text]; 
     selectedmodelvalue.value = data.selectedOptions[0].value; 
     modelName.value = data.selectedOptions[0].text;
+}
+
+// 处理创建新对话事件
+const handleCreNewChat = () => {
+    if (chatHistory.value.length === 0) {
+        return
+    }
+    // 弹出确认框，询问是否创建新对话
+   showConfirmDialog({
+            message: '确定要创建新对话吗？创建新对话内容将清空！',
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+        }).then(() => {
+            location.reload()// 刷新页面
+        }).catch(() => {
+            // 取消操作
+    })
 }
 
 //发送请求到服务器
@@ -207,19 +244,24 @@ onMounted(() => {
     background-color: #f7fcff;
     padding: 8px 12px;
     z-index: 100;    /* 确保在最上层 */
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease;/* 平滑过渡 */
 }
 .userbubble{
-    margin-top: 10px;
+    margin-top: 5px;
     margin-left: 10px;
     margin-right: 10px;
+    margin-bottom: 70px;
 
 }
 .aibubble{
     margin-top: 10px;
     margin-left: 10px;
     margin-right: 10px; 
-    margin-bottom: 100px;
+    margin-bottom: 70px;
+}
+.button-sender-container {
+    margin-bottom: 5px;
+    
 }
 
 
