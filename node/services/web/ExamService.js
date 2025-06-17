@@ -2,7 +2,6 @@ const ExamModel = require('../../models/ExamModel')
 const  UserExamModel = require('../../models/UserExamModel')
 const  UserIssuseModel = require('../../models/UserIssuseModel.js')
 const NewsModel = require('../../models/NewsModel')
-const testapi = require('../../llm/test.js')
 const UserFeedbackModel = require('../../models/UserFeedbackModel')
 
 
@@ -26,9 +25,6 @@ const ExamService = {
     },
     getSwipeNews: async () => {
         return await NewsModel.find({isPublish:1}).sort({createdTime:-1})
-    },
-    chat: async (message) => {
-        return await testapi.chat(message);
     },
     UserFeedbackAdvice: async ({useradvice,userinfo,type,IsSolved,createtime}) => {
         return await UserFeedbackModel.create({
