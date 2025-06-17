@@ -6,7 +6,7 @@
         </div>
       <div class="title-block">
         <h1 class="main-title">题喵喵|MiaoTest</h1>
-        <p class="subtitle">基于AI大模型的智能题库与自主题目练习平台</p>
+        <p class="subtitle">基于AI大模型的智能题库自主题目练习</p>
         <a 
           class="github-link"
           href="https://github.com/qijun1900/MiaoTest"
@@ -27,7 +27,7 @@
       <ul>
         <li>📚 题库管理与分类</li>
         <li>📃多题型在线考试与错题练习</li>
-        <li>🤖AI智能解析，题目一键解答</li>
+        <li>🤖AI智能解析，题目一键解析</li>
         <li>🎶批量题库管理与导入</li>
         <li>📱多端适配，移动端友好体验</li>
         <li>🙋‍♀️基于AI大语言模型API实现智能集成，响应速度快</li>
@@ -49,6 +49,7 @@
         <div class="tech-item">Vue Router</div>
         <div class="tech-item">前后端分离架构</div>
         <div class="tech-item">Vite</div>
+        <div class="tech-item">Nginx</div>
       </div>
     </section>
 

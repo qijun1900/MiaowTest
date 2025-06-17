@@ -93,6 +93,7 @@ import getLLMList from '@/API/getLLMList';
 import VanPicker from '@/components/FuntionComponents/VanPicker.vue';
 import { Affix } from 'ant-design-vue';
 import { showConfirmDialog } from 'vant';
+import { showToast } from 'vant';
 
 
 const chatHistory = ref([]);
@@ -148,9 +149,13 @@ const handelConfirm = (data) => {
 // 处理创建新对话事件
 const handleCreNewChat = () => {
     if (chatHistory.value.length === 0) {
+        showToast({
+        message: '当前已经是新对话',
+        position: 'top',
+        });
         return
     }
-    // 弹出确认框，询问是否创建新对话
+    
    showConfirmDialog({
             message: '确定要创建新对话吗？创建新对话内容将清空！',
             confirmButtonText: '确定',
@@ -250,18 +255,15 @@ onMounted(() => {
     margin-top: 5px;
     margin-left: 10px;
     margin-right: 10px;
-    margin-bottom: 70px;
-
+    margin-bottom: 100px;
 }
 .aibubble{
-    margin-top: 10px;
     margin-left: 10px;
     margin-right: 10px; 
-    margin-bottom: 70px;
+    margin-bottom: 110px;
 }
 .button-sender-container {
-    margin-bottom: 5px;
-    
+    margin-bottom: 4px;
 }
 
 
