@@ -22,8 +22,8 @@
             @hasData="onHasData"/>
         </div>
         <div class="empty">
-                <Empty v-if="!hasData"
-                Description="暂无题目添加"/> 
+            <Empty v-if="!hasData"
+            Description="暂无题目添加"/> 
         </div>
 
     </div>

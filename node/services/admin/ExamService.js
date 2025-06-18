@@ -4,6 +4,7 @@ const ExamBlankModel =require('../../models/BlankModel')
 const ExamJudgeModel =require('../../models/JudgeModel')
 const ExamShortModel =require('../../models/ShortModel')
 const  UserExamModel = require('../../models/UserExamModel')
+const AianalysisModel = require('../../models/AianalysisModel')
 
 const ExamService ={
     add:async({name,code,category,year,isPublish,cover,createdTime})=>{
@@ -149,44 +150,81 @@ const ExamService ={
         return modelMap[questionType]?.find({_id}) || null;
     },
     UpdateSelectQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
-        return ExamSelectModel.updateOne({_id},{
+       // 等待更新操作完成
+        const updateResult = await ExamSelectModel.updateOne({_id},{
             stem,
             options,
             isPublish, 
             analysis,
             isAIanswer,
             createdTime
-        }) 
+        });
+
+        // 执行删除操作
+        const deleteAIResult = await AianalysisModel.deleteMany({questionId:_id});
+
+        // 返回更新和删除操作的结果
+        return {
+            updateResult,
+            deleteAIResult
+        };
+        
     },
     UpdateBlankQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
-        return ExamBlankModel.updateOne({_id},{
+       const updateResult = await ExamBlankModel.updateOne({_id},{
             stem,
             options,
-            isPublish, 
+            isPublish,
             analysis,
             isAIanswer,
             createdTime
-        }) 
+        });
+
+        // 执行删除操作
+        const deleteAIResult = await AianalysisModel.deleteMany({questionId:_id});
+
+        // 返回更新和删除操作的结果
+        return {
+            updateResult,
+            deleteAIResult
+        };
     },
     UpdateJudgeQuestion:async({_id,stem,answer,isPublish,analysis,isAIanswer,createdTime})=>{
-        return ExamJudgeModel.updateOne({_id},{
+        
+        const updateResult = await ExamJudgeModel.updateOne({_id},{
             stem,
             answer,
-            isPublish, 
+            isPublish,
             analysis,
             isAIanswer,
             createdTime
-        }) 
+        })
+        // 执行删除操作
+        const deleteAIResult = await AianalysisModel.deleteMany({questionId:_id});   
+
+        // 返回更新和删除操作的结果
+        return {
+            updateResult,
+            deleteAIResult
+        };  
     },
     UpdateShortQuestionList:async({_id,stem,content,isPublish,analysis,isAIanswer,createdTime})=>{
-        return ExamShortModel.updateOne({_id},{
+       
+        const updateResult = await ExamShortModel.updateOne({_id},{
             stem,
             content,
-            isPublish, 
+            isPublish,
             analysis,
             isAIanswer,
-            createdTime,
-        }) 
+            createdTime 
+        })
+        // 执行删除操作
+        const deleteAIResult = await AianalysisModel.deleteMany({questionId:_id});
+        // 返回更新和删除操作的结果
+        return {
+            updateResult,
+            deleteAIResult
+        };
     },
     UpdateExamStatus:async({examId,isPublish})=>{
         const [examUpdate, userExamUpdate] = await Promise.all([
