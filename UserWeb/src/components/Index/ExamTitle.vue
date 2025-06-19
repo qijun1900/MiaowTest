@@ -35,7 +35,7 @@ const handleClick = (item) => {
 const fetchData = async () => {
    try {
     const res = await getUserExaminfo(props.UserExamID);
-    UserExaminfo.value = res[0]  
+    UserExaminfo.value = res[0]
     if(UserExaminfo.value){
        emit('hasData', true);
     } else {

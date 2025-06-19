@@ -127,7 +127,8 @@ const handleSubmit = (answerText) => {
 .answer-content {
     font-size: 17px;
     color: #323131;
-    word-break: break-all;
+    word-break: keep-all;  /* 防止单词断开 */
+    white-space: normal;   /* 允许正常换行 */
     line-height: 1.5;
     font-weight: 500;
 }

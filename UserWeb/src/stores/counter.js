@@ -35,11 +35,11 @@ export const useExamStore = defineStore('exam', {
       this.IsOPenAI = openAI
       localStorage.setItem('exam_openAI', openAI)
     },
-    // 新增设置方法,用于设置当前题目
+    // 新增设置方法,用于储存当前题目
     setCurrentQuestion(question) {
       localStorage.setItem('exam_currentQuestion', JSON.stringify(question))  // 同步更新到localStorage本地存储仍需序列化
     },
-    // 新增设置方法,用于设置当前选择题目类型题目
+    // 新增设置方法,用于储存当前选择的题目
     setSelectedQuestions(questions) {
       this.selectedQuestions = questions
       localStorage.setItem('exam_selectedQuestions', JSON.stringify(questions))

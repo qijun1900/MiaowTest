@@ -13,7 +13,47 @@ const ExamService = {
         return await ExamModel.findById(id)
     },
     getUserExamInfo: async (id) => {
-        return await UserExamModel.find({ examId: id }, { questionTitle: 1 });
+        // 使用聚合管道来过滤数组元素
+        return await UserExamModel.aggregate([
+            {
+                // 先匹配 examId 条件
+                $match: {
+                    examId: id
+                }
+            },
+            {
+                // 再使用 $filter 操作符过滤 questionTitle 数组，选择 isPublishType 为 1 的元素
+                $project: {
+                    questionTitle: {
+                        $map: {
+                            input: {
+                                $filter: {
+                                    input: "$questionTitle",
+                                    as: "title",
+                                    cond: { $eq: ["$$title.isPublishType", 1] }
+                                }
+                            },
+                            as: "filteredTitle",
+                            in: {
+                                $mergeObjects: [
+                                    "$$filteredTitle",
+                                    {
+                                        questionIdS: {
+                                            $map: {
+                                                input: "$$filteredTitle.questionIdS",
+                                                as: "question",
+                                                in: [ "$$question" ] // 将每个元素包裹到数组中
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
+       //return await UserExamModel.find({examId:id},{questionTitle:1})
     },
     postUserExamIssuse: async (ExamId, ExamtagId,Type, createdTime) => {
         return await UserIssuseModel.create({ 

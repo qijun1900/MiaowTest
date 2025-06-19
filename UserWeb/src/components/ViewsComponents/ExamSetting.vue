@@ -45,7 +45,7 @@
                 </van-slider> 
             </div>
             <div class="set-group"> 
-                <span class="set-label">是否立即显示答案：</span>
+                <span class="set-label">是否立即显示答案{Building}：</span>
                 <van-switch 
                     v-model="IsshowAnswer"
                     size="24px"
@@ -117,7 +117,7 @@ const practiceCount = ref(1) // 修改为数字类型，设置默认值为1
 const IsOPenAI = ref(true)
 
 onMounted(() => {
-    questions.value = store.getCurrentQuestion()// 获取当前题型的题目
+    questions.value = store.getCurrentQuestion()// 获取当前题型的所有题目
     practiceCount.value = questions.value.length // 初始化为题目总数
 })
 

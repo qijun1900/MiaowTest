@@ -21,7 +21,6 @@ const userinput = ref('')
 const isShowBubble = ref(false)
 const senderRef = ref(null)  // 新增 Sender 组件引用
 
-
 const emit = defineEmits(['userinputsubmit','isHidePrompts','isShowBubble'])
 
 const handleUserInput = () => {
@@ -40,8 +39,6 @@ const handleCancel = () => {
 const handleFocus = () => {
     emit('isHidePrompts', true)
 }
-
-
 
 // 暴露重置loading方法
 const resetLoading = () => {

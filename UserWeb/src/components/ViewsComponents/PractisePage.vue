@@ -2,7 +2,7 @@
     <van-config-provider :theme-vars="themeVars">
         <div class="container">
             <TopBack 
-                title="练习设置" 
+                title="题目练习" 
                 iconName="warning-o"
                 :iconSize="29" 
                 navBarIconColor="#3b3c3d" 

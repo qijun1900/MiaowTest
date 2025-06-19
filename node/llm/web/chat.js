@@ -14,7 +14,9 @@ async function postExamAIanalyse(message,model) {
     ];
     const completion = await openai.chat.completions.create({
         model: model,
-        messages: messages, 
+        messages: messages,
+        // 添加 enable_thinking 参数，解决BadRequestError: 400 parameter.enable_thinking must be set to false for non-streaming calls
+        enable_thinking: false 
     });
     return {
         Aidata:completion.choices[0].message.content,
@@ -30,8 +32,10 @@ async function postUserChat(messages, model) {
         ];
     }
     const completion = await openai.chat.completions.create({
-        model:model,
+        model: model,
         messages: messages,
+        // 添加 enable_thinking 参数，解决BadRequestError: 400 parameter.enable_thinking must be set to false for non-streaming calls
+        enable_thinking: false 
     });
     return {
         Aidata:completion.choices[0].message.content,
