@@ -151,7 +151,18 @@ sendExamAIanalyse: async (message, questionId, Type) => {
 - **后台端重构**：使用vite+vue3重构后台管理端，增加代码可读性。
 - **后台端接入AI**：后台端加入AI功能使其导入题目更方便。
 
-## 七、总结
+## 七、系统界面预览
+
+### 1. 用户端
+![用户端首页](./Image/User/07b0fa9c71a0e6b2ff7112135d0668e.jpg)
+
+
+### 2. 管理后台
+![后台题库管理](./Image/Admin/Snipaste_2025-06-20_19-58-04.jpg)
+
+
+
+## 八、总结
 
 MiaoTest 项目以现代前后端分离架构，实现了题库、考试、资讯、公告、AI智能解析等丰富功能，采用主流技术栈（Vue3、Node.js、MongoDB、JWT、AI API 等），并通过服务端集成大模型能力赋能教育应用场景，为用户带来智能化的考试与学习体验。
 
