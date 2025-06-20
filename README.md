@@ -156,13 +156,24 @@ sendExamAIanalyse: async (message, questionId, Type) => {
 ### 1. 用户端
 <div align="center">
     <img src="./Image/User/07b0fa9c71a0e6b2ff7112135d0668e.jpg" width="45%">
-    <img src="./Image/User/user_exam_page.jpg" width="45%">
+    <img src="./Image/User/73a207a1df3401e0a3a67fbf71d9e04.jpg" width="45%">
+    <img src="./Image/User/d5b50122545f34e57e18996ca8453fa.jpg" width="45%">
+    <img src="./Image/User/de958d17ba25aa6895e1dd1f83f98a9.jpg" width="45%">
+    <img src="./Image/User/f4788b1e911bd7579db02562125a179.jpg" width="45%">
+    <img src="./Image/User/f933958cf1c6156fd08f38f3f3b3124.jpg" width="45%">
 </div>
 
 ### 2. 管理后台
 <div align="center">
     <img src="./Image/Admin/Snipaste_2025-06-20_19-58-04.jpg" width="45%">
-    <img src="./Image/Admin/question_edit.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-58-39.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-58-54.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-59-07.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-59-19.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-59-32.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-59-41.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-59-55.jpg" width="45%">
+    <img src="./Image/Admin/Snipaste_2025-06-20_20-01-00.jpg" width="45%">
 </div>
 
 
