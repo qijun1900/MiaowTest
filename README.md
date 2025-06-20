@@ -154,11 +154,16 @@ sendExamAIanalyse: async (message, questionId, Type) => {
 ## 七、系统界面预览
 
 ### 1. 用户端
-![用户端首页](./Image/User/07b0fa9c71a0e6b2ff7112135d0668e.jpg)
-
+<div align="center">
+    <img src="./Image/User/07b0fa9c71a0e6b2ff7112135d0668e.jpg" width="45%">
+    <img src="./Image/User/user_exam_page.jpg" width="45%">
+</div>
 
 ### 2. 管理后台
-![后台题库管理](./Image/Admin/Snipaste_2025-06-20_19-58-04.jpg)
+<div align="center">
+    <img src="./Image/Admin/Snipaste_2025-06-20_19-58-04.jpg" width="45%">
+    <img src="./Image/Admin/question_edit.jpg" width="45%">
+</div>
 
 
 
