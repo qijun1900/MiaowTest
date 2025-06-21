@@ -103,7 +103,8 @@ const handleSubmit = (answerText) => {
     flex: 1;
     font-size: 18px;
     color: #222;
-    word-break: break-all;
+    word-break: keep-all;  /* 防止单词断开 */
+    white-space: normal;   /* 允许正常换行 */
 }
 
 .answer-container {
