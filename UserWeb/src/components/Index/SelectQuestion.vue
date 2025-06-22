@@ -167,8 +167,6 @@ const handleSumitMultiple = () => {
     flex: 1;
     font-size: 20px;
     color: #222;
-    word-break: keep-all;  /* 防止单词断开 */
-    white-space: normal;   /* 允许正常换行 */
 }
 
 .option-list {
@@ -205,7 +203,6 @@ const handleSumitMultiple = () => {
     flex: 1;
     color: #333;
     font-size: 18px;
-    word-break: break-all;
 }
 
 .correct-option {

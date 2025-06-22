@@ -104,8 +104,6 @@ const handleSubmit = (answers) => {
     flex: 1;
     font-size: 20px;
     color: #222;
-    word-break: keep-all;  /* 防止单词断开 */
-    white-space: normal;   /* 允许正常换行 */
 
 }
 
@@ -144,7 +142,6 @@ const handleSubmit = (answers) => {
     color: #42c600f1;
     margin-right: 9px;
     line-height: 1.35;
-    word-break: break-all;
     font-weight: 600;
 }
 

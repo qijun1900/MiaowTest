@@ -133,9 +133,6 @@ const options = computed(() => [
     flex: 1;
     font-size: 20px;
     color: #222;
-    word-break: keep-all;  /* 防止单词断开 */
-    white-space: normal;   /* 允许正常换行 */
-
 }
 
 .option-list {
@@ -182,7 +179,6 @@ const options = computed(() => [
     color: #333;
     font-size: 18px;
     font-weight: 600;
-    word-break: break-all;
 }
 
 .answer-container {
