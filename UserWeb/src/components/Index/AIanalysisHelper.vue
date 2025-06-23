@@ -11,13 +11,13 @@
             <div v-for="item in questionData" :key="item._id" class="question-item">
 
                 <div class="question-stem">
-                    <span class="stem">{{ item.stem }}</span>
+                    <span class="stem" v-translate>{{ item.stem }}</span>
                 </div>
 
                 <!-- 选择题(Type 1) -->
                 <div v-if="item.Type === 1" class="question-options">
                     <div v-for="(option, index) in item.options" :key="index" class="option-item">
-                        <span class="option-content">
+                        <span class="option-content" v-translate>
                             {{ String.fromCharCode(65 + index) }}. {{ option.content }}
                             <span v-if="option.isCorrect" class="correct-answer">✓</span>
                         </span>
@@ -28,7 +28,7 @@
                 <div v-if="item.Type === 2" class="blank-answers">
                     <div v-for="(answer, index) in item.options" :key="index" class="blank-item">
                         <span class="blank-label">空{{ index + 1 }}:</span>
-                        <span class="blank-content">{{ answer.content }}</span>
+                        <span class="blank-content" v-translate>{{ answer.content }}</span>
                     </div>
                 </div>
 
@@ -43,7 +43,7 @@
                 <!-- 简答题(Type 4) -->
                 <div v-if="item.Type === 4" class="short-answer">
                     <div class="answer-title">参考答案：</div>
-                    <div class="answer-content" v-html="item.content"></div>
+                    <div class="answer-content" v-html="item.content" v-translate></div>
                 </div>
             </div>
             <div class="talk-container">

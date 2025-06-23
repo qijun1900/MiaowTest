@@ -12,7 +12,7 @@
     </div>
 
     <div class="analyse-content">
-        <span class="font-analyse">{{ analysis }}</span>
+        <span class="font-analyse" v-translate>{{ analysis }}</span>
     </div>
     <div v-if="isAIanswer === 1">
        <AiWarn/>

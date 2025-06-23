@@ -12,6 +12,7 @@ import PractisePage from '@/components/ViewsComponents/PractisePage.vue'
 import UserAdvice from '@/views/User/UserAdvice.vue'
 import HomeChat from '@/views/Chat/HomeChat.vue'
 import Introduce from '@/views/Home/Introduce.vue'
+// import Test2dbWord from '@/views/Test/Test2dbWord.vue'
 
 
 
@@ -71,7 +72,12 @@ const routes = [
     path: '/projectintroduce',
     name:'introduce',
     component: Introduce
-  }
+  },
+  // {
+  //   path: '/test2dbword',
+  //   name:'test2dbword',
+  //   component: Test2dbWord
+  // }
 ]
 
 const router = createRouter({

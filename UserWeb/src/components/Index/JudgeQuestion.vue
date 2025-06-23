@@ -5,7 +5,7 @@
                 判断
             </el-check-tag>
             <span class="question-index">【{{ index }}】</span>
-            <span class="question-stem">{{ question.stem}}</span>
+            <span class="question-stem" v-translate>{{ question.stem}}</span>
         </div>
         <div class="option-list">
             <div v-for="(option, index) in options" 

@@ -25,7 +25,7 @@
     "pinia": "^3.0.1",
     "tdesign-mobile-vue": "^1.9.0",
     "tdesign-vue-next": "^1.13.2",
-    "vant": "^4.9.19",
+    "vant": "^4.9.20",
     "vue": "^3.5.13",
     "vue-clipboard3": "^2.0.0",
     "vue-router": "^4.5.0"

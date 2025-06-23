@@ -5,7 +5,7 @@
                     {{ question.isMultiple === 1 ? '多选' : '单选' }}
                 </el-check-tag>
                 <span class="question-index">【{{ index }}】</span>
-                <span class="question-stem">{{ question.stem }}</span>
+                <span class="question-stem" v-translate>{{ question.stem }}</span>
             </div>
             <div class="option-list">
                 <div 
@@ -23,7 +23,7 @@
                     <el-tag round class="option-tag">
                         {{ String.fromCharCode(65 + index) }}
                     </el-tag>
-                    <span class="option-content">{{ option.content }}</span>
+                    <span class="option-content"  >{{ option.content }}</span>
                 </div>
             </div>
             <div class="multiple-button" v-if="question.isMultiple === 1">

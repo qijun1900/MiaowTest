@@ -45,6 +45,20 @@ const LLMController ={
             console.error('Error fetching getLLMList details:', error); // 处理错误
         }
         
+    },
+    postTranslateWorld:async (req,res)=>{
+        try {
+            const {word} = req.body; 
+            console.log("要翻译的单词:", word);
+            const result = await LLMService.postTranslateWorld(word) // 调用服务层的postTranslateWorld方法
+            res.send({
+                code: 200,
+                ActionType: "OK",
+                data: result // 返回服务层的响应结果
+            })
+        } catch (error) {
+            console.error('Error fetching postTranslateWorld details:', error); // 处理错误
+        }
     }
 
 }

@@ -43,5 +43,25 @@ async function postUserChat(messages, model) {
     } 
 }
 
+async function postTranslateWorld(word) {
+    const messages = [
+        { role: "user", content: word }  // 仅包含一个用户消息，不需要系统提示
+    ];
+    const completion = await openai.chat.completions.create({
+        model: "qwen-mt-turbo",
+        messages: messages,
+        enable_thinking: false,
+        translation_options: {  // 添加翻译选项
+            source_lang: "auto",  // 自动检测源语言
+            target_lang: "zh"     // 目标语言设为中文
+        }
+    });
+    return {
+        Aidata: completion.choices[0].message.content,
+        modelName: completion.model
+    };
+}
 
-module.exports = { postExamAIanalyse,postUserChat };
+
+
+module.exports = { postExamAIanalyse,postUserChat ,postTranslateWorld};

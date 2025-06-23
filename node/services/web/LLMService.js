@@ -36,6 +36,11 @@ const LLMService = {
     },
     getLLMList: async () => {
         return await LLMsModel.find({ isPublish: 1 })
+    },
+    postTranslateWorld: async (word) => {
+        // 调用大模型翻译单词的接口
+        const result = await chat.postTranslateWorld(word);
+        return result;
     }
 
 }

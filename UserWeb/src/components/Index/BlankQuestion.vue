@@ -5,7 +5,7 @@
                 填空
             </el-check-tag>
             <span class="question-index">【{{ index }}】</span>
-            <span class="question-stem">{{ question.stem }}</span>
+            <span class="question-stem" v-translate>{{ question.stem }}</span>
         </div>
         <div class="option-list">
             <AnswerInput :options="question.options" v-model="userAnswers" @submit="handleSubmit" />
@@ -14,7 +14,7 @@
             <div>
                 <span class="answer-font">答案：</span>
                 <div v-for="(answer, index) in question.options" :key="index" class="answer-option">
-                    <span class="index-lable">空{{ index + 1 }}:</span><span class="answer-lable">{{ answer.content
+                    <span class="index-lable">空{{ index + 1 }}:</span><span class="answer-lable" v-translate>{{ answer.content
                         }}</span>
                 </div>
             </div>

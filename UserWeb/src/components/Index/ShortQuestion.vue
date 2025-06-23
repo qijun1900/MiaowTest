@@ -5,7 +5,7 @@
                 简答
             </el-check-tag>
             <span class="question-index">【{{ index }}】</span>
-            <span class="question-stem">{{ question.stem }}</span>
+            <span class="question-stem" v-translate>{{ question.stem }}</span>
         </div>
         <div class="option-list">
             <ShortAnswerInput 
@@ -17,7 +17,7 @@
             <div>
                 <span class="answer-font">答案：</span>
                 <div class="answer-option">
-                    <span class="answer-content" v-html="question.content"></span>
+                    <span class="answer-content" v-html="question.content" v-translate></span>
                 </div>
             </div>
         </div>
