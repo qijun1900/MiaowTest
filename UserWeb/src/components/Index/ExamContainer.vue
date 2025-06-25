@@ -15,6 +15,9 @@
         </van-grid>
         <van-back-top :offset="200" />
     </div>
+    <div v-if="gridItems.length === 0">
+        <VantLoading/>
+    </div>
 </van-config-provider>
 </template>
 
@@ -24,6 +27,7 @@ import getExamDetails from '@/API/getExamDetails'
 import escconfig from '@/config/esc.config'
 import LoadImage from '../FuntionComponents/LoadImage.vue'
 import RouterPush from '@/util/RouterPush'
+import VantLoading from './VantLoading.vue'
 
 const gridItems = ref([])
 
@@ -103,7 +107,6 @@ watch(() => props.UseData, (newVal) => {
     border-radius: 6px;
     overflow: hidden;
 }
-/* 新增图片加载失败样式 */
 .image-error {
     display: flex;
     flex-direction: column;

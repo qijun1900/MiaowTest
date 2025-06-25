@@ -43,11 +43,15 @@ import HotExamContainer from '@/components/Index/ExamContainer.vue';
 import RouterPush from '@/util/RouterPush';
 import { ref } from 'vue';
 import { showToast } from 'vant';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 const loading = ref(false);//下拉刷新
 const onRefresh = () => {
       setTimeout(() => {
-        showToast('刷新成功');
+        router.go(0);
         loading.value = false;
+        showToast('刷新成功');
       }, 1000);
     };
 </script>

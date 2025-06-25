@@ -1,14 +1,20 @@
 <template>
     <div>
-    <van-cell-group inset v-if="UserExaminfo && UserExaminfo.questionTitle">
-        <van-cell
-            v-for="item in UserExaminfo.questionTitle" 
-            :key="item._id" 
-            :title="item.content"
-            is-link
-            @click="handleClick(item)"
-            class="exam-title-cell"/>
-    </van-cell-group>
+        <van-cell-group inset v-if="UserExaminfo && UserExaminfo.questionTitle">
+            <van-cell
+                v-for="item in UserExaminfo.questionTitle" 
+                :key="item._id" 
+                :title="item.content"
+                is-link
+                @click="handleClick(item)"
+                class="exam-title-cell"/>
+        </van-cell-group>
+        <div v-else-if="!isLoaded">
+            <VantLoading/>
+        </div>
+        <div v-else class="empty">
+            <Empty Description="暂无题目添加"/> 
+        </div>
     </div>
 </template>
 <script setup>
@@ -16,6 +22,8 @@ import getUserExaminfo from '@/API/getUserExam';
 import { onMounted ,ref} from 'vue';
 import { useExamStore } from '@/stores/counter'
 import RouterPush from '@/util/RouterPush';
+import VantLoading from './VantLoading.vue';
+import Empty from '../FuntionComponents/Empty.vue';
 const store = useExamStore()
 const UserExaminfo = ref([]);
 const props = defineProps({
@@ -25,17 +33,18 @@ const props = defineProps({
     }
 })
 const emit = defineEmits(['hasData']); 
-
 const handleClick = (item) => {
     store.setCurrentTitle(item.content)
     store.setCurrentQuestion(item.questionIdS)
     RouterPush(`/ExamSetting/${item._id}`)
 }
+const isLoaded = ref(false);  // 增加载状态标识
 
 const fetchData = async () => {
    try {
     const res = await getUserExaminfo(props.UserExamID);
-    UserExaminfo.value = res[0]
+    UserExaminfo.value = res[0];
+    isLoaded.value = true;  // 数据加载完成
     if(UserExaminfo.value){
        emit('hasData', true);
     } else {
@@ -43,6 +52,7 @@ const fetchData = async () => {
     }
    }catch (error) {
         console.error('获取考试数据失败:', error);
+        isLoaded.value = true;  // 出错也标记为已加载
    }
 }
 onMounted(async () => {

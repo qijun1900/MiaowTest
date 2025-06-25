@@ -21,11 +21,7 @@
             :UserExamID="route.params.id"
             @hasData="onHasData"/>
         </div>
-        <div class="empty">
-            <Empty v-if="!hasData"
-            Description="暂无题目添加"/> 
-        </div>
-
+       
     </div>
 </template>
 <script setup>
@@ -33,7 +29,6 @@ import { useRoute } from 'vue-router';
 import TopBack from '@/components/FuntionComponents/TopBack.vue';
 import ExamDtail from '../Index/ExamDtail.vue';
 import ExamTitle from '../Index/ExamTitle.vue';
-import Empty from '../FuntionComponents/Empty.vue';
 import { ref } from 'vue';
 import Divider from '../FuntionComponents/Divider.vue';
 

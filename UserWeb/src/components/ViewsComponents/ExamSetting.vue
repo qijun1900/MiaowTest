@@ -6,7 +6,7 @@
         :iconSize="27"
         navBarHeight="54px"
         navBarIconColor="#3b3c3d"/>
-        <Divider position="left" title="题型信息"/>
+        <Divider position="left" title="| 题型信息 |"/>
         <div>
             <van-cell-group inset class="info-group">
                 <van-cell 
@@ -29,7 +29,7 @@
                 </van-cell>
             </van-cell-group>
         </div>
-        <Divider position="left" title="练习设置"/>
+        <Divider position="left" title="| 练习设置 |"/>
         <div class="settings-container">
             <div class="set-group">
                 <span class="set-label">请选择题目数量：</span>   
