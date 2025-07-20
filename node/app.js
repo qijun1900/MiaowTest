@@ -14,6 +14,8 @@ const AdminExamRouter = require('./routes/admin/ExamRouter');
 const WebUserExamRouter = require('./routes/web/ExamRouter');
 const AdminLLMRouter = require('./routes/admin/LLMRouter');
 const WebLLMRouter = require('./routes/web/LLMRouter');
+const FunctionRouter = require('./routes/admin/FunctionRouter');
+
 var app = express();
 
 // view engine setup
@@ -40,6 +42,7 @@ app.use('/users',UserRouter)
 app.use(WebNewsRouter)
 app.use(WebUserExamRouter)
 app.use(WebLLMRouter)
+app.use(FunctionRouter)
 
 
 /*

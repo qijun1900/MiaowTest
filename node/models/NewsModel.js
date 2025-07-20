@@ -1,11 +1,12 @@
 const mongoose = require('mongoose')
 
 const NewsSchema = new mongoose.Schema({
-    tittle: String,
+    title: String,
     content: String,
     category:Number,//分类
     cover:String,
     isPublish:Number,//0:未发布，1：发布
+    creator:String,//创建者
     editTime:Date,
 })
 

@@ -7,7 +7,7 @@ const UserController = {
         if (result.length === 0) {
             res.send({
                 code: "-1",
-                err: "用户名或密码不匹配"
+                error: "用户名或密码不匹配"
             });
         }else {
             //生成token
@@ -42,7 +42,7 @@ const UserController = {
         })
         if(avatar){
             res.send({
-                ActionType:"OK_更新完毕",
+                ActionType:"OK",
                 data:{
                     username,
                     introduction,
@@ -52,7 +52,7 @@ const UserController = {
             })
         }else{
             res.send({
-                ActionType:"OK_更新完毕",
+                ActionType:"OK",
                 data:{
                     username,
                     introduction,
@@ -62,7 +62,7 @@ const UserController = {
         }
     },
     add:async (req,res)=>{
-        const {username,introduction,gender,role,password} = req.body
+        const {username,introduction,gender,role,password,state} = req.body
         const avatar = req.file ? `/avataruploads/${req.file.filename}`:""
        await UserService.add({
             username,
@@ -71,21 +71,29 @@ const UserController = {
             avatar,
             role:Number(role),
             password,
+            state:Number(state),
+            createTime:Date.now()
         })
         res.send({
             ActionType:"OK"
         })
     },
     getList:async (req,res)=>{
-        const result = await UserService.getlist(req.params)
+        const {page,size} = req.query
+        const result = await UserService.getlist({
+            ...req.params,
+            page: Number(page),
+            size: Number(size)
+        })
         res.send({
-
             ActionType:"OK",  
-            data:result
+            data:result,
+            total: result.total
         })
     },
-    delList:async (req,res)=>{
-        const result = await UserService.dellist({_id:req.params.id})
+    delListOneUser:async (req,res)=>{
+        const {_id} = req.body
+        const result = await UserService.dellist({_id})
         res.send({
             ActionType:"OK",  
         })
@@ -98,5 +106,29 @@ const UserController = {
         })
 
     },
+        delListManyUser:async (req,res)=>{
+        const {_ids} = req.body
+        console.log(_ids)
+        const result = await UserService.delManylist({_ids})
+        res.send({
+            ActionType:"OK",
+        })
+    },
+    editUser:async (req,res)=>{
+        const {_id,username,introduction,gender,role,state} = req.body
+        const avatar = req.file ? `/avataruploads/${req.file.filename}`:""
+        const result = await UserService.editUser({
+            _id,
+            username,
+            introduction,
+            gender,
+            role,
+            state,
+            avatar
+        })
+        res.send({
+            ActionType:"OK",
+        })
+    }
 };
 module.exports = UserController;
