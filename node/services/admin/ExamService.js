@@ -30,8 +30,17 @@ const ExamService ={
             createdTime 
         })
     },
-    getexamList:async({_id})=>{
-        return _id?ExamModel.find({_id}):ExamModel.find({}).sort({createdTime:-1})
+    getexamList:async({page, size})=>{
+        //分页查询
+        const skip = (page - 1) * size
+        const [data, total] = await Promise.all([
+            ExamModel.find({})
+                .skip(skip)
+                .limit(size)
+               .sort({createdTime:-1}),
+            ExamModel.countDocuments({})
+        ])
+      return { data, total };
     },
     updateInfo:async({name,code,category,year,isPublish,cover,creator,day,createdTime,_id})=>{
         if(cover){

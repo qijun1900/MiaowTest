@@ -511,10 +511,9 @@ const handleRefreshExamData = async()=>{
             page: currentPage.value,
             size: pageSize.value,  
         },getExamList)
-        console.log(res)
         if(res.ActionType==="OK"){
-            tableData.value = res.data
-            // total.value = res.Data.total
+            tableData.value = res.data.data
+            total.value = res.data.total
         }
     }catch(error){
         ElMessage.error("获取考试列表失败")

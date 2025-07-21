@@ -22,7 +22,11 @@ const ExamController ={
         }) 
     },
     getexamList:async (req,res)=>{
-        const result = await ExamService.getexamList({_id:req.params.id})
+        const {page,size} = req.query
+        const result = await ExamService.getexamList({
+            page: Number(page),
+            size: Number(size)
+        })
         res.send({
             ActionType: "OK",
             data: result,

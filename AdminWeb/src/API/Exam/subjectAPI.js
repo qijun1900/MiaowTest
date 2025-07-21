@@ -16,10 +16,17 @@ export async function postAddExam(data) {
         console.error("Error during add exam:", error);
     }
 }
-export async function getExamList() {
+export async function getExamList(params) {
     // 获取考试列表
     try {
-        const response = await axios.get("/adminapi/exam/list");
+        const response = await axios.get("/adminapi/exam/list",{
+            params:{
+                page: params?.page || 1,
+                size: params?.size || 20,
+                // 保留其他可能的查询参数
+                ...params 
+            }
+        });
         if (response.data.code === 200) {
             return response.data;
         }

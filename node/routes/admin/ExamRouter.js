@@ -7,7 +7,6 @@ const upload = multer({ dest: 'public/examcoveruploads/' })
 
 ExamRouter.post('/adminapi/exam/add',upload.single('file'),ExamController.ExamAdd)//添加
 ExamRouter.get('/adminapi/exam/list',ExamController.getexamList)//获取多个考试
-// ExamRouter.get('/adminapi/exam/list/:id',ExamController.getexamList)//获取单个考试
 ExamRouter.post("/adminapi/exam/update",upload.single('file'),ExamController.updateInfo)//更新考试信息
 ExamRouter.post('/adminapi/exam/updateExamStatus',ExamController.updateExamStatus)//更新考试状态
 ExamRouter.post("/adminapi/exam/deloneExam",ExamController.deleteOneExamInfo)//删除单个考试信息
