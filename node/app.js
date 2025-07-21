@@ -8,7 +8,6 @@ const JWT = require('./MiddleWares/jwt');
 var indexRouter = require('./routes/index');
 const UserRouter = require('./routes/admin/UserRouter');
 const NewsRouter = require('./routes/admin/NewsRouter');
-const ProductRouter = require('./routes/admin/ProductRouter') 
 const WebNewsRouter = require('./routes/web/NewsRouter');
 const AdminExamRouter = require('./routes/admin/ExamRouter');
 const WebUserExamRouter = require('./routes/web/ExamRouter');
@@ -74,7 +73,6 @@ app.use((req,res,next)=>{
 })
 app.use(UserRouter);
 app.use(NewsRouter)
-app.use(ProductRouter)
 app.use(AdminExamRouter)
 app.use(AdminLLMRouter)
 

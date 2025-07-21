@@ -3,6 +3,7 @@ import Center from "@/views/Center/Center.vue"
 import Users  from "@/views/Users/Users.vue"    
 import Announcement from "@/views/News/Announcement.vue"
 import NotFound from "@/views/NotFound/NotFound.vue"
+import ExamManage from "@/views/Exam/ExamManage.vue"
 
 const routes= [
     {
@@ -30,6 +31,11 @@ const routes= [
         name:"NotFound",
         component:NotFound
     },
+    {
+        path: '/exam/exammanage',
+        name: 'ExamManage',
+        component: ExamManage,
+    }
 
 ]
 export default routes

@@ -7,7 +7,17 @@ const  UserExamModel = require('../../models/UserExamModel')
 const AianalysisModel = require('../../models/AianalysisModel')
 
 const ExamService ={
-    add:async({name,code,category,year,isPublish,cover,createdTime})=>{
+    ExamAdd:async({
+        name,
+        category,
+        code,
+        year,
+        isPublish,
+        cover,
+        creator,
+        day,
+        createdTime
+    })=>{
         return ExamModel.create({
             name,
             code,
@@ -15,13 +25,15 @@ const ExamService ={
             year,
             isPublish,
             cover,
-            createdTime
+            creator,
+            day,
+            createdTime 
         })
     },
     getexamList:async({_id})=>{
         return _id?ExamModel.find({_id}):ExamModel.find({}).sort({createdTime:-1})
     },
-    updateInfo:async({name,code,category,year,isPublish,createdTime,cover,_id})=>{
+    updateInfo:async({name,code,category,year,isPublish,cover,creator,day,createdTime,_id})=>{
         if(cover){
             return ExamModel.updateOne({_id},{
                 name,
@@ -30,7 +42,10 @@ const ExamService ={
                 year,
                 isPublish,
                 createdTime,
-                cover}) 
+                cover,
+                creator,
+                day
+            }) 
         }else{
             return ExamModel.updateOne({_id},{
                 name,
@@ -41,8 +56,14 @@ const ExamService ={
                 createdTime})
         }
     },
-    deleteInfo:async({_id})=>{
+    updateExamStatus:async({_id,state})=>{
+        return ExamModel.updateOne({_id},{isPublish:state})
+    },
+    deleteOneExamInfo:async({_id})=>{
         return ExamModel.deleteOne({_id})
+    },
+    deleteManyExamInfo:async({_ids})=>{
+        return ExamModel.deleteMany({_id:{$in:_ids}})
     },
     AddSelectQuestion:async({examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type,isMultiple})=>{
         return ExamSelectModel.create({

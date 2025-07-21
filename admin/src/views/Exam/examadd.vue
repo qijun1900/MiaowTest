@@ -217,8 +217,6 @@ const submitForm = ()=>{
         }
     })
 }
-
-
 </script>
 
 <style scoped>

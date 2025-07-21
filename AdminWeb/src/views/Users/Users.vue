@@ -178,11 +178,11 @@
                     </el-table>
                 </div>
                 <div class="pagination">
-                      <Pagination 
-                        :total="total"
-                        v-model:current-page="currentPage"
-                        v-model:page-size="pageSize"
-                        @page-change="handlePageChange"/>
+                    <Pagination 
+                    :total="total"
+                    v-model:current-page="currentPage"
+                    v-model:page-size="pageSize"
+                    @page-change="handlePageChange"/>
                 </div>
             </el-card>
         </div>

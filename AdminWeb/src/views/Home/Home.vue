@@ -112,7 +112,7 @@ const fetchData = async() => {
         }
         
         if(res2.ActionType === "OK"){
-            announcementTotal.value = res2.total  
+            announcementTotal.value = res2.data.total
         } else {
             console.log("获取公告总数失败")
         }

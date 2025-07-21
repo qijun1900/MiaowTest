@@ -1,18 +1,20 @@
 const ExamService = require("../../services/admin/ExamService");
 
 const ExamController ={
-    add:async (req,res) => {
+    ExamAdd:async (req,res) => {
         const cover = req.file?`/examcoveruploads/${req.file.filename}`:""   
-        const {name,code,category,year,isPublish } = req.body
-        // 修复：解析JSON字符串并转换为数字数组
+        const {name,category,code,year,isPublish,creator,day } = req.body
         const parsedCategory = JSON.parse(category).map(Number)
-        await ExamService.add({
+        console.log(name,parsedCategory,code,year,isPublish,cover,creator,day)
+        await ExamService.ExamAdd({
             name,
+            category:parsedCategory,
             code,
-            category: parsedCategory, // 使用转换后的数组
             year,
             isPublish:Number(isPublish),
             cover,
+            creator,
+            day,
             createdTime:new Date()
         })
         res.send({
@@ -23,31 +25,54 @@ const ExamController ={
         const result = await ExamService.getexamList({_id:req.params.id})
         res.send({
             ActionType: "OK",
-            data: result
+            data: result,
+            code:200,
         })   
     },
     updateInfo:async(req,res)=>{
         const cover = req.file?`/examcoveruploads/${req.file.filename}`:""   
-        const {name,code,category,year,isPublish,_id} = req.body
+        const {name,code,category,year,isPublish,creator,day,_id} = req.body
         const parsedCategory = JSON.parse(category).map(Number)
         await ExamService.updateInfo({
             name,
+            category:parsedCategory,
             code,
-            category: parsedCategory, 
             year,
             isPublish:Number(isPublish),
-            createdTime:new Date(),
             cover,
+            creator,
+            day,
+            createdTime:new Date(),
             _id
         })
         res.send({
             ActionType: "OK",
+            code:200,
         })
     },
-    deleteInfo:async(req,res)=>{
-        await ExamService.deleteInfo({_id:req.params.id})
+    updateExamStatus:async(req,res)=>{
+        const {_id,state} = req.body
+        await ExamService.updateExamStatus({_id,state:Number(state)})
         res.send({
             ActionType: "OK",
+            code:200,
+        })
+    },
+    deleteOneExamInfo:async(req,res)=>{
+        const {_id} = req.body
+        await ExamService.deleteOneExamInfo({_id})
+        res.send({
+            ActionType: "OK",
+            code:200,
+        })
+    },
+    deleteManyExamInfo:async(req,res)=>{
+        const {_ids} = req.body
+        console.log(_ids)
+        await ExamService.deleteManyExamInfo({_ids})
+        res.send({
+            ActionType: "OK",
+            code:200,
         })
     },
     AddSelectQuestion:async(req,res)=>{

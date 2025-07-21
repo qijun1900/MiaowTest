@@ -1,10 +1,12 @@
 <template>
   <el-aside :width="appStore.isCollapse ? '64px' : '150px'" style="transition: width 0.3s ease;">
-    <el-menu :collapse="appStore.isCollapse" :router="true" :collapse-transition="true" :default-active="route.fullPath"
+    <el-menu 
+      :collapse="appStore.isCollapse" 
+      :router="true" :collapse-transition="true" 
+      :default-active="route.fullPath"
       style="transition: all 0.3s;">
       <el-menu-item index="/index">
-        <CatIcon/>
-        <span>后台管理系统</span>
+        <span class="title">题喵喵后台管理系统</span>
       </el-menu-item>
 
       <el-menu-item index="/index">
@@ -28,13 +30,6 @@
         <span>用户管理</span>
       </el-menu-item>
 
-      <!-- <el-menu-item index="/news">
-        <el-icon>
-          <MessageBox />
-        </el-icon>
-        <span>用户管理</span>
-      </el-menu-item> -->
-
       <el-sub-menu index="/news-manage">
         <template #title>
           <el-icon>
@@ -43,7 +38,16 @@
           <span>信息管理</span>
         </template>
         <el-menu-item index="/news/announcement">通知公告</el-menu-item>
-        <!-- <el-menu-item index="/news/newslist">信息列表</el-menu-item> -->
+      </el-sub-menu>
+
+      <el-sub-menu index="/Exam-manage">
+        <template #title>
+          <el-icon>
+            <DocumentCopy />
+          </el-icon>
+          <span>考试管理</span>
+        </template>
+        <el-menu-item index="/exam/exammanage">科目管理</el-menu-item>
       </el-sub-menu>
     </el-menu>
   </el-aside>
@@ -51,9 +55,8 @@
 
 <script setup>
 import { useAppStore } from '@/stores/index';
-import { HomeFilled, Avatar, UserFilled, MessageBox } from '@element-plus/icons-vue'
+import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
-import CatIcon from '../icons/CatIcon.vue';
 
 const route = useRoute()
 const appStore = useAppStore()
@@ -71,5 +74,10 @@ const appStore = useAppStore()
       transition: all 0.3s;
     }
   }
+}
+.title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
 }
 </style>

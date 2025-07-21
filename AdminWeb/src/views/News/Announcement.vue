@@ -115,6 +115,7 @@
                         <el-switch
                             v-model="scope.row.isPublish"
                             inline-prompt
+                            size="large"
                             :active-value="1"
                             :inactive-value="0"
                             active-text="已发布"
@@ -198,7 +199,10 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="内容" prop="content">
-                        <Editor @event="handlechange" :height="300" :content="Form.content"/>
+                        <Editor 
+                            @event="handlechange" 
+                            :height="300" 
+                            :content="Form.content"/>
                     </el-form-item>
                     <el-form-item label="封面" prop="cover">
                         <Upload 
@@ -233,7 +237,7 @@ import { useAppStore } from '@/stores';
 import formatTime from '@/util/formatTime'
 import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
 import SearchFilter from '@/components/FunComponents/SearchFilter.vue'
-
+import handleLooked from '@/util/CheckInfo'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/FunComponents/Dialog .vue')
@@ -369,7 +373,8 @@ const handleConfirm = async() => {
         if(isEditMode.value) {
             const res = await postEditAnnouncement(submitData)
             if(res.ActionType === "OK") {
-                ElMessage.success('公告修改成功')
+                ElMessage.success('通知/公告修改成功')
+                resetForm()
             }
         } else {
             const valid = await FormRef.value.validate()
@@ -379,7 +384,8 @@ const handleConfirm = async() => {
             }
             const res = await postAddAnnouncement(submitData)
             if(res.ActionType === "OK") {
-                ElMessage.success('公告添加成功')
+                ElMessage.success('通知/公告添加成功')
+                resetForm()
             }
         }
         await handleRefreshAnData()
@@ -387,7 +393,7 @@ const handleConfirm = async() => {
         ElMessage.error(isEditMode.value ? "公告修改失败" : "公告添加失败")
         console.error(error)
     }
-    resetForm()
+    
 }
 //删除单个
 const handleDeleteOne = async (row) => {
@@ -399,17 +405,7 @@ const handleDeleteMany = async () => {
     await handleDelete(selectedRows.value,PostDeleteManyAnnouncement)
     handleRefreshAnData()
 }
-//点击查看详细信息
-const handleLooked = (content) => {
-    ElMessage({
-        showClose: true,
-        dangerouslyUseHTMLString: true,// 允许使用 HTML 内容
-        message: `信息内容为:${content}`,
-        duration: 5000,
-        type: 'primary',
-        plain: true,
-    })
-}
+
 // 处理发布状态变化
 const handlePublishChange = async (row) => {
     try {
@@ -429,10 +425,9 @@ const handleRefreshAnData = async() => {
             page: currentPage.value,
             size: pageSize.value,  
         },getAnnouncementList)
-        console.log(res)
         if(res.code === 200){
             tableData.value = res.data.data
-            total.value = res.total
+            total.value = res.data.total
         }
     }catch(error){
         ElMessage.error('获取列表失败')

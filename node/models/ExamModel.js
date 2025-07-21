@@ -6,6 +6,8 @@ const ExamSchema  = new mongoose.Schema({
     year:String,
     cover:String,
     isPublish:Number,
+    creator:String,
+    day:Date,
     createdTime:Date,
 })
 const ExamModel  = mongoose.model("exam",ExamSchema)

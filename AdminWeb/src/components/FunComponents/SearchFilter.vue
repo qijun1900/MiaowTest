@@ -69,8 +69,19 @@ const props = defineProps({
                 type: 'select',
                 label: '状态',
                 placeholder: '请选择状态',
-                field: 'selectFilter',  // 存储值的字段名
-                fields: ['status'],  // 实际搜索字段
+                field: 'selectFilter1',  // 存储值的字段名
+                fields: ['status1'],  // 实际搜索字段
+                options: [
+                    { label: '启用', value: 1 },
+                    { label: '禁用', value: 2 }
+                ]
+            },
+            { 
+                type: 'select',
+                label: '状态',
+                placeholder: '请选择状态',
+                field: 'selectFilter2',  // 存储值的字段名
+                fields: ['status2'],  // 实际搜索字段
                 options: [
                     { label: '启用', value: 1 },
                     { label: '禁用', value: 2 }
@@ -87,10 +98,10 @@ const searchFilters = reactive({})
 props.filterConfig.forEach(item => {
     searchFilters[item.field] = ''
 })
-
+//bug,value为0，不能过滤
 // 搜索方法
 const handleSearch = () => {
-    //console.log('当前搜索条件:', searchFilters)
+    // 初始化为原始数据
     let filteredData = [...props.Data];
     
     // 遍历所有过滤条件
@@ -103,7 +114,6 @@ const handleSearch = () => {
             ).value
         }
     });
-    // console.log('过滤后数据:', filteredData)
     emit('onsearch', filteredData)
 };
 

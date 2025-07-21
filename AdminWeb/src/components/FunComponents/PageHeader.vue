@@ -22,7 +22,7 @@ const Title = computed(() => {
       return '个人中心';
     case '/users':
       return '用户管理';
-    case '/news/notice':
+    case '/news/announcement':
       return '通知公告';
     default:
       return '后台管理系统';
