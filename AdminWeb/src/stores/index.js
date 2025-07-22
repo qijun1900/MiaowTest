@@ -5,6 +5,7 @@ export const useAppStore = defineStore('app', () => {
     // 状态定义
     const isCollapse = ref(false);
     const userInfo = ref({});
+    const examInfo = ref({});
     
     //action    
     const actions = {
@@ -17,12 +18,18 @@ export const useAppStore = defineStore('app', () => {
         },
         clearUserInfo() {
             userInfo.value = {};
-        }
+        },
+        changeExamInfo(value) {
+            // 使用 Object.assign 确保响应式更新
+            examInfo.value = Object.assign({}, examInfo.value, value);
+        },
+
     };
 
     return { 
         isCollapse,
         userInfo,
+        examInfo,
         ...actions 
     };
 }, {

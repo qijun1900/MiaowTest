@@ -119,7 +119,7 @@
                                 v-for="value in scope.row.category" 
                                 :key="value"
                                 class="question-tag"
-                                @click="handelquestion(value)">
+                                @click="handleCheckQuestion(scope.row,value)">
                                 <el-icon class="tag-icon"><Histogram /></el-icon>
                                 {{ getCategoryName(value) }}
                             </el-check-tag>
@@ -145,7 +145,7 @@
                         {{ scope.row.creator }}
                     </template>
                 </el-table-column>
-                <el-table-column label="创建时间" width="180">
+                <el-table-column label="更新时间" width="180">
                     <template #default="scope">
                         {{ formatTime.getTime2(scope.row.createdTime) }}
                     </template>
@@ -167,6 +167,12 @@
                                 删除
                             </el-button>
                         </Popconfirm>
+                        <el-button 
+                            type="success" 
+                            plain 
+                            @click="handleEdit(scope.row)">
+                            仪表盘
+                        </el-button>
                         <el-button 
                             type="info" 
                             plain 
@@ -283,6 +289,7 @@ import {
 from '@/API/Exam/subjectAPI'//api
 import getCategoryName from '@/util/formatExamname'
 import handleLooked from '@/util/CheckInfo'
+import RouterPush from '@/util/RouterPush'
 
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
@@ -503,6 +510,18 @@ const handleConfirm =async()=>{
         ElMessage.error(isEditMode.value ? "科目修改失败" : "科目添加失败")
         console.error('提交数据时发生错误:', error)
     }
+}
+//查看每个科目题型,并跳转到对应页面
+const handleCheckQuestion = (data,category) => {
+    console.log(data,category)
+    RouterPush(
+        `/exam/questionlist/${data._id}`,
+        {category} 
+    )
+    appStore.changeExamInfo({
+        ...data,
+        category:category,
+    })
 }
 //获取考试列表+刷新+分页
 const handleRefreshExamData = async()=>{

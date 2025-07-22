@@ -22,3 +22,10 @@ const props = defineProps({
 
 })
 </script>
+<style scoped>
+:deep(.el-divider__text) {
+  font-size: 15px;
+  font-weight: bold;
+  color: #409eff;
+}
+</style>

@@ -4,6 +4,9 @@ import Users  from "@/views/Users/Users.vue"
 import Announcement from "@/views/News/Announcement.vue"
 import NotFound from "@/views/NotFound/NotFound.vue"
 import ExamManage from "@/views/Exam/ExamManage.vue"
+import QuestiontManage from "@/views/Exam/QuestiontManage.vue"
+import QuestionAdd from "@/views/Exam/QuestionAdd.vue"
+
 
 const routes= [
     {
@@ -35,6 +38,16 @@ const routes= [
         path: '/exam/exammanage',
         name: 'ExamManage',
         component: ExamManage,
+    },
+    {
+        path: '/exam/questionlist/:id',
+        name: 'QuestionManage',
+        component: QuestiontManage,
+    },
+    {
+        path: '/exam/questionadd/:id',
+        name: 'QuestionAdd',
+        component: QuestionAdd,
     }
 
 ]
