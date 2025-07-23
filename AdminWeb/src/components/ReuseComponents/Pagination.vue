@@ -5,6 +5,7 @@
     background 
     layout="total, sizes, prev, pager, next, jumper"
     :total="props.total" 
+    :page-sizes="[10,20,30, 50, 100, 200, 500, 1000]"
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
     />

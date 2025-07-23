@@ -98,6 +98,21 @@ const ExamController ={
             ActionType:"OK",
         })
     },
+    getSelectQuestionList:async(req,res)=>{
+        const {page,size,examId,questionType} = req.query
+        const result = await ExamService.getSelectQuestionList({
+            page: Number(page),
+            size: Number(size),
+            examId,
+            questionType:Number(questionType)
+        })
+        res.send({
+            code:200,
+            ActionType: "OK",
+            data: result,
+        })
+    },
+
     AddBlankQuestion:async(req,res)=>{
         const {examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,Type} = req.body
         await ExamService.AddBlankQuestion({
@@ -166,38 +181,37 @@ const ExamController ={
         })
     },
     UpdateOneQuestion:async(req,res)=>{
-        const {_id,isPublish} = req.body
-        const questionType = req.query.questionType
+        const{_id,isPublish,questionType} = req.body
         await ExamService.UpdateOneQuestion({
             _id,
             isPublish:Number(isPublish),
             questionType
         })
-            
         res.send({
             code:200,
             ActionType:"OK",
         })
     },
     UpdateBatchQuestion:async(req,res)=>{
-        const {ids,isPublish} = req.body
-        const questionType = Number(req.query.questionType)
-        await ExamService.UpdateBatchQuestion({
-            ids,
-            isPublish:Number(isPublish),
-            questionType,
-        })
+        const {Ids,questionType} = req.body;
+        console.log("ss",Ids,questionType)
+        await ExamService.UpdateBatchQuestion({Ids,questionType})
         res.send({
             code:200,
             ActionType:"OK",
         })
     },
-    DeleteQuestion:async(req,res)=>{
-        const questionType = Number(req.query.questionType)
-        await ExamService.DeleteQuestion({
-            _id: req.params.id,
-            questionType
+    DeleteOneQuestion:async(req,res)=>{
+        const {_id,questionType} = req.body
+        await ExamService.DeleteOneQuestion({_id,questionType})
+        res.send({
+            code:200,
+            ActionType:"OK",
         })
+    },
+    DeleteManyQuestion:async(req,res)=>{
+        const {Ids,questionType} = req.body
+        await ExamService.DeleteManyQuestion({Ids,questionType})
         res.send({
             code:200,
             ActionType:"OK",
@@ -215,17 +229,17 @@ const ExamController ={
         })
     },
     UpdateSelectQuestion:async(req,res)=>{
-        const _id = req.params.id
-        const {stem,options,isPublish,analysis,isAIanswer} = req.body
+        const {_id} = req.query
+        const {stem,options,isPublish,analysis,isAIanswer,isMultiple} = req.body
         await ExamService.UpdateSelectQuestion({
-            _id,
-            stem,
-            options,
-            isPublish:Number(isPublish),
-            analysis,
-            isAIanswer:Number(isAIanswer),
-            createdTime:new Date(),
-        }) 
+           _id,
+           stem,
+           options,
+           isPublish:Number(isPublish),
+           analysis,
+           isAIanswer:Number(isAIanswer),
+           isMultiple:Number(isMultiple),
+        })
         res.send({
             code:200,
             ActionType:"OK", 

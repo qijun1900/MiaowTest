@@ -313,7 +313,7 @@ const options = [
 ]
 //表格分页器
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const total = ref(0)
 //editor内容改变的回调
 const handlechange = (data) => {

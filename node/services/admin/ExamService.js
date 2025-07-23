@@ -88,6 +88,23 @@ const ExamService ={
             createdTime
         })
     },
+    getSelectQuestionList:async({page,size,examId,questionType})=>{
+        const skip = (page - 1) * size;
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        const model = modelMap[questionType];
+        const [data, total] = await Promise.all([
+            model.find({examId})
+                .skip(skip)
+                .limit(size),
+            model.countDocuments({examId})
+        ]);
+        return { data, total };
+    },
     AddBlankQuestion :async({examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,createdTime,Type})=>{
         return ExamBlankModel.create({
             examId,
@@ -152,16 +169,19 @@ const ExamService ={
         }; 
         return modelMap[questionType]?.updateOne({_id},{isPublish}) || null;
     },
-    UpdateBatchQuestion:async({ids,isPublish,questionType})=>{
+    UpdateBatchQuestion:async({Ids,questionType})=>{
         const modelMap = {
             1: ExamSelectModel,
             2: ExamBlankModel,
             3: ExamJudgeModel,
             4: ExamShortModel
         };
-        return modelMap[questionType]?.updateMany({_id: {$in: ids}},{isPublish}) || null;
+        return modelMap[questionType]?.updateMany(
+            {_id: {$in: Ids}},
+            { $bit: { isPublish: { xor: 1 } } }  // 使用位运算翻转布尔值
+        ) || null;
     },
-    DeleteQuestion:async({_id,questionType})=>{
+    DeleteOneQuestion:async({_id,questionType})=>{
         const modelMap = {
             1: ExamSelectModel,
             2: ExamBlankModel,
@@ -169,6 +189,15 @@ const ExamService ={
             4: ExamShortModel
         };
         return modelMap[questionType]?.deleteOne({_id}) || null;
+    },
+    DeleteManyQuestion:async({Ids,questionType})=>{
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        return modelMap[questionType]?.deleteMany({_id:{$in:Ids}}        ) || null;
     },
     getQuestionInfo:async({_id,questionType})=>{
         const modelMap = {
@@ -179,7 +208,7 @@ const ExamService ={
         }; 
         return modelMap[questionType]?.find({_id}) || null;
     },
-    UpdateSelectQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,createdTime})=>{
+    UpdateSelectQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,isMultiple})=>{
        // 等待更新操作完成
         const updateResult = await ExamSelectModel.updateOne({_id},{
             stem,
@@ -187,7 +216,7 @@ const ExamService ={
             isPublish, 
             analysis,
             isAIanswer,
-            createdTime
+            isMultiple
         });
 
         // 执行删除操作

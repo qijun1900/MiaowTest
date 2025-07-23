@@ -20,7 +20,7 @@
                         label: '科目代码',
                         placeholder: '请输入科目代码',
                         field: 'codeSearch',  
-                        fields: ['code']
+                        fields: ['_id']// 要搜索的字段,csID
                     },
                     {
                         type: 'select',
@@ -310,7 +310,7 @@ const isEditMode = ref(false)
 const currentEditId = ref(null)
 //表格分页器
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const total = ref(0)
 // UI 状态与方法管理
 const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTableState()
@@ -513,7 +513,6 @@ const handleConfirm =async()=>{
 }
 //查看每个科目题型,并跳转到对应页面
 const handleCheckQuestion = (data,category) => {
-    console.log(data,category)
     RouterPush(
         `/exam/questionlist/${data._id}`,
         {category} 

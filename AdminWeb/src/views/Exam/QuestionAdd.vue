@@ -1,6 +1,6 @@
 <template>
     <div>
-        <component :is="currentComponent" :ExamID="ExamID" />
+      <component :is="currentComponent"  />
     </div>
 </template>
 <script setup>
@@ -12,11 +12,12 @@ import Blank from '@/components/Exam/Blank.vue';//2
 import Judge from '@/components/Exam/Judge.vue';//3
 import Short from '@/components/Exam/Short.vue';//4
 
+
 const appStore = useAppStore();
 const route = useRoute();
 
-const ExamID = route.params.id;
-const QuestionType = appStore.examInfo.category
+const ExamID = route.params.id;// 科目ID
+const QuestionType = appStore.examInfo.category// 题目类型
 
 
 // 根据题目类型返回对应编辑组件

@@ -36,7 +36,8 @@ export function useTableActions() {
         try{
            const res  =  await API({
             page: params.page || 1,
-            size: params.size || 20
+            size: params.size || 20,
+            ...params
            })
            if(res.ActionType=== 'OK'){
             ElMessage.success('表格刷新成功')
@@ -48,4 +49,4 @@ export function useTableActions() {
         }
     }
     return { selectedRows, handleSelectionChange, handleDelete,handleRefresh }
-}
+}``

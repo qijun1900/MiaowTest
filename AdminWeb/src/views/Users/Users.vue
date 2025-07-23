@@ -339,7 +339,7 @@ const userFormrules = reactive({
 })
 //表格相关，分页器
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const total = ref(0)
 
 //头像上传
