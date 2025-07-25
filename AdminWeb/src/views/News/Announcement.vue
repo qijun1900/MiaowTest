@@ -226,12 +226,12 @@ import { ref, defineAsyncComponent, reactive,onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import Editor from '@/components/FunComponents/Editor.vue'
 import {
-        postAddAnnouncement,
-        getAnnouncementList,
-        PostDeleteManyAnnouncement,
-        PostDeleteOneAnnouncement,
-        updateAnnouncementPublishStatus,
-        postEditAnnouncement
+    postAddAnnouncement,
+    getAnnouncementList,
+    PostDeleteManyAnnouncement,
+    PostDeleteOneAnnouncement,
+    updateAnnouncementPublishStatus,
+    postEditAnnouncement
     } from '@/API/News/announcementAPI'//APi
 import { useAppStore } from '@/stores';
 import formatTime from '@/util/formatTime'

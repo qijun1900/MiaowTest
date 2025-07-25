@@ -167,6 +167,9 @@
                                 {{ scope.row.answer === 1 ? '正确' : '错误' }}
                             </el-tag>
                         </template>
+                        <template v-else-if="QuestionType===4">
+                            <el-tag type="info" @click="handleLooked(scope.row.content)">查看答案</el-tag>
+                        </template>
                     </template>
                 </el-table-column>
                 <el-table-column label="是否为AI答案" width="150">
@@ -218,7 +221,7 @@
                         <el-button 
                             type="success" 
                             plain 
-                            @click="handleMore(scope.row)">
+                            @click="handlePreview(scope.row)">
                             预览
                         </el-button>
                         <el-button 
@@ -248,10 +251,13 @@
             <template #dialogcontent>
                 <component 
                 :is="currentComponent" 
-                :Data="EditQuestionData" 
+                :Data="QuestionData" 
                 :isEdit="isEditMode"/>
             </template>
         </Dialog>
+        <QuestionPreview
+            v-model="PreviewdialogVisible"
+            :Data="QuestionData"/>
     </div>
 </template>
 <script setup>
@@ -273,16 +279,20 @@ import Judge from '@/components/Exam/Judge.vue';//3
 import Short from '@/components/Exam/Short.vue';//4
 import { ElMessage } from 'element-plus';
 import { formatSelectAnswer,isAianswer } from '@/util/formatAnswer';
-import { 
+import {
     getQuestionList,
     UpdateOneQuestion,
     UpdateManyQuestion,
     DeleteOneQuestion,
     DeleteManyQuestion
     } from '@/API/Question/QuestionPublicAPI';
+import handleLooked from '@/util/CheckInfo'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/FunComponents/Dialog .vue')
+)
+const QuestionPreview = defineAsyncComponent(() =>
+    import('@/components/Exam/QuestionPreview.vue')
 )
 
 //UI 状态与方法管理
@@ -304,8 +314,10 @@ const QuestionType = appStore.examInfo.category;
 const dialogVisible = ref(false)
 // 添加编辑状态
 const isEditMode = ref(false)
-// 单个题目数据
-const EditQuestionData = ref(null)
+// 单个题目数据,用来预览和编辑题目
+const QuestionData = ref(null)
+//预览对话框
+const PreviewdialogVisible = ref(false)
 
 //删除单个
 const handleDeleteOne = async (row) => {
@@ -392,7 +404,7 @@ const handlePublishMany = async () => {
 const handleEdit = (row) => {
     dialogVisible.value = true
     isEditMode.value = true
-    EditQuestionData.value = row
+    QuestionData.value = row
 }
 //获取考试列表+刷新+分页
 const handleRefreshQuestionData = async () => {
@@ -411,6 +423,12 @@ const handleRefreshQuestionData = async () => {
     }catch(error){
         console.error('获取题目列表失败:',error)
     }
+}
+//预览
+const handlePreview = (row) => {
+    console.log("row", row)
+  PreviewdialogVisible.value = true
+  QuestionData.value = row
 }
 
 onMounted(()=>{

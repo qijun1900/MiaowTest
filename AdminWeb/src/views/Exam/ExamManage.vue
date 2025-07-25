@@ -265,6 +265,7 @@
             </el-form>
         </template>
     </Dialog>
+    
 </template>
 <script setup>
 import SearchFilter from '@/components/FunComponents/SearchFilter.vue'
@@ -298,7 +299,6 @@ const Dialog = defineAsyncComponent(() =>
 const Upload = defineAsyncComponent(() =>
     import('@/components/upload/Upload.vue')
 )
-
 //pinia
 const appStore = useAppStore()
 //tableData数据
@@ -312,6 +312,7 @@ const currentEditId = ref(null)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+
 // UI 状态与方法管理
 const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTableState()
 // 表格数据与方法管理

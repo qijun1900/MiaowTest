@@ -132,7 +132,12 @@
         </el-table-column>
       </el-table>
     </el-card>
-    <el-dialog v-model="dialogVisible" :modal="false" width="60%" title="题目预览" class="preview-dialog">
+    <el-dialog 
+      v-model="dialogVisible" 
+      :modal="false" 
+      width="60%" 
+      title="题目预览"
+      class="preview-dialog">
       <div v-if="previewData" class="preview-content">
         <el-divider content-position="left"><span class="divider-title">题目题干</span></el-divider>
         <h3 class="question-stem">{{ previewData.stem }}</h3>
