@@ -5,18 +5,17 @@ const multer  = require('multer')
 const upload = multer({ dest: 'public/examcoveruploads/' })
 
 
-ExamRouter.post('/adminapi/exam/add',upload.single('file'),ExamController.ExamAdd)//添加
-ExamRouter.get('/adminapi/exam/list',ExamController.getexamList)//获取多个考试
-ExamRouter.post("/adminapi/exam/update",upload.single('file'),ExamController.updateInfo)//更新考试信息
-ExamRouter.post('/adminapi/exam/updateExamStatus',ExamController.updateExamStatus)//更新考试状态
-ExamRouter.post("/adminapi/exam/deloneExam",ExamController.deleteOneExamInfo)//删除单个考试信息
-ExamRouter.post("/adminapi/exam/delmanyExam",ExamController.deleteManyExamInfo)//删除多个考试信息
+ExamRouter.post('/adminapi/exam/add',upload.single('file'),ExamController.ExamAdd)//添加考试科目
+ExamRouter.get('/adminapi/exam/list',ExamController.getexamList)//获取多个考试科目
+ExamRouter.post("/adminapi/exam/update",upload.single('file'),ExamController.updateInfo)//更新考试科目信息
+ExamRouter.post('/adminapi/exam/updateExamStatus',ExamController.updateExamStatus)//更新考试科目状态
+ExamRouter.post("/adminapi/exam/deloneExam",ExamController.deleteOneExamInfo)//删除单个考试科目信息
+ExamRouter.post("/adminapi/exam/delmanyExam",ExamController.deleteManyExamInfo)//删除多个考试科目信息
+ExamRouter.get("/adminapi/exam/get/questionList",ExamController.getSelectQuestionList)//获取不同类型的题目列表
 ExamRouter.post("/adminapi/exam/add/selectquestion",ExamController.AddSelectQuestion)//添加选择题
-ExamRouter.get("/adminapi/exam/get/selectquestion",ExamController.getSelectQuestionList)//获取选择题列表
-ExamRouter.post("/adminapi/exam/blankquestion",ExamController.AddBlankQuestion)//添加填空题
-ExamRouter.post("/adminapi/exam/judgequestion",ExamController.AddJudgeQuestion)//添加判断题
-ExamRouter.post("/adminapi/exam/shortquestion",ExamController.AddShortQuestionList)//添加简答题
-ExamRouter.get("/adminapi/exam/questionlist/:id",ExamController.getQuestionList)//获取不同类型的所有题目列表
+ExamRouter.post("/adminapi/exam/add/blankquestion",ExamController.AddBlankQuestion)//添加填空题
+ExamRouter.post("/adminapi/exam/add/judgequestion",ExamController.AddJudgeQuestion)//添加判断题
+ExamRouter.post("/adminapi/exam/add/shortquestion",ExamController.AddShortQuestionList)//添加简答题
 ExamRouter.post("/adminapi/exam/update/PublishQuestionstate",ExamController.UpdateOneQuestion)//更新单条发布状态
 ExamRouter.post("/adminapi/exam/update/ManyPublishQuestionstate",ExamController.UpdateBatchQuestion)//更新多条发布状态
 ExamRouter.post("/adminapi/exam/question/deleteOneQuestion",ExamController.DeleteOneQuestion)//删除单个题目

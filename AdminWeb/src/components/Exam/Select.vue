@@ -52,6 +52,7 @@ import { ElMessage } from 'element-plus';
 import { useRoute } from 'vue-router';
 import selectAPI from '@/API/Question/SelectAPI';
 
+
 const route = useRoute();
 const formRef = ref();
 const form = reactive({
@@ -154,15 +155,14 @@ const submitForm = async () => {
             if (valid) {
                 const response = await selectAPI.postAddSelect(form)
                 if (response.code === 200) {
-                    ElMessage.success("添加题目成功")
+                    ElMessage.success("选择题添加题目成功")
                     resetForm()
                 }
                 else {
-                    ElMessage.error("添加题目失败")
+                    ElMessage.error("选择题添加题目失败")
                 }
             }
         }
-
     } catch (error) {
         console.error("添加题目失败", error)
     }

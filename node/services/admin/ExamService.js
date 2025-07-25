@@ -144,22 +144,6 @@ const ExamService ={
             createdTime
         }) 
     },
-    getQuestionList:async({examId,questionType,isPublish,isAddUserList})=>{
-        const modelMap = {
-            1: ExamSelectModel,
-            2: ExamBlankModel,
-            3: ExamJudgeModel,
-            4: ExamShortModel
-        };
-        if(isPublish){
-            return modelMap[questionType]?.find({examId,isPublish}) || null;
-        }else if(isAddUserList){
-            return modelMap[questionType]?.find({examId,isAddUserList}) || null; 
-        }
-        else{
-            return modelMap[questionType]?.find({examId}) || null;
-        }
-    },
     UpdateOneQuestion:async({_id,isPublish,questionType})=>{
         const modelMap = {
             1: ExamSelectModel,
@@ -208,7 +192,7 @@ const ExamService ={
         }; 
         return modelMap[questionType]?.find({_id}) || null;
     },
-    UpdateSelectQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,isMultiple})=>{
+    UpdateSelectQuestion:async({_id,stem,options,isPublish,analysis,isAIanswer,isMultiple,createdTime})=>{
        // 等待更新操作完成
         const updateResult = await ExamSelectModel.updateOne({_id},{
             stem,
@@ -216,7 +200,8 @@ const ExamService ={
             isPublish, 
             analysis,
             isAIanswer,
-            isMultiple
+            isMultiple,
+            createdTime
         });
 
         // 执行删除操作

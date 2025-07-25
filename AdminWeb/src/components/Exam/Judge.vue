@@ -58,6 +58,9 @@ import { useRoute } from 'vue-router';
 import Divider from '../ReuseComponents/Divider.vue';
 import Editor from '../FunComponents/Editor.vue';
 import { ElMessage } from 'element-plus';
+import { judgeAPI } from '@/API/Question/JudgeAPI';
+import { Checked } from '@element-plus/icons-vue';
+
 
 const route = useRoute();
 const formRef = ref();
@@ -78,13 +81,28 @@ const handlechangeStem = (data) => {
 const handlechangeAnalysis = (data) => {
     form.analysis = data
 }
+//重置表单
+const resetForm = () => {
+    form.stem = '';
+    form.answer = null;
+    form.analysis = '';
+    form.isAIanswer = 0;
+    form.isAddUserList = 0;
+}
 
 
 const submitForm = async () => {
     try {
         const valid = await formRef.value.validate()
-        if (!valid) return;
-        console.log(form)
+        if(valid){
+            const res = await judgeAPI.postAddJudge(form)
+            if(res.code === 200){
+                ElMessage.success('判断题添加成功')
+                resetForm()
+            }else{
+                ElMessage.error('判断题添加失败')
+            }
+        }
     }catch (error) {
         ElMessage.error('表单验证失败')
         console.error('表单验证失败:', error)

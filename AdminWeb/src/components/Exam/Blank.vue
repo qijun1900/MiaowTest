@@ -80,7 +80,8 @@ import {  Delete } from '@element-plus/icons-vue';
 import {  reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-
+import { blankAPI } from '@/API/Question/BlankAPI';
+import { Checked } from '@element-plus/icons-vue';
 
 const route = useRoute();
 const formRef = ref();
@@ -113,23 +114,34 @@ const removeOption = (index) => {
       form.options.splice(index, 1);
     }
 };
+//重置表单
+const resetForm = () => {
+    form.stem = '';
+    form.options=[
+        { content:"" },
+    ];
+    form.isPublish = 0;
+    form.analysis = '';
+    form.isAIanswer = 0;
+    form.isAddUserList = 0;
+    form.Type = 2;
+}
 const submitForm = async () => {
     try {
       const valid = await formRef.value.validate()
-      if(!valid) return;
-
-      
-      console.log(form)
+      if (valid) {
+        const response = await blankAPI.postAddBlank(form)
+        console.log(response)
+        if(response.code === 200){
+          ElMessage.success("填空题添加题目成功")
+          resetForm()
+        }else{
+          ElMessage.error("填空题添加题目失败")
+        }
+      }  
     }catch (error) {
         ElMessage.error('表单验证失败')
       console.error('添加题目失败：', error);
     }
 }
-
-
-
-
-
-
-
 </script>

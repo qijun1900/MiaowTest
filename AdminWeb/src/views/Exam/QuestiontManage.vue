@@ -89,7 +89,7 @@
                                         plain 
                                         @click="handlePublishMany"
                                         :disabled="!selectedRows || selectedRows.length === 0">
-                                        批量发布
+                                        批量改变状态
                                     </el-button>
                                     <Popconfirm
                                         title="您确定删除吗？"
@@ -153,8 +153,19 @@
                 </el-table-column>
                 <el-table-column label="题目答案" width="180">
                     <template #default="scope">
-                        <template v-if="QuestionType == 1">
+                        <template v-if="QuestionType === 1">
                             <el-tag type="success">{{ formatSelectAnswer(scope.row.options) }}</el-tag>
+                        </template>
+                        <template v-else-if="QuestionType === 2">
+                            <div  v-for="(option, index) in scope.row.options" :key="index">
+                                <el-tag class="blank-tag">空{{ index + 1 }}</el-tag>
+                                <span class="blank-content">{{ option.content }}</span>
+                            </div>
+                        </template>
+                        <template v-else-if="QuestionType ===3 ">
+                           <el-tag :type="scope.row.answer == 1 ? 'success' : 'danger'">
+                                {{ scope.row.answer === 1 ? '正确' : '错误' }}
+                            </el-tag>
                         </template>
                     </template>
                 </el-table-column>
@@ -260,10 +271,15 @@ import Select from '@/components/Exam/Select.vue';//1
 import Blank from '@/components/Exam/Blank.vue';//2
 import Judge from '@/components/Exam/Judge.vue';//3
 import Short from '@/components/Exam/Short.vue';//4
-import selectAPI from '@/API/Question/SelectAPI';
 import { ElMessage } from 'element-plus';
 import { formatSelectAnswer,isAianswer } from '@/util/formatAnswer';
-import { UpdateOneQuestion ,UpdateManyQuestion,DeleteOneQuestion,DeleteManyQuestion} from '@/API/Question/QuestionPublicAPI';
+import { 
+    getQuestionList,
+    UpdateOneQuestion,
+    UpdateManyQuestion,
+    DeleteOneQuestion,
+    DeleteManyQuestion
+    } from '@/API/Question/QuestionPublicAPI';
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/FunComponents/Dialog .vue')
@@ -347,7 +363,6 @@ const handlePageChange = ({ page, size }) => {
 }
 //发布状态改变
 const handlePublishChange = async (row) => {
-    console.log("row", row)
     try{
         const res = await UpdateOneQuestion({
             _id: row._id,
@@ -387,7 +402,7 @@ const handleRefreshQuestionData = async () => {
             page: currentPage.value,
             size: pageSize.value,
             questionType: QuestionType,
-        },selectAPI.getSelectList)
+        },getQuestionList)
         console.log("data", res.data.data)
         if(res.code===200){
             tableData.value = res.data.data

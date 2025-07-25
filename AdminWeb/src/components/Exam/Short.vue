@@ -43,7 +43,10 @@
                     :content="form.analysis"/>
           </el-form-item>
           <el-form-item>
-              <el-checkbox v-model="form.isAIanswer" :true-value="1" :false-value="0">
+              <el-checkbox 
+                v-model="form.isAIanswer" 
+                :true-value="1" 
+                :false-value="0">
               是否由AI生成的解析
               </el-checkbox>
           </el-form-item>
@@ -59,6 +62,8 @@ import {reactive, ref} from "vue";
 import Divider from '../ReuseComponents/Divider.vue';
 import Editor from '../FunComponents/Editor.vue';
 import { ElMessage } from 'element-plus';
+import { shortAPI } from '@/API/Question/ShortAPI';
+import { Checked } from '@element-plus/icons-vue';
 
 
 const route = useRoute();
@@ -83,19 +88,32 @@ const handlechangeContent = (data) => {
 const handlechangeAnalysis = (data) => {
     form.analysis = data
 }
+//重置表单
+const resetForm = () => {
+    form.stem = '';
+    form.content = '';
+    form.isPublish = 0;
+    form.analysis = '';
+    form.isAIanswer = 0;
+    form.isAddUserList = 0;
+    form.Type = 4;
+};
 //提交表单
 const submitForm = async () => {
     try{
         const valid = await formRef.value.validate()
-        if(!valid) return
-        console.log(form)
-
-
+        if(valid){
+            const res = await shortAPI.postAddShort(form)
+            if(res.code === 200){
+                ElMessage.success('提交成功');
+                resetForm();
+            }else{
+                ElMessage.error('提交失败，请稍后重试');
+            }
+        }
     }catch(error){
         console.error(error);
         ElMessage.error('提交失败，请稍后重试');
     }
 };
-
-
 </script>

@@ -112,7 +112,6 @@ const ExamController ={
             data: result,
         })
     },
-
     AddBlankQuestion:async(req,res)=>{
         const {examId,stem,options,isPublish,analysis,isAIanswer,isAddUserList,Type} = req.body
         await ExamService.AddBlankQuestion({
@@ -165,19 +164,6 @@ const ExamController ={
         res.send({
             code:200,
             ActionType:"OK", 
-        })
-    },
-    getQuestionList:async(req,res)=>{
-        const result = await ExamService.getQuestionList({
-            examId:req.params.id,
-            questionType:req.query.questionType,
-            isPublish:req.query.isPublish,
-            isAddUserList:req.query.isAddUserList
-        })
-        res.send({
-            code:200,
-            ActionType: "OK",
-            data: result
         })
     },
     UpdateOneQuestion:async(req,res)=>{
@@ -239,6 +225,7 @@ const ExamController ={
            analysis,
            isAIanswer:Number(isAIanswer),
            isMultiple:Number(isMultiple),
+           createdTime:new Date()
         })
         res.send({
             code:200,

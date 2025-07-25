@@ -4,21 +4,15 @@
     </div>
 </template>
 <script setup>
-import { useRoute } from 'vue-router';
-import { onMounted,computed } from 'vue';
+import { computed } from 'vue';
 import { useAppStore } from '@/stores';
 import Select from '@/components/Exam/Select.vue';//1
 import Blank from '@/components/Exam/Blank.vue';//2
 import Judge from '@/components/Exam/Judge.vue';//3
 import Short from '@/components/Exam/Short.vue';//4
 
-
 const appStore = useAppStore();
-const route = useRoute();
-
-const ExamID = route.params.id;// 科目ID
 const QuestionType = appStore.examInfo.category// 题目类型
-
 
 // 根据题目类型返回对应编辑组件
 const currentComponent = computed(() => {
@@ -32,9 +26,5 @@ const currentComponent = computed(() => {
 }) 
 
 
-onMounted(()=>{
-    console.log(ExamID)
-    console.log(QuestionType)
-})
 
 </script>
