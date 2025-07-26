@@ -4,9 +4,11 @@ const llmSchema  = new mongoose.Schema({
     modelName:String,
     modelValue:String,
     isPublish:Number,//0:未发布，1：发布
-    editTime:Date,
+    description:String,//描述
+    creator:String,//创建人
+    createdTime:Date,
 })
 
-const LLMModel    = mongoose.model("llm",llmSchema )
+const LLMModel  = mongoose.model("llm",llmSchema )
 
 module.exports = LLMModel

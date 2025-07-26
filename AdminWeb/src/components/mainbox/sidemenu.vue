@@ -49,13 +49,21 @@
         </template>
         <el-menu-item index="/exam/exammanage">科目管理</el-menu-item>
       </el-sub-menu>
+
+      <el-sub-menu index="/Model-manage">
+        <template #title>
+          <el-icon><Cpu /></el-icon>
+          <span>模型管理</span>
+        </template>
+        <el-menu-item index="/model/modelmanage">模型管理</el-menu-item>
+      </el-sub-menu>
     </el-menu>
   </el-aside>
 </template>
 
 <script setup>
 import { useAppStore } from '@/stores/index';
-import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy } from '@element-plus/icons-vue'
+import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy,Cpu } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
 
 const route = useRoute()

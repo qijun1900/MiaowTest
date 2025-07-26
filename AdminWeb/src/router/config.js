@@ -6,6 +6,7 @@ import NotFound from "@/views/NotFound/NotFound.vue"
 import ExamManage from "@/views/Exam/ExamManage.vue"
 import QuestiontManage from "@/views/Exam/QuestiontManage.vue"
 import QuestionAdd from "@/views/Exam/QuestionAdd.vue"
+import ModelManage from "@/views/LLM/ModelManage.vue"
 
 
 const routes= [
@@ -48,6 +49,11 @@ const routes= [
         path: '/exam/questionadd/:id',
         name: 'QuestionAdd',
         component: QuestionAdd,
+    },
+    {
+        path: '/model/modelmanage',
+        name: 'ModelManage',
+        component: ModelManage,
     }
 
 ]

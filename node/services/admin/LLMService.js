@@ -1,24 +1,38 @@
 const LLMModel = require("../../models/LLMsModel");
 const LLMService = {
-    addmodel: async ({modelName,modelValue,isPublish,editTime}) => {
+    addmodel: async ({modelName,modelValue,isPublish,description,creator,createdTime}) => {
         return await LLMModel.create({
             modelName,
             modelValue,
             isPublish,
-            editTime
+            description,
+            creator,
+            createdTime
         })
     },
-    getmodel: async () => {
-        return await LLMModel.find({})
+    getmodel: async ({page,size}) => {
+        // 分页查询
+        const skip = (page - 1) * size
+        const [data, total] = await Promise.all([
+            LLMModel.find({})
+                .skip(skip)
+                .limit(size),
+            LLMModel.countDocuments({})
+        ])
+        return { data, total };
     },
-    updatempdelinfo: async ({modelName,modelValue,_id}) => {
-        return await LLMModel.updateOne({_id},{modelName,modelValue})
+    updateModel: async ({_id, modelName, modelValue,description,creator,editTime}) => {
+        return await LLMModel.updateOne({_id},{modelName,modelValue,description,creator,editTime})
     },
-    deletemodel: async ({_id}) => {
-        return await LLMModel.deleteOne({_id})
+    deleteOnemodel: async ({modelName,modelValue,_id}) => {
+        return await LLMModel.deleteOne({_id},{modelName,modelValue})
     },
-    changestatus: async ({_id,isPublish,editTime}) => {
-        return await LLMModel.updateOne({_id},{isPublish,editTime})
+    deleteManymodel: async ({_ids}) => {
+        return await LLMModel.deleteMany({_id:{$in:_ids}})
+    },
+    changestatus: async ({_id,state}) => {
+        return await LLMModel.updateOne({_id},{isPublish:state})
+       
     }
     
 

@@ -265,7 +265,6 @@
             </el-form>
         </template>
     </Dialog>
-    
 </template>
 <script setup>
 import SearchFilter from '@/components/FunComponents/SearchFilter.vue'
@@ -410,7 +409,6 @@ const handleAdd = ()=>{
 }
 //按下搜索按钮
 const handleOnSearch = (data) => {
-    console.log('过滤结果:', data); // 查看过滤结果
     if (data.length === 0) {
         ElMessage.error('未搜索到该信息')
     } else {
@@ -484,9 +482,7 @@ const handleConfirm =async()=>{
             category: JSON.stringify(subjectForm.category) ,// 序列化数组
             _id: currentEditId.value }
         if(isEditMode.value){
-            console.log(submitData)
             const res = await postUpdateExam(submitData)
-            console.log(res)
             if(res.ActionType==="OK"){
                 ElMessage.success("科目修改成功")
                 handleRefreshExamData()

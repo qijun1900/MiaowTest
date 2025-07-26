@@ -63,6 +63,8 @@ const Title = computed(() => {
       return '题目列表';
     case (route.path.match(/^\/exam\/questionadd\//) ? route.path : ''):
       return '添加题目';
+    case '/model/modelmanage':
+      return '模型管理';
     default:
       return '后台管理系统';
   }

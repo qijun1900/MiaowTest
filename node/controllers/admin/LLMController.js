@@ -2,49 +2,72 @@ const LLMService = require("../../services/admin/LLMService");
 
 const LLMController = {
     addmodel: async (req, res) => {
-        const { modelName, modelValue ,isPublish} = req.body;
+        const { modelName, modelValue,description,isPublish,creator} = req.body;
         await LLMService.addmodel({ 
             modelName, 
             modelValue,
             isPublish,
-            editTime:new Date()
+            creator,
+            description,
+            createdTime:new Date()
          })
         res.send({
             code: 200,
-            mActionType: "OK", 
+            ActionType: "OK", 
         })
         
     },
     getmodellist: async (req, res) => {
-        const result = await LLMService.getmodel()
+        const { page, size } = req.query;
+        console.log(page, size);
+        const result = await LLMService.getmodel({
+            page: Number(page),
+            size: Number(size)
+        })
         res.send({
             code: 200,
-            mActionType: "OK",
+            ActionType: "OK",
             data: result
         })
     },
-    updatempdelinfo: async (req, res) => {
-        const { modelName, modelValue,_id} = req.body;
-        await LLMService.updatempdelinfo({ modelName, modelValue,_id })
+    updateModel: async (req, res) => {
+        const {_id, modelName, modelValue,description,creator} = req.body;
+        await LLMService.updateModel({
+            _id,
+            modelName,
+            modelValue,
+            creator,
+            description,
+            editTime:new Date()
+        })
         res.send({
             code: 200,
-            mActionType: "OK",
+            ActionType: "OK",
         })
     },
-    deletemodel: async (req, res) => {
-        const {id} = req.params;
-        await LLMService.deletemodel({_id:id})
+    deleteOnemodel: async (req, res) => {
+        const {_id} = req.body
+        console.log(_id)
+        await LLMService.deleteOnemodel({_id})
         res.send({
             code: 200,
-            mActionType: "OK", 
+            ActionType: "OK", 
+        })
+    },
+    deleteManymodel: async (req, res) => {
+        const {_ids} = req.body;
+        await LLMService.deleteManymodel({_ids})
+        res.send({
+            code: 200,
+            ActionType: "OK",
         })
     },
     changestatus: async (req, res) => {
-        const {_id,isPublish} = req.body;
-        await LLMService.changestatus({_id,isPublish})
+        const {_id,state} = req.body;
+        await LLMService.changestatus({_id,state})
         res.send({
             code: 200,
-            mActionType: "OK",
+            ActionType: "OK",
         })
     }
 }
