@@ -22,9 +22,9 @@ ExamRouter.post("/adminapi/exam/question/deleteOneQuestion",ExamController.Delet
 ExamRouter.post("/adminapi/exam/question/deleteManyQuestion",ExamController.DeleteManyQuestion)//删除多个题目
 ExamRouter.get("/adminapi/exam/whichOneQuestion/:id",ExamController.getQuestionInfo)//获取单一题目详细信息
 ExamRouter.post("/adminapi/exam/update/selectquestion",ExamController.UpdateSelectQuestion)//更新单条选择题
-ExamRouter.post("/adminapi/exam/blankquestionUpdate/:id",ExamController.UpdateBlankQuestion)//更新单条填空题
-ExamRouter.post("/adminapi/exam/judgequestionUpdate/:id",ExamController.UpdateJudgeQuestion)//更新单条判断题
-ExamRouter.post("/adminapi/exam/shortquestionUpdate/:id",ExamController.UpdateShortQuestionList)//更新单条简答题
+ExamRouter.post("/adminapi/exam/update/blankquestion",ExamController.UpdateBlankQuestion)//更新单条填空题
+ExamRouter.post("/adminapi/exam/update/judgequestion",ExamController.UpdateJudgeQuestion)//更新单条判断题
+ExamRouter.post("/adminapi/exam/update/shortquestion",ExamController.UpdateShortQuestionList)//更新单条简答题
 ExamRouter.post("/adminapi/exam/updateExamStatus",ExamController.UpdateExamStatus)//更新考试状态
 ExamRouter.post("/adminapi/exam/AddUserExamInfo",ExamController.AddUserExamInfo)//用户端的考试信息
 ExamRouter.post("/adminapi/exam/UpdateUserExamInfo",ExamController.UpdateUserExamInfo)//更新用户端的考试信息，不再是新增

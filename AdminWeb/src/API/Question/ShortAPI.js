@@ -12,6 +12,16 @@ import axios from "axios";
         }catch (error) {
             console.log(error)
         }
-      
     },
+    //更新简答题
+    postUpdateShort: async (data,_id) => {
+        try{
+            const res = await axios.post("/adminapi/exam/update/shortquestion", data,{params:{_id}})
+            if(res.data.code === 200){
+                return res.data
+            }
+        }catch (error) {
+            console.log(error)
+        }
+    }
  }

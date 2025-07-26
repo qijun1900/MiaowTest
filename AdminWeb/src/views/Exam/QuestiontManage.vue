@@ -148,7 +148,7 @@
                 <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/> 
                 <el-table-column label="题目题干" width="250">
                     <template #default="scope">
-                        {{ scope.row.stem }}
+                        <div v-html="scope.row.stem"></div>
                     </template>
                 </el-table-column>
                 <el-table-column label="题目答案" width="180">
@@ -358,6 +358,7 @@ const currentComponent = computed(() => {
 //添加题目按钮，打开对话框
 const handleAdd = () => {
     dialogVisible.value = true
+    isEditMode.value = false
 }
 //按下搜索按钮
 const handleOnSearch = (data) => {
@@ -426,7 +427,6 @@ const handleRefreshQuestionData = async () => {
 }
 //预览
 const handlePreview = (row) => {
-    console.log("row", row)
   PreviewdialogVisible.value = true
   QuestionData.value = row
 }

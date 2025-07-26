@@ -1,7 +1,8 @@
 <template>
     <div class="container">
         <el-card shadow="hover" style=" border-radius: 10px;">
-            <el-form ref="formRef" 
+            <el-form 
+                ref="formRef" 
                 :model="form"  
                 label-position="top">
                 <Divider content="题目题干"/>
@@ -30,7 +31,7 @@
                   type="success" 
                   @click="submitForm"
                   :icon="Checked">
-                添加题目
+                 {{ props.isEdit ? '更新题目' : '添加题目' }}
             </el-button>
             <Divider content="题目解析"/>
             <el-form-item 
@@ -58,7 +59,7 @@
 </template>
 <script setup>
 import {useRoute} from 'vue-router';
-import {reactive, ref} from "vue";
+import {reactive, ref,watch} from "vue";
 import Divider from '../ReuseComponents/Divider.vue';
 import Editor from '../FunComponents/Editor.vue';
 import { ElMessage } from 'element-plus';
@@ -78,6 +79,11 @@ const form = reactive({
   isAddUserList:0,//0:不是，1：是
   Type:4, // 题目类型
 });
+// 定义props
+const props = defineProps({
+    Data: Object,
+    isEdit: Boolean,
+})
 //editor内容改变的回调
 const handlechangeStem = (data) => {
     form.stem = data
@@ -101,14 +107,24 @@ const resetForm = () => {
 //提交表单
 const submitForm = async () => {
     try{
-        const valid = await formRef.value.validate()
-        if(valid){
-            const res = await shortAPI.postAddShort(form)
+        if(props.isEdit&&props.Data){
+            const _id = props.Data._id
+            const res = await shortAPI.postUpdateShort(form,_id)
             if(res.code === 200){
-                ElMessage.success('提交成功');
-                resetForm();
+                ElMessage.success('更新成功');
             }else{
-                ElMessage.error('提交失败，请稍后重试');
+                ElMessage.error('更新失败');
+            }
+        }else{
+            const valid = await formRef.value.validate()
+            if(valid){
+                const res = await shortAPI.postAddShort(form)
+                if(res.code === 200){
+                    ElMessage.success('提交成功');
+                    resetForm();
+                }else{
+                    ElMessage.error('提交失败，请稍后重试');
+                }
             }
         }
     }catch(error){
@@ -116,4 +132,15 @@ const submitForm = async () => {
         ElMessage.error('提交失败，请稍后重试');
     }
 };
+watch(() => props.Data, (newVal) => {
+    if (newVal && props.isEdit) {
+        const data = newVal;
+        form.stem = data.stem;
+        form.content = data.content;
+        form.analysis = data.analysis;
+        form.isAIanswer = data.isAIanswer;
+        form.isAddUserList = data.isAddUserList;
+        form.Type = data.Type || 4;
+    }
+}, { immediate: true });
 </script>

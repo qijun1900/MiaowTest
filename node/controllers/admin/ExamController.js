@@ -233,7 +233,7 @@ const ExamController ={
         })
     },
     UpdateBlankQuestion:async(req,res)=>{
-        const _id = req.params.id
+        const {_id} = req.query
         const {stem,options,isPublish,analysis,isAIanswer} = req.body
         await ExamService.UpdateBlankQuestion({
             _id,
@@ -250,7 +250,7 @@ const ExamController ={
         })
     },
     UpdateJudgeQuestion:async(req,res)=>{
-        const _id = req.params.id
+        const {_id} = req.query
         const {stem,answer,isPublish,analysis,isAIanswer} = req.body
         await ExamService.UpdateJudgeQuestion({
             _id,
@@ -267,7 +267,7 @@ const ExamController ={
         })
     },
     UpdateShortQuestionList:async(req,res)=>{
-        const _id = req.params.id
+        const {_id} =  req.query
         const {stem,content,isPublish,analysis,isAIanswer} = req.body
         await ExamService.UpdateShortQuestionList({
             _id,

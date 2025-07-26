@@ -1,14 +1,24 @@
 <template>
     <div class="container">
-        <el-card shadow="hover" style=" border-radius: 10px;">
-            <el-form :model="form" ref="formRef" label-position="top">
+        <el-card 
+            shadow="hover" 
+            style=" border-radius: 10px;">
+            <el-form 
+                :model="form" 
+                ref="formRef" 
+                label-position="top">
                 <Divider content="题目题干" />
                 <el-form-item prop="stem" :rules="[{ required: true, message: '题干不能为空', trigger: 'blur' }]">
-                    <Editor :key="'stem-editor'" @event="handlechangeStem" :height="100" placeholder="请在此处输入题目题干..."
+                    <Editor 
+                        :key="'stem-editor'" 
+                        @event="handlechangeStem" 
+                        :height="100" placeholder="请在此处输入题目题干..."
                         :content="form.stem" />
                 </el-form-item>
                 <Divider content="题目选项" />
-                <el-row :gutter="20" v-for="(option, index) in form.options" :key="index">
+                <el-row 
+                    :gutter="20" v-for="(option, index) in form.options" 
+                    :key="index">
                     <el-col :span="18">
                         <el-form-item :label="`${String.fromCharCode(65 + index)}`" :prop="`options.${index}.content`"
                             :rules="[{ required: true, message: '选项内容不能为空', trigger: 'blur' }]">
@@ -17,7 +27,10 @@
                     </el-col>
                     <el-col :span="6" class="flex items-center">
                         <el-checkbox v-model="option.isCorrect" @change="updateMultipleStatus">正确答案</el-checkbox>
-                        <el-button type="danger" @click="removeOption(index)" :disabled="form.options.length <= 2"
+                        <el-button 
+                            type="danger" 
+                            @click="removeOption(index)" 
+                            :disabled="form.options.length <= 2"
                             circle :icon="Delete" />
                     </el-col>
                 </el-row>
@@ -44,7 +57,7 @@
     </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import Divider from '../ReuseComponents/Divider.vue';
 import Editor from '@/components/FunComponents/Editor.vue'
 import { Delete, CirclePlusFilled, Checked } from '@element-plus/icons-vue';
@@ -77,24 +90,6 @@ const props = defineProps({
     Data: Object,
     isEdit: Boolean,
 })
-// 添加对Data prop的监听
-watch(() => props.Data, (newVal) => {
-    if (newVal && props.isEdit) {
-        const data = newVal
-        form.stem = data.stem
-        form.options = (data.options || []).map(opt => ({
-            content: opt.content || opt,
-            isCorrect: opt.isCorrect || false
-        }))
-        form.analysis = data.analysis
-        form.isAIanswer = data.isAIanswer
-        form.isAddUserList = data.isAddUserList
-        form.Type = data.Type || 1
-        form.isMultiple = data.isMultiple
-        form.isPublish = data.isPublish
-    }
-}, { immediate: true })
-
 //editor内容改变的回调
 const handlechangeStem = (data) => {
     form.stem = data
@@ -167,8 +162,22 @@ const submitForm = async () => {
         console.error("添加题目失败", error)
     }
 }
-onMounted(() => {
-
-})
+// 添加对Data prop的监听
+watch(() => props.Data, (newVal) => {
+    if (newVal && props.isEdit) {
+        const data = newVal
+        form.stem = data.stem
+        form.options = (data.options || []).map(opt => ({
+            content: opt.content || opt,
+            isCorrect: opt.isCorrect || false
+        }))
+        form.analysis = data.analysis
+        form.isAIanswer = data.isAIanswer
+        form.isAddUserList = data.isAddUserList
+        form.Type = data.Type || 1
+        form.isMultiple = data.isMultiple
+        form.isPublish = data.isPublish
+    }
+}, { immediate: true })
 
 </script>

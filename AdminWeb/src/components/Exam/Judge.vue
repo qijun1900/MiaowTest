@@ -32,7 +32,7 @@
                     type="success" 
                     @click="submitForm"
                     :icon="Checked">
-                添加题目
+                    {{ props.isEdit ? '更新题目' : '添加题目' }}
                 </el-button>
             <Divider content="题目解析"/>
             <el-form-item  prop="analysis">
@@ -53,7 +53,7 @@
     </div>
 </template>
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref,watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Divider from '../ReuseComponents/Divider.vue';
 import Editor from '../FunComponents/Editor.vue';
@@ -74,6 +74,11 @@ const form = reactive({
     isAddUserList: 0,
     Type:3, // 题目类型
 });
+// 定义props
+const props = defineProps({
+    Data: Object,
+    isEdit: Boolean,
+})
 //editor内容改变的回调
 const handlechangeStem = (data) => {
     form.stem = data
@@ -89,18 +94,27 @@ const resetForm = () => {
     form.isAIanswer = 0;
     form.isAddUserList = 0;
 }
-
-
+//提交表单
 const submitForm = async () => {
     try {
-        const valid = await formRef.value.validate()
-        if(valid){
-            const res = await judgeAPI.postAddJudge(form)
+        if(props.isEdit&&props.Data){
+            const _id = props.Data._id
+            const res = await judgeAPI.postUpdateJudge(form,_id)
             if(res.code === 200){
-                ElMessage.success('判断题添加成功')
-                resetForm()
+                ElMessage.success('判断题更新成功')
             }else{
-                ElMessage.error('判断题添加失败')
+                ElMessage.error('判断题更新失败')
+            }
+        }else{
+            const valid = await formRef.value.validate()
+            if(valid){
+                const res = await judgeAPI.postAddJudge(form)
+                if(res.code === 200){
+                    ElMessage.success('判断题添加成功')
+                    resetForm()
+                }else{
+                    ElMessage.error('判断题添加失败')
+                }
             }
         }
     }catch (error) {
@@ -108,4 +122,15 @@ const submitForm = async () => {
         console.error('表单验证失败:', error)
     }
 }
+watch(() => props.Data, (newVal) => {
+    if (newVal && props.isEdit) {
+        const data = newVal;
+        form.stem = data.stem
+        form.answer = data.answer
+        form.analysis = data.analysis || '';
+        form.isAIanswer = data.isAIanswer || 0;
+        form.isAddUserList = data.isAddUserList || 0;
+        form.Type = data.Type || '';
+    }
+},{ immediate: true})
 </script>

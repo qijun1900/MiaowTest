@@ -1,13 +1,13 @@
 <template>
     <el-dialog 
-        draggable="true"
+        :draggable="true"
         v-model="PreviewdialogVisible" 
         width="60%" 
         title="题目预览" 
         class="preview-dialog">
         <div v-if="previewData" class="preview-content">
             <el-divider content-position="left"><span class="divider-title">题目题干</span></el-divider>
-            <h3 class="question-stem">{{ previewData.stem }}</h3>
+            <h3 class="question-stem" v-html="previewData.stem"></h3>
 
             <!-- 选择题预览 -->
             <el-divider content-position="left"><span class="divider-title">题目详情</span></el-divider>
@@ -30,7 +30,7 @@
                     <span class="blank-content">{{ option.content }}</span>
                 </div>
             </div>
-
+            
             <!-- 判断题预览 -->
             <div v-else-if="previewData.Type === 3" class="judge-container">
                 <el-tag :type="previewData.answer == 1 ? 'success' : 'danger'" size="large" class="judge-tag">
