@@ -430,71 +430,8 @@ onMounted(() => {
     opacity: 0;
 }
 
-/* 表单样式 */
-.subject-form {
-    padding: 0 20px;
-}
-
-/* 表单元素间距 */
-.subject-form :deep(.el-form-item) {
-    margin-bottom: 22px;
-}
-
-/* 全宽选择器 */
-.full-width-select {
-    width: 100%;
-}
-
-/* 输入框样式 */
-.subject-form :deep(.el-input__inner) {
-    border-radius: 4px;
-    height: 38px;
-}
-
-/* 标签样式 */
-.subject-form :deep(.el-form-item__label) {
-    font-weight: 500;
-    color: #606266;
-    padding-bottom: 8px;
-}
-
-/* 上传组件容器样式 */
-.subject-form :deep(.upload-container) {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: border-color 0.3s;
-}
-
-.subject-form :deep(.upload-container:hover) {
-    border-color: #409eff;
-}
-
-.question-tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 4px 0;
-}
-
-.question-tag {
-    margin: 0;
-    padding: 6px 12px;
-    border-radius: 14px;
-    font-size: 14px;  /* 增大字体 */
-    font-size: 13px;
-    transition: all 0.2s ease;
-    background-color: #cde8fa;  /* 添加浅蓝色背景 */
-}
 
 
-.question-tag:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
 
-.tag-icon {
-    margin-right: 4px;
-    font-size: 14px;
-}
+
 </style>
