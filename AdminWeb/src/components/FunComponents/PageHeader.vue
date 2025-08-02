@@ -65,6 +65,8 @@ const Title = computed(() => {
       return '添加题目';
     case '/model/modelmanage':
       return '模型管理';
+    case (route.path.match(/^\/exam\/createExamType\//) ? route.path : ''):
+      return '考试题型管理';
     default:
       return '后台管理系统';
   }

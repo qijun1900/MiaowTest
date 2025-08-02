@@ -112,7 +112,7 @@
                             @click="handleLooked(scope.row.code)">科目代码</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="题型" width="320">
+                <el-table-column label="科目题库" width="280">
                     <template #default="scope">
                         <div class="question-tags-container">
                             <el-check-tag 
@@ -126,7 +126,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="状态" width="140">
+                <el-table-column label="状态" width="120">
                     <template #default="scope">
                         <el-switch
                             size="large"
@@ -174,10 +174,11 @@
                             仪表盘
                         </el-button>
                         <el-button 
+                            color="#626aef"
                             type="info" 
                             plain 
-                            @click="handleMore(scope.row)">
-                            更多
+                            @click="handleCreate(scope.row)">
+                            创建考试题型<el-icon><CirclePlusFilled /></el-icon>
                         </el-button>
                     </template>
                 </el-table-column>
@@ -268,7 +269,7 @@
 </template>
 <script setup>
 import SearchFilter from '@/components/FunComponents/SearchFilter.vue'
-import { RefreshRight, Hide, Open,Histogram } from '@element-plus/icons-vue'
+import { RefreshRight, Hide, Open,Histogram ,CirclePlusFilled} from '@element-plus/icons-vue'
 import Tooltip from '@/components/ReuseComponents/Tooltip.vue'
 import { useTableState } from '@/composables/State/useTableState'
 import { useTableActions } from '@/composables/Action/useTableActions'
@@ -517,6 +518,15 @@ const handleCheckQuestion = (data,category) => {
     appStore.changeExamInfo({
         ...data,
         category:category,
+    })
+}
+//创建题目
+const handleCreate = (data) => {
+    RouterPush(
+        `/exam/createExamType/${data._id}`,
+    )
+    appStore.changeExamInfo({
+       ...data,
     })
 }
 //获取考试列表+刷新+分页

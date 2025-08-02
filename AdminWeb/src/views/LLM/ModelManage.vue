@@ -364,7 +364,6 @@ const handleConfirm = async () => {
                 ElMessage.error('请填写完整信息')
                 return
             }
-            console.log('提交数据:', submitData)
             const res = await postAddModel(submitData)
             if (res.code === 200) {
                 ElMessage.success('模型添加成功')
@@ -384,7 +383,6 @@ const handleRefreshModelData = async () => {
             page: currentPage.value,
             size: pageSize.value,
         },getModelList)
-        console.log('获取列表数据:', res)
          if(res.code === 200){
             tableData.value = res.data.data
             total.value = res.data.total

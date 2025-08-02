@@ -1,18 +1,13 @@
 const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
-  name: String ,   // 考试名称
   questionTitle: [{
     content: String,                           // 题型名称
+    description: String,                          // 题型描述
     questionIdS: [{ type: Array }],           // 关联的题目ID集合
-    isPublishType:Number,                     // 发布状态
+    isPublish:Number,                     // 发布状态
     }],
-  code: String ,       
-  isPublish: Number,     
-  category:Array, 
-  examId:String,
-  cover:String,
-  year:String,
-  createdTime: Date,     
+  examId:String,// 考试ID
 });
-const UserExamModel = mongoose.model("userExam", UserSchema);
+const UserExamModel = mongoose.model("userexam", UserSchema);
+
 module.exports = UserExamModel;

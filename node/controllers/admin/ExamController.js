@@ -294,68 +294,66 @@ const ExamController ={
             ActionType:"OK",
         })
     },
-    AddUserExamInfo:async(req,res)=>{
-        const {name,questionTitle,code,isPublish,category,examId,cover,year} = req.body
-        await ExamService.AddUserExamInfo({
-            name,
-            questionTitle,
-            code,
+    AddquestionTitle:async(req,res)=>{
+        const {content,description,isPublish,questionIdS,examId} = req.body
+        await ExamService.AddquestionTitle({
+            content,
+            description,
+            questionIdS:questionIdS,
             isPublish:Number(isPublish),
-            category,
-            examId,
-            cover,
-            year,
-            createdTime:new Date()
+            examId
         })
         res.send({
             code:200,
             ActionType:"OK",
         })
     },
-    UpdateUserExamInfo:async(req,res)=>{
-        const {name,questionTitle,code,isPublish,category,examId,cover,year} = req.body
-        await ExamService.UpdateUserExamInfo({
-            name,
-            questionTitle,
-            code,
-            isPublish:Number(isPublish),
-            category,
+    getQuestionTitle:async(req,res)=>{
+        const {page,size,examId} = req.query
+        const result = await ExamService.getQuestionTitle({
+            page: Number(page),
+            size: Number(size),
             examId,
-            cover,
-            year,
-            createdTime:new Date()
-        }) 
-        res.send({
-            code:302,
-            ActionType:"OK", 
         })
-    },
-    getUserExamInfo:async(req,res)=>{
-        const result = await ExamService.getUserExamInfo({examId:req.params.id})
         res.send({
             code:200,
             ActionType:"OK",
-            data:result, 
+            data: result,
         })
     },
-    updateQuestionTitleStatus:async(req,res)=>{
-        const {examId,titleId,isPublishType} = req.body 
-        await ExamService.updateQuestionTitleStatus({
+    UpdateQuestionTitle:async(req,res)=>{
+        const {content,description,examId,_id} = req.body 
+        console.log(content,description,examId,_id)
+        await ExamService.UpdateQuestionTitle({
+            content,
+            description,
             examId,
-            titleId,
-            isPublishType
+            _id,
         })
         res.send({
             code:200,
             ActionType:"OK",
         })
     },
-    deleteQuestionTitle:async(req,res)=>{
-        const {examId,titleId} = req.body
-        await ExamService.deleteQuestionTitle({
-            examId,
-            titleId,
+    DeleteOneQuestionTitle:async(req,res)=>{
+        const {_id,examId} = req.body
+        await ExamService.DeleteOneQuestionTitle({_id,examId})
+        res.send({
+            code:200,
+            ActionType:"OK",
         })
+    },
+    DeleteManyQuestionTitle:async(req,res)=>{
+        const {_ids,examId} = req.body
+        await ExamService.DeleteManyQuestionTitle({_ids,examId})
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
+    UpdateOneQuestionTitleState:async(req,res)=>{
+        const {_id, examId, state} = req.body
+        await ExamService.UpdateOneQuestionTitleState({_id,examId,isPublish:Number(state)})
         res.send({
             code:200,
             ActionType:"OK",

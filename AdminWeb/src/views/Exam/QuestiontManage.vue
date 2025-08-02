@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <el-container>
+<div>
+    <el-container>
         <el-aside width="350px">
             <el-card style="border-radius: 5px" shadow="never">
                 <el-descriptions 
@@ -32,7 +32,7 @@
                 </el-descriptions>
             </el-card>
         </el-aside>
-        <el-container>
+    <el-container>
             <el-header v-show="showSearch">
                 <transition name="slide-up">
                 <el-card 
@@ -244,10 +244,10 @@
         <Dialog
         :DilogTitle="isEditMode ? '编辑题目' : '新增题目'" 
         :DilogButContent="isEditMode ? '取消' : '取消'"
-            DilogWidth="1200px"
-            :draggable="true"
-            top="2vh" 
-            v-model="dialogVisible">
+        DilogWidth="1200px"
+        :draggable="true"
+        top="2vh" 
+        v-model="dialogVisible">
             <template #dialogcontent>
                 <component 
                 :is="currentComponent" 
@@ -258,7 +258,7 @@
         <QuestionPreview
             v-model="PreviewdialogVisible"
             :Data="QuestionData"/>
-    </div>
+</div>
 </template>
 <script setup>
 import { useRoute } from 'vue-router';

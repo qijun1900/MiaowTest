@@ -7,7 +7,7 @@ import ExamManage from "@/views/Exam/ExamManage.vue"
 import QuestiontManage from "@/views/Exam/QuestiontManage.vue"
 import QuestionAdd from "@/views/Exam/QuestionAdd.vue"
 import ModelManage from "@/views/LLM/ModelManage.vue"
-
+import QuestionTypeManage from "@/views/Exam/QuestionTypeManage.vue"
 
 const routes= [
     {
@@ -54,6 +54,12 @@ const routes= [
         path: '/model/modelmanage',
         name: 'ModelManage',
         component: ModelManage,
+    },
+    {
+        path: '/exam/createExamType/:id',
+        name: 'QuestionTypeManage',
+        component: QuestionTypeManage,
+            
     }
 
 ]
