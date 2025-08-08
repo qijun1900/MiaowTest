@@ -178,7 +178,7 @@
                             type="info" 
                             plain 
                             @click="handleCreate(scope.row)">
-                            创建考试题型<el-icon><CirclePlusFilled /></el-icon>
+                            创建考试<el-icon><CirclePlusFilled /></el-icon>
                         </el-button>
                     </template>
                 </el-table-column>
@@ -288,7 +288,7 @@ import {
         PostDeleteManyExam
     } 
 from '@/API/Exam/subjectAPI'//api
-import getCategoryName from '@/util/formatExamname'
+import { getCategoryName } from '@/util/formatExamname'
 import handleLooked from '@/util/CheckInfo'
 import RouterPush from '@/util/RouterPush'
 

@@ -269,7 +269,7 @@ import { useTableState } from '@/composables/State/useTableState'
 import { useTableActions } from '@/composables/Action/useTableActions'
 import { useAppStore } from '@/stores';
 import formatTime from '@/util/formatTime'
-import getCategoryName from '@/util/formatExamname'
+import {getCategoryName} from '@/util/formatExamname'
 import Tooltip from '@/components/ReuseComponents/Tooltip.vue'
 import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
 import Pagination from '@/components/ReuseComponents/Pagination.vue'

@@ -364,36 +364,62 @@ const ExamService = {
             { $set: { "questionTitle.$.isPublish": isPublish } }
         )
     },
-    AddSingUserList: async ({ examId, questionId, isAddUserList, Type, titleId, row }) => {
+    getAddQusetionList: async ({category ,examId}) => {
         const modelMap = {
             1: ExamSelectModel,
             2: ExamBlankModel,
             3: ExamJudgeModel,
             4: ExamShortModel
         };
-
+        const model = modelMap[category];
+        return model.find({ examId: examId,isAddUserList:0},{_id:1,stem:1,isAddUserList:1}) || null;
+    },
+    AddOneQuestion: async ({_id,examId, category,QuestionTitleId}) => {
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        };
+        const model = modelMap[category];
         const [updateResult, insertResult] = await Promise.all([
-            modelMap[Type]?.updateOne(
-                { examId, _id: questionId },
-                { $set: { isAddUserList } }
-            ) || null,
+            model.updateOne(
+                { _id },
+                { $set: { isAddUserList: 1 } }
+            ),
             UserExamModel.updateOne(
-                {
-                    examId,
-                    "questionTitle._id": titleId
-                },
-                {
-                    $push: {
-                        'questionTitle.$.questionIdS': { $each: [row] }
-                    }
-                },
-                { upsert: true }
+                { examId, "questionTitle._id": QuestionTitleId },
+                { $push: { "questionTitle.$.questionIdS": { _id ,category} } }
             )
-        ]);
+        ])
         return {
             updateResult,
             insertResult
+        }
+    },
+    AddManyQuestion: async ({_ids,examId,category,QuestionTitleId}) => {
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
         };
+        const model = modelMap[category];   
+        const [updateResult, insertResult] = await Promise.all([
+            model.updateMany(
+                { _id: { $in: _ids } },
+                { $set: { isAddUserList: 1 } }
+            ),
+            UserExamModel.updateOne(
+                { examId, "questionTitle._id": QuestionTitleId },
+                { $push: { "questionTitle.$.questionIdS": { $each: _ids.map(_id => ({ _id,category })) } } }
+            )
+            
+        ])
+        return {
+            updateResult,
+            insertResult
+        }
     },
     RemoveSingUserList: async ({ examId, questionId, isAddUserList, Type, titleId, row }) => {
         const modelMap = {

@@ -359,20 +359,33 @@ const ExamController ={
             ActionType:"OK",
         })
     },
-    AddSingUserList:async(req,res)=>{
-        const {examId,questionId,isAddUserList,Type,titleId,row} = req.body 
-        const result = await ExamService.AddSingUserList({
+    getAddQusetionList:async(req,res)=>{
+        const {category,examId} = req.query
+        console.log("ss",category,examId)
+        const result = await ExamService.getAddQusetionList({
+            category:Number(category),
             examId,
-            questionId,
-            isAddUserList ,
-            Type:Number(Type),
-            titleId,
-            row,
         })
         res.send({
             code:200,
-            ActionType:"OK", 
+            ActionType:"OK",
             data:result,
+        })
+    },
+    AddOneQuestion:async(req,res)=>{
+        const {_id, examId,category,QuestionTitleId} = req.body
+        await ExamService.AddOneQuestion({_id,examId,category,QuestionTitleId})
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
+    AddManyQuestion:async(req,res)=>{
+        const {_ids,examId,category,QuestionTitleId} = req.body
+        await ExamService.AddManyQuestion({_ids,examId,category,QuestionTitleId})
+        res.send({
+            code:200,
+            ActionType:"OK",
         })
     },
     RemoveSingUserList:async(req,res)=>{

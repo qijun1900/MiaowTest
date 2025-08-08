@@ -2,6 +2,7 @@ import axios from "axios";
 
 
 export async function getQuestionList(params) {
+    //获取题目列表
     try {
         const res = await axios.get("/adminapi/exam/get/questionList", {
             params: {

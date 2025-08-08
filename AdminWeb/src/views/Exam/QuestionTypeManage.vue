@@ -156,12 +156,12 @@
                             type="success" 
                             plain 
                             @click="handleCheck(scope.row)">
-                            查看题目
+                            查看题目<el-icon><View /></el-icon>
                         </el-button>
                         <el-button 
                             type="success" 
                             plain 
-                            @click="handleAddQuestion(scope.row)">
+                            @click="handleChooseQuestionType(scope.row)">
                             添加题目<el-icon><Plus /></el-icon>
                         </el-button>
                     </template>
@@ -202,6 +202,39 @@
                 </el-form>
             </template>
         </Dialog>
+        <Drawer 
+            v-model="drawerVisible1"
+            drawerTitle="选择题目类型"
+            :drawerModal="false"
+            drawerSize="30%">
+            <template #drawercontent>
+                   <div class="category-buttons">
+                    <el-button
+                        v-for="(item, index) in appStore.examInfo.category"
+                        :key="index"
+                        :class="`category-btn category-btn-${index}`"
+                        plain
+                        block
+                        @click="handleAddQuestion(item)">
+                        <el-icon>
+                            <component :is="getCategoryIcon(item)" />
+                        </el-icon>
+                        <span>{{ getCategoryName(item) }}</span>
+                    </el-button>
+                </div>
+            </template>
+        </Drawer>
+        <Drawer
+            v-model="drawerVisible2"
+            drawerTitle="添加题目"
+            drawerSize="50%">
+                <template #drawercontent>
+                    <QuestionAddList
+                    :QuestionTitleId="QuestionTitleId" 
+                    :WhichCategory="WhichCategory"
+                    :examId="route.params.id"/>
+                </template>
+        </Drawer>
     </div>
 </template>
 <script setup>
@@ -210,7 +243,7 @@ import { onMounted ,ref,defineAsyncComponent,reactive} from 'vue';
 import formatTime from '@/util/formatTime'
 import SearchFilter from '@/components/FunComponents/SearchFilter.vue'
 import Tooltip from '@/components/ReuseComponents/Tooltip.vue'
-import { RefreshRight, Hide, Open ,Plus } from '@element-plus/icons-vue'
+import { RefreshRight, Hide, Open ,Plus ,View} from '@element-plus/icons-vue'
 import { useTableState } from '@/composables/State/useTableState'
 import { useTableActions } from '@/composables/Action/useTableActions'
 import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
@@ -225,10 +258,14 @@ import {
         UpdateQuestionTitleOneState
     } from '@/API/Exam/questionTitleAPI';
 import { ElMessage } from 'element-plus';
-
+import Drawer from '@/components/ReuseComponents/Drawer.vue';
+import {getCategoryName,getCategoryIcon} from '@/util/formatExamname'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/FunComponents/Dialog .vue')
+)
+const QuestionAddList = defineAsyncComponent(() =>
+    import('@/components/FunComponents/QuestionAddList.vue')
 )
 const appStore = useAppStore();
 const route = useRoute()
@@ -244,9 +281,17 @@ const pageSize = ref(10)
 const total = ref(0)
 // 对话框状态
 const dialogVisible = ref(false)
+//抽屉状态
+const drawerVisible1 = ref(false)
+const drawerVisible2 = ref(false)
 // 添加编辑状态
 const isEditMode = ref(false)
 const currentEditId = ref(null)
+//WhichCategory 选择的题目类型
+const WhichCategory = ref(null)
+//QuestionTitleID 选择的题型ID
+const QuestionTitleId = ref(null)
+
 //表单数据
 const Form = reactive({
     content: '',           // 题型名称
@@ -336,7 +381,6 @@ const handleConfirm = async() => {
     try{
         if(isEditMode.value){
             const res = await UpdateQuestionTitleList(submitData)
-            console.log('res',res)
             if(res.code===200){
                 ElMessage.success('题型编辑成功')
                 isEditMode.value = false
@@ -381,9 +425,16 @@ const handleRefreshData = async() => {
 const handleCheck = (row) => {
    console.log(row)
 }
+//选择题目类型
+const handleChooseQuestionType = (row) => {
+    drawerVisible1.value = true
+    QuestionTitleId.value = row._id
+
+}
 //添加题目
-const handleAddQuestion = (row) => {
-    console.log(row)
+const handleAddQuestion = (category) => {
+    drawerVisible2.value = true
+    WhichCategory.value = category
 }
 onMounted(() => {
     handleRefreshData()
@@ -427,5 +478,81 @@ onMounted(() => {
 }
 .info-content {
     color: #409eff;
+}
+.category-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 增大按钮间距 */
+    padding: 15px; /* 增大内边距 */
+    margin-top: 100px;
+}
+
+.category-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 70px; /* 增大按钮高度 */
+    border-radius: 10px; /* 稍微增大圆角 */
+    transition: all 0.3s ease;
+    border: 1px solid #dcdfe6;
+    padding-left: 25px; /* 增大左内边距 */
+    font-size: 16px; /* 增大字体 */
+    font-weight: 500; /* 美化字体粗细 */
+}
+
+.category-btn:hover {
+    transform: translateX(5px); /* 增大悬停效果位移 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* 增强阴影效果 */
+}
+
+.category-btn .el-icon {
+    margin-right: 12px; /* 增大图标右边距 */
+    font-size: 20px; /* 增大图标大小 */
+}
+
+/* 为前几个按钮添加个性化颜色 */
+.category-btn-0 {
+    border-color: #409eff;
+    color: #409eff;
+}
+
+.category-btn-0:hover {
+    background-color: #ecf5ff;
+}
+
+.category-btn-1 {
+    border-color: #67c23a;
+    color: #67c23a;
+}
+
+.category-btn-1:hover {
+    background-color: #f0f9ec;
+}
+
+.category-btn-2 {
+    border-color: #e6a23c;
+    color: #e6a23c;
+}
+
+.category-btn-2:hover {
+    background-color: #fdf6ec;
+}
+
+.category-btn-3 {
+    border-color: #f56c6c;
+    color: #f56c6c;
+}
+
+.category-btn-3:hover {
+    background-color: #fef0f0;
+}
+
+.category-btn-4 {
+    border-color: #909399;
+    color: #909399;
+}
+
+.category-btn-4:hover {
+    background-color: #f4f4f5;
 }
 </style>

@@ -31,7 +31,10 @@ ExamRouter.get("/adminapi/questionTitle/getQuestionTitleList",ExamController.get
 ExamRouter.post("/adminapi/questionTitle/updateQuestionTitle",ExamController.UpdateQuestionTitle)//更新用户端的考试题型信息
 ExamRouter.post("/adminapi/questionTitle/deleteOneQuestionTitle",ExamController.DeleteOneQuestionTitle)//删除用户端的单个考试题型信息
 ExamRouter.post('/adminapi/questionTitle/deleteManyQuestionTitle',ExamController.DeleteManyQuestionTitle)//删除用户端的多个考试题型信息
-ExamRouter.post("/adminapi/questionTitle/updateQuestionOneTitleState",ExamController.UpdateOneQuestionTitleState)//更新单条用户题目状态
+ExamRouter.post("/adminapi/questionTitle/updateQuestionOneTitleState",ExamController.UpdateOneQuestionTitleState)//更新单条考试题型目状态
+ExamRouter.get("/adminapi/foruser/get/addQusetionList",ExamController.getAddQusetionList)//获取要添加题目列表
+ExamRouter.post("/adminapi/foruser/addone/Addquestion",ExamController.AddOneQuestion)//添加题目,开关添加单条题目
+ExamRouter.post("/adminapi/foruser/addmany/Addquestion",ExamController.AddManyQuestion)//添加题目,开关添加多条题目
 ExamRouter.post("/adminapi/exam/RemoveSingUserList",ExamController.RemoveSingUserList)//更新单条用户题目删除状态
 ExamRouter.post("/adminapi/exam/batchPublishedUserQuestionsList",ExamController.batchPublishedUserQuestionsList)//批量发布用户端的题目
 ExamRouter.get("/adminapi/exam/publishedUserQuestionsList/:id",ExamController.getUserQuestionsList)//获取用户端已发布的题目
