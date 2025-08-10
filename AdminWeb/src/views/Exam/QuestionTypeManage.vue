@@ -209,7 +209,6 @@
         <Drawer 
             v-model="drawerVisible1"
             drawerTitle="选择题目类型"
-            :drawerModal="false"
             drawerSize="30%">
             <template #drawercontent>
                    <div class="category-buttons">
@@ -433,7 +432,6 @@ const handleRefreshData = async() => {
     if(res.code===200){
         tableData.value = res.data[0].data
         total.value = res.data[0].total
-        console.log("tableData",tableData.value)
     }
 
   }catch(error){

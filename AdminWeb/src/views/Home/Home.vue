@@ -47,11 +47,14 @@
                     <div class="card-content">
                         <div class="card-header">
                             <el-icon class="card-icon"><Promotion /></el-icon>
-                            <span class="card-title">系统监控</span>
+                            <span class="card-title">科目信息</span>
                         </div>
                         <div class="card-body">
-                            <el-statistic title="在线设备" :value="42" />
-                            <el-button type="primary" class="card-button">监控面板</el-button>
+                            <el-statistic title="科目数量" :value="examTotal" />
+                            <el-button 
+                                type="primary" 
+                                class="card-button"
+                                @click="handleCheeckExam">查看详情</el-button>
                         </div>
                     </div>
                 </el-card>
@@ -88,9 +91,10 @@ import RouterPush from '@/util/RouterPush';
 import { onMounted,ref} from 'vue';
 import {getUserList} from '@/API/Users/userAPI'//API
 import {getAnnouncementList} from '@/API/News/announcementAPI'//APi
-
+import { getExamList } from '@/API/Exam/subjectAPI';
 const userTotal = ref(0)
 const announcementTotal = ref(0)
+const examTotal = ref(0)
 
 const handleAddUser = () => {
     RouterPush("/users",{showAddDialog:true })
@@ -98,11 +102,15 @@ const handleAddUser = () => {
 const handleCheeckAnnouncement = () => {
     RouterPush("/news/announcement")
 };
+const handleCheeckExam = () => {
+    RouterPush("/exam/exammanage")
+}
 const fetchData = async() => {
     try {
-        const [res1, res2] = await Promise.all([
+        const [res1, res2,res3] = await Promise.all([
             getUserList(),
-            getAnnouncementList()
+            getAnnouncementList(),
+            getExamList()
         ])
         
         if(res1.ActionType === "OK"){
@@ -115,6 +123,11 @@ const fetchData = async() => {
             announcementTotal.value = res2.data.total
         } else {
             console.log("获取公告总数失败")
+        }
+        if(res3.ActionType === "OK"){
+            examTotal.value = res3.data.total
+        } else {
+            console.log("获取科目总数失败")
         }
 
     } catch (error) {

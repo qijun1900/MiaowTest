@@ -372,7 +372,7 @@ const ExamService = {
             4: ExamShortModel
         };
         const model = modelMap[category];
-        return model.find({ examId: examId,isAddUserList:0},{_id:1,stem:1,isAddUserList:1}) || null;
+        return model.find({ examId: examId,isAddUserList:0,isPublish:1},{_id:1,stem:1,isAddUserList:1}) || null;
     },
     AddOneQuestion: async ({_id,examId, category,QuestionTitleId}) => {
         const modelMap = {

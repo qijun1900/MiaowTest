@@ -33,8 +33,8 @@ ExamRouter.post("/adminapi/questionTitle/deleteOneQuestionTitle",ExamController.
 ExamRouter.post('/adminapi/questionTitle/deleteManyQuestionTitle',ExamController.DeleteManyQuestionTitle)//删除用户端的多个考试题型信息
 ExamRouter.post("/adminapi/questionTitle/updateQuestionOneTitleState",ExamController.UpdateOneQuestionTitleState)//更新单条考试题型目状态
 ExamRouter.get("/adminapi/foruser/get/addQusetionList",ExamController.getAddQusetionList)//获取要添加题目列表
-ExamRouter.post("/adminapi/foruser/addone/Addquestion",ExamController.AddOneQuestion)//添加题目,开关添加单条题目
-ExamRouter.post("/adminapi/foruser/addmany/Addquestion",ExamController.AddManyQuestion)//添加题目,开关添加多条题目
+ExamRouter.post("/adminapi/foruser/addone/Addquestion",ExamController.AddOneQuestion)//向该题型下添加单条题目
+ExamRouter.post("/adminapi/foruser/addmany/Addquestion",ExamController.AddManyQuestion)//向该题型下添加多条题目
 ExamRouter.get("/adminapi/foruser/get/checkQusetionList",ExamController.getCheckQusetionList)//获取已添加题目列表ID
 ExamRouter.post("/adminapi/foruser/get/matchQusetionList",ExamController.MatchQusetionList)//根据_id和category匹配题目获取题目信息
 ExamRouter.post("/adminapi/foruser/post/RemoveUsersQuestionList",ExamController.RemoveUserQuestionList)//删除该题型下的题目ids

@@ -56,6 +56,12 @@
                             @click="handlePreview(scope.row)">
                             预览题目
                         </el-button>
+                        <el-button 
+                            type="primary" 
+                            plain 
+                            @click="handleEdit(scope.row)">
+                            编辑题目
+                        </el-button>
                     </template>
                 </el-table-column>
              </el-table>
@@ -64,6 +70,20 @@
         <QuestionPreview
             v-model="PreviewdialogVisible"
             :Data="QuestionData"/>
+        <Dialog
+        :DilogTitle="isEditMode ? '编辑题目' : '新增题目'" 
+        :DilogButContent="isEditMode ? '取消' : '取消'"
+        DilogWidth="1200px"
+        :draggable="true"
+        top="2vh" 
+        v-model="dialogVisible">
+            <template #dialogcontent>
+                <component 
+                :is="currentComponent" 
+                :Data="QuestionData" 
+                :isEdit="isEditMode"/>
+            </template>
+        </Dialog>
     </div>
 </template>
 <script setup>
@@ -74,8 +94,15 @@ import {getCategoryName} from '@/util/formatExamname'
 import { useTableActions } from '@/composables/Action/useTableActions'
 import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
 import { ElMessage } from 'element-plus';
+import Select from '@/components/Exam/Select.vue';//1
+import Blank from '@/components/Exam/Blank.vue';//2
+import Judge from '@/components/Exam/Judge.vue';//3
+import Short from '@/components/Exam/Short.vue';//4
 const QuestionPreview = defineAsyncComponent(() =>
     import('@/components/Exam/QuestionPreview.vue')
+)
+const Dialog = defineAsyncComponent(() =>
+    import('@/components/FunComponents/Dialog .vue')
 )
 const { selectedRows,handleSelectionChange } = useTableActions()
 
@@ -83,6 +110,9 @@ const tableData = ref([]) // 表格数据
 const tableSearchText = ref('')//搜索框
 const PreviewdialogVisible = ref(false)//预览对话框
 const QuestionData = ref(null)// 单个题目数据
+const dialogVisible = ref(false)// 编辑对话框状态
+const isEditMode = ref(false)// 添加编辑状态
+const whichcategory= ref(null) // 题目类型
 const props=defineProps({
     examId: { // 科目ID
         type: String,
@@ -127,7 +157,7 @@ const SearchTextfilteredQuestionListData = computed(() => {
       )
     : tableData.value
 })
-//预览
+//预览题目
 const handlePreview = (row) => {
   PreviewdialogVisible.value = true
   QuestionData.value = row
@@ -170,6 +200,24 @@ const handleRefresh = () => {
         type:'success',
     })
 }
+//编辑题目
+const handleEdit = (row) => {
+    console.log("row",row)
+    dialogVisible.value = true
+    isEditMode.value = true
+    QuestionData.value = row
+    whichcategory.value = row.Type
+}
+// 根据题目类型返回对应编辑组件
+const currentComponent = computed(() => {
+  const componentMap = {
+    1: Select,  // 选择题组件
+    2: Blank,   // 填空题组件
+    3: Judge,  // 判断题组件
+    4: Short   // 简答题组件
+  }
+  return componentMap[Number(whichcategory.value)]  || null
+}) 
 
 // 监听props变化，变化时重新请求数据
 watch([() => props.QuestionTitleId, () => props.examId], () => {
