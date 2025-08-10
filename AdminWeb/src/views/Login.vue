@@ -41,22 +41,30 @@
                     />
                 </el-form-item>
 
-                <el-form-item>
-                    <el-button 
-                        type="primary" 
-                        @click="submitForm" 
-                        class="login-button"
-                        :icon="Pointer"
-                    >
-                        立即登录
-                    </el-button>
+                <el-form-item label="验证码" prop="vcode">
+                    <Vcode
+                        :show="isShow"
+                        @success="onSuccess"
+                        @close="onClose"
+                        @fail="onFail"
+                    />
+                    <el-button @click="showVcode">点击验证</el-button>
                 </el-form-item>
+                <el-button 
+                    type="primary" 
+                    @click="submitForm" 
+                    class="login-button"
+                    :icon="Pointer"
+                >
+                    立即登录
+                </el-button>
             </el-form>
         </div>
     </div>
 </template>
 
 <script setup>
+import Vcode from "vue3-puzzle-vcode";
 import { UserFilled, User, Lock, Pointer } from '@element-plus/icons-vue';
 import { reactive, ref } from "vue";
 import { ElMessage } from 'element-plus'
@@ -66,13 +74,31 @@ import RouterPush from "@/util/RouterPush";
 
 
 const appStore = useAppStore()
-
+const isShow = ref(false);
 const loginForm = reactive({
     username: "",
     password: "",
+    vcode: ""
 });
-
 const loginFormRef = ref({});
+
+const showVcode = () => {//显示验证码
+    isShow.value = true;
+};
+
+const onSuccess = () => {///验证通过
+    isShow.value = false;
+    loginForm.vcode = "验证通过";
+};
+
+const onClose = () => {//关闭验证码
+    isShow.value = false;
+};
+
+const onFail = () => {//验证失败
+    isShow.value = false;
+    ElMessage.error("验证失败");
+};
 
 //规则
 const loginrules = reactive({
@@ -90,12 +116,21 @@ const loginrules = reactive({
         trigger: "blur",
         },
     ],
+    vcode: [
+        {
+            required: true,
+            message: "请完成验证",
+            trigger: "blur"
+        }
+    ]
 });
 
-const submitForm = ()=>{
-    try{
-        loginFormRef.value.validate(async (valid)=>{
-            if(valid){
+
+
+const submitForm = () => {
+    try {
+        loginFormRef.value.validate(async (valid) => {
+            if (valid && loginForm.vcode === "验证通过") {
                 const res = await postUserLogin(loginForm)
                 if(res.ActionType ==="OK"){                 
                     appStore.changeUserInfo({
@@ -106,12 +141,14 @@ const submitForm = ()=>{
                 }else{
                     ElMessage.error("用户名或密码错误！！！")
                 }
+            } else if (!loginForm.vcode) {
+                ElMessage.error("请完成验证");
             }
-        })
-    }catch(e){
-        console.error("登录失败", e)
+        });
+    } catch (e) {
+        console.error("登录失败", e);
     }
-}
+};
 </script>
 
 <style scoped>

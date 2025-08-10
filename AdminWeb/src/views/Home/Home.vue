@@ -2,7 +2,7 @@
     <div>
         <Divider content="快捷操作">
             <el-icon>
-                <EditPen />
+                <EditPen/>
             </el-icon>
         </Divider>
         <el-row :gutter="20">
@@ -79,7 +79,6 @@
             <el-col :span="10"><el-card shadow="hover"><BarChart/></el-card></el-col>
             <el-col :span="14"><el-card shadow="hover"><PieChart/></el-card></el-col>
         </el-row>
-        
     </div>
 </template>
 <script setup>
