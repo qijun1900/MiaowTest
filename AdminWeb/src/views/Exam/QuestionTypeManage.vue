@@ -106,7 +106,7 @@
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
                 <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/> 
-                <el-table-column label="题型名称" width="320">
+                <el-table-column label="题型名称" width="300">
                     <template #default="scope">
                         <div >{{ scope.row.content }}</div>
                     </template>
@@ -125,17 +125,17 @@
                         </el-switch>
                     </template>
                 </el-table-column>
-                <el-table-column label="题型描述" width="250">
+                <el-table-column label="题型描述" width="230">
                     <template #default="scope">
                         <div >{{ scope.row.description }}</div>
                     </template>
                 </el-table-column> 
-                <el-table-column label="题目数量" width="140">
+                <el-table-column label="题目数量" width="100">
                     <template #default="scope">
-                        <div >{{ 0 }}</div>
+                       <div>{{ scope.row.questionIdS.length }}</div>
                     </template>
                 </el-table-column> 
-                <el-table-column label="操作">
+                <el-table-column label="更改" width="200">
                     <template #default="scope">
                         <el-button 
                             type="primary" 
@@ -152,7 +152,11 @@
                                 删除
                             </el-button>
                         </Popconfirm>
-                         <el-button 
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template #default="scope">
+                    <el-button 
                             type="success" 
                             plain 
                             @click="handleCheck(scope.row)">
@@ -429,6 +433,7 @@ const handleRefreshData = async() => {
     if(res.code===200){
         tableData.value = res.data[0].data
         total.value = res.data[0].total
+        console.log("tableData",tableData.value)
     }
 
   }catch(error){
@@ -451,6 +456,7 @@ const handleAddQuestion = (category) => {
     drawerVisible2.value = true
     WhichCategory.value = category
 }
+
 
 onMounted(() => {
     handleRefreshData()

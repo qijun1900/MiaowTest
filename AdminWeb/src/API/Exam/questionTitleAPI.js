@@ -67,4 +67,3 @@ export async function UpdateQuestionTitleOneState({_id, examId, state}) {
         console.error("Error during update question title one state:", error);
     }
 }
-

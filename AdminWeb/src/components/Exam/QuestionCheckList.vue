@@ -16,7 +16,7 @@
                             <el-button
                                 type="danger"
                                 plain
-                                :disabled="!selectedRows || selectedRows.length === 0">
+                                :disabled="!selectedRows || selectedRows.length === 0 || tableData.length === 0">
                                 批量删除
                             </el-button>
                         </Popconfirm>
@@ -107,7 +107,6 @@ const fechData = async () => {
             })
             const matchData = FetchMatchQuestionList(extractedData)
             matchData.then((res)=>{
-                console.log("matchData",res.data)
                 if(res.code === 200) {
                     tableData.value = res.data
                 }
