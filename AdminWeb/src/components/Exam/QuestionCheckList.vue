@@ -9,10 +9,30 @@
                     style="width: 300px"
                     :prefix-icon="Search"
                     />
+                    <div class="header-right">
+                        <Popconfirm
+                            title="您确定删除吗"
+                            @confirm="handleDelete()">
+                            <el-button
+                                type="danger"
+                                plain
+                                :disabled="!selectedRows || selectedRows.length === 0">
+                                批量删除
+                            </el-button>
+                        </Popconfirm>
+                        <el-button
+                            type="primary"
+                            plain
+                            @click="handleRefresh">
+                            刷新数据
+                        </el-button>
+                    </div>
             </div>
             <el-table 
                 :data="SearchTextfilteredQuestionListData"
                 style="width: 100%"
+                stripe 
+                @selection-change="handleSelectionChange"
                 v-if="tableData.length>0">
                 <el-table-column type="selection" width="65" />
                 <el-table-column type="index" label="序号" width="90" :index="(index) => index + 1"/>
@@ -48,13 +68,16 @@
 </template>
 <script setup>
 import { onMounted ,ref,computed,watch,defineAsyncComponent} from 'vue';
-import { FetchCheckQuestionList ,FetchMatchQuestionList} from '@/API/Exam/addQusetionAPI';
+import { FetchCheckQuestionList ,FetchMatchQuestionList,RemoveUserList} from '@/API/Exam/usersQusetionAPI';
 import { Search } from '@element-plus/icons-vue';
 import {getCategoryName} from '@/util/formatExamname'
-
+import { useTableActions } from '@/composables/Action/useTableActions'
+import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
+import { ElMessage } from 'element-plus';
 const QuestionPreview = defineAsyncComponent(() =>
     import('@/components/Exam/QuestionPreview.vue')
 )
+const { selectedRows,handleSelectionChange } = useTableActions()
 
 const tableData = ref([]) // 表格数据
 const tableSearchText = ref('')//搜索框
@@ -120,12 +143,41 @@ const getTagType = (type) => {
   }
   return typeMap[type] || 'info'
 }
+// 批量删除
+const handleDelete = async()=> {
+   // 提取所有选中行的ID和题目类型
+    const chooseInfo = selectedRows.value.map(item => ({
+        _id: item._id, // 题目ID
+        category: item.Type // 题目类型
+    }))
+    const res = await RemoveUserList({
+        chooseInfo: chooseInfo, // 选中题目信息
+        examId: props.examId, // 科目ID
+        QuestionTitleId: props.QuestionTitleId // 题型ID
+    })
+    if(res.code === 200) {
+        ElMessage({
+            message: '删除题目成功',
+            type:'success',
+        })
+        fechData()
+    }
+}
+// 刷新数据
+const handleRefresh = () => {
+    fechData()
+    ElMessage({
+        message: '刷新成功',
+        type:'success',
+    })
+}
+
 // 监听props变化，变化时重新请求数据
 watch([() => props.QuestionTitleId, () => props.examId], () => {
     if(props.QuestionTitleId && props.examId) {
         fechData()
     }
-})
+},{immediate:true})
 
 onMounted(()=>{
     fechData()

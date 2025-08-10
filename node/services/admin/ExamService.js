@@ -452,34 +452,31 @@ const ExamService = {
         )
      return results.filter(Boolean); // 过滤掉null结果
     },
-    RemoveSingUserList: async ({ examId, questionId, isAddUserList, Type, titleId, row }) => {
+    RemoveUserQuestionList: async ({chooseInfo,examId,QuestionTitleId}) => {
+        // 删除该题型下的题目ids,并将isAddUserList置为0
         const modelMap = {
             1: ExamSelectModel,
             2: ExamBlankModel,
             3: ExamJudgeModel,
             4: ExamShortModel
-        };
-        const [updateResult, deleteResult] = await Promise.all([
-            modelMap[Type]?.updateOne(
-                { examId, _id: questionId },
-                { $set: { isAddUserList } }
-            ) || null,
-            //三次匹配更新，第一次匹配examId，第二次匹配questionTitle._id，第三次匹配questionIdS._id，删除符合条件的元素
-            UserExamModel.updateOne(
-                {
-                    examId,
-                    "questionTitle._id": titleId,
-                },
-                {
-                    $pull: {
-                        "questionTitle.$.questionIdS": { _id: row._id }
-                    }
-                }
-            )
+        }
+        const updatePromises = chooseInfo.map(({ _id, category }) => {// 更新题目状态
+            const model = modelMap[category];
+            return model.updateOne({ _id }, { isAddUserList: 0 });
+        });
+        const deletePromises = chooseInfo.map(({ _id }) => {// 删除题目ID
+            return UserExamModel.updateOne(
+                { examId, "questionTitle._id": QuestionTitleId },
+                { $pull: { "questionTitle.$.questionIdS": { _id } } }
+            );
+        })
+        const [updateResults, deleteResults] = await Promise.all([
+            Promise.all(updatePromises),
+            Promise.all(deletePromises)
         ])
         return {
-            updateResult,
-            deleteResult
+            updateResults,
+            deleteResults
         }
     },
     batchPublishedUserQuestionsList: async ({ examId, Type, titleId, questionId, questionIdS }) => {

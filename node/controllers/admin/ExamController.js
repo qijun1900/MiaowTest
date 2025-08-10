@@ -406,16 +406,9 @@ const ExamController ={
             data:result,
         })
     },
-    RemoveSingUserList:async(req,res)=>{
-        const {examId,questionId,isAddUserList,Type,titleId,row} = req.body 
-         await ExamService.RemoveSingUserList({
-            examId,
-            questionId,
-            isAddUserList ,
-            Type:Number(Type),
-            titleId,
-            row,
-        })
+    RemoveUserQuestionList:async(req,res)=>{
+        const {chooseInfo,examId,QuestionTitleId} = req.body
+        await ExamService.RemoveUserQuestionList({chooseInfo,examId,QuestionTitleId})
         res.send({
             code:200,
             ActionType:"OK",

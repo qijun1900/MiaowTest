@@ -48,7 +48,7 @@ export async function AddManyQuestion({_ids,examId,category,QuestionTitleId}) {
 }
 
 export async function FetchCheckQuestionList(examId,QuestionTitleId) {
-    // 获取已添加的题目列表
+    // 获取该题型下已添加的题目列表
     try{
         const response = await axios.get("/adminapi/foruser/get/checkQusetionList",{
             params:{
@@ -72,4 +72,16 @@ export async function FetchMatchQuestionList(extractedData){
         console.error("Error during fetch match question list:", error);
         throw error; 
     }   
+}
+
+export async function RemoveUserList({chooseInfo,examId,QuestionTitleId}) {
+    // 删除该题型下的题目ids
+    try{
+        const response = await axios.post("/adminapi/foruser/post/RemoveUsersQuestionList",{chooseInfo,examId,QuestionTitleId});
+        return response.data;   
+    }catch (error) {
+        console.error("Error during remove user list:", error);
+        throw error; 
+    }   
+    
 }

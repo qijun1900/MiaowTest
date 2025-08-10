@@ -36,8 +36,8 @@ ExamRouter.get("/adminapi/foruser/get/addQusetionList",ExamController.getAddQuse
 ExamRouter.post("/adminapi/foruser/addone/Addquestion",ExamController.AddOneQuestion)//添加题目,开关添加单条题目
 ExamRouter.post("/adminapi/foruser/addmany/Addquestion",ExamController.AddManyQuestion)//添加题目,开关添加多条题目
 ExamRouter.get("/adminapi/foruser/get/checkQusetionList",ExamController.getCheckQusetionList)//获取已添加题目列表ID
-ExamRouter.post("/adminapi/foruser/get/matchQusetionList",ExamController.MatchQusetionList)//匹配题目
-ExamRouter.post("/adminapi/exam/RemoveSingUserList",ExamController.RemoveSingUserList)//更新单条用户题目删除状态
+ExamRouter.post("/adminapi/foruser/get/matchQusetionList",ExamController.MatchQusetionList)//根据_id和category匹配题目获取题目信息
+ExamRouter.post("/adminapi/foruser/post/RemoveUsersQuestionList",ExamController.RemoveUserQuestionList)//删除该题型下的题目ids
 ExamRouter.post("/adminapi/exam/batchPublishedUserQuestionsList",ExamController.batchPublishedUserQuestionsList)//批量发布用户端的题目
 ExamRouter.get("/adminapi/exam/publishedUserQuestionsList/:id",ExamController.getUserQuestionsList)//获取用户端已发布的题目
 ExamRouter.post("/adminapi/exam/UserquestionlistDown/:id",ExamController.UserquestionlistDown)//不同类型题目用户端的题目全部下架操作

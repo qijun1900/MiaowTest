@@ -14,8 +14,14 @@
                         type="primary" 
                         plain 
                         @click="handlePublishMany"
-                        :disabled="!selectedRows || selectedRows.length === 0">
+                        :disabled="!selectedRows || selectedRows.length === 0 || tableData.length === 0">
                         批量改变状态
+                    </el-button>
+                    <el-button
+                        type="primary"
+                        plain
+                        @click="handleRefresh">
+                        刷新数据
                     </el-button>
                 </div>
             </div>
@@ -52,7 +58,7 @@
 </template>
 <script setup>
 import { onMounted, watch,ref,computed} from 'vue';
-import { FetchAddQuestionList,AddOneQuestion,AddManyQuestion } from '@/API/Exam/addQusetionAPI';
+import { FetchAddQuestionList,AddOneQuestion,AddManyQuestion } from '@/API/Exam/usersQusetionAPI';
 import { Search } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { useTableActions } from '@/composables/Action/useTableActions'
@@ -78,7 +84,6 @@ const props = defineProps({
 const fechData = async () => {
     // 调用接口获取数据
     const res = await FetchAddQuestionList(props.WhichCategory,props.examId)
-    console.log(res)
     if (res.code === 200) {
         tableData.value = res.data
     }
@@ -123,7 +128,14 @@ const handlePublishMany = async() => {
     fechData()
   }
 }
-
+// 刷新数据
+const handleRefresh = () => {
+    fechData()
+    ElMessage({
+        message: '刷新成功',
+        type:'success',
+    })
+}
 // 监听props变化，变化时重新请求数据
 watch([() => props.WhichCategory, () => props.examId], () => {
     if(props.WhichCategory && props.examId) {
@@ -133,7 +145,6 @@ watch([() => props.WhichCategory, () => props.examId], () => {
 // 在组件挂载时获取数据
 onMounted(() => {
     fechData()
-     console.log('handleCheck',props.QuestionTitleId)
 })
 </script>
 <style scoped>
