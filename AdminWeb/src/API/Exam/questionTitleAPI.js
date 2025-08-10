@@ -44,7 +44,6 @@ export async function DeleteOneQuestionTitle(_id, examId) {
     }catch (error) {
         console.error("Error during delete one question title:", error);
     }
-    
 }
 
 export async function DeleteManyQuestionTitle(_ids, examId) {
@@ -68,3 +67,4 @@ export async function UpdateQuestionTitleOneState({_id, examId, state}) {
         console.error("Error during update question title one state:", error);
     }
 }
+

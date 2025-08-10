@@ -230,10 +230,20 @@
             drawerSize="50%">
                 <template #drawercontent>
                     <QuestionAddList
-                    :QuestionTitleId="QuestionTitleId" 
-                    :WhichCategory="WhichCategory"
-                    :examId="route.params.id"/>
+                        :QuestionTitleId="QuestionTitleId" 
+                        :WhichCategory="WhichCategory"
+                        :examId="route.params.id"/>
                 </template>
+        </Drawer>
+        <Drawer
+            v-model="drawerVisible3"
+            drawerTitle="题目列表"
+            drawerSize="50%">
+            <template #drawercontent>
+               <QuestionCheckList
+                    :QuestionTitleId="QuestionTitleId"
+                    :examId="route.params.id"/>
+            </template>
         </Drawer>
     </div>
 </template>
@@ -255,7 +265,7 @@ import {
         UpdateQuestionTitleList,
         DeleteOneQuestionTitle,
         DeleteManyQuestionTitle,
-        UpdateQuestionTitleOneState
+        UpdateQuestionTitleOneState,
     } from '@/API/Exam/questionTitleAPI';
 import { ElMessage } from 'element-plus';
 import Drawer from '@/components/ReuseComponents/Drawer.vue';
@@ -265,7 +275,10 @@ const Dialog = defineAsyncComponent(() =>
     import('@/components/FunComponents/Dialog .vue')
 )
 const QuestionAddList = defineAsyncComponent(() =>
-    import('@/components/FunComponents/QuestionAddList.vue')
+    import('@/components/Exam/QuestionAddList.vue')
+)
+const QuestionCheckList = defineAsyncComponent(() =>
+    import('@/components/Exam/QuestionCheckList.vue')
 )
 const appStore = useAppStore();
 const route = useRoute()
@@ -284,6 +297,7 @@ const dialogVisible = ref(false)
 //抽屉状态
 const drawerVisible1 = ref(false)
 const drawerVisible2 = ref(false)
+const drawerVisible3 = ref(false)
 // 添加编辑状态
 const isEditMode = ref(false)
 const currentEditId = ref(null)
@@ -423,7 +437,8 @@ const handleRefreshData = async() => {
 }
 //查看已添加题目
 const handleCheck = (row) => {
-   console.log(row)
+   drawerVisible3.value = true
+   QuestionTitleId.value = row._id
 }
 //选择题目类型
 const handleChooseQuestionType = (row) => {
@@ -436,6 +451,7 @@ const handleAddQuestion = (category) => {
     drawerVisible2.value = true
     WhichCategory.value = category
 }
+
 onMounted(() => {
     handleRefreshData()
 });

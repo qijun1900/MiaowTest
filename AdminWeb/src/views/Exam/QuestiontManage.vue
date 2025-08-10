@@ -416,7 +416,6 @@ const handleRefreshQuestionData = async () => {
             size: pageSize.value,
             questionType: QuestionType,
         },getQuestionList)
-        console.log("data", res.data.data)
         if(res.code===200){
             tableData.value = res.data.data
             total.value = res.data.total

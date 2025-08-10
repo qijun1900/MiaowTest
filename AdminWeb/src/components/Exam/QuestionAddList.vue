@@ -133,6 +133,7 @@ watch([() => props.WhichCategory, () => props.examId], () => {
 // 在组件挂载时获取数据
 onMounted(() => {
     fechData()
+     console.log('handleCheck',props.QuestionTitleId)
 })
 </script>
 <style scoped>

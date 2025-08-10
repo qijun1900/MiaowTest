@@ -421,6 +421,37 @@ const ExamService = {
             insertResult
         }
     },
+    getCheckQusetionList: async ({examId,QuestionTitleId}) => {
+        const userExamInfo= await UserExamModel.findOne(
+            {
+                examId,
+                "questionTitle._id": QuestionTitleId
+            },
+            {
+                "questionTitle.$": 1// 使用$投影操作符只返回匹配的questionTitle数组元素
+                // 1表示包含该字段，0表示排除其他字段
+            }
+        )
+        // 返回匹配的questionTitle条目中的questionIdS数组，如果没有则返回空数组
+        return userExamInfo.questionTitle[0].questionIdS || [];
+       
+    },
+    MatchQusetionList: async ({extractedData}) => {
+        const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        }
+        // 使用Promise.all并发查询每个ID对应的题目
+        const results = await Promise.all(
+            extractedData.map(({_id, category}) => {
+                const model = modelMap[category];
+                return model.findById(_id);
+            })
+        )
+     return results.filter(Boolean); // 过滤掉null结果
+    },
     RemoveSingUserList: async ({ examId, questionId, isAddUserList, Type, titleId, row }) => {
         const modelMap = {
             1: ExamSelectModel,

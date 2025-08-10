@@ -388,6 +388,24 @@ const ExamController ={
             ActionType:"OK",
         })
     },
+    getCheckQusetionList:async(req,res)=>{
+        const {examId,QuestionTitleId} = req.query
+        const result = await ExamService.getCheckQusetionList({examId,QuestionTitleId})
+        res.send({
+            code:200,
+            ActionType:"OK",
+            data:result,
+        })
+    },
+    MatchQusetionList:async(req,res)=>{
+        const {extractedData} = req.body
+        const result = await ExamService.MatchQusetionList({extractedData})
+        res.send({
+            code:200,
+            ActionType:"OK",
+            data:result,
+        })
+    },
     RemoveSingUserList:async(req,res)=>{
         const {examId,questionId,isAddUserList,Type,titleId,row} = req.body 
          await ExamService.RemoveSingUserList({

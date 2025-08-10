@@ -46,3 +46,30 @@ export async function AddManyQuestion({_ids,examId,category,QuestionTitleId}) {
     }
     
 }
+
+export async function FetchCheckQuestionList(examId,QuestionTitleId) {
+    // 获取已添加的题目列表
+    try{
+        const response = await axios.get("/adminapi/foruser/get/checkQusetionList",{
+            params:{
+                examId,
+                QuestionTitleId
+            }
+        });
+        return response.data;
+        
+    }catch (error) {
+        console.error("Error during fetch check question list:", error);
+        throw error; 
+    }
+}
+export async function FetchMatchQuestionList(extractedData){
+    // 获取匹配的题目列表
+    try{
+        const response = await axios.post("/adminapi/foruser/get/matchQusetionList",{extractedData});
+        return response.data;
+    }catch (error) {
+        console.error("Error during fetch match question list:", error);
+        throw error; 
+    }   
+}

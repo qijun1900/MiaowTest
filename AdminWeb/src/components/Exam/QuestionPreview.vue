@@ -55,7 +55,7 @@
         </div>
         <template #footer>
             <el-button type="primary" @click="dialogConfirmClose" class="close-btn">
-                关闭
+              关闭
             </el-button>
         </template>
     </el-dialog>
@@ -82,11 +82,11 @@ const previewData = computed(() => props.Data)
 
 // 同步父组件的 v-model 值
 watch(() => props.modelValue, (newVal) => {
-    PreviewdialogVisible.value = newVal
+  PreviewdialogVisible.value = newVal
 })
 // 当对话框关闭时同步状态
 watch(PreviewdialogVisible, (val) => {
-    emit('update:modelValue', val)
+  emit('update:modelValue', val)
 })
 // 点击确认按钮的逻辑
 const dialogConfirmClose = () => {
