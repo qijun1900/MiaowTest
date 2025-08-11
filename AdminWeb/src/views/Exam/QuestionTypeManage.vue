@@ -127,7 +127,7 @@
                 </el-table-column>
                 <el-table-column label="题型描述" width="230">
                     <template #default="scope">
-                        <div >{{ scope.row.description }}</div>
+                        <div >{{ scope.row.description || '无描述' }}</div>
                     </template>
                 </el-table-column> 
                 <el-table-column label="题目数量" width="100">

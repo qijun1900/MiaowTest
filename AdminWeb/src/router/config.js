@@ -8,6 +8,7 @@ import QuestiontManage from "@/views/Exam/QuestiontManage.vue"
 import QuestionAdd from "@/views/Exam/QuestionAdd.vue"
 import ModelManage from "@/views/LLM/ModelManage.vue"
 import QuestionTypeManage from "@/views/Exam/QuestionTypeManage.vue"
+import BatchAddQuestion from "@/components/Exam/BatchAddQuestion.vue"
 
 const routes= [
     {
@@ -49,6 +50,11 @@ const routes= [
         path: '/exam/questionadd/:id',
         name: 'QuestionAdd',
         component: QuestionAdd,
+    },
+    {
+        path: '/exam/batchadd/:id',
+        name: 'BatchAddQuestion',
+        component: BatchAddQuestion,
     },
     {
         path: '/model/modelmanage',

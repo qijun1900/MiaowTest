@@ -3,7 +3,7 @@
     <template #content>
       <div class="header-content">
         <span> {{ Title }} </span>
-       <div v-if="/^\/exam\/(questionadd|questionlist)\//.test(route.path)" class="custom-style">
+       <div v-if="/^\/exam\/(questionadd|questionlist|batchadd)\//.test(route.path)" class="custom-style">
           <el-segmented 
             v-model="value" 
             :options="options" 
@@ -31,8 +31,10 @@ const value = ref(route.path.startsWith('/exam/questionlist/') ? 'questionlist' 
 
 const options = [
   { label: '题目列表', value: 'questionlist' },
-  { label: '添加题目', value: 'questionadd' }
+  { label: '添加题目', value: 'questionadd' },
+  { label: '批量添加', value: 'batchadd' }
 ]
+
 const handleSegmentedChange = (newValue) => {
   const examId = route.params.id
   const query = route.query
@@ -42,8 +44,10 @@ const handleSegmentedChange = (newValue) => {
   }
   if (newValue === 'questionlist') {
     router.push(`/exam/questionlist/${examId}?category=${query.category}`)
-  } else {
+  } else if (newValue === 'questionadd') {
     router.push(`/exam/questionadd/${examId}?category=${query.category}`)
+  } else {
+    router.push(`/exam/batchadd/${examId}?category=${query.category}`)
   }
 }
 
@@ -63,6 +67,8 @@ const Title = computed(() => {
       return '题目列表';
     case (route.path.match(/^\/exam\/questionadd\//) ? route.path : ''):
       return '添加题目';
+    case (route.path.match(/^\/exam\/batchadd\//)? route.path : ''):
+      return '批量添加';
     case '/model/modelmanage':
       return '模型管理';
     case (route.path.match(/^\/exam\/createExamType\//) ? route.path : ''):
@@ -77,6 +83,8 @@ watch(() => route.path, (newPath) => {
     value.value = 'questionlist'
   } else if (newPath.startsWith('/exam/questionadd/')) {
     value.value = 'questionadd'
+  } else if (newPath.startsWith('/exam/batchadd/')) {
+    value.value = 'batchadd'
   }
 })
 </script>
@@ -94,7 +102,7 @@ watch(() => route.path, (newPath) => {
 /* 保留原有的分段控件样式 */
 .custom-style .el-segmented {
   --el-segmented-item-selected-color: var(--el-text-color-primary);
-  --el-segmented-item-selected-bg-color: #ffd100;
+  --el-segmented-item-selected-bg-color: #ffd000;
   --el-border-radius-base: 16px;
 }
 </style>

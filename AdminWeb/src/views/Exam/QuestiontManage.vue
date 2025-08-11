@@ -419,6 +419,7 @@ const handleRefreshQuestionData = async () => {
         if(res.code===200){
             tableData.value = res.data.data
             total.value = res.data.total
+            appStore.changecurrentQuestionTotal(res.data.total)//更新总题目数
         }
     }catch(error){
         console.error('获取题目列表失败:',error)
