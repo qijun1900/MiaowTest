@@ -8,6 +8,7 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^17.2.1",
     "express": "^4.21.2",
     "http-errors": "~1.6.3",
     "jade": "^1.9.2",

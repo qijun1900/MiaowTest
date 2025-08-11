@@ -1,8 +1,10 @@
-//1panel MongoDB配置文件,部署上线文件
+//1panel MongoDB配置文件,部署上线文件,需要在根目录创建.env文件,并添加以下内容:
+require('dotenv').config(); 
+
 module.exports ={
-    username:'mongo_cG37de',//用户名
-    password:'mongo_FG2M6e',//密码
-    host:'172.18.0.2',
-    sport:'27017',
-    databasename:'examinationsystem'
+    username: process.env.MONGO_USERNAME ,//用户名
+    password: process.env.MONGO_PASSWORD ,//密码
+    host: process.env.MONGO_HOST ,// 主机地址
+    sport: process.env.MONGO_PORT, // 端口
+    databasename: process.env.MONGO_DATABASE ,// 数据库名称
 }
