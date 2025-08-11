@@ -1,11 +1,14 @@
 <template>
     <div class="container">
+        <Welcome 
+            title="欢迎使用AI智能录题，可大量向该科目改题型下添加题目！"
+            extra="当前对话模型："/>
         <div class="sender">
             <EditorSender 
-                placeholder="请在此处按照格式正确输入题目内容~"
+                placeholder="请在此处输入内容~"
                 :iSshowHeaderFlog="true"
                 :iSshowPrefixFlog="true"
-                HeaderLeftTitle="💯欢迎使用AI自动录入题目~"
+                HeaderLeftTitle="💯当前科目及其题目信息~"
                 HeaderSelfWrapclassName="my-header-self-wrap"
                 HeaderSelfContentclassName="my-header-self-content">
                 <template #HeaderSelfContent>
@@ -41,17 +44,13 @@ import { useAppStore } from '@/stores';
 import {getCategoryName} from '@/util/formatExamname'
 import formatTime from '@/util/formatTime'
 import { onMounted } from 'vue';
+import Welcome from '../Element-plus-x/Welcome.vue';
 
 const appStore = useAppStore();
-const props = defineProps({
-    total: {
-    type: Number,
-    default: 0
-  }
-})
+
 
 onMounted(() => {
-    console.log(props.total);
+  
 });
 
 
@@ -61,7 +60,9 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height: 100%;
+    width: 100%;
 }
 
 .sender {
@@ -71,7 +72,8 @@ onMounted(() => {
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    margin-top: 400px;
+    margin-top: 50px;
+
 }
 
 
