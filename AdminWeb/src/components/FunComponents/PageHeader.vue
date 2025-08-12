@@ -27,7 +27,11 @@ const route = useRoute()
 const goBack = ()=>{
   RouterBack();  
 }
-const value = ref(route.path.startsWith('/exam/questionlist/') ? 'questionlist' : 'questionadd')
+const value = ref(
+  route.path.startsWith('/exam/questionlist/') ? 'questionlist' :
+  route.path.startsWith('/exam/questionadd/') ? 'questionadd' :
+  route.path.startsWith('/exam/batchadd/') ? 'batchadd' : 'questionadd'
+)
 
 const options = [
   { label: '题目列表', value: 'questionlist' },

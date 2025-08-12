@@ -1,6 +1,11 @@
 <template>
     <div class="container">
-        <EditorSender :placeholder=props.placeholder :auto-focus="props.isFocus">
+        <EditorSender  
+            ref="senderRef"
+            @submit="handleSubmit"
+            :placeholder=props.placeholder 
+            :auto-focus="props.isFocus"
+            :clearable="props.iSclearable">
             <template v-if="showHeader" #header>
                 <div :class="props.HeaderSelfWrapclassName">
                     <div :class="['default-header-self-title']">
@@ -21,7 +26,9 @@
             </template>
             <template v-if="props.iSshowPrefixFlog" #prefix>
                 <div class="prefix-self-wrap">
-                <el-button color="#626aef" :dark="true" @click="openCloseHeader">
+                <el-button color="#626aef" 
+                    :dark="true" 
+                    @click="openCloseHeader">
                     打开/关闭头部
                 </el-button>
                 </div>
@@ -32,7 +39,8 @@
 <script setup>
 import { CircleClose } from '@element-plus/icons-vue';
 import { ref } from 'vue';
-
+const senderRef = ref();
+const emit = defineEmits(['user-submit']);
 const props = defineProps({
     placeholder: {// 编辑器占位符
         type: String,
@@ -42,7 +50,11 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    iSshowHeaderFlog: {// 是否显示头部
+    iSclearable: {// 是否可清空
+        type: Boolean,
+        default: false
+    },
+    isShowHeaderFlog: {// 是否显示头部
         type: Boolean,
         default: false
     },
@@ -62,18 +74,35 @@ const props = defineProps({
         type: String,
         default: 'default-header-self-content'
     }
-
 })
-
-const showHeader = ref(props.iSshowHeaderFlog);
-
+const showHeader = ref(props.isShowHeaderFlog);// 是否显示头部
+// 获取编辑器内容的方法
+const getEditorContent = () => {
+  const content = senderRef.value.getCurrentValue();
+    // content 结构示例:
+    // {
+    //   text: "纯文本内容",
+    //   html: "<p>带格式的HTML内容</p>",
+    //   tags: ["标签1", "标签2"]
+    // 
+  return content;
+};
 const openCloseHeader = () => {
     showHeader.value = !showHeader.value;
 };
-
 const closeCloseHeader = () => {
     showHeader.value = false;
 };
+
+const handleSubmit = () => {
+    const content = getEditorContent();
+    showHeader.value = false; // 关闭头部
+    emit('user-submit',content); 
+};
+
+
+
+
 </script>
 
 <style scoped>

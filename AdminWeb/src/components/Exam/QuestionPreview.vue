@@ -1,3 +1,4 @@
+<!-- 题目预览组件 -->
 <template>
     <el-dialog 
         :draggable="true"

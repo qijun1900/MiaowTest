@@ -5,10 +5,10 @@ import Announcement from "@/views/News/Announcement.vue"
 import NotFound from "@/views/NotFound/NotFound.vue"
 import ExamManage from "@/views/Exam/ExamManage.vue"
 import QuestiontManage from "@/views/Exam/QuestiontManage.vue"
-import QuestionAdd from "@/views/Exam/QuestionAdd.vue"
+import QuestionAdd from "@/views/Exam/QuestionSingleAdd.vue"
 import ModelManage from "@/views/LLM/ModelManage.vue"
 import QuestionTypeManage from "@/views/Exam/QuestionTypeManage.vue"
-import BatchAddQuestion from "@/components/Exam/BatchAddQuestion.vue"
+import QuestionBatchAdd from "@/views/Exam/QuestionBatchAdd.vue"
 
 const routes= [
     {
@@ -54,7 +54,7 @@ const routes= [
     {
         path: '/exam/batchadd/:id',
         name: 'BatchAddQuestion',
-        component: BatchAddQuestion,
+        component: QuestionBatchAdd,
     },
     {
         path: '/model/modelmanage',

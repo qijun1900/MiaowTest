@@ -1,3 +1,4 @@
+<!-- 根据题型的不同来选择相应组件 -->
 <template>
     <div>
       <component :is="currentComponent"  />
