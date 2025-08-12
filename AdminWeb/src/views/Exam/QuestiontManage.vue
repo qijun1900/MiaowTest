@@ -289,7 +289,7 @@ import {
 import handleLooked from '@/util/CheckInfo'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
-    import('@/components/FunComponents/Dialog .vue')
+    import('@/components/ReuseComponents/Dialog .vue')
 )
 const QuestionPreview = defineAsyncComponent(() =>
     import('@/components/Exam/QuestionPreview.vue')

@@ -103,7 +103,7 @@ const QuestionPreview = defineAsyncComponent(() =>
     import('@/components/Exam/QuestionPreview.vue')
 )
 const Dialog = defineAsyncComponent(() =>
-    import('@/components/FunComponents/Dialog .vue')
+    import('@/components/ReuseComponents/Dialog .vue')
 )
 const { selectedRows,handleSelectionChange } = useTableActions()
 

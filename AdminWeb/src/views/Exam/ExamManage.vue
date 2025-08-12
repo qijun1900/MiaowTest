@@ -294,7 +294,7 @@ import RouterPush from '@/util/RouterPush'
 
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
-    import('@/components/FunComponents/Dialog .vue')
+    import('@/components/ReuseComponents/Dialog .vue')
 )
 const Upload = defineAsyncComponent(() =>
     import('@/components/upload/Upload.vue')
