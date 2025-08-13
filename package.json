@@ -5,6 +5,6 @@
   "scripts": {
     "start:node": "cd node && npm start",
     "start:admin": "cd AdminWeb && npm run dev",
-    "start": "powershell -Command \"Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:node'; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:admin'\""
+    "serve": "powershell -Command \"Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:node'; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:admin'\""
   }
 }
