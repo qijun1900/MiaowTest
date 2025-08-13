@@ -46,7 +46,7 @@
                 <XBubble
                     :content="message.content"
                     :placement="message.role === 'user' ?'end': 'start'"
-                    :bubbleHeaderTitle="message.role === 'user' ? appStore.userInfo.username :'题目添加AI助手'"
+                    :bubbleHeaderTitle="message.role === 'user' ? appStore.userInfo.username :'AI助手'"
                     :isLoading="message.isLoading || false"
                 />
             </div>
@@ -61,11 +61,11 @@ import formatTime from '@/util/formatTime'
 import { onMounted ,ref} from 'vue';
 import XWelcome from '@/components/Element-plus-x/XWelcome.vue';
 import XBubble from '@/components/Element-plus-x/XBubble.vue';
+import { testChatAPI } from '@/API/LLM/chatAPI';
 
 const appStore = useAppStore();
 const isSendValue = ref(false);
 const chatHistory = ref([]);
-
 const isLoading = ref(false);
 
 const handleUserSend = async (data) => {
@@ -81,18 +81,20 @@ const handleUserSend = async (data) => {
             isLoading: true
         });
 
-        // 这里模拟 AI 响应，实际项目中替换为真实的 API 调用
+        //  AI 回复的过程
         isLoading.value = true;
         try {
-            // 模拟 API 延迟
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // 获取到 AI 回复后，更新最后一条消息
-            chatHistory.value[chatHistory.value.length - 1] = {
-                role: 'assistant',
-                content: '这是AI的回复内容',  // 这里替换为实际的 AI 回复
-                isLoading: false
-            };
+            console.log(chatHistory.value)
+            const response = await testChatAPI(chatHistory.value,"qwen-plus"); 
+            console.log(response)
+            if(response.code===200){
+                // 成功获取 AI 回复后更新消息
+                chatHistory.value[chatHistory.value.length - 1] = {// 直接修改最后一个消息
+                    role: 'assistant',
+                    content: response.data.Aidata,
+                    isLoading: false
+                };
+            }
         } catch (error) {
             console.error('获取 AI 回复失败:', error);
             // 发生错误时更新消息

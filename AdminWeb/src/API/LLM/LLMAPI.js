@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export async function postAddModel(data) {
+    // 添加模型
     try {
         const res = await axios.post("/adminapi/model/addmodel", data)
         return res.data
@@ -9,6 +10,7 @@ export async function postAddModel(data) {
         console.error("Error:", error);
     }
 }
+
 export async function getModelList(params) {
     // 获取模型列表
     try {
@@ -24,6 +26,7 @@ export async function getModelList(params) {
         console.error("Error:", error);
     }
 }
+
 export async function updateModelPublishStatus(_id, state) {
     try {
         const res = await axios.post("/adminapi/model/updateModelPublishStatus", {_id, state})
@@ -32,8 +35,9 @@ export async function updateModelPublishStatus(_id, state) {
         console.error("Error:", error);
     }
 }
+
 export async function postDeleteOneModel(_id) {
-    // 删除单个考试信息
+    // 删除单个模型
     try {
         const response = await axios.post("/adminapi/model/deloneModel",{_id});
         if(response.data.code === 200) {
@@ -44,6 +48,7 @@ export async function postDeleteOneModel(_id) {
     }
     
 }
+
 export async function postDeleteManyModel(_ids) {
     // 删除多个
     try {

@@ -1,4 +1,5 @@
 const LLMModel = require("../../models/LLMsModel");
+const chat = require("../../llm/admin/chat")
 const LLMService = {
     addmodel: async ({modelName,modelValue,isPublish,description,creator,createdTime}) => {
         return await LLMModel.create({
@@ -33,6 +34,9 @@ const LLMService = {
     changestatus: async ({_id,state}) => {
         return await LLMModel.updateOne({_id},{isPublish:state})
        
+    },
+    testChatModel: async (message,model) => {
+        return await chat.postUserSingleChat(message,model)
     }
     
 
