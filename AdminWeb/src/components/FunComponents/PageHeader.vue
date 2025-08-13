@@ -77,6 +77,8 @@ const Title = computed(() => {
       return '模型管理';
     case (route.path.match(/^\/exam\/createExamType\//) ? route.path : ''):
       return '考试题型管理';
+    case '/model/chat':
+      return '模型对话';
     default:
       return '后台管理系统';
   }

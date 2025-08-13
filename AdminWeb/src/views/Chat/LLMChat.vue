@@ -2,41 +2,13 @@
     <div class="container">
             <XWelcome 
                 v-show="!isSendValue"
-                title="欢迎使用AI智能录题，可大量向该科目改题型下添加题目！"
+                title="欢迎使用AI对话~！"
                 extra="当前对话模型："/>
         <div :class="isSendValue ? 'active-sender':'default-sender'">
             <XEditorSender
                 @user-submit="handleUserSend"
                 placeholder="请在此处输入内容~"
-                :isShowHeaderFlog="true"
-                :iSshowPrefixFlog="true"
-                :iSclearable="true"
-                HeaderLeftTitle="💯当前科目及其题目信息~"
-                HeaderSelfWrapclassName="my-header-self-wrap"
-                HeaderSelfContentclassName="my-header-self-content">
-                <template #HeaderSelfContent>
-                    <el-card style="border-radius: 10px" shadow="never">
-                        <el-descriptions 
-                            :column="4">
-                            <el-descriptions-item 
-                                label="科目名称">
-                            <el-tag type="success">{{ appStore.examInfo.name }}</el-tag>
-                        </el-descriptions-item>
-                        <el-descriptions-item 
-                            label="题目类别" >
-                            <el-tag type="warning">{{ getCategoryName(appStore.examInfo.category) }}</el-tag>
-                        </el-descriptions-item>
-                        <el-descriptions-item 
-                            label="题目数量" >
-                            <el-tag type="primary">{{ appStore.currentQuestionTotal }}</el-tag>
-                        </el-descriptions-item>
-                        <el-descriptions-item 
-                            label="创建时间">
-                            <el-tag type="info">{{ formatTime.getTime2(appStore.examInfo.createdTime) }}</el-tag>
-                        </el-descriptions-item>
-                        </el-descriptions>
-                    </el-card>
-                </template>
+                :iSclearable="true">
             </XEditorSender>
         </div>
         <div 
@@ -56,8 +28,6 @@
 <script setup>
 import XEditorSender  from '@/components/Element-plus-x/XEditorSender .vue';
 import { useAppStore } from '@/stores';
-import {getCategoryName} from '@/util/formatExamname'
-import formatTime from '@/util/formatTime'
 import { onMounted ,ref} from 'vue';
 import XWelcome from '@/components/Element-plus-x/XWelcome.vue';
 import XBubble from '@/components/Element-plus-x/XBubble.vue';

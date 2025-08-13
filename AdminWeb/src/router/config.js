@@ -9,6 +9,7 @@ import QuestionAdd from "@/views/Exam/QuestionSingleAdd.vue"
 import ModelManage from "@/views/LLM/ModelManage.vue"
 import QuestionTypeManage from "@/views/Exam/QuestionTypeManage.vue"
 import QuestionBatchAdd from "@/views/Exam/QuestionBatchAdd.vue"
+import LLMChat from "@/views/Chat/LLMChat.vue"
 
 const routes= [
     {
@@ -64,8 +65,12 @@ const routes= [
     {
         path: '/exam/createExamType/:id',
         name: 'QuestionTypeManage',
-        component: QuestionTypeManage,
-            
+        component: QuestionTypeManage,  
+    },
+    {
+        path: '/model/chat',
+        name: 'LLMChat',
+        component: LLMChat,
     }
 
 ]

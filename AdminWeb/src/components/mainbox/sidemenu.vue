@@ -57,13 +57,21 @@
         </template>
         <el-menu-item index="/model/modelmanage">模型管理</el-menu-item>
       </el-sub-menu>
+
+      <el-menu-item index="/model/chat">
+        <el-icon>
+          <ChatRound />
+        </el-icon>
+        <span>模型对话</span>
+      </el-menu-item>
+      
     </el-menu>
   </el-aside>
 </template>
 
 <script setup>
 import { useAppStore } from '@/stores/index';
-import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy,Cpu } from '@element-plus/icons-vue'
+import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy,Cpu ,ChatRound} from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
 
 const route = useRoute()
