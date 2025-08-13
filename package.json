@@ -1,0 +1,10 @@
+{
+  "name": "answer-system",
+  "version": "1.0.0",
+  "description": "答题系统",
+  "scripts": {
+    "start:node": "cd node && npm start",
+    "start:admin": "cd AdminWeb && npm run dev",
+    "start": "powershell -Command \"Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:node'; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:admin'\""
+  }
+}
