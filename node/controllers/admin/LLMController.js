@@ -78,6 +78,14 @@ const LLMController = {
             ActionType: "OK",
             data: result
         })
+    },
+    getChatModels: async (req, res) => {
+        const result = await LLMService.getChatModels()
+        res.send({
+            code: 200,
+            ActionType: "OK",
+            data: result
+        })
     }
 }
 

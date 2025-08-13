@@ -9,3 +9,11 @@ export async function testChatAPI(message,model) {
     }
 }
 
+export async function getChatModels() {
+    try {
+        const res = await axios.get("/adminapi/caht/get/getChatModelsList")
+        return res.data;
+    }catch (error) {
+        console.error("Error:", error);
+    }
+}

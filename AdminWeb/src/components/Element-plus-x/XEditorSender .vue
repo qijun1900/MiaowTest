@@ -5,7 +5,8 @@
             @submit="handleSubmit"
             :placeholder=props.placeholder 
             :auto-focus="props.isFocus"
-            :clearable="props.iSclearable">
+            :clearable="props.iSclearable"
+            :loading="props.isSenderloading">
             <template v-if="showHeader" #header>
                 <div :class="props.HeaderSelfWrapclassName">
                     <div :class="['default-header-self-title']">
@@ -24,13 +25,9 @@
                     </div>
                 </div>    
             </template>
-            <template v-if="props.iSshowPrefixFlog" #prefix>
+            <template  #prefix>
                 <div class="prefix-self-wrap">
-                <el-button color="#626aef" 
-                    :dark="true" 
-                    @click="openCloseHeader">
-                    打开/关闭头部
-                </el-button>
+                    <slot name="sender-prefix"></slot>
                 </div>
             </template>
         </EditorSender>
@@ -66,6 +63,10 @@ const props = defineProps({
         type: String,
         default: '💯 欢迎使用 Element Plus X'
     },
+    isSenderloading: {// 是否显示加载中状态
+        type: Boolean,
+        default: false
+    },
     HeaderSelfWrapclassName: {// 自定义类名
         type: String,
         default: 'default-header-self-wrap'
@@ -87,21 +88,26 @@ const getEditorContent = () => {
     // 
   return content;
 };
+// 打开头部方法
 const openCloseHeader = () => {
     showHeader.value = !showHeader.value;
 };
+// 关闭头部方法
 const closeCloseHeader = () => {
     showHeader.value = false;
 };
-
+// 提交方法
 const handleSubmit = () => {
     const content = getEditorContent();
     showHeader.value = false; // 关闭头部
     emit('user-submit',content); 
 };
-
-
-
+// 清空内容方法
+const clearContent = () => {
+  senderRef.value && senderRef.value.clear && senderRef.value.clear();
+};
+// 暴露方法
+defineExpose({ clearContent,openCloseHeader });
 
 </script>
 

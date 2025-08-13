@@ -37,6 +37,9 @@ const LLMService = {
     },
     testChatModel: async (message,model) => {
         return await chat.postUserSingleChat(message,model)
+    },
+    getChatModels: async () => {
+        return await LLMModel.find({isPublish:1})
     }
     
 

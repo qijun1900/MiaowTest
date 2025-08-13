@@ -1,86 +1,121 @@
 <template>
     <div class="container">
-            <XWelcome 
-                v-show="!isSendValue"
-                title="欢迎使用AI对话~！"
-                extra="当前对话模型："/>
-        <div :class="isSendValue ? 'active-sender':'default-sender'">
-            <XEditorSender
-                @user-submit="handleUserSend"
-                placeholder="请在此处输入内容~"
-                :iSclearable="true">
+        <XWelcome 
+            v-show="!isSendValue" 
+            title="欢迎使用AI对话~！" 
+            :extra="`当前对话模型：${selectedModel || 'qwen-plus'}`"
+            :description="modelOptions.find(option => option.value === selectedModel)?.description || ''"/>
+        <div 
+            :class="isSendValue ? 'active-sender' : 'default-sender'">
+            <XEditorSender 
+                ref="editorRef"
+                @user-submit="handleUserSend" 
+                placeholder="请在此处输入内容~" 
+                :iSclearable="true"
+                :isSenderloading="isSenderloading"
+                :iSshowPrefixFlog="true"
+                :isShowHeaderFlog="false">
+                <template #sender-prefix>
+                    <ElSelect
+                        placeholder="选择模型"
+                        v-model="selectedModel"
+                        :options="modelOptions"
+                        selectWith="160px"/>
+                </template>
             </XEditorSender>
         </div>
-        <div 
-            class="chat-container"  
-            v-show="isSendValue">
-            <div v-for="(message,index) in chatHistory" :key="index" class="message-wrapper">
-                <XBubble
-                    :content="message.content"
-                    :placement="message.role === 'user' ?'end': 'start'"
+        <div class="chat-container" v-show="isSendValue">
+            <div 
+                v-for="(message, index) in chatHistory" 
+                :key="index" 
+                class="message-wrapper">
+                <XBubble 
+                    :content="message.content" 
+                    :placement="message.role === 'user' ? 'end' : 'start'"
                     :bubbleHeaderTitle="message.role === 'user' ? appStore.userInfo.username : message.role"
-                    :isLoading="message.isLoading || false"
+                    :isLoading="message.isLoading || false" 
+                    :typingsteps="4" 
+                    :typinginterval="30" 
+                    typingsuffix="💩"
+                    :isFog="true" 
                 />
             </div>
         </div>
     </div>
 </template>
 <script setup>
-import XEditorSender  from '@/components/Element-plus-x/XEditorSender .vue';
+import XEditorSender from '@/components/Element-plus-x/XEditorSender .vue';
 import { useAppStore } from '@/stores';
-import { onMounted ,ref} from 'vue';
+import { onMounted, ref } from 'vue';
 import XWelcome from '@/components/Element-plus-x/XWelcome.vue';
 import XBubble from '@/components/Element-plus-x/XBubble.vue';
-import { testChatAPI } from '@/API/LLM/chatAPI';
+import { testChatAPI,getChatModels } from '@/API/LLM/chatAPI';
+import ElSelect from '@/components/ReuseComponents/ElSelect.vue';
 
-const appStore = useAppStore();
-const isSendValue = ref(false);
-const chatHistory = ref([]);
-const isLoading = ref(false);
+const appStore = useAppStore();// Pinia应用状态管理
+const isSendValue = ref(false);// 是否发送消息
+const chatHistory = ref([]);// 聊天记录
+const editorRef = ref();// 编辑器引用
+const isSenderloading = ref(false);// 发送按钮加载中状态Sender
+const selectedModel = ref('');// 选择的模型value
+const modelOptions = ref([]);// 模型选项,列表
+const FetchModeList = async () => {
+    try {
+        const response = await getChatModels();
+        console.log(response);
+        if (response.code === 200) {
+            modelOptions.value = response.data.map(item => ({
+                value: item.modelValue,
+                label: item.modelName,
+                description: item.description
+            }));
+        }
+    } catch (error) {
+        console.error('Error fetching chat models:', error);
+    }
+}
 
 const handleUserSend = async (data) => {
-    if(data){
-        // 添加用户消息
-        chatHistory.value.push({role: 'user', content: data.text});
+    if (data) {
+        chatHistory.value.push({ role: 'user', content: data.text });
+        isSenderloading.value = true; // 开始加载
+        editorRef.value?.clearContent();// 清空编辑器内容
         isSendValue.value = true;
-        
-        // 立即添加一个 loading 状态的 AI 消息
+
         chatHistory.value.push({
             role: 'AI助手',
             content: '正在思考中...',
             isLoading: true
         });
 
-        //  AI 回复的过程
-        isLoading.value = true;
         try {
-            console.log(chatHistory.value)
-            const response = await testChatAPI(chatHistory.value,"qwen-plus"); 
-            console.log(response)
-            if(response.code===200){
-                // 成功获取 AI 回复后更新消息
-                chatHistory.value[chatHistory.value.length - 1] = {// 直接修改最后一个消息
-                    role:response.data.modelName,
+            const response = await testChatAPI(
+                chatHistory.value,
+                selectedModel.value? selectedModel.value : 'qwen-plus' 
+            );
+            console.log(response);
+            if (response.code === 200) {
+                chatHistory.value[chatHistory.value.length - 1] = {
+                    role: response.data.modelName,
                     content: response.data.Aidata,
                     isLoading: false
                 };
             }
         } catch (error) {
-            console.error('获取 AI 回复失败:', error);
-            // 发生错误时更新消息
+            console.error('Error fetching chat response:', error);
             chatHistory.value[chatHistory.value.length - 1] = {
                 role: 'assistant',
                 content: '抱歉，获取回复时出现错误',
                 isLoading: false
             };
         } finally {
-            isLoading.value = false;
+            isSenderloading.value = false; // 结束加载
         }
     }
 }
 
 onMounted(() => {
-  
+    FetchModeList();
 });
 
 
@@ -96,7 +131,7 @@ onMounted(() => {
 }
 
 
-.default-sender{
+.default-sender {
     width: 100%;
     max-width: 1100px;
     background-color: #f9f9f9;
@@ -105,7 +140,8 @@ onMounted(() => {
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     margin-top: 30px;
 }
-.active-sender{
+
+.active-sender {
     width: 100%;
     max-width: 1100px;
     background-color: #f9f9f9;
@@ -125,12 +161,9 @@ onMounted(() => {
     gap: 30px;
     width: 100%;
     max-width: 1200px;
-    margin: 20px auto;
     padding: 20px;
-    height: calc(100vh - 170px);
+    height: calc(100vh - 300px);
     overflow-y: auto;
     margin-bottom: 90px;
 }
-
-
 </style>

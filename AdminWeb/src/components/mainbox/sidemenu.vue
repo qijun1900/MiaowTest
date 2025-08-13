@@ -60,7 +60,7 @@
 
       <el-menu-item index="/model/chat">
         <el-icon>
-          <ChatRound />
+          <ChatLineRound />
         </el-icon>
         <span>模型对话</span>
       </el-menu-item>
@@ -71,7 +71,7 @@
 
 <script setup>
 import { useAppStore } from '@/stores/index';
-import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy,Cpu ,ChatRound} from '@element-plus/icons-vue'
+import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy,Cpu ,ChatLineRound} from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
 
 const route = useRoute()

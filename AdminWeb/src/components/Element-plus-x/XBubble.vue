@@ -3,6 +3,13 @@
         :content="props.content"
         :placement="props.placement" 
         :loading="props.isLoading"
+        :typing="{ 
+            step:props.typingstep ,
+            interval: props.typinginterval, 
+            suffix: props.typingsuffix 
+        }"
+        :isMarkdown="true"
+        :is-fog="props.isFog"
         >
         <template #avatar>
             <el-avatar 
@@ -38,6 +45,22 @@ const props = defineProps({
         default: '气泡的头部'
     },
     isLoading: {// 是否显示加载中状态
+        type: Boolean,
+        default: false
+    },
+    typingstep: {// 打字的步数
+        type: Number,
+        default: 2
+    },
+    typinginterval: {// 打字的时间间隔
+        type: Number,
+        default: 50
+    },
+    typingsuffix: {// 打字的后缀
+        type: String,
+        default: '|'
+    },
+    isFog: {// 是否雾化效果
         type: Boolean,
         default: false
     }
