@@ -160,6 +160,13 @@
                             </el-button>
                         </Popconfirm>
                         <el-button 
+                            type="success" 
+                            plain 
+                            @click="handleChat(scope.row)"
+                            :disabled="scope.row.isPublish===0">
+                            立即对话
+                        </el-button>
+                        <el-button 
                             type="info" 
                             plain 
                             @click="handleMore(scope.row)">
@@ -230,6 +237,7 @@ import {
     } 
 from '@/API/LLM/LLMAPI'//api
 import { useAppStore } from '@/stores';
+import RouterPush from '@/util/RouterPush'
 
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
@@ -345,6 +353,10 @@ const handleEdit = (row) => {
 //添加模型
 const handleAdd = ()=>{
     dialogVisible.value = true
+}
+//跳转对话页面
+const handleChat = (row) => {
+   RouterPush('/model/chat',{modelValue:row.modelValue})
 }
 //提交
 const handleConfirm = async () => {

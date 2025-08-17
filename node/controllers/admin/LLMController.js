@@ -19,7 +19,6 @@ const LLMController = {
     },
     getmodellist: async (req, res) => {
         const { page, size } = req.query;
-        console.log(page, size);
         const result = await LLMService.getmodel({
             page: Number(page),
             size: Number(size)
@@ -47,7 +46,6 @@ const LLMController = {
     },
     deleteOnemodel: async (req, res) => {
         const {_id} = req.body
-        console.log(_id)
         await LLMService.deleteOnemodel({_id})
         res.send({
             code: 200,

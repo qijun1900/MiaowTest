@@ -51,7 +51,7 @@ import XWelcome from '@/components/Element-plus-x/XWelcome.vue';
 import XBubble from '@/components/Element-plus-x/XBubble.vue';
 import { testChatAPI,getChatModels } from '@/API/LLM/chatAPI';
 import ElSelect from '@/components/ReuseComponents/ElSelect.vue';
-
+import { useRoute } from 'vue-router';
 const appStore = useAppStore();// Pinia应用状态管理
 const isSendValue = ref(false);// 是否发送消息
 const chatHistory = ref([]);// 聊天记录
@@ -59,10 +59,11 @@ const editorRef = ref();// 编辑器引用
 const isSenderloading = ref(false);// 发送按钮加载中状态Sender
 const selectedModel = ref('');// 选择的模型value
 const modelOptions = ref([]);// 模型选项,列表
+
+// 获取模型列表
 const FetchModeList = async () => {
     try {
         const response = await getChatModels();
-        console.log(response);
         if (response.code === 200) {
             modelOptions.value = response.data.map(item => ({
                 value: item.modelValue,
@@ -74,7 +75,7 @@ const FetchModeList = async () => {
         console.error('Error fetching chat models:', error);
     }
 }
-
+// 处理用户发送消息
 const handleUserSend = async (data) => {
     if (data) {
         chatHistory.value.push({ role: 'user', content: data.text });
@@ -91,9 +92,8 @@ const handleUserSend = async (data) => {
         try {
             const response = await testChatAPI(
                 chatHistory.value,
-                selectedModel.value? selectedModel.value : 'qwen-plus' 
+                selectedModel.value ? selectedModel.value : 'qwen-plus' 
             );
-            console.log(response);
             if (response.code === 200) {
                 chatHistory.value[chatHistory.value.length - 1] = {
                     role: response.data.modelName,
@@ -115,6 +115,10 @@ const handleUserSend = async (data) => {
 }
 
 onMounted(() => {
+    const route = useRoute();
+    if (route.query.modelValue) {
+      selectedModel.value = route.query.modelValue;
+    }
     FetchModeList();
 });
 
