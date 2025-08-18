@@ -36,7 +36,7 @@ const LLMService = {
         return await LLMModel.updateOne({_id},{isPublish:state})
        
     },
-    testChatModel: async (message,model) => {
+    useLLMChat: async (message,model) => {
         return await chat.postUserSingleChat(message,model)
     },
     getChatModels: async () => {

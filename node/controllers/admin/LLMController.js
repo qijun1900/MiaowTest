@@ -68,9 +68,9 @@ const LLMController = {
             ActionType: "OK",
         })
     },
-    testChatModel: async (req, res) => {
+    useLLMChat: async (req, res) => {
         const {message,model} = req.body;
-        const result = await LLMService.testChatModel(message,model)
+        const result = await LLMService.useLLMChat(message,model)
         res.send({
             code: 200,
             ActionType: "OK",
