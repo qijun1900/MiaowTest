@@ -1,5 +1,6 @@
 const LLMModel = require("../../models/LLMsModel");
-const chat = require("../../llm/admin/chat")
+const chat = require("../../llm/admin/Chat/chat")
+const modelapp = require("../../llm/admin/ModelApp/test")
 const LLMService = {
     addmodel: async ({modelName,modelValue,isPublish,description,creator,createdTime}) => {
         return await LLMModel.create({
@@ -40,6 +41,9 @@ const LLMService = {
     },
     getChatModels: async () => {
         return await LLMModel.find({isPublish:1})
+    },
+    testModelAppAPI: async (message) => {
+        return await modelapp.IdentifyFraudInfo(message)
     }
     
 

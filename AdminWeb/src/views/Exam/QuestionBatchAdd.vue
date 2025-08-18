@@ -61,7 +61,7 @@ import formatTime from '@/util/formatTime'
 import { onMounted ,ref} from 'vue';
 import XWelcome from '@/components/Element-plus-x/XWelcome.vue';
 import XBubble from '@/components/Element-plus-x/XBubble.vue';
-import { testChatAPI } from '@/API/LLM/chatAPI';
+import { testModelAppAPI } from '@/API/LLM/modelappAPI';
 
 const appStore = useAppStore();
 const isSendValue = ref(false);
@@ -85,13 +85,13 @@ const handleUserSend = async (data) => {
         isLoading.value = true;
         try {
             console.log(chatHistory.value)
-            const response = await testChatAPI(chatHistory.value,"qwen-plus"); 
+            const response = await testModelAppAPI(chatHistory.value); 
             console.log(response)
             if(response.code===200){
                 // 成功获取 AI 回复后更新消息
                 chatHistory.value[chatHistory.value.length - 1] = {// 直接修改最后一个消息
                     role:response.data.modelName,
-                    content: response.data.Aidata,
+                    content: response.data,
                     isLoading: false
                 };
             }

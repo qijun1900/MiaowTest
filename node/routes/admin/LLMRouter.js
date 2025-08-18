@@ -10,5 +10,6 @@ LLMRouter.post("/adminapi/model/delmanyModel",LLMController.deleteManymodel)//�
 LLMRouter.post("/adminapi/model/updateModelPublishStatus",LLMController.changestatus)//修改模型发布状态
 LLMRouter.post("/adminapi/caht/test",LLMController.testChatModel)//测试接口
 LLMRouter.get("/adminapi/caht/get/getChatModelsList",LLMController.getChatModels)//获取对话模型列表
+LLMRouter.post("/adminapi/modelapp/test",LLMController.testModelAppAPI)//测试模型应用接口
 
 module.exports = LLMRouter; 

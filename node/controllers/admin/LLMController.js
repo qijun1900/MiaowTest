@@ -84,6 +84,15 @@ const LLMController = {
             ActionType: "OK",
             data: result
         })
+    },
+    testModelAppAPI: async (req, res) => {
+        const {message} = req.body;
+        const result = await LLMService.testModelAppAPI(message)
+        res.send({
+            code: 200,
+            ActionType: "OK",
+            data: result
+        })
     }
 }
 
