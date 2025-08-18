@@ -2,14 +2,13 @@ const axios = require('axios');
 const { filterLastUserMessage } = require('../../../helpers/MessageFilter');
 
 
-async function IdentifyFraudInfo(prompt) {
+async function AutoAddQuestion(prompt) {
     const apiKey = process.env.DASHSCOPE_API_KEY;
-    const appId = 'd3bf66f163c84d0186033fc70daba17d';
+    const appId = '5e5c60ebaaf544229ca276a80f07bdde';//智能体应用ID
 
     const url = `https://dashscope.aliyuncs.com/api/v1/apps/${appId}/completion`;
 
     const filteredMessages = filterLastUserMessage(prompt);
-    console.log('Filtered messages:', filteredMessages[0].content);
     
     // 构建请求体
     const data = {
@@ -41,5 +40,5 @@ async function IdentifyFraudInfo(prompt) {
 
 // 仅导出函数供外部调用
 module.exports = {
-    IdentifyFraudInfo
+    AutoAddQuestion
 };

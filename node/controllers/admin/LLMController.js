@@ -85,9 +85,9 @@ const LLMController = {
             data: result
         })
     },
-    testModelAppAPI: async (req, res) => {
-        const {message} = req.body;
-        const result = await LLMService.testModelAppAPI(message)
+    BatchaddQuestion: async (req, res) => {
+        const {message,examId,category} = req.body;
+        const result = await LLMService.BatchaddQuestion(message,examId,category)
         res.send({
             code: 200,
             ActionType: "OK",

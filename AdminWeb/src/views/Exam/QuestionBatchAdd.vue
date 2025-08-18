@@ -2,8 +2,7 @@
     <div class="container">
             <XWelcome 
                 v-show="!isSendValue"
-                title="欢迎使用AI智能录题，可大量向该科目改题型下添加题目！"
-                extra="当前对话模型："/>
+                title="欢迎使用AI智能录题，可大量向该科目改题型下添加题目！"/>
         <div :class="isSendValue ? 'active-sender':'default-sender'">
             <XEditorSender
                 ref="editorRef"
@@ -58,6 +57,11 @@
                     :placement="message.role === 'user' ?'end': 'start'"
                     :bubbleHeaderTitle="message.role === 'user' ? appStore.userInfo.username : message.role"
                     :isLoading="message.isLoading || false"
+                    :bubbleAvatarSrc="message.role ==='user' ? `http://${escconfig.serverHost}:${escconfig.serverPort}` + appStore.userInfo.avatar :'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'"
+                    :typingsteps="4" 
+                    :typinginterval="30" 
+                    typingsuffix="💩"
+                    :isFog="true" 
                 />
             </div>
         </div>
@@ -71,7 +75,9 @@ import formatTime from '@/util/formatTime'
 import { onMounted ,ref} from 'vue';
 import XWelcome from '@/components/Element-plus-x/XWelcome.vue';
 import XBubble from '@/components/Element-plus-x/XBubble.vue';
-import { testModelAppAPI } from '@/API/LLM/modelappAPI';
+import { modelappBatchaddQuestion } from '@/API/LLM/modelappAPI';
+import escconfig from '../../config/esc.config';
+import { useRoute } from 'vue-router';
 
 const appStore = useAppStore();
 const isSendValue = ref(false);// 是否发送消息
@@ -79,7 +85,8 @@ const chatHistory = ref([]);// 聊天记录
 const isLoading = ref(false);// 发送按钮加载中状态
 const editorRef = ref();// 编辑器引用
 const isSenderloading = ref(false);// 发送按钮加载中状态Sender
-
+const route = useRoute();
+const category = appStore.examInfo.category;
 // 提交方法
 const handleUserSend = async (data) => {
     if(data){
@@ -91,7 +98,7 @@ const handleUserSend = async (data) => {
         
         // 立即添加一个 loading 状态的 AI 消息
         chatHistory.value.push({
-            role: 'AI助手',
+            role: '题目添加AI助手',
             content: '正在思考中...',
             isLoading: true
         });
@@ -99,14 +106,13 @@ const handleUserSend = async (data) => {
         //  AI 回复的过程
         isLoading.value = true;
         try {
-            console.log(chatHistory.value)
-            const response = await testModelAppAPI(chatHistory.value); 
+            const response = await modelappBatchaddQuestion(chatHistory.value,route.params.id,category); 
             console.log(response)
             if(response.code===200){
                 // 成功获取 AI 回复后更新消息
                 chatHistory.value[chatHistory.value.length - 1] = {// 直接修改最后一个消息
-                    role:'AI助手',
-                    content: response.data,
+                    role:'题目添加AI助手',
+                    content: response.data.message + `(插入数量为：${response.data.count})`,
                     isLoading: false
                 };
             }
@@ -176,7 +182,7 @@ onMounted(() => {
     max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
-    height: calc(100vh - 170px);
+    height: calc(100vh - 300px);
     overflow-y: auto;
     margin-bottom: 90px;
 }
