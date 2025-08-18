@@ -6,14 +6,24 @@
                 extra="当前对话模型："/>
         <div :class="isSendValue ? 'active-sender':'default-sender'">
             <XEditorSender
+                ref="editorRef"
                 @user-submit="handleUserSend"
-                placeholder="请在此处输入内容~"
+                placeholder="请在此处输入题目内容~"
                 :isShowHeaderFlog="true"
                 :iSshowPrefixFlog="true"
                 :iSclearable="true"
+                :isSenderloading="isSenderloading"
                 HeaderLeftTitle="💯当前科目及其题目信息~"
                 HeaderSelfWrapclassName="my-header-self-wrap"
                 HeaderSelfContentclassName="my-header-self-content">
+                <template #sender-prefix>
+                    <el-button 
+                        color="#626aef" 
+                        :dark="true" 
+                        @click="openCloseHeader">
+                        打开/关闭头部
+                    </el-button>
+                </template>
                 <template #HeaderSelfContent>
                     <el-card style="border-radius: 10px" shadow="never">
                         <el-descriptions 
@@ -64,14 +74,19 @@ import XBubble from '@/components/Element-plus-x/XBubble.vue';
 import { testModelAppAPI } from '@/API/LLM/modelappAPI';
 
 const appStore = useAppStore();
-const isSendValue = ref(false);
-const chatHistory = ref([]);
-const isLoading = ref(false);
+const isSendValue = ref(false);// 是否发送消息
+const chatHistory = ref([]);// 聊天记录
+const isLoading = ref(false);// 发送按钮加载中状态
+const editorRef = ref();// 编辑器引用
+const isSenderloading = ref(false);// 发送按钮加载中状态Sender
 
+// 提交方法
 const handleUserSend = async (data) => {
     if(data){
         // 添加用户消息
         chatHistory.value.push({role: 'user', content: data.text});
+        isSenderloading.value = true; // 开始加载
+        editorRef.value?.clearContent();// 清空编辑器内容
         isSendValue.value = true;
         
         // 立即添加一个 loading 状态的 AI 消息
@@ -90,7 +105,7 @@ const handleUserSend = async (data) => {
             if(response.code===200){
                 // 成功获取 AI 回复后更新消息
                 chatHistory.value[chatHistory.value.length - 1] = {// 直接修改最后一个消息
-                    role:response.data.modelName,
+                    role:'AI助手',
                     content: response.data,
                     isLoading: false
                 };
@@ -104,10 +119,14 @@ const handleUserSend = async (data) => {
                 isLoading: false
             };
         } finally {
-            isLoading.value = false;
+           isSenderloading.value = false; // 结束加载
         }
     }
 }
+// 打开头部方法
+const openCloseHeader = () => {
+    editorRef.value.openCloseHeader();
+};
 
 onMounted(() => {
   

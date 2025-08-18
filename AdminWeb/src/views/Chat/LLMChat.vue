@@ -34,6 +34,7 @@
                     :placement="message.role === 'user' ? 'end' : 'start'"
                     :bubbleHeaderTitle="message.role === 'user' ? appStore.userInfo.username : message.role"
                     :isLoading="message.isLoading || false" 
+                    :bubbleAvatarSrc="message.role ==='user' ? `http://${escconfig.serverHost}:${escconfig.serverPort}` + appStore.userInfo.avatar :'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'"
                     :typingsteps="4" 
                     :typinginterval="30" 
                     typingsuffix="💩"
@@ -52,6 +53,10 @@ import XBubble from '@/components/Element-plus-x/XBubble.vue';
 import { testChatAPI,getChatModels } from '@/API/LLM/chatAPI';
 import ElSelect from '@/components/ReuseComponents/ElSelect.vue';
 import { useRoute } from 'vue-router';
+import escconfig from '../../config/esc.config';
+
+
+
 const appStore = useAppStore();// Pinia应用状态管理
 const isSendValue = ref(false);// 是否发送消息
 const chatHistory = ref([]);// 聊天记录
@@ -59,6 +64,7 @@ const editorRef = ref();// 编辑器引用
 const isSenderloading = ref(false);// 发送按钮加载中状态Sender
 const selectedModel = ref('');// 选择的模型value
 const modelOptions = ref([]);// 模型选项,列表
+
 
 // 获取模型列表
 const FetchModeList = async () => {
