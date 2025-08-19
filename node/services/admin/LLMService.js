@@ -4,7 +4,7 @@ const ExamBlankModel = require('../../models/BlankModel')
 const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const chat = require("../../llm/admin/Chat/chat")
-const modelapp = require("../../llm/admin/ModelApp/test")
+const modelapp = require("../../llm/admin/ModelApp/Iaa")
 
 
 const LLMService = {
@@ -55,11 +55,25 @@ const LLMService = {
             // 移除Markdown代码块标记
             const cleanData = data.replace(/```json/g, '').replace(/```/g, '').trim();
             console.log('Clean data:',cleanData)
-            // 解析JSON数据
-            const jsonData = JSON.parse(cleanData);
+            // 处理可能的多JSON对象情况
+            let jsonData;
+            try {
+                // 先尝试直接解析
+                jsonData = JSON.parse(cleanData);
+            } catch (e) {
+                // 如果失败，尝试用数组包裹
+                try {
+                    jsonData = JSON.parse(`[${cleanData.replace(/}\s*{/g, '},{')}]`);
+                } catch (err) {
+                    console.error('JSON解析失败:', err);
+                    throw new Error('数据格式错误，无法解析');
+                }
+            }
             console.log("jsondata",jsonData)
             
-            const updatedQuestions = jsonData.map(item => {
+            // 确保jsonData是数组
+            const questionsArray = Array.isArray(jsonData) ? jsonData : [jsonData];
+            const updatedQuestions = questionsArray.map(item => {
                return {
                 ...item,
                 examId: examId,
@@ -83,8 +97,8 @@ const LLMService = {
 
             // 插入数据到对应的模型
             await currentModel.insertMany(updatedQuestions);
-            
-            return { success: true, message: '数据插入成功',count: updatedQuestions.length };
+
+            return { success: true, message: '数据插入成功',count: updatedQuestions.length,data:updatedQuestions };
         } catch (error) {
             console.error('数据插入失败:', error);
             return { success: false, message: '数据插入失败' };

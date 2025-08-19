@@ -8,7 +8,6 @@
                    <QuestionDisplay />
                 </template>
             </XWelcome>
-                
         <div :class="isSendValue ? 'active-sender':'default-sender'">
             <XEditorSender
                 ref="editorRef"
@@ -54,9 +53,7 @@
                 </template>
             </XEditorSender>
         </div>
-        <div 
-            class="chat-container"  
-            v-show="isSendValue">
+        <div class="chat-container"  v-show="isSendValue">
             <div v-for="(message,index) in chatHistory" :key="index" class="message-wrapper">
                 <XBubble
                     :content="message.content"
@@ -67,10 +64,55 @@
                     :typingsteps="4" 
                     :typinginterval="30" 
                     typingsuffix="💩"
-                    :isFog="true" 
-                />
+                    :isFog="true"/> 
+            </div>
+            <div v-if="response && response.data && response.data.data.length > 0">
+                <el-card style="border-radius: 10px ;width: 650px;">
+                <el-table :data="response.data.data" style="width: 600px;">
+                    <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/> 
+                    <el-table-column label="题目题干" width="250">
+                        <template #default="scope">
+                            <div v-html="scope.row.stem"></div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="题目答案" width="180">
+                        <template #default="scope">
+                            <template v-if="scope.row.Type === 1">
+                                <el-tag type="success">{{ formatSelectAnswer(scope.row.options) }}</el-tag>
+                            </template>
+                            <template v-else-if="scope.row.Type === 2">
+                                <div  v-for="(option, index) in scope.row.options" :key="index">
+                                    <el-tag class="blank-tag">空{{ index + 1 }}</el-tag>
+                                    <span class="blank-content">{{ option.content }}</span>
+                                </div>
+                            </template>
+                            <template v-else-if="scope.row.Type ===3 ">
+                            <el-tag :type="scope.row.answer == 1 ? 'success' : 'danger'">
+                                    {{ scope.row.answer === 1 ? '正确' : '错误' }}
+                                </el-tag>
+                            </template>
+                            <template v-else-if="scope.row.Type===4">
+                                <el-tag type="info" @click="handleLooked(scope.row.content)">查看答案</el-tag>
+                            </template>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                    <template #default="scope">
+                        <el-button 
+                            type="success" 
+                            plain 
+                            @click="handlePreview(scope.row)">
+                            预览
+                        </el-button>
+                    </template>
+                </el-table-column>
+               </el-table>
+               </el-card>
             </div>
         </div>
+        <QuestionPreview
+        v-model="PreviewdialogVisible"
+        :Data="QuestionData"/>
     </div>
 </template>
 <script setup>
@@ -78,13 +120,22 @@ import XEditorSender  from '@/components/Element-plus-x/XEditorSender .vue';
 import { useAppStore } from '@/stores';
 import {getCategoryName} from '@/util/formatExamname'
 import formatTime from '@/util/formatTime'
-import { onMounted ,ref} from 'vue';
+import { ref,defineAsyncComponent} from 'vue';
 import XWelcome from '@/components/Element-plus-x/XWelcome.vue';
 import XBubble from '@/components/Element-plus-x/XBubble.vue';
 import { modelappBatchaddQuestion } from '@/API/LLM/modelappAPI';
 import escconfig from '../../config/esc.config';
 import { useRoute } from 'vue-router';
 import QuestionDisplay from '@/components/Exam/QuestionDisplay.vue';
+import { formatSelectAnswer } from '@/util/formatAnswer';
+import handleLooked from '@/util/CheckInfo'
+
+
+// 动态导入较大的组件
+const QuestionPreview = defineAsyncComponent(() =>
+    import('@/components/Exam/QuestionPreview.vue')
+)
+
 
 const appStore = useAppStore();
 const isSendValue = ref(false);// 是否发送消息
@@ -93,8 +144,12 @@ const isLoading = ref(false);// 发送按钮加载中状态
 const editorRef = ref();// 编辑器引用
 const isSenderloading = ref(false);// 发送按钮加载中状态Sender
 const route = useRoute();
-const category = appStore.examInfo.category;
+const QuestionType = appStore.examInfo.category;// 题目类型
+const QuestionData = ref(null);// 题目数据
+const PreviewdialogVisible = ref(false)// 预览对话框
+
 // 提交方法
+const response = ref(null);
 const handleUserSend = async (data) => {
     if(data){
         // 添加用户消息
@@ -113,13 +168,12 @@ const handleUserSend = async (data) => {
         //  AI 回复的过程
         isLoading.value = true;
         try {
-            const response = await modelappBatchaddQuestion(chatHistory.value,route.params.id,category); 
-            console.log(response)
-            if(response.code===200){
+            response.value = await modelappBatchaddQuestion(chatHistory.value,route.params.id,QuestionType); 
+            if(response.value.code===200){
                 // 成功获取 AI 回复后更新消息
                 chatHistory.value[chatHistory.value.length - 1] = {// 直接修改最后一个消息
                     role:'题目添加AI助手',
-                    content: response.data.message + `(插入数量为：${response.data.count})`,
+                    content: response.value.data.message + `(插入数量为：${response.value.data.count})`,
                     isLoading: false
                 };
             }
@@ -140,12 +194,11 @@ const handleUserSend = async (data) => {
 const openCloseHeader = () => {
     editorRef.value.openCloseHeader();
 };
-
-onMounted(() => {
-  
-});
-
-
+//预览
+const handlePreview = (row) => {
+  PreviewdialogVisible.value = true
+  QuestionData.value = row
+}
 </script>
 <style scoped>
 .container {
