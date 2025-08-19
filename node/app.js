@@ -6,14 +6,15 @@ var logger = require('morgan');
 
 
 const JWT = require('./MiddleWares/jwt');
+const clientDetector = require('./MiddleWares/clientDetector');// 引入客户端检测中间件
 var indexRouter = require('./routes/index');
 const UserRouter = require('./routes/admin/UserRouter');
 const NewsRouter = require('./routes/admin/NewsRouter');
-const WebNewsRouter = require('./routes/web/NewsRouter');
+const WebNewsRouter = require('./routes/user/NewsRouter');
 const AdminExamRouter = require('./routes/admin/ExamRouter');
-const WebUserExamRouter = require('./routes/web/ExamRouter');
+const WebUserExamRouter = require('./routes/user/ExamRouter');
 const AdminLLMRouter = require('./routes/admin/LLMRouter');
-const WebLLMRouter = require('./routes/web/LLMRouter');
+const WebLLMRouter = require('./routes/user/LLMRouter');
 const FunctionRouter = require('./routes/admin/FunctionRouter');
 
 var app = express();
@@ -27,15 +28,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+// CORS跨域资源共享中间件配置
+// 用于处理跨域请求，允许前端应用从不同域访问后端API
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");  // 允许所有域名访问
+  // 设置允许访问的源（Origin），* 表示允许所有域名来源的请求
+  // 在生产环境中应该设置为具体的前端域名，如：http://your-frontend-domain.com
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  
+  // 设置允许的请求头信息
+  // 这些是客户端在发送请求时可以包含的自定义头部信息
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );  // 允许的请求头
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE"); // 允许的HTTP方法
+    "Origin, X-Requested-With, Content-Type, Accept, source-client, platform"
+  );
+  
+  // 设置允许的HTTP请求方法
+  // 定义了客户端可以使用的请求方式类型
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  
+  // 调用next()将请求传递给下一个中间件处理
+  // 这是Express中间件链的标准做法，确保请求继续向下传递
   next();
 });
+app.use(clientDetector); // 使用客户端检测中间件
 
 app.use('/', indexRouter);
 app.use('/users',UserRouter)

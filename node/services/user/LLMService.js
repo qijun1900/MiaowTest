@@ -1,4 +1,4 @@
-const  chat = require('../../llm/web/chat.js')
+const  chat = require('../../llm/user/chat')
 const AianalysisModel = require('../../models/AianalysisModel')
 const LLMsModel = require('../../models/LLMsModel')
 

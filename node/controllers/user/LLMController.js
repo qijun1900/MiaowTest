@@ -1,4 +1,4 @@
-const LLMService = require("../../services/web/LLMService");
+const LLMService = require("../../services/user/LLMService");
 const QuestionMap = require("../../MiddleWares/questionMap");
 
 const LLMController ={

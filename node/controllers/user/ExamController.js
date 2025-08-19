@@ -1,4 +1,4 @@
-const ExamService = require("../../services/web/ExamService");
+const ExamService = require("../../services/user/ExamService");
 
 const ExamController ={
     getExamList:async (req,res)=>{

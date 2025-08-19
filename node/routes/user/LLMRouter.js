@@ -1,5 +1,5 @@
 var express = require('express');
-const LLMController = require('../../controllers/web/LLMController');
+const LLMController = require('../../controllers/user/LLMController');
 var LLMRouter = express.Router();
 
 LLMRouter.post("/webapi/chat/ExamAIanalyse/psotExamAIanalyse",LLMController.sendExamAIanalyse)//调用大模型获得题目解析

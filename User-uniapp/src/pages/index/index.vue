@@ -9,18 +9,29 @@
   <view>用户信息：{{ userInfo.userInfo }}</view>
   <button @click="handleLogin" type="primary">登录</button>
   <button @click="handleOut" type="warn">退出</button>
+  <button @click="handGet">请求</button>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useUserInfo } from '../../stores/modules/info';
+import { http } from '../../util/http';
 const userInfo = useUserInfo()
-const title = ref('欢迎使用uni-app--项目环境')
+
+
 const handleLogin = () => {
   userInfo.setInfo({ username: 'Jack' })
 }
 const handleOut = () => {
   userInfo.clearInfo()
+}
+const handGet = async() => {
+  const res = await http({
+    method: 'GET',
+    url: '/uniappAPI/get/test',
+  })
+  console.log(res);
+  
 }
 
 </script>

@@ -1,4 +1,4 @@
-const NewsService = require("../../services/web/NewsService");
+const NewsService = require("../../services/user/NewsService");
 
 const NewsController ={
     getNoticeInfo:async(req,res)=>{
