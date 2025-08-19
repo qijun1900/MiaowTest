@@ -83,7 +83,7 @@ const LLMService = {
 
             // 插入数据到对应的模型
             await currentModel.insertMany(updatedQuestions);
-
+            
             return { success: true, message: '数据插入成功',count: updatedQuestions.length };
         } catch (error) {
             console.error('数据插入失败:', error);

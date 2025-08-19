@@ -4,8 +4,11 @@
       :title=props.title
       :extra=props.extra
       :description=props.description
-      :style="{ background: bgColor }"
-    />
+      :style="{ background: bgColor }">
+        <template #extra>
+            <slot name="welcomeExtra"></slot>
+        </template>
+    </Welcome>
 </template>
 <script setup>
 
@@ -24,7 +27,7 @@ const props = defineProps({
     },
     description: {// 描述信息
         type: String,
-        default: '这是描述信息 ~'
+        default: ''
     },
 
 })

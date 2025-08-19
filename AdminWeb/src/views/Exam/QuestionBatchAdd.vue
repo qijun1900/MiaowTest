@@ -2,7 +2,13 @@
     <div class="container">
             <XWelcome 
                 v-show="!isSendValue"
-                title="欢迎使用AI智能录题，可大量向该科目改题型下添加题目！"/>
+                title="欢迎使用AI智能录题，可向该科目题类型下添加大量题目！"
+                description="大模型智能体应用，使用自然语言输入即可识别题目类型与结构化输出，实现题目自动处理与添加">
+                <template #welcomeExtra>
+                   <QuestionDisplay />
+                </template>
+            </XWelcome>
+                
         <div :class="isSendValue ? 'active-sender':'default-sender'">
             <XEditorSender
                 ref="editorRef"
@@ -78,6 +84,7 @@ import XBubble from '@/components/Element-plus-x/XBubble.vue';
 import { modelappBatchaddQuestion } from '@/API/LLM/modelappAPI';
 import escconfig from '../../config/esc.config';
 import { useRoute } from 'vue-router';
+import QuestionDisplay from '@/components/Exam/QuestionDisplay.vue';
 
 const appStore = useAppStore();
 const isSendValue = ref(false);// 是否发送消息

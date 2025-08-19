@@ -46,6 +46,12 @@
                 </el-card>
             </div>
 
+          <el-divider content-position="left"><span class="divider-title">题目解析</span></el-divider>
+          <div v-if="previewData.analysis" v-html="previewData.analysis" class="analysis-content">
+          </div>
+          <div v-else class="analysis-content">暂无解析</div>
+
+
         <div class="info-footer">
           <el-tag type="info" class="info-tag">更新时间: {{ formatTime.getTime2(previewData.createdTime) }}</el-tag>
           <el-tag :type="previewData.isAIanswer === 1 ? 'warning' : 'info'" class="info-tag">
@@ -91,8 +97,8 @@ watch(PreviewdialogVisible, (val) => {
 })
 // 点击确认按钮的逻辑
 const dialogConfirmClose = () => {
-    emit('dialogConfirmColse')
-    PreviewdialogVisible.value = false
+  emit('dialogConfirmColse')
+  PreviewdialogVisible.value = false
 }
 </script>
 <style scoped>
@@ -151,7 +157,7 @@ const dialogConfirmClose = () => {
 }
 
 .correct-answer {
-  margin: 20px 0;
+  margin: 5px 0;
   text-align: center;
 }
 
@@ -185,6 +191,15 @@ const dialogConfirmClose = () => {
 
 .answer-content {
   line-height: 1.8;
+}
+
+/* 解析内容样式 */
+.analysis-content {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border-radius: 6px;
+  line-height: 1.6;
 }
 
 /* 底部信息样式 */
