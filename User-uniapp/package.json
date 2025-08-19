@@ -52,6 +52,7 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-4070520250711001",
     "@dcloudio/uni-mp-xhs": "3.0.0-4070520250711001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-4070520250711001",
+    "@dcloudio/uni-ui": "^1.5.11",
     "vue": "3.4.21",
     "vue-i18n": "9.14.5"
   },
@@ -64,6 +65,8 @@
     "@types/wechat-miniprogram": "^3.4.8",
     "@uni-helper/uni-app-types": "^1.0.0-alpha.6",
     "@vue/runtime-core": "3.5.18",
+    "sass": "^1.90.0",
+    "sass-loader": "^10.1.1",
     "vite": "5.2.8"
   }
 }
