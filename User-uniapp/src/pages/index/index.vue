@@ -6,11 +6,22 @@
       </uni-card>
     </view>
   </view>
+  <view>用户信息：{{ userInfo.userInfo }}</view>
+  <button @click="handleLogin" type="primary">登录</button>
+  <button @click="handleOut" type="warn">退出</button>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useUserInfo } from '../../stores/modules/info';
+const userInfo = useUserInfo()
 const title = ref('欢迎使用uni-app--项目环境')
+const handleLogin = () => {
+  userInfo.setInfo({ username: 'Jack' })
+}
+const handleOut = () => {
+  userInfo.clearInfo()
+}
 
 </script>
 
