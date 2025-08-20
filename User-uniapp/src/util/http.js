@@ -1,5 +1,11 @@
 import escconfig from '../config/esc.config';
 const baseURl = `http://${escconfig.serverHost}:${escconfig.serverPort}`
+// 统一的HTTP请求封装
+// 适用于uni-app的http请求封装，支持小程序和H5平台
+// 支持拦截器，支持Promise化
+// 支持自动添加baseURL，支持自动添加token，支持自动添加客户端标识，支持自动添加平台标识
+// 支持自动处理错误，支持自动处理超时，支持自动处理网络错误，支持自动处理401错误
+
 
 // 检测当前运行环境
 const getPlatform = () => {
@@ -14,6 +20,7 @@ const getPlatform = () => {
         return 'miniapp';
     } catch (e) {
         // 如果获取系统信息失败，默认按小程序处理
+        console.error('获取系统信息失败:', e);
         return 'miniapp';
     }
 };
@@ -67,8 +74,6 @@ export const http = (options) => {
                         icon: 'none',//显示错误图标
                         mask: true//防止用户连续点击按钮
                     })
-                    cosnole.log(res)
-
                 }
             },
             fail(err) {
