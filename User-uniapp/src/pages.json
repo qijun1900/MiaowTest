@@ -10,13 +10,31 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "首页"
 			}
 		},
 		{
 			"path": "pages/my/my",
 			"style": {
-				"navigationBarTitleText": "my"
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/chat/chat",
+			"style": {
+				"navigationBarTitleText": "chat"
+			}
+		},
+		{
+			"path": "pages/exam/exam",
+			"style": {
+				"navigationBarTitleText": "exam"
+			}
+		},
+		{
+			"path": "pages/file/file",
+			"style": {
+				"navigationBarTitleText": "file"
 			}
 		}
 	],
@@ -25,5 +43,45 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#666666",
+		"selectedColor": "#007AFF",
+		"backgroundColor": "#F8F8F8",
+		"borderStyle": "black",
+		"H5": {
+			"position": "bottom"
+		},
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabBar/index.png",
+				"selectedIconPath": "static/tabBar/index-active.png"
+			},
+			{
+				"pagePath": "pages/exam/exam",
+				"text": "考试",
+				"iconPath": "static/tabBar/exam.png",
+				"selectedIconPath": "static/tabBar/exam-active.png"
+			},
+			{
+				"pagePath": "pages/chat/chat",
+				"text": "喵喵智答",
+				"iconPath": "static/tabBar/chat.png"
+			},
+			{
+				"pagePath": "pages/file/file",
+				"text": "资料",
+				"iconPath": "static/tabBar/file.png",
+				"selectedIconPath": "static/tabBar/file-active.png"
+			},
+			{
+				"pagePath": "pages/my/my",
+				"text": "我的",
+				"iconPath": "static/tabBar/my.png",
+				"selectedIconPath": "static/tabBar/my-active.png"
+			}
+		]
 	}
 }
