@@ -32,6 +32,7 @@ $uni-bg-color: #fff;
 $uni-bg-color-grey: #f8f8f8;
 $uni-bg-color-hover: #f1f1f1; // 点击状态颜色
 $uni-bg-color-mask: rgba(0, 0, 0, 0.4); // 遮罩颜色
+$uni-bg-color-primary: #007aff; // 主色调
 
 /* 边框颜色 */
 $uni-border-color: #c8c7cc;
@@ -56,7 +57,7 @@ $uni-border-radius-circle: 50%;
 
 /* 水平间距 */
 $uni-spacing-row-sm: 5px;
-$uni-spacing-row-base: 10px;
+$uni-spacing-row-base: 10px;// 水平间距
 $uni-spacing-row-lg: 15px;
 
 /* 垂直间距 */

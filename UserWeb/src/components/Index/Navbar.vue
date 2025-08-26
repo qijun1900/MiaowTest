@@ -1,3 +1,4 @@
+
 <template>
     <div class="nav-container">
         <van-config-provider :theme-vars="themeVars">
