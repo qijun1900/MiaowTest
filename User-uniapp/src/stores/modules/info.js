@@ -32,8 +32,8 @@ export const useUserInfo = defineStore('userinfo',()=>{
                 },
                 setItem(key,value){
                     return typeof window !== 'undefined' 
-                        ? localStorage.setItem(key,value)
-                        : uni.setStorageSync(key,value);
+                    ? localStorage.setItem(key,value)
+                    : uni.setStorageSync(key,value);
                 },
             }
         }
