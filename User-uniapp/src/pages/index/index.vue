@@ -6,9 +6,6 @@
 
 <script setup>
 
-
-
-
 </script>
 
 <style>

@@ -10,7 +10,10 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页"
+				"navigationBarTitleText": "首页",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF"
+
 			}
 		},
 		{
@@ -28,13 +31,13 @@
 		{
 			"path": "pages/exam/exam",
 			"style": {
-				"navigationBarTitleText": "exam"
+				"navigationBarTitleText": "所有考试"
 			}
 		},
 		{
 			"path": "pages/file/file",
 			"style": {
-				"navigationBarTitleText": "file"
+				"navigationBarTitleText": "所有资料"
 			}
 		}
 	],
@@ -49,9 +52,6 @@
 		"selectedColor": "#007AFF",
 		"backgroundColor": "#F8F8F8",
 		"borderStyle": "black",
-		"H5": {
-			"position": "bottom"
-		},
 		"list": [
 			{
 				"pagePath": "pages/index/index",
