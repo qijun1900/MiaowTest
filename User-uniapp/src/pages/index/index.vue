@@ -5,7 +5,7 @@
     </view>
     <view class="card-container">
       <view class="noticbar">
-        <uniNoticeBar />
+        <uniNoticeBar :noticeData="noticeData"/>
       </view>
       <view class="swiper">
         <uniSwiper :list="swiperList" />
@@ -37,7 +37,7 @@
   </view>
 </template>
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted,ref } from 'vue';
 import uniSearch from '../../components/core/uniSearch.vue';
 import uniNoticeBar from '../../components/core/uniNoticeBar.vue';
 import uniSwiper from '../../components/core/uniSwiper.vue';
@@ -46,6 +46,8 @@ import HotExamContainer from '../../components/modules/index/HotExamContainer.vu
 import UserQuestionBank from '../../components/modules/index/UserQuestionBank.vue';
 import { getNoticeInfo } from '../../API/Index/AnnouncementAPI';
 
+
+const  noticeData = ref([])
 const swiperList = [
   {
     type: 'image',
@@ -66,8 +68,9 @@ const swiperList = [
 
 const fetchNoticeInfo = async ()=>{
   try{
-    const res = await getNoticeInfo()
-    console.log(res)
+  const res = await getNoticeInfo()
+  noticeData.value = res.data
+  console.log(noticeData.value)
 
   }catch(error){
     console.error('获取通知信息失败:',error)

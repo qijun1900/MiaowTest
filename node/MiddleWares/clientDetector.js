@@ -14,7 +14,9 @@ const clientDetector = (req, res, next) => {
     };
     
     // 记录请求来源（用于统计分析）
-    console.log(`[${new Date().toISOString()}] Request from ${sourceClient} (${platform})`);
+    const displaySource = sourceClient || 'Admin';
+    const displayPlatform = platform || 'Background management';
+    console.log(`[${new Date().toISOString()}] Request from ${displaySource} (${displayPlatform})`);
     
     next();
 };
