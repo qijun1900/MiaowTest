@@ -1,7 +1,7 @@
 <template>
   <view class="content">
     <view class="search-container">
-      <uniSearch />
+      <uniSearch placeholder="搜索考试名称"/>
     </view>
     <view class="card-container">
       <view class="noticbar">
@@ -37,13 +37,14 @@
   </view>
 </template>
 <script setup>
+import { onMounted } from 'vue';
 import uniSearch from '../../components/core/uniSearch.vue';
 import uniNoticeBar from '../../components/core/uniNoticeBar.vue';
 import uniSwiper from '../../components/core/uniSwiper.vue';
 import uniNavigation from '../../components/modules/index/Navbar.vue';
 import HotExamContainer from '../../components/modules/index/HotExamContainer.vue';
 import UserQuestionBank from '../../components/modules/index/UserQuestionBank.vue';
-
+import { getNoticeInfo } from '../../API/Index/AnnouncementAPI';
 
 const swiperList = [
   {
@@ -63,6 +64,21 @@ const swiperList = [
   }
 ]
 
+const fetchNoticeInfo = async ()=>{
+  try{
+    const res = await getNoticeInfo()
+    console.log(res)
+
+  }catch(error){
+    console.error('获取通知信息失败:',error)
+  }
+
+}
+
+onMounted(() => {
+  fetchNoticeInfo()
+  
+})
 const handleViewMore = () => {
   console.log('查看更多推荐练习')
   // 这里可以添加跳转到更多练习页面的逻辑

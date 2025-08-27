@@ -51,7 +51,6 @@ const httpInterceptor = {
         }
     }
 }
-
 uni.addInterceptor('request', httpInterceptor)
 uni.addInterceptor('uploadFile', httpInterceptor)
 

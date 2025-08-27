@@ -1,6 +1,9 @@
 <template>
     <view class="container">
-        <scroll-view class="hot-exam-scroll" scroll-x="true" scroll-left="0">
+        <scroll-view 
+            class="hot-exam-scroll" 
+            scroll-x="true" 
+            scroll-left="0">
             <view class="hot-exam-list">
                 <view class="exam-item" 
                     v-for="(exam, index) in hotExamList" 

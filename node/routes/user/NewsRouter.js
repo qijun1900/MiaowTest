@@ -4,7 +4,7 @@ var NewsRouter = express.Router();
 
 
 //涉及文件上传
-NewsRouter.get("/webapi/Notice/getNoticInfo", NewsController.getNoticeInfo)
+NewsRouter.get("/uniappAPI/Notice/getNoticeInfo", NewsController.getNoticeInfo)
 
 
 module.exports = NewsRouter; 

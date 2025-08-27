@@ -1,7 +1,7 @@
 <template>
     <uni-search-bar 
         @confirm="search" 
-        :focus="true" 
+        :focus="false" 
         v-model="searchValue" 
         @blur="blur" 
         @focus="focus" 
