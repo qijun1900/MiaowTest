@@ -3,10 +3,9 @@
     <uni-grid :column="4" :showBorder="false" :square="false">
       <uni-grid-item v-for="(item, index) in navItems" :key="index">
         <view class="grid-item">
-          <!-- 使用图片替代SVG -->
           <image 
             v-if="item.icon === 'github-cat'" 
-           src="/static/navBar/github-cat.png"
+            src="/static/navBar/github-cat.png"
             :style="{width: '40px', height: '40px'}"
             mode="aspectFit" />
           <text class="nav-title">
@@ -47,7 +46,7 @@ const navItems = ref([
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .navigation-container {
   padding: 20rpx;
   background-color: #e6eeff;
@@ -59,6 +58,9 @@ const navItems = ref([
   align-items: center;
   justify-content: center;
   padding: 5rpx 0;
+  /* 添加以下样式确保H5端正确显示 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .nav-title {
@@ -68,4 +70,19 @@ const navItems = ref([
   text-align: center;
   margin-top: 10rpx;
 }
+
+/* 针对H5端的特殊样式 */
+/* #ifdef H5 */
+.navigation-container ::v-deep .uni-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 10rpx !important;
+}
+
+.navigation-container ::v-deep .uni-grid-item {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+/* #endif */
 </style>

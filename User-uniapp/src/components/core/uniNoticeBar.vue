@@ -1,14 +1,16 @@
 <template>
-<uni-notice-bar
-    v-if="text"
-    color="#2979FF"
-    background-color="#e4eeff" 
-    show-icon 
-    scrollable		
-    :text="props.text" 
-    showIcon
-    single 
-    />
+<view class="noticeBar">
+    <uni-notice-bar
+        v-if="text"
+        color="#2979FF"
+        background-color="#e4eeff" 
+        show-icon 
+        scrollable		
+        :text="props.text" 
+        showIcon
+        single 
+        />
+    </view>
 </template>
 <script setup>
 const props = defineProps({
@@ -20,5 +22,7 @@ const props = defineProps({
 
 </script>
 <style lang="scss" >
+
+
 
 </style>
