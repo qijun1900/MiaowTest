@@ -1,12 +1,5 @@
 <template>
     <view class="container">
-        <view class="header-section">
-            <view class="hot-exam-title">推荐练习</view>
-            <view class="more-section" @click="handleViewMore">
-                <text class="more-text">查看更多</text>
-                <text class="arrow-icon">›</text>
-            </view>
-        </view>
         <scroll-view class="hot-exam-scroll" scroll-x="true" scroll-left="0">
             <view class="hot-exam-list">
                 <view class="exam-item" 
@@ -62,62 +55,14 @@ const handleExamClick = (exam) => {
     //     url: `/pages/exam/detail?id=${exam.id}`
     // })
 }
-
-const handleViewMore = () => {
-    console.log('查看更多推荐练习')
-    // 这里可以添加跳转到更多练习页面的逻辑
-    // uni.navigateTo({
-    //     url: '/pages/exam/more'
-    // })
-}
 </script>
 
 <style scoped>
 .container {
-    padding: 20rpx;
-    background-color: #ffffff;
-    border-radius: 12rpx;
-    margin: 20rpx 0;
-}
-
-.header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20rpx;
-}
-
-.hot-exam-title {
-    font-size: 32rpx;
-    font-weight: bold;
-    color: #333333;
-    padding-left: 10rpx;
-    border-left: 6rpx solid #007AFF;
-}
-
-.more-section {
-    display: flex;
-    align-items: center;
-    padding: 10rpx 20rpx;
-    background-color: #f5f5f5;
-    border-radius: 20rpx;
-    transition: background-color 0.2s ease;
-}
-
-.more-section:active {
-    background-color: #e8e8e8;
-}
-
-.more-text {
-    font-size: 24rpx;
-    color: #666666;
-    margin-right: 8rpx;
-}
-
-.arrow-icon {
-    font-size: 28rpx;
-    color: #007AFF;
-    font-weight: bold;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
+    margin: 0;
 }
 
 .hot-exam-scroll {

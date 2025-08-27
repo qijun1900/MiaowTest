@@ -14,8 +14,25 @@
         <uniNavigation />
       </view>
     </view>
-    <view calss="hot-exam">
+    <view class="hot-exam">
+      <view class="header-section">
+        <view class="hot-exam-title">推荐练习</view>
+        <view class="more-section" @click="handleViewMore">
+          <text class="more-text">查看更多</text>
+          <text class="arrow-icon">›</text>
+        </view>
+      </view>
       <HotExamContainer />
+    </view>
+    <view class="my-question-bank">
+      <view class="header-section">
+        <view class="hot-exam-title">我的题库</view>
+        <view class="more-section" @click="handleCreateQuestionBank">
+          <text class="more-text">新建题库</text>
+          <text class="arrow-icon">›</text>
+        </view>
+      </view>
+      <UserQuestionBank />
     </view>
   </view>
 </template>
@@ -25,6 +42,8 @@ import uniNoticeBar from '../../components/core/uniNoticeBar.vue';
 import uniSwiper from '../../components/core/uniSwiper.vue';
 import uniNavigation from '../../components/modules/index/Navbar.vue';
 import HotExamContainer from '../../components/modules/index/HotExamContainer.vue';
+import UserQuestionBank from '../../components/modules/index/UserQuestionBank.vue';
+
 
 const swiperList = [
   {
@@ -44,7 +63,21 @@ const swiperList = [
   }
 ]
 
+const handleViewMore = () => {
+  console.log('查看更多推荐练习')
+  // 这里可以添加跳转到更多练习页面的逻辑
+  // uni.navigateTo({
+  //     url: '/pages/exam/more'
+  // })
+}
 
+const handleCreateQuestionBank = () => {
+  console.log('新建题库')
+  // 这里可以添加跳转到新建题库页面的逻辑
+  // uni.navigateTo({
+  //     url: '/pages/questionbank/create'
+  // })
+}
 </script>
 <style scoped lang="scss">
 .search-container {
@@ -70,4 +103,55 @@ const swiperList = [
   padding-right: 10rpx;
 }
 
+.hot-exam {
+  padding: 20rpx;
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  margin: 20rpx 0;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.hot-exam-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  padding-left: 10rpx;
+  border-left: 6rpx solid #007AFF;
+}
+
+.more-section {
+  display: flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 20rpx;
+  transition: background-color 0.2s ease;
+}
+
+.more-section:active {
+  background-color: #e8e8e8;
+}
+
+.more-text {
+  font-size: 24rpx;
+  color: #666666;
+  margin-right: 8rpx;
+}
+
+.arrow-icon {
+  font-size: 28rpx;
+  color: #007AFF;
+  font-weight: bold;
+}
+
+.my-question-bank {
+  padding: 20rpx;
+
+}
 </style>
