@@ -1,29 +1,39 @@
 <template>
     <view class="container">
-        <view class="question-bank-item" 
-        v-for="(item, index) in questionBanks" 
-        :key="index" 
-        @click="handleClick(item)">
-            <!-- 左边静态图片 -->
-            <image 
-                class="bank-image" 
-                src="/static/other/my-questionbank.png" 
-                mode="aspectFill">
-            </image>
-            
-            <!-- 右边题库信息 -->
-            <view class="bank-info">
-                <text class="bank-name">{{ item.name }}</text>
-                <view class="bank-details">
-                    <text class="question-count">{{ item.questionCount }}题</text>
-                    <text class="time">{{ item.time }}</text>
+        <!-- 有题库数据时显示题库列表 -->
+        <view v-if="questionBanks.length > 0">
+            <view class="question-bank-item" 
+            v-for="(item, index) in questionBanks" 
+            :key="index" 
+            @click="handleClick(item)">
+                <!-- 左边静态图片 -->
+                <image 
+                    class="bank-image" 
+                    src="/static/other/my-questionbank.png" 
+                    mode="aspectFill">
+                </image>
+                
+                <!-- 右边题库信息 -->
+                <view class="bank-info">
+                    <text class="bank-name">{{ item.name }}</text>
+                    <view class="bank-details">
+                        <text class="question-count">{{ item.questionCount }}题</text>
+                        <text class="time">{{ item.time }}</text>
+                    </view>
+                </view>
+                
+                <!-- 最右侧指示图标 -->
+                <view class="more-section">
+                    <text class="arrow-icon">›</text>
                 </view>
             </view>
-            
-            <!-- 最右侧指示图标 -->
-            <view class="more-section">
-                <text class="arrow-icon">›</text>
-            </view>
+        </view>
+        
+        <!-- 空状态显示 -->
+        <view v-else class="empty-state">
+            <image class="empty-image" src="/static/other/my-questionbank.png" mode="aspectFit"></image>
+            <text class="empty-text">暂无题库</text>
+            <text class="empty-desc">快去创建你的第一个题库吧！</text>
         </view>
     </view>
 </template>
@@ -33,21 +43,21 @@ import { ref } from 'vue'
 
 // 假数据
 const questionBanks = ref([
-    {
-        name: 'JavaScript基础题库',
-        questionCount: 50,
-        time: '120分钟'
-    },
-    {
-        name: 'Vue.js进阶题库',
-        questionCount: 30,
-        time: '90分钟'
-    },
-    {
-        name: 'React实战题库',
-        questionCount: 40,
-        time: '100分钟'
-    }
+    // {
+    //     name: 'JavaScript基础题库',
+    //     questionCount: 50,
+    //     time: '2055/11/12'
+    // },
+    // {
+    //     name: 'Vue.js进阶题库',
+    //     questionCount: 30,
+    //     time: '2025/12/12'
+    // },
+    // {
+    //     name: 'React实战题库',
+    //     questionCount: 40,
+    //     time: '2026/11/12'
+    // }
 ])
 
 // 点击事件处理
@@ -116,5 +126,36 @@ const handleClick = (item) => {
     font-size: 26rpx;
     color: #007AFF;
     font-weight: bold;
+}
+
+/* 空状态样式 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80rpx 40rpx;
+    background-color: #ffffff;
+    border-radius: 12rpx;
+}
+
+.empty-image {
+    width: 120rpx;
+    height: 120rpx;
+    margin-bottom: 30rpx;
+    opacity: 0.5;
+}
+
+.empty-text {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #666666;
+    margin-bottom: 20rpx;
+}
+
+.empty-desc {
+    font-size: 26rpx;
+    color: #999999;
+    text-align: center;
 }
 </style>
