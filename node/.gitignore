@@ -31,3 +31,6 @@ coverage
 
 *.tsbuildinfo
 .env
+
+# 忽略 public 目录
+public/

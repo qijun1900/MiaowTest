@@ -23,6 +23,8 @@ ExamRouter.get("/uniappAPI/get/test",(req,res)=>{
         return;
     }
 })
+//uniappAPI
+ExamRouter.get("/uniappAPI/IndexHotExam/getHotExamList",ExamController.getHotExamList)//获取热门考试
 
 
 module.exports = ExamRouter; 

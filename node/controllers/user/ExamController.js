@@ -116,6 +116,21 @@ const ExamController ={
             console.error('Error fetching postUserQuestionIssuse details:', error); // 处理错误 
         }
         
+    },
+    //uniappAPI
+    getHotExamList:async (req,res)=>{
+        try {
+            const result = await ExamService.getHotExamList()
+            res.send({
+                code:200,
+                data: result 
+            })
+
+            
+        }
+        catch (error) {
+            console.error('Error fetching getHotExamList details:', error); // 处理错误
+        }
     }
 }
 

@@ -39,6 +39,12 @@
 			"style": {
 				"navigationBarTitleText": "所有资料"
 			}
+		},
+		{
+			"path": "pages/public/searchview",
+			"style": {
+				"navigationBarTitleText": "搜索"
+			}
 		}
 	],
 	"globalStyle": {

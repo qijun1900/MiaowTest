@@ -14,6 +14,24 @@ const NewsService ={
         }catch(error){
             console.log(error)
         }
+    },
+    getIndexBanner:async()=>{
+        try{
+            return await NewsModel.find({isPublish:1,category:1},{
+                isPublish:0,
+                category:0,
+                creator:0,
+                editTime:0,
+                __v:0,
+                _id:0,
+                title:0,
+                content:0,
+
+            })
+
+        }catch(error){
+            console.log(error)
+        }
     }
 }
 

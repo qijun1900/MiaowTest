@@ -80,6 +80,13 @@ const ExamService = {
         return await UserIssuseModel.create({
             ExamtagId,Type,userQuestion,stem,questionId,ExamId,IsSolved,createdTime
         })
+    },
+    getHotExamList: async () => {
+        return await ExamModel.find({isPublish:1},{
+            isPublish:0,
+            creator:0,
+            category:0,
+        }).sort({createdTime:-1}).limit(7)
     }
 
 }

@@ -11,9 +11,15 @@
                     <image 
                         class="exam-cover" 
                         :src="exam.cover" 
+                        :lazy-load="true"
                         mode="aspectFill">
                     </image>
-                    <view class="exam-title">{{ exam.title }}</view>
+                    <view class="exam-title">{{ exam.name }}</view>
+                </view>
+                <!-- 数据加载前显示占位图 -->
+                <view v-if="isLoading" class="exam-item placeholder-item">
+                    <view class="exam-cover placeholder-cover"></view>
+                    <view class="exam-title placeholder-title"></view>
                 </view>
             </view>
         </scroll-view>
@@ -21,43 +27,37 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref ,onMounted} from 'vue'
+import { getHotExamList } from '../../../API/Index/HotExamAPI' 
+import escconfig from '../../../config/esc.config'
 
-const hotExamList = ref([
-    {
-        id: 1,
-        title: '计算机等级考试',
-        cover: 'https://img.freepik.com/free-photo/computer-programming-coding-screen_53876-120412.jpg'
-    },
-    {
-        id: 2,
-        title: '英语四级模拟考试',
-        cover: 'https://img.freepik.com/free-photo/english-language-learning-concept_23-2151144166.jpg'
-    },
-    {
-        id: 3,
-        title: '数学建模竞赛',
-        cover: 'https://img.freepik.com/free-photo/mathematics-formula-chalkboard_23-2148157415.jpg'
-    },
-    {
-        id: 4,
-        title: '普通话水平测试',
-        cover: 'https://img.freepik.com/free-photo/teacher-holding-class_23-2149378302.jpg'
-    },
-    {
-        id: 5,
-        title: '教师资格证考试',
-        cover: 'https://img.freepik.com/free-photo/education-day-arrangement-with-desk_23-2149378287.jpg'
+const hotExamList = ref([])
+const isLoading = ref(true)
+
+const fetchHotExamData = async () => {
+    try {
+        isLoading.value = true
+        const res = await getHotExamList()
+        hotExamList.value = res.data.map(item => ({
+            id: item._id,
+            name: item.name,
+            cover: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}` // 根据实际情况调整URL
+        }))
+        console.log(res.data)
+    } catch (error) {
+        console.error('获取热门考试数据失败:', error)
+    } finally {
+        isLoading.value = false
     }
-])
+}
 
 const handleExamClick = (exam) => {
     console.log('点击考试:', exam)
-    // 这里可以添加跳转到考试详情页的逻辑
-    // uni.navigateTo({
-    //     url: `/pages/exam/detail?id=${exam.id}`
-    // })
 }
+onMounted(()=>{
+    fetchHotExamData()
+    
+})
 </script>
 
 <style scoped>
@@ -80,10 +80,10 @@ const handleExamClick = (exam) => {
 }
 
 .exam-item {
-    flex-shrink: 0;
-    width: 300rpx;
-    margin-right: 20rpx;
-    background-color: #f8f8f8;
+    flex-shrink: 0;/*  防止元素缩小 */
+    width: 218rpx;
+    margin-right: 22rpx;
+    background-color: #f0f0f0;
     border-radius: 12rpx;
     overflow: hidden;
     box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
@@ -96,7 +96,7 @@ const handleExamClick = (exam) => {
 
 .exam-cover {
     width: 100%;
-    height: 200rpx;
+    height: 235rpx;
     background-color: #e0e0e0;
 }
 
@@ -106,11 +106,40 @@ const handleExamClick = (exam) => {
     color: #333333;
     text-align: center;
     white-space: normal;
-    line-height: 1.4;
-    height: 38rpx;
+    line-height: 1;
+    height: 30rpx;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+}
+
+/* 占位图样式 */
+.placeholder-item {
+    background-color: #f5f5f5;
+}
+
+.placeholder-cover {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+.placeholder-title {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4rpx;
+    height: 28rpx;
+    margin: 16rpx;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }
 </style>

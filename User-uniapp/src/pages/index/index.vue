@@ -1,7 +1,13 @@
 <template>
   <view class="content">
     <view class="search-container">
-      <uniSearch placeholder="搜索考试名称"/>
+      <navigator 
+        url="/pages/public/searchview" 
+        hover-class="navigator-hover" 
+        animation-type="pop-in" 
+        animation-duration="300">
+        <uni-search-bar placeholder="搜索考试名称~" cancelButton="none"></uni-search-bar>
+      </navigator>
     </view>
     <view class="card-container">
       <view class="noticbar">
@@ -38,39 +44,21 @@
 </template>
 <script setup>
 import { onMounted,ref } from 'vue';
-import uniSearch from '../../components/core/uniSearch.vue';
 import uniNoticeBar from '../../components/core/uniNoticeBar.vue';
 import uniSwiper from '../../components/core/uniSwiper.vue';
 import uniNavigation from '../../components/modules/index/Navbar.vue';
 import HotExamContainer from '../../components/modules/index/HotExamContainer.vue';
 import UserQuestionBank from '../../components/modules/index/UserQuestionBank.vue';
-import { getNoticeInfo } from '../../API/Index/AnnouncementAPI';
-
+import { getNoticeInfo ,getIndexBanner} from '../../API/Index/AnnouncementAPI';
+import escconfig from '../../config/esc.config';
 
 const  noticeData = ref([])
-const swiperList = [
-  {
-    type: 'image',
-    src: 'https://picsum.photos/800/400?random=1',
-    mode: 'aspectFill'
-  },
-  {
-    type: 'image',
-    src: 'https://picsum.photos/800/400?random=2',
-    mode: 'aspectFill'
-  },
-  {
-    type: 'image',
-    src: 'https://picsum.photos/800/400?random=3',
-    mode: 'aspectFill'
-  }
-]
+const swiperList = ref([])
 
 const fetchNoticeInfo = async ()=>{
   try{
   const res = await getNoticeInfo()
   noticeData.value = res.data
-  console.log(noticeData.value)
 
   }catch(error){
     console.error('获取通知信息失败:',error)
@@ -78,8 +66,25 @@ const fetchNoticeInfo = async ()=>{
 
 }
 
+const fetchBannerInfo = async ()=>{
+  try{
+  const res = await getIndexBanner()
+  if (res.data && Array.isArray(res.data)) {
+    swiperList.value = res.data.map(item => ({
+      type: 'image',
+      src: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`,
+    }))
+  }
+
+  }catch(error){
+    console.error('获取轮播图信息失败:',error)
+  }
+
+}
+
 onMounted(() => {
   fetchNoticeInfo()
+  fetchBannerInfo()
   
 })
 const handleViewMore = () => {

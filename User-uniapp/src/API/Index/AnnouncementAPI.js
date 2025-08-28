@@ -15,3 +15,16 @@ export async function getNoticeInfo() {
     }
 }
 
+export async function getIndexBanner(){
+    try{
+        return await http({
+            url: '/uniappAPI/Banner/getIndexBanner',
+            method: 'GET',
+        })
+    }catch(error){
+        console.error("getBanner 失败", error);
+        throw error; 
+    }
+
+}
+
