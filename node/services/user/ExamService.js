@@ -94,8 +94,8 @@ const ExamService = {
             cover:1,
             name:1,
             _id:1,
+            createdTime:1,
         }).sort({createdTime:-1})
     }
-
 }
 module.exports = ExamService

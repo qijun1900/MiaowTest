@@ -10,7 +10,13 @@
     
     <!-- 搜索框 -->
     <view class="search-container">
-      <uniSearch placeholder="搜索考试科目名称"  />
+      <navigator 
+        url="/pages/public/searchview" 
+        hover-class="navigator-hover" 
+        animation-type="pop-in" 
+        animation-duration="300">
+        <uni-search-bar placeholder="搜索考试名称~" cancelButton="none"></uni-search-bar>
+      </navigator>
     </view>
     
     <view class="exam-list">
@@ -33,12 +39,13 @@
           </view>
           <view class="subject-info">
             <text class="subject-name">{{ subject.name }}</text>
+            <text class="update-time">更新时间:{{ formatTime.getTime2(subject.createdTime) }}</text>
           </view>
           <view class="subject-arrow">›</view>
         </view>
       </view>
     </view>
-    
+
     <!-- 回到顶部组件 -->
     <BackToTop 
       ref="backToTopRef" 
@@ -49,10 +56,10 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { getExamSubjects, clearExamSubjectsCache } from '../../API/Exam/ExamAPI';
-import uniSearch from '../../components/core/uniSearch.vue';
 import BackToTop from '../../components/core/BackToTop.vue';
 import escconfig from '../../config/esc.config';
 import { onPageScroll } from '@dcloudio/uni-app';
+import formatTime from '../../util/formatTime';
 
 // 响应式数据
 const examSubjects = ref([]);
@@ -71,6 +78,7 @@ const fetchExamSubjects = async (forceRefresh = false) => {
       id: item._id,
       name: item.name,
       coverImage: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`,
+      updateTime: item.updateTime // 添加更新时间字段
     }));
     console.log('考试科目数据:', data);
   } catch (error) {
@@ -174,18 +182,6 @@ onMounted(() => {
   height: 400rpx;
 }
 
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400rpx;
-}
-
-.empty-text {
-  color: #999999;
-  font-size: 28rpx;
-}
-
 .subject-list {
   width: 100%;
 }
@@ -193,7 +189,7 @@ onMounted(() => {
 .subject-item {
   background-color: #ffffff;
   border-radius: 12rpx;
-  padding: 30rpx;
+  padding: 29rpx;
   margin-bottom: 13rpx;
   display: flex;
   align-items: center;
@@ -224,12 +220,6 @@ onMounted(() => {
   border-radius: 50%;
 }
 
-.icon-text {
-  color: #ffffff;
-  font-size: 32rpx;
-  font-weight: bold;
-}
-
 .subject-info {
   flex: 1;
   display: flex;
@@ -243,9 +233,9 @@ onMounted(() => {
   margin-bottom: 8rpx;
 }
 
-.subject-count {
+.update-time {
   font-size: 24rpx;
-  color: #666666;
+  color: #999999;
 }
 
 .subject-arrow {
