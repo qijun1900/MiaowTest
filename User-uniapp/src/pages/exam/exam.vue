@@ -40,7 +40,9 @@
     </view>
     
     <!-- 回到顶部组件 -->
-    <BackToTop ref="backToTopRef" position="bottom-right" :scrollDistance="300" />
+    <BackToTop 
+      ref="backToTopRef" 
+      position="bottom-right"  />
   </view>
 </template>
 

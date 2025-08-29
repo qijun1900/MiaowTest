@@ -7,21 +7,19 @@
             showButton ? 'fade-in' : 'fade-out'
         ]"
         :style="{ zIndex: props.zIndex }">
-        <button class="back-button">
+        <button class="back-button" :disabled="isScrolling">
             <view class="back-icon">
-                <uni-icons type="arrow-up" size="24" color="#333333"></uni-icons>
+                <uni-icons type="arrow-up" size="24" :color="primaryColor"></uni-icons>
             </view>
         </button>    
     </view>
 </template>
+
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 
 const props = defineProps({
-    show: {
-        type: Boolean,
-        default: true
-    },
+    // 按钮位置
     position: {
         type: String,
         default: 'bottom-right',
@@ -29,51 +27,94 @@ const props = defineProps({
             return ['bottom-right', 'bottom-left', 'top-right', 'top-left'].includes(value)
         }
     },
+    // 按钮层级
     zIndex: {
         type: Number,
         default: 999
     },
-    // 新增：滚动多少距离后显示按钮
+    // 滚动多少距离后显示按钮
     scrollDistance: {
         type: Number,
         default: 300
+    },
+    // 防抖延迟时间
+    debounceDelay: {
+        type: Number,
+        default: 100
+    },
+    // 主要颜色
+    primaryColor: {
+        type: String,
+        default: '#007AFF'
     }
 })
 
 const showButton = ref(false)
+const isScrolling = ref(false)
+let debounceTimer = null
 
 const topBack = () => {
+    if (isScrolling.value) return
+    
+    isScrolling.value = true
+    showButton.value = false
+    
     uni.pageScrollTo({
         scrollTop: 0,
-        duration: 300
+        duration: 300,
+        success: () => {
+            setTimeout(() => {
+                isScrolling.value = false
+                showButton.value = true
+            }, 500)
+        },
+        fail: () => {
+            isScrolling.value = false
+            showButton.value = true
+        }
     });
 }
 
 // 暴露方法给父组件调用
 const handlePageScroll = (e) => {
-    if (!props.show) return;
+    if (isScrolling.value) return;
     
-    // 获取滚动距离
-    const scrollTop = e.scrollTop;
+    // 清除之前的定时器
+    if (debounceTimer) {
+        clearTimeout(debounceTimer)
+    }
     
-    // 当滚动距离超过设定值时显示按钮，否则隐藏
-    showButton.value = scrollTop > props.scrollDistance;
+    // 设置防抖
+    debounceTimer = setTimeout(() => {
+        const scrollTop = e.scrollTop;
+        showButton.value = scrollTop > props.scrollDistance;
+    }, props.debounceDelay)
 }
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+    if (debounceTimer) {
+        clearTimeout(debounceTimer)
+    }
+})
 
 // 暴露方法给父组件
 defineExpose({
     handlePageScroll
 })
-
 </script>
+
 <style scoped>
 .top-back {
     position: fixed;
     padding: 12px;
     transition: all 0.3s ease;
+    --back-button-size: 50px;
+    --back-button-bg: #ffffff;
+    --back-button-border: #e0e0e0;
+    --back-button-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* 位置控制 */
 .position-bottom-right {
     bottom: 100rpx;
     right: 40rpx;
@@ -94,31 +135,35 @@ defineExpose({
     left: 20rpx;
 }
 
-/* 按钮样式 */
 .back-button {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 50px;
-    height: 50px;
+    width: var(--back-button-size);
+    height: var(--back-button-size);
     border-radius: 50%;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: var(--back-button-bg);
+    border: 1px solid var(--back-button-border);
+    box-shadow: var(--back-button-shadow);
     transition: all 0.3s ease;
     cursor: pointer;
     padding: 0;
     margin: 0;
 }
 
-.back-button:hover {
+.back-button:hover:not(:disabled) {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.back-button:active {
+.back-button:active:not(:disabled) {
     transform: scale(0.95);
+}
+
+.back-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .back-button::after {
@@ -132,13 +177,6 @@ defineExpose({
     margin-bottom: 2px;
 }
 
-.back-text {
-    color: #333333;
-    font-size: 10px;
-    font-weight: 500;
-}
-
-/* 动画效果 */
 .fade-in {
     animation: fadeIn 0.3s ease-in-out;
 }
