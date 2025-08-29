@@ -25,6 +25,6 @@ ExamRouter.get("/uniappAPI/get/test",(req,res)=>{
 })
 //uniappAPI
 ExamRouter.get("/uniappAPI/IndexHotExam/getHotExamList",ExamController.getHotExamList)//获取热门考试
-
+ExamRouter.get("/uniappAPI/Exam/getExamSubjects",ExamController.getExamSubjects)//获取所有考试科目
 
 module.exports = ExamRouter; 

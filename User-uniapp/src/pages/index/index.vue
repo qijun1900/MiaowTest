@@ -88,19 +88,15 @@ onMounted(() => {
   
 })
 const handleViewMore = () => {
-  console.log('查看更多推荐练习')
-  // 这里可以添加跳转到更多练习页面的逻辑
-  // uni.navigateTo({
-  //     url: '/pages/exam/more'
-  // })
+  uni.switchTab({
+	url: '/pages/exam/exam'
+});
 }
 
 const handleCreateQuestionBank = () => {
-  console.log('新建题库')
-  // 这里可以添加跳转到新建题库页面的逻辑
-  // uni.navigateTo({
-  //     url: '/pages/questionbank/create'
-  // })
+  uni.navigateTo({
+      url: '/pages/exam/crquestionbank'
+  })
 }
 </script>
 <style scoped lang="scss">

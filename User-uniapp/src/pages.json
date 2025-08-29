@@ -45,6 +45,13 @@
 			"style": {
 				"navigationBarTitleText": "搜索"
 			}
+		},
+		{
+			"path": "pages/exam/crquestionbank",
+			"style": {
+				"navigationBarTitleText": "创建题库"
+			}
+		
 		}
 	],
 	"globalStyle": {

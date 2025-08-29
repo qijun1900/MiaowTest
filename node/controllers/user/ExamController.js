@@ -131,6 +131,17 @@ const ExamController ={
         catch (error) {
             console.error('Error fetching getHotExamList details:', error); // 处理错误
         }
+    },
+    getExamSubjects:async (req,res)=>{
+        try {
+            const result = await ExamService.getExamSubjects()
+            res.send({
+                code:200,
+                data: result 
+            })
+        }catch (error) {
+            console.error('Error fetching getExamSubjects details:', error); // 处理错误
+        }
     }
 }
 

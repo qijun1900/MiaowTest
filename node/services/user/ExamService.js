@@ -81,12 +81,20 @@ const ExamService = {
             ExamtagId,Type,userQuestion,stem,questionId,ExamId,IsSolved,createdTime
         })
     },
+    // uniappAPI
     getHotExamList: async () => {
         return await ExamModel.find({isPublish:1},{
             isPublish:0,
             creator:0,
             category:0,
         }).sort({createdTime:-1}).limit(7)
+    },
+    getExamSubjects: async () => {
+        return await ExamModel.find({isPublish:1},{
+            cover:1,
+            name:1,
+            _id:1,
+        }).sort({createdTime:-1})
     }
 
 }

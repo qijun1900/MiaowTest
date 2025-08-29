@@ -101,12 +101,13 @@ onMounted(()=>{
 }
 
 .exam-title {
-    padding: 16rpx;
-    font-size: 28rpx;
+    padding: 15rpx;
+    font-size: 23rpx;
+    font-weight: bold;
     color: #333333;
     text-align: center;
     white-space: normal;
-    line-height: 1;
+    line-height: 1.4;
     height: 30rpx;
     overflow: hidden;
     text-overflow: ellipsis;
