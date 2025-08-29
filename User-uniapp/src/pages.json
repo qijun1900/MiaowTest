@@ -51,7 +51,12 @@
 			"style": {
 				"navigationBarTitleText": "创建题库"
 			}
-		
+		},
+		{
+			"path": "pages/public/subjectdetailview",
+			"style": {
+				"navigationBarTitleText": "考试详情"
+			}
 		}
 	],
 	"globalStyle": {

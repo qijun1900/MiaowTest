@@ -8,8 +8,12 @@
         @input="input"
         cancelButton="none"
         :placeholder="props.placeholder">
+        <template v-slot:searchIcon>
+            <uni-icons color="#007aff"  type="search"/>
+        </template>
 	</uni-search-bar>
 </template>
+
 <script setup>
 import { ref } from 'vue'
 
@@ -40,8 +44,6 @@ const input = (value) => {
     // 输入事件处理
     console.log('输入内容:', value)
 }
-
-
 
 </script>
 

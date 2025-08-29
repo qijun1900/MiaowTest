@@ -15,7 +15,7 @@
         hover-class="navigator-hover" 
         animation-type="pop-in" 
         animation-duration="300">
-        <uni-search-bar placeholder="搜索考试名称~" cancelButton="none"></uni-search-bar>
+        <uniSearch placeholder="搜索考试科目~" />
       </navigator>
     </view>
     
@@ -60,6 +60,7 @@ import BackToTop from '../../components/core/BackToTop.vue';
 import escconfig from '../../config/esc.config';
 import { onPageScroll } from '@dcloudio/uni-app';
 import formatTime from '../../util/formatTime';
+import uniSearch from '../../components/core/uniSearch.vue';
 
 // 响应式数据
 const examSubjects = ref([]);
@@ -78,9 +79,9 @@ const fetchExamSubjects = async (forceRefresh = false) => {
       id: item._id,
       name: item.name,
       coverImage: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`,
-      updateTime: item.updateTime // 添加更新时间字段
+      createdTime: item. createdTime
     }));
-    console.log('考试科目数据:', data);
+    console.log('考试科目数据:',data);
   } catch (error) {
     console.error('获取考试科目失败:', error);
     uni.showToast({
@@ -94,9 +95,9 @@ const fetchExamSubjects = async (forceRefresh = false) => {
 
 const handleSubjectClick = (subject) => {
   console.log('点击科目:', subject.name);
-  // 这里可以添加跳转到考试详情页的逻辑
+  // 跳转到考试详情页，传递科目ID作为参数
   uni.navigateTo({
-    url: `/pages/exam/detail?id=${subject.id}`
+    url: `/pages/public/subjectdetailview?id=${subject.id}`
   });
 };
 

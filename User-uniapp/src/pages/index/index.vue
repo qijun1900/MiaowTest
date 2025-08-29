@@ -6,7 +6,7 @@
         hover-class="navigator-hover" 
         animation-type="pop-in" 
         animation-duration="300">
-        <uni-search-bar placeholder="搜索考试名称~" cancelButton="none"></uni-search-bar>
+         <uniSearch placeholder="搜索考试科目~" />
       </navigator>
     </view>
     <view class="card-container">
@@ -51,6 +51,7 @@ import HotExamContainer from '../../components/modules/index/HotExamContainer.vu
 import UserQuestionBank from '../../components/modules/index/UserQuestionBank.vue';
 import { getNoticeInfo ,getIndexBanner} from '../../API/Index/AnnouncementAPI';
 import escconfig from '../../config/esc.config';
+import uniSearch from '../../components/core/uniSearch.vue';
 
 const  noticeData = ref([])
 const swiperList = ref([])
