@@ -54,3 +54,22 @@ export function clearExamSubjectsCache() {
 export function hasValidExamSubjectsCache() {
   return cacheManager.has(CACHE_KEY, CACHE_EXPIRY_TIME);
 }
+
+
+/**
+ * 获取用户点击的考试科目考试题型
+ * @param {string} examSubjectId 考试科目ID
+ */
+export async function getExamSubjectTypes(examSubjectId) {
+  try {
+    const response = await http({
+      url: `/uniappAPI/Exam/getExamSubjectTypes/${examSubjectId}`,
+      method: 'GET',
+    });   
+    return response;
+  }catch (error) {
+    console.error("getExamSubjectTypes 失败", error);
+    throw error;
+  }
+  
+}

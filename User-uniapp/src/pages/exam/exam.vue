@@ -39,7 +39,7 @@
           </view>
           <view class="subject-info">
             <text class="subject-name">{{ subject.name }}</text>
-            <text class="update-time">更新时间:{{ formatTime.getTime2(subject.createdTime) }}</text>
+            <text class="update-time">更新时间:{{ formatTime.getTime2(subject.updateTime) }}</text>
           </view>
           <view class="subject-arrow">›</view>
         </view>
@@ -79,7 +79,8 @@ const fetchExamSubjects = async (forceRefresh = false) => {
       id: item._id,
       name: item.name,
       coverImage: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`,
-      createdTime: item. createdTime
+      updateTime: item.createdTime,
+      ...item
     }));
     console.log('考试科目数据:',data);
   } catch (error) {
@@ -94,10 +95,9 @@ const fetchExamSubjects = async (forceRefresh = false) => {
 };
 
 const handleSubjectClick = (subject) => {
-  console.log('点击科目:', subject.name);
-  // 跳转到考试详情页，传递科目ID作为参数
+  // 跳转到考试详情页，传递完整科目数据作为参数
   uni.navigateTo({
-    url: `/pages/public/subjectdetailview?id=${subject.id}`
+    url: `/pages/public/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
   });
 };
 

@@ -49,6 +49,7 @@
     /* 小程序特有相关 */
     "mp-weixin" : {
         "appid" : "wx4f6ba6075c1d2a31",
+        "mergeVirtualHostAttributes" : true,
         "setting" : {
             "urlCheck" : false
         },
@@ -61,7 +62,8 @@
         "usingComponents" : true
     },
     "mp-toutiao" : {
-        "usingComponents" : true
+        "usingComponents" : true,
+        "mergeVirtualHostAttributes" : true
     },
     "uniStatistics": {  
         "enable": false

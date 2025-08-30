@@ -107,7 +107,7 @@ defineExpose({
 <style scoped>
 .top-back {
     position: fixed;
-    padding: 12px;
+    padding: 12rpx;
     transition: all 0.3s ease;
     --back-button-size: 50px;
     --back-button-bg: #ffffff;
@@ -154,7 +154,7 @@ defineExpose({
 
 .back-button:hover:not(:disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.15);
 }
 
 .back-button:active:not(:disabled) {
@@ -172,9 +172,9 @@ defineExpose({
 
 .back-icon {
     color: #333333;
-    font-size: 18px;
+    font-size: 18rpx;
     font-weight: bold;
-    margin-bottom: 2px;
+    margin-bottom: 2rpx;
 }
 
 .fade-in {

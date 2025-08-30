@@ -142,6 +142,19 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getExamSubjects details:', error); // 处理错误
         }
+    },
+    getExamSubjectTypes:async (req,res)=>{
+        try {
+            const ExamSubjectId = req.params.id; // 从请求参数中获取ExamSubjectId
+            const result = await ExamService.getExamSubjectTypes(ExamSubjectId) 
+            console.log("ExamSubjectId:", ExamSubjectId); 
+            res.send({
+                code:200,
+                data: result
+            })
+        }catch (error) {
+            console.error('Error fetching getExamSubjectTypes details:', error); // 处理错误
+        }
     }
 }
 

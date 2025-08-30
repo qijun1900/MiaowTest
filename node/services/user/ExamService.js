@@ -95,7 +95,22 @@ const ExamService = {
             name:1,
             _id:1,
             createdTime:1,
+            day:1,
+            year:1,
         }).sort({createdTime:-1})
+    },
+    getExamSubjectTypes: async (id) => {
+        return await UserExamModel.aggregate([// 聚合查询
+            { $match: { examId: id } }, // 匹配 examId 为指定 id 的文档
+            { $unwind: "$questionTitle" }, // 展开 questionTitle 数组
+            {
+                $project:{//投影字段，只保留需要的字段
+                    content: "$questionTitle.content",
+                    questionIdS: "$questionTitle.questionIdS",
+                    _id: 0 // 排除 _id 字段
+                }
+            }
+        ])
     }
 }
 module.exports = ExamService
