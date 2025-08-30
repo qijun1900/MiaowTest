@@ -102,12 +102,13 @@ const ExamService = {
     getExamSubjectTypes: async (id) => {
         return await UserExamModel.aggregate([// 聚合查询
             { $match: { examId: id } }, // 匹配 examId 为指定 id 的文档
-            { $unwind: "$questionTitle" }, // 展开 questionTitle 数组
+            { $unwind: "$questionTitle" }, // 先展开数组
+            { $match: { "questionTitle.isPublish": 1 } }, // 然后筛选 isPublish 为 1 的文档(代表考试题型发布)
             {
-                $project:{//投影字段，只保留需要的字段
-                    content: "$questionTitle.content",
-                    questionIdS: "$questionTitle.questionIdS",
-                    _id: 0 // 排除 _id 字段
+                $project:{
+                    content: "$questionTitle.content",// 提取 questionTitle 中的 content 字段
+                    questionIdS: "$questionTitle.questionIdS",// 提取 questionTitle 中的 questionIdS 字段
+                    _id: 0// 不显示 _id 字段
                 }
             }
         ])

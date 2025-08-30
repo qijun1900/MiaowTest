@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [
     uni(),
     visualizer()
-
   ],
   css: {
     preprocessorOptions: {
