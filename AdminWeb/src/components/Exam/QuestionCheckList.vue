@@ -132,7 +132,7 @@ const fechData = async () => {
            const extractedData = res.data.map(subArray =>{
                 const obj =subArray[0]  
                 return {
-                    _id:obj._id, // 题目ID
+                _id:obj._id, // 题目ID
                 category:obj.category, // 题目类型
                 }
             })

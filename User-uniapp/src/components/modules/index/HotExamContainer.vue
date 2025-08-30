@@ -7,10 +7,10 @@
             <view class="hot-exam-list">
                 <view class="exam-item" 
                     v-for="(exam, index) in hotExamList" 
-                    :key="index" @click="handleExamClick(exam)">
+                    :key="index" @click="handleClickExam(exam)">
                     <image 
                         class="exam-cover" 
-                        :src="exam.cover" 
+                        :src="exam.coverImage" 
                         :lazy-load="true"
                         mode="aspectFill">
                     </image>
@@ -41,7 +41,8 @@ const fetchHotExamData = async () => {
         hotExamList.value = res.data.map(item => ({
             id: item._id,
             name: item.name,
-            cover: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}` // 根据实际情况调整URL
+            coverImage: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`, // 根据实际情况调整URL
+            ...item
         }))
         console.log(res.data)
     } catch (error) {
@@ -51,9 +52,13 @@ const fetchHotExamData = async () => {
     }
 }
 
-const handleExamClick = (exam) => {
-    console.log('点击考试:', exam)
-}
+const handleClickExam = (subject) => {
+  // 跳转到考试详情页，传递完整科目数据作为参数
+  uni.navigateTo({
+    url: `/pages/public/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
+  });
+};
+
 onMounted(()=>{
     fetchHotExamData()
     

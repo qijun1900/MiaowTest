@@ -3,7 +3,10 @@ const  UserExamModel = require('../../models/UserExamModel')
 const  UserIssuseModel = require('../../models/UserIssuseModel.js')
 const NewsModel = require('../../models/NewsModel')
 const UserFeedbackModel = require('../../models/UserFeedbackModel')
-
+const ExamSelectModel = require('../../models/SelectModel')
+const ExamBlankModel = require('../../models/BlankModel')
+const ExamJudgeModel = require('../../models/JudgeModel')
+const ExamShortModel = require('../../models/ShortModel')
 
 const ExamService = {
     getExamList: async () => {
@@ -112,6 +115,25 @@ const ExamService = {
                 }
             }
         ])
+    },
+    FetchMatchQuestionList: async (extractedData) => {
+         const modelMap = {
+            1: ExamSelectModel,
+            2: ExamBlankModel,
+            3: ExamJudgeModel,
+            4: ExamShortModel
+        }
+        // 使用Promise.all并发查询每个ID对应的题目
+        const results = await Promise.all(
+            extractedData.map(({_id, category}) => {
+                const model = modelMap[category];
+                return model.findById(_id);
+            })
+        )
+         return results.filter(Boolean); // 过滤掉null结果
     }
+        
+        
+    
 }
 module.exports = ExamService

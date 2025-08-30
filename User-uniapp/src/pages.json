@@ -61,6 +61,12 @@
 			"style": {
 				"navigationBarTitleText": "考试详情"
 			}
+		},
+		{
+			"path": "pages/public/PracticeSettingView",
+			"style": {
+				"navigationBarTitleText": "练习设置"
+			}
 		}
 	],
 	"globalStyle": {

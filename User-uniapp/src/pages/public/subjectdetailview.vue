@@ -33,7 +33,40 @@
                 </view>
             </view>
         </view>
-    <up-divider text="分割线"></up-divider>
+        
+    <up-divider 
+        text="|考试题型|" 
+        textPosition="left"  
+        textColor="#007AFF"
+        lineColor="#86bbf5">
+    </up-divider>
+    
+    <!-- 题型列表 -->
+    <view class="subject-types-container" v-if="subjectTypes && subjectTypes.length > 0">
+        <scroll-view scroll-y class="subject-types-scroll">
+            <view class="subject-types-list">
+                <view 
+                    class="subject-type-item" 
+                    v-for="(item, index) in subjectTypes" 
+                    :key="index" 
+                    @click="navigateToQuestions(item)">
+                    <view class="subject-type-info">
+                        <view class="type-header">
+                            <text class="subject-type-name">{{ item.content }}</text>
+                            <view class="question-badge" :class="{'no-questions': !item.questionIdS || item.questionIdS.length === 0}">
+                                <text class="question-count">{{ item.questionIdS ? item.questionIdS.length : 0 }}题</text>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="arrow-container">
+                        <uni-icons type="forward" size="16" color="#007AFF"></uni-icons>
+                    </view>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+    <!-- 数据为空 -->
+    <Empty description="暂无题型数据" class="empty" v-else/>
     </view>
 </template>
 
@@ -42,10 +75,12 @@ import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import formatTime from '../../util/formatTime';
 import { getExamSubjectTypes } from '../../API/Exam/ExamAPI';
-// import Divider from '../../components/core/Divider.vue';
+import Empty from '../../components/core/Empty.vue';
+import { useQuestionStore } from '../../stores/modules/QuestionStore';
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据
+const questionStore = useQuestionStore();
 
 // 页面加载时接收参数
 onLoad((options) => {
@@ -54,13 +89,12 @@ onLoad((options) => {
         try {
             // 解析传递过来的科目数据
             const subjectData = JSON.parse(decodeURIComponent(options.data));
-            console.log('科目数据:', subjectData);
             
             // 更新考试信息
             examInfo.value = {
-                id: subjectData.id,
+                id: subjectData.id ,
                 name: subjectData.name,
-                year: subjectData.year || '2023年',
+                year: subjectData.year,
                 coverImage: subjectData.coverImage,
                 updateTime: formatTime.getTime2(subjectData.createdTime),
                 startTime: formatTime.getTime2(subjectData.day) || '待定'
@@ -88,7 +122,6 @@ const fetchClickSubjectData = async (subjectId) => {
     try {
         const response = await getExamSubjectTypes(subjectId);
         subjectTypes.value = response.data;
-        console.log('点击的科目数据:', subjectTypes.value);
        
     }catch (error) {
         console.error('获取点击的科目数据失败:', error);
@@ -98,12 +131,24 @@ const fetchClickSubjectData = async (subjectId) => {
         });
     }
 }
+
+// 导航到题目列表页面
+const navigateToQuestions = (subjectType) => {
+    questionStore.setCurrentQuestionIds(subjectType.questionIdS || []);
+    questionStore.FetchQuestionData();
+   uni.navigateTo({
+        url: `/pages/public/PracticeSettingView`
+    });
+}
 </script>
 
 <style scoped>
 .container {
     padding: 0rpx 12rpx;
     background-color: #ffffff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .exam-detail {
@@ -114,6 +159,7 @@ const fetchClickSubjectData = async (subjectId) => {
     padding: 12rpx;
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
     margin-top: 8rpx;
+    flex-shrink: 0;
 }
 
 .exam-cover {
@@ -167,4 +213,99 @@ const fetchClickSubjectData = async (subjectId) => {
     flex: 1;
     word-break: break-all;
 }
+
+.empty{
+    margin-top: 150rpx;
+}
+
+/* 题型列表样式 */
+.subject-types-container {
+    padding: 0 6rpx;
+    flex: 1;
+    overflow: hidden;
+    margin-bottom: 85rpx;
+}
+
+.subject-types-scroll {
+    height: 100%;
+}
+
+.subject-types-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16rpx;
+}
+
+.subject-type-item {
+    background: linear-gradient(to right, #ffffff, #f0f6ff);
+    border-radius: 16rpx;
+    padding: 26rpx 24rpx;
+    box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5rpx solid #007bff;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.subject-type-item:active {
+    transform: scale(0.98);
+    box-shadow: 0 2rpx 6rpx rgba(0, 122, 255, 0.12);
+}
+
+.subject-type-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(0, 122, 255, 0.05), transparent 70%);
+    z-index: 0;
+}
+
+.subject-type-info {
+    flex: 1;
+    z-index: 1;
+}
+
+.type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.subject-type-name {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333333;
+    flex: 1;
+}
+
+.question-badge {
+    background-color: #1b89ff;
+    border-radius: 30rpx;
+    padding: 5rpx 16rpx;
+    margin-left: 16rpx;
+    flex-shrink: 0;
+}
+
+.question-badge.no-questions {
+    background-color: #bfbfbf;
+}
+
+.question-count {
+    color: #ffffff;
+    font-size: 24rpx;
+    font-weight: 700;
+}
+
+.arrow-container {
+    margin-left: 16rpx;
+    z-index: 1;
+}
+
 </style>

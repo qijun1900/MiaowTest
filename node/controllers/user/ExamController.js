@@ -147,13 +147,25 @@ const ExamController ={
         try {
             const ExamSubjectId = req.params.id; // 从请求参数中获取ExamSubjectId
             const result = await ExamService.getExamSubjectTypes(ExamSubjectId) 
-            console.log("ExamSubjectId:", ExamSubjectId); 
             res.send({
                 code:200,
                 data: result
             })
         }catch (error) {
             console.error('Error fetching getExamSubjectTypes details:', error); // 处理错误
+        }
+    },
+    FetchMatchQuestionList:async (req,res)=>{
+        try {
+            const extractedData = req.body; 
+            console.log("ExamSubjectId:", extractedData);
+            const result = await ExamService.FetchMatchQuestionList(extractedData) 
+            res.send({
+                code: 200,
+                data: result
+            });
+        }catch (error) {
+            console.error('Error fetching FetchMatchQuestionList details:', error); // 处理错误
         }
     }
 }

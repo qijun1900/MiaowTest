@@ -399,6 +399,7 @@ const ExamController ={
     },
     MatchQusetionList:async(req,res)=>{
         const {extractedData} = req.body
+        console.log(extractedData)
         const result = await ExamService.MatchQusetionList({extractedData})
         res.send({
             code:200,
