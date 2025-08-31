@@ -51,7 +51,7 @@
 			}
 		},
 		{
-			"path": "pages/exam/crquestionbank",
+			"path": "pages/exam/crquestionbankView",
 			"style": {
 				"navigationBarTitleText": "创建题库"
 			}
@@ -66,6 +66,12 @@
 			"path": "pages/exam/PracticeSettingView",
 			"style": {
 				"navigationBarTitleText": "练习设置"
+			}
+		},
+		{
+			"path": "pages/exam/PracticeView",
+			"style": {
+				"navigationBarTitleText": "练习"
 			}
 		}
 	],

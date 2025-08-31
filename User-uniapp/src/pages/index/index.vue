@@ -93,7 +93,7 @@ const handleViewMore = () => {
 
 const handleCreateQuestionBank = () => {
   uni.navigateTo({
-      url: '/pages/exam/crquestionbank'
+      url: '/pages/exam/crquestionbankView'
   })
 }
 </script>

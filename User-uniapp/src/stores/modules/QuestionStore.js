@@ -1,16 +1,27 @@
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { defineStore } from 'pinia';
 import { FetchMatchQuestionList } from "../../API/Exam/ExamAPI";
+
+
 
 export const useQuestionStore = defineStore("question", () => {
     const QuestionIDs = ref([]); // 存储问题ID的数组
     const QuestionData = ref([]); // 存储问题的数组
+    const UserChooseQuestion = ref([]); // 存储用户选择的问题的数组
+    
+    // 添加用户设置的状态
+    const userSettings = ref({
+        questionCount: 1,
+        isRandom: false,
+        isOptionRandom: false,
+    });
 
     const QuestionIDsActions = {
         setCurrentQuestionIds: (val) => { // 定义函数，用于设置问题ID的数组
             QuestionIDs.value = val; // 将传入的值赋值给QuestionIDs.value
         },
     }
+    
     const QuestionDataActions = {
         FetchQuestionData: async () => { 
             try {
@@ -22,12 +33,82 @@ export const useQuestionStore = defineStore("question", () => {
             }
         }
     }
+    
+    const getter = {
+        // 根据用户设置获取问题
+        setSelectedQuestions: (questionCount, isRandom, isOptionRandom) => {
+            if (!QuestionData.value || QuestionData.value.length === 0) {
+                UserChooseQuestion.value = [];
+                return [];
+            }
+            
+            // 复制原始数组以避免修改原始数据
+            let selectedQuestions = [...QuestionData.value];
+            
+            // 如果需要题目乱序
+            if (isRandom) {
+                // Fisher-Yates 洗牌算法
+                for (let i = selectedQuestions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [selectedQuestions[i], selectedQuestions[j]] = [selectedQuestions[j], selectedQuestions[i]];
+                }
+            }
+            
+            // 截取指定数量的问题
+            selectedQuestions = selectedQuestions.slice(0, questionCount);
+            
+            // 如果需要选项乱序
+            if (isOptionRandom) {
+                selectedQuestions = selectedQuestions.map(question => {
+                    // 复制问题对象以避免修改原始数据
+                    const newQuestion = {...question};
+                    
+                    // 如果问题有选项，则对选项进行乱序
+                    if (newQuestion.options && Array.isArray(newQuestion.options)) {
+                        // 修复：确保正确复制选项数组
+                        const options = JSON.parse(JSON.stringify(newQuestion.options));
+                        // Fisher-Yates 洗牌算法
+                        for (let i = options.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [options[i], options[j]] = [options[j], options[i]];
+                        }
+                        newQuestion.options = options;
+                    }
+                    return newQuestion;
+                });
+            }
+            
+            // 更新用户选择的问题数组
+            UserChooseQuestion.value = selectedQuestions;
+            
+            return selectedQuestions;
+        },
+        
+        // 更新用户设置
+        updateUserSettings: (settings) => {
+            userSettings.value = { ...userSettings.value, ...settings };
+            // 当设置更新时，自动更新选择的问题
+            getter.setSelectedQuestions(
+                userSettings.value.questionCount,
+                userSettings.value.isRandom,
+                userSettings.value.isOptionRandom
+            );
+        },
+        
+        // 获取当前选择的问题（计算属性）
+        getFilteredQuestions: computed(() => {
+            return UserChooseQuestion.value;
+        })
+    }
 
     return {
         QuestionIDs,
         QuestionData,
+        UserChooseQuestion,
+        userSettings,
         ...QuestionIDsActions,
-        ...QuestionDataActions
+        ...QuestionDataActions,
+        ...getter
     }
 },
     //持久化

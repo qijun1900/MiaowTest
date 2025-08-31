@@ -36,7 +36,7 @@
 
         <view class="card">
             <view class="setting-item">
-                <text class="label">题目数量：</text>
+                <text class="label">练习数量：</text>
                 <view class="slider-container">
                     <view class="slider-wrapper">
                         <up-slider v-model="questionCount" min="1" :max="QuestionTypeData.amount"></up-slider>
@@ -77,7 +77,7 @@ import {ref} from 'vue';
 import {useQuestionStore} from '../../stores/modules/QuestionStore'
 import { onLoad } from '@dcloudio/uni-app';
 const QuestionStore = useQuestionStore()
-const QuestionTypeData = ref([])
+const QuestionTypeData = ref([])// 考试题型基本数据
 
 // 练习设置
 const questionCount = ref(1) 
@@ -93,10 +93,9 @@ onLoad((options) => {
             // 解析传递过来的科目数据
             const Data = JSON.parse(decodeURIComponent(options.data));
             QuestionTypeData.value = Data
-            console.log("传递过来的数据",QuestionTypeData.value)
             
             // 设置默认题目数量为总题数（最大值）
-            questionCount.value = Data.amount || 50
+            questionCount.value = Data.amount 
         } catch (error) {
             console.error('解析科目数据失败:', error);
             uni.showToast({
@@ -113,7 +112,15 @@ onLoad((options) => {
     }
 })
 const handleStart = ()=>{
-    console.log("开始练习")
+    QuestionStore.setSelectedQuestions(questionCount.value,isRandom.value,isOptionRandom.value)// 设置当前选择的题目数量
+    uni.navigateTo({
+        url: `/pages/exam/PracticeView?data=${encodeURIComponent(JSON.stringify({
+            questionCount:questionCount.value,
+            isRandom:isRandom.value,
+            isOptionRandom:isOptionRandom.value,
+            isShowAnswer:isShowAnswer.value,
+            isShowAI:isShowAI.value}))}`
+    })
 }
 
 </script>
