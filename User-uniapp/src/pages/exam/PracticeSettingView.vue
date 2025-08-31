@@ -7,7 +7,6 @@
             lineColor="#86bbf5">
         </up-divider>
         
-        
         <view class="card">
             <view class="info-item">
                 <text class="label">考试名称：</text>
@@ -69,7 +68,12 @@
                 </view>
             </view>
         </view>
-        <up-button type="primary" text="立即练习" shape="circle" @click="handleStart"></up-button>
+        <up-button 
+            type="primary" 
+            text="立即练习" 
+            shape="circle" 
+            @click="handleStart">
+        </up-button>
     </view>
 </template>
 <script setup>  
@@ -112,14 +116,9 @@ onLoad((options) => {
     }
 })
 const handleStart = ()=>{
-    QuestionStore.setSelectedQuestions(questionCount.value,isRandom.value,isOptionRandom.value)// 设置当前选择的题目数量
+    QuestionStore.setSelectedQuestions(questionCount.value,isRandom.value,isOptionRandom.value)// 设置当前选择的题目数量，乱序选项等信息
     uni.navigateTo({
-        url: `/pages/exam/PracticeView?data=${encodeURIComponent(JSON.stringify({
-            questionCount:questionCount.value,
-            isRandom:isRandom.value,
-            isOptionRandom:isOptionRandom.value,
-            isShowAnswer:isShowAnswer.value,
-            isShowAI:isShowAI.value}))}`
+        url: `/pages/exam/PracticeView`
     })
 }
 

@@ -71,7 +71,9 @@
 		{
 			"path": "pages/exam/PracticeView",
 			"style": {
-				"navigationBarTitleText": "练习"
+				"navigationBarTitleText": "练习",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black" // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
 			}
 		}
 	],

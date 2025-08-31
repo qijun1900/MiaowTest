@@ -84,7 +84,6 @@ const fetchExamSubjects = async (forceRefresh = false) => {
       updateTime: item.createdTime,
       ...item
     }));
-    console.log('考试科目数据:',data);
   } catch (error) {
     console.error('获取考试科目失败:', error);
     uni.showToast({
