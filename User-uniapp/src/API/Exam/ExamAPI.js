@@ -79,13 +79,11 @@ export async function getExamSubjectTypes(examSubjectId) {
  */
 export async function FetchMatchQuestionList(extractedData){
   try{
-
     const response = await http({
       url: `/uniappAPI/Exam/FetchMatchQuestionList`,
       method: 'POST',
       data:extractedData
     });
-    console.log("获取的问题列表:", response);
     
     return response;
 

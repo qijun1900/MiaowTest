@@ -11,7 +11,7 @@
     <!-- 搜索框 -->
     <view class="search-container">
       <navigator 
-        url="/pages/public/searchview" 
+        url="/pages/exam/searchview" 
         hover-class="navigator-hover" 
         animation-type="pop-in" 
         animation-duration="300">
@@ -49,7 +49,9 @@
     <!-- 回到顶部组件 -->
     <BackToTop 
       ref="backToTopRef" 
-      position="bottom-right"  />
+      position="bottom-right"/>
+
+    <up-divider text="已经到底了" :dashed="true"></up-divider>
   </view>
 </template>
 
@@ -97,7 +99,7 @@ const fetchExamSubjects = async (forceRefresh = false) => {
 const handleSubjectClick = (subject) => {
   // 跳转到考试详情页，传递完整科目数据作为参数
   uni.navigateTo({
-    url: `/pages/public/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
+    url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
   });
 };
 

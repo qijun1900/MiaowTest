@@ -13,15 +13,9 @@ export const useQuestionStore = defineStore("question", () => {
     }
     const QuestionDataActions = {
         FetchQuestionData: async () => { 
-            // const extractedData = QuestionIDs.value.map(item => ({
-            //     questionId: item._id,
-            //     category: item.category
-            // }));
-
             try {
                 const response = await FetchMatchQuestionList(QuestionIDs.value);
                 QuestionData.value = response.data; // 存储获取的数据
-                return response.data;
             } catch (error) {
                 console.error('Error fetching question details:', error);
                 throw error; // 抛出错误以便上层处理

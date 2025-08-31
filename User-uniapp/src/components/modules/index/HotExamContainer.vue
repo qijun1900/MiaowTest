@@ -44,7 +44,6 @@ const fetchHotExamData = async () => {
             coverImage: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`, // 根据实际情况调整URL
             ...item
         }))
-        console.log(res.data)
     } catch (error) {
         console.error('获取热门考试数据失败:', error)
     } finally {
@@ -55,7 +54,7 @@ const fetchHotExamData = async () => {
 const handleClickExam = (subject) => {
   // 跳转到考试详情页，传递完整科目数据作为参数
   uni.navigateTo({
-    url: `/pages/public/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
+    url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
   });
 };
 

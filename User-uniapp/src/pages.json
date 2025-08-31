@@ -57,13 +57,13 @@
 			}
 		},
 		{
-			"path": "pages/public/subjectdetailview",
+			"path": "pages/exam/subjectdetailview",
 			"style": {
 				"navigationBarTitleText": "考试详情"
 			}
 		},
 		{
-			"path": "pages/public/PracticeSettingView",
+			"path": "pages/exam/PracticeSettingView",
 			"style": {
 				"navigationBarTitleText": "练习设置"
 			}

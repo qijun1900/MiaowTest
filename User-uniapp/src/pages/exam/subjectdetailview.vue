@@ -99,7 +99,7 @@ onLoad((options) => {
                 updateTime: formatTime.getTime2(subjectData.createdTime),
                 startTime: formatTime.getTime2(subjectData.day) || '待定'
             };
-             // 在后台异步请求最新数据（不影响页面初始加载速度）
+            // 在后台异步请求最新数据（不影响页面初始加载速度）
             fetchClickSubjectData(subjectData.id);
         } catch (error) {
             console.error('解析科目数据失败:', error);
@@ -134,10 +134,15 @@ const fetchClickSubjectData = async (subjectId) => {
 
 // 导航到题目列表页面
 const navigateToQuestions = (subjectType) => {
-    questionStore.setCurrentQuestionIds(subjectType.questionIdS || []);
-    questionStore.FetchQuestionData();
+    questionStore.setCurrentQuestionIds(subjectType.questionIdS || []);// 设置当前题目ID数组
+    questionStore.FetchQuestionData();// 数据请求获取题目详细信息
    uni.navigateTo({
-        url: `/pages/public/PracticeSettingView`
+        url: `/pages/exam/PracticeSettingView?data=${encodeURIComponent(JSON.stringify({
+            subjectTypeName: subjectType.content,
+            examName: examInfo.value.name,
+            updateTime: examInfo.value.updateTime,
+            amount: subjectType.questionIdS ? subjectType.questionIdS.length : 0
+        }))}`
     });
 }
 </script>

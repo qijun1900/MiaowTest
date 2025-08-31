@@ -75,12 +75,9 @@ const fetchBannerInfo = async ()=>{
       type: 'image',
       src: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`,
     }))
-  }
-
-  }catch(error){
+  }}catch(error){
     console.error('获取轮播图信息失败:',error)
   }
-
 }
 
 onMounted(() => {
