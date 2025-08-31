@@ -8,7 +8,7 @@ export const useQuestionStore = defineStore("question", () => {
     const QuestionIDs = ref([]); // 存储问题ID的数组
     const QuestionData = ref([]); // 存储问题的数组
     const UserChooseQuestion = ref([]); // 存储用户选择的问题的数组
-    
+
     // 添加用户设置的状态
     const userSettings = ref({
         questionCount: 1,
@@ -21,9 +21,9 @@ export const useQuestionStore = defineStore("question", () => {
             QuestionIDs.value = val; // 将传入的值赋值给QuestionIDs.value
         },
     }
-    
+
     const QuestionDataActions = {
-        FetchQuestionData: async () => { 
+        FetchQuestionData: async () => {
             try {
                 const response = await FetchMatchQuestionList(QuestionIDs.value);
                 QuestionData.value = response.data; // 存储获取的数据
@@ -33,18 +33,25 @@ export const useQuestionStore = defineStore("question", () => {
             }
         }
     }
-    
+
+
+
     const getter = {
-        // 根据用户设置获取问题
+        /**
+         * @param {number} questionCount 题目数量
+         * @param {boolean} isRandom 是否题目乱序
+         * @param {boolean} isOptionRandom 是否选项乱序
+         * @returns {Array} 返回处理后的题目数组
+         */
         setSelectedQuestions: (questionCount, isRandom, isOptionRandom) => {
             if (!QuestionData.value || QuestionData.value.length === 0) {
                 UserChooseQuestion.value = [];
                 return [];
             }
-            
+
             // 复制原始数组以避免修改原始数据
             let selectedQuestions = [...QuestionData.value];
-            
+
             // 如果需要题目乱序
             if (isRandom) {
                 // Fisher-Yates 洗牌算法
@@ -53,16 +60,16 @@ export const useQuestionStore = defineStore("question", () => {
                     [selectedQuestions[i], selectedQuestions[j]] = [selectedQuestions[j], selectedQuestions[i]];
                 }
             }
-            
+
             // 截取指定数量的问题
             selectedQuestions = selectedQuestions.slice(0, questionCount);
-            
+
             // 如果需要选项乱序
             if (isOptionRandom) {
                 selectedQuestions = selectedQuestions.map(question => {
                     // 复制问题对象以避免修改原始数据
-                    const newQuestion = {...question};
-                    
+                    const newQuestion = { ...question };
+
                     // 如果问题有选项，则对选项进行乱序
                     if (newQuestion.options && Array.isArray(newQuestion.options)) {
                         // 修复：确保正确复制选项数组
@@ -77,13 +84,13 @@ export const useQuestionStore = defineStore("question", () => {
                     return newQuestion;
                 });
             }
-            
+
             // 更新用户选择的问题数组
             UserChooseQuestion.value = selectedQuestions;
-            
+
             return selectedQuestions;
         },
-        
+
         // 更新用户设置
         updateUserSettings: (settings) => {
             userSettings.value = { ...userSettings.value, ...settings };
@@ -94,7 +101,7 @@ export const useQuestionStore = defineStore("question", () => {
                 userSettings.value.isOptionRandom
             );
         },
-        
+
         // 获取当前选择的问题（计算属性）
         getFilteredQuestions: computed(() => {
             return UserChooseQuestion.value;
