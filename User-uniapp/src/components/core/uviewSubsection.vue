@@ -2,7 +2,7 @@
     <view class="subsection-wrapper">
         <up-subsection 
         :list="props.list" 
-        mode="button" 
+        :mode="props.mode" 
         :current="current"
         @change="handleSubsectionChange">
     </up-subsection>
@@ -20,21 +20,23 @@ const props = defineProps({
     current: {
         type: Number,
         default: 0
+    },
+    mode: {
+        type: String,
+        default: 'button'
     }
+
 });
 
 // 定义emit
-const emit = defineEmits(['update:current']);
+const emit = defineEmits(['updateCurrent']);
 
 // 处理切换事件
 const handleSubsectionChange = (index) => {
-    emit('update:current', index);
+    emit('updateCurrent', index);
 };
 </script>
 
 <style scoped>
-.subsection-wrapper {
-    width: 40%; /* 控制分段控制器的宽度 */
-    margin: 0 auto; /* 居中显示 */
-}
+
 </style>
