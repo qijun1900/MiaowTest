@@ -112,6 +112,4 @@ onMounted(() => {
     overflow-y: auto;
 
 }
-
-
 </style>

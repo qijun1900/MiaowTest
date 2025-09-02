@@ -40,6 +40,9 @@
 </template>
 
 <script setup>
+// 判断题选项，A代表正确，B代表错误
+const judgeOptions = ['正确', '错误'];
+
 const props = defineProps({
     question: {
         type: Object,
@@ -51,8 +54,6 @@ const props = defineProps({
     }
 });
 
-// 判断题选项，A代表正确，B代表错误
-const judgeOptions = ['正确', '错误'];
 
 </script>
 
@@ -100,11 +101,6 @@ const judgeOptions = ['正确', '错误'];
     transition: all 0.3s ease;
 }
 
-.option-item:active {
-    background-color: #e7f1ff;
-    border-color: #0d82ff;
-    transform: scale(0.98);
-}
 
 /* 正确答案样式 */
 .correct-answer {

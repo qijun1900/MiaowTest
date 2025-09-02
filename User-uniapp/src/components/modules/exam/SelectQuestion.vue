@@ -21,7 +21,7 @@
         <view class="question-answer-container">
             <text class="answer-label">答案：</text>
             <text class="answer-content" v-for="(option, index) in question.options" :key="index" >
-                {{String.fromCharCode(65 + index)}}
+                <text v-if="option.isCorrect">{{String.fromCharCode(65 + index)}}</text>
             </text>
         </view>
         <view class="question-explanation-container">
@@ -100,11 +100,6 @@ const props = defineProps({
     transition: all 0.3s ease;
 }
 
-.option-item:active {
-    background-color: #e7f1ff;
-    border-color: #0d82ff;
-    transform: scale(0.98);
-}
 
 /* 正确答案样式 */
 .correct-answer {
@@ -120,7 +115,7 @@ const props = defineProps({
     min-width: 40rpx;
     text-align: center;
 }
-
+/* 正确答案选项标签样式  */
 .correct-answer .option-tag {
     color: #4caf50;
 }
