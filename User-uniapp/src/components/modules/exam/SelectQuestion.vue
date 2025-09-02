@@ -24,6 +24,20 @@
                 {{String.fromCharCode(65 + index)}}
             </text>
         </view>
+        <view class="question-explanation-container">
+            <view class="question-explanation-header">
+                <text class="explanation-label">解析:</text>
+                <uni-icons 
+                    type="help"
+                    size="21" 
+                    class="explanation-icon"
+                    color="#6f89ff"></uni-icons>
+            </view>
+            <view class="question-explanation-content">
+                <rich-text v-if="question.analysis && question.analysis !== ''" :nodes="question.analysis"></rich-text>
+                <text v-else>暂无解析</text>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -44,7 +58,7 @@ const props = defineProps({
 
 <style scoped>
 .question-container {
-    padding: 14rpx 20rpx;
+    padding: 16.5rpx 20rpx;
 }
 
 .question-index{
@@ -140,5 +154,26 @@ const props = defineProps({
     font-weight: bold;
     color: #54c058;
     margin-right: 8rpx;
+}
+/* 解析容器样式 */
+.question-explanation-container {
+    margin-top: 45rpx;
+    padding: 30rpx 20rpx;
+    background-color: #f5f5f5;
+    border-radius: 12rpx;
+    margin-bottom: 15rpx;
+}
+.question-explanation-header {
+    margin-bottom: 20rpx;
+}
+.explanation-label {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #333;
+}
+.question-explanation-content {
+    font-size: 28rpx;
+    color: #303030;
+    font-weight: 580;
 }
 </style>

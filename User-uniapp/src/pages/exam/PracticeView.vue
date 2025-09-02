@@ -58,11 +58,6 @@ const currentQuestion = computed(() => {
   return questionStore.UserChooseQuestion[currentQuestionIndex.value];
 });
 
-// 计算属性 - 获取答题进度
-const progress = computed(() => {
-  if (totalQuestions.value === 0) return 0;
-  return Math.round((currentQuestionIndex.value + 1) / totalQuestions.value * 100);
-});
 
 const handleSendMode =(value)=>{
     currentMode.value = value; // 更新当前选中的模式
@@ -103,12 +98,19 @@ onMounted(() => {
 .content {
     /* 计算内容区高度，减去导航栏高度 */
     height: calc(100vh - 44px);
-    overflow: hidden;
     position: relative;
+    overflow-y: auto; /* 允许垂直滚动 */
+    
 }
 
 .question-swiper {
     height: 100%;
+    overflow-y: auto; /* 允许垂直滚动 */;
+}
+.question-container {
+    height: 100%;
+    overflow-y: auto;
+
 }
 
 
