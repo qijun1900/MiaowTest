@@ -26,10 +26,10 @@
                     v-for="(item,index) in questionStore.UserChooseQuestion" 
                     :key="index">
                     <view class="question-container">
-                        <SelectQuestion v-if="item.Type===1"/>
-                        <BlankQuestion v-if="item.Type===2"/>
-                        <JudgeQuestion v-if="item.Type===3"/>
-                        <ShortQuestion v-if="item.Type===4"/>
+                        <SelectQuestion v-if="item.Type===1" :question="item" :questionIndex="index + 1"/>
+                        <BlankQuestion v-if="item.Type===2" :question="item" :questionIndex="index + 1"/>
+                        <JudgeQuestion v-if="item.Type===3" :question="item" :questionIndex="index + 1"/>
+                        <ShortQuestion v-if="item.Type===4" :question="item" :questionIndex="index + 1"/>
                     </view>
                     </swiper-item>
                 </swiper>
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue'; // 导入computed
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import UviewSubsection from "../../components/core/uviewSubsection.vue";
 import SelectQuestion from '../../components/modules/exam/SelectQuestion.vue';//Type=1
@@ -52,6 +52,17 @@ const list = ref(['答题模式', '学习模式']);// 添加subsection需要的�
 const currentMode = ref(0);// 当前选中的模式，0表示答题模式，1表示学习模式
 const navBarHeight = ref(0); // 导航栏高度
 const currentQuestionIndex = ref(0);// 当前选中的问题索引
+
+// 添加计算属性, 获取当前问题
+const currentQuestion = computed(() => {
+  return questionStore.UserChooseQuestion[currentQuestionIndex.value];
+});
+
+// 计算属性 - 获取答题进度
+const progress = computed(() => {
+  if (totalQuestions.value === 0) return 0;
+  return Math.round((currentQuestionIndex.value + 1) / totalQuestions.value * 100);
+});
 
 const handleSendMode =(value)=>{
     currentMode.value = value; // 更新当前选中的模式
@@ -87,9 +98,18 @@ onMounted(() => {
     width: 40%; /* 控制分段控制器的宽度 */
     margin: 0 auto; /* 居中显示 */
 }
+
+/* 新增内容区域高度和滚动 */
 .content {
-    height: 100vh; /* 设置页面高度 */
-    overflow: hidden; /* 禁用滚动 */
-    box-sizing: border-box; /* 包含padding在高度内 */
+    /* 计算内容区高度，减去导航栏高度 */
+    height: calc(100vh - 44px);
+    overflow: hidden;
+    position: relative;
 }
+
+.question-swiper {
+    height: 100%;
+}
+
+
 </style>

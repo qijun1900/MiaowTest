@@ -149,13 +149,13 @@ const handleStart = ()=>{
 
 .info-item {
     display: flex;
-    margin-bottom: 12px;
+    margin-bottom: 12rpx;
     align-items: center;
 }
 
 .setting-item {
     display: flex;
-    margin-bottom: 12px;
+    margin-bottom: 12rpx;
     align-items: center;
     justify-content: space-between;
     padding-bottom: 12px;
@@ -172,7 +172,7 @@ const handleStart = ()=>{
     color: #666;
     font-size: 14px;
     position: relative;
-    padding-left: 10px;
+    padding-left: 10rpx;
     white-space: nowrap;
 }
 
@@ -182,8 +182,8 @@ const handleStart = ()=>{
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 4px;
-    height: 14px;
+    width: 8rpx;
+    height: 29rpx;
     background-color: #007AFF;
     border-radius: 2px;
 }
