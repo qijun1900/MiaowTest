@@ -1,14 +1,54 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 
+/**
+ * 答题状态管理Store
+ * 用于管理用户答题过程中的所有状态，包括用户答案、正确答案、答题情况等
+ * 支持多种题型的答案存储和校验，包括单选题、多选题、判断题、填空题和简答题
+ */
 export const useAnswerStore = defineStore('answer', () => {
-    // 状态
-    const userAnswers = ref({}); // 存储用户答案，格式为 {questionId: answer}
-    const answeredQuestions = ref([]); // 已答题目的ID列表
-    const correctAnswers = ref({}); // 存储正确答案，格式为 {questionId: correctAnswer}
-    const isAnswerCorrect = ref({}); // 存储答题是否正确，格式为 {questionId: boolean}
+    // ================ 状态定义 ================
+    /**
+     * 用户答案存储
+     * 格式: {questionId: answer}
+     * questionId: 题目ID
+     * answer: 用户答案（单选/判断为字符串，多选为数组，填空/简答为字符串）
+     */
+    const userAnswers = ref({}); 
+    
+    /**
+     * 已答题目的ID列表
+     * 用于记录用户已经回答过的题目，避免重复统计
+     */
+    const answeredQuestions = ref([]); 
+    
+    /**
+     * 正确答案存储
+     * 格式: {questionId: correctAnswer}
+     * questionId: 题目ID
+     * correctAnswer: 正确答案（单选/判断为字符串，多选为数组，填空/简答为字符串）
+     */
+    const correctAnswers = ref({}); 
+    
+    /**
+     * 答题是否正确的状态
+     * 格式: {questionId: boolean}
+     * questionId: 题目ID
+     * boolean: true表示答案正确，false表示答案错误
+     */
+    const isAnswerCorrect = ref({}); 
 
-    // 保存用户答案
+    // ================ 方法定义 ================
+    
+    /**
+     * 保存用户答案
+     * @param {string|number} questionId - 题目ID
+     * @param {string|Array} answer - 用户答案
+     * 流程:
+     * 1. 将用户答案存储到userAnswers中
+     * 2. 如果该题目尚未记录在已答列表中，则添加到answeredQuestions
+     * 3. 调用checkAnswer方法检查答案是否正确
+     */
     const saveUserAnswer = (questionId, answer) => {
         userAnswers.value[questionId] = answer;
         if (!answeredQuestions.value.includes(questionId)) {
@@ -18,12 +58,27 @@ export const useAnswerStore = defineStore('answer', () => {
         checkAnswer(questionId);
     };
     
-    // 保存正确答案
+    /**
+     * 保存正确答案
+     * @param {string|number} questionId - 题目ID
+     * @param {string|Array} correctAnswer - 正确答案
+     * 通常在考试开始时或题目加载时调用，用于后续的答案校验
+     */
     const saveCorrectAnswer = (questionId, correctAnswer) => {
         correctAnswers.value[questionId] = correctAnswer;
     };
     
-    // 检查答案是否正确
+    /**
+     * 检查用户答案是否正确
+     * @param {string|number} questionId - 题目ID
+     * 处理逻辑:
+     * 1. 获取用户答案和正确答案
+     * 2. 如果任一答案不存在，则直接返回
+     * 3. 根据题目类型进行不同的比较:
+     *    - 多选题: 比较两个数组是否包含相同元素（不考虑顺序）
+     *    - 其他题型: 直接比较值是否相等
+     * 4. 将比较结果存储到isAnswerCorrect中
+     */
     const checkAnswer = (questionId) => {
         const userAnswer = userAnswers.value[questionId];
         const correctAnswer = correctAnswers.value[questionId];
@@ -44,17 +99,30 @@ export const useAnswerStore = defineStore('answer', () => {
         }
     };
     
-    // 获取用户答案
+    /**
+     * 获取用户答案
+     * @param {string|number} questionId - 题目ID
+     * @returns {string|Array} 用户答案
+     */
     const getUserAnswer = (questionId) => {
         return userAnswers.value[questionId];
     };
     
-    // 获取答题是否正确
+    /**
+     * 获取答题是否正确
+     * 如，在考试结束后展示用户的答题情况
+     * @param {string|number} questionId - 题目ID
+     * @returns {boolean} 答案是否正确
+     */
     const getIsAnswerCorrect = (questionId) => {
         return isAnswerCorrect.value[questionId];
     };
     
-    // 清空所有答案
+    /**
+     * 清空所有答案
+     * 通常在考试结束或重新开始考试时调用
+     * 重置所有状态到初始值
+     */
     const clearAllAnswers = () => {
         userAnswers.value = {};
         answeredQuestions.value = [];
@@ -62,7 +130,12 @@ export const useAnswerStore = defineStore('answer', () => {
         isAnswerCorrect.value = {};
     };
     
-    // 计算答题正确率
+    /**
+     * 计算答题正确率
+     * @returns {number} 正确率（0-100之间的数值）
+     * 计算方法: 正确答题数 / 已答题总数 * 100
+     * 如果没有答题，返回0
+     */
     const calculateAccuracy = () => {
         if (answeredQuestions.value.length === 0) return 0;
         
@@ -72,10 +145,10 @@ export const useAnswerStore = defineStore('answer', () => {
                 correctCount++;
             }
         });
-        
         return (correctCount / answeredQuestions.value.length) * 100;
     };
 
+    // ================ 导出的状态和方法 ================
     return {
         userAnswers,
         answeredQuestions,
@@ -90,16 +163,37 @@ export const useAnswerStore = defineStore('answer', () => {
         calculateAccuracy
     };
 },
-//持久化
+// ================ 持久化配置 ================
+/**
+ * 持久化配置
+ * 使Store的状态能够在页面刷新后保持
+ * 同时支持小程序和网页端的存储方式
+ */
 {
     //持久化的配置同时支持小程序和网页端
     persist: {
         storage: {
+            /**
+             * 获取存储的数据
+             * @param {string} key - 存储的键名
+             * @returns {any} 存储的数据
+             * 根据运行环境选择不同的存储API:
+             * - 网页端: 使用localStorage
+             * - 小程序端: 使用uni.getStorageSync
+             */
             getItem(key) {
                 return typeof window !== 'undefined'
                     ? localStorage.getItem(key)
                     : uni.getStorageSync(key);
             },
+            /**
+             * 设置存储的数据
+             * @param {string} key - 存储的键名
+             * @param {any} value - 要存储的数据
+             * 根据运行环境选择不同的存储API:
+             * - 网页端: 使用localStorage
+             * - 小程序端: 使用uni.setStorageSync
+             */
             setItem(key, value) {
                 return typeof window !== 'undefined'
                     ? localStorage.setItem(key, value)
