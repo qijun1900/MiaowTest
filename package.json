@@ -6,6 +6,7 @@
     "start:node": "cd node && npm start",
     "start:admin": "cd AdminWeb && npm run dev",
     "start:uniapp": "cd User-uniapp && npm run dev:mp-weixin",
-    "serve": "powershell -Command \"Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:node'; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:admin'\"; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:uniapp'"
+    "start:uniapp:h5": "cd User-uniapp && npm run dev:h5",
+    "serve": "powershell -Command \"Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:node'; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:admin'\"; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:uniapp' ; Start-Process powershell -ArgumentList '-NoExit','-Command','npm run start:uniapp:h5'"
   }
 }
