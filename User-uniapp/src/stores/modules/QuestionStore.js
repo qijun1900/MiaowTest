@@ -9,8 +9,8 @@ export const useQuestionStore = defineStore("question", () => {
     const QuestionData = ref([]); // 存储问题的数组
     const UserChooseQuestion = ref([]); // 存储用户选择的问题的数组
     const UserShowSettings = ref({ // 存储用户显示设置的对象
-        showAnswer: true, // 是否显示答案(默认显示 )
-        showAIHelp: true, // 是否显示AI解析(默认显示 )
+        showAnswer: false, // 是否显示答案(默认显示 )
+        showAIHelp: false, // 是否显示AI解析(默认显示 )
     });
 
 

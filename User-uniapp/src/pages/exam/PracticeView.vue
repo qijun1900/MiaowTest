@@ -4,7 +4,8 @@
         <u-navbar 
             title="" 
             bgColor="#F8F8F8" 
-            :autoBack="true">
+            :autoBack="true"
+            @rightClick="rightClick">
             <template #center>
                 <UviewSubsection 
                     :list="list" 
@@ -26,7 +27,11 @@
                     v-for="(item,index) in questionStore.UserChooseQuestion" 
                     :key="index">
                     <view class="question-container">
-                        <SelectQuestion v-if="item.Type===1" :question="item" :questionIndex="index + 1"/>
+                        <SelectQuestion 
+                            v-if="item.Type===1" 
+                            :question="item" 
+                            :questionIndex="index + 1"
+                            :currentMode="currentMode"/>
                         <BlankQuestion v-if="item.Type===2" :question="item" :questionIndex="index + 1"/>
                         <JudgeQuestion v-if="item.Type===3" :question="item" :questionIndex="index + 1"/>
                         <ShortQuestion v-if="item.Type===4" :question="item" :questionIndex="index + 1"/>
@@ -61,12 +66,16 @@ const currentQuestionIndex = ref(0);// 当前选中的问题索引
 
 const handleSendMode =(value)=>{
     currentMode.value = value; // 更新当前选中的模式
+    console.log("当前模式:", currentMode.value === 0 ? "答题模式" : "学习模式");
 }
 // 处理滑动事件
 const handleQuestionChange = (e) => {
     currentQuestionIndex.value = e.detail.current; // 更新当前选中的问题索引
-    console.log(currentQuestionIndex.value)// 输出当前选中的问题索引
 }
+// 处理右侧按钮点击事件
+const rightClick = () => {  
+    console.log('rightClick');  
+};  
 
 
 // 获取导航栏高度

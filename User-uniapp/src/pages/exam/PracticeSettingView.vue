@@ -50,7 +50,7 @@
                 </view>
             </view>
             <view class="setting-item">
-                <text class="label">选项乱序：</text>
+                <text class="label">选项乱序(选择题有效)：</text>
                 <view class="switch-wrapper">
                     <up-switch v-model="isOptionRandom" size="20"></up-switch>
                 </view>
@@ -87,8 +87,8 @@ const QuestionTypeData = ref([])// 考试题型基本数据
 const questionCount = ref(1) 
 const isRandom = ref(false) // 默认不乱序
 const isOptionRandom = ref(false) // 默认选项不乱序
-const isShowAnswer = ref(true) //是否立即显示答案
-const isShowAIHelp = ref(true)//是否开启AI解析
+const isShowAnswer = ref(false) //是否立即显示答案
+const isShowAIHelp = ref(false)//是否开启AI解析
 
 // 页面加载时
 onLoad((options) => {

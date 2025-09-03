@@ -12,19 +12,46 @@
         <view 
             v-for="(option,index) in question.options" 
             :key="index"
-            class="option-container">
-            <view class="option-item" :class="{'correct-answer': option.isCorrect}">
+            class="option-container"
+            @click="handleOptionClick(index)"
+            :style="{ pointerEvents: props.currentMode === 1 ? 'none' : 'auto' }">
+            <view class="option-item" 
+                  :class="{
+                      'correct-answer': showAnswerComputed && option.isCorrect,
+                      'selected-answer': isSelected(index),
+                      'multiple-selected': question.isMultiple === 1 && isSelected(index),
+                      'wrong-answer': showAnswerComputed && isSelected(index) && !option.isCorrect
+                  }">
                 <text class="option-tag">{{String.fromCharCode(65 + index)}}.</text>
                 <text class="option-content">{{option.content}}</text>
             </view>
         </view>
-        <view class="question-answer-container">
+
+        <!--多选题提交按钮 -->
+        <view class="Multiple-submit-button" style="margin-top: 30rpx;">
+            <uni-transition
+                :show="props.question.isMultiple === 1 && !showAnswerComputed && props.currentMode === 0 && selectedOptions.length > 0"
+                mode-class="fade"
+                :duration="300"
+            >
+                <up-button 
+                    v-if="props.question.isMultiple === 1 && !showAnswerComputed && props.currentMode === 0 && selectedOptions.length > 0"
+                    @click="submitMultiAnswer"
+                    type="primary" 
+                    text="核验答案" 
+                    shape="circle" 
+                    icon="checkmark-circle-fill">
+                </up-button>
+            </uni-transition>
+        </view>
+
+        <view class="question-answer-container" v-if="showAnswerComputed">
             <text class="answer-label">答案：</text>
             <text class="answer-content" v-for="(option, index) in question.options" :key="index" >
                 <text v-if="option.isCorrect">{{String.fromCharCode(65 + index)}}</text>
             </text>
         </view>
-        <view class="question-explanation-container">
+        <view class="question-explanation-container" v-if="showAnswerComputed">
             <view class="question-explanation-header">
                 <text class="explanation-label">解析:</text>
                 <uni-icons 
@@ -38,10 +65,16 @@
                 <text v-else>暂无解析</text>
             </view>
         </view>
+        <button v-if="props.currentMode === 0" @click="hanleDE">清除答案</button>
     </view>
 </template>
 
 <script setup>
+import { ref, onMounted, computed } from 'vue';
+import { useAnswerStore } from '@/stores/modules/AnswerStore';
+import { useQuestionStore } from '../../../stores/modules/QuestionStore';
+import uniTransition from '@dcloudio/uni-ui/lib/uni-transition/uni-transition.vue';
+
 const props = defineProps({
     question: {
         type: Object,
@@ -50,10 +83,110 @@ const props = defineProps({
     questionIndex: {
         type: Number,
         required: true
+    },
+    currentMode: {
+        type: Number,
+        default: 0 // 默认值为0，表示答题模式 1为学习模式
     }
 });
 
+const answerStore = useAnswerStore();
+const selectedOptions = ref([]);
+const questionStore = useQuestionStore();
+const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否显示答案
+// 控制多选题答案显示
+const multiAnswerSubmitted = ref(false);
 
+const hanleDE = ()=>{
+    answerStore.clearAllAnswers();
+    selectedOptions.value = [];
+    multiAnswerSubmitted.value = false;
+}
+
+// 判断选项是否被选中
+const isSelected = (index) => {
+    if (props.question.isMultiple === 1) {
+        // 多选题
+        return selectedOptions.value.includes(index);
+    } else {
+        // 单选题
+        return selectedOptions.value.length === 1 && selectedOptions.value[0] === index;
+    }
+};
+
+// 处理选项点击
+const handleOptionClick = (index) => {
+    if (props.currentMode === 1) return; // 学习模式不可点击
+    if (props.question.isMultiple === 1) {
+        // 多选题处理逻辑
+        const optionIndex = selectedOptions.value.indexOf(index);
+        if (optionIndex > -1) {
+            // 如果已选中，则取消选中
+            selectedOptions.value.splice(optionIndex, 1);
+        } else {
+            // 如果未选中，则添加到选中列表
+            selectedOptions.value.push(index);
+        }
+        // 保存用户答案（多选答案为数组）
+        answerStore.saveUserAnswer(props.question._id, [...selectedOptions.value]);
+    } else {
+        // 单选题处理逻辑
+        selectedOptions.value = [index];
+        // 保存用户答案（单选答案为单个值）
+        answerStore.saveUserAnswer(props.question._id, index);
+    }
+};
+
+// 组件挂载时，保存正确答案到store
+onMounted(() => {
+    // 获取正确答案的索引
+    const correctAnswers = [];
+    props.question.options.forEach((option, index) => {
+        if (option.isCorrect) {
+            correctAnswers.push(index);
+        }
+    });
+    
+    // 根据题目类型保存正确答案
+    if (props.question.isMultiple === 1) {
+        // 多选题，保存数组
+        answerStore.saveCorrectAnswer(props.question._id, correctAnswers);
+    } else {
+        // 单选题，保存单个值
+        answerStore.saveCorrectAnswer(props.question._id, correctAnswers[0]);
+    }
+    
+    // 如果用户之前已经答过题，恢复选择状态
+    const userAnswer = answerStore.getUserAnswer(props.question._id);
+    if (userAnswer !== undefined) {
+        if (props.question.isMultiple === 1 && Array.isArray(userAnswer)) {
+            selectedOptions.value = [...userAnswer];
+        } else if (props.question.isMultiple === 0 && typeof userAnswer === 'number') {
+            selectedOptions.value = [userAnswer];
+        }
+    }
+    // 清除多选题提交状态
+    multiAnswerSubmitted.value = false;
+});
+
+// 控制答案和解析的显示逻辑
+const showAnswerComputed = computed(() => {
+    if (props.currentMode === 1) {
+        // 学习模式直接显示
+        return true;
+    }
+    // 多选题需点击提交按钮
+    if (props.question.isMultiple === 1) {
+        return multiAnswerSubmitted.value;
+    }
+    // 单选题，只有用户选择后才显示
+    return showAnswerSetting && selectedOptions.value.length > 0;
+});
+
+// 多选题提交按钮事件
+const submitMultiAnswer = () => {
+    multiAnswerSubmitted.value = true;
+};
 </script>
 
 <style scoped>
@@ -100,11 +233,28 @@ const props = defineProps({
     transition: all 0.3s ease;
 }
 
+/* 选中答案样式 */
+.selected-answer {
+    background-color: #e3f2fd;
+    border-color: #0d82ff;
+}
+
+/* 多选选中样式 */
+.multiple-selected {
+    background-color: #e3f2fd;
+    border-color: #0d82ff;
+}
 
 /* 正确答案样式 */
 .correct-answer {
     background-color: #e8f5e9;
     border-color: #4caf50;
+}
+
+/* 错误答案样式 */
+.wrong-answer {
+    background-color: #ffeaea;
+    border-color: #ff4d4f;
 }
 
 .option-tag {
@@ -115,9 +265,25 @@ const props = defineProps({
     min-width: 40rpx;
     text-align: center;
 }
+
+/* 选中答案选项标签样式 */
+.selected-answer .option-tag {
+    color: #0d82ff;
+}
+
+/* 多选选中选项标签样式 */
+.multiple-selected .option-tag {
+    color: #0d82ff;
+}
+
 /* 正确答案选项标签样式  */
 .correct-answer .option-tag {
     color: #4caf50;
+}
+
+/* 错误答案选项标签样式 */
+.wrong-answer .option-tag {
+    color: #ff4d4f;
 }
 
 .option-content {
@@ -150,6 +316,7 @@ const props = defineProps({
     color: #54c058;
     margin-right: 8rpx;
 }
+
 /* 解析容器样式 */
 .question-explanation-container {
     margin-top: 45rpx;
@@ -170,5 +337,10 @@ const props = defineProps({
     font-size: 28rpx;
     color: #303030;
     font-weight: 580;
+}
+.Multiple-submit-button{
+    margin-top: 15rpx;
+    margin-bottom: 15rpx;
+    padding: 0rpx 30rpx;
 }
 </style>
