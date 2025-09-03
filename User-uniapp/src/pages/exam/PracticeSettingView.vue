@@ -120,6 +120,7 @@ const handleStart = ()=>{
     QuestionStore.setUserShowSettings({ // 设置用户显示设置
         showAnswer: isShowAnswer.value,
         showAIHelp: isShowAIHelp.value,
+        OptionRandom : isOptionRandom.value,
     })
     uni.navigateTo({
         url: `/pages/exam/PracticeView`
@@ -136,7 +137,7 @@ const handleStart = ()=>{
 
 .card {
     background-color: #ffffff;
-    border-radius: 10px;
+    border-radius: 10rpx;
     padding: 20rpx;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     margin-bottom: 20rpx;
@@ -153,7 +154,7 @@ const handleStart = ()=>{
 
 .info-item {
     display: flex;
-    margin-bottom: 12rpx;
+    margin-bottom: 15rpx;
     align-items: center;
 }
 
@@ -162,7 +163,7 @@ const handleStart = ()=>{
     margin-bottom: 12rpx;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 12px;
+    padding-bottom: 25rpx;
     border-bottom: 1px dashed #e0e0e0;
 }
 
@@ -174,7 +175,7 @@ const handleStart = ()=>{
 .label {
     width: 90px;
     color: #666;
-    font-size: 14px;
+    font-size: 30rpx;
     position: relative;
     padding-left: 10rpx;
     white-space: nowrap;
@@ -195,7 +196,7 @@ const handleStart = ()=>{
 .value {
     flex: 1;
     color: #333;
-    font-size: 14px;
+    font-size: 28rpx;
     font-weight: 500;
 }
 
@@ -209,12 +210,12 @@ const handleStart = ()=>{
 
 .slider-wrapper {
     flex: 1;
-    margin-right: 10px;
+    margin-right: 10rpx;
 }
 
 .slider-value {
     text-align: right;
-    font-size: 12px;
+    font-size: 28rpx;
     color: #007AFF;
     min-width: 50rpx;
     white-space: nowrap;

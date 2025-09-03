@@ -65,7 +65,11 @@
                 <text v-else>暂无解析</text>
             </view>
         </view>
-        <button v-if="props.currentMode === 0" @click="hanleDE">清除答案</button>
+        <button 
+            v-if="props.currentMode === 0"
+            @click="hanleDE">
+            清除答案
+        </button>
     </view>
 </template>
 

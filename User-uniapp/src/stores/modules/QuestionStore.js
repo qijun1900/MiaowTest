@@ -11,6 +11,7 @@ export const useQuestionStore = defineStore("question", () => {
     const UserShowSettings = ref({ // 存储用户显示设置的对象
         showAnswer: false, // 是否显示答案(默认显示 )
         showAIHelp: false, // 是否显示AI解析(默认显示 )
+        OptionRandom: false, // 是否选项乱序(默认显示 )
     });
 
 

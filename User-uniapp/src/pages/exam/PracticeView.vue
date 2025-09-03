@@ -2,10 +2,10 @@
     <view>
         <!-- uView自定义导航栏 -->
         <u-navbar 
-            title="" 
             bgColor="#F8F8F8" 
             :autoBack="true"
-            @rightClick="rightClick">
+            rightIcon="more-dot-fill"
+            @leftClick="leftClick">
             <template #center>
                 <UviewSubsection 
                     :list="list" 
@@ -24,18 +24,19 @@
                     @change="handleQuestionChange"
                     :duration="300">
                     <swiper-item 
-                    v-for="(item,index) in questionStore.UserChooseQuestion" 
-                    :key="index">
-                    <view class="question-container">
-                        <SelectQuestion 
-                            v-if="item.Type===1" 
-                            :question="item" 
-                            :questionIndex="index + 1"
-                            :currentMode="currentMode"/>
-                        <BlankQuestion v-if="item.Type===2" :question="item" :questionIndex="index + 1"/>
-                        <JudgeQuestion v-if="item.Type===3" :question="item" :questionIndex="index + 1"/>
-                        <ShortQuestion v-if="item.Type===4" :question="item" :questionIndex="index + 1"/>
-                    </view>
+                        v-for="(item,index) in questionStore.UserChooseQuestion" 
+                        :key="index">
+                        <view class="question-container">
+                            <SelectQuestion 
+                                v-if="item.Type===1" 
+                                :question="item" 
+                                :questionIndex="index + 1"
+                                :currentMode="currentMode"
+                                :key="refreshKey"/>
+                            <BlankQuestion v-if="item.Type===2" :question="item" :questionIndex="index + 1"/>
+                            <JudgeQuestion v-if="item.Type===3" :question="item" :questionIndex="index + 1"/>
+                            <ShortQuestion v-if="item.Type===4" :question="item" :questionIndex="index + 1"/>
+                        </view>
                     </swiper-item>
                 </swiper>
         </view>
@@ -50,13 +51,15 @@ import SelectQuestion from '../../components/modules/exam/SelectQuestion.vue';//
 import BlankQuestion from '../../components/modules/exam/BlankQuestion.vue';//Type=2
 import JudgeQuestion from '../../components/modules/exam/JudgeQuestion.vue';//Type=3
 import ShortQuestion from '../../components/modules/exam/ShortQuestion.vue';//Type=4
-
+import { useAnswerStore } from '../../stores/modules/AnswerStore';
 
 const questionStore = useQuestionStore();
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
 const currentMode = ref(0);// 当前选中的模式，0表示答题模式，1表示学习模式
 const navBarHeight = ref(0); // 导航栏高度
 const currentQuestionIndex = ref(0);// 当前选中的问题索引
+const answerStore = useAnswerStore();// AnswerStore
+const refreshKey = ref(0);// 用于触发子组件刷新
 
 // // 添加计算属性, 获取当前问题
 // const currentQuestion = computed(() => {
@@ -73,8 +76,19 @@ const handleQuestionChange = (e) => {
     currentQuestionIndex.value = e.detail.current; // 更新当前选中的问题索引
 }
 // 处理右侧按钮点击事件
-const rightClick = () => {  
-    console.log('rightClick');  
+const leftClick = () => { 
+    if(questionStore.UserShowSettings.showAnswer || questionStore.UserShowSettings.OptionRandom ){
+        answerStore.clearAllAnswers();
+        refreshKey.value++; // 触发所有题目组件刷新
+        currentQuestionIndex.value = 0; // 回到第一题
+        console.log("清除所有答案");
+        uni.showToast({ 
+        title: `当前开启${questionStore.UserShowSettings.showAnswer? '立即显示答案开启' : '选项乱序开启'}>>返回将清除所有答案`, 
+        icon: 'none' ,
+        duration:4000,
+        mask: true // 添加遮罩，防止触摸穿透
+    });
+    } 
 };  
 
 
@@ -92,9 +106,8 @@ const getNavBarHeight = () => {
     // #endif
 }
 onMounted(() => {
-    console.log( questionStore.UserChooseQuestion)
-    console.log(questionStore.UserShowSettings)
     getNavBarHeight();
+    console.log(questionStore.UserChooseQuestion)
 })
 </script>
 
