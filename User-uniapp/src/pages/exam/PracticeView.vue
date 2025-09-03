@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'; // 导入computed
+import { onMounted, ref,  } from 'vue'; // 导入computed
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import UviewSubsection from "../../components/core/uviewSubsection.vue";
 import SelectQuestion from '../../components/modules/exam/SelectQuestion.vue';//Type=1
@@ -53,10 +53,10 @@ const currentMode = ref(0);// 当前选中的模式，0表示答题模式，1表
 const navBarHeight = ref(0); // 导航栏高度
 const currentQuestionIndex = ref(0);// 当前选中的问题索引
 
-// 添加计算属性, 获取当前问题
-const currentQuestion = computed(() => {
-  return questionStore.UserChooseQuestion[currentQuestionIndex.value];
-});
+// // 添加计算属性, 获取当前问题
+// const currentQuestion = computed(() => {
+//   return questionStore.UserChooseQuestion[currentQuestionIndex.value];
+// });
 
 
 const handleSendMode =(value)=>{
@@ -83,8 +83,9 @@ const getNavBarHeight = () => {
     // #endif
 }
 onMounted(() => {
-   console.log( questionStore.UserChooseQuestion)
-   getNavBarHeight();
+    console.log( questionStore.UserChooseQuestion)
+    console.log(questionStore.UserShowSettings)
+    getNavBarHeight();
 })
 </script>
 

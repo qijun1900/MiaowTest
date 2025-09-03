@@ -1,4 +1,4 @@
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { defineStore } from 'pinia';
 import { FetchMatchQuestionList } from "../../API/Exam/ExamAPI";
 
@@ -8,13 +8,11 @@ export const useQuestionStore = defineStore("question", () => {
     const QuestionIDs = ref([]); // 存储问题ID的数组
     const QuestionData = ref([]); // 存储问题的数组
     const UserChooseQuestion = ref([]); // 存储用户选择的问题的数组
-
-    // 添加用户设置的状态
-    const userSettings = ref({
-        questionCount: 1,
-        isRandom: false,
-        isOptionRandom: false,
+    const UserShowSettings = ref({ // 存储用户显示设置的对象
+        showAnswer: true, // 是否显示答案(默认显示 )
+        showAIHelp: true, // 是否显示AI解析(默认显示 )
     });
+
 
     const QuestionIDsActions = {
         setCurrentQuestionIds: (val) => { // 定义函数，用于设置问题ID的数组
@@ -34,7 +32,11 @@ export const useQuestionStore = defineStore("question", () => {
         }
     }
 
-
+    const UserShowSettingsActions = {
+        setUserShowSettings: (val) => { // 定义函数，用于设置用户显示设置
+            UserShowSettings.value = val; // 将传入的值赋值给UserShowSettings.value
+        },
+    }
 
     const getter = {
         /**
@@ -71,7 +73,8 @@ export const useQuestionStore = defineStore("question", () => {
                     const newQuestion = { ...question };
 
                     // 如果问题有选项，则对选项进行乱序
-                    if (newQuestion.options && Array.isArray(newQuestion.options)) {
+                    // 添加条件：当Type为2时候为填空题目，不进行乱序
+                    if (newQuestion.options && Array.isArray(newQuestion.options) && newQuestion.type !== 2 ) {
                         // 修复：确保正确复制选项数组
                         const options = JSON.parse(JSON.stringify(newQuestion.options));
                         // Fisher-Yates 洗牌算法
@@ -90,32 +93,18 @@ export const useQuestionStore = defineStore("question", () => {
 
             return selectedQuestions;
         },
-
-        // 更新用户设置
-        updateUserSettings: (settings) => {
-            userSettings.value = { ...userSettings.value, ...settings };
-            // 当设置更新时，自动更新选择的问题
-            getter.setSelectedQuestions(
-                userSettings.value.questionCount,
-                userSettings.value.isRandom,
-                userSettings.value.isOptionRandom
-            );
-        },
-
-        // 获取当前选择的问题（计算属性）
-        getFilteredQuestions: computed(() => {
-            return UserChooseQuestion.value;
-        })
     }
 
     return {
         QuestionIDs,
         QuestionData,
         UserChooseQuestion,
-        userSettings,
+        UserShowSettings,
         ...QuestionIDsActions,
         ...QuestionDataActions,
-        ...getter
+        ...UserShowSettingsActions,
+        ...getter,
+
     }
 },
     //持久化

@@ -64,7 +64,7 @@
             <view class="setting-item">
                 <text class="label">开启AI解析：</text>
                 <view class="switch-wrapper">
-                    <up-switch v-model="isShowAI" size="20"></up-switch>
+                    <up-switch v-model="isShowAIHelp" size="20"></up-switch>
                 </view>
             </view>
         </view>
@@ -88,7 +88,7 @@ const questionCount = ref(1)
 const isRandom = ref(false) // 默认不乱序
 const isOptionRandom = ref(false) // 默认选项不乱序
 const isShowAnswer = ref(true) //是否立即显示答案
-const isShowAI = ref(true)//是否开启AI解析
+const isShowAIHelp = ref(true)//是否开启AI解析
 
 // 页面加载时
 onLoad((options) => {
@@ -117,6 +117,10 @@ onLoad((options) => {
 })
 const handleStart = ()=>{
     QuestionStore.setSelectedQuestions(questionCount.value,isRandom.value,isOptionRandom.value)// 设置当前选择的题目数量，乱序选项等信息
+    QuestionStore.setUserShowSettings({ // 设置用户显示设置
+        showAnswer: isShowAnswer.value,
+        showAIHelp: isShowAIHelp.value,
+    })
     uni.navigateTo({
         url: `/pages/exam/PracticeView`
     })
