@@ -33,9 +33,20 @@
                                 :questionIndex="index + 1"
                                 :currentMode="currentMode"
                                 :key="refreshKey"/>
-                            <BlankQuestion v-if="item.Type===2" :question="item" :questionIndex="index + 1"/>
-                            <JudgeQuestion v-if="item.Type===3" :question="item" :questionIndex="index + 1"/>
-                            <ShortQuestion v-if="item.Type===4" :question="item" :questionIndex="index + 1"/>
+                            <BlankQuestion 
+                                v-if="item.Type===2" 
+                                :question="item" 
+                                :questionIndex="index + 1"/>
+                            <JudgeQuestion 
+                                v-if="item.Type===3" 
+                                :question="item" 
+                                :questionIndex="index + 1" 
+                                :currentMode="currentMode" 
+                                :key="refreshKey"/>
+                            <ShortQuestion 
+                                v-if="item.Type===4" 
+                                :question="item" 
+                                :questionIndex="index + 1"/>
                         </view>
                     </swiper-item>
                 </swiper>
@@ -86,7 +97,6 @@ const leftClick = () => {
         title: `当前开启${questionStore.UserShowSettings.showAnswer? '立即显示答案开启' : '选项乱序开启'}>>返回将清除所有答案`, 
         icon: 'none' ,
         duration:4000,
-        mask: true // 添加遮罩，防止触摸穿透
     });
     } 
 };  
