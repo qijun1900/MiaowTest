@@ -54,7 +54,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useAnswerStore } from '@/stores/modules/AnswerStore';
+import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
 import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 
 
@@ -74,7 +74,7 @@ const props = defineProps({
     }
 });
 const judgeOptions = ['正确', '错误'];// 判断题选项，A代表正确，B代表错误
-const answerStore = useAnswerStore();// 答案存储
+const answerStore = useObjectiveAnswerStore();// 答案存储
 const selectedOption = ref(null);// 选中的选项
 const questionStore = useQuestionStore();// 问题存储
 const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否显示答案

@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
  * 用于管理用户答题过程中的所有状态，包括用户答案、正确答案、答题情况等
  * 支持多种题型的答案存储和校验，包括单选题、多选题、判断题、填空题和简答题
  */
-export const useAnswerStore = defineStore('answer', () => {
+export const useObjectiveAnswerStore = defineStore('answer', () => {
     // ================ 状态定义 ================
     /**
      * 用户答案存储

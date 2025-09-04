@@ -44,13 +44,14 @@
                 </up-button>
             </uni-transition>
         </view>
-
+        <!-- 答案 -->
         <view class="question-answer-container" v-if="showAnswerComputed">
             <text class="answer-label">答案：</text>
             <text class="answer-content" v-for="(option, index) in question.options" :key="index" >
                 <text v-if="option.isCorrect">{{String.fromCharCode(65 + index)}}</text>
             </text>
         </view>
+        <!-- 解析 -->
         <view class="question-explanation-container" v-if="showAnswerComputed">
             <view class="question-explanation-header">
                 <text class="explanation-label">解析:</text>
@@ -75,7 +76,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useAnswerStore } from '@/stores/modules/AnswerStore';
+import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
 import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 import uniTransition from '@dcloudio/uni-ui/lib/uni-transition/uni-transition.vue';
 
@@ -94,7 +95,7 @@ const props = defineProps({
     }
 });
 
-const answerStore = useAnswerStore();
+const answerStore = useObjectiveAnswerStore();
 const selectedOptions = ref([]);
 const questionStore = useQuestionStore();
 const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否显示答案

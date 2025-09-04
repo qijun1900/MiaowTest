@@ -36,7 +36,8 @@
                             <BlankQuestion 
                                 v-if="item.Type===2" 
                                 :question="item" 
-                                :questionIndex="index + 1"/>
+                                :questionIndex="index + 1"
+                                :currentMode="currentMode"/>
                             <JudgeQuestion 
                                 v-if="item.Type===3" 
                                 :question="item" 
@@ -46,7 +47,8 @@
                             <ShortQuestion 
                                 v-if="item.Type===4" 
                                 :question="item" 
-                                :questionIndex="index + 1"/>
+                                :questionIndex="index + 1"
+                                :currentMode="currentMode"/>
                         </view>
                     </swiper-item>
                 </swiper>
@@ -62,14 +64,14 @@ import SelectQuestion from '../../components/modules/exam/SelectQuestion.vue';//
 import BlankQuestion from '../../components/modules/exam/BlankQuestion.vue';//Type=2
 import JudgeQuestion from '../../components/modules/exam/JudgeQuestion.vue';//Type=3
 import ShortQuestion from '../../components/modules/exam/ShortQuestion.vue';//Type=4
-import { useAnswerStore } from '../../stores/modules/AnswerStore';
+import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerStore';
 
 const questionStore = useQuestionStore();
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
 const currentMode = ref(0);// 当前选中的模式，0表示答题模式，1表示学习模式
 const navBarHeight = ref(0); // 导航栏高度
 const currentQuestionIndex = ref(0);// 当前选中的问题索引
-const answerStore = useAnswerStore();// AnswerStore
+const answerStore = useObjectiveAnswerStore();// AnswerStore
 const refreshKey = ref(0);// 用于触发子组件刷新
 
 // // 添加计算属性, 获取当前问题
