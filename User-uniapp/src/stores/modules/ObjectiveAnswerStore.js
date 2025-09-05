@@ -4,15 +4,15 @@ import { defineStore } from 'pinia';
 /**
  * 答题状态管理Store
  * 用于管理用户答题过程中的所有状态，包括用户答案、正确答案、答题情况等
- * 支持多种题型的答案存储和校验，包括单选题、多选题、判断题、填空题和简答题
+ * 支持多种题型的答案存储和校验，包括单选题、多选题、判断题
  */
-export const useObjectiveAnswerStore = defineStore('answer', () => {
+export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
     // ================ 状态定义 ================
     /**
      * 用户答案存储
      * 格式: {questionId: answer}
      * questionId: 题目ID
-     * answer: 用户答案（单选/判断为字符串，多选为数组，填空/简答为字符串）
+     * answer: 用户答案（单选/判断为字符串，多选为数组）
      */
     const userAnswers = ref({}); 
     
@@ -26,7 +26,7 @@ export const useObjectiveAnswerStore = defineStore('answer', () => {
      * 正确答案存储
      * 格式: {questionId: correctAnswer}
      * questionId: 题目ID
-     * correctAnswer: 正确答案（单选/判断为字符串，多选为数组，填空/简答为字符串）
+     * correctAnswer: 正确答案（单选/判断为字符串，多选为数组，）
      */
     const correctAnswers = ref({}); 
     
@@ -93,9 +93,6 @@ export const useObjectiveAnswerStore = defineStore('answer', () => {
             const userAnswerSorted = [...userAnswer].sort();
             const correctAnswerSorted = [...correctAnswer].sort();
             isAnswerCorrect.value[questionId] = JSON.stringify(userAnswerSorted) === JSON.stringify(correctAnswerSorted);
-        } else {
-            // 单选题、判断题、填空题、简答题：直接比较
-            isAnswerCorrect.value[questionId] = userAnswer === correctAnswer;
         }
     };
     

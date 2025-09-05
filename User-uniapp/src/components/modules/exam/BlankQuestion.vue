@@ -56,6 +56,25 @@
                 </view>
             </view>
         </view>
+        <!-- 用户判断 -->
+        <view class="user-judgment-container" v-if="showAnswerComputed">
+            <up-button 
+                icon="close"
+                type="primary" 
+                :plain="true" 
+                text="答错了" 
+                shape="circle" 
+                class="user-judgment-but"
+                @click="handleSelfEvaluation(false)"></up-button>
+            <up-button 
+                icon="checkmark"
+                type="primary" 
+                :plain="true" 
+                text="答对了" 
+                shape="circle" 
+                class="user-judgment-but"
+                @click="handleSelfEvaluation(true)"></up-button>
+        </view>
         <!-- 解析 -->
         <view class="question-explanation-container" v-if="showAnswerComputed">
             <view class="question-explanation-header">
@@ -71,11 +90,16 @@
                 <text v-else>暂无解析</text>
             </view>
         </view>
+        <button @click="handleDE">清除Store</button>
     </view>
 </template>
 
 <script setup>
-import {  ref, watch,computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
+import { useSubjectiveAnswerStore } from '@/stores/modules/SubjectiveAnswerStore';
+
+
+const subjectiveAnswerStore = useSubjectiveAnswerStore();// 初始化 store
 
 const props = defineProps({
     question: {
@@ -95,11 +119,43 @@ const props = defineProps({
 // 初始化用户输入数组，根据options长度创建对应数量的空字符串
 const userinput = ref(props.question.options.map(() => ''));
 const isShowAnswer = ref(false);
+
+//测试
+const handleDE = () => {
+    subjectiveAnswerStore.clearAllAnswers(); // 调用 store 中的方法清除所有数据
+    console.log("sub-Store已清除"); 
+};
+
+
+// 组件挂载时，从 store 获取已保存的答案（如果有）
+onMounted(() => {
+    const savedAnswer = subjectiveAnswerStore.getUserAnswer(props.question._id);
+    if (savedAnswer) {
+        userinput.value = savedAnswer;
+    }
+    
+    //挂载时候 保存参考答案到 store
+    const referenceAnswers = props.question.options.map(option => option.content);
+    subjectiveAnswerStore.saveReferenceAnswer(props.question._id, referenceAnswers);
+
+    //cosnsole
+    // console.log(
+    //     "用户答案存储",subjectiveAnswerStore.userAnswers,
+    //     "已答题目的ID列表",subjectiveAnswerStore.answeredQuestions,
+    //     "参考答案存储",subjectiveAnswerStore.referenceAnswers,
+    //     "用户自评是否正确的状态",subjectiveAnswerStore.isUserSelfCorrect,
+    // )
+});
+
+// 监听用户输入变化，保存到 store
+watch(userinput, (newInput) => {
+    subjectiveAnswerStore.saveUserAnswer(props.question._id, newInput);
+}, { deep: true });
+
 // 监听question.options变化，重新初始化userinput数组
 watch(() => props.question.options, (newOptions) => {
     userinput.value = newOptions.map(() => '');
 }, { deep: true });
-
 
 const showAnswerComputed = computed(() => {
     if(props.currentMode === 1){
@@ -109,6 +165,11 @@ const showAnswerComputed = computed(() => {
     // 答题模式，根据用户点击显示答案
     return isShowAnswer.value;
 });
+
+// 处理用户自评
+const handleSelfEvaluation = (isCorrect) => {
+    subjectiveAnswerStore.saveUserSelfEvaluation(props.question._id, isCorrect);
+};
 </script>
 
 <style scoped>
@@ -197,5 +258,16 @@ const showAnswerComputed = computed(() => {
     font-size: 28rpx;
     color: #303030;
     font-weight: 580;
+}
+.user-judgment-container{
+    margin-top: 20rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8rpx;
+}
+.user-judgment-but{
+    flex: 1; /* 让按钮占据相同的宽度 */
+    margin: 0 10rpx; /* 调整按钮之间的间距 */
 }
 </style>
