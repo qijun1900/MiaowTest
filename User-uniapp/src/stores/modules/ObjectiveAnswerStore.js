@@ -26,7 +26,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
      * 正确答案存储
      * 格式: {questionId: correctAnswer}
      * questionId: 题目ID
-     * correctAnswer: 正确答案（单选/判断为字符串，多选为数组，）
+     * correctAnswer: 正确答案（单选/判断为字符串，多选为数组）
      */
     const correctAnswers = ref({}); 
     

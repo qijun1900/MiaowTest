@@ -31,7 +31,7 @@
             </up-textarea>
             </view>
         </view>
-        <!-- 用户自行判断答案 -->
+        <!-- 查看答案 -->
         <view class="check-container">
             <up-button 
                 v-if="props.currentMode === 0"
@@ -43,54 +43,62 @@
             </up-button>
         </view>
         <!-- 答案 -->
-        <view class="question-answer-container" v-if="showAnswerComputed">
-            <text class="answer-label">答案：</text>
-            <view class="answer-content">
-                <view 
-                    v-for="(option, index) 
-                    in question.options" 
-                    :key="index" 
-                    class="answer-item">
-                    <text class="answer-index">空{{index + 1}}:{{option.content}}</text>
-                    <text v-if="index < question.options.length - 1" class="answer-separator">;</text>
+        <uni-transition name="fade" mode="out-in" :show="showAnswerComputed">
+            <view class="question-answer-container" key="answer">
+                <text class="answer-label">答案：</text>
+                <view class="answer-content">
+                    <view 
+                        v-for="(option, index) 
+                        in question.options" 
+                        :key="index" 
+                        class="answer-item">
+                        <text class="answer-index">空{{index + 1}}:{{option.content}}</text>
+                        <text v-if="index < question.options.length - 1" class="answer-separator">;</text>
+                    </view>
                 </view>
             </view>
-        </view>
+        </uni-transition>
         <!-- 用户判断 -->
-        <view class="user-judgment-container" v-if="showAnswerComputed">
-            <up-button 
-                icon="close"
-                type="primary" 
-                :plain="true" 
-                text="答错了" 
-                shape="circle" 
-                class="user-judgment-but"
-                @click="handleSelfEvaluation(false)"></up-button>
-            <up-button 
-                icon="checkmark"
-                type="primary" 
-                :plain="true" 
-                text="答对了" 
-                shape="circle" 
-                class="user-judgment-but"
-                @click="handleSelfEvaluation(true)"></up-button>
-        </view>
+        <uni-transition name="fade" mode="out-in" :show="showAnswerComputed && props.currentMode === 0">
+            <view class="user-judgment-container" key="judgment">
+                <up-button 
+                    icon="close"
+                    type="primary" 
+                    :plain="true" 
+                    text="答错了" 
+                    shape="circle" 
+                    class="user-judgment-but"
+                    @click="handleSelfEvaluation(false)"></up-button>
+                <up-button 
+                    icon="checkmark"
+                    type="primary" 
+                    :plain="true" 
+                    text="答对了" 
+                    shape="circle" 
+                    class="user-judgment-but"
+                    @click="handleSelfEvaluation(true)"></up-button>
+            </view>
+        </uni-transition>
         <!-- 解析 -->
-        <view class="question-explanation-container" v-if="showAnswerComputed">
-            <view class="question-explanation-header">
-                <text class="explanation-label">解析:</text>
-                <uni-icons 
-                    type="help"
-                    size="21" 
-                    class="explanation-icon"
-                    color="#6f89ff"></uni-icons>
+        <uni-transition name="fade" mode="out-in" :show="showAnswerComputed">
+            <view class="question-explanation-container" key="explanation">
+                <view class="question-explanation-header">
+                    <text class="explanation-label">解析:</text>
+                    <uni-icons 
+                        type="help"
+                        size="21" 
+                        class="explanation-icon"
+                        color="#6f89ff"></uni-icons>
+                </view>
+                <view class="question-explanation-content">
+                    <rich-text v-if="question.analysis && question.analysis !== ''" :nodes="question.analysis"></rich-text>
+                    <text v-else>暂无解析</text>
+                </view>
             </view>
-            <view class="question-explanation-content">
-                <rich-text v-if="question.analysis && question.analysis !== ''" :nodes="question.analysis"></rich-text>
-                <text v-else>暂无解析</text>
-            </view>
-        </view>
-        <button @click="handleDE">清除Store</button>
+        </uni-transition>
+        <button 
+            @click="handleDE"  
+            v-if="props.currentMode === 0">清除Store</button>
     </view>
 </template>
 
@@ -98,9 +106,7 @@
 import { ref, watch, computed, onMounted } from 'vue';
 import { useSubjectiveAnswerStore } from '@/stores/modules/SubjectiveAnswerStore';
 
-
 const subjectiveAnswerStore = useSubjectiveAnswerStore();// 初始化 store
-
 const props = defineProps({
     question: {
         type: Object,
@@ -118,34 +124,13 @@ const props = defineProps({
 
 // 初始化用户输入数组，根据options长度创建对应数量的空字符串
 const userinput = ref(props.question.options.map(() => ''));
-const isShowAnswer = ref(false);
+const isShowAnswer = ref(false);// 控制答案和解析的显示逻辑
 
 //测试
 const handleDE = () => {
     subjectiveAnswerStore.clearAllAnswers(); // 调用 store 中的方法清除所有数据
     console.log("sub-Store已清除"); 
 };
-
-
-// 组件挂载时，从 store 获取已保存的答案（如果有）
-onMounted(() => {
-    const savedAnswer = subjectiveAnswerStore.getUserAnswer(props.question._id);
-    if (savedAnswer) {
-        userinput.value = savedAnswer;
-    }
-    
-    //挂载时候 保存参考答案到 store
-    const referenceAnswers = props.question.options.map(option => option.content);
-    subjectiveAnswerStore.saveReferenceAnswer(props.question._id, referenceAnswers);
-
-    //cosnsole
-    // console.log(
-    //     "用户答案存储",subjectiveAnswerStore.userAnswers,
-    //     "已答题目的ID列表",subjectiveAnswerStore.answeredQuestions,
-    //     "参考答案存储",subjectiveAnswerStore.referenceAnswers,
-    //     "用户自评是否正确的状态",subjectiveAnswerStore.isUserSelfCorrect,
-    // )
-});
 
 // 监听用户输入变化，保存到 store
 watch(userinput, (newInput) => {
@@ -170,6 +155,26 @@ const showAnswerComputed = computed(() => {
 const handleSelfEvaluation = (isCorrect) => {
     subjectiveAnswerStore.saveUserSelfEvaluation(props.question._id, isCorrect);
 };
+
+// 组件挂载时，从 store 获取已保存的答案（如果有）
+onMounted(() => {
+    const savedAnswer = subjectiveAnswerStore.getUserAnswer(props.question._id);
+    if (savedAnswer) {
+        userinput.value = savedAnswer;
+    }
+    
+    //挂载时候 保存参考答案到 store
+    const referenceAnswers = props.question.options.map(option => option.content);
+    subjectiveAnswerStore.saveReferenceAnswer(props.question._id, referenceAnswers);
+
+    //cosnsole
+    // console.log(
+    //     "用户答案存储",subjectiveAnswerStore.userAnswers,
+    //     "已答题目的ID列表",subjectiveAnswerStore.answeredQuestions,
+    //     "参考答案存储",subjectiveAnswerStore.referenceAnswers,
+    //     "用户自评是否正确的状态",subjectiveAnswerStore.isUserSelfCorrect,
+    // )
+});
 </script>
 
 <style scoped>
@@ -269,5 +274,18 @@ const handleSelfEvaluation = (isCorrect) => {
 .user-judgment-but{
     flex: 1; /* 让按钮占据相同的宽度 */
     margin: 0 10rpx; /* 调整按钮之间的间距 */
+}
+.check-container{
+    margin-top: 20rpx;
+    padding: 0 28rpx;
+}
+/* 淡入淡出动画 */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

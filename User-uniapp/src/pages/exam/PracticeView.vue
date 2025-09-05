@@ -48,7 +48,8 @@
                                 v-if="item.Type===4" 
                                 :question="item" 
                                 :questionIndex="index + 1"
-                                :currentMode="currentMode"/>
+                                :currentMode="currentMode"
+                                :key="refreshKey"/>
                         </view>
                     </swiper-item>
                 </swiper>
