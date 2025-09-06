@@ -13,7 +13,6 @@
                     @updateCurrent="handleSendMode"/>
             </template> 
         </u-navbar>
-        
         <!-- 页面内容 -->
         <view 
             class="content" 
@@ -65,15 +64,15 @@
             <up-tabbar-item 
                 :text="String(correctCount)" 
                 icon="/static/other/right.png" 
-                v-show="questionStore.UserShowSettings.showAnswer"></up-tabbar-item>
+                v-show="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
             <up-tabbar-item 
                 :text="String(incorrectCount)" 
                 icon="/static/other/error.png" 
-                v-show="questionStore.UserShowSettings.showAnswer"></up-tabbar-item>
+                v-show="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
             <up-tabbar-item 
                 :text="String(accuracyRate)" 
                 icon="/static/other/percent.png" 
-                v-show="questionStore.UserShowSettings.showAnswer"></up-tabbar-item>
+                v-show="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
             <up-tabbar-item 
                 text="答题卡" 
                 icon="list-dot" 
@@ -167,17 +166,20 @@ const handleQuestionChange = (e) => {
 
 // 处理右侧按钮点击事件
 const leftClick = () => { 
-    if(questionStore.UserShowSettings.showAnswer || questionStore.UserShowSettings.OptionRandom ){
-        ObjectiveAnswerStore.clearAllAnswers();
-        SubjectiveAnswerStore.clearAllAnswers();
-        refreshKey.value++; // 触发所有题目组件刷新
-        currentQuestionIndex.value = 0; // 回到第一题
-        uni.showToast({ 
-        title: `当前开启${questionStore.UserShowSettings.showAnswer? '立即显示答案开启' : '选项乱序开启'}>>返回将清除选择判断做题痕迹`, 
-        icon: 'none' ,
-        duration:4000,
-    });
-    } 
+    // if(questionStore.UserShowSettings.showAnswer || questionStore.UserShowSettings.OptionRandom ){
+    //     ObjectiveAnswerStore.clearAllAnswers();
+    //     SubjectiveAnswerStore.clearAllAnswers();
+    //     refreshKey.value++; // 触发所有题目组件刷新
+    //     currentQuestionIndex.value = 0; // 回到第一题
+    //     uni.showToast({ 
+    //     title: `当前开启${questionStore.UserShowSettings.showAnswer? '立即显示答案开启' : '选项乱序开启'}>>返回将清除选择判断做题痕迹`, 
+    //     icon: 'none' ,
+    //     duration:4000,
+    // });
+    // } 
+    console.log( "清除");
+    SubjectiveAnswerStore.clearAllAnswers();
+    ObjectiveAnswerStore.clearAllAnswers();
 };  
 // 处理答题卡
 const handleCheck = () => {

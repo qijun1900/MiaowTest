@@ -66,11 +66,6 @@
                 <text v-else>暂无解析</text>
             </view>
         </view>
-        <button 
-            v-if="props.currentMode === 0"
-            @click="hanleDE">
-            清除答案
-        </button>
     </view>
 </template>
 
@@ -102,12 +97,6 @@ const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否�
 // 控制多选题答案显示
 const multiAnswerSubmitted = ref(false);
 
-
-const hanleDE = ()=>{
-    answerStore.clearAllAnswers();
-    selectedOptions.value = [];
-    multiAnswerSubmitted.value = false;
-}
 
 // 判断选项是否被选中
 const isSelected = (index) => {

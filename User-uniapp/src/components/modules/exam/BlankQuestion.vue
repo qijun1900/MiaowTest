@@ -96,9 +96,6 @@
                 </view>
             </view>
         </uni-transition>
-        <button 
-            @click="handleDE"  
-            v-if="props.currentMode === 0">清除Store</button>
     </view>
 </template>
 
@@ -126,11 +123,6 @@ const props = defineProps({
 const userinput = ref(props.question.options.map(() => ''));
 const isShowAnswer = ref(false);// 控制答案和解析的显示逻辑
 
-//测试
-const handleDE = () => {
-    subjectiveAnswerStore.clearAllAnswers(); // 调用 store 中的方法清除所有数据
-    console.log("sub-Store已清除"); 
-};
 
 // 监听用户输入变化，保存到 store
 watch(userinput, (newInput) => {

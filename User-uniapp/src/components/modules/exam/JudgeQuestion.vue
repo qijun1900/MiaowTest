@@ -44,11 +44,6 @@
                 <text v-else>暂无解析</text>
             </view>
         </view>
-        <button 
-            v-if="props.currentMode === 0"
-            @click="handleClearAnswer">
-            清除答案
-        </button>
     </view>
 </template>
 
@@ -79,11 +74,6 @@ const selectedOption = ref(null);// 选中的选项
 const questionStore = useQuestionStore();// 问题存储
 const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否显示答案
 
-// 清除答案
-const handleClearAnswer = () => {
-    selectedOption.value = null;
-    answerStore.clearAllAnswers();
-};
 
 // 判断选项是否被选中
 const isSelected = (index) => {

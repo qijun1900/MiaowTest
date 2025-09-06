@@ -86,11 +86,6 @@
                 </view>
             </view>
         </uni-transition>
-        <button 
-            v-if="props.currentMode === 0"
-            @click="handleDE">
-            清除答案
-        </button>
     </view>
 </template>
 
@@ -115,11 +110,6 @@ const props = defineProps({
 });
 const userinput = ref('');
 const isShowAnswer = ref(false);
-//测试
-const handleDE = () => {
-    subjectiveAnswerStore.clearAllAnswers(); // 调用 store 中的方法清除所有数据
-    console.log("sub-Store已清除"); 
-};
 
 const showAnswerComputed = computed(() => {
     if(props.currentMode === 1){
