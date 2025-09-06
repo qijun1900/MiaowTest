@@ -76,7 +76,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
      * 2. 如果任一答案不存在，则直接返回
      * 3. 根据题目类型进行不同的比较:
      *    - 多选题: 比较两个数组是否包含相同元素（不考虑顺序）
-     *    - 其他题型: 直接比较值是否相等
+     *    - 单选题: 直接比较值是否相等
      * 4. 将比较结果存储到isAnswerCorrect中
      */
     const checkAnswer = (questionId) => {
@@ -93,6 +93,9 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
             const userAnswerSorted = [...userAnswer].sort();
             const correctAnswerSorted = [...correctAnswer].sort();
             isAnswerCorrect.value[questionId] = JSON.stringify(userAnswerSorted) === JSON.stringify(correctAnswerSorted);
+        } else {
+            // 单选题和判断题：使用宽松相等比较，允许类型转换
+            isAnswerCorrect.value[questionId] = userAnswer == correctAnswer;
         }
     };
     

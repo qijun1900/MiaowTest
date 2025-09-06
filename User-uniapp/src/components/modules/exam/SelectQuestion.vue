@@ -30,7 +30,7 @@
         <!--多选题提交按钮 -->
         <view class="Multiple-submit-button" style="margin-top: 30rpx;">
             <uni-transition
-                :show="props.question.isMultiple === 1 && !showAnswerComputed && props.currentMode === 0 && selectedOptions.length > 0"
+                :show="props.question.isMultiple === 1 && !showAnswerComputed && props.currentMode === 0 && selectedOptions.length > 0 && questionStore.UserShowSettings.showAnswer"
                 mode-class="fade"
                 :duration="300"
             >
@@ -102,6 +102,7 @@ const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否�
 // 控制多选题答案显示
 const multiAnswerSubmitted = ref(false);
 
+
 const hanleDE = ()=>{
     answerStore.clearAllAnswers();
     selectedOptions.value = [];
@@ -132,13 +133,12 @@ const handleOptionClick = (index) => {
             // 如果未选中，则添加到选中列表
             selectedOptions.value.push(index);
         }
-        // 保存用户答案（多选答案为数组）
-        answerStore.saveUserAnswer(props.question._id, [...selectedOptions.value]);
+        // 多选题不立即保存答案，等待用户点击核验答案按钮
     } else {
         // 单选题处理逻辑
         selectedOptions.value = [index];
-        // 保存用户答案（单选答案为单个值）
-        answerStore.saveUserAnswer(props.question._id, index);
+        // 保存用户答案（单选答案为单个值），确保类型为数字
+        answerStore.saveUserAnswer(props.question._id, Number(index));
     }
 };
 
@@ -190,6 +190,8 @@ const showAnswerComputed = computed(() => {
 
 // 多选题提交按钮事件
 const submitMultiAnswer = () => {
+    // 保存多选题答案
+    answerStore.saveUserAnswer(props.question._id, [...selectedOptions.value]);
     multiAnswerSubmitted.value = true;
 };
 </script>

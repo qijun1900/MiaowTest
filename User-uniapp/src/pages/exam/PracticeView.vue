@@ -48,17 +48,43 @@
                                 v-if="item.Type===4" 
                                 :question="item" 
                                 :questionIndex="index + 1"
-                                :currentMode="currentMode"
-                                :key="refreshKey"/>
+                                :currentMode="currentMode"/>
                         </view>
                     </swiper-item>
                 </swiper>
+        </view>
+        <!-- 自定义底部 -->
+        <view class="bottom">
+            <up-tabbar
+            :border="true"
+            :fixed="true"
+            :placeholder="true"
+            :safeAreaInsetBottom="true"
+            backgroundColor="#f2f2f2"
+            zIndex="10">
+            <up-tabbar-item 
+                :text="String(correctCount)" 
+                icon="/static/other/right.png" 
+                v-show="questionStore.UserShowSettings.showAnswer"></up-tabbar-item>
+            <up-tabbar-item 
+                :text="String(incorrectCount)" 
+                icon="/static/other/error.png" 
+                v-show="questionStore.UserShowSettings.showAnswer"></up-tabbar-item>
+            <up-tabbar-item 
+                :text="String(accuracyRate)" 
+                icon="/static/other/percent.png" 
+                v-show="questionStore.UserShowSettings.showAnswer"></up-tabbar-item>
+            <up-tabbar-item 
+                text="答题卡" 
+                icon="list-dot" 
+                @click="handleCheck"></up-tabbar-item>
+        </up-tabbar>
         </view>
     </view>
 </template>
 
 <script setup>
-import { onMounted, ref,  } from 'vue'; // 导入computed
+import { onMounted, ref, computed } from 'vue'; // 导入computed
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import UviewSubsection from "../../components/core/uviewSubsection.vue";
 import SelectQuestion from '../../components/modules/exam/SelectQuestion.vue';//Type=1
@@ -66,43 +92,97 @@ import BlankQuestion from '../../components/modules/exam/BlankQuestion.vue';//Ty
 import JudgeQuestion from '../../components/modules/exam/JudgeQuestion.vue';//Type=3
 import ShortQuestion from '../../components/modules/exam/ShortQuestion.vue';//Type=4
 import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerStore';
+import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore';
 
 const questionStore = useQuestionStore();
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
 const currentMode = ref(0);// 当前选中的模式，0表示答题模式，1表示学习模式
 const navBarHeight = ref(0); // 导航栏高度
 const currentQuestionIndex = ref(0);// 当前选中的问题索引
-const answerStore = useObjectiveAnswerStore();// AnswerStore
+const ObjectiveAnswerStore = useObjectiveAnswerStore();// AnswerStore
+const SubjectiveAnswerStore = useSubjectiveAnswerStore();// 主观题答案Store
 const refreshKey = ref(0);// 用于触发子组件刷新
 
-// // 添加计算属性, 获取当前问题
-// const currentQuestion = computed(() => {
-//   return questionStore.UserChooseQuestion[currentQuestionIndex.value];
-// });
+// 计算答对次数
+const correctCount = computed(() => {
+    // 客观题答对次数
+    let objectiveCorrect = 0;
+    ObjectiveAnswerStore.answeredQuestions.forEach(questionId => {
+        if (ObjectiveAnswerStore.getIsAnswerCorrect(questionId)) {
+            objectiveCorrect++;
+        }
+    });
+    
+    // 主观题自评正确次数
+    let subjectiveCorrect = 0;
+    SubjectiveAnswerStore.answeredQuestions.forEach(questionId => {
+        if (SubjectiveAnswerStore.getUserSelfEvaluation(questionId)) {
+            subjectiveCorrect++;
+        }
+    });
+    
+    return objectiveCorrect + subjectiveCorrect;
+});
 
+// 计算答错次数
+const incorrectCount = computed(() => {
+    // 客观题答错次数
+    let objectiveIncorrect = 0;
+    ObjectiveAnswerStore.answeredQuestions.forEach(questionId => {
+        if (!ObjectiveAnswerStore.getIsAnswerCorrect(questionId)) {
+            objectiveIncorrect++;
+        }
+    });
+    
+    // 主观题自评错误次数
+    let subjectiveIncorrect = 0;
+    SubjectiveAnswerStore.answeredQuestions.forEach(questionId => {
+        if (SubjectiveAnswerStore.getUserSelfEvaluation(questionId) === false) {
+            subjectiveIncorrect++;
+        }
+    });
+    
+    return objectiveIncorrect + subjectiveIncorrect;
+});
 
+// 计算正确率
+const accuracyRate = computed(() => {
+    const totalAnswered = correctCount.value + incorrectCount.value;
+    if (totalAnswered === 0) return 0;
+    
+    // 保留一位小数
+    return Math.round((correctCount.value / totalAnswered) * 1000) / 10;
+});
+
+//选择模式
 const handleSendMode =(value)=>{
     currentMode.value = value; // 更新当前选中的模式
     console.log("当前模式:", currentMode.value === 0 ? "答题模式" : "学习模式");
 }
+
 // 处理滑动事件
 const handleQuestionChange = (e) => {
     currentQuestionIndex.value = e.detail.current; // 更新当前选中的问题索引
 }
+
 // 处理右侧按钮点击事件
 const leftClick = () => { 
     if(questionStore.UserShowSettings.showAnswer || questionStore.UserShowSettings.OptionRandom ){
-        answerStore.clearAllAnswers();
+        ObjectiveAnswerStore.clearAllAnswers();
+        SubjectiveAnswerStore.clearAllAnswers();
         refreshKey.value++; // 触发所有题目组件刷新
         currentQuestionIndex.value = 0; // 回到第一题
-        console.log("清除所有答案");
         uni.showToast({ 
-        title: `当前开启${questionStore.UserShowSettings.showAnswer? '立即显示答案开启' : '选项乱序开启'}>>返回将清除所有答案`, 
+        title: `当前开启${questionStore.UserShowSettings.showAnswer? '立即显示答案开启' : '选项乱序开启'}>>返回将清除选择判断做题痕迹`, 
         icon: 'none' ,
         duration:4000,
     });
     } 
 };  
+// 处理答题卡
+const handleCheck = () => {
+   console.log("答题卡")
+}
 
 
 // 获取导航栏高度
