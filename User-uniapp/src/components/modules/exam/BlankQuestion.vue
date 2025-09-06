@@ -271,13 +271,5 @@ onMounted(() => {
     margin-top: 20rpx;
     padding: 0 28rpx;
 }
-/* 淡入淡出动画 */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
+
 </style>

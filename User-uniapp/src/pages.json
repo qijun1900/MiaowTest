@@ -75,6 +75,12 @@
 				"navigationStyle": "custom",
 				"navigationBarTextStyle": "black"// 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
 			}		
+		},
+		{
+			"path": "pages/exam/PracticeResultsView",
+			"style": {
+				"navigationBarTitleText": "练习结果"
+			}
 		}
 	],
 	"globalStyle": {

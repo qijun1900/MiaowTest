@@ -51,7 +51,20 @@
                         </view>
                     </swiper-item>
                 </swiper>
-        </view>
+                <uni-transition :show="isEndQuestion" mode="fade">
+                    <view class="but-container">
+                        <up-button 
+                            @click="handleSubmitAnswer"
+                            type="primary" 
+                            shape="circle" 
+                            icon="checkbox-mark"
+                            :plain="true"
+                            :hairline="false">
+                            提交答案
+                        </up-button>
+                    </view>
+                </uni-transition>
+        </view> 
         <!-- 自定义底部 -->
         <view class="bottom">
             <up-tabbar
@@ -178,12 +191,28 @@ const leftClick = () => {
     // });
     // } 
     console.log( "清除");
-    SubjectiveAnswerStore.clearAllAnswers();
-    ObjectiveAnswerStore.clearAllAnswers();
-};  
+}
 // 处理答题卡
 const handleCheck = () => {
    console.log("答题卡")
+}
+
+//当最后一题时候显示提交按钮
+const isEndQuestion = computed(() => {
+    if(currentQuestionIndex.value === questionStore.UserChooseQuestion.length - 1 && currentMode.value === 0){
+        console.log("最后一题");
+        return true;
+    }else{  
+        return false;
+    }
+});
+
+//handleSubmitAnswer
+const handleSubmitAnswer = () => {
+    console.log("提交答案");
+    uni.navigateTo({
+        url: '/pages/exam/PracticeResultsView' 
+    })
 }
 
 
@@ -200,9 +229,9 @@ const getNavBarHeight = () => {
     navBarHeight.value = 44; // 导航栏高度
     // #endif
 }
+
 onMounted(() => {
     getNavBarHeight();
-    console.log(questionStore.UserChooseQuestion)
 })
 </script>
 
@@ -218,6 +247,8 @@ onMounted(() => {
     height: calc(100vh - 44px);
     position: relative;
     overflow-y: auto; /* 允许垂直滚动 */
+    display: flex;  /* 使用flex布局 */
+    flex-direction: column; /* 垂直方向布局 */
     
 }
 
@@ -228,6 +259,12 @@ onMounted(() => {
 .question-container {
     height: 100%;
     overflow-y: auto;
-
+}
+.but-container{
+    z-index: 100;
+    position: fixed;
+    bottom: 200rpx;
+    width: 90%;
+    left: 6%;
 }
 </style>
