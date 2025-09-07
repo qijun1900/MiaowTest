@@ -42,7 +42,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
     
     /**
      * 保存用户答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @param {string|Array} answer - 用户答案
      * 流程:
      * 1. 将用户答案存储到userAnswers中
@@ -60,7 +60,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
     
     /**
      * 保存正确答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @param {string|Array} correctAnswer - 正确答案
      * 通常在考试开始时或题目加载时调用，用于后续的答案校验
      */
@@ -70,7 +70,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
     
     /**
      * 检查用户答案是否正确
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * 处理逻辑:
      * 1. 获取用户答案和正确答案
      * 2. 如果任一答案不存在，则直接返回
@@ -101,7 +101,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
     
     /**
      * 获取用户答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @returns {string|Array} 用户答案
      */
     const getUserAnswer = (questionId) => {
@@ -110,8 +110,8 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
     
     /**
      * 获取答题是否正确
-     * 如，在考试结束后展示用户的答题情况
-     * @param {string|number} questionId - 题目ID
+     * 在考试结束后展示用户的答题情况
+     * @param {string} questionId - 题目ID
      * @returns {boolean} 答案是否正确
      */
     const getIsAnswerCorrect = (questionId) => {
@@ -129,24 +129,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
         correctAnswers.value = {};
         isAnswerCorrect.value = {};
     };
-    
-    /**
-     * 计算答题正确率
-     * @returns {number} 正确率（0-100之间的数值）
-     * 计算方法: 正确答题数 / 已答题总数 * 100
-     * 如果没有答题，返回0
-     */
-    const calculateAccuracy = () => {
-        if (answeredQuestions.value.length === 0) return 0;
-        
-        let correctCount = 0;
-        answeredQuestions.value.forEach(questionId => {
-            if (isAnswerCorrect.value[questionId]) {
-                correctCount++;
-            }
-        });
-        return (correctCount / answeredQuestions.value.length) * 100;
-    };
+
 
     // ================ 导出的状态和方法 ================
     return {
@@ -160,7 +143,6 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
         getUserAnswer,
         getIsAnswerCorrect,
         clearAllAnswers,
-        calculateAccuracy
     };
 },
 // ================ 持久化配置 ================

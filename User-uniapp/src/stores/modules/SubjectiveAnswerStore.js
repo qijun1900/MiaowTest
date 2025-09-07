@@ -50,7 +50,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 保存用户答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @param {string|Array} answer - 用户答案
      * 流程:
      * 1. 将用户答案存储到userAnswers中
@@ -65,7 +65,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 保存参考答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @param {string|Array} referenceAnswer - 参考答案
      * 通常在题目加载时调用，用于后续的用户自评参考
      */
@@ -75,7 +75,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 保存用户自评结果
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @param {boolean} isCorrect - 用户自评是否正确
      * 用户查看参考答案后，自行判断答案是否正确
      */
@@ -87,7 +87,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 标记用户已查看参考答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * 用户点击查看参考答案时调用
      */
     const markViewedReferenceAnswer = (questionId) => {
@@ -96,7 +96,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 获取用户答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @returns {string|Array} 用户答案
      */
     const getUserAnswer = (questionId) => {
@@ -105,7 +105,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 获取参考答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @returns {string|Array} 参考答案
      */
     const getReferenceAnswer = (questionId) => {
@@ -114,7 +114,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 获取用户自评是否正确
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @returns {boolean} 用户自评是否正确
      */
     const getUserSelfEvaluation = (questionId) => {
@@ -123,7 +123,7 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
     
     /**
      * 获取用户是否已查看参考答案
-     * @param {string|number} questionId - 题目ID
+     * @param {string} questionId - 题目ID
      * @returns {boolean} 用户是否已查看参考答案
      */
     const getHasViewedReferenceAnswer = (questionId) => {
@@ -141,30 +141,6 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
         referenceAnswers.value = {};
         isUserSelfCorrect.value = {};
         hasViewedReferenceAnswer.value = {};
-    };
-    
-    /**
-     * 计算用户自评正确率
-     * @returns {number} 自评正确率（0-100之间的数值）
-     * 计算方法: 用户自评正确的答题数 / 已自评答题总数 * 100
-     * 如果没有自评答题，返回0
-     */
-    const calculateSelfEvaluationAccuracy = () => {
-        // 获取已进行自评的题目数量
-        const evaluatedQuestions = answeredQuestions.value.filter(questionId => 
-            hasViewedReferenceAnswer.value[questionId] !== undefined && 
-            hasViewedReferenceAnswer.value[questionId] === true
-        );
-        
-        if (evaluatedQuestions.length === 0) return 0;
-        
-        let correctCount = 0;
-        evaluatedQuestions.forEach(questionId => {
-            if (isUserSelfCorrect.value[questionId]) {
-                correctCount++;
-            }
-        });
-        return (correctCount / evaluatedQuestions.length) * 100;
     };
     
     /**
@@ -193,7 +169,6 @@ export const useSubjectiveAnswerStore = defineStore('subjectiveAnswer', () => {
         getUserSelfEvaluation,
         getHasViewedReferenceAnswer,
         clearAllAnswers,
-        calculateSelfEvaluationAccuracy,
         getUnEvaluatedQuestions
     };
 },

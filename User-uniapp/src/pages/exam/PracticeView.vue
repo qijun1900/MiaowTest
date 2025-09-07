@@ -77,21 +77,49 @@
             <up-tabbar-item 
                 :text="String(correctCount)" 
                 icon="/static/other/right.png" 
-                v-show="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
+                v-if="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
             <up-tabbar-item 
                 :text="String(incorrectCount)" 
                 icon="/static/other/error.png" 
-                v-show="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
+                v-if="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
             <up-tabbar-item 
                 :text="String(accuracyRate)" 
                 icon="/static/other/percent.png" 
-                v-show="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
+                v-if="questionStore.UserShowSettings.showAnswer && currentMode===0"></up-tabbar-item>
             <up-tabbar-item 
                 text="答题卡" 
                 icon="list-dot" 
                 @click="handleCheck"></up-tabbar-item>
-        </up-tabbar>
+            </up-tabbar>
         </view>
+        <!-- popup  -->
+            <uviewPopup 
+                v-model:show="popupShow"
+                :round="30" 
+                title="答题卡" >
+                    <template #popupcontent>
+                        <view class="popup-container">
+                            <view class="popup-but-container">
+                                <up-button
+                                    :plain="true" 
+                                    :hairline="true" 
+                                    type="primary">
+                                    清空本次记录
+                                </up-button>
+                                <up-button
+                                    :plain="true" 
+                                    :hairline="true" 
+                                    type="primary">
+                                    查看练习成绩
+                                </up-button>
+                            </view>
+                            <AnswerSheet
+                                :questions="questionStore.UserChooseQuestion" 
+                                :currentIndex="currentQuestionIndex"
+                                @question-click="handleQuestionCardClick"/>
+                       </view>
+                    </template>
+            </uviewPopup>
     </view>
 </template>
 
@@ -105,15 +133,20 @@ import JudgeQuestion from '../../components/modules/exam/JudgeQuestion.vue';//Ty
 import ShortQuestion from '../../components/modules/exam/ShortQuestion.vue';//Type=4
 import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerStore';
 import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore';
+import uviewPopup from '../../components/core/uviewPopup.vue';
+import AnswerSheet from '../../components/modules/exam/AnswerSheet.vue';
 
 const questionStore = useQuestionStore();
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
 const currentMode = ref(0);// 当前选中的模式，0表示答题模式，1表示学习模式
 const navBarHeight = ref(0); // 导航栏高度
 const currentQuestionIndex = ref(0);// 当前选中的问题索引
-const ObjectiveAnswerStore = useObjectiveAnswerStore();// AnswerStore
+const ObjectiveAnswerStore = useObjectiveAnswerStore();// 客观题答案Store
 const SubjectiveAnswerStore = useSubjectiveAnswerStore();// 主观题答案Store
 const refreshKey = ref(0);// 用于触发子组件刷新
+const popupShow = ref(false);// 弹窗
+
+
 
 // 计算答对次数
 const correctCount = computed(() => {
@@ -179,17 +212,6 @@ const handleQuestionChange = (e) => {
 
 // 处理右侧按钮点击事件
 const leftClick = () => { 
-    // if(questionStore.UserShowSettings.showAnswer || questionStore.UserShowSettings.OptionRandom ){
-    //     ObjectiveAnswerStore.clearAllAnswers();
-    //     SubjectiveAnswerStore.clearAllAnswers();
-    //     refreshKey.value++; // 触发所有题目组件刷新
-    //     currentQuestionIndex.value = 0; // 回到第一题
-    //     uni.showToast({ 
-    //     title: `当前开启${questionStore.UserShowSettings.showAnswer? '立即显示答案开启' : '选项乱序开启'}>>返回将清除选择判断做题痕迹`, 
-    //     icon: 'none' ,
-    //     duration:4000,
-    // });
-    // } 
     console.log( "清除");
     SubjectiveAnswerStore.clearAllAnswers();
     ObjectiveAnswerStore.clearAllAnswers();
@@ -198,7 +220,14 @@ const leftClick = () => {
 // 处理答题卡
 const handleCheck = () => {
    console.log("答题卡")
+   popupShow.value = true;
+   
 }
+// 处理答题卡点击
+const handleQuestionCardClick = (index) => {
+    currentQuestionIndex.value = index; // 更新当前选中的问题索引
+}
+
 
 //当最后一题时候显示提交按钮
 const isEndQuestion = computed(() => {
@@ -235,6 +264,7 @@ const getNavBarHeight = () => {
 
 onMounted(() => {
     getNavBarHeight();
+    console.log("答题是否正确的状态",ObjectiveAnswerStore.isAnswerCorrect)
 })
 </script>
 
@@ -269,5 +299,14 @@ onMounted(() => {
     bottom: 200rpx;
     width: 90%;
     left: 6%;
+}
+.popup-container{
+    padding: 0px 5rpx;
+}
+.popup-but-container{
+    display: flex; /* 使用flex布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    gap: 20rpx; /* 添加按钮之间的间距 */
 }
 </style>
