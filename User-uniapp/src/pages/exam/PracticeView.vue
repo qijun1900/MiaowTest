@@ -191,7 +191,10 @@ const leftClick = () => {
     // });
     // } 
     console.log( "清除");
-}
+    SubjectiveAnswerStore.clearAllAnswers();
+    ObjectiveAnswerStore.clearAllAnswers();
+};  
+
 // 处理答题卡
 const handleCheck = () => {
    console.log("答题卡")
