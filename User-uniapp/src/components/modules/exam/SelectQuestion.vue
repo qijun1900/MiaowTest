@@ -122,12 +122,31 @@ const handleOptionClick = (index) => {
             // 如果未选中，则添加到选中列表
             selectedOptions.value.push(index);
         }
+        // 当 showAnswerSetting 为 false 时，多选题直接保存答案
+        if (!showAnswerSetting) {
+            // 如果没有选中任何选项，从store中移除答案
+            if (selectedOptions.value.length === 0) {
+                answerStore.removeUserAnswer(props.question._id);
+            } else {
+                answerStore.saveUserAnswer(props.question._id, [...selectedOptions.value]);
+            }
+        }
         // 多选题不立即保存答案，等待用户点击核验答案按钮
     } else {
         // 单选题处理逻辑
-        selectedOptions.value = [index];
-        // 保存用户答案（单选答案为单个值），确保类型为数字
-        answerStore.saveUserAnswer(props.question._id, Number(index));
+        // 检查是否已选中该选项
+        const selectedIndex = selectedOptions.value.indexOf(index);
+        if (selectedIndex > -1) {
+            // 如果已选中，则取消选中（清空选择）
+            selectedOptions.value = [];
+            // 从store中移除答案
+            answerStore.removeUserAnswer(props.question._id);
+        } else {
+            // 如果未选中，则设置为选中
+            selectedOptions.value = [index];
+            // 保存用户答案（单选答案为单个值），确保类型为数字
+            answerStore.saveUserAnswer(props.question._id, Number(index));
+        }
     }
 };
 

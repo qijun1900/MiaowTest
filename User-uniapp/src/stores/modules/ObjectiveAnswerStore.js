@@ -131,6 +131,22 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
     };
 
 
+    /**
+     * 移除用户答案
+     * @param {string} questionId - 题目ID
+     * 当用户取消选择所有选项时调用
+     */
+    const removeUserAnswer = (questionId) => {
+        delete userAnswers.value[questionId];
+        // 从已答题目列表中移除
+        const index = answeredQuestions.value.indexOf(questionId);// 查找题目ID在已答列表中的索引
+        if (index > -1) {// 如果找到索引
+            answeredQuestions.value.splice(index, 1);// 从已答列表中移除该题目ID
+        }
+        // 移除答题正确性状态
+        delete isAnswerCorrect.value[questionId];
+    };
+
     // ================ 导出的状态和方法 ================
     return {
         userAnswers,
@@ -143,6 +159,7 @@ export const useObjectiveAnswerStore = defineStore('objectiveAnswer', () => {
         getUserAnswer,
         getIsAnswerCorrect,
         clearAllAnswers,
+        removeUserAnswer, // 添加新方法
     };
 },
 // ================ 持久化配置 ================

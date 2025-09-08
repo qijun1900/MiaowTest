@@ -103,13 +103,15 @@
                                 <up-button
                                     :plain="true" 
                                     :hairline="true" 
-                                    type="primary">
+                                    type="primary"
+                                    @click="handleCleanAnswer">
                                     清空本次记录
                                 </up-button>
                                 <up-button
                                     :plain="true" 
                                     :hairline="true" 
-                                    type="primary">
+                                    type="primary"
+                                    @click="handleSubmitAnswer">
                                     查看练习成绩
                                 </up-button>
                             </view>
@@ -212,22 +214,28 @@ const handleQuestionChange = (e) => {
 
 // 处理右侧按钮点击事件
 const leftClick = () => { 
-    console.log( "清除");
     SubjectiveAnswerStore.clearAllAnswers();
     ObjectiveAnswerStore.clearAllAnswers();
 };  
 
-// 处理答题卡
+// 处理清空答案
+const handleCleanAnswer = () => {
+    SubjectiveAnswerStore.clearAllAnswers();
+    ObjectiveAnswerStore.clearAllAnswers();
+    popupShow.value = false;
+    refreshKey.value++
+}
+
+// 处理答题卡 Popup 显示
 const handleCheck = () => {
-   console.log("答题卡")
    popupShow.value = true;
    
 }
+
 // 处理答题卡点击
 const handleQuestionCardClick = (index) => {
     currentQuestionIndex.value = index; // 更新当前选中的问题索引
 }
-
 
 //当最后一题时候显示提交按钮
 const isEndQuestion = computed(() => {
@@ -242,11 +250,11 @@ const isEndQuestion = computed(() => {
 //handleSubmitAnswer
 const handleSubmitAnswer = () => {
     console.log("提交答案");
+    popupShow.value = false;
     uni.navigateTo({
         url: '/pages/exam/PracticeResultsView' 
     })
 }
-
 
 // 获取导航栏高度
 const getNavBarHeight = () => {
@@ -264,7 +272,6 @@ const getNavBarHeight = () => {
 
 onMounted(() => {
     getNavBarHeight();
-    console.log("答题是否正确的状态",ObjectiveAnswerStore.isAnswerCorrect)
 })
 </script>
 

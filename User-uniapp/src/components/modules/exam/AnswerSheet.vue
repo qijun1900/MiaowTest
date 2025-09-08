@@ -9,22 +9,24 @@
         <view 
           class="answer-circle" 
           :class="{
-            'correct': isAnsweredCorrectly(question._id),
-            'incorrect': isAnsweredIncorrectly(question._id),
+            'correct': isAnsweredCorrectly(question._id) && isShowAnswer,
+            'incorrect': isAnsweredIncorrectly(question._id) && isShowAnswer,
             'unanswered': !isAnswered(question._id),
+            'answered': isAnswered(question._id) && !isShowAnswer,
             'current': currentIndex === index
           }">
           {{ index + 1 }}
         </view>
       </view>
     </view>
+    <up-divider text="没有更多了" :dashed="true" textPosition="center"></up-divider>
   </view>
 </template>
 
 <script setup>
 import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
 import { useSubjectiveAnswerStore } from '../../../stores/modules/SubjectiveAnswerStore';
-
+import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 // 定义组件属性
 const props = defineProps({
   questions: {
@@ -43,6 +45,8 @@ const emit = defineEmits(['question-click']);
 // 获取Store实例
 const ObjectiveAnswerStore = useObjectiveAnswerStore();
 const SubjectiveAnswerStore = useSubjectiveAnswerStore();
+const QuestionStore = useQuestionStore();
+const isShowAnswer =QuestionStore.UserShowSettings.showAnswer
 
 // 处理题目点击事件
 const handleQuestionClick = (index) => {
@@ -139,14 +143,20 @@ const isAnsweredIncorrectly = (questionId) => {
   border: 2rpx solid #dcdfe6;
 }
 
+.answer-circle.answered {
+  background-color: #fffacd; /* 已作答淡黄色背景 */
+  border-color: #ffd700;
+  color: #333333; /* 保持文字为深色 */
+}
+
 .answer-circle.correct {
-  background-color: #4caf50; /* 答对绿色 */
+  background-color: #6bd46e; /* 答对绿色 */
   border-color: #4caf50;
   color: #ffffff; /* 答对时文字为白色 */
 }
 
 .answer-circle.incorrect {
-  background-color: #f56c6c; /* 答错红色 */
+  background-color: #ff7878; /* 答错红色 */
   border-color: #f56c6c;
   color: #ffffff; /* 答错时文字为白色 */
 }
@@ -171,6 +181,13 @@ const isAnsweredIncorrectly = (questionId) => {
 }
 
 .answer-circle.current.incorrect {
+  background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
+  border-color: #1890ff;
+  color: #1890ff; /* 当前题目优先显示蓝色文字 */
+}
+
+/* 当题目既是当前又是已作答时的样式优先级 */
+.answer-circle.current.answered {
   background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
   border-color: #1890ff;
   color: #1890ff; /* 当前题目优先显示蓝色文字 */
