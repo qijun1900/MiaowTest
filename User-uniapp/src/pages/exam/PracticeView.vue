@@ -104,21 +104,25 @@
                                     :plain="true" 
                                     :hairline="true" 
                                     type="primary"
-                                    @click="handleCleanAnswer">
+                                    @click="handleCleanAnswer"
+                                    shape="circle">
                                     清空本次记录
                                 </up-button>
                                 <up-button
                                     :plain="true" 
                                     :hairline="true" 
                                     type="primary"
-                                    @click="handleSubmitAnswer">
+                                    @click="handleSubmitAnswer"
+                                    shape="circle">
                                     查看练习成绩
                                 </up-button>
                             </view>
-                            <AnswerSheet
-                                :questions="questionStore.UserChooseQuestion" 
-                                :currentIndex="currentQuestionIndex"
-                                @question-click="handleQuestionCardClick"/>
+                            <view class="answer-sheet">
+                                <AnswerSheet
+                                    :questions="questionStore.UserChooseQuestion" 
+                                    :currentIndex="currentQuestionIndex"
+                                    @question-click="handleQuestionCardClick"/>
+                            </view>
                        </view>
                     </template>
             </uviewPopup>
@@ -315,5 +319,11 @@ onMounted(() => {
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
     gap: 20rpx; /* 添加按钮之间的间距 */
+}
+.answer-sheet{
+    padding: 10rpx 10rpx;
+    background-color: #ffffff;
+    border-radius: 28rpx;
+    margin-top: 20rpx;
 }
 </style>

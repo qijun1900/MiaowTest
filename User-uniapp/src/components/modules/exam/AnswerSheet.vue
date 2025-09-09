@@ -35,7 +35,7 @@ const props = defineProps({
   },
   currentIndex: {
     type: Number,
-    default: 0
+    default: -1
   }
 });
 
@@ -109,7 +109,7 @@ const isAnsweredIncorrectly = (questionId) => {
 
 <style scoped>
 .answer-sheet-container {
-  padding: 20rpx;
+  padding: 20rpx 15rpx 20rpx 48rpx;
 }
 
 .answer-sheet-grid {
