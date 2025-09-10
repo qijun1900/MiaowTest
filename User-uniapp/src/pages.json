@@ -39,9 +39,9 @@
 			}
 		},
 		{
-			"path": "pages/file/file",
+			"path": "pages/function/function",
 			"style": {
-				"navigationBarTitleText": "所有资料"
+				"navigationBarTitleText": "所有工具"
 			}
 		},
 		{
@@ -115,10 +115,10 @@
 				"selectedIconPath": "static/tabBar/chat.png"
 			},
 			{
-				"pagePath": "pages/file/file",
-				"text": "资料",
-				"iconPath": "static/tabBar/file.png",
-				"selectedIconPath": "static/tabBar/file-active.png"
+				"pagePath": "pages/function/function",
+				"text": "工具",
+				"iconPath": "static/tabBar/function.png",
+				"selectedIconPath": "static/tabBar/function-active.png"
 			},
 			{
 				"pagePath": "pages/my/my",

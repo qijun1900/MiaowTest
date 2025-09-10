@@ -1,5 +1,5 @@
 <template>
   <view>
-    fail
+    function
   </view>
 </template>
