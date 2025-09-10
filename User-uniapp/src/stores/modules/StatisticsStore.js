@@ -24,7 +24,7 @@ export const useStatisticsStore = defineStore("statistics", () => {
 
         // 统计主观题答对次数
         let subjectiveCorrect = 0;
-        SubjectiveAnswerStore.answeredQuestions.forEach(questionId => {
+        SubjectiveAnswerStore.answeredQuestions.forEach(questionId => { //answeredQuestions, 主观题已答题目ID列表,没有输入答案不能算
             const selfEvaluation = SubjectiveAnswerStore.getUserSelfEvaluation(questionId);
             // 只有当用户明确自评为正确时才计入答对次数
             if (selfEvaluation === true) {
@@ -47,7 +47,7 @@ export const useStatisticsStore = defineStore("statistics", () => {
 
         // 统计主观题答错次数
         let subjectiveIncorrect = 0;
-        SubjectiveAnswerStore.answeredQuestions.forEach(questionId => {
+        SubjectiveAnswerStore.answeredQuestions.forEach(questionId => { //answeredQuestions, 主观题已答题目ID列表,没有输入答案不能算
             const selfEvaluation = SubjectiveAnswerStore.getUserSelfEvaluation(questionId);
             // 只有当用户明确自评为错误时才计入答错次数
             if (selfEvaluation === false) {

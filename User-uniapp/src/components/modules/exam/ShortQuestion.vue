@@ -138,12 +138,6 @@ onMounted(()=>{
 
     //挂载时候 保存参考答案到 store
     subjectiveAnswerStore.saveReferenceAnswer(props.question._id,props.question.content);
-    // console.log(
-    //     "用户答案存储",subjectiveAnswerStore.userAnswers,
-    //     "已答题目的ID列表",subjectiveAnswerStore.answeredQuestions,
-    //     "参考答案存储",subjectiveAnswerStore.referenceAnswers,
-    //     "用户自评是否正确的状态",subjectiveAnswerStore.isUserSelfCorrect,
-    // )
 })
 </script>
 

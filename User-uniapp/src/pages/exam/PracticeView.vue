@@ -159,7 +159,6 @@ const { correctCount, incorrectCount, accuracyRate } = storeToRefs(StatisticsSto
 //选择模式
 const handleSendMode =(value)=>{
     currentMode.value = value; // 更新当前选中的模式
-    console.log("当前模式:", currentMode.value === 0 ? "答题模式" : "学习模式");
 }
 
 // 处理滑动事件
@@ -195,7 +194,6 @@ const handleQuestionCardClick = (index) => {
 //当最后一题时候显示提交按钮
 const isEndQuestion = computed(() => {
     if(currentQuestionIndex.value === questionStore.UserChooseQuestion.length - 1 && currentMode.value === 0){
-        console.log("最后一题");
         return true;
     }else{  
         return false;
