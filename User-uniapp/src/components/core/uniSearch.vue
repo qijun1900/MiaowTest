@@ -1,13 +1,14 @@
 <template>
     <uni-search-bar 
-        @confirm="search" 
         :focus="false" 
         v-model="searchValue" 
         @blur="blur" 
         @focus="focus" 
         @input="input"
         cancelButton="none"
-        :placeholder="props.placeholder">
+        :placeholder="props.placeholder"
+        radius="8"
+        :bgColor="props.bgColor">
         <template v-slot:searchIcon>
             <uni-icons color="#007aff"  type="search"/>
         </template>
@@ -22,13 +23,13 @@ const props = defineProps({
     placeholder: {
         type: String,
         default: '自定placeholder'
-    } 
+    },
+    bgColor: {
+        type: String,
+        default: '#F8F8F8'
+    }
 })
 
-const search = () => {
-    // 搜索确认事件处理
-    console.log('搜索:', searchValue.value)
-}
 
 const blur = () => {
     // 失去焦点事件处理

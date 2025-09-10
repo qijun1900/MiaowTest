@@ -14,7 +14,7 @@
             'unanswered': !isAnswered(question._id),
             'answered': isAnswered(question._id) && !isShowAnswer,
             'current': currentIndex === index
-          }">
+            }">
           {{ index + 1 }}
         </view>
       </view>

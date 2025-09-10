@@ -11,7 +11,7 @@
     <!-- 搜索框 -->
     <view class="search-container">
       <navigator 
-        url="/pages/exam/searchview" 
+        url="/pages/public/searchview" 
         hover-class="navigator-hover" 
         animation-type="pop-in" 
         animation-duration="300">
@@ -128,7 +128,7 @@ onMounted(() => {
 .container {
   padding: 20rpx;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #F8F8F8;
 }
 
 .header {

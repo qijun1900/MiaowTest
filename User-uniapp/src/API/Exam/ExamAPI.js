@@ -75,7 +75,7 @@ export async function getExamSubjectTypes(examSubjectId) {
 }
 
 /**
- * @param {}
+ * @param { }
  */
 export async function FetchMatchQuestionList(extractedData){
   try{
