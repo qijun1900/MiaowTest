@@ -22,7 +22,6 @@
     <up-divider text="没有更多了" :dashed="true" textPosition="center"></up-divider>
   </view>
 </template>
-
 <script setup>
 import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
 import { useSubjectiveAnswerStore } from '../../../stores/modules/SubjectiveAnswerStore';
