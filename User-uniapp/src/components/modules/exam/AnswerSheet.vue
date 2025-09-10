@@ -26,7 +26,7 @@
 <script setup>
 import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
 import { useSubjectiveAnswerStore } from '../../../stores/modules/SubjectiveAnswerStore';
-import { useQuestionStore } from '../../../stores/modules/QuestionStore';
+import { computed } from 'vue';
 // 定义组件属性
 const props = defineProps({
   questions: {
@@ -36,8 +36,13 @@ const props = defineProps({
   currentIndex: {
     type: Number,
     default: -1
+  },
+  isShowAnswer: {
+    type: Boolean,
+    default: false
   }
 });
+
 
 // 定义事件
 const emit = defineEmits(['question-click']);
@@ -45,8 +50,8 @@ const emit = defineEmits(['question-click']);
 // 获取Store实例
 const ObjectiveAnswerStore = useObjectiveAnswerStore();
 const SubjectiveAnswerStore = useSubjectiveAnswerStore();
-const QuestionStore = useQuestionStore();
-const isShowAnswer =QuestionStore.UserShowSettings.showAnswer
+const  isShowAnswer = computed(() => props.isShowAnswer);
+
 
 // 处理题目点击事件
 const handleQuestionClick = (index) => {
@@ -109,7 +114,7 @@ const isAnsweredIncorrectly = (questionId) => {
 
 <style scoped>
 .answer-sheet-container {
-  padding: 20rpx 15rpx 20rpx 48rpx;
+  padding: 15rpx 15rpx 20rpx 48rpx;
 }
 
 .answer-sheet-grid {

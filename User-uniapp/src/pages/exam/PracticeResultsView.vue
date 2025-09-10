@@ -5,7 +5,13 @@
         </view>
         <view class="accuracy">
             <view class="accuracy-circle">
-                <text class="accuracy-percent">68%</text>
+               <up-count-to
+                    color="#ffffff" 
+                    :startVal="0" 
+                    :endVal="accuracyRate" 
+                    :fontSize="40"
+                    :decimals="1"
+                    :bold="true"/>
                 <text class="accuracy-text">正确率</text>
             </view>
         </view>
@@ -16,19 +22,19 @@
             <view class="data-content">
                 <view class="data-item">
                     <view class="data-info">
-                        <text class="data-value">10</text>
+                        <text class="data-value">{{ correctCount }}</text>
                         <text class="data-label">正确数</text>
                     </view>
                 </view>
                 <view class="data-item">
                     <view class="data-info">
-                        <text class="data-value">2</text>
+                        <text class="data-value">{{ incorrectCount }}</text>
                         <text class="data-label">错误数</text>
                     </view>
                 </view>
                 <view class="data-item">
                     <view class="data-info">
-                        <text class="data-value">8</text>
+                        <text class="data-value">{{ unansweredCount }}</text>
                         <text class="data-label">未作答</text>
                     </view>
                 </view>
@@ -39,20 +45,26 @@
                 <text class="data-label">答题情况</text>
             </view>
             <AnswerSheet 
-            :questions="QuestionStore.UserChooseQuestion">
-        </AnswerSheet>
+                :questions="QuestionStore.UserChooseQuestion"
+                :isShowAnswer="QuestionStore.UserShowSettings.showAnswer">
+            </AnswerSheet>
         </view>
    </view>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import FireworkEffect from '@/components/plug-in/firework-effect/firework-effect.vue'//特效
 import AnswerSheet from '../../components/modules/exam/AnswerSheet.vue'
 import { useQuestionStore } from '../../stores/modules/QuestionStore'
+import {useStatisticsStore} from '../../stores/modules/StatisticsStore'
+
 
 const fireworkRef = ref(null)
 const QuestionStore = useQuestionStore()
+const StatisticsStore = useStatisticsStore()
+const {correctCount,incorrectCount,unansweredCount,accuracyRate} = storeToRefs(StatisticsStore)
 
 onMounted(() => {
     // 页面加载完成后触发烟花效果
@@ -65,6 +77,7 @@ onMounted(() => {
 .container{
     padding:10rpx 20rpx;
     background-color: #f8f8f8;
+    height: 100vh;
 }
 
 .accuracy{
@@ -79,7 +92,7 @@ onMounted(() => {
     width: 220rpx;
     height: 220rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1330e9 0%, #2575fc 100%);
+    background: linear-gradient(135deg, #5608ff 0%, #2575fc 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -101,15 +114,6 @@ onMounted(() => {
     opacity: 0.4;
     z-index: -1;
     filter: blur(15rpx);
-}
-
-.accuracy-percent{
-    font-size: 80rpx;
-    font-weight: bold;
-    color: #ffffff;
-    line-height: 1;
-    margin-bottom: 10rpx;
-    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
 }
 
 .accuracy-text{
@@ -180,6 +184,5 @@ onMounted(() => {
     background-color: #ffffff;
     border-radius: 20rpx;
     padding: 30rpx;
-    margin: 20rpx 0 0 0;
 }
 </style>
