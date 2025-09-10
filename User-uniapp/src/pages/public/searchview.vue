@@ -12,6 +12,7 @@ import { getExamSubjects } from '../../API/Exam/ExamAPI';
 
 const examSubjects = ref([]);
 
+
 const fetchExamSubjects = async (forceRefresh = false) => {
         try{
             const data = await getExamSubjects(forceRefresh);
@@ -20,7 +21,7 @@ const fetchExamSubjects = async (forceRefresh = false) => {
                 name: item.name,
             }))
             console.log(examSubjects.value)
-            
+
         }catch(err){
             console.log(err)
         }
