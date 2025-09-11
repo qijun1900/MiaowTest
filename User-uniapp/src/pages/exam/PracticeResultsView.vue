@@ -46,7 +46,7 @@
             </view>
             <AnswerSheet 
                 :questions="QuestionStore.UserChooseQuestion"
-                :isShowAnswer="QuestionStore.UserShowSettings.showAnswer">
+                :isShowAnswer="true">
             </AnswerSheet>
         </view>
    </view>

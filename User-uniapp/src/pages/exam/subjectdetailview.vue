@@ -155,7 +155,6 @@ const navigateToQuestions = (subjectType) => {
     display: flex;
     flex-direction: column;
 }
-
 .exam-detail {
     display: flex;
     flex-direction: row;
@@ -163,7 +162,7 @@ const navigateToQuestions = (subjectType) => {
     border-radius: 12rpx;
     padding: 12rpx;
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
-    margin-top: 8rpx;
+    margin-top: 15rpx;
     flex-shrink: 0;
 }
 
@@ -173,9 +172,9 @@ const navigateToQuestions = (subjectType) => {
 }
 
 .cover-image {
-    width: 120px;
-    height: 160px;
-    border-radius: 6px;
+    width: 232rpx;
+    height: 305rpx;
+    border-radius: 8rpx;
     object-fit: cover;
 }
 
@@ -189,7 +188,7 @@ const navigateToQuestions = (subjectType) => {
 .info-item {
     display: flex;
     align-items: center;
-    padding: 8px 0;
+    padding: 8rpx 0;
     border-bottom: 1px solid #f0f0f0;
 }
 
@@ -198,23 +197,23 @@ const navigateToQuestions = (subjectType) => {
 }
 
 .info-icon {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
+    width: 33rpx;
+    height: 33rpx;
+    margin-right: 10rpx;
     flex-shrink: 0;
 }
 
 .info-title {
     font-weight: bold;
     color: #333333;
-    margin-right: 6px;
-    font-size: 14px;
+    margin-right: 5rpx;
+    font-size: 25rpx;
     flex-shrink: 0;
 }
 
 .info-content {
     color: #666666;
-    font-size: 14px;
+    font-size: 26rpx;
     flex: 1;
     word-break: break-all;
 }

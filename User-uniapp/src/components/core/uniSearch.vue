@@ -2,9 +2,6 @@
     <uni-search-bar 
         :focus="false" 
         v-model="searchValue" 
-        @blur="blur" 
-        @focus="focus" 
-        @input="input"
         cancelButton="none"
         :placeholder="props.placeholder"
         radius="8"
@@ -16,9 +13,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const searchValue = ref('')
+const emit = defineEmits(['update:searchText', 'search'])
 const props = defineProps({
     placeholder: {
         type: String,
@@ -27,24 +25,25 @@ const props = defineProps({
     bgColor: {
         type: String,
         default: '#F8F8F8'
+    },
+    searchText: {
+        type: String,
+        default: ''
     }
 })
 
+// 监听searchValue变化，通知父组件
+watch(searchValue, (newValue) => {
+    emit('update:searchText', newValue)
+    emit('search', newValue)
+})
 
-const blur = () => {
-    // 失去焦点事件处理
-    console.log('搜索框失去焦点')
-}
-
-const focus = () => {
-    // 获取焦点事件处理
-    console.log('搜索框获取焦点')
-}
-
-const input = (value) => {
-    // 输入事件处理
-    console.log('输入内容:', value)
-}
+// 监听props.searchText变化，同步到本地
+watch(() => props.searchText, (newValue) => {
+    if (newValue !== searchValue.value) {
+        searchValue.value = newValue
+    }
+})
 
 </script>
 
