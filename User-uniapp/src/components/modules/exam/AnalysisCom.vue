@@ -1,5 +1,5 @@
 <template>
-    <uni-transition name="fade" mode="out-in" :show="showAnalysis">
+    <uni-transition name="fade" mode="out-in" :show="props.showAnalysis">
         <view class="question-explanation-container" key="explanation">
             <view class="question-explanation-header">
                 <text class="explanation-label">解析:</text>
@@ -10,7 +10,7 @@
                     color="#6f89ff"></uni-icons>
             </view>
             <view class="question-explanation-content">
-                <rich-text v-if="analysis && analysis !== ''" :nodes="props.analysis"></rich-text>
+                <up-markdown :content="analysis" v-if="analysis && analysis !== ''"></up-markdown>
                 <text v-else>暂无解析</text>
             </view>
         </view>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-
+import {computed} from 'vue'
 const props = defineProps({
     analysis: {
         type: String,
@@ -29,6 +29,10 @@ const props = defineProps({
         default: false
     }
 });
+
+const analysis = computed(() => {
+    return props.analysis;
+})
 </script>
 <style lang="scss" scoped>
 /* 解析容器样式 */
@@ -39,9 +43,7 @@ const props = defineProps({
     border-radius: 12rpx;
     margin-bottom: 15rpx;
 }
-.question-explanation-header {
-    margin-bottom: 20rpx;
-}
+
 .explanation-label {
     font-size: 28rpx;
     font-weight: bold;
@@ -52,4 +54,5 @@ const props = defineProps({
     color: #303030;
     font-weight: 580;
 }
+
 </style>

@@ -25,25 +25,14 @@
                 <text class="option-content">{{option}}</text>
             </view>
         </view>
-        
+        <!-- 答案 -->
         <view class="question-answer-container" v-if="showAnswerComputed">
             <text class="answer-label">答案：</text>
             <text class="answer-content">{{question.answer === 1 ? 'A' : 'B'}}</text>
         </view>
-        <view class="question-explanation-container" v-if="showAnswerComputed">
-            <view class="question-explanation-header">
-                <text class="explanation-label">解析:</text>
-                <uni-icons 
-                    type="help"
-                    size="21" 
-                    class="explanation-icon"
-                    color="#6f89ff"></uni-icons>
-            </view>
-            <view class="question-explanation-content">
-                <!-- 解析 -->
-                <AnalysisCom :analysis="question.analysis" :showAnalysis="showAnswerComputed" />
-            </view>
-        </view>
+
+        <!-- 解析 -->
+        <AnalysisCom :analysis="question.analysis" :showAnalysis="showAnswerComputed" />
     </view>
 </template>
 
