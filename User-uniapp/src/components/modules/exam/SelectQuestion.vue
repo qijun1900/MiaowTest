@@ -52,20 +52,7 @@
             </text>
         </view>
         <!-- 解析 -->
-        <view class="question-explanation-container" v-if="showAnswerComputed">
-            <view class="question-explanation-header">
-                <text class="explanation-label">解析:</text>
-                <uni-icons 
-                    type="help"
-                    size="21" 
-                    class="explanation-icon"
-                    color="#6f89ff"></uni-icons>
-            </view>
-            <view class="question-explanation-content">
-                <rich-text v-if="question.analysis && question.analysis !== ''" :nodes="question.analysis"></rich-text>
-                <text v-else>暂无解析</text>
-            </view>
-        </view>
+        <AnalysisCom :analysis="question.analysis" :showAnalysis="showAnswerComputed" />
     </view>
 </template>
 
@@ -74,6 +61,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
 import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 import uniTransition from '@dcloudio/uni-ui/lib/uni-transition/uni-transition.vue';
+import AnalysisCom from '@/components/modules/exam/Analysiscom.vue';
 
 const props = defineProps({
     question: {
@@ -332,27 +320,6 @@ const submitMultiAnswer = () => {
     margin-right: 8rpx;
 }
 
-/* 解析容器样式 */
-.question-explanation-container {
-    margin-top: 45rpx;
-    padding: 30rpx 20rpx;
-    background-color: #f5f5f5;
-    border-radius: 12rpx;
-    margin-bottom: 15rpx;
-}
-.question-explanation-header {
-    margin-bottom: 20rpx;
-}
-.explanation-label {
-    font-size: 28rpx;
-    font-weight: bold;
-    color: #333;
-}
-.question-explanation-content {
-    font-size: 28rpx;
-    color: #303030;
-    font-weight: 580;
-}
 .Multiple-submit-button{
     margin-top: 15rpx;
     margin-bottom: 15rpx;
