@@ -225,10 +225,13 @@
                             预览
                         </el-button>
                         <el-button 
-                            type="info" 
+                            type="warning" 
                             plain 
-                            @click="handleMore(scope.row)">
-                            更多
+                            :loading-icon="Eleme" 
+                            :loading="aiAnalysisLoadingArr.includes(scope.row._id)"
+                            @click="handleGetAnalysis(scope.row)"
+                            :disabled="scope.row.isAIanswer===1 && scope.row.analysis !==''">
+                            AI解析
                         </el-button>
                     </template>
                 </el-table-column>
@@ -287,6 +290,9 @@ import {
     DeleteManyQuestion
     } from '@/API/Question/QuestionPublicAPI';
 import handleLooked from '@/util/CheckInfo'
+import formatQuestion from '@/util/formatQuestion';
+import {modelappGetQuestionAnalysis} from '@/API/LLM/modelappAPI'
+import { Eleme } from '@element-plus/icons-vue'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/ReuseComponents/Dialog .vue')
@@ -318,6 +324,8 @@ const isEditMode = ref(false)
 const QuestionData = ref(null)
 //预览对话框
 const PreviewdialogVisible = ref(false)
+//AI解析状态
+const aiAnalysisLoadingArr = ref([])
 
 //删除单个
 const handleDeleteOne = async (row) => {
@@ -431,6 +439,30 @@ const handlePreview = (row) => {
   QuestionData.value = row
 }
 
+//AI解析
+const handleGetAnalysis = async (row) => {
+    try{
+       // 将题目ID添加到loading数组中
+       aiAnalysisLoadingArr.value.push(row._id)
+       const question = formatQuestion(row)
+       const res = await modelappGetQuestionAnalysis({
+        message: question,
+        questionType: QuestionType,
+        _id: row._id,
+       })
+       if(res.code===200){
+        handleRefreshQuestionData()
+        ElMessage.success('AI解析成功')
+       }
+       // 从loading数组中移除题目ID
+       aiAnalysisLoadingArr.value = aiAnalysisLoadingArr.value.filter(id => id !== row._id)
+    }catch(error){
+        ElMessage.error('AI解析失败')
+        console.error('AI解析失败:',error)
+        // 从loading数组中移除题目ID
+        aiAnalysisLoadingArr.value = aiAnalysisLoadingArr.value.filter(id => id !== row._id)
+    }
+}
 onMounted(()=>{
     handleRefreshQuestionData()
 })

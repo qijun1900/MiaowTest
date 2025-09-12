@@ -4,8 +4,8 @@ const ExamBlankModel = require('../../models/BlankModel')
 const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const chat = require("../../llm/admin/Chat/chat")
-const modelapp = require("../../llm/admin/ModelApp/Iaa")
-
+const AutoAddQuestionmodelapp = require("../../llm/admin/ModelApp/Iaa")
+const AutoAnalysisQuestionmodelapp = require("../../llm/admin/ModelApp/analysis")
 
 const LLMService = {
     addmodel: async ({modelName,modelValue,isPublish,description,creator,createdTime}) => {
@@ -50,7 +50,7 @@ const LLMService = {
     },
     BatchaddQuestion: async (message,examId,category) => {
         try {
-            const data = await modelapp.AutoAddQuestion(message);
+            const data = await AutoAddQuestionmodelapp.AutoAddQuestion(message);
 
             // 移除Markdown代码块标记
             const cleanData = data.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -98,11 +98,77 @@ const LLMService = {
             // 插入数据到对应的模型
             await currentModel.insertMany(updatedQuestions);
 
-            return { success: true, message: '数据插入成功',count: updatedQuestions.length,data:updatedQuestions };
+            return { 
+                success: true, 
+                message: '数据插入成功',
+                count: updatedQuestions.length,
+                data:updatedQuestions 
+            };
         } catch (error) {
             console.error('数据插入失败:', error);
             return { success: false, message: '数据插入失败' };
         }
+    },
+    getQuestionAnalysis: async (message,questionType,_id) => {
+        try {
+            const data = await AutoAnalysisQuestionmodelapp.AutoAnalysisQuestion(message);
+
+            // 移除Markdown代码块标记
+            const cleanData = data.replace(/```json/g, '').replace(/```/g, '').trim();
+            // 处理可能的多JSON对象情况
+            let jsonData;
+            try {
+                // 先尝试直接解析
+                jsonData = JSON.parse(cleanData);
+            } catch (e) {
+                // 如果失败，尝试用数组包裹
+                try {
+                    jsonData = JSON.parse(`[${cleanData.replace(/}\s*{/g, '},{')}]`);
+                } catch (err) {
+                    console.error('JSON解析失败:', err);
+                    throw new Error('数据格式错误，无法解析');
+                }
+            }
+        
+            // 根据category获取对应模型
+            const modelMap = {
+                1: ExamSelectModel,
+                2: ExamBlankModel,
+                3: ExamJudgeModel,
+                4: ExamShortModel
+            };
+            const currentModel = modelMap[questionType];
+            
+            // 使用currentModel和_id更新analysis字段
+            if (jsonData && jsonData.analysis) {
+                const updateResult = await currentModel.updateOne(
+                    { _id: _id },
+                    { 
+                        analysis: jsonData.analysis,
+                        isAIanswer: 1 // 标记为AI回答
+                    }
+                );
+
+                return {
+                    success: true,
+                    message: '题目分析更新成功',
+                };
+            } else {
+                return {
+                    success: false,
+                    message: '未获取到有效的分析内容'
+                };
+            }
+           
+        }catch (error) {
+            console.error('Error fetching formatQuestion details:', error);
+            return {
+                success: false,
+                message: '更新分析失败',
+                error: error.message
+            };
+        }
+        
     }
 }
 module.exports = LLMService

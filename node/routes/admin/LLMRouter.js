@@ -11,5 +11,5 @@ LLMRouter.post("/adminapi/model/updateModelPublishStatus",LLMController.changest
 LLMRouter.post("/adminapi/llm/chat",LLMController.useLLMChat)//单次对话
 LLMRouter.get("/adminapi/llm/get/getChatModelsList",LLMController.getChatModels)//获取对话模型列表
 LLMRouter.post("/adminapi/modelapp/batchaddquestion",LLMController.BatchaddQuestion)//智能体批量导入题目
-
+LLMRouter.post("/adminapi/modelapp/getquestionanalysis",LLMController.getQuestionAnalysis)//智能体获取题目解析
 module.exports = LLMRouter; 

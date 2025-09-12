@@ -172,7 +172,7 @@ const navigateToQuestions = (subjectType) => {
 }
 
 .cover-image {
-    width: 232rpx;
+    width: 225rpx;
     height: 305rpx;
     border-radius: 8rpx;
     object-fit: cover;

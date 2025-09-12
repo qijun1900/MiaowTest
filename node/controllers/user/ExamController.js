@@ -158,7 +158,6 @@ const ExamController ={
     FetchMatchQuestionList:async (req,res)=>{
         try {
             const extractedData = req.body; 
-            console.log("ExamSubjectId:", extractedData);
             const result = await ExamService.FetchMatchQuestionList(extractedData) 
             res.send({
                 code: 200,

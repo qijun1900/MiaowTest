@@ -93,6 +93,16 @@ const LLMController = {
             ActionType: "OK",
             data: result
         })
+    },
+    getQuestionAnalysis: async (req, res) => {
+        const {message,questionType,_id} = req.body;
+        const result = await LLMService.getQuestionAnalysis(message,questionType,_id)
+        console.log(result)
+        res.send({
+            code: 200,
+            ActionType: "OK",
+            data: result
+        })
     }
 }
 
