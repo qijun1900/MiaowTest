@@ -14,7 +14,7 @@
                 <text v-else>暂无解析</text>
             </view>
             <view class="AI-warning" v-if="isAIanswer">
-                <up-icon name="error" color="#f4ae2c" size="17px"></up-icon>
+                <up-icon name="error" color="#f4ae2c" size="15px"></up-icon>
                 <text class="AI-warning-lable">本解析由 AI 生成，内容仅供参考，请仔细甄别!</text>
             </view>
         </view>
@@ -60,7 +60,7 @@ const analysis = computed(() => {
 .question-explanation-content {
     font-size: 26rpx;
     color: #303030;
-    font-weight: 580;
+    font-weight: 538;
 }
 .AI-warning{
     display: flex;

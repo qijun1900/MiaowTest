@@ -17,7 +17,7 @@
         </view>
         <view class="data-container">
             <view class="data-title">
-                <text class="data-label">练习详情</text>
+                <text class="data-label">练习情况</text>
             </view>
             <view class="data-content">
                 <view class="data-item">
@@ -49,7 +49,24 @@
                 :isShowAnswer="true">
             </AnswerSheet>
         </view>
-   </view>
+        <view class="action-container">
+            <up-button
+                :plain="true" 
+                :hairline="true" 
+                type="primary"
+                shape="circle">
+                导出为PDF
+            </up-button>
+            <up-button
+                :plain="true"
+                :hairline="true"
+                type="primary"
+                shape="circle">
+                查看错题
+            </up-button>
+            
+        </view>
+   </view>  
 </template>
 
 <script setup>
@@ -184,5 +201,12 @@ onMounted(() => {
     background-color: #ffffff;
     border-radius: 20rpx;
     padding: 30rpx;
+}
+.action-container{
+    display: flex; /* 使用flex布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    gap: 20rpx; /* 添加按钮之间的间距 */
+    margin-top: 20rpx; /* 调整顶部间距 */
 }
 </style>
