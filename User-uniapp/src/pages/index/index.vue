@@ -32,13 +32,18 @@
     </view>
     <view class="my-question-bank">
       <view class="header-section">
-        <view class="hot-exam-title">我的题库</view>
-        <view class="more-section" @click="handleCreateQuestionBank">
-          <text class="more-text">新建题库</text>
+        <view class="hot-exam-title"><uviewSubsection :list="list" @updateCurrent="handleSendMode"/></view>
+        <view class="more-section" @click="handleCreateQuestionBank" v-if="currentMode===0">
+          <text class="more-text" >新建题库</text>
+          <text class="arrow-icon">›</text>
+        </view>
+        <view class="more-section" @click="handleViewMore" v-if="currentMode===1">
+          <text class="more-text" >查看考试</text>
           <text class="arrow-icon">›</text>
         </view>
       </view>
-      <UserQuestionBank />
+      <UserQuestionBank v-if="currentMode===0"/>
+      <view v-if="currentMode===1">收藏考试</view>
     </view>
   </view>
 </template>
@@ -52,9 +57,18 @@ import UserQuestionBank from '../../components/modules/index/UserQuestionBank.vu
 import { getNoticeInfo ,getIndexBanner} from '../../API/Index/AnnouncementAPI';
 import escconfig from '../../config/esc.config';
 import uniSearch from '../../components/core/uniSearch.vue';
+import uviewSubsection from '../../components/core/uviewSubsection.vue';
 
-const  noticeData = ref([])
-const swiperList = ref([])
+const  noticeData = ref([])// 添加notice需要的数据
+const swiperList = ref([])// 添加swiper需要的数据
+const list = ref(['我的题库', '收藏考试']);// 添加subsection需要的数据
+const currentMode = ref(0); // 当前选中的模式，默认为0
+
+//选择模式
+const handleSendMode =(value)=>{
+  currentMode.value = value; // 更新当前选中的模式
+  console.log('当前模式:', currentMode.value); // 输出当前模式
+}
 
 const fetchNoticeInfo = async ()=>{
   try{
@@ -141,6 +155,7 @@ const handleCreateQuestionBank = () => {
   color: #333333;
   padding-left: 10rpx;
   border-left: 6rpx solid #007AFF;
+  width: 55%;
 }
 
 .more-section {
