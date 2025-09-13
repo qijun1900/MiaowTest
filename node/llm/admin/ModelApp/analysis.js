@@ -1,14 +1,12 @@
 ﻿const axios = require('axios');
 
-// 添加延迟函数
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function AutoAnalysisQuestion(prompt) {
     const apiKey = process.env.DASHSCOPE_API_KEY;
     const appId = 'd960bc87aa7149b6821f50413ad4859a';
 
     const url = `https://dashscope.aliyuncs.com/api/v1/apps/${appId}/completion`;
-
+    
     
     const data = {
         input: {
