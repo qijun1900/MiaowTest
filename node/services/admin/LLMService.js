@@ -6,6 +6,7 @@ const ExamShortModel = require('../../models/ShortModel')
 const chat = require("../../llm/admin/Chat/chat")
 const AutoAddQuestionmodelapp = require("../../llm/admin/ModelApp/Iaa")
 const AutoAnalysisQuestionmodelapp = require("../../llm/admin/ModelApp/analysis")
+const withRetry = require("../../helpers/retryUtils")
 
 const LLMService = {
     addmodel: async ({modelName,modelValue,isPublish,description,creator,createdTime}) => {
@@ -54,7 +55,7 @@ const LLMService = {
 
             // 移除Markdown代码块标记
             const cleanData = data.replace(/```json/g, '').replace(/```/g, '').trim();
-            console.log('Clean data:',cleanData)
+            
             // 处理可能的多JSON对象情况
             let jsonData;
             try {
@@ -111,7 +112,10 @@ const LLMService = {
     },
     getQuestionAnalysis: async (message,questionType,_id) => {
         try {
-            const data = await AutoAnalysisQuestionmodelapp.AutoAnalysisQuestion(message);
+            // 使用重试机制包装API调用
+            const data = await withRetry.withRetry(async () => {
+                return await AutoAnalysisQuestionmodelapp.AutoAnalysisQuestion(message);
+            }, 3, 2000); // 最多重试3次，初始延迟2秒
 
             // 移除Markdown代码块标记
             const cleanData = data.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -162,6 +166,16 @@ const LLMService = {
            
         }catch (error) {
             console.error('Error fetching formatQuestion details:', error);
+            
+            // 检查是否是429错误
+            if (error.response && error.response.status === 429) {
+                return {
+                    success: false,
+                    message: 'API请求频率过高，请稍后再试',
+                    error: 'RATE_LIMIT_EXCEEDED'
+                };
+            }
+            
             return {
                 success: false,
                 message: '更新分析失败',

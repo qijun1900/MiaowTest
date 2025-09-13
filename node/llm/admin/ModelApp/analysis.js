@@ -1,15 +1,15 @@
-const axios = require('axios');
+ï»¿const axios = require('axios');
+
+// æ·»åŠ å»¶è¿Ÿå‡½æ•°
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function AutoAnalysisQuestion(prompt) {
     const apiKey = process.env.DASHSCOPE_API_KEY;
-    const appId = 'd960bc87aa7149b6821f50413ad4859a';//ÖÇÄÜÌåÓ¦ÓÃID----AIÖÇÄÜ·ÖÎö
+    const appId = 'd960bc87aa7149b6821f50413ad4859a';
 
     const url = `https://dashscope.aliyuncs.com/api/v1/apps/${appId}/completion`;
 
-
-    console.log(prompt)
     
-    // ¹¹½¨ÇëÇóÌå
     const data = {
         input: {
             prompt: prompt,
@@ -23,7 +23,8 @@ async function AutoAnalysisQuestion(prompt) {
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            timeout: 30000 // è®¾ç½®è¶…æ—¶æ—¶é—´ä¸º30ç§’
         });
 
         if (response.status === 200) {
@@ -33,11 +34,18 @@ async function AutoAnalysisQuestion(prompt) {
         }
     } catch (error) {
         console.error(`Error calling DashScope: ${error.message}`);
+        
+
+        if (error.response && error.response.status === 429) {
+            console.error('API rate limit exceeded. Please check your usage limits.');
+            error.message = 'API rate limit exceeded. Please check your usage limits.';
+        }
+        
         throw error;
     }
 }
 
-// ½öµ¼³öº¯Êý¹©Íâ²¿µ÷ÓÃ
+
 module.exports = {
     AutoAnalysisQuestion
 };
