@@ -70,7 +70,10 @@
             </view>
         </uni-transition>
         <!-- 解析 -->
-        <AnalysisCom :analysis="question.analysis" :showAnalysis="showAnswerComputed" />
+        <AnalysisCom 
+            :analysis="question.analysis" 
+            :showAnalysis="showAnswerComputed" 
+            :isAIanswer="question.isAIanswer=== 1 ? true:false"/>
     </view>
 </template>
 

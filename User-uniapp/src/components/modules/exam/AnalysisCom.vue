@@ -13,6 +13,10 @@
                 <up-markdown :content="analysis" v-if="analysis && analysis !== ''"></up-markdown>
                 <text v-else>暂无解析</text>
             </view>
+            <view class="AI-warning" v-if="isAIanswer">
+                <up-icon name="error" color="#f4ae2c" size="17px"></up-icon>
+                <text class="AI-warning-lable">本解析由 AI 生成，内容仅供参考，请仔细甄别!</text>
+            </view>
         </view>
     </uni-transition>
 </template>
@@ -25,6 +29,10 @@ const props = defineProps({
         default: ''
     },
     showAnalysis: {
+        type: Boolean,
+        default: false
+    },
+    isAIanswer: {
         type: Boolean,
         default: false
     }
@@ -41,7 +49,7 @@ const analysis = computed(() => {
     padding: 30rpx 20rpx;
     background-color: #f5f5f5;
     border-radius: 12rpx;
-    margin-bottom: 15rpx;
+    margin-bottom: 30rpx;
 }
 
 .explanation-label {
@@ -50,9 +58,17 @@ const analysis = computed(() => {
     color: #333;
 }
 .question-explanation-content {
-    font-size: 28rpx;
+    font-size: 26rpx;
     color: #303030;
     font-weight: 580;
 }
-
+.AI-warning{
+    display: flex;
+    align-items: center;
+}
+.AI-warning-lable{
+    font-size: 24rpx;
+    color: #898989;
+    font-weight: 580;
+}
 </style>
