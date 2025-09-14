@@ -16,6 +16,7 @@ const WebUserExamRouter = require('./routes/user/ExamRouter');
 const AdminLLMRouter = require('./routes/admin/LLMRouter');
 const WebLLMRouter = require('./routes/user/LLMRouter');
 const FunctionRouter = require('./routes/admin/FunctionRouter');
+const UniUserRouter = require('./routes/user/UserRouter');
 
 var app = express();
 
@@ -58,6 +59,7 @@ app.use(WebNewsRouter)
 app.use(WebUserExamRouter)
 app.use(WebLLMRouter)
 app.use(FunctionRouter)
+app.use(UniUserRouter)
 
 
 /*

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+//Admin USer
 const UserSchema = new mongoose.Schema({
     username: String,
     password: String,
