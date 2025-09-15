@@ -7,7 +7,7 @@
 			// uView 规则如下配置
 			"^u--(.*)": "uview-plus/components/u-$1/u-$1.vue",
 			"^up-(.*)": "uview-plus/components/u-$1/u-$1.vue",
-	        "^u-([^-].*)": "uview-plus/components/u-$1/u-$1.vue"
+			"^u-([^-].*)": "uview-plus/components/u-$1/u-$1.vue"
 		}
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
@@ -17,7 +17,6 @@
 				"navigationBarTitleText": "首页",
 				"navigationBarTextStyle": "white",
 				"navigationBarBackgroundColor": "#007AFF"
-
 			}
 		},
 		{
@@ -73,14 +72,22 @@
 			"style": {
 				"navigationBarTitleText": "练习",
 				"navigationStyle": "custom",
-				"navigationBarTextStyle": "black"// 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
-			}		
+				"navigationBarTextStyle": "black" // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
+			}
 		},
 		{
 			"path": "pages/exam/PracticeResultsView",
 			"style": {
 				"navigationBarTitleText": "练习结果",
 				"disableScroll": true // 禁止页面滚动
+			}
+		},
+		{
+			"path": "pages/my/UserInfoView",
+			"style": {
+				"navigationBarTitleText": "用户信息",
+				"disableScroll": true // 禁止页面滚动
+				
 			}
 		}
 	],

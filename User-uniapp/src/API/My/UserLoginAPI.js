@@ -5,16 +5,17 @@ import { http } from '../../util/http.js';
  * @param {string} message - 登录信息
  * @param {string} code - 登录凭证
  * @returns {Promise} 返回用户登录数据
+ * 
  */
 export const Userlogin = async(message,code) => {
    try{
        return await http({
            url: '/uniappAPI/User/Userlogin',
            method: 'POST',
-           data: {
+            data: {
                message,
                code,
-           },
+            },
        });
 
    }catch(error){

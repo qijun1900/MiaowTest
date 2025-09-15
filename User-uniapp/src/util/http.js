@@ -1,5 +1,8 @@
 import escconfig from '../config/esc.config';
 const baseURl = `http://${escconfig.serverHost}:${escconfig.serverPort}`
+import { UserInfoStore } from '../stores/modules/UserinfoStore';
+
+
 // 统一的HTTP请求封装
 // 适用于uni-app的http请求封装，支持小程序和H5平台
 // 支持拦截器，支持Promise化
@@ -45,9 +48,9 @@ const httpInterceptor = {
             'platform': platform//平台 h5/miniapp
         }
         //添加token
-        const token = uni.getStorageSync('token');
+        const token = uni.getStorageSync('token');//从本地获取token
         if (token) {
-            options.header.Authorization = token;
+            options.header.Authorization = `Bearer ${token}`; // 添加Bearer前缀
         }
     }
 }
@@ -61,11 +64,18 @@ export const http = (options) => {
             success(res) {
                 //状态码2xx，直接返回结果数据
                 if(res.statusCode >=200 && res.statusCode < 300){
-                    resolve(res.data)
-                }else if(res.statusCode === 401){//token过期，需要重新登录
+                    resolve(res.data)//返回数据
+                }else if(res.statusCode === 401){
+                    //token过期，需要重新登录
                     //清理本地token和用户信息
+                    uni.removeStorageSync('token');
+                    
+                    //清理用户信息
+                    const userInfoStore = UserInfoStore();
+                    userInfoStore.clearUserInfo();
+                    
                     //跳转登录页
-                    //uni.navigateTo({url: '/pages/login/login'})
+                    uni.navigateTo({url: '/pages/my/my'});
                     reject('登录过期，请重新登录',res)
                 } else{
                     uni.showToast({

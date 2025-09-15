@@ -1,23 +1,23 @@
 import { ref } from "vue"
 import { defineStore } from 'pinia';
 
-export const useUserInfo = defineStore('userinfo',()=>{
+export const UserInfoStore = defineStore('userinfo',()=>{
     //信息
-    const userInfo = ref()
+    const userInfo = ref([])
 
     //登录保存
-    const setInfo = (val)=>{
+    const setUserInfo = (val)=>{
         userInfo.value = val
     }
 
     //清除
-    const clearInfo = ()=>{
+    const clearUserInfo = ()=>{
         userInfo.value = undefined
     }
     return {
         userInfo,
-        setInfo,
-        clearInfo
+        setUserInfo,
+        clearUserInfo
     }
 },
 //持久化

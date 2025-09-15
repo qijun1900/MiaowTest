@@ -3,15 +3,22 @@
     <!-- 用户信息区域 -->
     <view class="user-info">
       <view class="avatar-wrapper">
-        <image class="avatar" src="/static/other/default-avatar.png" mode="aspectFill"></image>
+        <image 
+          class="avatar" 
+          :src="userInfoStore.userInfo?.avatar || '/static/other/default-avatar.png'" 
+          mode="aspectFill"
+        ></image>
       </view>
       <view class="user-detail" @click="handleLogin">
-        <view class="login-btn" v-if="!isLoggedIn">点击登录</view>
-        <view class="username" v-else>用户名</view>
-        <view class="user-desc">登录后可享受更多服务</view>
+        <view class="user-info-content">
+          <view class="login-btn" v-if="!isLoggedIn">点击登录</view>
+          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${91}位喵宝` }}</view>
+          <view class="user-desc" v-if="!isLoggedIn">登录后可享受更多服务</view>
+          <view class="user-openid" v-else>openid:<text class="openid-data">{{ userInfoStore.userInfo?.openid || '欢迎回来' }}</text></view>
+        </view>
+        <view class="arrow-right" v-if="isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
       </view>
     </view>
-    <view class="logout-btn" v-if="isLoggedIn">退出登录</view>
 
     <uviewOverlay v-model:show="overlayShow">
       <template #overlaycontent>
@@ -28,60 +35,83 @@
             <up-button @click="handleCancelLogin">暂不登录</up-button>
           </view>
         </view>
-
       </template>
     </uviewOverlay>
-    
-    <uviewPopup 
-      v-model:show="popupShow"
-      :round="30">
-        <template #popupcontent>
-          <view>展示</view>
-
-        </template>
-    </uviewPopup>
-
-
   </view>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import uviewOverlay from '../../components/core/uviewOverlay.vue';
-import uviewPopup from '../../components/core/uviewPopup.vue';
 import { Userlogin } from '../../API/My/UserLoginAPI';
-const overlayShow = ref(false)
-const popupShow = ref(false)
+import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 
-const isLoggedIn = false; // 默认未登录状态
+const overlayShow = ref(false);
+const userInfoStore = UserInfoStore();
+
+// 使用计算属性来判断用户是否已登录
+const isLoggedIn = computed(() => {
+  return !!userInfoStore.userInfo && Object.keys(userInfoStore.userInfo).length > 0;
+});
 
 const handleLogin = () => {
-  overlayShow.value = true;
+  if (!isLoggedIn.value) {
+    overlayShow.value = true;
+  }else{
+    uni.navigateTo({
+      url: '/pages/my/UserInfoView'
+    });
+  }
+};
 
-}
 const handleCancelLogin = () => {
   overlayShow.value = false;
-}
-const handleUseWXLogin = () => {
+};
+
+const handleUseWXLogin = async () => {
   overlayShow.value = false;
-  // 在这里处理微信登录逻辑
-  console.log('使用微信登录');
-  uni.login({
-    provider: 'weixin',
-    success: (data) => {
-      console.log('微信登录成功', data);
-      const response = Userlogin(data.errMsg,data.code)
-      console.log(response)
-    },
-    fail: (err) => {
-      console.error('微信登录失败', err);
+  
+  try {
+    // 将 uni.login 封装为 Promise
+    const loginData = await new Promise((resolve, reject) => {
+      uni.login({
+        provider: 'weixin',
+        success: (data) => resolve(data),
+        fail: (err) => reject(err)
+      });
+    });
+    
+    // 使用 await 等待 Userlogin 完成
+    const response = await Userlogin(loginData.errMsg, loginData.code);
+    if (response.code === 200) {
+      // 登录成功
+      uni.showToast({
+        title: '登录成功',
+        icon: 'success'
+      });
+      userInfoStore.setUserInfo(response.data.data.userInfo); // 存储用户信息
+      uni.setStorageSync('token', response.data.data.token); // 存储 Token
     }
-  })
-}
+  } catch (error) {
+    console.error('微信登录失败', error);
+    // 可以在这里添加错误提示
+    uni.showToast({
+      title: '登录失败，请重试',
+      icon: 'none'
+    });
+  }
+};
 
-
-
-
+onMounted(() => {
+  // 检查本地存储中是否有 token
+  const token = uni.getStorageSync('token');
+  // 如果有 token 但没有用户信息，可能需要重新获取用户信息
+  if (token && !isLoggedIn.value) {
+    // 这里可以添加获取用户信息的逻辑
+    console.log("Token exists but no user info, may need to fetch user data");
+  }
+  console.log("UserInfo", userInfoStore.userInfo);
+});
 </script>
 
 <style scoped>
@@ -114,6 +144,18 @@ const handleUseWXLogin = () => {
 
 .user-detail {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-info-content {
+  flex: 1;
+}
+
+.arrow-right {
+  margin-left: 10rpx;
+  flex-shrink: 0;
 }
 
 .login-btn {
@@ -133,6 +175,14 @@ const handleUseWXLogin = () => {
 .user-desc {
   font-size: 26rpx;
   color: #999999;
+}
+.user-openid {
+  font-size: 25rpx;
+  color: #333333;
+}
+.openid-data{
+  font-size: 23rpx;
+  color: #929292;
 }
 
 .logout-btn {

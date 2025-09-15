@@ -12,7 +12,7 @@ const UserController = {
                 data: result
             })
         } catch (error) {
-            console.error("Userlogin Ê§°Ü", error);
+            console.error("Userlogin å¤±è´¥", error);
             throw error;
         }
     }

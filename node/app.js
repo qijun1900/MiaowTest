@@ -59,17 +59,16 @@ app.use(WebNewsRouter)
 app.use(WebUserExamRouter)
 app.use(WebLLMRouter)
 app.use(FunctionRouter)
-app.use(UniUserRouter)
+app.use(UniUserRouter)// 注册用户路由(uni)
 
 
 /*
-adminapi===后台
-webapi===前台
+adminapi===后台管理接口
 */
 app.use((req,res,next)=>{
   //token有效，next()
   //token过期返回401
-  if(req.url === "/adminapi/user/login"){
+  if(req.url === "/adminapi/user/login"){//登录接口不验证token
     next()
     return;
   }
@@ -77,11 +76,11 @@ app.use((req,res,next)=>{
   if(token){
     var payload = JWT.verify(token)
     if(payload){
-      const newToken = JWT.generate({
-        _id:payload._id,
-        username:payload.username
+      const newToken = JWT.generate({//生成新的token，有效期3d
+        _id:payload._id, 
+        username:payload.username 
       },"3d")   
-      res.header('Authorization',newToken)
+      res.header('Authorization',newToken)//将新的token返回给客户端
       next()
     }else{
       res.status(401).send({errCode:"-1",errInfo:"token过期"})
