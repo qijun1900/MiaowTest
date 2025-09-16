@@ -40,8 +40,8 @@ app.use((req, res, next) => {
   // 这些是客户端在发送请求时可以包含的自定义头部信息
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, source-client, platform"
-  );
+    "Origin, X-Requested-With, Content-Type, Accept, source-client, platform, Authorization"
+  );// 允许的头部信息
   
   // 设置允许的HTTP请求方法
   // 定义了客户端可以使用的请求方式类型
@@ -58,7 +58,6 @@ app.use('/users',UserRouter)
 app.use(WebNewsRouter)
 app.use(WebUserExamRouter)
 app.use(WebLLMRouter)
-app.use(FunctionRouter)
 app.use(UniUserRouter)// 注册用户路由(uni)
 
 
@@ -88,10 +87,11 @@ app.use((req,res,next)=>{
   }
 
 })
-app.use(UserRouter);
-app.use(NewsRouter)
-app.use(AdminExamRouter)
-app.use(AdminLLMRouter)
+app.use(UserRouter);//用户路由(admin)
+app.use(NewsRouter)//信息路由(admin)
+app.use(AdminExamRouter)//考试路由(admin)
+app.use(AdminLLMRouter)//llm路由(admin)
+app.use(FunctionRouter)//功能路由(admin)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

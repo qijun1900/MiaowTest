@@ -14,7 +14,7 @@
           <view class="login-btn" v-if="!isLoggedIn">点击登录</view>
           <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${91}位喵宝` }}</view>
           <view class="user-desc" v-if="!isLoggedIn">登录后可享受更多服务</view>
-          <view class="user-openid" v-else>openid:<text class="openid-data">{{ userInfoStore.userInfo?.openid || '欢迎回来' }}</text></view>
+          <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.openid || '欢迎回来' }}</text></view>
         </view>
         <view class="arrow-right" v-if="isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
       </view>
@@ -72,7 +72,7 @@ const handleUseWXLogin = async () => {
   overlayShow.value = false;
   
   try {
-    // 将 uni.login 封装为 Promise
+    // 将 uni.login 封装为 Promise, 以便使用 await
     const loginData = await new Promise((resolve, reject) => {
       uni.login({
         provider: 'weixin',
@@ -89,12 +89,11 @@ const handleUseWXLogin = async () => {
         title: '登录成功',
         icon: 'success'
       });
-      userInfoStore.setUserInfo(response.data.data.userInfo); // 存储用户信息
-      uni.setStorageSync('token', response.data.data.token); // 存储 Token
+      userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
+      uni.setStorageSync('token', response.data.token); // 存储 Token
     }
   } catch (error) {
     console.error('微信登录失败', error);
-    // 可以在这里添加错误提示
     uni.showToast({
       title: '登录失败，请重试',
       icon: 'none'
@@ -107,10 +106,8 @@ onMounted(() => {
   const token = uni.getStorageSync('token');
   // 如果有 token 但没有用户信息，可能需要重新获取用户信息
   if (token && !isLoggedIn.value) {
-    // 这里可以添加获取用户信息的逻辑
     console.log("Token exists but no user info, may need to fetch user data");
   }
-  console.log("UserInfo", userInfoStore.userInfo);
 });
 </script>
 
