@@ -13,10 +13,11 @@ import { UserInfoStore } from '../stores/modules/UserinfoStore';
 // 检测当前运行环境
 const getPlatform = () => {
     try {
-        const systemInfo = uni.getSystemInfoSync();
-        if (systemInfo.uniPlatform === 'web') {
+        // 使用 uni.getAppBaseInfo 替代 uni.getSystemInfoSync
+        const appBaseInfo = uni.getAppBaseInfo();
+        if (appBaseInfo.uniPlatform === 'web') {
             return 'h5';
-        } else if (systemInfo.uniPlatform === 'mp-weixin') {
+        } else if (appBaseInfo.uniPlatform === 'mp-weixin') {
             return 'miniapp';
         }
         // 默认按小程序处理

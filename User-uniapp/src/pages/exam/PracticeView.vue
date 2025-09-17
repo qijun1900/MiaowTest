@@ -212,9 +212,9 @@ const handleSubmitAnswer = () => {
 // 获取导航栏高度
 const getNavBarHeight = () => {
     // #ifdef MP-WEIXIN 
-    // 小程序端使用uni.getSystemInfoSync获取状态栏高度
-    const systemInfo = uni.getSystemInfoSync();
-    navBarHeight.value = systemInfo.statusBarHeight + 44; // 状态栏高度 + 导航栏高度
+    // 小程序端使用uni.getWindowInfo获取状态栏高度
+    const windowInfo = uni.getWindowInfo();
+    navBarHeight.value = windowInfo.statusBarHeight + 44; // 状态栏高度 + 导航栏高度
     // #endif
     
     // #ifdef H5 
