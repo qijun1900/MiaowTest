@@ -3,9 +3,12 @@
         <view class="exam-detail">
             <!-- 左侧考试封面 -->
             <view class="exam-cover">
-                <image :src="examInfo.coverImage" mode="aspectFill" class="cover-image"></image>
+                <image 
+                :src="examInfo.coverImage" 
+                mode="aspectFill" 
+                class="cover-image"></image>
             </view>
-            
+
             <!-- 右侧考试信息 -->
             <view class="exam-info">
                 <view class="info-item">
@@ -13,19 +16,19 @@
                     <text class="info-title">考试名称：</text>
                     <text class="info-content">{{ examInfo.name }}</text>
                 </view>
-                
+
                 <view class="info-item">
                     <image src="/static/other/year.png" class="info-icon"></image>
                     <text class="info-title">考试年份：</text>
                     <text class="info-content">{{ examInfo.year }}</text>
                 </view>
-                
+
                 <view class="info-item">
                     <image src="/static/other/time.png" class="info-icon"></image>
                     <text class="info-title">更新时间：</text>
                     <text class="info-content">{{ examInfo.updateTime }}</text>
                 </view>
-                
+
                 <view class="info-item">
                     <image src="/static/other/open-time.png" class="info-icon"></image>
                     <text class="info-title">开考时间：</text>
@@ -33,40 +36,53 @@
                 </view>
             </view>
         </view>
-        
-    <up-divider 
-        text="|考试题型|" 
-        textPosition="left"  
-        textColor="#007AFF"
-        lineColor="#86bbf5">
-    </up-divider>
-    
-    <!-- 题型列表 -->
-    <view class="subject-types-container" v-if="subjectTypes && subjectTypes.length > 0">
-        <scroll-view scroll-y class="subject-types-scroll">
-            <view class="subject-types-list">
-                <view 
-                    class="subject-type-item" 
-                    v-for="(item, index) in subjectTypes" 
-                    :key="index" 
-                    @click="navigateToQuestions(item)">
-                    <view class="subject-type-info">
-                        <view class="type-header">
-                            <text class="subject-type-name">{{ item.content }}</text>
-                            <view class="question-badge" :class="{'no-questions': !item.questionIdS || item.questionIdS.length === 0}">
-                                <text class="question-count">{{ item.questionIdS ? item.questionIdS.length : 0 }}题</text>
+
+        <up-divider text="|考试题型|" textPosition="left" textColor="#007AFF" lineColor="#86bbf5">
+        </up-divider>
+
+        <!-- 题型列表 -->
+        <view 
+            class="subject-types-container" 
+            v-if="subjectTypes && subjectTypes.length > 0">
+            <scroll-view scroll-y class="subject-types-scroll">
+                <view class="subject-types-list">
+                    <view 
+                        class="subject-type-item" 
+                        v-for="(item, index) in subjectTypes" 
+                        :key="index"
+                        @click="navigateToQuestions(item)">
+                        <view class="subject-type-info">
+                            <view class="type-header">
+                                <text class="subject-type-name">{{ item.content }}</text>
+                                <view class="question-badge"
+                                    :class="{ 'no-questions': !item.questionIdS || item.questionIdS.length === 0 }">
+                                    <text class="question-count">
+                                        {{ item.questionIdS ? item.questionIdS.length : 0}}题</text>
+                                </view>
                             </view>
                         </view>
-                    </view>
-                    <view class="arrow-container">
-                        <uni-icons type="forward" size="16" color="#007AFF"></uni-icons>
+                        <view class="arrow-container">
+                            <uni-icons type="forward" size="16" color="#007AFF"></uni-icons>
+                        </view>
                     </view>
                 </view>
-            </view>
-        </scroll-view>
-    </view>
-    <!-- 数据为空 -->
-    <Empty description="暂无题型数据" class="empty" v-else/>
+            </scroll-view>
+        </view>
+
+        <!-- 数据为空 -->
+        <Empty description="暂无题型数据" class="empty" v-else />
+
+        <!-- 自定义底部 -->
+        <view class="bottom">
+            <up-button 
+                type="primary" 
+                class="bottom-button"
+                icon="star"
+                :plain="true"
+                @click="handleFavoriteExam">
+                收藏考试
+            </up-button>
+        </view>
     </view>
 </template>
 
@@ -77,6 +93,7 @@ import formatTime from '../../util/formatTime';
 import { getExamSubjectTypes } from '../../API/Exam/ExamAPI';
 import Empty from '../../components/core/Empty.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
+import { addExamFavorite } from '../../API/My/FavoriteAPI';
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据
@@ -84,15 +101,15 @@ const questionStore = useQuestionStore();
 
 // 页面加载时接收参数
 onLoad((options) => {
-    
+
     if (options.data) {
         try {
             // 解析传递过来的科目数据
             const subjectData = JSON.parse(decodeURIComponent(options.data));
-            
+
             // 更新考试信息
             examInfo.value = {
-                id: subjectData.id ,
+                id: subjectData.id,
                 name: subjectData.name,
                 year: subjectData.year,
                 coverImage: subjectData.coverImage,
@@ -122,8 +139,8 @@ const fetchClickSubjectData = async (subjectId) => {
     try {
         const response = await getExamSubjectTypes(subjectId);
         subjectTypes.value = response.data;
-       
-    }catch (error) {
+
+    } catch (error) {
         console.error('获取点击的科目数据失败:', error);
         uni.showToast({
             title: '获取数据失败',
@@ -131,12 +148,24 @@ const fetchClickSubjectData = async (subjectId) => {
         });
     }
 }
+// 收藏考试
+const handleFavoriteExam = async() => {
+    const response = await addExamFavorite( examInfo.value.id);
+    console.log(response);
+    if (response.code === 200) {
+        uni.showToast({
+            title: '收藏成功',
+            icon: 'success'
+        });
+    }
+   
+}
 
 // 导航到题目列表页面
 const navigateToQuestions = (subjectType) => {
     questionStore.setCurrentQuestionIds(subjectType.questionIdS || []);// 设置当前题目ID数组
     questionStore.FetchQuestionData();// 数据请求获取题目详细信息
-   uni.navigateTo({
+    uni.navigateTo({
         url: `/pages/exam/PracticeSettingView?data=${encodeURIComponent(JSON.stringify({
             subjectTypeName: subjectType.content,
             examName: examInfo.value.name,
@@ -155,6 +184,7 @@ const navigateToQuestions = (subjectType) => {
     display: flex;
     flex-direction: column;
 }
+
 .exam-detail {
     display: flex;
     flex-direction: row;
@@ -218,7 +248,7 @@ const navigateToQuestions = (subjectType) => {
     word-break: break-all;
 }
 
-.empty{
+.empty {
     margin-top: 150rpx;
 }
 
@@ -227,7 +257,7 @@ const navigateToQuestions = (subjectType) => {
     padding: 0 6rpx;
     flex: 1;
     overflow: hidden;
-    margin-bottom: 85rpx;
+    margin-bottom: 120rpx;
 }
 
 .subject-types-scroll {
@@ -312,4 +342,19 @@ const navigateToQuestions = (subjectType) => {
     z-index: 1;
 }
 
+/* 底部按钮样式 */
+.bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100rpx;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30rpx;
+    box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
 </style>

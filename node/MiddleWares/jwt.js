@@ -37,7 +37,7 @@ const JWT = {
         }
         
         // 将解码后的用户信息添加到请求对象中
-        req.user = decoded;
+        req.user = decoded; 
         next();
       };
     }

@@ -1,5 +1,6 @@
 const UserService = require("../../services/user/UserService");
 
+
 const UserController = {
 
     Userlogin: async (req, res) => {
@@ -45,6 +46,36 @@ const UserController = {
                 message: '服务器错误'
             });
         }
+    },
+    //收藏考试
+    addExamFavorite :async (req,res)=>{
+        try {
+            const { examId } = req.body;
+            const {openid} = req.user//获取用户openid
+            console.log("openid",openid);
+            const result = await UserService.addExamFavorite(examId,openid);
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                })
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message
+                });
+            }
+        }catch(error){
+            console.error("addExamFavorite 失败", error);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }   
+       
     }
 }
 

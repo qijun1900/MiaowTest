@@ -5,7 +5,7 @@
       <view class="avatar-wrapper">
         <image 
           class="avatar" 
-          :src="userInfoStore.userInfo?.avatar || '/static/other/default-avatar.png'" 
+          :src="  isLoggedIn ? '/static/other/default-avatar.png' : '/static/other/default-user.png'" 
           mode="aspectFill"
         ></image>
       </view>
@@ -121,7 +121,7 @@ onMounted(() => {
 .user-info {
   display: flex;
   align-items: center;
-  background-color: #ffffff;
+  background: linear-gradient(135deg,#f5f5f5, #ecf9ff 100%);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;

@@ -25,9 +25,11 @@ const ConsumerSchema = new mongoose.Schema({
     },
     createTime: {
         type: Date,
+    },
+    favoriteExams:{//ÊÕ²ØµÄ¿¼ÊÔ
+        type:Array,
+        default:[]
     }
-
-
 })
 
 const ConsumerModel = mongoose.model("consumer", ConsumerSchema)
