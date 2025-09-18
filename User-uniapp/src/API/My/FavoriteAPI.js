@@ -54,3 +54,19 @@ export async function getExamFavorites(examId) {
     }
 }
 
+/**
+ * 获取用户收藏的考试列表
+ * @returns {Promise} 返回用户收藏的考试列表
+ */
+export async function getUserFavorites() {
+    try {
+        return await http({
+            url: '/uniappAPI/UserFavorite/getUserFavoritesExams',
+            method: 'GET',
+        });
+    }catch (error) {
+        console.error("getUserFavorites 失败", error);
+        throw error;
+    }
+}
+

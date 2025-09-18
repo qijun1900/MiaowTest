@@ -1,6 +1,7 @@
 const wxAuth = require("../../MiddleWares/wxAuth");
 const JWT = require("../../MiddleWares/jwt");
 const ConsumerModel = require("../../models/ConsumerModel");
+const ExamModel = require("../../models/ExamModel");
 
 const UserService = {
     Userlogin: async (message, code) => {
@@ -184,6 +185,36 @@ const UserService = {
             return {
                 code: 500,
                 message: '取消收藏失败',
+                error: error.message,
+                success: false
+            }
+        }
+    },
+    getUserFavoritesExam: async (openid) => {
+        try {
+            const user = await ConsumerModel.findOne({ openid });
+
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                }
+            }
+            // 查询收藏的考试信息，只返回指定字段
+            const result = await ExamModel.find({
+                _id: { $in: user.favoriteExams }// 通过用户收藏的考试ID，查询对应的考试信息
+            }).select('name code  year cover  day createdTime _id');
+            
+            return {
+                code: 200,
+                success: true,
+                data: result
+            }
+        }catch (error) {
+            console.error("getUserFavoritesExam 失败", error);
+            return {
+                code: 500,
                 error: error.message,
                 success: false
             }

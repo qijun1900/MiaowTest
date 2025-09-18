@@ -12,17 +12,6 @@ ExamRouter.get("/webapi/News/getSwipeNews",ExamController.getSwipeNews)//获取�
 ExamRouter.post("/webapi/user/postUserAdvice",ExamController.UserFeedbackAdvice)//用户反馈接口
 ExamRouter.post("/webapi/user/postUserQuestionIssuse",ExamController.postUserQuestionIssuse)//用户反馈题目问题接口
 
-ExamRouter.get("/uniappAPI/get/test",(req,res)=>{
-    console.log(req.clientInfo.sourceClient)
-    if(req.clientInfo.sourceClient === "web"){
-        res.send({code:200,ActionType:"OK",data:"web请求成功"})
-        return;
-    }
-    if(req.clientInfo.sourceClient === "miniapp"){
-        res.send({code:200,ActionType:"OK",data:"miniapp请求成功"})
-        return;
-    }
-})
 //uniappAPI
 ExamRouter.get("/uniappAPI/IndexHotExam/getHotExamList",ExamController.getHotExamList)//获取热门考试
 ExamRouter.get("/uniappAPI/Exam/getExamSubjects",ExamController.getExamSubjects)//获取所有考试科目

@@ -1,13 +1,11 @@
 <template>
     <view class="container">
-        <view v-if="questionBanks.length > 0">
-            <view class="question-bank-item" 
-            v-for="(item, index) in questionBanks" 
-            :key="index" 
-            @click="handleClick(item)">
+        <view v-if="favoriteExam.length > 0">
+            <view class="question-bank-item" v-for="(item, index) in questionBanks" :key="index"
+                @click="handleClick(item)">
             </view>
         </view>
-        
+
         <!-- 空状态显示 -->
         <view v-else class="empty-state">
             <image class="empty-image" src="/static/other/exam-favorite.png" mode="aspectFit"></image>
@@ -18,11 +16,26 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getUserFavorites } from '../../../API/My/FavoriteAPI'
 
-// 假数据
-const questionBanks = ref([])
+const favoriteExam = ref([])
 
+const fetchFavoriteExam = async () => {
+    try {
+        const response = await getUserFavorites()
+        if (response.code === 200) {
+            favoriteExam.value = response.data
+            console.log(favoriteExam.value)
+        }
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+onMounted(() => {
+    fetchFavoriteExam()
+})
 // 点击事件处理
 const handleClick = (item) => {
     console.log('点击题库:', item.name)

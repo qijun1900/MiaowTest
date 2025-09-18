@@ -124,6 +124,26 @@ const UserController = {
                 message: '服务器错误'
             });
         }
+    },
+    getUserFavoritesExam: async (req, res) => {
+        try {
+            const { openid } = req.user;
+            const result = await UserService.getUserFavoritesExam(openid);  // 调用服务层方法获取用户收藏的考试
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data,
+                });
+            }
+        }catch (error) {
+            console.error("getUserFavoritesExam 失败", error);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
     }
 }
 
