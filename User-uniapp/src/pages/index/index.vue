@@ -43,7 +43,7 @@
         </view>
       </view>
       <UserQuestionBank v-if="currentMode===0"/>
-      <view v-if="currentMode===1">收藏考试</view>
+      <UserExamFavorite v-if="currentMode===1"/>
     </view>
   </view>
 </template>
@@ -58,6 +58,7 @@ import { getNoticeInfo ,getIndexBanner} from '../../API/Index/AnnouncementAPI';
 import escconfig from '../../config/esc.config';
 import uniSearch from '../../components/core/uniSearch.vue';
 import uviewSubsection from '../../components/core/uviewSubsection.vue';
+import UserExamFavorite from '../../components/modules/index/UserExamFavorite.vue';
 
 const  noticeData = ref([])// 添加notice需要的数据
 const swiperList = ref([])// 添加swiper需要的数据

@@ -9,7 +9,6 @@ import { UserInfoStore } from '../stores/modules/UserinfoStore';
 // 支持自动添加baseURL，支持自动添加token，支持自动添加客户端标识，支持自动添加平台标识
 // 支持自动处理错误，支持自动处理超时，支持自动处理网络错误，支持自动处理401错误
 
-
 // 检测当前运行环境
 const getPlatform = () => {
     try {
