@@ -97,14 +97,14 @@ const UserService = {
             };
         }
     },
-    addExamFavorite: async (examId,openid) => {
+    addExamFavorite: async (examId, openid) => {
         try {
             const result = await ConsumerModel.findOneAndUpdate(
-                { openid:openid }, // 查询条件
+                { openid: openid }, // 查询条件
                 { $addToSet: { favoriteExams: examId } }, // 更新操作，将examId添加到favoriteExams数组中，确保不重复
                 { new: true } // 返回更新后的文档
             );
-            
+
             if (!result) {
                 return {
                     code: 404,
@@ -112,7 +112,7 @@ const UserService = {
                     success: false
                 };
             }
-            
+
             return {
                 code: 200,
                 message: '收藏成功',
@@ -126,6 +126,67 @@ const UserService = {
                 error: error.message,
                 success: false
             };
+        }
+    },
+    getExamFavorites: async (examId, openid) => {
+        try {
+            const user = await ConsumerModel.findOne({ openid });
+
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+
+            // 检查用户是否收藏了该考试
+            const isFavorited = user.favoriteExams && user.favoriteExams.includes(examId);
+
+            return {
+                code: 200,
+                success: true,
+                data: {
+                    isFavorited: isFavorited
+                }
+            };
+        } catch (error) {
+            console.error("getExamFavorites 失败", error);
+            return {
+                code: 500,
+                error: error.message,
+                success: false
+            };
+        }
+    },
+    removeExamFavorite: async (examId, openid) => {
+        try {
+            const result = await ConsumerModel.findOneAndUpdate(
+                { openid: openid }, // 查询条件
+                { $pull: { favoriteExams: examId } }, // 更新操作，将examId从favoriteExams数组中移除
+                { new: true } // 返回更新后的文档
+            );  
+
+            if (!result) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                }
+            }
+            return {
+                code: 200,
+                message: '取消收藏成功',
+                success: true,
+            }
+        }catch (error) {
+            console.error("removeExamFavorite 失败", error);
+            return {
+                code: 500,
+                message: '取消收藏失败',
+                error: error.message,
+                success: false
+            }
         }
     }
 }

@@ -37,14 +37,16 @@ export async function removeExamFavorite(examId) {
 }
 
 /**
- * 获取用户收藏的考试列表
+ * 检测是否收藏了考试
+ * @param {string} examId - 考试ID
  * @returns {Promise} 返回用户收藏的考试列表
  */
-export async function getExamFavorites() {
+export async function getExamFavorites(examId) {
     try {
         return await http({
             url: '/uniappAPI/UserFavorite/getExamFavorites',
-            method: 'GET'
+            method: 'POST',
+           data: { examId }
         });
     } catch (error) {
         console.error("getExamFavorites 失败", error);

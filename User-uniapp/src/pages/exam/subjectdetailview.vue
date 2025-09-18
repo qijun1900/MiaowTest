@@ -3,10 +3,7 @@
         <view class="exam-detail">
             <!-- 左侧考试封面 -->
             <view class="exam-cover">
-                <image 
-                :src="examInfo.coverImage" 
-                mode="aspectFill" 
-                class="cover-image"></image>
+                <image :src="examInfo.coverImage" mode="aspectFill" class="cover-image"></image>
             </view>
 
             <!-- 右侧考试信息 -->
@@ -41,15 +38,10 @@
         </up-divider>
 
         <!-- 题型列表 -->
-        <view 
-            class="subject-types-container" 
-            v-if="subjectTypes && subjectTypes.length > 0">
+        <view class="subject-types-container" v-if="subjectTypes && subjectTypes.length > 0">
             <scroll-view scroll-y class="subject-types-scroll">
                 <view class="subject-types-list">
-                    <view 
-                        class="subject-type-item" 
-                        v-for="(item, index) in subjectTypes" 
-                        :key="index"
+                    <view class="subject-type-item" v-for="(item, index) in subjectTypes" :key="index"
                         @click="navigateToQuestions(item)">
                         <view class="subject-type-info">
                             <view class="type-header">
@@ -57,7 +49,7 @@
                                 <view class="question-badge"
                                     :class="{ 'no-questions': !item.questionIdS || item.questionIdS.length === 0 }">
                                     <text class="question-count">
-                                        {{ item.questionIdS ? item.questionIdS.length : 0}}题</text>
+                                        {{ item.questionIdS ? item.questionIdS.length : 0 }}题</text>
                                 </view>
                             </view>
                         </view>
@@ -74,13 +66,10 @@
 
         <!-- 自定义底部 -->
         <view class="bottom">
-            <up-button 
-                type="primary" 
-                class="bottom-button"
-                icon="star"
-                :plain="true"
-                @click="handleFavoriteExam">
-                收藏考试
+            <up-button type="primary" class="bottom-button" :icon="isFavorited ? 'star-fill' : 'star'"
+                :plain="!isFavorited" @click="handleFavoriteExam" shape="circle"
+                :iconColor="isFavorited ? '#ffae34' : '#007AFF'">
+                {{ isFavorited ? '已收藏' : '收藏考试' }}
             </up-button>
         </view>
     </view>
@@ -93,11 +82,12 @@ import formatTime from '../../util/formatTime';
 import { getExamSubjectTypes } from '../../API/Exam/ExamAPI';
 import Empty from '../../components/core/Empty.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
-import { addExamFavorite } from '../../API/My/FavoriteAPI';
+import { addExamFavorite, removeExamFavorite, getExamFavorites } from '../../API/My/FavoriteAPI';
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据
 const questionStore = useQuestionStore();
+const isFavorited = ref(false); // 添加收藏状态变量
 
 // 页面加载时接收参数
 onLoad((options) => {
@@ -116,8 +106,10 @@ onLoad((options) => {
                 updateTime: formatTime.getTime2(subjectData.createdTime),
                 startTime: formatTime.getTime2(subjectData.day) || '待定'
             };
-            // 在后台异步请求最新数据（不影响页面初始加载速度）
+            //获取题型详细 在后台异步请求最新数据（不影响页面初始加载速度）
             fetchClickSubjectData(subjectData.id);
+            // 检测收藏状态
+            checkFavoriteStatus(subjectData.id);
         } catch (error) {
             console.error('解析科目数据失败:', error);
             uni.showToast({
@@ -148,17 +140,66 @@ const fetchClickSubjectData = async (subjectId) => {
         });
     }
 }
-// 收藏考试
-const handleFavoriteExam = async() => {
-    const response = await addExamFavorite( examInfo.value.id);
-    console.log(response);
-    if (response.code === 200) {
+
+// 检测收藏状态
+const checkFavoriteStatus = async (examId) => {
+    try {
+        const response = await getExamFavorites(examId);
+        if (response.code === 200) {
+            isFavorited.value = response.data.isFavorited; // 根据返回数据判断是否已收藏
+        }
+    } catch (error) {
+        console.error('检测收藏状态失败:', error);
+    }
+}
+
+// 收藏/取消收藏考试
+const handleFavoriteExam = async () => {
+    try {
+        if (isFavorited.value) {
+            // 使用 Promise 包装 uni.showModal, 以便在异步操作完成后再执行后续逻辑
+            const showModal = () => {
+                return new Promise((resolve) => {
+                    uni.showModal({
+                        title: '您确定要取消收藏吗？',
+                        success: (res) => {
+                            resolve(res.confirm);
+                        }
+                    });
+                });
+            };
+
+            const confirmed = await showModal();
+
+            if (confirmed) {
+                // 用户点击了确定，执行取消收藏操作
+                const response = await removeExamFavorite(examInfo.value.id);
+                if (response.code === 200) {
+                    isFavorited.value = false;
+                    uni.showToast({
+                        title: response.message || '取消收藏成功',
+                        icon: 'success'
+                    });
+                }
+            }
+        } else {
+            // 如果未收藏，则添加收藏
+            const response = await addExamFavorite(examInfo.value.id);
+            if (response.code === 200) {
+                isFavorited.value = true;
+                uni.showToast({
+                    title: response.message || '收藏成功',
+                    icon: 'success'
+                });
+            }
+        }
+    } catch (error) {
+        console.error('收藏操作失败:', error);
         uni.showToast({
-            title: '收藏成功',
-            icon: 'success'
+            title: '操作失败',
+            icon: 'none'
         });
     }
-   
 }
 
 // 导航到题目列表页面
