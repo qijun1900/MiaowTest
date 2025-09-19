@@ -21,17 +21,18 @@ const UserService = {
                 });
                 await user.save();
 
-                console.log('创建新用户:', openid);
+                console.log('创建新微信用户:', openid);
             }
 
             // 生成token，包含openid和过期时间（例如7天），如果过期将生成新的token
-            const token = JWT.generate({ openid: openid }, '7d');
+            const token = JWT.generate({ uid: user._id}, '7d');
 
             return {
                 success: true,
                 data: {
                     token,
                     userInfo: {
+                        uid: user._id,
                         openid: user.openid,
                         nickname: user.nickname || '',
                         avatar: user.avatar || '',
@@ -51,9 +52,9 @@ const UserService = {
     },
 
     // 更新用户信息
-    updateUserInfo: async ({ openid, nickname, avatar, gender }) => {
+    updateUserInfo: async ({ uid, nickname, avatar, gender }) => {
         try {
-            const user = await ConsumerModel.findOne({ openid });
+            const user = await ConsumerModel.findOne({ uid });
 
             if (!user) {
                 return {
@@ -83,6 +84,7 @@ const UserService = {
                 message: '更新成功',
                 success: true,
                 data: {
+                    uid: user._id,
                     openid: user.openid,
                     nickname: user.nickname || '',
                     avatar: user.avatar || '',
@@ -98,10 +100,10 @@ const UserService = {
             };
         }
     },
-    addExamFavorite: async (examId, openid) => {
+    addExamFavorite: async (examId, uid) => {
         try {
             const result = await ConsumerModel.findOneAndUpdate(
-                { openid: openid }, // 查询条件
+                { _id: uid }, // 查询条件
                 { $addToSet: { favoriteExams: examId } }, // 更新操作，将examId添加到favoriteExams数组中，确保不重复
                 { new: true } // 返回更新后的文档
             );
@@ -129,9 +131,9 @@ const UserService = {
             };
         }
     },
-    getExamFavorites: async (examId, openid) => {
+    getExamFavorites: async (examId, uid) => {
         try {
-            const user = await ConsumerModel.findOne({ openid });
+            const user = await ConsumerModel.findOne({ _id:uid });
 
             if (!user) {
                 return {
@@ -160,10 +162,10 @@ const UserService = {
             };
         }
     },
-    removeExamFavorite: async (examId, openid) => {
+    removeExamFavorite: async (examId, uid) => {
         try {
             const result = await ConsumerModel.findOneAndUpdate(
-                { openid: openid }, // 查询条件
+                { _id: uid }, // 查询条件
                 { $pull: { favoriteExams: examId } }, // 更新操作，将examId从favoriteExams数组中移除
                 { new: true } // 返回更新后的文档
             );  
@@ -190,9 +192,9 @@ const UserService = {
             }
         }
     },
-    getUserFavoritesExam: async (openid) => {
+    getUserFavoritesExam: async (uid) => {
         try {
-            const user = await ConsumerModel.findOne({ openid });
+            const user = await ConsumerModel.findOne({ _id:uid });
 
             if (!user) {
                 return {

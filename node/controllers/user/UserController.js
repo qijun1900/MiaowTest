@@ -20,8 +20,9 @@ const UserController = {
     // 更新用户信息
     updateUserInfo: async (req, res) => {
         try {
-            const { openid, nickname, avatar, gender } = req.body;
-            const result = await UserService.updateUserInfo({ openid, nickname, avatar, gender });
+            const { nickname, avatar, gender } = req.body;
+            const { uid } = req.user//获取用户openid
+            const result = await UserService.updateUserInfo({ uid, nickname, avatar, gender });
 
             if (result.success) {
                 res.send({
@@ -50,8 +51,8 @@ const UserController = {
     addExamFavorite: async (req, res) => {
         try {
             const { examId } = req.body;
-            const { openid } = req.user//获取用户openid
-            const result = await UserService.addExamFavorite(examId, openid);
+            const { uid } = req.user//获取用户openid
+            const result = await UserService.addExamFavorite(examId, uid);
             if (result.success) {
                 res.send({
                     code: 200,
@@ -79,9 +80,9 @@ const UserController = {
     getExamFavorites: async (req, res) => {
         try {
             const { examId } = req.body;
-            const { openid } = req.user;
+            const { uid } = req.user;
 
-            const result = await UserService.getExamFavorites(examId, openid);
+            const result = await UserService.getExamFavorites(examId, uid);
             if (result.success) {
                 res.send({
                     code: 200,
@@ -107,8 +108,8 @@ const UserController = {
     removeExamFavorite: async (req, res) => {
         try {
             const { examId } = req.body;
-            const { openid } = req.user;
-            const result = await UserService.removeExamFavorite(examId, openid);
+            const { uid } = req.user;
+            const result = await UserService.removeExamFavorite(examId, uid);
             if (result.success) {
                 res.send({
                     code: 200,
@@ -127,8 +128,8 @@ const UserController = {
     },
     getUserFavoritesExam: async (req, res) => {
         try {
-            const { openid } = req.user;
-            const result = await UserService.getUserFavoritesExam(openid);  // 调用服务层方法获取用户收藏的考试
+            const { uid } = req.user;
+            const result = await UserService.getUserFavoritesExam(uid);  // 调用服务层方法获取用户收藏的考试
             if (result.success) {
                 res.send({
                     code: 200,
