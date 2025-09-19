@@ -87,7 +87,12 @@
 			"style": {
 				"navigationBarTitleText": "用户信息",
 				"disableScroll": true // 禁止页面滚动
-				
+			}
+		},
+		{
+			"path": "pages/my/UserRegisterView",
+			"style": {
+				"navigationBarTitleText": "用户注册"
 			}
 		}
 	],

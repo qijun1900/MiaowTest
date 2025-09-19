@@ -34,9 +34,9 @@
       </view>
       
       <view class="info-item" @click="handleCopyOpenid">
-        <view class="info-label">openid</view>
+        <view class="info-label">Uid</view>
         <view class="info-value">
-          <text class="openid-text">{{ userInfoStore.userInfo?.openid }}</text>
+          <text class="openid-text">{{ userInfoStore.userInfo?.uid }}</text>
           <up-icon name="file-text" size="18px"></up-icon>
         </view>
       </view>
@@ -101,8 +101,8 @@ const handleEditGender = () => {
 
 // 复制 openid
 const handleCopyOpenid = () => {
-  if (userInfoStore.userInfo?.openid) {
-    handleCopy(userInfoStore.userInfo.openid);
+  if (userInfoStore.userInfo?.uid) {
+    handleCopy(userInfoStore.userInfo.uid);
   }
 };
 // 通用更新用户信息函数

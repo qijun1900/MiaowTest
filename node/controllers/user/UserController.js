@@ -16,7 +16,23 @@ const UserController = {
             throw error;
         }
     },
-
+    UserRegister: async (req, res) => {
+        try {
+            const { account, verifyCode, password } = req.body;
+            const result = await UserService.UserRegister(account, verifyCode, password);
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                    data: result.data,
+                })
+            }
+        }catch (error) {
+            console.error("UserRegister 失败", error);
+            throw error;
+        }
+    },
     // 更新用户信息
     updateUserInfo: async (req, res) => {
         try {

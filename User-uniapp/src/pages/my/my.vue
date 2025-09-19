@@ -14,7 +14,7 @@
           <view class="login-btn" v-if="!isLoggedIn">点击登录</view>
           <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${91}位喵宝` }}</view>
           <view class="user-desc" v-if="!isLoggedIn">登录后可享受更多服务</view>
-          <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.openid || '欢迎回来' }}</text></view>
+          <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.uid || '欢迎回来' }}</text></view>
         </view>
         <view class="arrow-right" v-if="isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
       </view>
@@ -28,8 +28,17 @@
             <text class="login-tips">请选择下面任意一种方式登录</text>
           </view>
           <view class="login-but">
-            <up-button type="primary" icon="fingerprint">账号登录</up-button>
+            <!-- #ifdef H5 -->
+            <up-button type="primary" icon="fingerprint" @click="handleUseAccountLogin">账号登录</up-button>
+            <!-- #endif -->
+            <!-- #ifdef MP-WEIXIN -->
+            <up-button type="primary" icon="fingerprint" @click="handleUseAccountLogin">账号登录</up-button>
             <up-button color="#09B83E" type="success" icon="weixin-fill" @click="handleUseWXLogin">微信登录</up-button>
+            <!-- #endif -->
+            <!-- #ifndef H5 || MP-WEIXIN --> 
+            <up-button type="primary" icon="fingerprint" @click="handleUseAccountLogin">账号登录</up-button>
+            <up-button color="#09B83E" type="success" icon="weixin-fill" @click="handleUseWXLogin">微信登录</up-button>
+            <!-- #endif -->
           </view>
           <view class="login-cancel">
             <up-button @click="handleCancelLogin">暂不登录</up-button>
@@ -68,9 +77,9 @@ const handleCancelLogin = () => {
   overlayShow.value = false;
 };
 
+// 微信程序端登录
 const handleUseWXLogin = async () => {
   overlayShow.value = false;
-  
   try {
     // 将 uni.login 封装为 Promise, 以便使用 await
     const loginData = await new Promise((resolve, reject) => {
@@ -100,6 +109,15 @@ const handleUseWXLogin = async () => {
     });
   }
 };
+
+// 处理账号登录 h5端和小程序端
+const handleUseAccountLogin = () => {
+  overlayShow.value = false;
+  uni.navigateTo({
+    url: '/pages/my/UserRegisterView'
+  });
+}
+
 
 onMounted(() => {
   // 检查本地存储中是否有 token

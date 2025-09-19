@@ -50,11 +50,46 @@ const UserService = {
             };
         }
     },
+    UserRegister: async (account, verifyCode, password) => {
+        try {
+            // 检查验证码是否正确（这里需要实现验证码验证逻辑）
+            // 假设验证码验证通过，直接注册用户
+            console.log(account, verifyCode, password);
 
+            const newUser = new ConsumerModel({ 
+                username: account,
+                email: account, 
+                password 
+            });
+
+            await newUser.save();
+
+            // 生成token，包含openid和过期时间（例如7天），如果过期将生成新的token
+            const token = JWT.generate({ uid: newUser._id}, '7d');
+
+            return {
+                code: 200,
+                success: true,
+                message: '注册成功',
+                data: {
+                    token,
+                    userInfo:{
+                        uid: newUser._id, 
+                        nickname: newUser.nickname || '',
+                        avatar: newUser.avatar || '',
+                        gender: newUser.gender || 0,
+                    }
+                }
+            }
+        }catch (error) {
+            console.error("UserRegister 失败", error);
+            throw error;
+        }
+    },
     // 更新用户信息
     updateUserInfo: async ({ uid, nickname, avatar, gender }) => {
         try {
-            const user = await ConsumerModel.findOne({ uid });
+            const user = await ConsumerModel.findOne({ _id:uid });
 
             if (!user) {
                 return {

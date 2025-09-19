@@ -1,32 +1,36 @@
 const mongoose = require('mongoose')
-//Admin USer
+
 const ConsumerSchema = new mongoose.Schema({
-    openid: {//用户唯一标识
+    username: {//用户名
         type: String,
-        required: true,
         unique: true,
-        index: true//索引
+        index: true
     },
-    session_key: {//用户会话密钥
+    email: { //邮箱
         type: String,
-        required: true
+    },
+    openid: { //openid
+        type: String,
+    },
+    session_key: {// session_key
+        type: String,
     },
     nickname: { //昵称
         type: String,
         default: ''
     },
-    avatar: {   //头像
+    avatar: {  //头像
         type: String,
         default: ''
     },
     gender: {
         type: Number,
-        default: 0 // 0:未知, 1:男, 2:女
+        default: 0 //0 未知 1 男 2 女
     },
     createTime: {
         type: Date,
     },
-    favoriteExams:{//收藏的考试
+    favoriteExams:{
         type:Array,
         default:[]
     }

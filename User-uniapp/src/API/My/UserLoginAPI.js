@@ -1,7 +1,7 @@
 import { http } from '../../util/http.js';
 
 /**
- * 用户登录
+ * 微信 用户登录 注册
  * @param {string} message - 登录信息
  * @param {string} code - 登录凭证
  * @returns {Promise} 返回用户登录数据
@@ -20,6 +20,34 @@ export const Userlogin = async(message,code) => {
 
    }catch(error){
        console.error("Userlogin 失败", error);
+       throw error;
+   }
+}
+
+/**
+ * 用户账户注册(h5/wx)
+ * @param  {string} account - 用户账号
+ * @param  {string} verifyCode - 验证码
+ * @param  {string} password - 密码
+ * @returns {Promise} 返回更新用户信息的响应
+ *
+ */
+export const UserRegister = async({account,verifyCode,password}) => {
+   try{
+       if (!account || !verifyCode || !password) {
+           throw new Error("缺少必要参数");
+       }
+       return await http({
+           url: '/uniappAPI/User/UserRegister',
+           method: 'POST',
+            data: {
+               account,
+               verifyCode,
+               password,
+            }
+       });
+   }catch(error){
+       console.error("UserRegister 失败", error);
        throw error;
    }
 }
