@@ -98,16 +98,6 @@
           @click="handleLogin"
         ></up-button>
       </view>
-      
-      <!-- 底部提示 - 改进兼容性 -->
-      <view class="tips-section">
-        <view class="tips-content">
-          <view class="tips-text">注册即表示您同意</view>
-          <view class="tips-link" @tap="showUserAgreement">《用户服务协议》</view>
-          <view class="tips-text">和</view>
-          <view class="tips-link" @tap="showPrivacyPolicy">《隐私政策》</view>
-        </view>
-      </view>
     </view>
   </view>
 </template>
@@ -264,10 +254,6 @@ const handleLogin = async () => {
       // password.value = '';
       // confirmPassword.value = '';
 
-      // setTimeout(() => {
-      //   uni.navigateTo({ url: '/pages/my/UserLoginView' });
-      // }, 1500);
-
   } catch (error) {
     console.error('注册异常:', error);
     const errorMsg = error.message || '网络异常，请稍后重试';
@@ -280,23 +266,7 @@ const handleLogin = async () => {
   }
 };
 
-// 显示用户服务协议
-const showUserAgreement = () => {
-  uni.showModal({
-    title: '用户服务协议',
-    content: '用户服务协议内容...\n\n这里是用户服务协议的详细内容，包括服务条款、使用规则、责任限制等相关信息。',
-    showCancel: false
-  });
-};
 
-// 显示隐私政策
-const showPrivacyPolicy = () => {
-  uni.showModal({
-    title: '隐私政策',
-    content: '隐私政策内容...\n\n这里是隐私政策的详细内容，包括信息收集、使用、保护等相关政策。',
-    showCancel: false
-  });
-};
 
 // 开始倒计时
 const startCountdown = () => {
@@ -481,65 +451,4 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-
-
-/* 提示区域 - 改进兼容性 */
-.tips-section {
-  width: 100%;
-  text-align: center;
-  margin-top: 40rpx;
-  padding: 0 20rpx;
-  box-sizing: border-box;
-}
-
-.tips-content {
-  display: inline-flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8rpx;
-  line-height: 1.5;
-}
-
-.tips-text,
-.tips-link {
-  display: inline-block;
-  font-size: 24rpx;
-  line-height: 36rpx;
-  height: 36rpx;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-.tips-text {
-  color: #7F8C8D;
-}
-
-.tips-link {
-  color: #3498DB;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* 微信小程序兼容性处理 */
-/* #ifdef MP-WEIXIN */
-.tips-content {
-  display: block;
-}
-
-.tips-text,
-.tips-link {
-  display: inline;
-  vertical-align: baseline;
-}
-/* #endif */
-
-/* 小屏幕适配 */
-@media screen and (max-width: 320px) {
-  .tips-text,
-  .tips-link {
-    font-size: 22rpx;
-    line-height: 32rpx;
-    height: 32rpx;
-  }
-}
 </style>

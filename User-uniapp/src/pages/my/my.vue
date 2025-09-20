@@ -9,7 +9,7 @@
           mode="aspectFill"
         ></image>
       </view>
-      <view class="user-detail" @click="handleLogin">
+      <view class="user-detail" @click="handleUserinfo">
         <view class="user-info-content">
           <view class="login-btn" v-if="!isLoggedIn">点击登录</view>
           <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${91}位喵宝` }}</view>
@@ -19,7 +19,7 @@
         <view class="arrow-right" v-if="isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
       </view>
     </view>
-
+    
     <uviewOverlay v-model:show="overlayShow">
       <template #overlaycontent>
         <view class="rect">
@@ -63,7 +63,7 @@ const isLoggedIn = computed(() => {
   return !!userInfoStore.userInfo && Object.keys(userInfoStore.userInfo).length > 0;
 });
 
-const handleLogin = () => {
+const handleUserinfo = () => {
   if (!isLoggedIn.value) {
     overlayShow.value = true;
   }else{
@@ -114,7 +114,7 @@ const handleUseWXLogin = async () => {
 const handleUseAccountLogin = () => {
   overlayShow.value = false;
   uni.navigateTo({
-    url: '/pages/my/UserRegisterView'
+    url: '/pages/my/UserLoginView'
   });
 }
 

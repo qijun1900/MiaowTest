@@ -94,6 +94,12 @@
 			"style": {
 				"navigationBarTitleText": "用户注册"
 			}
+		},
+		{
+			"path": "pages/my/UserLoginView",
+			"style": {
+				"navigationBarTitleText": "UserLoginView"
+			}
 		}
 	],
 	"globalStyle": {
