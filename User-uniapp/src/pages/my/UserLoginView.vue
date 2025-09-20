@@ -60,6 +60,21 @@
       </u-form>
     </view>
     
+    <!-- 添加微信登录按钮 -->
+    <!-- #ifdef MP-WEIXIN -->
+    <view class="wechat-login-section">
+      <view class="divider">
+        <text class="divider-text">其他登录方式</text>
+      </view>
+      <view class="wechat-login-container">
+        <view class="wechat-login-btn" @click="handleUseWXLogin">
+          <u-icon name="weixin-fill" color="#ffffff" size="28"></u-icon>
+        </view>
+        <text class="wechat-login-text">微信一键登录</text>
+      </view>
+    </view>
+    <!-- #endif -->
+    
     <!-- 底部提示 - 改进兼容性 -->
     <view class="tips-section">
       <view class="tips-content">
@@ -68,24 +83,94 @@
         <view class="tips-text">和</view>
         <view class="tips-link" @tap="showPrivacyPolicy">《隐私政策》</view>
       </view>
-    </view>
+    </view> 
   </view>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue';
+import { UserAccountLogin } from '../../API/My/UserLoginAPI';
+import { UserInfoStore } from '../../stores/modules/UserinfoStore';
+import { wechatLogin } from '../../util/wechatLogin';
 
 const showPassword = ref(true);
 const rememberMe = ref([]);
+const userInfoStore = UserInfoStore();
 
 const formData = reactive({
   email: '',
   password: ''
 });
 
-const handleLogin = () => {
-  // 登录逻辑
-  console.log('登录', formData);
+const handleLogin =async () => {
+  try {
+    const response = await UserAccountLogin({
+      account: formData.email,
+      password: formData.password
+    });
+    
+    // 处理登录成功的情况
+    if(response.code === 200 && response.success){
+      uni.showToast({
+        title: '登录成功',
+        icon:'success',
+        duration:2000
+      });
+      uni.setStorageSync('token',response.data.token); // 存储 Token
+      userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
+      uni.switchTab({
+        url: '/pages/my/my'
+      });
+      return;
+    }
+    
+    // 处理各种错误情况
+    if(response.code === 404) {
+      // 账号尚未注册
+      uni.showModal({
+        title: '提示',
+        content: response.message || '账号尚未注册',
+        confirmText: '去注册',
+        success: function (res) {
+          if (res.confirm) {
+            uni.navigateTo({
+              url: '/pages/my/UserRegisterView'
+            });
+          }
+        }
+      });
+    } else if(response.code === 401) {
+      // 密码或账号错误
+      uni.showToast({
+        title: response.message || '密码或账号错误',
+        icon: 'none',
+        duration: 2000
+      });
+    } else {
+      // 其他错误
+      uni.showToast({
+        title: response.message || '登录失败，请稍后重试',
+        icon: 'none',
+        duration: 2000
+      });
+    }
+  }catch (error) {
+    // 网络错误或其他异常
+    uni.showToast({
+      title: error.message || '网络异常，请稍后重试',
+      icon: 'none',
+      duration: 2000
+    });
+  }
+};
+
+// 微信登录方法 - 使用工具函数
+const handleUseWXLogin = async () => {
+  try {
+    await wechatLogin();
+  } catch (error) {
+    console.error('微信登录失败', error);
+  }
 };
 
 const goToRegister = () => {
@@ -257,9 +342,76 @@ const showPrivacyPolicy = () => {
   }
 }
 
+// 微信登录部分样式
+.wechat-login-section {
+  margin-top: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  
+  .divider {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 50rpx;
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: #e5e5e5;
+    }
+    
+    .divider-text {
+      font-size: 26rpx;
+      color: #909193;
+      background-color: #f5f9ff;
+      padding: 0 20rpx;
+      position: relative;
+      z-index: 1;
+    }
+  }
+  
+  .wechat-login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .wechat-login-btn {
+    width: 120rpx;
+    height: 120rpx;
+    background: linear-gradient(135deg, #09BB07, #07C160);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8rpx 25rpx rgba(9, 187, 7, 0.4);
+    transition: all 0.3s ease;
+    margin-bottom: 10rpx;
+    
+    &:active {
+      transform: scale(0.95);
+      box-shadow: 0 4rpx 15rpx rgba(9, 187, 7, 0.4);
+    }
+  }
+  
+  .wechat-login-text {
+    font-size: 26rpx;
+    color: #666666;
+    margin-top: 5rpx;
+  }
+}
+
 .tips-section {
   margin-top: auto;
-  margin-bottom: 50rpx;
+  margin-bottom: 10rpx;
   position: relative;
   z-index: 1;
   

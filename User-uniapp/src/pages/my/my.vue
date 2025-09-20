@@ -52,8 +52,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import uviewOverlay from '../../components/core/uviewOverlay.vue';
-import { Userlogin } from '../../API/My/UserLoginAPI';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
+import { wechatLogin } from '../../util/wechatLogin';
 
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
@@ -77,36 +77,18 @@ const handleCancelLogin = () => {
   overlayShow.value = false;
 };
 
-// 微信程序端登录
+// 微信程序端登录 - 使用工具函数
 const handleUseWXLogin = async () => {
   overlayShow.value = false;
   try {
-    // 将 uni.login 封装为 Promise, 以便使用 await
-    const loginData = await new Promise((resolve, reject) => {
-      uni.login({
-        provider: 'weixin',
-        success: (data) => resolve(data),
-        fail: (err) => reject(err)
-      });
+    await wechatLogin({
+      onSuccess: () => {
+        // 登录成功后关闭弹窗
+        overlayShow.value = false;
+      }
     });
-    
-    // 使用 await 等待 Userlogin 完成
-    const response = await Userlogin(loginData.errMsg, loginData.code);
-    if (response.code === 200) {
-      // 登录成功
-      uni.showToast({
-        title: '登录成功',
-        icon: 'success'
-      });
-      userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
-      uni.setStorageSync('token', response.data.token); // 存储 Token
-    }
   } catch (error) {
     console.error('微信登录失败', error);
-    uni.showToast({
-      title: '登录失败，请重试',
-      icon: 'none'
-    });
   }
 };
 
@@ -117,7 +99,6 @@ const handleUseAccountLogin = () => {
     url: '/pages/my/UserLoginView'
   });
 }
-
 
 onMounted(() => {
   // 检查本地存储中是否有 token

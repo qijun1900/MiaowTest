@@ -104,9 +104,6 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
 import { UserRegister } from '../../API/My/UserLoginAPI';
-import { UserInfoStore } from '../../stores/modules/UserinfoStore';
-
-const userInfoStore = UserInfoStore();
 
 // 表单数据
 const email = ref('');
@@ -229,30 +226,17 @@ const handleLogin = async () => {
       verifyCode: verifyCode.value,
       password: password.value,
     });
-    console.log(result);
     if (result.code === 200) {
       uni.showToast({
         title: result.message,
         icon: 'success',
         duration: 2000
       });
-      uni.setStorageSync('token',result.data.token); // 存储 Token
-      userInfoStore.setUserInfo(result.data.userInfo); // 更新用户信息
-      
-      // // 注册成功后，跳转到登录页面
-      // setTimeout(() => {
-      //   uni.navigateTo({ url: '/pages/my/UserLoginView' });
-      // }, 1500);
+      setTimeout(() => {
+        uni.navigateTo({ url: '/pages/my/UserLoginView' });
+      }, 1500);
     }
 
-
-
-
-      // 清空表单
-      // email.value = '';
-      // verifyCode.value = '';
-      // password.value = '';
-      // confirmPassword.value = '';
 
   } catch (error) {
     console.error('注册异常:', error);

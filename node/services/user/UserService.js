@@ -59,31 +59,74 @@ const UserService = {
             const newUser = new ConsumerModel({ 
                 username: account,
                 email: account, 
-                password 
+                password,
+                createTime: new Date(),
             });
 
             await newUser.save();
-
-            // 生成token，包含openid和过期时间（例如7天），如果过期将生成新的token
-            const token = JWT.generate({ uid: newUser._id}, '7d');
 
             return {
                 code: 200,
                 success: true,
                 message: '注册成功',
-                data: {
-                    token,
-                    userInfo:{
-                        uid: newUser._id, 
-                        nickname: newUser.nickname || '',
-                        avatar: newUser.avatar || '',
-                        gender: newUser.gender || 0,
-                    }
-                }
             }
         }catch (error) {
             console.error("UserRegister 失败", error);
             throw error;
+        }
+    },
+    UserAccountLogin: async (account, password) => {
+        try {
+            // 查找用户，可以通过用户名或邮箱登录
+            const user = await ConsumerModel.findOne({ 
+                $or: [
+                    { username: account },
+                    { email: account }
+                ]
+            });
+
+            // 如果用户不存在
+            if (!user) {
+                return {
+                    code: 404,
+                    success: false,
+                    message: '账号尚未注册'
+                };
+            }
+            // 检查密码是否匹配（这里假设密码是明文存储，实际应用中应使用哈希存储）
+            if (user.password !== password) {
+                return {
+                    code: 401,
+                    success: false,
+                    message: '密码或账号错误'
+                };
+            }
+
+            // 生成token，包含用户ID和过期时间（7天）
+            const token = JWT.generate({ uid: user._id }, '7d');
+            
+            return {
+                code: 200,
+                success: true,
+                message: '登录成功',
+                data: {
+                    token,
+                    userInfo: {
+                        uid: user._id,
+                        nickname: user.nickname || '',
+                        avatar: user.avatar || '',
+                        gender: user.gender || 0,
+                    }
+                }
+            };
+        } catch (error) {
+            console.error("UserAccountLogin 失败", error);
+            return {
+                code: 500,
+                success: false,
+                message: '登录失败',
+                error: error.message
+            };
         }
     },
     // 更新用户信息

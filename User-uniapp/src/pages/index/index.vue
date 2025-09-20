@@ -68,9 +68,8 @@ const currentMode = ref(0); // 当前选中的模式，默认为0
 //选择模式
 const handleSendMode =(value)=>{
   currentMode.value = value; // 更新当前选中的模式
-  console.log('当前模式:', currentMode.value); // 输出当前模式
 }
-
+// 获取通知信息
 const fetchNoticeInfo = async ()=>{
   try{
   const res = await getNoticeInfo()
@@ -81,7 +80,7 @@ const fetchNoticeInfo = async ()=>{
   }
 
 }
-
+// 获取轮播图信息
 const fetchBannerInfo = async ()=>{
   try{
   const res = await getIndexBanner()

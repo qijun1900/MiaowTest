@@ -33,6 +33,22 @@ const UserController = {
             throw error;
         }
     },
+    // 用户账号登录
+    UserAccountLogin: async (req, res) => {
+        try {
+            const { account, password } = req.body;
+            const result = await UserService.UserAccountLogin(account, password);
+            res.send({
+                code: result.code,
+                success: result.success,
+                message: result.message,
+                data: result.data || {},
+            })
+        }catch (error) {
+            console.error("UserAccountLogin 失败", error);
+            throw error;
+        }
+    },
     // 更新用户信息
     updateUserInfo: async (req, res) => {
         try {

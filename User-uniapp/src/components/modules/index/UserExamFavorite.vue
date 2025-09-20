@@ -1,11 +1,11 @@
 <template>
     <view class="container">
         <view v-if="favoriteExam.length > 0">
-            <view class="question-bank-item" v-for="(item, index) in questionBanks" :key="index"
+            <view class="question-bank-item" v-for="(item, index) in favoriteExam" :key="index"
                 @click="handleClick(item)">
             </view>
         </view>
-
+        
         <!-- 空状态显示 -->
         <view v-else class="empty-state">
             <image class="empty-image" src="/static/other/exam-favorite.png" mode="aspectFit"></image>
@@ -26,10 +26,22 @@ const fetchFavoriteExam = async () => {
         const response = await getUserFavorites()
         if (response.code === 200) {
             favoriteExam.value = response.data
-            console.log(favoriteExam.value)
         }
     } catch (error) {
-        console.log(error)
+        // 处理错误
+        console.error('获取收藏考试失败:', error)
+        uni.showModal({
+            title: '提示',
+            content: '您尚未登录，是否前往登录？',
+            confirmText: '去登录',
+            success: function (res) {
+                if (res.confirm) {
+                    uni.navigateTo({
+                        url: '/pages/my/UserLoginView'
+                    });
+                }
+            }
+        });
 
     }
 }

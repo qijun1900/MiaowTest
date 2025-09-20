@@ -9,6 +9,9 @@ const ConsumerSchema = new mongoose.Schema({
     email: { //” œ‰
         type: String,
     },
+    password : { //√‹¬Î
+        type: String,
+    },
     openid: { //openid
         type: String,
     },

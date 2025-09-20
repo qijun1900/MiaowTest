@@ -1,10 +1,10 @@
 import { http } from '../../util/http.js';
 
 /**
- * Î¢ĞÅ ÓÃ»§µÇÂ¼ ×¢²á
- * @param {string} message - µÇÂ¼ĞÅÏ¢
- * @param {string} code - µÇÂ¼Æ¾Ö¤
- * @returns {Promise} ·µ»ØÓÃ»§µÇÂ¼Êı¾İ
+ * å¾®ä¿¡ç”¨æˆ·ç™»å½•/æ³¨å†Œ 
+ * @param {string} message - ç™»å½•ä¿¡æ¯
+ * @param {string} code - ç™»å½•å‡­è¯
+ * @returns {Promise} è¿”å›ç”¨æˆ·ç™»å½•ç»“æœ
  * 
  */
 export const Userlogin = async(message,code) => {
@@ -19,23 +19,23 @@ export const Userlogin = async(message,code) => {
        });
 
    }catch(error){
-       console.error("Userlogin Ê§°Ü", error);
+       console.error("Userlogin å¤±è´¥", error);
        throw error;
    }
 }
 
 /**
- * ÓÃ»§ÕË»§×¢²á(h5/wx)
- * @param  {string} account - ÓÃ»§ÕËºÅ
- * @param  {string} verifyCode - ÑéÖ¤Âë
- * @param  {string} password - ÃÜÂë
- * @returns {Promise} ·µ»Ø¸üĞÂÓÃ»§ĞÅÏ¢µÄÏìÓ¦
+ * ç”¨æˆ·è´¦å·æ³¨å†Œ(h5/wx)
+ * @param  {string} account - ç”¨æˆ·è´¦å·
+ * @param  {string} verifyCode - éªŒè¯ç 
+ * @param  {string} password - å¯†ç 
+ * @returns {Promise} è¿”å›æ³¨å†Œç”¨æˆ·ä¿¡æ¯å“åº”
  *
  */
 export const UserRegister = async({account,verifyCode,password}) => {
    try{
        if (!account || !verifyCode || !password) {
-           throw new Error("È±ÉÙ±ØÒª²ÎÊı");
+           throw new Error("ç¼ºå°‘å¿…è¦å‚æ•°");
        }
        return await http({
            url: '/uniappAPI/User/UserRegister',
@@ -47,7 +47,32 @@ export const UserRegister = async({account,verifyCode,password}) => {
             }
        });
    }catch(error){
-       console.error("UserRegister Ê§°Ü", error);
+       console.error("UserRegister å¤±è´¥", error);
+       throw error;
+   }
+}
+
+/**
+ * ç”¨æˆ·ä½¿ç”¨è´¦å·ç™»å½•(h5/wx)
+ * @param  {string} account - ç”¨æˆ·è´¦å·
+ * @param  {string} password - å¯†ç 
+ * @returns {Promise} 
+ **/
+export const UserAccountLogin = async({account,password}) => {
+   try{
+       if (!account ||!password) {
+           throw new Error("è¯·è¾“å…¥è´¦å·å’Œå¯†ç ");
+       }
+       return await http({
+           url: '/uniappAPI/User/UserAccountLogin',
+           method: 'POST',
+            data: {
+               account,
+               password,
+            }
+       });
+   }catch(error){
+       console.error("UserAccountLogin å¤±è´¥", error);
        throw error;
    }
 }
