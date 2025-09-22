@@ -37,6 +37,8 @@ const UserService = {
                         nickname: user.nickname || '',
                         avatar: user.avatar || '',
                         gender: user.gender || 0,
+                        username: user.username || '',
+
                     }
                 }
             };

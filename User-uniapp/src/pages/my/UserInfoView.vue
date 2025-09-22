@@ -40,8 +40,18 @@
           <up-icon name="file-text" size="18px"></up-icon>
         </view>
       </view>
+
+      <!-- #ifdef MP-WEIXIN -->
+      <view class="info-item" @click="handleUserRsgister">
+        <view class="info-label">{{ accountBindStatus?"已绑定账号":"尚未绑定账号" }}</view>
+        <view class="info-value">
+          <text class="openid-text">{{accountBindStatus?"您已经绑定账号":"立即绑定账号" }}</text>
+          <up-icon name="arrow-right" size="14px"></up-icon>
+        </view>
+      </view>
+      <!-- #endif -->
+       
     </view>
-    
     <!-- 退出登录按钮 -->
     <view class="logout-section">
       <view class="logout-btn" @click="handleLogout">退出登录</view>
@@ -50,6 +60,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import handleCopy from '../../util/copy';
 import { updateUserInfo } from '../../API/My/UserInfoUpdateAPI';
@@ -60,6 +71,10 @@ const genderMap = {// 性别映射表
   1: '男',
   2: '女'
 };
+// 账号绑定状态计算属性
+const accountBindStatus = computed(() => {
+  return userInfoStore.userInfo?.username ? true : false
+});
 
 // 将性别数字转换为文本
 const getGenderText = (genderValue) => {
@@ -98,13 +113,21 @@ const handleEditGender = () => {
     }
   });
 };
-
+// 处理账号绑定
+const handleUserRsgister = () => {
+  if(!accountBindStatus.value){
+    uni.navigateTo({
+      url: '/pages/my/UserRegisterView?isBind=true',
+    });
+  }
+};
 // 复制 openid
 const handleCopyOpenid = () => {
   if (userInfoStore.userInfo?.uid) {
     handleCopy(userInfoStore.userInfo.uid);
   }
 };
+
 // 通用更新用户信息函数
 const updateUserData = async (userData, fieldName) => {
   try {
@@ -153,6 +176,7 @@ const handleLogout = () => {
           title: '已退出登录',
           icon: 'success'
         });
+        uni.navigateBack();
       }
     }
   });

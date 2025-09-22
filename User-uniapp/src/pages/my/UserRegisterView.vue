@@ -13,8 +13,8 @@
         <view class="login-icon">
           <up-icon name="account" size="48" color="#5DADE2"></up-icon>
         </view>
-        <text class="login-title">注册账户</text>
-        <text class="login-subtitle">请输入您的邮箱完成注册</text>
+        <text class="login-title">{{ bindMode ? '绑定账号' : '注册账户' }}</text>
+        <text class="login-subtitle">{{ bindMode ? '请输入您的账号完成绑定' : '请输入您的邮箱完成注册' }}</text>
       </view>
       
       <!-- 表单区域 -->
@@ -89,7 +89,7 @@
       <!-- 登录按钮 -->
       <view class="button-section">
         <up-button 
-          text="立即注册" 
+          :text="bindMode ? '立即绑定' : '立即注册'" 
           color="#5DADE2"
           size="large"
           class="login-btn"
@@ -103,7 +103,14 @@
 </template>
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
-import { UserRegister } from '../../API/My/UserLoginAPI';
+import { onLoad } from '@dcloudio/uni-app';
+import { UserRegister, BindAccount } from '../../API/My/UserLoginAPI';
+import { UserInfoStore } from '../../stores/modules/UserinfoStore';
+
+// 添加绑定模式状态
+const bindMode = ref(false);
+const userInfoStore = UserInfoStore();
+
 
 // 表单数据
 const email = ref('');
@@ -213,33 +220,52 @@ const handleLogin = async () => {
           success: () => {
             password.value = '';
             confirmPassword.value = '';
-            resolve();// 确保密码输入框被清空
+            resolve();
           }
         });
       });
       throw new Error('密码不一致');
     }
 
-    // 调用注册 API
-    const result = await UserRegister({
-      account: email.value,
-      verifyCode: verifyCode.value,
-      password: password.value,
-    });
+    let result;
+    // 根据模式调用不同的API
+    if (bindMode.value) {
+      // 绑定账号模式
+      result = await BindAccount({
+        account: email.value,
+        verifyCode: verifyCode.value,
+        password: password.value,
+      });
+    } else {
+      // 普通注册模式
+      result = await UserRegister({
+        account: email.value,
+        verifyCode: verifyCode.value,
+        password: password.value,
+      });
+    }
+    
     if (result.code === 200) {
       uni.showToast({
         title: result.message,
         icon: 'success',
         duration: 2000
       });
-      setTimeout(() => {
-        uni.navigateTo({ url: '/pages/my/UserLoginView' });
-      }, 1500);
+      
+      if (bindMode.value) {
+        userInfoStore.setUserInfo(result.data.userInfo); // 绑定成功后更新用户信息并返回
+        setTimeout(() => {
+          uni.navigateBack();
+        }, 1500);
+      } else {
+        // 注册成功后跳转到登录页
+        setTimeout(() => {
+          uni.navigateTo({ url: '/pages/my/UserLoginView' });
+        }, 1500);
+      }
     }
-
-
   } catch (error) {
-    console.error('注册异常:', error);
+    console.error(bindMode.value ? '绑定异常:' : '注册异常:', error);
     const errorMsg = error.message || '网络异常，请稍后重试';
     uni.showToast({
       title: errorMsg,
@@ -249,8 +275,6 @@ const handleLogin = async () => {
     throw error;
   }
 };
-
-
 
 // 开始倒计时
 const startCountdown = () => {
@@ -273,6 +297,13 @@ const stopCountdown = () => {
     countdownTimer.value = null;
   }
 };
+
+onLoad((options) => {
+  if(options.isBind === "true" ){
+    bindMode.value = true;
+  }
+});
+
 
 // 组件卸载时清理定时器
 onUnmounted(() => {

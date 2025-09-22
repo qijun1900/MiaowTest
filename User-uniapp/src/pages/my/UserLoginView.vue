@@ -170,6 +170,11 @@ const handleUseWXLogin = async () => {
     await wechatLogin();
   } catch (error) {
     console.error('微信登录失败', error);
+    uni.showToast({
+      title: '微信登录失败',
+      icon: 'none'
+    })
+
   }
 };
 

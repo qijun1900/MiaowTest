@@ -76,3 +76,30 @@ export const UserAccountLogin = async({account,password}) => {
        throw error;
    }
 }
+
+/**
+ * 微信用户绑定账号
+ * @param  {string} account - 用户账号
+ * @param  {string} verifyCode - 验证码
+ * @param  {string} password - 密码
+ * @returns {Promise} 返回绑定结果
+ */
+export const BindAccount = async({account,verifyCode,password}) => {
+   try{
+       if (!account || !verifyCode || !password) {
+           throw new Error("缺少必要参数");
+       }
+       return await http({
+           url: '/uniappAPI/User/BindAccount',
+           method: 'POST',
+            data: {
+               account,
+               verifyCode,
+               password,
+            }
+       });
+   }catch(error){
+       console.error("BindAccount 失败", error);
+       throw error;
+   }
+}
