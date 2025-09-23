@@ -28,7 +28,7 @@ const UserController = {
                     data: result.data,
                 })
             }
-        }catch (error) {
+        } catch (error) {
             console.error("UserRegister 失败", error);
             throw error;
         }
@@ -44,7 +44,7 @@ const UserController = {
                 message: result.message,
                 data: result.data || {},
             })
-        }catch (error) {
+        } catch (error) {
             console.error("UserAccountLogin 失败", error);
             throw error;
         }
@@ -169,7 +169,7 @@ const UserController = {
                     data: result.data,
                 });
             }
-        }catch (error) {
+        } catch (error) {
             console.error("getUserFavoritesExam 失败", error);
             res.send({
                 code: 500,
@@ -188,7 +188,6 @@ const UserController = {
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
-                    data: result.data,
                 });
             } else {
                 res.send({
@@ -197,14 +196,29 @@ const UserController = {
                     message: result.message
                 });
             }
-        }catch (error) {
+        } catch (error) {
             console.error("BindAccount 失败", error);
             res.send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
             });
-        }          
+        }
+    },
+    checkUserBind: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const result = await UserService.checkUserBind(uid);
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data,
+                });
+            }
+        } catch (error) {
+
+        }
     }
 }
 

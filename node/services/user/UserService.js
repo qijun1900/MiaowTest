@@ -334,14 +334,6 @@ const UserService = {
                         code: 200,
                         message: '账号绑定成功',
                         success: true,
-                        data: {
-                            uid: wechatUser._id,
-                            openid: wechatUser.openid,
-                            nickname: wechatUser.nickname || '',
-                            avatar: wechatUser.avatar || '',
-                            gender: wechatUser.gender || 0,
-                            username: wechatUser.username || ''
-                        }
                     };
                 }
                 
@@ -372,14 +364,6 @@ const UserService = {
                 code: 200,
                 message: '账号绑定成功',
                 success: true,
-                data: {
-                    uid: wechatUser._id,
-                    openid: wechatUser.openid,
-                    nickname: wechatUser.nickname || '',
-                    avatar: wechatUser.avatar || '',
-                    gender: wechatUser.gender || 0,
-                    username: wechatUser.username || ''
-                }
             };
         } catch (error) {
             console.error("BindAccount 失败", error);
@@ -390,7 +374,38 @@ const UserService = {
                 success: false
             }
         }
+    },
+    checkUserBind: async (uid) => {
+        try {
+            //检查用户是否绑定账号
+            const user = await ConsumerModel.findOne({ _id:uid });  
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                }
+            }
+            const isBind = user.username && user.password;
+            return {
+                code: 200,
+                success: true,
+                data: {
+                    isBind: !!isBind,
+                }
+            }
+        }
+        catch (error) {
+            console.error("checkUserBind 失败", error);
+            return {
+                code: 500,
+                message: '服务器错误',
+                error: error.message,
+                success: false
+            }
+        }
     }
 }
+
 
 module.exports = UserService

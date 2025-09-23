@@ -85,7 +85,7 @@
           </view>
         </view>
       </view>
-      
+
       <!-- 登录按钮 -->
       <view class="button-section">
         <up-button 
@@ -105,11 +105,9 @@
 import { ref, computed, onUnmounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { UserRegister, BindAccount } from '../../API/My/UserLoginAPI';
-import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 
 // 添加绑定模式状态
 const bindMode = ref(false);
-const userInfoStore = UserInfoStore();
 
 
 // 表单数据
@@ -253,7 +251,6 @@ const handleLogin = async () => {
       });
       
       if (bindMode.value) {
-        userInfoStore.setUserInfo(result.data); 
         setTimeout(() => {
           uni.navigateBack();
         }, 1500);

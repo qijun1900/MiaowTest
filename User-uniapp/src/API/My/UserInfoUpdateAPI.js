@@ -19,3 +19,17 @@ export const updateUserInfo = async(userInfo) => {
        throw error;
    }
 }
+/**检测用户是否绑定
+ * @param {string} uid - 用户唯一标识
+ * @returns {Promise} 返回用户绑定信息的响应
+ */
+export const checkUserBind = async() => {
+   try{
+       return await http({
+           url: '/uniappAPI/User/checkUserBind',
+           method: 'GET',
+       });
+   }catch(error){
+       console.error("checkUserBind 失败", error);
+   }
+}
