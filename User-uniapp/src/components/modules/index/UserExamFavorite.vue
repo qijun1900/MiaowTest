@@ -1,16 +1,37 @@
 <template>
     <view class="container">
-        <view v-if="favoriteExam.length > 0">
-            <view class="question-bank-item" v-for="(item, index) in favoriteExam" :key="index"
-                @click="handleClick(item)">
+        <view class="exam-list">
+            <view v-if="loading" class="loading">
+                <uni-load-more status="loading" />
             </view>
-        </view>
-        
-        <!-- 空状态显示 -->
-        <view v-else class="empty-state">
-            <image class="empty-image" src="/static/other/exam-favorite.png" mode="aspectFit"></image>
-            <text class="empty-text">暂无收藏考试</text>
-            <text class="empty-desc">快去收藏你的第一个考试吧！</text>
+            <view v-else-if="favoriteExam.length > 0" class="subject-list">
+                <view 
+                    v-for="subject in favoriteExam" 
+                    :key="subject._id" 
+                    class="subject-item"
+                    @click="handleClick(subject)"
+                >
+                    <view class="subject-icon">
+                        <image 
+                            :src="subject.coverImage || `http://${escconfig.serverHost}:${escconfig.serverPort}${subject.cover}`" 
+                            mode="aspectFill"
+                            class="subject-image"
+                        />
+                    </view>
+                    <view class="subject-info">
+                        <text class="subject-name">{{ subject.name }}</text>
+                        <text class="update-time">更新时间:{{ formatTime.getTime2(subject.updateTime || subject.createdTime) }}</text>
+                    </view>
+                    <view class="subject-arrow">›</view>
+                </view>
+            </view>
+            
+            <!-- 空状态显示 -->
+            <view v-else class="empty-state">
+                <image class="empty-image" src="/static/other/exam-favorite.png" mode="aspectFit"></image>
+                <text class="empty-text">暂无收藏考试</text>
+                <text class="empty-desc">快去收藏你的第一个考试吧！</text>
+            </view>
         </view>
     </view>
 </template>
@@ -18,14 +39,25 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getUserFavorites } from '../../../API/My/FavoriteAPI'
+import formatTime from '../../../util/formatTime'
+import escconfig from '../../../config/esc.config'
 
 const favoriteExam = ref([])
+const loading = ref(false)
 
 const fetchFavoriteExam = async () => {
+    loading.value = true
     try {
         const response = await getUserFavorites()
         if (response.code === 200) {
-            favoriteExam.value = response.data
+            favoriteExam.value = response.data.map(item => ({
+                id: item._id,
+                name: item.name,
+                coverImage: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`,
+                updateTime: item.createdTime,
+                ...item
+            }))
+            console.log('收藏考试:', favoriteExam.value)
         }
     } catch (error) {
         // 处理错误
@@ -42,77 +74,101 @@ const fetchFavoriteExam = async () => {
                 }
             }
         });
-
+    } finally {
+        loading.value = false
     }
 }
+// 点击事件处理
+const handleClick = (item) => {
+    console.log('点击考试:', item.name)
+    // 跳转到考试详情页，传递完整科目数据作为参数
+    uni.navigateTo({
+        url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(item))}`
+    })
+}
+
 onMounted(() => {
     fetchFavoriteExam()
 })
-// 点击事件处理
-const handleClick = (item) => {
-    console.log('点击题库:', item.name)
-}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
-    padding: 10rpx;
+    padding: 20rpx 20rpx 5rpx 20rpx ;
 }
 
-.question-bank-item {
+.exam-list {
+    width: 100%;
+}
+
+.loading {
     display: flex;
+    justify-content: center;
     align-items: center;
-    padding: 25rpx;
-    margin-bottom: 20rpx;
+    height: 400rpx;
+}
+
+.subject-list {
+    width: 100%;
+}
+
+.subject-item {
     background-color: #ffffff;
     border-radius: 12rpx;
+    padding: 29rpx;
+    margin-bottom: 15rpx;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
 }
 
-.bank-image {
-    width: 85rpx;
-    height: 85rpx;
-    border-radius: 8rpx;
+.subject-item:active {
+    transform: scale(0.98);
+}
+
+.subject-icon {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-right: 30rpx;
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
-.bank-info {
+.subject-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.subject-info {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-.bank-name {
-    font-size: 27rpx;
+.subject-name {
+    font-size: 32rpx;
     font-weight: bold;
     color: #333333;
-    margin-bottom: 15rpx;
+    margin-bottom: 8rpx;
 }
 
-.bank-details {
-    display: flex;
-    align-items: center;
-    gap: 20rpx;
-}
-
-.question-count {
+.update-time {
     font-size: 24rpx;
-    color: #666666;
-}
-
-.time {
-    font-size: 25rpx;
     color: #999999;
 }
 
-.more-section {
-    display: flex;
-    align-items: center;
-}
-
-.arrow-icon {
-    font-size: 26rpx;
-    color: #007AFF;
+.subject-arrow {
+    font-size: 32rpx;
+    color: #999999;
     font-weight: bold;
+    margin-left: 20rpx;
 }
 
 /* 空状态样式 */
@@ -124,6 +180,7 @@ const handleClick = (item) => {
     padding: 80rpx 40rpx;
     background-color: #ffffff;
     border-radius: 12rpx;
+    margin-top: 20rpx;
 }
 
 .empty-image {

@@ -50,7 +50,6 @@
         </view>
       </view>
       <!-- #endif -->
-       
     </view>
     <!-- 退出登录按钮 -->
     <view class="logout-section">
@@ -77,7 +76,6 @@ const genderMap = {// 性别映射表
 const CheckaccountBindStatus =async()=> {
   try{
     const response = await checkUserBind();
-    console.log(response);
     if(response.code===200){
       accountBindStatus.value = response.data.isBind;
     }
@@ -86,7 +84,6 @@ const CheckaccountBindStatus =async()=> {
     return false;
   }
 }
-
 
 // 将性别数字转换为文本
 const getGenderText = (genderValue) => {
