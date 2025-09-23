@@ -177,6 +177,34 @@ const UserController = {
                 message: '服务器错误'
             });
         }
+    },
+    BindAccount: async (req, res) => {
+        try {
+            const { account, password, verifyCode } = req.body;
+            const { uid } = req.user;
+            const result = await UserService.BindAccount({ uid, account, password, verifyCode });
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                    data: result.data,
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message
+                });
+            }
+        }catch (error) {
+            console.error("BindAccount 失败", error);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }          
     }
 }
 

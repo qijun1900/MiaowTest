@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const UserModel = require('./models/UserModel');
-const config = require('./config/db.config')
+const config = require('./config/db.config')// 导入数据库配置(本地)
 
 mongoose.connect(`mongodb://${config.DBHOST}:${config.DBPORT}/${config.DBNAME}`);
 

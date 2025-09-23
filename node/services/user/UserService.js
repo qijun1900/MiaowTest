@@ -301,6 +301,95 @@ const UserService = {
                 success: false
             }
         }
+    },
+    BindAccount: async ({uid, account, password, verifyCode}) => {
+        try {
+            // 首先检查微信用户是否存在
+            const wechatUser = await ConsumerModel.findOne({ _id: uid });
+            
+            if (!wechatUser) {
+                return {
+                    code: 404,
+                    message: '微信用户不存在',
+                    success: false
+                };
+            }
+            
+            // 检查账号是否已被其他用户绑定
+            const existingUser = await ConsumerModel.findOne({ 
+                $or: [
+                    { username: account },
+                    { email: account }
+                ]
+            });
+            
+            if (existingUser) {
+                // 如果是同一个用户，直接更新信息，即换绑账号
+                if (existingUser._id.toString() === uid) {
+                    wechatUser.username = account;
+                    wechatUser.email = account;
+                    wechatUser.password = password;
+                    await wechatUser.save()
+                    return {
+                        code: 200,
+                        message: '账号绑定成功',
+                        success: true,
+                        data: {
+                            uid: wechatUser._id,
+                            openid: wechatUser.openid,
+                            nickname: wechatUser.nickname || '',
+                            avatar: wechatUser.avatar || '',
+                            gender: wechatUser.gender || 0,
+                            username: wechatUser.username || ''
+                        }
+                    };
+                }
+                
+                // 如果是不同用户，需要将非微信用户的数据转移到微信用户，然后删除非微信用户，并绑定账号和密码
+                //  转移收藏的考试
+                if (existingUser.favoriteExams && existingUser.favoriteExams.length > 0) {
+                    // 合并收藏的考试，去重
+                    const mergedFavorites = [...new Set([
+                        ...(wechatUser.favoriteExams || []),
+                        ...existingUser.favoriteExams
+                    ])];
+                    wechatUser.favoriteExams = mergedFavorites;
+                }
+                
+                
+                // 删除非微信用户
+                await ConsumerModel.deleteOne({ _id: existingUser._id });
+            }
+            
+            // 更新微信用户信息，绑定账号和密码
+            wechatUser.username = account;
+            wechatUser.email = account; // 将账号同时作为邮箱
+            wechatUser.password = password;
+            
+            await wechatUser.save();
+            
+            return {
+                code: 200,
+                message: '账号绑定成功',
+                success: true,
+                data: {
+                    uid: wechatUser._id,
+                    openid: wechatUser.openid,
+                    nickname: wechatUser.nickname || '',
+                    avatar: wechatUser.avatar || '',
+                    gender: wechatUser.gender || 0,
+                    username: wechatUser.username || ''
+                }
+            };
+        } catch (error) {
+            console.error("BindAccount 失败", error);
+            return {
+                code: 500,
+                message: '绑定失败',
+                error: error.message,
+                success: false
+            }
+        }
     }
 }
 

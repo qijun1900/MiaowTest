@@ -1,15 +1,15 @@
 const mongoose = require('mongoose')
 
 const ConsumerSchema = new mongoose.Schema({
-    username: {//ÓÃ»§Ãû
+    username: {//ï¿½Ã»ï¿½ï¿½ï¿½
         type: String,
         unique: true,
         index: true
     },
-    email: { //ÓÊÏä
+    email: { //ï¿½ï¿½ï¿½ï¿½
         type: String,
     },
-    password : { //ÃÜÂë
+    password : { //ï¿½ï¿½ï¿½ï¿½
         type: String,
     },
     openid: { //openid
@@ -18,17 +18,17 @@ const ConsumerSchema = new mongoose.Schema({
     session_key: {// session_key
         type: String,
     },
-    nickname: { //êÇ³Æ
+    nickname: { //ï¿½Ç³ï¿½
         type: String,
         default: ''
     },
-    avatar: {  //Í·Ïñ
+    avatar: {  //Í·ï¿½ï¿½
         type: String,
         default: ''
     },
     gender: {
         type: Number,
-        default: 0 //0 Î´Öª 1 ÄÐ 2 Å®
+        default: 0 //0 Î´Öª 1 ï¿½ï¿½ 2 Å®
     },
     createTime: {
         type: Date,

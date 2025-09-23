@@ -253,7 +253,7 @@ const handleLogin = async () => {
       });
       
       if (bindMode.value) {
-        userInfoStore.setUserInfo(result.data.userInfo); // 绑定成功后更新用户信息并返回
+        userInfoStore.setUserInfo(result.data); 
         setTimeout(() => {
           uni.navigateBack();
         }, 1500);
@@ -303,7 +303,6 @@ onLoad((options) => {
     bindMode.value = true;
   }
 });
-
 
 // 组件卸载时清理定时器
 onUnmounted(() => {
