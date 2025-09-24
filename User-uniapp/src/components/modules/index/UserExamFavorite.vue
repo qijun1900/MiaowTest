@@ -57,7 +57,6 @@ const fetchFavoriteExam = async () => {
                 updateTime: item.createdTime,
                 ...item
             }))
-            console.log('收藏考试:', favoriteExam.value)
         }
     } catch (error) {
         // 处理错误

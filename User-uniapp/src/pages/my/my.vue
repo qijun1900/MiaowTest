@@ -19,7 +19,23 @@
         <view class="arrow-right" v-if="isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
       </view>
     </view>
+    <!-- vip -->
+    <view >
+      <VipCard/>
+    </view>
     
+    <!-- Core Nav -->
+     <view>
+      <myNavbar/>
+     </view>
+
+      <up-divider 
+        text="更多功能" 
+        textPosition="left"  
+        textColor="#007AFF"
+        lineColor="#86bbf5">
+      </up-divider>
+
     <uviewOverlay v-model:show="overlayShow">
       <template #overlaycontent>
         <view class="rect">
@@ -54,6 +70,8 @@ import { ref, onMounted, computed } from 'vue';
 import uviewOverlay from '../../components/core/uviewOverlay.vue';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
+import myNavbar from '../../components/modules/my/myNavbar.vue';
+import VipCard from '../../components/modules/my/VipCard.vue';
 
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
@@ -118,7 +136,7 @@ onMounted(() => {
 .container {
   min-height: 100vh;
   background-color: #f5f5f5;
-  padding: 20rpx;
+  padding: 20rpx 15rpx 0 15rpx;
 }
 
 .user-info {

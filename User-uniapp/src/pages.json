@@ -85,20 +85,20 @@
 		{
 			"path": "pages/my/UserInfoView",
 			"style": {
-				"navigationBarTitleText": "用户信息",
+				"navigationBarTitleText": "个人信息",
 				"disableScroll": true // 禁止页面滚动
 			}
 		},
 		{
 			"path": "pages/my/UserRegisterView",
 			"style": {
-				"navigationBarTitleText": "用户注册"
+				"navigationBarTitleText": "注册"
 			}
 		},
 		{
 			"path": "pages/my/UserLoginView",
 			"style": {
-				"navigationBarTitleText": "UserLoginView"
+				"navigationBarTitleText": "登录"
 			}
 		}
 	],
