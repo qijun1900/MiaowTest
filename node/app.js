@@ -84,6 +84,8 @@ app.use((req,res,next)=>{
     }else{
       res.status(401).send({errCode:"-1",errInfo:"token过期"})
     }
+  } else {
+    res.status(401).send({errCode:"-1",errInfo:"token为空"});
   }
 
 })

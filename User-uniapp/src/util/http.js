@@ -1,7 +1,8 @@
 import escconfig from '../config/esc.config';
-const baseURl = `http://${escconfig.serverHost}:${escconfig.serverPort}`
+const baseURl = escconfig.useTunnel 
+  ? escconfig.tunnelUrl 
+  : `http://${escconfig.serverHost}:${escconfig.serverPort}`;
 import { UserInfoStore } from '../stores/modules/UserinfoStore';
-
 
 // 统一的HTTP请求封装
 // 适用于uni-app的http请求封装，支持小程序和H5平台

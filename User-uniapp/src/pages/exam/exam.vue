@@ -80,7 +80,7 @@ const fetchExamSubjects = async (forceRefresh = false) => {
     examSubjects.value = data.data.map(item => ({
       id: item._id,
       name: item.name,
-      coverImage: `http://${escconfig.serverHost}:${escconfig.serverPort}${item.cover}`,
+      coverImage: `${escconfig.useTunnel ? escconfig.tunnelUrl : `http://${escconfig.serverHost}:${escconfig.serverPort}`}${item.cover}`,
       updateTime: item.createdTime,
       ...item
     }));
