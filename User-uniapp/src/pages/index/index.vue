@@ -97,7 +97,6 @@ const fetchBannerInfo = async ()=>{
 onMounted(() => {
   fetchNoticeInfo()
   fetchBannerInfo()
-  
 })
 const handleViewMore = () => {
   uni.switchTab({

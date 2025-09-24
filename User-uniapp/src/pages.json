@@ -98,7 +98,14 @@
 		{
 			"path": "pages/my/UserLoginView",
 			"style": {
-				"navigationBarTitleText": "登录"
+				"navigationBarTitleText": "登录",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/exam/manualImportView",
+			"style": {
+				"navigationBarTitleText": "手动导入"
 			}
 		}
 	],

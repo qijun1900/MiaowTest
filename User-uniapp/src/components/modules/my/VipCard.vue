@@ -40,7 +40,7 @@
 import { ref } from 'vue'
 
 // 会员状态 - 暂时设为false，你可以根据需要修改
-const isMember = ref(true)
+const isMember = ref(false)
 </script>
 
 <style scoped lang="scss">
@@ -78,6 +78,7 @@ const isMember = ref(true)
       rgba(210, 180, 140, 0.4) 75%, 
       rgba(205, 133, 63, 0.4) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;

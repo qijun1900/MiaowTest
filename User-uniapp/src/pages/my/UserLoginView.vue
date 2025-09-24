@@ -1,5 +1,11 @@
 <template>
   <view class="login-container">
+    <!-- 添加返回按钮 -->
+    <view class="back-btn" @click="goBack">
+      <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
+      <text class="back-text">返回</text>
+    </view>
+    
     <!-- 装饰性背景元素 -->
     <view class="bg-decoration top-left"></view>
     <view class="bg-decoration top-right"></view>
@@ -102,7 +108,14 @@ const formData = reactive({
   password: ''
 });
 
-const handleLogin =async () => {
+// 返回上一页的方法
+const goBack = () => {
+  uni.switchTab({
+    url: '/pages/my/my'
+  });
+};
+
+const handleLogin = async () => {
   try {
     const response = await UserAccountLogin({
       account: formData.email,
@@ -118,9 +131,13 @@ const handleLogin =async () => {
       });
       uni.setStorageSync('token',response.data.token); // 存储 Token
       userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
-      uni.switchTab({
-        url: '/pages/my/my'
-      });
+      
+      // 登录成功后返回上一页
+      setTimeout(() => {
+        uni.navigateBack({
+          delta: 1
+        });
+      }, 1500);
       return;
     }
     
@@ -174,7 +191,6 @@ const handleUseWXLogin = async () => {
       title: '微信登录失败',
       icon: 'none'
     })
-
   }
 };
 
@@ -212,6 +228,25 @@ const showPrivacyPolicy = () => {
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  
+  // 返回按钮样式
+  .back-btn {
+    position: absolute;
+    top: 90rpx;
+    left: 40rpx;
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+    z-index: 10;
+    padding: 10rpx 20rpx;
+    border-radius: 20rpx;
+    background-color: rgba(255, 255, 255, 0.8);
+    
+    .back-text {
+      font-size: 28rpx;
+      color: #3c9cff;
+    }
+  }
   
   // 装饰性背景元素
   .bg-decoration {

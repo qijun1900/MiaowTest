@@ -19,8 +19,9 @@
         <view class="arrow-right" v-if="isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
       </view>
     </view>
+    
     <!-- vip -->
-    <view >
+    <view>
       <VipCard/>
     </view>
     
