@@ -33,8 +33,41 @@ const ConsumerSchema = new mongoose.Schema({
     createTime: {
         type: Date,
     },
-    favoriteExams:{
+    favoriteExams:{// 收藏的考试
         type:Array,
+        default:[]
+    },
+    favoriteQuestions:{// 收藏的题目
+        type:Array,
+        default:[]
+    },
+    questionbanks:{// 题库
+        type: [{
+            _id: { // 题库唯一标识
+                type: mongoose.Schema.Types.ObjectId,
+                default: () => new mongoose.Types.ObjectId()
+            },
+            name: { // 题库名称
+                type: String,
+                required: true
+            },
+            description: { // 题库描述
+                type: String,
+                default: ''
+            },
+            createTime: { // 创建时间
+                type: Date,
+                default: Date.now
+            },
+            questionCount: { // 题目数量
+                type: Number,
+                default: 0
+            },
+            isPublic: { // 是否公开
+                type: Boolean,
+                default: false
+            }
+        }],
         default:[]
     }
 })

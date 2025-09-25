@@ -2,10 +2,17 @@ const mongoose = require('mongoose');
 
 const UserQuestionSchema = new mongoose.Schema({
     // 用户关联信息
-    userId: { // 创建题目的用户ID
+    Uid: { // 创建题目的用户ID
         type: mongoose.Schema.Types.ObjectId,// 关联用户表的主键
         ref: 'consumer',// 引用用户模型
         required: true// 必填
+    },
+    
+    // 题库关联信息
+    questionbankId: { // 所属题库ID
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'consumer.questionbanks',// 引用用户题库
+        default: null
     },
     
     // 题目基本信息
@@ -59,8 +66,9 @@ const UserQuestionSchema = new mongoose.Schema({
 });
 
 // 添加索引以提高查询性能
-UserQuestionSchema.index({ userId: 1, createTime: -1 });
-UserQuestionSchema.index({ type: 1, status: 1 });
+UserQuestionSchema.index({ Uid: 1, createTime: -1 });
+UserQuestionSchema.index({ Type: 1, status: 1 });
+UserQuestionSchema.index({ questionbankId: 1 }); // 添加题库索引
 
 const UserQuestionModel = mongoose.model("user_question", UserQuestionSchema);
 module.exports = UserQuestionModel;
