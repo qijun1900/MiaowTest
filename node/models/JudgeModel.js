@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const JudgeSchema  = new mongoose.Schema({
     examId:String,
     stem:String,
-    answer:Number,
+    answer:Number,//0:错误，1：正确
     isPublish:Number,
     analysis:String,// 新增字段，用于存储解析
     isAIanswer:Number,// 新增字段，用于存储是否AI回答 

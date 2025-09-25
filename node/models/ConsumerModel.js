@@ -1,15 +1,15 @@
 const mongoose = require('mongoose')
 
 const ConsumerSchema = new mongoose.Schema({
-    username: {//�û���
+    username: {
         type: String,
-        unique: true,
-        index: true
+        unique: true,// 唯一索引
+        index: true// 索引
     },
-    email: { //����
+    email: { 
         type: String,
     },
-    password : { //����
+    password : {
         type: String,
     },
     openid: { //openid
@@ -18,17 +18,17 @@ const ConsumerSchema = new mongoose.Schema({
     session_key: {// session_key
         type: String,
     },
-    nickname: { //�ǳ�
+    nickname: { 
         type: String,
         default: ''
     },
-    avatar: {  //ͷ��
+    avatar: {  
         type: String,
         default: ''
     },
     gender: {
         type: Number,
-        default: 0 //0 δ֪ 1 �� 2 Ů
+        default: 0 //性别 0: 未知、1: 男性、2: 女性
     },
     createTime: {
         type: Date,

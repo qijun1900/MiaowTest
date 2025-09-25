@@ -1,6 +1,6 @@
 <template>
   <view class="login-container">
-    <!-- 添加返回按钮 -->
+    <!-- 自定义 添加返回按钮 -->
     <view class="back-btn" @click="goBack">
       <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
       <text class="back-text">返回</text>
