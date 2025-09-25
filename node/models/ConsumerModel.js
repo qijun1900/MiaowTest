@@ -47,7 +47,7 @@ const ConsumerSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 default: () => new mongoose.Types.ObjectId()
             },
-            name: { // 题库名称
+            bankName: { // 题库名称
                 type: String,
                 required: true
             },

@@ -171,7 +171,7 @@ const handleManualImport = () => {
         success: (res) => {
             if (res.confirm) {
                 uni.navigateTo({
-                    url: `/pages/exam/manualImportView?bankName=${encodeURIComponent(questionBankName.value)}`
+                    url: `/pages/exam/ManualImportView?bankName=${encodeURIComponent(questionBankName.value)}`
                 })
             }
         }

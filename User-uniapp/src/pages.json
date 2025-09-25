@@ -103,9 +103,10 @@
 			}
 		},
 		{
-			"path": "pages/exam/manualImportView",
+			"path": "pages/exam/ManualImportView",
 			"style": {
 				"navigationBarTitleText": "手动导入"
+
 			}
 		}
 	],
