@@ -1,7 +1,8 @@
 <template>
     <view class="editor-section">
         <!-- 工具栏 -->
-        <view class="toolbar-container" :class="{ 'toolbar-show': showtoolbar, 'toolbar-hide': !showtoolbar }">
+        <view class="toolbar-container" 
+            :class="{ 'toolbar-show': showtoolbar, 'toolbar-hide': !showtoolbar }">
             <view class="toolbar">
                 <!-- 撤销/重做 -->
                 <view class="toolbar-item" @tap.stop="undo" :class="{ disabled: !canUndo }">
@@ -523,15 +524,15 @@ const formatText = (e) => {
 }
 
 .toolbar-hide {
-    max-height: 0;
-    opacity: 0;
-    transform: translateY(-10px);
+    max-height: 0; /* 隐藏时设置最大高度为0 */
+    opacity: 0; /* 隐藏时设置透明度为0 */
+    transform: translateY(-10px); /* 向上移动 */
 }
 
 .toolbar-show {
-    max-height: 200rpx;
+    max-height: 200rpx;     /* 显示时设置最大高度 */
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0); /* 恢复原始位置 */
 }
 
 .toolbar {

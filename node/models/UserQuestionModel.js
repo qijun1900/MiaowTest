@@ -26,19 +26,20 @@ const UserQuestionSchema = new mongoose.Schema({
         enum: [1, 2, 3, 4]// 限定类型
     },
     
-    // 题目内容（根据类型动态使用）
-    content: { // 简答题答案 
+    // 简答题答案 
+    content: { 
         type: String,
         default: ''
     },
-    options: { // 选择题选项，填空题内容
+    options: { // 选择题选项及答案，填空题答案内容
         type: Array,
         default: []
     },
-    answer: { // 正确答案（根据类型不同格式）
-        type: mongoose.Schema.Types.Mixed,//判断使用
+    answer: { 
+        type: Number, //答案，针对判断题
+        default: null
     },
-    analysis: { // 解析
+    analysis: { // 解析 
         type: String,
         default: ''
     },

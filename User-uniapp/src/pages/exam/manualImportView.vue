@@ -5,15 +5,16 @@
      <view class="question-type-selector">
        <view class="selector-row">
          <text class="selector-label">题型：</text>
-         <view class="picker-display">
-           <text class="selected-type">{{ selectedQuestionTypeLabel || '选择题' }}</text>
-           <picker 
-             class="type-picker"
-             :range="questionTypeLabels" 
-             :value="pickerValue"
-             @change="onTypeChange">
-           </picker>
-         </view>
+         <picker 
+           class="type-picker"
+           :range="questionTypeLabels" 
+           :value="pickerValue"
+           @change="onTypeChange">
+           <view class="picker-display">
+             <text class="selected-type">{{ selectedQuestionTypeLabel || '选择题' }}</text>
+             <text class="picker-arrow">▼</text>
+           </view>
+         </picker>
        </view>
      </view>
       <!-- 不同组件 -->
@@ -81,7 +82,7 @@ onLoad((option) => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #f8f8f8;
+  background-color: #fbfbfb;
 }
 
 .content {
@@ -100,23 +101,27 @@ onLoad((option) => {
   display: flex;
   align-items: center;
   gap: 20rpx;
+  /* 使两端对齐 */
+  justify-content: space-between;
 }
 
 .selector-label {
   font-size: 28rpx;
   color: #333;
   white-space: nowrap;
+  /* 确保标签不会过度收缩 */
+  flex-shrink: 0;
 }
 
 .picker-display {
-  position: relative;
   display: flex;
   align-items: center;
   padding: 20rpx;
   border: 1rpx solid #e0e0e0;
   border-radius: 8rpx;
   background-color: #fafafa;
-  min-width: 200rpx;
+  min-width: 300rpx;
+  /* 确保选择器占据剩余空间但不会过度扩张 */
   flex: 1;
 }
 
@@ -126,21 +131,14 @@ onLoad((option) => {
   flex: 1;
 }
 
-.picker-display::after {
-  content: '▼';
+.picker-arrow {
   font-size: 20rpx;
   color: #666;
   margin-left: 10rpx;
+  /* 确保箭头在最右侧 */
+  margin-left: auto;
 }
 
-.type-picker {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-}
 .question-type-component{
   margin-top: 20rpx;
   

@@ -107,6 +107,10 @@
                     <uni-icons type="checkmark" size="16" color="#4cd964"></uni-icons>
                     <text class="feature-text">支持批量导入，提高效率</text>
                 </view>
+                <view class="feature-item">
+                    <uni-icons type="checkmark" size="16" color="#4cd964"></uni-icons>
+                    <text class="feature-text">支持AI快速生成解析</text>
+                </view>
             </view>
         </view>
 
