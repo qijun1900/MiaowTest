@@ -91,8 +91,8 @@ onLoad((option) => {
 
 .question-type-selector {
   background: white;
-  padding: 30rpx;
-  border-radius: 10rpx;
+  padding: 20rpx;
+  border-radius: 15rpx;
   border: 1rpx solid #e0e0e0;
 }
 
