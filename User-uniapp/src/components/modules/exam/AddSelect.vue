@@ -4,15 +4,15 @@
         <view class="editor-section">
             <text class="section-title">题目题干</text>
             <uniEditor 
-                placeholder="请输入内容..."
+                placeholder="请在此处输入题干内容"
                 v-model="stem"
-                :show-toolbar="true"
             />
         </view>
         
         <!-- 调试信息 -->
         <view class="debug-info">
             <text>当前题干内容：{{ stem }}</text>
+            
         </view>
     </view>
 </template>
@@ -22,6 +22,7 @@ import { ref } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 
 const stem = ref('') // 题干
+// const anlysis = ref('') // 解析
 </script>
 
 <style scoped>

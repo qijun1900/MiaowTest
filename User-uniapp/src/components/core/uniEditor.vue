@@ -1,138 +1,129 @@
 <template>
     <view class="editor-section">
-        <view class="toolbar">
-            <!-- 撤销/重做 -->
-            <view class="toolbar-item" @tap.stop="undo" :class="{ disabled: !canUndo }">
-                <text class="iconfont icon-undo">↶</text>
-            </view>
-            <view class="toolbar-item" @tap.stop="redo" :class="{ disabled: !canRedo }">
-                <text class="iconfont icon-redo">↷</text>
-            </view>
-            
-            <view class="toolbar-divider"></view>
-            
-            <!-- 基本格式 -->
-            <view 
-                class="toolbar-item" 
-                :class="{ active: currentFormat === 'bold' }" 
-                data-format="bold" 
-                @tap.stop="formatText"
-                :title="'加粗'">
-                <text class="iconfont icon-bold">B</text>
-            </view>
-            <view class="toolbar-item" :class="{ active: currentFormat === 'italic' }" data-format="italic" @tap.stop="formatText" :title="'斜体'">
-                <text class="iconfont icon-italic">I</text>
-            </view>
-            <view class="toolbar-item" :class="{ active: currentFormat === 'underline' }" data-format="underline" @tap.stop="formatText" :title="'下划线'">
-                <text class="iconfont icon-underline">U</text>
-            </view>
-            <view class="toolbar-item" :class="{ active: currentFormat === 'strike' }" data-format="strike" @tap.stop="formatText" :title="'删除线'">
-                <text class="iconfont icon-strike">S</text>
-            </view>
-            
-            <view class="toolbar-divider"></view>
-            
-            <!-- 对齐方式 -->
-            <view class="toolbar-item" :class="{ active: currentFormat === 'alignLeft' }" data-format="align" data-value="left" @tap.stop="formatText" :title="'左对齐'">
-                <text class="iconfont icon-align-left">◀</text>
-            </view>
-            <view class="toolbar-item" :class="{ active: currentFormat === 'alignCenter' }" data-format="align" data-value="center" @tap.stop="formatText" :title="'居中对齐'">
-                <text class="iconfont icon-align-center">◆</text>
-            </view>
-            <view class="toolbar-item" :class="{ active: currentFormat === 'alignRight' }" data-format="align" data-value="right" @tap.stop="formatText" :title="'右对齐'">
-                <text class="iconfont icon-align-right">▶</text>
-            </view>
-            
-            <view class="toolbar-divider"></view>
-            
-            <!-- 角标 -->
-            <view 
-                class="toolbar-item" 
-                :class="{ active: currentFormat === 'script-super' }"
-                data-name="script" 
-                data-value="super" 
-                @tap.stop="formatText"
-                :title="'上角标'">
-                <text class="iconfont icon-superscript">x²</text>
-            </view>
-            <view 
-                class="toolbar-item" 
-                :class="{ active: currentFormat === 'script-sub' }" 
-                data-name="script" 
-                data-value="sub" 
-                @tap.stop="formatText"
-                :title="'下角标'">
-                <text class="iconfont icon-subscript">x₂</text>
-            </view>
-            
-            <view class="toolbar-divider"></view>
-            
-            <!-- 颜色 -->
-            <view class="toolbar-item" @tap.stop="showColorPicker" :title="'字体颜色'">
-                <text class="iconfont icon-color" style="color: #ff0000;">C</text>
-            </view>
-            <view class="toolbar-item" @tap.stop="showBgColorPicker" :title="'背景颜色'">
-                <text class="iconfont icon-bgcolor" style="background-color: #ffff00;">B</text>
-            </view>
-            
-            <view class="toolbar-divider"></view>
-            
-            <!-- 列表 -->
-            <view class="toolbar-item" :class="{ active: currentFormat === 'list' }" data-format="list" @tap.stop="formatText" :title="'无序列表'">
-                <text class="iconfont icon-list">L</text>
-            </view>
-            <view class="toolbar-item" :class="{ active: currentFormat === 'orderedList' }" data-format="orderedList" @tap.stop="formatText" :title="'有序列表'">
-                <text class="iconfont icon-ordered-list">1.</text>
-            </view>
-            
-            <view class="toolbar-divider"></view>
-            
-            <!-- 清除格式 -->
-            <view class="toolbar-item" @tap.stop="clearFormat" :title="'清除格式'">
-                <text class="iconfont icon-clear">✕</text>
-            </view>
-            
-            <!-- 清空内容 -->
-            <view class="toolbar-item" @tap.stop="clearContent" :title="'清空内容'">
-                <text class="iconfont icon-clear-all">⌫</text>
-            </view>
-        </view>
-        
-        <!-- 字体颜色选择器 -->
-        <view class="color-picker" v-if="showColor">
-            <view class="color-option" v-for="color in colors" :key="color" @tap="setFontColor(color)">
-                <view :style="{ backgroundColor: color }" class="color-circle"></view>
-            </view>
-            <view class="custom-color">
-                <input type="color" v-model="customColor" @change="setFontColor(customColor)" />
-            </view>
-        </view>
-        
-        <!-- 背景颜色选择器 -->
-        <view class="color-picker" v-if="showBgColor">
-            <view class="color-option" v-for="color in colors" :key="color" @tap="setBgColor(color)">
-                <view :style="{ backgroundColor: color }" class="color-circle"></view>
-            </view>
-            <view class="custom-color">
-                <input type="color" v-model="customBgColor" @change="setBgColor(customBgColor)" />
+        <!-- 工具栏 -->
+        <view class="toolbar-container" :class="{ 'toolbar-show': showtoolbar, 'toolbar-hide': !showtoolbar }">
+            <view class="toolbar">
+                <!-- 撤销/重做 -->
+                <view class="toolbar-item" @tap.stop="undo" :class="{ disabled: !canUndo }">
+                    <text class="iconfont icon-undo">↶</text>
+                </view>
+                <view class="toolbar-item" @tap.stop="redo" :class="{ disabled: !canRedo }">
+                    <text class="iconfont icon-redo">↷</text>
+                </view>
+
+                <view class="toolbar-divider"></view>
+
+                <!-- 基本格式 -->
+                <view class="toolbar-item" :class="{ active: currentFormat === 'bold' }" data-format="bold"
+                    @tap.stop="formatText" :title="'加粗'">
+                    <text class="iconfont icon-bold">B</text>
+                </view>
+                <view class="toolbar-item" :class="{ active: currentFormat === 'italic' }" data-format="italic"
+                    @tap.stop="formatText" :title="'斜体'">
+                    <text class="iconfont icon-italic">I</text>
+                </view>
+                <view class="toolbar-item" :class="{ active: currentFormat === 'underline' }" data-format="underline"
+                    @tap.stop="formatText" :title="'下划线'">
+                    <text class="iconfont icon-underline">U</text>
+                </view>
+                <view class="toolbar-item" :class="{ active: currentFormat === 'strike' }" data-format="strike"
+                    @tap.stop="formatText" :title="'删除线'">
+                    <text class="iconfont icon-strike">S</text>
+                </view>
+
+                <view class="toolbar-divider"></view>
+
+                <!-- 对齐方式 -->
+                <view class="toolbar-item" :class="{ active: currentFormat === 'alignLeft' }" data-format="align"
+                    data-value="left" @tap.stop="formatText" :title="'左对齐'">
+                    <text class="iconfont icon-align-left">◀</text>
+                </view>
+                <view class="toolbar-item" :class="{ active: currentFormat === 'alignCenter' }" data-format="align"
+                    data-value="center" @tap.stop="formatText" :title="'居中对齐'">
+                    <text class="iconfont icon-align-center">◆</text>
+                </view>
+                <view class="toolbar-item" :class="{ active: currentFormat === 'alignRight' }" data-format="align"
+                    data-value="right" @tap.stop="formatText" :title="'右对齐'">
+                    <text class="iconfont icon-align-right">▶</text>
+                </view>
+
+                <view class="toolbar-divider"></view>
+
+                <!-- 角标 -->
+                <view class="toolbar-item" :class="{ active: currentFormat === 'script-super' }" data-name="script"
+                    data-value="super" @tap.stop="formatText" :title="'上角标'">
+                    <text class="iconfont icon-superscript">x²</text>
+                </view>
+                <view class="toolbar-item" :class="{ active: currentFormat === 'script-sub' }" data-name="script"
+                    data-value="sub" @tap.stop="formatText" :title="'下角标'">
+                    <text class="iconfont icon-subscript">x₂</text>
+                </view>
+
+                <view class="toolbar-divider"></view> <!-- 分割线 -->
+
+                <!-- 颜色 -->
+                <view class="toolbar-item" @tap.stop="showColorPicker" :title="'字体颜色'">
+                    <text class="iconfont icon-color" style="color: #ff0000;">C</text>
+                </view>
+                <view class="toolbar-item" @tap.stop="showBgColorPicker" :title="'背景颜色'">
+                    <text class="iconfont icon-bgcolor" style="background-color: #ffff00;">B</text>
+                </view>
+
+                <view class="toolbar-divider"></view>
+
+                <!-- 列表 -->
+                <view class="toolbar-item" :class="{ active: currentFormat === 'list' }" data-format="list"
+                    @tap.stop="formatText" :title="'无序列表'">
+                    <text class="iconfont icon-list">L</text>
+                </view>
+                <view class="toolbar-item" :class="{ active: currentFormat === 'orderedList' }" data-format="orderedList"
+                    @tap.stop="formatText" :title="'有序列表'">
+                    <text class="iconfont icon-ordered-list">1.</text>
+                </view>
+
+                <view class="toolbar-divider"></view>
+
+                <!-- 清除格式 -->
+                <view class="toolbar-item" @tap.stop="clearFormat" :title="'清除格式'">
+                    <text class="iconfont icon-clear">✕</text>
+                </view>
+
+                <!-- 清空内容 -->
+                <view class="toolbar-item" @tap.stop="clearContent" :title="'清空内容'">
+                    <text class="iconfont icon-clear-all">⌫</text>
+                </view>
+
+                <!-- 字体颜色选择器 -->
+                <view class="color-picker" v-if="showColor">
+                    <view class="color-option" v-for="color in colors" :key="color" @tap="setFontColor(color)">
+                        <view :style="{ backgroundColor: color }" class="color-circle"></view>
+                    </view>
+                    <view class="custom-color">
+                        <input type="color" v-model="customColor" @change="setFontColor(customColor)" />
+                    </view>
+                </view>
+
+                <!-- 背景颜色选择器 -->
+                <view class="color-picker" v-if="showBgColor">
+                    <view class="color-option" v-for="color in colors" :key="color" @tap="setBgColor(color)">
+                        <view :style="{ backgroundColor: color }" class="color-circle"></view>
+                    </view>
+                    <view class="custom-color">
+                        <input type="color" v-model="customBgColor" @change="setBgColor(customBgColor)" />
+                    </view>
+                </view>
             </view>
         </view>
-        
-        <!-- 字体大小选择器 -->
-        <view class="font-size-picker" v-if="showFontSize">
-            <view class="font-size-option" v-for="size in fontSizes" :key="size.value" @tap="setFontSize(size.value)">
-                <text :style="{ fontSize: size.value + 'px' }">{{ size.label }}</text>
-            </view>
-        </view>
-        
+        <!-- 编辑器 -->
         <view class="editor-wrapper">
             <editor 
-                id="editor"
-                class="editor"
-                :placeholder="props.placeholder"
+                id="editor" 
+                class="editor" 
+                :placeholder="props.placeholder" 
                 @input="handleInput"
-                @ready="handleReady"
-            />
+                @ready="handleReady" 
+                @focus="hanleFocus"
+                @blur="handleBlur"/>
         </view>
     </view>
 </template>
@@ -151,7 +142,7 @@ const currentFormat = ref('');
 // 撤销/重做状态
 const canUndo = ref(false);
 const canRedo = ref(false);
-// 历史记录栈
+// 历史记录栈,先进后出
 const historyStack = ref([]);
 const historyIndex = ref(-1);
 
@@ -167,25 +158,46 @@ const customBgColor = ref('#ffffff');
 // 字体大小选择器
 const showFontSize = ref(false);
 
+// 工具栏显示
+const showtoolbar = ref(false);
+// 延迟隐藏定时器
+const hideTimer = ref(null);
 
 // 获取当前组件实例
 const { proxy } = getCurrentInstance();
 
 // 定义组件属性
 const props = defineProps({
-    modelValue: {
+    modelValue: {// 双向绑定的内容
         type: String,
         default: ''
     },
-    placeholder: {
+    placeholder: {// 编辑器占位符
         type: String,
         default: '请输入内容...'
     },
-    height: {
+    height: {// 编辑器高度
         type: String,
         default: '400rpx'
-    }
+    },
 });
+
+//工具栏显示
+const hanleFocus = () => {
+    showtoolbar.value = true;
+    // 清除可能存在的隐藏定时器
+    if (hideTimer.value) {
+        clearTimeout(hideTimer.value);
+        hideTimer.value = null;
+    }
+}
+
+const handleBlur = () => {
+    // 延迟隐藏工具栏，给用户时间点击工具栏按钮
+    hideTimer.value = setTimeout(() => {
+        showtoolbar.value = false;
+    }, 300); // 300ms延迟，用户有足够时间点击工具栏
+}
 
 // 定义事件
 const emit = defineEmits(['update:modelValue']);
@@ -196,17 +208,17 @@ const saveHistory = (content) => {
     if (historyIndex.value < historyStack.value.length - 1) {
         historyStack.value = historyStack.value.slice(0, historyIndex.value + 1);
     }
-    
+
     // 添加新的历史记录
     historyStack.value.push(content);
     historyIndex.value = historyStack.value.length - 1;
-    
+
     // 限制历史记录的最大长度
     if (historyStack.value.length > 50) {
         historyStack.value.shift();
         historyIndex.value--;
     }
-    
+
     // 更新撤销/重做状态
     updateUndoRedoStatus();
 };
@@ -223,7 +235,7 @@ const handleInput = (e) => {
     const html = e.detail.html;
     lastContent.value = html;
     emit('update:modelValue', html);
-    
+
     // 保存历史记录
     saveHistory(html);
 };
@@ -242,7 +254,7 @@ const handleReady = () => {
                 editorCtx.value.setContents({
                     html: props.modelValue
                 });
-                
+
                 // 初始化历史记录
                 historyStack.value = [props.modelValue];
                 historyIndex.value = 0;
@@ -257,7 +269,6 @@ const handleReady = () => {
         .exec();
 };
 
-
 // 监听modelValue变化，同步到编辑器
 watch(() => props.modelValue, (newValue) => {
     // 如果是用户输入导致的modelValue变化，不重新设置内容
@@ -265,18 +276,18 @@ watch(() => props.modelValue, (newValue) => {
         isUserInput.value = false;
         return;
     }
-    
+
     // 如果内容没有变化，不重新设置
     if (newValue === lastContent.value) {
         return;
     }
-    
+
     if (editorCtx.value && newValue !== undefined) {
         lastContent.value = newValue;
         editorCtx.value.setContents({
             html: newValue
         });
-        
+
         // 保存历史记录
         saveHistory(newValue);
     }
@@ -296,15 +307,13 @@ const showBgColorPicker = () => {
     showFontSize.value = false;
 };
 
-
-
 // 设置字体颜色
 const setFontColor = (color) => {
     if (editorCtx.value) {
         editorCtx.value.format('color', color);
         showColor.value = false;
         customColor.value = color;
-        
+
         // 格式化后获取当前内容并保存历史记录
         setTimeout(() => {
             editorCtx.value.getContents({
@@ -322,7 +331,7 @@ const setBgColor = (color) => {
         editorCtx.value.format('backgroundColor', color);
         showBgColor.value = false;
         customBgColor.value = color;
-        
+
         // 格式化后获取当前内容并保存历史记录
         setTimeout(() => {
             editorCtx.value.getContents({
@@ -334,20 +343,18 @@ const setBgColor = (color) => {
     }
 };
 
-
-
 // 撤销
 const undo = () => {
     if (canUndo.value && editorCtx.value) {
         // 移动到上一个历史记录
         historyIndex.value--;
-        
+
         // 恢复内容
         const content = historyStack.value[historyIndex.value];
         editorCtx.value.setContents({
             html: content
         });
-        
+
         // 更新状态
         lastContent.value = content;
         emit('update:modelValue', content);
@@ -360,13 +367,13 @@ const redo = () => {
     if (canRedo.value && editorCtx.value) {
         // 移动到下一个历史记录
         historyIndex.value++;
-        
+
         // 恢复内容
         const content = historyStack.value[historyIndex.value];
         editorCtx.value.setContents({
             html: content
         });
-        
+
         // 更新状态
         lastContent.value = content;
         emit('update:modelValue', content);
@@ -379,7 +386,7 @@ const clearFormat = () => {
     if (editorCtx.value) {
         editorCtx.value.removeFormat();
         currentFormat.value = '';
-        
+
         // 清除格式后获取当前内容并保存历史记录
         setTimeout(() => {
             editorCtx.value.getContents({
@@ -404,7 +411,7 @@ const clearContent = () => {
                     });
                     lastContent.value = '';
                     emit('update:modelValue', '');
-                    
+
                     // 保存历史记录
                     saveHistory('');
                 }
@@ -418,9 +425,9 @@ const formatText = (e) => {
     const name = e.currentTarget.dataset.name;
     const format = e.currentTarget.dataset.format;
     const value = e.currentTarget.dataset.value;
-    
+
     if ((!name && !format) || !editorCtx.value) return;
-    
+
     // 处理角标特殊逻辑
     if (name === 'script') {
         const formatKey = `script-${value}`;
@@ -434,7 +441,7 @@ const formatText = (e) => {
             // 设置角标格式
             editorCtx.value.format('script', value);
         }
-        
+
         // 格式化后获取当前内容并保存历史记录
         setTimeout(() => {
             editorCtx.value.getContents({
@@ -445,7 +452,7 @@ const formatText = (e) => {
         }, 100);
         return;
     }
-    
+
     // 处理对齐方式
     if (format === 'align') {
         const formatKey = `align${value.charAt(0).toUpperCase() + value.slice(1)}`;
@@ -459,7 +466,7 @@ const formatText = (e) => {
             // 设置对齐格式
             editorCtx.value.format('align', value);
         }
-        
+
         // 格式化后获取当前内容并保存历史记录
         setTimeout(() => {
             editorCtx.value.getContents({
@@ -470,17 +477,17 @@ const formatText = (e) => {
         }, 100);
         return;
     }
-    
+
     // 处理其他格式...
     const targetFormat = name || format;
-    
+
     // 如果点击的是当前已选中的格式，则取消选中
     if (currentFormat.value === targetFormat) {
         currentFormat.value = '';
     } else {
         currentFormat.value = targetFormat;
     }
-    
+
     if (targetFormat === 'list') {
         editorCtx.value.format('list', 'unordered');
     } else if (targetFormat === 'orderedList') {
@@ -489,7 +496,7 @@ const formatText = (e) => {
         // 普通格式处理
         editorCtx.value.format(targetFormat, value || true);
     }
-    
+
     // 格式化后获取当前内容并保存历史记录
     setTimeout(() => {
         editorCtx.value.getContents({
@@ -508,6 +515,23 @@ const formatText = (e) => {
     border-radius: 8rpx;
     overflow: hidden;
     position: relative;
+}
+
+.toolbar-container {
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.toolbar-hide {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.toolbar-show {
+    max-height: 200rpx;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .toolbar {
