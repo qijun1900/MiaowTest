@@ -26,12 +26,12 @@ export async function getExamSubjects(forceRefresh = false) {
       url: '/uniappAPI/Exam/getExamSubjects',
       method: 'GET',
     });
-    
-    
+
+
     // 将数据存入缓存
     cacheManager.set(CACHE_KEY, response);
     console.log('从服务器获取考试科目数据并缓存');
-    
+
     return response;
   } catch (error) {
     console.error("getExamSubjects 失败", error);
@@ -65,30 +65,48 @@ export async function getExamSubjectTypes(examSubjectId) {
     const response = await http({
       url: `/uniappAPI/Exam/getExamSubjectTypes/${examSubjectId}`,
       method: 'GET',
-    });   
+    });
     return response;
-  }catch (error) {
+  } catch (error) {
     console.error("getExamSubjectTypes 失败", error);
     throw error;
   }
-  
+
 }
 
-/**
- * @param { }
+/** 匹配题目列表
+ * @param {Array} extractedData 问题ID数组
+ * @returns {Promise} 返回匹配的题目列表
  */
-export async function FetchMatchQuestionList(extractedData){
-  try{
+export async function FetchMatchQuestionList(extractedData) {
+  try {
     const response = await http({
       url: `/uniappAPI/Exam/FetchMatchQuestionList`,
       method: 'POST',
-      data:extractedData
+      data: extractedData
     });
-    
+
     return response;
 
-  }catch (error) {
+  } catch (error) {
     console.error("FetchMatchQuestionList 失败", error);
+    throw error;
+  }
+}
+
+/**
+ * 添加用户自建题库
+ * @param {String} bankName 题库名称
+**/
+export async function AddUserBank(bankName) {
+  try {
+      return await http({
+      url:"/uniappAPI/exam/AddUserBank",
+      method: 'POST',
+      data: { bankName: bankName } 
+    });
+  }catch (error) {
+    console.error("AddUserBank 失败", error);
     throw error;
   }
 }

@@ -170,10 +170,10 @@ const ExamController ={
     useraddquestion:async (req,res)=>{
         try {
             const { uid } = req.user;//获取用户openid
-            const questionData = req.body;
+            const {questionData} = req.body;
             const result = await ExamService.useraddquestion(
                 uid, // 用户ID
-                questionData, // 解构问题数据
+                questionData, // 问题数据对象
             )
            if (result.success) {
                 res.send({
@@ -191,6 +191,33 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching useraddquestion details:', error); // 处理错误
 
+        }
+    },
+    AddUserBank:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { bankName } = req.body; // 从请求体中获取bankName
+            const result = await ExamService.AddUserBank(uid, bankName);
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                    data: result.data
+                });
+            } else {
+                res.status(result.code).send({
+                    code: result.code,
+                    message: result.message,
+                });
+            }
+        }catch (error) {
+            console.error('Error fetching AddUserBank details:', error); // 处理错误
+            res.status(500).send({
+                code: 500,
+                message: '服务器内部错误',
+            });
         }
     }
 }

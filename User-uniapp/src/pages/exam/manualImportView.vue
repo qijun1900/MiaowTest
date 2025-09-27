@@ -21,16 +21,16 @@
       <view class="question-type-component">
          <!-- 根据 selectedQuestionTypeValue 的值来决定显示哪个组件 -->
         <view v-if="selectedQuestionTypeValue === 1">
-          <AddSelect />
+          <AddSelect :currentBankId="questionbankId" />
         </view>
         <view v-else-if="selectedQuestionTypeValue === 2">
-          <AddBlank />
+          <AddBlank :currentBankId="questionbankId"/>
         </view>
         <view v-else-if="selectedQuestionTypeValue === 3">
-          <AddJudge />
+          <AddJudge :currentBankId="questionbankId"/>
         </view>
         <view v-else-if="selectedQuestionTypeValue === 4">
-          <AddShort />  
+          <AddShort :currentBankId="questionbankId"/>  
         </view>
       </view>
    </view>
@@ -45,7 +45,7 @@ import AddBlank from '../../components/modules/exam/AddBlank.vue';// 填空题2
 import AddJudge from '../../components/modules/exam/AddJudge.vue';// 判断题3
 import AddShort from '../../components/modules/exam/AddShort.vue';// 简答题4
 
-const bankName = ref('')
+const questionbankId = ref(null)
 // 选择器相关
 const pickerValue = ref(0)
 const selectedQuestionTypeValue = ref(1) // 默认选择题
@@ -74,8 +74,15 @@ const onTypeChange = (e) => {
 
 onLoad((option) => {
   if(option.bankName){
-    bankName.value = option.bankName
+   uni.showToast({
+    title: `${option.bankName}题库创建成功`,
+    icon: 'success',
+   })
   }
+  if(option.bankId){
+    questionbankId.value = option.bankId
+  }
+
 })
 </script>
 

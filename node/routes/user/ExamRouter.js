@@ -18,7 +18,7 @@ ExamRouter.post("/webapi/user/postUserQuestionIssuse",ExamController.postUserQue
 ExamRouter.get("/uniappAPI/IndexHotExam/getHotExamList",ExamController.getHotExamList)//获取热门考试
 ExamRouter.get("/uniappAPI/Exam/getExamSubjects",ExamController.getExamSubjects)//获取所有考试科目
 ExamRouter.get("/uniappAPI/Exam/getExamSubjectTypes/:id",ExamController.getExamSubjectTypes)//获取单个考试科目下的所有考试题型
-ExamRouter.post("/uniappAPI/Exam/FetchMatchQuestionList",ExamController.FetchMatchQuestionList)//获取匹配题
-ExamRouter.post("/uniapp/exam/useradd/question",JWT.verifyTokenMiddleware(),ExamController.useraddquestion)//用户添加自己的题目
-
+ExamRouter.post("/uniappAPI/Exam/FetchMatchQuestionList",ExamController.FetchMatchQuestionList)//获取匹配的题目题
+ExamRouter.post("/uniappAPI/exam/useradd/question",JWT.verifyTokenMiddleware(),ExamController.useraddquestion)//用户添加自己的题目
+ExamRouter.post("/uniappAPI/exam/AddUserBank",JWT.verifyTokenMiddleware(),ExamController.AddUserBank)//用户添加自己的题库
 module.exports = ExamRouter; 

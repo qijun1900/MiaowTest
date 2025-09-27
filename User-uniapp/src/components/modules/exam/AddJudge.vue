@@ -43,12 +43,17 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref} from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemDivider from '../../core/ThemDivider.vue';
 import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
 const butLoading = ref(false) // 按钮加载中
+const props = defineProps({
+  currentBankId: { // 接收题库ID
+    default: null
+  }
+})
 
 // 使用 reactive 集合所有数据
 const formData = reactive({
@@ -99,6 +104,10 @@ const handleSend = async () => {
             answer: formData.answer,
             analysis: formData.analysis
         };
+        // 如果有题库ID，添加到提交数据中
+        if (props.currentBankId) {
+        submitData.questionbankId = props.currentBankId;
+        }
 
         // 调用API提交数据
         const res = await addQuestion(submitData)
@@ -108,7 +117,7 @@ const handleSend = async () => {
             butLoading.value = false;
             // 提示提交成功 
             uni.showToast({
-                title: '提交成功',
+                title: res.message,
                 icon: 'none'
             })
         }
@@ -121,10 +130,6 @@ const handleSend = async () => {
     } finally {
         butLoading.value = false;
     }
-
-
-
-
 }
 
 // 重置表单
@@ -133,6 +138,7 @@ const resetForm = () => {
     formData.analysis = '';
     formData.answer = null;
 }
+
 </script>
 
 <style scoped>

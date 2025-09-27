@@ -14,11 +14,10 @@ import { http } from '../../util/http.js';
  */
 export async function addQuestion(questionData) {
   try {
-    console.log("addQuestion 开始", questionData);
     return await http({
-      url: '/uniapp/exam/useradd/question',
+      url: '/uniappAPI/exam/useradd/question',
       method: 'POST',
-      data: questionData
+      data: {questionData}
     });
   } catch (error) {
     console.error("addQuestion 失败", error);

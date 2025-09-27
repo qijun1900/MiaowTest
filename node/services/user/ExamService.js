@@ -145,6 +145,11 @@ const ExamService = {
                 createTime: new Date()
             };
             
+            // 如果有题库ID，添加到题目中
+            if (questionData.questionbankId) {
+                newQuestion.questionbankId = questionData.questionbankId;
+            }
+            
             // 根据题目类型添加特定字段
             switch (questionData.Type) {
                 case 1: // 选择题
@@ -165,6 +170,16 @@ const ExamService = {
             }
             
             const result = await userQuestionModel.create(newQuestion);
+            
+            // 如果题目关联了题库，更新题库的题目计数
+            if (questionData.questionbankId) {
+                const ConsumerModel = require('../../models/ConsumerModel');
+                await ConsumerModel.updateOne(
+                    { _id: uid, 'questionbanks._id': questionData.questionbankId },// 查找用户的指定题库
+                    { $inc: { 'questionbanks.$.questionCount': 1 } }// 增加 questionCount 字段的值
+                );
+            }
+            
             return{
                 success:true,
                 message:'题目添加成功',
@@ -176,7 +191,66 @@ const ExamService = {
                 message:'题目添加失败',
                 code:500
             }
-            throw error;
+        }
+    },
+    AddUserBank: async (uid, bankName) => {
+        try {
+            const ConsumerModel = require('../../models/ConsumerModel');
+            
+            // 查找用户
+            const user = await ConsumerModel.findById(uid);
+            
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            
+            // 检查题库名称是否已存在
+            const bankExists = user.questionbanks.some(bank => bank.bankName === bankName);// 检查是否存在同名题库，some() 方法用于检查数组中是否至少有一个元素通过了指定的测试函数。
+            if (bankExists) {
+                return {
+                    code: 400,
+                    message: '题库名称已存在',
+                    success: false
+                };
+            }
+            
+            // 添加新题库
+            const newBank = {
+                bankName: bankName,
+                description: '',
+                createTime: new Date(),
+                questionCount: 0,
+                isPublic: false
+            };
+            
+            user.questionbanks.push(newBank);
+            
+            // 保存用户信息
+            await user.save();
+            
+            // 获取新添加的题库ID（最后一个元素）
+            const newBankId = user.questionbanks[user.questionbanks.length - 1]._id;
+            
+            return {
+                code: 200,
+                message: '题库添加成功',
+                success: true,
+                data: {
+                    bankId: newBankId
+                }
+            };
+        } catch (error) {
+            console.error('AddUserBank 失败:', error);
+            return {
+                code: 500,
+                message: '添加题库失败',
+                error: error.message,
+                success: false
+            };
         }
     }
         

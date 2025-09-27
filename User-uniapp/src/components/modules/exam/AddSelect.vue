@@ -49,6 +49,12 @@ import uniEditor from '../../core/uniEditor.vue';
 import ThemDivider from '../../core/ThemDivider.vue';
 import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
+const props = defineProps({
+  currentBankId: { // 接收题库ID
+    default: null
+  }
+})
+
 const butLoading = ref(false) // 按钮加载中
 // 使用 reactive 集合所有数据
 const formData = reactive({
@@ -91,6 +97,7 @@ const setCorrectAnswer = (index) => {
   // 根据选择的答案数量设置是否多选
   formData.isMultiple = correctCount > 1 ? 1 : 0
 }
+
 
 // 提交表单
 const handleSend = async () => {
@@ -135,6 +142,11 @@ const handleSend = async () => {
       analysis: formData.analysis,
       isMultiple: formData.isMultiple
     };
+    
+    // 如果有题库ID，添加到提交数据中
+    if (props.currentBankId) {
+      submitData.questionbankId = props.currentBankId;
+    }
 
     const res = await addQuestion(submitData)
     if (res.code === 200) {

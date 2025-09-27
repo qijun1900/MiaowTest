@@ -32,6 +32,11 @@ import ThemDivider from '../../core/ThemDivider.vue';
 import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
 const butLoading = ref(false) // 按钮加载中
+const props = defineProps({
+  currentBankId: { // 接收题库ID
+    default: null
+  }
+})
 
 // 使用 reactive 集合所有数据
 const formData = reactive({
@@ -62,7 +67,7 @@ const handleSend = async () => {
       return;
     }
 
-    //   // 设置按钮加载状态
+    // 设置按钮加载状态
     butLoading.value = true;
 
     // 准备提交的数据
@@ -72,6 +77,10 @@ const handleSend = async () => {
       content: formData.content,
       analysis: formData.analysis
     };
+    // 如果有题库ID，添加到提交数据中
+    if (props.currentBankId) {
+      submitData.questionbankId = props.currentBankId;
+    }
     // 调用API提交数据
     const res = await addQuestion(submitData)
     if (res.code === 200) {
@@ -80,12 +89,10 @@ const handleSend = async () => {
       butLoading.value = false;
       // 提示提交成功
       uni.showToast({
-        title: '提交成功',
+        title:  res.message,
         icon: 'none'
       })
     }
-
-
   } catch (e) {
     console.log(e)
     uni.showToast({

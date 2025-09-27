@@ -122,8 +122,25 @@
 </template>
 
 <script setup>
-import { ref, computed,onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
+import { AddUserBank } from '../../API/Exam/ExamAPI';
+
+// 封装 uni.showModal 为 Promise
+const showModal = (options) => {
+  return new Promise((resolve) => {
+    uni.showModal({
+      ...options,
+      success: (res) => {
+        resolve(res);
+      },
+      fail: () => {
+        resolve({ confirm: false }); // 如果用户关闭模态框，返回确认为 false
+      }
+    });
+  });
+};
+
 // 题库名称和验证状态
 const questionBankName = ref('')
 const nameError = ref('')
@@ -160,7 +177,7 @@ const validateName = () => {
 }
 
 // 导入方式处理函数
-const handleManualImport = () => {
+const handleManualImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
             title: '请先输入有效的题库名称',
@@ -169,42 +186,31 @@ const handleManualImport = () => {
         return
     }
 
-    uni.showModal({
-        title: '手动导入',
-        content: `即将为题库"${questionBankName.value}"进行手动导入`,
-        success: (res) => {
-            if (res.confirm) {
-                uni.navigateTo({
-                    url: `/pages/exam/ManualImportView?bankName=${encodeURIComponent(questionBankName.value)}`
-                })
-            }
+    try {
+        const modal = await showModal({
+            title: '手动导入',
+            content: `即将为题库"${questionBankName.value}"进行手动导入`
+        });
+        if (!modal.confirm) {
+            return; // 如果用户取消，直接返回
         }
-    })
-}
-
-const handlePhotoImport = () => {
-    if (!isNameValid.value) {
-        uni.showToast({
-            title: '请先输入有效的题库名称',
-            icon: 'none'
-        })
-        return
+        const res = await AddUserBank(questionBankName.value)
+        console.log(res)
+        
+        if (modal.confirm && res.code===200) {
+            // 获取返回的题库ID
+            const bankId = res.data?.bankId;
+            uni.navigateTo({
+                url: `/pages/exam/ManualImportView?bankName=${questionBankName.value}&bankId=${bankId}`
+            })
+                 
+        }
+    } catch (error) {
+        console.error('手动导入出错:', error);
     }
-    
-    uni.showModal({
-        title: '拍照导入',
-        content: `即将为题库"${questionBankName.value}"进行拍照导入`,
-        success: (res) => {
-            if (res.confirm) {
-                uni.navigateTo({
-                    url: `/pages/exam/photoImportView?bankName=${encodeURIComponent(questionBankName.value)}`
-                })
-            }
-        }
-    })
 }
 
-const handleAIImport = () => {
+const handlePhotoImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
             title: '请先输入有效的题库名称',
@@ -213,33 +219,79 @@ const handleAIImport = () => {
         return
     }
     
-    uni.showModal({
-        title: 'AI导入',
-        content: `即将为题库"${questionBankName.value}"进行AI智能导入`,
-        success: (res) => {
-            if (res.confirm) {
+    try {
+        const modal = await showModal({
+            title: '拍照导入',
+            content: `即将为题库"${questionBankName.value}"进行拍照导入`
+        });
+        
+        if (modal.confirm) {
+            const res = await AddUserBank(questionBankName.value)
+            console.log(res)
+            
+            if (res.code===200) {
+                // 获取返回的题库ID
+                const bankId = res.data?.bankId;
                 uni.navigateTo({
-                    url: `/pages/exam/aiImportView?bankName=${encodeURIComponent(questionBankName.value)}`
+                    url: `/pages/exam/photoImportView?bankName=${encodeURIComponent(questionBankName.value)}&bankId=${bankId}`
                 })
             }
         }
-    })
+    } catch (error) {
+        console.error('拍照导入出错:', error);
+    }
 }
+
+const handleAIImport = async () => {
+    if (!isNameValid.value) {
+        uni.showToast({
+            title: '请先输入有效的题库名称',
+            icon: 'none'
+        })
+        return
+    }
+    
+    try {
+        const modal = await showModal({
+            title: 'AI导入',
+            content: `即将为题库"${questionBankName.value}"进行AI智能导入`
+        });
+        
+        if (modal.confirm) {
+            const res = await AddUserBank(questionBankName.value)
+            console.log(res)
+            
+            if (res.code===200) {
+                // 获取返回的题库ID
+                const bankId = res.data?.bankId;
+                uni.navigateTo({
+                    url: `/pages/exam/aiImportView?bankName=${questionBankName.value}&bankId=${bankId}`
+                })
+            }
+        }
+    } catch (error) {
+        console.error('AI导入出错:', error);
+    }
+}
+
 // 页面加载时检查用户是否已登录
-onMounted(() => {
+onMounted(async () => {
   if (!isLoggedIn.value) {
-    uni.showModal({
-      title: '您未登录',
-      content: '请先登录后再创建题库',
-      showCancel: false,
-      success: (res) => {
-        if (res.confirm) {
-          uni.redirectTo({
-            url: '/pages/my/UserLoginView'
-          })
-        }
+    try {
+      const res = await showModal({
+        title: '您未登录',
+        content: '请先登录后再创建题库',
+        showCancel: false
+      });
+      
+      if (res.confirm) {
+        uni.redirectTo({
+          url: '/pages/my/UserLoginView'
+        })
       }
-    })
+    } catch (error) {
+      console.error('登录检查出错:', error);
+    }
   }
 })
 </script>
