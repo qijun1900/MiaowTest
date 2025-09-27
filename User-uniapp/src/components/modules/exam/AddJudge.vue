@@ -3,32 +3,24 @@
         <ThemDivider text="题目题干" />
         <!-- 题干编辑器 -->
         <view class="editor-section">
-            <uniEditor 
-            placeholder="请在此处输入题干内容" 
-            v-model="formData.stem" 
-            height="200rpx" />
+            <uniEditor placeholder="请在此处输入题干内容" v-model="formData.stem" height="200rpx" />
         </view>
         <ThemDivider text="题目答案" />
         <view class="options-container">
             <!-- 答案列表 -->
             <view class="judge-options">
-                <view class="judge-option" 
-                      v-for="(option, index) in formData.options" 
-                      :key="index" 
-                      :class="{ 'selected': formData.answer === option.value }"
-                      @click="setAnswer(option.value)">
+                <view class="judge-option" v-for="(option, index) in formData.options" :key="index"
+                    :class="{ 'selected': formData.answer === option.value }" @click="setAnswer(option.value)">
                     <!-- 选项图标 -->
                     <view class="option-icon" :class="option.value === 1 ? 'correct-icon' : 'wrong-icon'">
-                        <uni-icons 
-                            :type="option.value === 1 ? 'checkmarkempty' : 'closeempty'" 
-                            size="18" 
+                        <uni-icons :type="option.value === 1 ? 'checkmarkempty' : 'closeempty'" size="18"
                             :color="formData.answer === option.value ? '#ffffff' : (option.value === 1 ? '#52c41a' : '#ff4d4f')">
                         </uni-icons>
                     </view>
-                    
+
                     <!-- 选项文本 -->
                     <view class="option-text">{{ option.text }}</view>
-                    
+
                     <!-- 答案选择圆圈 -->
                     <view class="radio-btn">
                         <view class="radio-circle" :class="{ 'selected': formData.answer === option.value }"></view>
@@ -40,10 +32,7 @@
         <ThemDivider text="题目解析(可选)" />
         <!-- 解析编辑器 -->
         <view class="editor-section">
-            <uniEditor 
-                placeholder="请在此处输入解析内容" 
-                v-model="formData.analysis" 
-                height="200rpx" />
+            <uniEditor placeholder="请在此处输入解析内容" v-model="formData.analysis" height="200rpx" />
         </view>
         <view class="submit-btn">
             <button type="primary" :loading="butLoading" @click="handleSend">添加题目</button>
@@ -63,67 +52,86 @@ const butLoading = ref(false) // 按钮加载中
 
 // 使用 reactive 集合所有数据
 const formData = reactive({
-  Type: 3, // 题目类型，默认为3（判断题）
-  stem: '', // 题干
-  analysis: '', // 解析
-  answer: null, // 答案，1为正确，2为错误
-  // 选项数据
-  options: [
-    { text: '正确', value: 1 },
-    { text: '错误', value: 2 }
-  ]
+    Type: 3, // 题目类型，默认为3（判断题）
+    stem: '', // 题干
+    analysis: '', // 解析
+    answer: null, // 答案，1为正确，2为错误
+    // 选项数据
+    options: [
+        { text: '正确', value: 1 },
+        { text: '错误', value: 2 }
+    ]
 })
 
 // 设置答案
 const setAnswer = (value) => {
-  formData.answer = value
+    formData.answer = value
 }
 
 // 提交表单
-const handleSend = async() => {
-  // 验证题目是否为空
-  if (!formData.stem.trim()) {
-    uni.showToast({
-      title: '请输入题目内容',
-      icon: 'none'
-    });
-    return;
-  }
-  
-  // 验证是否选择了答案
-  if (formData.answer === null) {
-    uni.showToast({
-      title: '请选择正确答案',
-      icon: 'none'
-    });
-    return;
-  }
-  
-//   // 设置按钮加载状态
-//   butLoading.value = true;
-  
-  // 准备提交的数据
-  const submitData = {
-    Type: formData.Type,
-    stem: formData.stem,
-    answer: formData.answer,
-    analysis: formData.analysis
-  };
+const handleSend = async () => {
+    try {
+        // 验证题目是否为空
+        if (!formData.stem.trim()) {
+            uni.showToast({
+                title: '请输入题目内容',
+                icon: 'none'
+            });
+            return;
+        }
 
-// 调用API提交数据
-  const res = await addQuestion(submitData)
-  console.log(res)
-  
-  
-  
- 
+        // 验证是否选择了答案
+        if (formData.answer === null) {
+            uni.showToast({
+                title: '请选择正确答案',
+                icon: 'none'
+            });
+            return;
+        }
+
+        // 设置按钮加载状态
+        butLoading.value = true;
+
+        // 准备提交的数据
+        const submitData = {
+            Type: formData.Type,
+            stem: formData.stem,
+            answer: formData.answer,
+            analysis: formData.analysis
+        };
+
+        // 调用API提交数据
+        const res = await addQuestion(submitData)
+        if (res.code === 200) {
+            // 重置表单
+            resetForm()
+            butLoading.value = false;
+            // 提示提交成功 
+            uni.showToast({
+                title: '提交成功',
+                icon: 'none'
+            })
+        }
+    } catch (e) {
+        console.log(e)
+        uni.showToast({
+            title: '提交失败',
+            icon: 'none'
+        })
+    } finally {
+        butLoading.value = false;
+    }
+
+
+
+
 }
 
 // 重置表单
 const resetForm = () => {
-  formData.stem = '';
-  formData.analysis = '';
-  formData.answer = null;
+    formData.stem = '';
+    formData.analysis = '';
+    formData.answer = null;
 }
 </script>
 
@@ -132,7 +140,7 @@ const resetForm = () => {
     margin-bottom: 20rpx;
 }
 
-.options-container{
+.options-container {
     margin-top: 20rpx;
     background: white;
     padding: 20rpx;
