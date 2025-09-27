@@ -7,6 +7,7 @@ const ExamSelectModel = require('../../models/SelectModel')
 const ExamBlankModel = require('../../models/BlankModel')
 const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
+const userQuestionModel = require('../../models/UserQuestionModel')
 
 const ExamService = {
     getExamList: async () => {
@@ -131,8 +132,53 @@ const ExamService = {
             })
         )
          return results.filter(Boolean); // 过滤掉null结果
+    },
+    useraddquestion: async (uid, questionData) => {
+        try {
+            // 构建基础数据对象
+            const newQuestion = {
+                Uid: uid,
+                stem: questionData.stem,
+                Type: questionData.Type,
+                analysis: questionData.analysis || '', 
+                status: 0, // 默认为草稿状态
+                createTime: new Date()
+            };
+            
+            // 根据题目类型添加特定字段
+            switch (questionData.Type) {
+                case 1: // 选择题
+                    newQuestion.options = questionData.options;
+                    newQuestion.isMultiple = questionData.isMultiple || 0;
+                    break;
+                case 2: // 填空题
+                    newQuestion.options = questionData.options;
+                    break;
+                case 3: // 判断题
+                    newQuestion.answer = questionData.answer;
+                    break;
+                case 4: // 简答题
+                    newQuestion.content = questionData.content;
+                    break;
+                default:
+                    throw new Error('无效的题目类型');
+            }
+            
+            const result = await userQuestionModel.create(newQuestion);
+            return{
+                success:true,
+                message:'题目添加成功',
+            }
+        } catch (error) {
+            console.error('添加用户题目失败:', error);
+            return{
+                success:false,
+                message:'题目添加失败',
+                code:500
+            }
+            throw error;
+        }
     }
-        
         
     
 }

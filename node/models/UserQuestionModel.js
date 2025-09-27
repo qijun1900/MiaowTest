@@ -29,11 +29,11 @@ const UserQuestionSchema = new mongoose.Schema({
     // 简答题答案 
     content: { 
         type: String,
-        default: ''
+        default:null
     },
     options: { // 选择题选项及答案，填空题答案内容
         type: Array,
-        default: []
+        default:null,
     },
     answer: { 
         type: Number, //答案，针对判断题
@@ -46,18 +46,14 @@ const UserQuestionSchema = new mongoose.Schema({
     
     // 选择题特有字段
     isMultiple: { // 是否多选（仅选择题有效）
-        type: Boolean,
-        default: false
+        type:Number,
+        default:null
     },
     
     // 状态管理
     status: { // 状态：0-草稿 1-已发布 2-审核中 3-审核不通过
         type: Number,
         default: 0
-    },
-    isPublic: { // 是否公开
-        type: Boolean,
-        default: false
     },
     // 时间戳
     createTime: {

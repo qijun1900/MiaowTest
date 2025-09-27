@@ -5,15 +5,15 @@
         <view class="editor-section">
             <uniEditor 
                 placeholder="请在此处输入题干内容"
-                v-model="stem"
+                v-model="formData.stem"
                 height="200rpx"/>
         </view>
         <ThemDivider text="题目选项"/>
         <view class="options-container">
             <!-- 选项列表 -->
-            <view class="option-item" v-for="(option, index) in options" :key="index">
+            <view class="option-item" v-for="(option, index) in formData.options" :key="index">
                 <!-- 删除选项图标 -->
-                <view class="minus-btn" @click="removeOption(index)" v-if="options.length > 1">
+                <view class="minus-btn" @click="removeOption(index)" v-if="formData.options.length > 1">
                     <uni-icons type="close" size="16" color="#ffffff"></uni-icons>
                 </view>
                 
@@ -45,56 +45,125 @@
         <view class="editor-section">
             <uniEditor
                 placeholder="请在此处输入解析内容"
-                v-model="anlysis"
+                v-model="formData.analysis"
                 height="200rpx"/>
         </view>
         <view class="submit-btn">
-            <button type="primary" :loading="butLoading">添加题目</button>
+            <button type="primary" :loading="butLoading" @click="handleSend">添加题目</button>
         </view>
     </view>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemDivider from '../../core/ThemDivider.vue';
+import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
-const stem = ref('') // 题干
-const anlysis = ref('') // 解析
-const butLoading = ref(true) // 按钮加载中
+const butLoading = ref(false) // 按钮加载中
+// 使用 reactive 集合所有数据
+const formData = reactive({
+    Type: 1, // 题目类型
+    stem: '', // 题干
+    analysis: '', // 解析
+    isMultiple: null, // 是否多选
+    // 选项数据
+    options: [
+        { content: '', isCorrect: false },
+        { content: '', isCorrect: false },
+        { content: '', isCorrect: false },
+        { content: '', isCorrect: false }
+    ]
+})
 
-// 选项数据
-const options = ref([
-    { content: '', isCorrect: false },
-    { content: '', isCorrect: false },
-    { content: '', isCorrect: false },
-    { content: '', isCorrect: false }
-])
 // 添加选项
 const addOption = () => {
-    options.value.push({
-        content: '',
-        isCorrect: false
-    })
+  formData.options.push({
+    content: '',
+    isCorrect: false
+  })
 }
 
 // 移除选项
 const removeOption = (index) => {
-    if (options.value.length > 1) {
-        options.value.splice(index, 1)
-    }
+  if (formData.options.length > 1) {
+    formData.options.splice(index, 1)
+  }
 }
 
 // 设置正确答案
 const setCorrectAnswer = (index) => {
-    // 先将所有选项设为不正确
-    options.value.forEach(option => {
-        option.isCorrect = false
-    })
-    // 设置当前选项为正确答案
-    options.value[index].isCorrect = true
+  // 切换当前选项的正确状态
+  formData.options[index].isCorrect = !formData.options[index].isCorrect
+  
+  // 计算已选择的答案数量
+  const correctCount = formData.options.filter(option => option.isCorrect).length
+  
+  // 根据选择的答案数量设置是否多选
+  formData.isMultiple = correctCount > 1 ? 1 : 0
 }
 
+// 提交表单
+const handleSend =async () => {
+  // 验证题目是否为空
+  if (!formData.stem.trim()) {
+    uni.showToast({
+      title: '请输入题目内容',
+      icon: 'none'
+    });
+    return;
+  }
+  
+  // 验证选项内容是否为空
+  const hasEmptyOption = formData.options.some(option => !option.content.trim());
+  if (hasEmptyOption) {
+    uni.showToast({
+      title: '请填写所有选项内容',
+      icon: 'none'
+    });
+    return;
+  }
+  
+  // 验证是否选择了至少一个正确答案
+  const hasCorrectAnswer = formData.options.some(option => option.isCorrect);
+  if (!hasCorrectAnswer) {
+    uni.showToast({
+      title: '请至少选择一个正确答案',
+      icon: 'none'
+    });
+    return;
+  }
+  
+    // 设置按钮加载状态
+    //  butLoading.value = true;
+  
+  // 准备提交的数据
+  const submitData = {
+    Type: formData.Type,
+    stem: formData.stem,
+    options: formData.options,
+    analysis: formData.analysis,
+    isMultiple: formData.isMultiple
+  };
+  
+  const res = await addQuestion(submitData)
+  console.log(res)
+  
+
+}
+
+// 重置表单
+const resetForm = () => {
+  formData.stem = '';
+  formData.analysis = '';
+  formData.isMultiple = null;
+  formData.options = [
+    { content: '', isCorrect: false },
+    { content: '', isCorrect: false },
+    { content: '', isCorrect: false },
+    { content: '', isCorrect: false }
+  ];
+}
 </script>
 <style scoped>
 .editor-section {

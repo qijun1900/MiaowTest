@@ -166,6 +166,32 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching FetchMatchQuestionList details:', error); // 处理错误
         }
+    },
+    useraddquestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const questionData = req.body;
+            const result = await ExamService.useraddquestion(
+                uid, // 用户ID
+                questionData, // 解构问题数据
+            )
+           if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                });
+            }else{
+                res.send({
+                    code: result.code,
+                    message: result.message,
+                });
+            }
+             
+        }catch (error) {
+            console.error('Error fetching useraddquestion details:', error); // 处理错误
+
+        }
     }
 }
 

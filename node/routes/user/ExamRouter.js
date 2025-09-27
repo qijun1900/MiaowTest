@@ -1,6 +1,8 @@
 var express = require('express');
 const ExamController = require('../../controllers/user/ExamController');
 var ExamRouter = express.Router();
+const JWT = require('../../MiddleWares/jwt');// 引入JWT中间件，用于验证token
+
 
 
 //涉及文件上传
@@ -17,4 +19,6 @@ ExamRouter.get("/uniappAPI/IndexHotExam/getHotExamList",ExamController.getHotExa
 ExamRouter.get("/uniappAPI/Exam/getExamSubjects",ExamController.getExamSubjects)//获取所有考试科目
 ExamRouter.get("/uniappAPI/Exam/getExamSubjectTypes/:id",ExamController.getExamSubjectTypes)//获取单个考试科目下的所有考试题型
 ExamRouter.post("/uniappAPI/Exam/FetchMatchQuestionList",ExamController.FetchMatchQuestionList)//获取匹配题
+ExamRouter.post("/uniapp/exam/useradd/question",JWT.verifyTokenMiddleware(),ExamController.useraddquestion)//用户添加自己的题目
+
 module.exports = ExamRouter; 

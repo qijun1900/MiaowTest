@@ -5,7 +5,7 @@
         <view class="editor-section">
             <uniEditor 
             placeholder="请在此处输入题干内容" 
-            v-model="stem" 
+            v-model="formData.stem" 
             height="200rpx" />
         </view>
         <ThemDivider text="题目答案" />
@@ -13,16 +13,16 @@
             <!-- 答案列表 -->
             <view class="judge-options">
                 <view class="judge-option" 
-                      v-for="(option, index) in options" 
+                      v-for="(option, index) in formData.options" 
                       :key="index" 
-                      :class="{ 'selected': answer === option.value }"
+                      :class="{ 'selected': formData.answer === option.value }"
                       @click="setAnswer(option.value)">
                     <!-- 选项图标 -->
                     <view class="option-icon" :class="option.value === 1 ? 'correct-icon' : 'wrong-icon'">
                         <uni-icons 
                             :type="option.value === 1 ? 'checkmarkempty' : 'closeempty'" 
                             size="18" 
-                            :color="answer === option.value ? '#ffffff' : (option.value === 1 ? '#52c41a' : '#ff4d4f')">
+                            :color="formData.answer === option.value ? '#ffffff' : (option.value === 1 ? '#52c41a' : '#ff4d4f')">
                         </uni-icons>
                     </view>
                     
@@ -31,7 +31,7 @@
                     
                     <!-- 答案选择圆圈 -->
                     <view class="radio-btn">
-                        <view class="radio-circle" :class="{ 'selected': answer === option.value }"></view>
+                        <view class="radio-circle" :class="{ 'selected': formData.answer === option.value }"></view>
                     </view>
                 </view>
             </view>
@@ -42,38 +42,91 @@
         <view class="editor-section">
             <uniEditor 
                 placeholder="请在此处输入解析内容" 
-                v-model="anlysis" 
+                v-model="formData.analysis" 
                 height="200rpx" />
         </view>
         <view class="submit-btn">
-            <button type="primary" :loading="butLoading">添加题目</button>
+            <button type="primary" :loading="butLoading" @click="handleSend">添加题目</button>
         </view>
 
     </view>
 
 </template>
+
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemDivider from '../../core/ThemDivider.vue';
+import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
-const stem = ref('') // 题干
-const anlysis = ref('') // 解析
 const butLoading = ref(false) // 按钮加载中
-const answer = ref(null) // 答案，1为正确，2为错误
 
-// 选项数据
-const options = ref([
+// 使用 reactive 集合所有数据
+const formData = reactive({
+  Type: 3, // 题目类型，默认为3（判断题）
+  stem: '', // 题干
+  analysis: '', // 解析
+  answer: null, // 答案，1为正确，2为错误
+  // 选项数据
+  options: [
     { text: '正确', value: 1 },
     { text: '错误', value: 2 }
-])
+  ]
+})
 
 // 设置答案
 const setAnswer = (value) => {
-    answer.value = value
+  formData.answer = value
 }
 
+// 提交表单
+const handleSend = async() => {
+  // 验证题目是否为空
+  if (!formData.stem.trim()) {
+    uni.showToast({
+      title: '请输入题目内容',
+      icon: 'none'
+    });
+    return;
+  }
+  
+  // 验证是否选择了答案
+  if (formData.answer === null) {
+    uni.showToast({
+      title: '请选择正确答案',
+      icon: 'none'
+    });
+    return;
+  }
+  
+//   // 设置按钮加载状态
+//   butLoading.value = true;
+  
+  // 准备提交的数据
+  const submitData = {
+    Type: formData.Type,
+    stem: formData.stem,
+    answer: formData.answer,
+    analysis: formData.analysis
+  };
+
+// 调用API提交数据
+  const res = await addQuestion(submitData)
+  console.log(res)
+  
+  
+  
+ 
+}
+
+// 重置表单
+const resetForm = () => {
+  formData.stem = '';
+  formData.analysis = '';
+  formData.answer = null;
+}
 </script>
+
 <style scoped>
 .editor-section {
     margin-bottom: 20rpx;

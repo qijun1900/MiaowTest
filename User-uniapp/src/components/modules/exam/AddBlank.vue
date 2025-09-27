@@ -1,19 +1,23 @@
 <template>
-    <view >
+    <view>
          <ThemDivider text="题目题干"/>
         <!-- 题干编辑器 -->
         <view class="editor-section">
             <uniEditor 
                 placeholder="请在此处输入题干内容"
-                v-model="stem"
+                v-model="formData.stem"
                 height="200rpx"/>
         </view>
         <ThemDivider text="题目答案"/>
         <view class="options-container">
             <!-- 答案列表 -->
-            <view class="option-item" v-for="(answer, index) in answers" :key="index">
+            <view class="option-item" 
+                v-for="(answer, index) in formData.options" :key="index">
                 <!-- 删除答案图标 -->
-                <view class="minus-btn" @click="removeAnswer(index)" v-if="answers.length > 1">
+                <view 
+                    class="minus-btn" 
+                    @click="removeAnswer(index)" 
+                    v-if="formData.options.length > 1">
                     <uni-icons type="close" size="16" color="#ffffff"></uni-icons>
                 </view>
                 
@@ -40,43 +44,98 @@
         <view class="editor-section">
             <uniEditor
                 placeholder="请在此处输入解析内容"
-                v-model="anlysis"
+                v-model="formData.analysis"
                 height="200rpx"/>
         </view>
         <view class="submit-btn">
-            <button type="primary" :loading="butLoading">添加题目</button>
+            <button type="primary" :loading="butLoading" @click="handleSend">添加题目</button>
         </view>
     </view>
 </template>
+
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemDivider from '../../core/ThemDivider.vue';
+import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
-const stem = ref('') // 题干
-const anlysis = ref('') // 解析
 const butLoading = ref(false) // 按钮加载中
 
-// 答案数据
-const answers = ref([
-    { content: '' },
-])
+// 使用 reactive 集合所有数据
+const formData = reactive({
+    Type: 2, // 题目类型，默认为2（填空题）
+    stem: '', // 题干
+    analysis: '', // 解析
+    // 答案数据
+    options: [
+        { content: '' }
+    ]
+})
 
 // 添加答案
 const addAnswer = () => {
-    answers.value.push({
-        content: ''
-    })
+  formData.options.push({
+    content: ''
+  })
 }
 
 // 移除答案
 const removeAnswer = (index) => {
-    if (answers.value.length > 1) {
-        answers.value.splice(index, 1)
-    }
+  if (formData.options.length > 1) {
+    formData.options.splice(index, 1)
+  }
 }
 
+// 提交表单
+const handleSend = async() => {
+  // 验证题目是否为空
+  if (!formData.stem.trim()) {
+    uni.showToast({
+      title: '请输入题目内容',
+      icon: 'none'
+    });
+    return;
+  }
+  
+  // 验证答案内容是否为空
+  const hasEmptyAnswer = formData.options.some(options => !options.content.trim());
+  if (hasEmptyAnswer) {
+    uni.showToast({
+      title: '请填写所有答案内容',
+      icon: 'none'
+    });
+    return;
+  }
+  
+//   // 设置按钮加载状态
+//   butLoading.value = true;
+  
+  // 准备提交的数据
+  const submitData = {
+    Type: formData.Type,
+    stem: formData.stem,
+    options: formData.options,
+    analysis: formData.analysis
+  };
+  
+  // 调用API提交数据
+  const res = await addQuestion(submitData)
+  console.log(res)
+  
+  
+
+}
+
+// 重置表单
+const resetForm = () => {
+  formData.stem = '';
+  formData.analysis = '';
+  formData.answers = [
+    { content: '' }
+  ];
+}
 </script>
+
 <style scoped>
 .editor-section {
     margin-bottom: 20rpx;

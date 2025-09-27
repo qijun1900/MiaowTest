@@ -1,0 +1,27 @@
+import { http } from '../../util/http.js';
+
+/**
+ * 通用添加题目接口
+ * @param {Object} questionData - 题目数据
+ * @param {string} questionData.stem - 题干
+ * @param {number} questionData.Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @param {Array} questionData.options - 选项/答案数组 (选择题和填空题使用)
+ * @param {number} questionData.answer - 答案 (判断题使用, 1:正确, 2:错误)
+ * @param {string} questionData.content - 答案内容 (简答题使用)
+ * @param {string} questionData.analysis - 解析
+ * @param {number} questionData.isMultiple - 是否多选 (仅选择题使用)
+ * @returns {Promise} 返回添加题目结果
+ */
+export async function addQuestion(questionData) {
+  try {
+    console.log("addQuestion 开始", questionData);
+    return await http({
+      url: '/uniapp/exam/useradd/question',
+      method: 'POST',
+      data: questionData
+    });
+  } catch (error) {
+    console.error("addQuestion 失败", error);
+    throw error;
+  }
+}

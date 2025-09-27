@@ -5,7 +5,7 @@
         <view class="editor-section">
             <uniEditor 
                 placeholder="请在此处输入题干内容" 
-                v-model="stem" 
+                v-model="formData.stem" 
                 height="200rpx" />
         </view>
         <view class="answer-container">
@@ -17,7 +17,7 @@
             </view>
                 <uniEditor 
                     placeholder="请在此处输入参考答案" 
-                    v-model="content" 
+                    v-model="formData.content" 
                     height="300rpx"/>
         </view>
         <ThemDivider text="题目解析(可选)"/>
@@ -25,26 +25,77 @@
         <view class="editor-section">
             <uniEditor
                 placeholder="请在此处输入解析内容"
-                v-model="anlysis"
+                v-model="formData.analysis"
                 height="200rpx" />
         </view>
         <view class="submit-btn">
-            <button type="primary" :loading="butLoading">添加题目</button>
+            <button type="primary" :loading="butLoading" @click="handleSend">添加题目</button>
         </view>
     </view>
 </template>
+
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemDivider from '../../core/ThemDivider.vue';
+import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
-const stem = ref('') // 题干
-const content = ref('') // 答案
-const anlysis = ref('') // 解析
 const butLoading = ref(false) // 按钮加载中
 
+// 使用 reactive 集合所有数据
+const formData = reactive({
+  Type: 4, // 题目类型
+  stem: '', // 题干
+  content: '', // 答案
+  analysis: '' // 解析
+})
 
+// 提交表单
+const handleSend = async() => {
+  // 验证题目是否为空
+  if (!formData.stem.trim()) {
+    uni.showToast({
+      title: '请输入题目内容',
+      icon: 'none'
+    });
+    return;
+  }
+  
+  // 验证答案是否为空
+  if (!formData.content.trim()) {
+    uni.showToast({
+      title: '请输入参考答案',
+      icon: 'none'
+    });
+    return;
+  }
+  
+//   // 设置按钮加载状态
+//   butLoading.value = true;
+  
+  // 准备提交的数据
+  const submitData = {
+    Type: formData.Type,
+    stem: formData.stem,
+    content: formData.content,
+    analysis: formData.analysis
+  };
+  // 调用API提交数据
+  const res = await addQuestion(submitData)
+  console.log(res)
+  
+
+
+}
+
+// 重置表单
+const resetForm = () => {
+  formData.stem = '';
+  formData.content = '';
+  formData.analysis = '';
+}
 </script>
+
 <style scoped>
 .editor-section {
     margin-bottom: 20rpx;
@@ -82,5 +133,4 @@ const butLoading = ref(false) // 按钮加载中
     font-weight: 600;
     color: #333;
 }
-
 </style>
