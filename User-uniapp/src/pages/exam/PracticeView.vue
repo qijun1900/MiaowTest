@@ -143,6 +143,7 @@ import uviewPopup from '../../components/core/uviewPopup.vue';
 import AnswerSheet from '../../components/modules/exam/AnswerSheet.vue';
 import { useStatisticsStore } from '../../stores/modules/StatisticsStore';
 import { storeToRefs } from 'pinia'; // 从Pinia导入storeToRefs
+import navBarHeightUtil from '../../util/navBarHeight';
 
 const questionStore = useQuestionStore();// 问题Store,存储问题和用户设置
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
@@ -209,22 +210,13 @@ const handleSubmitAnswer = () => {
     })
 }
 
-// 获取导航栏高度
-const getNavBarHeight = () => {
-    // #ifdef MP-WEIXIN 
-    // 小程序端使用uni.getWindowInfo获取状态栏高度
-    const windowInfo = uni.getWindowInfo();
-    navBarHeight.value = windowInfo.statusBarHeight + 44; // 状态栏高度 + 导航栏高度
-    // #endif
-    
-    // #ifdef H5 
-    // H5端使用固定值
-    navBarHeight.value = 44; // 导航栏高度
-    // #endif
-}
+
 
 onMounted(() => {
-    getNavBarHeight();
+   navBarHeightUtil.getNavBarInfo()
+   console.log(navBarHeightUtil.getNavBarInfo().totalHeight);
+   navBarHeight.value = navBarHeightUtil.getNavBarInfo().totalHeight;
+    
 })
 </script>
 

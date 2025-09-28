@@ -52,7 +52,9 @@
 		{
 			"path": "pages/exam/crquestionbankView",
 			"style": {
-				"navigationBarTitleText": "创建题库"
+				"navigationBarTitleText": "创建题库",
+				"navigationStyle": "custom"
+
 			}
 		},
 		{

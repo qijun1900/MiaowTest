@@ -1,7 +1,7 @@
 <template>
   <view class="login-container">
     <!-- 自定义 添加返回按钮 -->
-    <view class="back-btn" @click="goBack">
+    <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
       <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
       <text class="back-text">返回</text>
     </view>
@@ -94,14 +94,22 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { UserAccountLogin } from '../../API/My/UserLoginAPI';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
+import navBarHeightUtil from '../../util/navBarHeight';
 
 const showPassword = ref(true);
 const rememberMe = ref([]);
 const userInfoStore = UserInfoStore();
+const navBarInfo = ref(0);// 导航栏高度信息
+
+// 计算返回按钮的top位置
+const backBtnTop = computed(() => {
+  // 根据导航栏高度信息计算返回按钮位置
+  return navBarInfo.value ? navBarInfo.value + 'rpx' : '75rpx';
+});
 
 const formData = reactive({
   email: '',
@@ -217,6 +225,13 @@ const showPrivacyPolicy = () => {
     showCancel: false
   });
 };
+
+// 计算导航栏高度
+onMounted(() => {
+  const info = navBarHeightUtil.getNavBarInfo();
+  navBarInfo.value = info.totalHeight;
+});
+
 </script>
 
 <style lang="scss" scoped>
@@ -232,8 +247,7 @@ const showPrivacyPolicy = () => {
   // 返回按钮样式
   .back-btn {
     position: absolute;
-    top: 90rpx;
-    left: 40rpx;
+    left: 20rpx;
     display: flex;
     align-items: center;
     gap: 10rpx;

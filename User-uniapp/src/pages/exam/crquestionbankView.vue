@@ -1,4 +1,12 @@
 <template>
+    <!-- 自定义 添加返回按钮 -->
+    <view 
+        class="back-btn" 
+        :style="{ top: backBtnTop }" 
+        @click="goBack">
+      <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
+      <text class="back-text">返回</text>
+    </view>
     <view class="container">
         <!-- 页面标题 -->
         <view class="page-header">
@@ -125,6 +133,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { AddUserBank } from '../../API/Exam/ExamAPI';
+import navBarHeightUtil from '../../util/navBarHeight';
+
+const navBarInfo = ref(0);// 导航栏高度信息
+// 题库名称和验证状态
+const questionBankName = ref('')
+const nameError = ref('')
+const userInfoStore = UserInfoStore()
 
 // 封装 uni.showModal 为 Promise
 const showModal = (options) => {
@@ -140,11 +155,15 @@ const showModal = (options) => {
     });
   });
 };
+// 计算返回按钮的top位置
+const backBtnTop = computed(() => {
+  // 根据导航栏高度信息计算返回按钮位置
+  return navBarInfo.value ? navBarInfo.value + 'rpx' : '75rpx';
+});
+const goBack = () => {
+  uni.navigateBack({ delta: 1 }); // 返回上一页
+};
 
-// 题库名称和验证状态
-const questionBankName = ref('')
-const nameError = ref('')
-const userInfoStore = UserInfoStore()
 
 // 使用计算属性来判断用户是否已登录
 const isLoggedIn = computed(() => {
@@ -276,6 +295,10 @@ const handleAIImport = async () => {
 
 // 页面加载时检查用户是否已登录
 onMounted(async () => {
+  // 获取导航栏高度信息
+   const info = navBarHeightUtil.getNavBarInfo();
+    navBarInfo.value = info.totalHeight;
+  
   if (!isLoggedIn.value) {
     try {
       const res = await showModal({
@@ -297,10 +320,27 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+  // 返回按钮样式
+  .back-btn {
+    position: absolute;
+    left: 20rpx;
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+    z-index: 10;
+    padding: 10rpx 20rpx;
+    border-radius: 20rpx;
+    background-color: rgba(255, 255, 255, 0.8);
+    
+    .back-text {
+      font-size: 28rpx;
+      color: #3c9cff;
+    }
+  }
 .container {
     min-height: 100vh;
     background: linear-gradient(135deg, #f5f9ff 0%, #e6f2ff 100%);
-    padding: 40rpx 30rpx;
+    padding: 100rpx 30rpx 30rpx 30rpx ;
     position: relative;
     overflow: hidden;
 }
@@ -537,8 +577,8 @@ onMounted(async () => {
 }
 
 .feature-text {
-    font-size: 24rpx;
-    color: #666;
+    font-size: 26rpx;
+    color: #606060;
     line-height: 1.5;
     flex: 1;
 }
@@ -571,6 +611,7 @@ onMounted(async () => {
         left: -35rpx;
     }
 }
+
 
 // 响应式适配
 @media (max-width: 750rpx) {

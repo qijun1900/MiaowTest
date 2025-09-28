@@ -85,7 +85,7 @@ onMounted(async ()=>{
 }
 
 .bank-name {
-    font-size: 27rpx;
+    font-size: 32rpx;
     font-weight: bold;
     color: #333333;
     margin-bottom: 15rpx;
