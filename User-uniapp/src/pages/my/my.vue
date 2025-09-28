@@ -5,18 +5,18 @@
       <view class="avatar-wrapper">
         <image 
           class="avatar" 
-          :src="  isLoggedIn ? '/static/other/default-avatar.png' : '/static/other/default-user.png'" 
+          :src="userInfoStore.isLoggedIn ? '/static/other/default-avatar.png' : '/static/other/default-user.png'" 
           mode="aspectFill"
         ></image>
       </view>
       <view class="user-detail" @click="handleUserinfo">
         <view class="user-info-content">
-          <view class="login-btn" v-if="!isLoggedIn">点击登录</view>
+          <view class="login-btn" v-if="!userInfoStore.isLoggedIn">点击登录</view>
           <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${91}位喵宝` }}</view>
-          <view class="user-desc" v-if="!isLoggedIn">登录后可享受更多服务</view>
+          <view class="user-desc" v-if="!userInfoStore.isLoggedIn">登录后可享受更多服务</view>
           <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.uid || '欢迎回来' }}</text></view>
         </view>
-        <view class="arrow-right" v-if="isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
+        <view class="arrow-right" v-if="userInfoStore.isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
       </view>
     </view>
     
@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref } from 'vue';
 import uviewOverlay from '../../components/core/uviewOverlay.vue';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
@@ -73,13 +73,8 @@ import ThemDivider from '../../components/core/ThemDivider.vue';
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
 
-// 使用计算属性来判断用户是否已登录
-const isLoggedIn = computed(() => {
-  return !!userInfoStore.userInfo && Object.keys(userInfoStore.userInfo).length > 0;
-});
-
 const handleUserinfo = () => {
-  if (!isLoggedIn.value) {
+  if (!userInfoStore.isLoggedIn) {
     overlayShow.value = true;
   }else{
     uni.navigateTo({
@@ -119,14 +114,7 @@ const handleUseAccountLogin = () => {
   });
 }
 
-onMounted(() => {
-  // 检查本地存储中是否有 token
-  const token = uni.getStorageSync('token');
-  // 如果有 token 但没有用户信息，可能需要重新获取用户信息
-  if (token && !isLoggedIn.value) {
-    console.log("Token exists but no user info, may need to fetch user data");
-  }
-});
+
 </script>
 
 <style scoped>

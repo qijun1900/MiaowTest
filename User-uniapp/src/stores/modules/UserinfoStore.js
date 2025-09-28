@@ -1,4 +1,4 @@
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { defineStore } from 'pinia';
 
 export const UserInfoStore = defineStore('userinfo',()=>{
@@ -14,10 +14,17 @@ export const UserInfoStore = defineStore('userinfo',()=>{
     const clearUserInfo = ()=>{
         userInfo.value = undefined
     }
+
+    // 登录状态检查函数
+    const isLoggedIn = computed(() => {
+        return !!userInfo.value && Object.keys(userInfo.value).length > 0;
+    })
+
     return {
         userInfo,
         setUserInfo,
-        clearUserInfo
+        clearUserInfo,
+        isLoggedIn
     }
 },
 //持久化

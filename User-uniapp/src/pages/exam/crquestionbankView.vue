@@ -164,12 +164,6 @@ const goBack = () => {
   uni.navigateBack({ delta: 1 }); // 返回上一页
 };
 
-
-// 使用计算属性来判断用户是否已登录
-const isLoggedIn = computed(() => {
-  return !!userInfoStore.userInfo && Object.keys(userInfoStore.userInfo).length > 0;
-});
-
 // 计算属性：检查名称是否有效
 const isNameValid = computed(() => {
     return questionBankName.value.length >= 2 && questionBankName.value.length <= 20 && !nameError.value
@@ -299,7 +293,7 @@ onMounted(async () => {
    const info = navBarHeightUtil.getNavBarInfo();
     navBarInfo.value = info.totalHeight;
   
-  if (!isLoggedIn.value) {
+  if (!userInfoStore.isLoggedIn) {
     try {
       const res = await showModal({
         title: '您未登录',
@@ -310,7 +304,7 @@ onMounted(async () => {
       if (res.confirm) {
         uni.redirectTo({
           url: '/pages/my/UserLoginView'
-        })
+        }) 
       }
     } catch (error) {
       console.error('登录检查出错:', error);
