@@ -110,3 +110,22 @@ export async function AddUserBank(bankName) {
     throw error;
   }
 }
+/**
+ * 获取用户题库列表
+ * @returns {blankName} 返回用户题库名称
+ * @returns {questionCount} 返回用户题库题目数量
+ * @returns {bankId} 返回用户题库ID
+ * @returns {createTime} 返回用户题库创建时间
+ */
+export async function getUserBankList() {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getUserBankList`,
+      method: 'GET',
+    });
+  }catch (error) {
+    console.error("getUserBankList 失败", error);
+    throw error;
+  }
+  
+}

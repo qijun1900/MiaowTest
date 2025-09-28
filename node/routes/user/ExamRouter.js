@@ -21,4 +21,5 @@ ExamRouter.get("/uniappAPI/Exam/getExamSubjectTypes/:id",ExamController.getExamS
 ExamRouter.post("/uniappAPI/Exam/FetchMatchQuestionList",ExamController.FetchMatchQuestionList)//获取匹配的题目题
 ExamRouter.post("/uniappAPI/exam/useradd/question",JWT.verifyTokenMiddleware(),ExamController.useraddquestion)//用户添加自己的题目
 ExamRouter.post("/uniappAPI/exam/AddUserBank",JWT.verifyTokenMiddleware(),ExamController.AddUserBank)//用户添加自己的题库
+ExamRouter.get("/uniappAPI/Exam/getUserBankList",JWT.verifyTokenMiddleware(),ExamController.getUserBankList)//获取用户的题库列表
 module.exports = ExamRouter; 

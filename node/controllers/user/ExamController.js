@@ -219,6 +219,24 @@ const ExamController ={
                 message: '服务器内部错误',
             });
         }
+    },
+    getUserBankList:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const result = await ExamService.getUserBankList(uid)
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    data: result.data
+                });
+            }else{
+                res.send({
+                    code: 401
+                });
+            }
+        }catch (error) {
+            console.error('Error fetching getUserBankList details:', error); // 处理错误
+        }
     }
 }
 

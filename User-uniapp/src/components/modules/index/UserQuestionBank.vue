@@ -15,10 +15,10 @@
                 
                 <!-- 右边题库信息 -->
                 <view class="bank-info">
-                    <text class="bank-name">{{ item.name }}</text>
+                    <text class="bank-name">{{ item.bankName }}</text>
                     <view class="bank-details">
                         <text class="question-count">{{ item.questionCount }}题</text>
-                        <text class="time">{{ item.time }}</text>
+                        <text class="time">{{formatTime.getTime2(item.createTime)}}</text>
                     </view>
                 </view>
                 
@@ -39,32 +39,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
+import { getUserBankList } from '../../../API/Exam/ExamAPI' 
+import formatTime from '../../../util/formatTime'
 
 // 假数据
-const questionBanks = ref([
-    // {
-    //     name: 'JavaScript基础题库',
-    //     questionCount: 50,
-    //     time: '2055/11/12'
-    // },
-    // {
-    //     name: 'Vue.js进阶题库',
-    //     questionCount: 30,
-    //     time: '2025/12/12'
-    // },
-    // {
-    //     name: 'React实战题库',
-    //     questionCount: 40,
-    //     time: '2026/11/12'
-    // }
-])
+const questionBanks = ref([])
 
 // 点击事件处理
 const handleClick = (item) => {
-    console.log('点击题库:', item.name)
+    console.log('点击题库:',item.bankId)
     // 这里可以添加跳转逻辑
 }
+onMounted(async ()=>{
+    const res = await getUserBankList()
+    questionBanks.value = res.data
+})
 </script>
 
 <style scoped>

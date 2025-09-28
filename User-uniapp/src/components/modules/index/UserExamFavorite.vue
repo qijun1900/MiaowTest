@@ -79,8 +79,6 @@ const fetchFavoriteExam = async () => {
 }
 // 点击事件处理
 const handleClick = (item) => {
-    console.log('点击考试:', item.name)
-    // 跳转到考试详情页，传递完整科目数据作为参数
     uni.navigateTo({
         url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(item))}`
     })

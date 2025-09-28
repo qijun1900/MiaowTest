@@ -252,6 +252,33 @@ const ExamService = {
                 success: false
             };
         }
+    },
+    getUserBankList: async (uid) => {
+        try {
+            const ConsumerModel = require('../../models/ConsumerModel');
+            // 查找用户
+            const user = await ConsumerModel.findById(uid);
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            // 返回用户的题库列表
+            return {
+                success: true,
+                data: user.questionbanks.map(bank => ({
+                    bankName: bank.bankName,
+                    questionCount: bank.questionCount,// 返回每个题库的题目数量
+                    bankId: bank._id, // 返回每个题库的ID
+                    createTime: bank.createTime,
+                }))
+            };
+        }catch (error) {
+            console.error('getUserBankList 失败:', error);
+        }
+
     }
         
     
