@@ -30,7 +30,7 @@
       <myNavbar/>
      </view>
 
-    <ThemDivider text="更多功能"/>
+    <ThemeDivider text="更多功能"/>
 
     <uviewOverlay v-model:show="overlayShow">
       <template #overlaycontent>
@@ -68,7 +68,7 @@ import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
 import myNavbar from '../../components/modules/my/myNavbar.vue';
 import VipCard from '../../components/modules/my/VipCard.vue';
-import ThemDivider from '../../components/core/ThemDivider.vue';
+import ThemeDivider from '../../components/core/ThemeDivider.vue';
 
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();

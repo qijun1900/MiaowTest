@@ -1,11 +1,11 @@
 <template>
   <view>
-    <ThemDivider text="题目题干" />
+    <ThemeDivider text="题目题干" />
     <!-- 题干编辑器 -->
     <view class="editor-section">
       <uniEditor placeholder="请在此处输入题干内容" v-model="formData.stem" height="200rpx" />
     </view>
-    <ThemDivider text="题目选项" />
+    <ThemeDivider text="题目选项" />
     <view class="options-container">
       <!-- 选项列表 -->
       <view class="option-item" v-for="(option, index) in formData.options" :key="index">
@@ -32,7 +32,7 @@
         <text>添加选项</text>
       </view>
     </view>
-    <ThemDivider text="题目解析(可选)" />
+    <ThemeDivider text="题目解析(可选)" />
     <!-- 解析编辑器 -->
     <view class="editor-section">
       <uniEditor placeholder="请在此处输入解析内容" v-model="formData.analysis" height="200rpx" />
@@ -46,7 +46,7 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
-import ThemDivider from '../../core/ThemDivider.vue';
+import ThemeDivider from '../../core/ThemeDivider.vue';
 import { addQuestion } from '../../../API/Exam/QuestionAPI';
 
 const props = defineProps({

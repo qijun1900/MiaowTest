@@ -54,7 +54,6 @@
 			"style": {
 				"navigationBarTitleText": "创建题库",
 				"navigationStyle": "custom"
-
 			}
 		},
 		{
@@ -108,7 +107,12 @@
 			"path": "pages/exam/ManualImportView",
 			"style": {
 				"navigationBarTitleText": "手动导入"
-
+			}
+		},
+		{
+			"path": "pages/exam/UserBankView",
+			"style": {
+				"navigationBarTitleText": "题库详情"
 			}
 		}
 	],

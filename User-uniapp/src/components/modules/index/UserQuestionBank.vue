@@ -48,8 +48,9 @@ const questionBanks = ref([])
 
 // 点击事件处理
 const handleClick = (item) => {
-    console.log('点击题库:',item.bankId)
-    // 这里可以添加跳转逻辑
+    uni.navigateTo({
+        url: `/pages/exam/UserBankView?data=${encodeURIComponent(JSON.stringify(item))}`
+    })
 }
 onMounted(async ()=>{
     const res = await getUserBankList()

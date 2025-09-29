@@ -14,7 +14,7 @@ const props = defineProps({
     },
     textPosition: { // 文字位置
         type: String,
-        default: 'left' // 可选值：left、right
+        default: 'left' // 可选值：left、right 
     }
 })
 </script>
