@@ -20,9 +20,7 @@
     </view>
     
     <view class="exam-list">
-      <view v-if="loading" class="loading">
-        <uni-load-more status="loading" />
-      </view>
+      <ThemeLoading v-if="loading" text="正在加载考试科目..." />
       <view v-else class="subject-list">
         <view 
           v-for="subject in examSubjects" 
@@ -63,6 +61,7 @@ import escconfig from '../../config/esc.config';
 import { onPageScroll } from '@dcloudio/uni-app';
 import formatTime from '../../util/formatTime';
 import uniSearch from '../../components/core/uniSearch.vue';
+import ThemeLoading from '../../components/core/ThemeLoading.vue';
 
 // 响应式数据
 const examSubjects = ref([]);
@@ -177,12 +176,7 @@ onMounted(() => {
   width: 100%;
 }
 
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400rpx;
-}
+
 
 .subject-list {
   width: 100%;

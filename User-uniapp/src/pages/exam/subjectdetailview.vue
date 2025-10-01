@@ -37,8 +37,11 @@
         <up-divider text="|考试题型|" textPosition="left" textColor="#007AFF" lineColor="#86bbf5">
         </up-divider>
 
+        <!-- 加载状态 -->
+        <ThemeLoading v-if="isLoading" text="正在加载题型数据..." />
+        
         <!-- 题型列表 -->
-        <view class="subject-types-container" v-if="subjectTypes && subjectTypes.length > 0">
+        <view class="subject-types-container" v-else-if="subjectTypes && subjectTypes.length > 0">
             <scroll-view scroll-y class="subject-types-scroll">
                 <view class="subject-types-list">
                     <view class="subject-type-item" v-for="(item, index) in subjectTypes" :key="index"
@@ -83,11 +86,13 @@ import { getExamSubjectTypes } from '../../API/Exam/ExamAPI';
 import Empty from '../../components/core/Empty.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import { addExamFavorite, removeExamFavorite, getExamFavorites } from '../../API/My/FavoriteAPI';
+import ThemeLoading from '../../components/core/ThemeLoading.vue';
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据
 const questionStore = useQuestionStore();
 const isFavorited = ref(false); // 添加收藏状态变量
+const isLoading = ref(false); // 加载状态
 
 // 页面加载时接收参数
 onLoad((options) => {
@@ -129,15 +134,17 @@ onLoad((options) => {
 // 异步请求点击的科目数据
 const fetchClickSubjectData = async (subjectId) => {
     try {
+        isLoading.value = true;
         const response = await getExamSubjectTypes(subjectId);
         subjectTypes.value = response.data;
-
     } catch (error) {
         console.error('获取点击的科目数据失败:', error);
         uni.showToast({
             title: '获取数据失败',
             icon: 'none'
         });
+    } finally {
+        isLoading.value = false;
     }
 }
 
