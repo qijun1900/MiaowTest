@@ -112,7 +112,8 @@
 		{
 			"path": "pages/exam/UserBankView",
 			"style": {
-				"navigationBarTitleText": "题库详情"
+				"navigationBarTitleText": "题库详情",
+				"disableScroll": true // 禁止页面滚动
 			}
 		}
 	],

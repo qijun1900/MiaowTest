@@ -237,6 +237,21 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getUserBankList details:', error); // 处理错误
         }
+    },
+    getUserBankQuestionList:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const bankId = req.params.id;//获取题库id
+            console.log("uid",uid,"bankId",bankId);
+            const result = await ExamService.getUserBankQuestionList(uid,bankId)
+            res.send({
+                code:200,
+                data: result.data
+            })  
+            
+        }catch (error) {
+            console.error('Error fetching getUserBankQuestionList details:', error); // 处理错误
+        }
     }
 }
 

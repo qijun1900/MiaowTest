@@ -25,27 +25,46 @@
       <view class="list-header">
         <text class="list-title">题目列表</text>
       </view>
-      <scroll-view scroll-y="true" class="question-scroll">
-        <view class="question-list">
+      <scroll-view 
+        scroll-y="true" 
+        class="question-scroll" 
+        :scroll-with-animation="false" 
+        :enable-back-to-top="false">
+        <!-- 加载中状态 -->
+        <ThemeLoading v-if="isLoading" text="正在加载题目..." />
+        
+        <!-- 题目列表 -->
+        <view class="question-list" v-else-if="QuestionData.length > 0">
           <!-- 题目项 -->
-          <view class="question-item" v-for="i in 30" :key="i">
-            <view class="question-number">第{{i}}题</view>
+          <view class="question-item" v-for="(item,index) in QuestionData" :key="item._id">
+            <view class="question-number">第{{index+1}}题</view>
             <view class="question-content">
-              <view class="question-type">选择题</view>
-              <view class="question-title">下列关于函数极限的说法，正确的是？</view>
+              <view class="question-type">{{ item.typeName }}</view>
+              <div class="question-title" v-html="item.stem"></div>
             </view>
             <view class="question-action">
              <uni-icons type="compose" size="23"></uni-icons>
             </view>
           </view>
         </view>
-        <ThemDivider textPosition="center" text="已经到底部了"/>
+        
+        <!-- 题目为空时候 -->
+        <Empty description="暂无题目数据" class="empty" v-else />
+        <!-- 底部提示 -->
+        <ThemDivider textPosition="center" text="已经到底部了" v-if="QuestionData.length>0"/>
       </scroll-view>
     </view>
     
     <!-- 底部按钮 -->
     <view class="bottom-button">
-      <button class="add-more-btn">添加更多题目</button>
+      <button class="add-question-btn">
+        <uni-icons type="plus" size="20" color="#fff"></uni-icons>
+        <text class="btn-text">添加题目</text>
+      </button>
+      <button class="practice-btn">
+        <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
+        <text class="btn-text">练习题目</text>
+      </button>
     </view>
   </view>
 </template>
@@ -55,17 +74,38 @@ import { onLoad } from '@dcloudio/uni-app';
 import { ref,onMounted } from 'vue';
 import ThemDivider from '../../components/core/ThemeDivider.vue';
 import formatTime from '../../util/formatTime'
+import { getUserBankQuestionList } from '../../API/Exam/QuestionAPI';
+import Empty from '../../components/core/Empty.vue';
+import ThemeLoading from '../../components/core/ThemeLoading.vue';
 
-const bankData  =ref([])
+const bankData  =ref([]);// 题库信息数据
+const QuestionData = ref([]);//题库题目数据
+const isLoading = ref(false); // 加载状态
+const fetchUserQuestion = async()=>{
+  try{
+    isLoading.value = true;
+    const res = await getUserBankQuestionList(bankData.value.bankId);
+    QuestionData.value = res.data;
+    console.log(res);
+  }catch(e){
+    console.log(e)
+    uni.showToast({
+      title: '获取题目失败，请稍后再试',
+      icon: 'none'
+    })
+  } finally {
+    isLoading.value = false;
+  }
+};
 onLoad((option)=>{
   if(option.data){
-    const data = JSON.parse(decodeURIComponent(option.data))
-    bankData.value = data
-    console.log(data)
-  }
-
+    const data = JSON.parse(decodeURIComponent(option.data));
+    bankData.value = data;
+  };
 })
+
 onMounted(()=>{
+  fetchUserQuestion()
 
 })
 
@@ -167,6 +207,7 @@ onMounted(()=>{
 .question-scroll {
   flex: 1;
   height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .question-list {
@@ -199,9 +240,9 @@ onMounted(()=>{
 }
 
 .question-title {
-  font-size: 30rpx;
+  font-size: 31rpx;
   color: #333;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .question-action {
@@ -213,19 +254,61 @@ onMounted(()=>{
 
 /* 底部按钮 */
 .bottom-button {
+  display: flex;
+  gap: 20rpx;
   padding: 20rpx 30rpx;
   margin-top: 10rpx;
 }
 
-.add-more-btn {
-  width: 100%;
+/* 添加题目按钮 */
+.add-question-btn {
+  flex: 1;
   height: 80rpx;
-  line-height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #4d94ff;
   color: #fff;
-  font-size: 30rpx;
+  font-size: 28rpx;
   border-radius: 40rpx;
   border: none;
   box-shadow: 0 4rpx 12rpx rgba(77, 148, 255, 0.3);
+  transition: all 0.3s ease;
 }
+
+.add-question-btn:active {
+  background-color: #3d7fd9;
+  opacity: 0.8;
+}
+
+/* 练习题目按钮 */
+.practice-btn {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  color: #4d94ff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  border: 2rpx solid #4d94ff;
+  box-shadow: 0 4rpx 12rpx rgba(77, 148, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.practice-btn:active {
+  background-color: #f0f7ff;
+  opacity: 0.8;
+}
+
+/* 按钮文字 */
+.btn-text {
+  margin-left: 8rpx;
+}
+.empty {
+    margin-top: 150rpx;
+}
+
+
 </style>

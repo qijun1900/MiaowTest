@@ -1,7 +1,10 @@
 <template>
     <view class="container">
+        <!-- 加载状态 -->
+        <ThemeLoading v-if="isLoading" text="正在加载题库..." />
+        
         <!-- 有题库数据时显示题库列表 -->
-        <view v-if="questionBanks.length > 0">
+        <view v-else-if="questionBanks.length > 0">
             <view class="question-bank-item" 
             v-for="(item, index) in questionBanks" 
             :key="index" 
@@ -42,9 +45,11 @@
 import { ref,onMounted } from 'vue'
 import { getUserBankList } from '../../../API/Exam/ExamAPI' 
 import formatTime from '../../../util/formatTime'
+import ThemeLoading from '../../core/ThemeLoading.vue'
 
 // 假数据
 const questionBanks = ref([])
+const isLoading = ref(false)
 
 // 点击事件处理
 const handleClick = (item) => {
@@ -53,8 +58,19 @@ const handleClick = (item) => {
     })
 }
 onMounted(async ()=>{
-    const res = await getUserBankList()
-    questionBanks.value = res.data
+    try {
+        isLoading.value = true
+        const res = await getUserBankList()
+        questionBanks.value = res.data
+    } catch (error) {
+        console.error('获取题库失败:', error)
+        uni.showToast({
+            title: '获取题库失败',
+            icon: 'none'
+        })
+    } finally {
+        isLoading.value = false
+    }
 })
 </script>
 

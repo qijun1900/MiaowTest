@@ -278,7 +278,78 @@ const ExamService = {
         }catch (error) {
             console.error('getUserBankList 失败:', error);
         }
-
+    },
+    getUserBankQuestionList: async (uid, bankId) => {
+        try {
+            const questions = await userQuestionModel.find({ Uid: uid, questionbankId: bankId });// 查找用户的指定题库     
+            if (!questions || questions.length === 0) {
+                return {
+                    code: 404,
+                    message: '题库不存在或题库为空',
+                    success: true,
+                    data: []
+                };
+            }
+            
+            // 根据题型格式化返回数据
+            const formattedQuestions = questions.map(question => {
+                const baseData = {
+                    _id: question._id,
+                    stem: question.stem,
+                    Type: question.Type,
+                    analysis: question.analysis,
+                    createTime: question.createTime,
+                };
+                
+                // 根据题型添加特定字段
+                switch (question.Type) {
+                    case 1: // 选择题
+                        return {
+                            ...baseData,
+                            options: question.options,
+                            isMultiple: question.isMultiple,
+                            typeName: '选择题'
+                        };
+                    case 2: // 填空题
+                        return {
+                            ...baseData,
+                            options: question.options,
+                            typeName: '填空题'
+                        };
+                    case 3: // 判断题
+                        return {
+                            ...baseData,
+                            answer: question.answer,
+                            typeName: '判断题'
+                        };
+                    case 4: // 简答题
+                        return {
+                            ...baseData,
+                            content: question.content,
+                            typeName: '简答题'
+                        };
+                    default:
+                        return {
+                            ...baseData,
+                            typeName: '未知题型'
+                        };
+                }
+            });
+            
+            return {
+                success: true,
+                data: formattedQuestions
+            };
+            
+        } catch (error) {
+            console.error('getUserBankQuestionList 失败:', error);
+            return {
+                code: 500,
+                message: '获取题库题目失败',
+                success: false,
+                error: error.message
+            };
+        }
     }
         
     

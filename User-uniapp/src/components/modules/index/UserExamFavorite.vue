@@ -1,9 +1,7 @@
 <template>
     <view class="container">
         <view class="exam-list">
-            <view v-if="loading" class="loading">
-                <uni-load-more status="loading" />
-            </view>
+            <ThemeLoading v-if="loading" text="正在加载收藏考试..." />
             <view v-else-if="favoriteExam.length > 0" class="subject-list">
                 <view 
                     v-for="subject in favoriteExam" 
@@ -41,6 +39,7 @@ import { ref, onMounted } from 'vue'
 import { getUserFavorites } from '../../../API/My/FavoriteAPI'
 import formatTime from '../../../util/formatTime'
 import escconfig from '../../../config/esc.config'
+import ThemeLoading from '../../core/ThemeLoading.vue'
 
 const favoriteExam = ref([])
 const loading = ref(false)
@@ -98,12 +97,7 @@ onMounted(() => {
     width: 100%;
 }
 
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400rpx;
-}
+
 
 .subject-list {
     width: 100%;

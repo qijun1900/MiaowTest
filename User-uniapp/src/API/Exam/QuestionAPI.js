@@ -24,3 +24,19 @@ export async function addQuestion(questionData) {
     throw error;
   }
 }
+/**
+ * 获取用户题库列表
+ * @param {String} bankId - 题库ID 
+ * @returns {Promise} 返回用户题库列表
+ */
+export async function getUserBankQuestionList(bankId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getUserBankQuestionList/${bankId}`,
+      method: 'GET'
+    });
+  }catch (error) {
+    console.error("getUserBankList 失败", error);
+    throw error;
+  }
+}
