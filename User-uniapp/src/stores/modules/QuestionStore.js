@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { FetchMatchQuestionList } from "../../API/Exam/ExamAPI";
 
 
+
 export const useQuestionStore = defineStore("question", () => {
     const QuestionIDs = ref([]); // 存储问题ID的数组
     const QuestionData = ref([]); // 存储问题的数组
@@ -29,7 +30,10 @@ export const useQuestionStore = defineStore("question", () => {
                 console.error('Error fetching question details:', error);
                 throw error; // 抛出错误以便上层处理
             }
-        }
+        },
+        SetUserBlankquestions: (val) => { // 新增方法，用于设置题目数据
+            QuestionData.value = val; // 将传入的值赋值给QuestionData.value
+        },
     }
 
     const UserShowSettingsActions = {

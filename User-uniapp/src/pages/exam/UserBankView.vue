@@ -24,6 +24,9 @@
     <view class="question-list-container">
       <view class="list-header">
         <text class="list-title">题目列表</text>
+        <button class="refresh-btn" @click="handleRefresh">
+          <uni-icons type="refreshempty" size="22" color="#4d94ff"></uni-icons>
+        </button>
       </view>
       <scroll-view 
         scroll-y="true" 
@@ -37,7 +40,7 @@
         <view class="question-list" v-else-if="QuestionData.length > 0">
           <!-- 题目项 -->
           <view class="question-item" v-for="(item,index) in QuestionData" :key="item._id">
-            <view class="question-number">第{{index+1}}题</view>
+            <view class="question-number">第{{ (index + 1) }}题</view>
             <view class="question-content">
               <view class="question-type">{{ item.typeName }}</view>
               <div class="question-title" v-html="item.stem"></div>
@@ -51,7 +54,7 @@
         <!-- 题目为空时候 -->
         <Empty description="暂无题目数据" class="empty" v-else />
         <!-- 底部提示 -->
-        <ThemDivider textPosition="center" text="已经到底部了" v-if="QuestionData.length>0"/>
+        <ThemDivider textPosition="center" text="已经到底部了" v-if="QuestionData.length>0 && !isLoading"/>
       </scroll-view>
     </view>
     
@@ -61,10 +64,34 @@
         <uni-icons type="plus" size="20" color="#fff"></uni-icons>
         <text class="btn-text">添加题目</text>
       </button>
-      <button class="practice-btn">
+      <button class="practice-btn"  @click="handleOpenSetting">
         <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
-        <text class="btn-text"  @click="handlePracticeQuestion">练习题目</text>
+        <text class="btn-text" >练习题目</text>
       </button>
+    </view>
+    
+    <!-- 弹出层 -->
+    <view>
+      <uviewPopup
+        v-model:show="settingpopupShow" 
+        title="练习设置">
+        <template #popupcontent>
+          <PracticeSettings 
+            v-if="settingpopupShow"
+            v-model:questionCount="questionCount"
+            :maxQuestions="QuestionData.length"
+            v-model:isRandom="isRandom"
+            v-model:isOptionRandom="isOptionRandom"
+            v-model:isShowAnswer="isShowAnswer"
+            v-model:isShowAIHelp="isShowAIHelp"/>
+          <view>
+            <button class="practice-btn" @click="handleStart">
+              <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
+              <text class="btn-text" >开始练习</text>
+            </button>
+          </view>
+        </template>
+      </uviewPopup>
     </view>
   </view>
 </template>
@@ -77,10 +104,22 @@ import formatTime from '../../util/formatTime'
 import { getUserBankQuestionList } from '../../API/Exam/QuestionAPI';
 import Empty from '../../components/core/Empty.vue';
 import ThemeLoading from '../../components/core/ThemeLoading.vue';
+import { useQuestionStore } from '../../stores/modules/QuestionStore';
+import uviewPopup from '../../components/core/uviewPopup.vue';
+import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue';
+
 
 const bankData  =ref([]);// 题库信息数据
 const QuestionData = ref([]);//题库题目数据
 const isLoading = ref(false); // 加载状态
+const QuestionStore = useQuestionStore()
+const settingpopupShow = ref(false); // 弹出层状态
+// 练习设置
+const questionCount = ref(1) 
+const isRandom = ref(false) // 默认不乱序
+const isOptionRandom = ref(false) // 默认选项不乱序
+const isShowAnswer = ref(false) //是否立即显示答案
+const isShowAIHelp = ref(false)//是否开启AI解析
 
 // 添加题目
  const handleAddQuestion = () => {
@@ -88,19 +127,47 @@ const isLoading = ref(false); // 加载状态
     url: `/pages/exam/ManualImportView?bankName=${bankData.value.bankName}&bankId=${bankData.value.bankId}&isNewCreate=false`
   })
  }
- // 练习题目
-// const handlePracticeQuestion = () => {
-//    uni.navigateTo({
-//     url: `/pages/exam/PracticeView?bankName=${bankData.value.bankName}&bankId=${bankData.value.bankId}`
-//   })
-// }
 
+//练习题目设置
+const handleOpenSetting = ()=>{
+    if(QuestionData.value.length==0){
+      uni.showToast({
+        title: '题库暂无题目请添加题目后练习',
+        icon: 'none'
+      })
+      return;
+    }
+    settingpopupShow.value = true;
+    // 先设置题目数据到Store，确保有数据可供选择
+    QuestionStore.SetUserBlankquestions(QuestionData.value);
+}
+
+// 开始练习
+const handleStart = ()=>{
+  settingpopupShow.value = false;
+  // 再进行题目选择和设置
+  QuestionStore.setSelectedQuestions(questionCount.value, isRandom.value, isOptionRandom.value);// 设置选择的题目
+  QuestionStore.setUserShowSettings({ // 设置用户显示设置
+    showAnswer: isShowAnswer.value,
+    showAIHelp: isShowAIHelp.value,
+    OptionRandom: isOptionRandom.value,
+  });
+  uni.navigateTo({
+    url: `/pages/exam/PracticeView`
+  })
+}
+
+// 刷新题目列表
+const handleRefresh = () => {
+  fetchUserQuestion();
+}
 
 const fetchUserQuestion = async()=>{
   try{
     isLoading.value = true;
     const res = await getUserBankQuestionList(bankData.value.bankId);
     QuestionData.value = res.data;
+    
   }catch(e){
     console.log(e)
     uni.showToast({
@@ -115,12 +182,12 @@ onLoad((option)=>{
   if(option.data){
     const data = JSON.parse(decodeURIComponent(option.data));
     bankData.value = data;
+    questionCount.value = bankData.value.questionCount;// 设置默认题目数量
   };
 })
 
 onMounted(()=>{
   fetchUserQuestion()
-
 })
 
 </script>
@@ -208,6 +275,9 @@ onMounted(()=>{
 }
 
 .list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 20rpx 30rpx;
   border-bottom: 1rpx solid #e6f2ff;
 }
@@ -216,6 +286,26 @@ onMounted(()=>{
   font-size: 32rpx;
   font-weight: bold;
   color: #1a5fb4;
+}
+
+/* 刷新按钮 */
+.refresh-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 2rpx solid #4d94ff;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.refresh-btn:active {
+  background-color: #f0f7ff;
+  transform: rotate(360deg);
 }
 
 .question-scroll {

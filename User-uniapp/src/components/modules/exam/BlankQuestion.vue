@@ -20,7 +20,7 @@
                     color="#3797ff" 
                     type="compose" 
                     size="20"></uni-icons>
-                <text>空{{index + 1}}</text> 
+                <text>空{{ (index + 1) }}</text> 
             </view>
             <view class="input-textarea">
             <up-textarea 
@@ -52,7 +52,7 @@
                         in question.options" 
                         :key="index" 
                         class="answer-item">
-                        <text class="answer-index">空{{index + 1}}:{{option.content}}</text>
+                        <text class="answer-index">空{{ (index + 1) }}:{{option.content}}</text>
                         <text v-if="index < question.options.length - 1" class="answer-separator">;</text>
                     </view>
                 </view>
@@ -80,7 +80,7 @@
             </view>
         </uni-transition>
         <!-- 解析 -->
-        <AnalysisCom +
+        <AnalysisCom 
         :analysis="question.analysis" 
         :showAnalysis="showAnswerComputed" 
         :isAIanswer="question.isAIanswer=== 1 ? true:false"/>

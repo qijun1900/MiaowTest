@@ -22,7 +22,7 @@
                       'multiple-selected': question.isMultiple === 1 && isSelected(index),
                       'wrong-answer': showAnswerComputed && isSelected(index) && !option.isCorrect
                   }">
-                <text class="option-tag">{{String.fromCharCode(65 + index)}}.</text>
+                <text class="option-tag">{{ String.fromCharCode(65 + index) }}.</text>
                 <text class="option-content">{{option.content}}</text>
             </view>
         </view>
@@ -48,7 +48,7 @@
         <view class="question-answer-container" v-if="showAnswerComputed">
             <text class="answer-label">答案：</text>
             <text class="answer-content" v-for="(option, index) in question.options" :key="index" >
-                <text v-if="option.isCorrect">{{String.fromCharCode(65 + index)}}</text>
+                <text v-if="option.isCorrect">{{ String.fromCharCode(65 + index) }}</text>
             </text>
         </view>
         <!-- 解析 -->

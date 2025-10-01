@@ -33,41 +33,13 @@
             lineColor="#86bbf5">
         </up-divider>
 
-        <view class="card">
-            <view class="setting-item">
-                <text class="label">练习数量：</text>
-                <view class="slider-container">
-                    <view class="slider-wrapper">
-                        <up-slider v-model="questionCount" min="1" :max="QuestionTypeData.amount"></up-slider>
-                    </view>
-                    <text class="slider-value">{{ questionCount }}题</text>
-                </view>
-            </view>
-            <view class="setting-item">
-                <text class="label">题目乱序：</text>
-                <view class="switch-wrapper">
-                    <up-switch v-model="isRandom" size="20"></up-switch>
-                </view>
-            </view>
-            <view class="setting-item">
-                <text class="label">选项乱序(选择题有效)：</text>
-                <view class="switch-wrapper">
-                    <up-switch v-model="isOptionRandom" size="20"></up-switch>
-                </view>
-            </view>
-            <view class="setting-item">
-                <text class="label">立即显示答案：</text>
-                <view class="switch-wrapper">
-                    <up-switch v-model="isShowAnswer" size="20"></up-switch>
-                </view>
-            </view>
-            <view class="setting-item">
-                <text class="label">开启AI解析：</text>
-                <view class="switch-wrapper">
-                    <up-switch v-model="isShowAIHelp" size="20"></up-switch>
-                </view>
-            </view>
-        </view>
+        <PracticeSettings 
+            v-model:questionCount="questionCount"
+            :maxQuestions="QuestionTypeData.amount"
+            v-model:isRandom="isRandom"
+            v-model:isOptionRandom="isOptionRandom"
+            v-model:isShowAnswer="isShowAnswer"
+            v-model:isShowAIHelp="isShowAIHelp"/>
         <up-button 
             type="primary" 
             text="立即练习" 
@@ -80,6 +52,7 @@
 import {ref} from 'vue';
 import {useQuestionStore} from '../../stores/modules/QuestionStore'
 import { onLoad } from '@dcloudio/uni-app';
+import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue'
 const QuestionStore = useQuestionStore()
 const QuestionTypeData = ref([])// 考试题型基本数据
 
@@ -143,33 +116,10 @@ const handleStart = ()=>{
     margin-bottom: 20rpx;
 }
 
-.card-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15rpx;
-    color: #333;
-    border-bottom: 1rpx solid #eee;
-    padding-bottom: 10rpx;
-}
-
 .info-item {
     display: flex;
     margin-bottom: 15rpx;
     align-items: center;
-}
-
-.setting-item {
-    display: flex;
-    margin-bottom: 12rpx;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 25rpx;
-    border-bottom: 1px dashed #e0e0e0;
-}
-
-.setting-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
 }
 
 .label {
@@ -198,32 +148,5 @@ const handleStart = ()=>{
     color: #333;
     font-size: 28rpx;
     font-weight: 500;
-}
-
-.slider-container {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.slider-wrapper {
-    flex: 1;
-    margin-right: 10rpx;
-}
-
-.slider-value {
-    text-align: right;
-    font-size: 28rpx;
-    color: #007AFF;
-    min-width: 50rpx;
-    white-space: nowrap;
-    flex-shrink: 0; /* 防止文本被压缩 */
-}
-
-.switch-wrapper {
-    margin-right: 10rpx;
-    flex-shrink: 0;
 }
 </style>

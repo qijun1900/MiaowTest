@@ -214,9 +214,7 @@ const handleSubmitAnswer = () => {
 
 onMounted(() => {
    navBarHeightUtil.getNavBarInfo()
-   console.log(navBarHeightUtil.getNavBarInfo().totalHeight);
    navBarHeight.value = navBarHeightUtil.getNavBarInfo().totalHeight;
-    
 })
 </script>
 

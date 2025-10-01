@@ -15,7 +15,7 @@
         </view>
 
         <!-- 答案编号 -->
-        <view class="option-letter">空{{ index + 1 }}</view>
+        <view class="option-letter">空{{ (index + 1) }}</view>
 
         <!-- 答案内容输入框 -->
         <input class="option-input" type="text" v-model="answer.content" placeholder="请输入答案内容" />
