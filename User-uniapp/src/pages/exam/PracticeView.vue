@@ -96,7 +96,7 @@
                 @click="handleCheck"></up-tabbar-item>
             </up-tabbar>
         </view>
-        <!-- popup  -->
+        <!-- 答题卡  -->
             <uviewPopup 
                 v-model:show="popupShow"
                 :round="30" 
@@ -208,7 +208,6 @@ const isEndQuestion = computed(() => {
 
 //handleSubmitAnswer
 const handleSubmitAnswer = () => {
-    console.log("提交答案");
     popupShow.value = false;
     uni.navigateTo({
         url: '/pages/exam/PracticeResultsView' 
@@ -224,14 +223,6 @@ onMounted(() => {
    // 获取安全区域信息
    const safeAreaInfo = navBarHeightUtil.getSafeAreaInfo();
    safeAreaBottom.value = safeAreaInfo.bottom;
-   
-   // 调试输出，帮助排查问题
-   console.log('导航栏高度信息:', {
-       statusBarHeight: navInfo.statusBarHeight,
-       navBarHeight: navInfo.navBarHeight,
-       totalHeight: navInfo.totalHeight,
-       safeAreaBottom: safeAreaInfo.bottom
-   });
 })
 </script>
 
