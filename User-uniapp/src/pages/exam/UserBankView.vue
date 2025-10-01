@@ -57,13 +57,13 @@
     
     <!-- 底部按钮 -->
     <view class="bottom-button">
-      <button class="add-question-btn">
+      <button class="add-question-btn" @click="handleAddQuestion">
         <uni-icons type="plus" size="20" color="#fff"></uni-icons>
         <text class="btn-text">添加题目</text>
       </button>
       <button class="practice-btn">
         <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
-        <text class="btn-text">练习题目</text>
+        <text class="btn-text"  @click="handlePracticeQuestion">练习题目</text>
       </button>
     </view>
   </view>
@@ -81,12 +81,26 @@ import ThemeLoading from '../../components/core/ThemeLoading.vue';
 const bankData  =ref([]);// 题库信息数据
 const QuestionData = ref([]);//题库题目数据
 const isLoading = ref(false); // 加载状态
+
+// 添加题目
+ const handleAddQuestion = () => {
+   uni.navigateTo({
+    url: `/pages/exam/ManualImportView?bankName=${bankData.value.bankName}&bankId=${bankData.value.bankId}&isNewCreate=false`
+  })
+ }
+ // 练习题目
+// const handlePracticeQuestion = () => {
+//    uni.navigateTo({
+//     url: `/pages/exam/PracticeView?bankName=${bankData.value.bankName}&bankId=${bankData.value.bankId}`
+//   })
+// }
+
+
 const fetchUserQuestion = async()=>{
   try{
     isLoading.value = true;
     const res = await getUserBankQuestionList(bankData.value.bankId);
     QuestionData.value = res.data;
-    console.log(res);
   }catch(e){
     console.log(e)
     uni.showToast({

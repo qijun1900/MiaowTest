@@ -214,7 +214,7 @@ const handleManualImport = async () => {
             // 获取返回的题库ID
             const bankId = res.data?.bankId;
             uni.navigateTo({
-                url: `/pages/exam/ManualImportView?bankName=${questionBankName.value}&bankId=${bankId}`
+                url: `/pages/exam/ManualImportView?bankName=${questionBankName.value}&bankId=${bankId}&isNewCreate=true`
             })
                  
         }

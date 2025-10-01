@@ -73,12 +73,19 @@ const onTypeChange = (e) => {
 }
 
 onLoad((option) => {
-  if(option.bankName){
+  if(option.bankName&&option.isNewCreate==='true'){
    uni.showToast({
     title: `${option.bankName}题库创建成功`,
     icon: 'success',
    })
   }
+  if(option.bankName&&option.isNewCreate==='false'){
+   uni.showToast({
+    title: `为${option.bankName}题库添加题目`,
+    icon: 'none',
+   })
+  }
+  
   if(option.bankId){
     questionbankId.value = option.bankId
   }

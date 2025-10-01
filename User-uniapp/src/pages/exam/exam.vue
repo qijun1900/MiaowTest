@@ -18,7 +18,7 @@
         <uniSearch placeholder="搜索考试科目~" />
       </navigator>
     </view>
-    
+    <!-- 考试列表 -->
     <view class="exam-list">
       <ThemeLoading v-if="loading" text="正在加载考试科目..." />
       <view v-else class="subject-list">
@@ -49,7 +49,7 @@
       ref="backToTopRef" 
       position="bottom-right"/>
 
-    <up-divider text="已经到底了" :dashed="true"></up-divider>
+    <up-divider text="已经到底了" :dashed="true" v-if="examSubjects.length>0 && !loading"></up-divider>
   </view>
 </template>
 
