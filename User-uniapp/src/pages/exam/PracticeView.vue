@@ -16,7 +16,11 @@
         <!-- 页面内容 -->
         <view 
             class="content" 
-            :style="{ paddingTop: navBarHeight + 'px' }">
+            :style="{ 
+                paddingTop: navBarHeight + 'px',
+                height: `calc(100vh - ${Math.max(navBarHeight, 44)}px - ${safeAreaBottom}px)`,
+                minHeight: '300px' 
+            }">
                 <swiper
                     class="question-swiper"
                     :current="currentQuestionIndex"
@@ -149,6 +153,7 @@ const questionStore = useQuestionStore();// 问题Store,存储问题和用户设
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
 const currentMode = ref(0);// 当前选中的模式，0表示答题模式，1表示学习模式
 const navBarHeight = ref(0); // 导航栏高度
+const safeAreaBottom = ref(0); // 底部安全区域高度
 const currentQuestionIndex = ref(0);// 当前选中的问题索引
 const ObjectiveAnswerStore = useObjectiveAnswerStore();// 客观题答案Store
 const SubjectiveAnswerStore = useSubjectiveAnswerStore();// 主观题答案Store
@@ -213,8 +218,20 @@ const handleSubmitAnswer = () => {
 
 
 onMounted(() => {
-   navBarHeightUtil.getNavBarInfo()
-   navBarHeight.value = navBarHeightUtil.getNavBarInfo().totalHeight;
+   const navInfo = navBarHeightUtil.getNavBarInfo();
+   navBarHeight.value = navInfo.totalHeight;
+   
+   // 获取安全区域信息
+   const safeAreaInfo = navBarHeightUtil.getSafeAreaInfo();
+   safeAreaBottom.value = safeAreaInfo.bottom;
+   
+   // 调试输出，帮助排查问题
+   console.log('导航栏高度信息:', {
+       statusBarHeight: navInfo.statusBarHeight,
+       navBarHeight: navInfo.navBarHeight,
+       totalHeight: navInfo.totalHeight,
+       safeAreaBottom: safeAreaInfo.bottom
+   });
 })
 </script>
 
@@ -226,22 +243,24 @@ onMounted(() => {
 
 /* 新增内容区域高度和滚动 */
 .content {
-    /* 计算内容区高度，减去导航栏高度 */
-    height: calc(100vh - 44px);
+    /* 高度通过内联样式动态设置 */
     position: relative;
     overflow-y: auto; /* 允许垂直滚动 */
     display: flex;  /* 使用flex布局 */
     flex-direction: column; /* 垂直方向布局 */
-    
+    box-sizing: border-box; /* 确保padding不影响总高度 */
 }
 
 .question-swiper {
     height: 100%;
-    overflow-y: auto; /* 允许垂直滚动 */;
+    flex: 1; /* 使用flex占满剩余空间 */
+    overflow: hidden; /* 防止滚动条重复 */
 }
 .question-container {
     height: 100%;
     overflow-y: auto;
+    padding: 10rpx; /* 添加适当内边距 */
+    box-sizing: border-box; /* 确保padding不影响总高度 */
 }
 .but-container{
     z-index: 100;
