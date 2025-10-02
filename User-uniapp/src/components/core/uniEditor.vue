@@ -100,7 +100,7 @@
                         <view :style="{ backgroundColor: color }" class="color-circle"></view>
                     </view>
                     <view class="custom-color">
-                        <input type="color" v-model="customColor" @change="setFontColor(customColor)" />
+                        <input type="color" class="custom-color-input" v-model="customColor" @change="setFontColor(customColor)" />
                     </view>
                 </view>
 
@@ -110,7 +110,7 @@
                         <view :style="{ backgroundColor: color }" class="color-circle"></view>
                     </view>
                     <view class="custom-color">
-                        <input type="color" v-model="customBgColor" @change="setBgColor(customBgColor)" />
+                        <input type="color" class="custom-color-input" v-model="customBgColor" @change="setBgColor(customBgColor)" />
                     </view>
                 </view>
             </view>
@@ -259,9 +259,12 @@ const handleInput = (e) => {
 
 // 编辑器准备就绪
 const handleReady = async () => {
-    // 等待DOM完全渲染
+    // 等待DOM完全渲染，在弹窗中需要更长的延迟
     await nextTick();
     await nextTick();
+    
+    // 添加延迟确保在弹窗或动态容器中也能正常工作
+    await new Promise(resolve => setTimeout(resolve, 50));
     
     try {
         // 检查组件是否还在挂载状态
@@ -679,9 +682,7 @@ onUnmounted(() => {
     position: relative;
 }
 
-.toolbar-item:active {
-    background-color: #e0e0e0;
-}
+/* 小程序不支持:active伪类，移除此样式 */
 
 .toolbar-item.active {
     background-color: #007aff;
@@ -693,7 +694,7 @@ onUnmounted(() => {
 
 .toolbar-item.disabled {
     opacity: 0.5;
-    pointer-events: none;
+    /* pointer-events 在小程序中不被支持，移除此属性 */
 }
 
 .toolbar-divider {
@@ -712,7 +713,7 @@ onUnmounted(() => {
     border-radius: 8rpx;
     padding: 10rpx;
     z-index: 100;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+    /* box-shadow 在小程序中支持有限，简化阴影效果 */
     display: flex;
     flex-wrap: wrap;
     max-width: 400rpx;
@@ -741,11 +742,11 @@ onUnmounted(() => {
     border-top: 1rpx solid #e5e5e5;
 }
 
-.custom-color input {
+.custom-color-input {
     width: 100%;
     height: 40rpx;
     border: none;
-    outline: none;
+    /* outline 在小程序中不被支持，移除此属性 */
 }
 
 .font-size-picker {
@@ -757,7 +758,7 @@ onUnmounted(() => {
     border-radius: 8rpx;
     padding: 10rpx;
     z-index: 100;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+    /* box-shadow 在小程序中支持有限，简化阴影效果 */
     display: flex;
     flex-direction: column;
     min-width: 120rpx;
@@ -769,13 +770,11 @@ onUnmounted(() => {
     border-bottom: 1rpx solid #f0f0f0;
 }
 
-.font-size-option:last-child {
+.font-size-option-last {
     border-bottom: none;
 }
 
-.font-size-option:active {
-    background-color: #f0f0f0;
-}
+/* 小程序不支持:active伪类，移除此样式 */
 
 .editor-wrapper {
     height: v-bind('props.height');

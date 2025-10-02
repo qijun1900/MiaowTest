@@ -7,7 +7,8 @@
         placeholder="请在此处输入题干内容" 
         v-model="formData.stem" 
         height="200rpx" 
-        id="stemEditorId1"/>
+        id="stemEditorId1"
+        />
     </view>
     <ThemeDivider text="题目选项" />
     <view class="options-container">
@@ -43,7 +44,7 @@
         placeholder="请在此处输入解析内容" 
         v-model="formData.analysis" 
         height="200rpx" 
-        id="analysisEditor1"/>
+        id="analysisEditorId2"/>
     </view>
     <view class="submit-btn">
       <button type="primary" :loading="butLoading" @click="handleSend">
@@ -70,6 +71,7 @@ const props = defineProps({
     default: null
   }
 })
+
 
 const butLoading = ref(false) // 按钮加载中
 // 使用 reactive 集合所有数据
@@ -168,7 +170,7 @@ const handleSend = async () => {
     if (props.currentBankId) {
       submitData.questionbankId = props.currentBankId;
     }
-    // 发送请求
+    //发送请求
     const res = await saveQuestion(submitData)
     if (res.code === 200) {
       // 只有在非编辑模式下才重置表单

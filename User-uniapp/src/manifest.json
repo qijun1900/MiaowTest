@@ -51,7 +51,26 @@
         "appid" : "wx4f6ba6075c1d2a31",
         "mergeVirtualHostAttributes" : true,
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "es6" : true,
+            "enhance" : true,
+            "postcss" : true,
+            "preloadBackgroundData" : false,
+            "minified" : true,
+            "newFeature" : false,
+            "coverView" : true,
+            "nodeModules" : false,
+            "autoAudits" : false,
+            "showShadowRootInWxmlPanel" : true,
+            "scopeDataCheck" : false,
+            "uglifyFileName" : false,
+            "checkInvalidKey" : true,
+            "checkSiteMap" : true,
+            "uploadWithSourceMap" : true,
+            "compileHotReLoad" : false,
+            "useMultiFrameRuntime" : true,
+            "useApiHook" : true,
+            "useApiHostProcess" : true
         },
         "usingComponents" : true
     },

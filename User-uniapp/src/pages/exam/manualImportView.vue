@@ -90,7 +90,7 @@ onLoad((option) => {
    })
   }
   if(option.isEdit==='true'&& option.data){
-    const data = JSON.parse(option.data)
+    const data = JSON.parse(decodeURIComponent(option.data))//解码数据
     isEditMode.value = true
     editQuestionData.value = data
     
