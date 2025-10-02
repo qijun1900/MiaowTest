@@ -46,7 +46,9 @@
               <div class="question-title" v-html="item.stem"></div>
             </view>
             <view class="question-action">
-             <uni-icons type="compose" size="23"></uni-icons>
+              <button class="edit-btn" @click="handleEditQuestion(item, index)">
+                <uni-icons type="compose" size="20" color="#4d94ff"></uni-icons>
+              </button>
             </view>
           </view>
         </view>
@@ -155,6 +157,13 @@ const handleStart = ()=>{
   uni.navigateTo({
     url: `/pages/exam/PracticeView`
   })
+}
+// 编辑题目
+const handleEditQuestion = (questionData) => {
+  uni.navigateTo({
+    url: `/pages/exam/ManualImportView?bankId=${bankData.value.bankId}&isEdit=true&data=${encodeURIComponent(JSON.stringify(questionData))}`
+  })
+
 }
 
 // 刷新题目列表
@@ -321,8 +330,13 @@ onMounted(()=>{
 .question-item {
   display: flex;
   align-items: center;
-  padding: 20rpx 30rpx 20rpx 20rpx;
+  padding: 25rpx 20rpx;
   border-bottom: 1rpx solid #f0f7ff;
+  transition: background-color 0.2s ease;
+}
+
+.question-item:hover {
+  background-color: #fafcff;
 }
 
 .question-number {
@@ -350,10 +364,35 @@ onMounted(()=>{
 }
 
 .question-action {
-  width: 60rpx;
+  width: 120rpx;
   display: flex;
   justify-content: center;
 }
+
+/* 编辑按钮 */
+.edit-btn {
+  width: 100rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f7ff;
+  border: 2rpx solid #4d94ff;
+  border-radius: 28rpx;
+  padding: 0 8rpx;
+  margin: 0;
+  font-size: 22rpx;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(77, 148, 255, 0.15);
+}
+
+.edit-btn:active {
+  background-color: #e6f2ff;
+  transform: scale(0.98);
+  box-shadow: 0 1rpx 4rpx rgba(77, 148, 255, 0.2);
+}
+
+
 
 
 /* 底部按钮 */

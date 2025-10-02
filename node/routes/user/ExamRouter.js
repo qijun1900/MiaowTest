@@ -23,4 +23,6 @@ ExamRouter.post("/uniappAPI/exam/useradd/question",JWT.verifyTokenMiddleware(),E
 ExamRouter.post("/uniappAPI/exam/AddUserBank",JWT.verifyTokenMiddleware(),ExamController.AddUserBank)//用户添加自己的题库
 ExamRouter.get("/uniappAPI/Exam/getUserBankList",JWT.verifyTokenMiddleware(),ExamController.getUserBankList)//获取用户的题库列表
 ExamRouter.get("/uniappAPI/exam/getUserBankQuestionList/:id",JWT.verifyTokenMiddleware(),ExamController.getUserBankQuestionList)//获取用户的题库题目
+ExamRouter.post("/uniappAPI/exam/userupdate/question",JWT.verifyTokenMiddleware(),ExamController.userUpdateQuestion)//用户更新自己的题目
+
 module.exports = ExamRouter; 

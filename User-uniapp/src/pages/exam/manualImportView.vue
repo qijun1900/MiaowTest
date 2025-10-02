@@ -21,16 +21,16 @@
       <view class="question-type-component">
          <!-- 根据 selectedQuestionTypeValue 的值来决定显示哪个组件 -->
         <view v-if="selectedQuestionTypeValue === 1">
-          <AddSelect :currentBankId="questionbankId" />
+          <AddSelect :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />
         </view>
         <view v-else-if="selectedQuestionTypeValue === 2">
-          <AddBlank :currentBankId="questionbankId"/>
+          <AddBlank :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />
         </view>
         <view v-else-if="selectedQuestionTypeValue === 3">
-          <AddJudge :currentBankId="questionbankId"/>
+          <AddJudge :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />
         </view>
         <view v-else-if="selectedQuestionTypeValue === 4">
-          <AddShort :currentBankId="questionbankId"/>  
+          <AddShort :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />  
         </view>
       </view>
    </view>
@@ -50,6 +50,10 @@ const questionbankId = ref(null)
 const pickerValue = ref(0)
 const selectedQuestionTypeValue = ref(1) // 默认选择题
 const selectedQuestionTypeLabel = ref('选择题') // 默认显示选择题
+//编辑模式下
+const isEditMode = ref(false)
+const editQuestionData = ref(null)
+
 
 // 题型数据
 const questionTypes = ref([
@@ -84,6 +88,22 @@ onLoad((option) => {
     title: `为${option.bankName}题库添加题目`,
     icon: 'none',
    })
+  }
+  if(option.isEdit==='true'&& option.data){
+    const data = JSON.parse(option.data)
+    isEditMode.value = true
+    editQuestionData.value = data
+    
+    // 根据编辑数据的题型设置初始显示的组件
+    if(data.Type) {
+      selectedQuestionTypeValue.value = data.Type
+      // 找到对应的题型标签和选择器索引
+      const typeIndex = questionTypes.value.findIndex(item => item.value === data.Type)
+      if(typeIndex !== -1) {// 确保找到对应的索引
+        pickerValue.value = typeIndex
+        selectedQuestionTypeLabel.value = questionTypes.value[typeIndex].label
+      }
+    }
   }
   
   if(option.bankId){

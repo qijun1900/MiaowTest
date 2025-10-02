@@ -252,6 +252,35 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getUserBankQuestionList details:', error); // 处理错误
         }
+    },
+    userUpdateQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionData } = req.body; // 从请求体中获取questionData
+            if(!uid){
+                res.send({
+                    code: 401,
+                    message: "您未登录",
+                })
+                return;
+            }
+            if(!questionData._id){
+                res.send({
+                    code: 400,
+                    message: "更新错误",
+                })
+                return;
+            }
+            console.log("uid",uid,"questionData",questionData);
+            const result = await ExamService.userUpdateQuestion(questionData)
+            res.send({
+                code: 200,
+                message: result.message,
+                data: result.data
+            });
+        }catch (error) {
+            console.error('Error fetching userUpdateQuestion details:', error); // 处理错误
+        }
     }
 }
 

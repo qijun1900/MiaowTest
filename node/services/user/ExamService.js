@@ -350,6 +350,37 @@ const ExamService = {
                 error: error.message
             };
         }
+    },
+    userUpdateQuestion: async (updatedData) => {
+        try {
+            const { _id, questionbankId, ...updateFields } = updatedData; // 解构出 _id 和 questionbankId，其他字段作为更新内容
+            // 查找并更新题目
+            const result = await userQuestionModel.findByIdAndUpdate(
+                _id, // 题目ID
+                { $set: updateFields }, // 更新内容
+                { new: true } // 返回更新后的文档
+            )
+            if (!result) {
+                return {
+                    code: 404,
+                    message: '题目不存在',
+                }
+            }else{
+                return {
+                    code: 200,
+                    message: '题目更新成功',
+                    data: result
+                }
+            }
+        }catch (error) {
+            console.error('userUpdateQuestion 失败:', error);
+            return {
+                code: 500,
+                message: '更新题目失败',
+                error: error.message
+            };
+        }
+        
     }
         
     

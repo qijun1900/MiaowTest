@@ -189,7 +189,7 @@ const validateName = () => {
     }
 }
 
-// 导入方式处理函数
+// 手动导入
 const handleManualImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
@@ -208,7 +208,6 @@ const handleManualImport = async () => {
             return; // 如果用户取消，直接返回
         }
         const res = await AddUserBank(questionBankName.value)
-        console.log(res)
         
         if (modal.confirm && res.code===200) {
             // 获取返回的题库ID
@@ -216,13 +215,12 @@ const handleManualImport = async () => {
             uni.navigateTo({
                 url: `/pages/exam/ManualImportView?bankName=${questionBankName.value}&bankId=${bankId}&isNewCreate=true`
             })
-                 
         }
     } catch (error) {
         console.error('手动导入出错:', error);
     }
 }
-
+//拍照
 const handlePhotoImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
@@ -254,7 +252,7 @@ const handlePhotoImport = async () => {
         console.error('拍照导入出错:', error);
     }
 }
-
+//Ai
 const handleAIImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({

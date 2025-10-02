@@ -118,7 +118,7 @@
         <!-- 编辑器 -->
         <view class="editor-wrapper">
             <editor 
-                id="editor" 
+                :id="props.id" 
                 class="editor" 
                 :placeholder="props.placeholder" 
                 @input="handleInput"
@@ -130,7 +130,7 @@
 </template>
 
 <script setup>
-import { ref, watch, getCurrentInstance } from 'vue';
+import { ref, watch, getCurrentInstance, onMounted, onUnmounted, nextTick } from 'vue';
 
 // 编辑器上下文
 const editorCtx = ref(null);
@@ -146,6 +146,10 @@ const canRedo = ref(false);
 // 历史记录栈,先进后出
 const historyStack = ref([]);
 const historyIndex = ref(-1);
+// 组件挂载状态
+const isMounted = ref(false);
+// 编辑器就绪状态
+const isEditorReady = ref(false);
 
 // 字体颜色选择器
 const showColor = ref(false);
@@ -181,6 +185,10 @@ const props = defineProps({
         type: String,
         default: '400rpx'
     },
+    id: {// 编辑器id
+        type: String,
+        default: 'editor'
+    }
 });
 
 //工具栏显示
@@ -232,42 +240,80 @@ const updateUndoRedoStatus = () => {
 
 // 处理输入事件
 const handleInput = (e) => {
-    isUserInput.value = true;
-    const html = e.detail.html;
-    lastContent.value = html;
-    emit('update:modelValue', html);
+    if (!isMounted.value || !isEditorReady.value) {
+        return;
+    }
+    
+    try {
+        isUserInput.value = true;
+        const html = e.detail.html;
+        lastContent.value = html;
+        emit('update:modelValue', html);
 
-    // 保存历史记录
-    saveHistory(html);
+        // 保存历史记录
+        saveHistory(html);
+    } catch (error) {
+        console.warn('Input handling failed:', error);
+    }
 };
 
 // 编辑器准备就绪
-const handleReady = () => {
-    // 获取编辑器上下文
-    uni.createSelectorQuery()
-        .in(proxy)
-        .select('#editor')
-        .context((res) => {
-            editorCtx.value = res.context;
-            // 编辑器就绪后，如果modelValue有值，设置到编辑器中
-            if (props.modelValue) {
-                lastContent.value = props.modelValue;
-                editorCtx.value.setContents({
-                    html: props.modelValue
-                });
+const handleReady = async () => {
+    // 等待DOM完全渲染
+    await nextTick();
+    await nextTick();
+    
+    try {
+        // 检查组件是否还在挂载状态
+        if (!isMounted.value) {
+            console.warn('Component unmounted before editor ready');
+            return;
+        }
+        
+        // 获取编辑器上下文
+        uni.createSelectorQuery()
+            .in(proxy)
+            .select(`#${props.id}`)
+            .context((res) => {
+                try {
+                    if (!res || !res.context) {
+                        console.error('Editor context not found for id:', props.id);
+                        return;
+                    }
+                    
+                    if (!isMounted.value) {
+                        console.warn('Component unmounted during context setup');
+                        return;
+                    }
+                    
+                    editorCtx.value = res.context;
+                    isEditorReady.value = true;
+                    
+                    // 编辑器就绪后，如果modelValue有值，设置到编辑器中
+                    if (props.modelValue && isMounted.value) {
+                        lastContent.value = props.modelValue;
+                        editorCtx.value.setContents({
+                            html: props.modelValue
+                        });
 
-                // 初始化历史记录
-                historyStack.value = [props.modelValue];
-                historyIndex.value = 0;
-                updateUndoRedoStatus();
-            } else {
-                // 初始化空内容的历史记录
-                historyStack.value = [''];
-                historyIndex.value = 0;
-                updateUndoRedoStatus();
-            }
-        })
-        .exec();
+                        // 初始化历史记录
+                        historyStack.value = [props.modelValue];
+                        historyIndex.value = 0;
+                        updateUndoRedoStatus();
+                    } else if (isMounted.value) {
+                        // 初始化空内容的历史记录
+                        historyStack.value = [''];
+                        historyIndex.value = 0;
+                        updateUndoRedoStatus();
+                    }
+                } catch (error) {
+                    console.error('Error setting up editor context:', error);
+                }
+            })
+            .exec();
+    } catch (error) {
+        console.error('Editor initialization failed:', error);
+    }
 };
 
 // 监听modelValue变化，同步到编辑器
@@ -283,14 +329,18 @@ watch(() => props.modelValue, (newValue) => {
         return;
     }
 
-    if (editorCtx.value && newValue !== undefined) {
-        lastContent.value = newValue;
-        editorCtx.value.setContents({
-            html: newValue
-        });
+    if (editorCtx.value && isEditorReady.value && isMounted.value && newValue !== undefined) {
+        try {
+            lastContent.value = newValue;
+            editorCtx.value.setContents({
+                html: newValue
+            });
 
-        // 保存历史记录
-        saveHistory(newValue);
+            // 保存历史记录
+            saveHistory(newValue);
+        } catch (error) {
+            console.warn('Failed to update editor content:', error);
+        }
     }
 });
 
@@ -310,111 +360,150 @@ const showBgColorPicker = () => {
 
 // 设置字体颜色
 const setFontColor = (color) => {
-    if (editorCtx.value) {
-        editorCtx.value.format('color', color);
-        showColor.value = false;
-        customColor.value = color;
+    if (editorCtx.value && isEditorReady.value && isMounted.value) {
+        try {
+            editorCtx.value.format('color', color);
+            showColor.value = false;
+            customColor.value = color;
 
-        // 格式化后获取当前内容并保存历史记录
-        setTimeout(() => {
-            editorCtx.value.getContents({
-                success: (res) => {
-                    saveHistory(res.html);
+            // 格式化后获取当前内容并保存历史记录
+            setTimeout(() => {
+                if (editorCtx.value && isEditorReady.value && isMounted.value) {
+                    editorCtx.value.getContents({
+                        success: (res) => {
+                            saveHistory(res.html);
+                        },
+                        fail: (error) => {
+                            console.warn('Failed to get contents after color change:', error);
+                        }
+                    });
                 }
-            });
-        }, 100);
+            }, 100);
+        } catch (error) {
+            console.warn('Failed to set font color:', error);
+        }
     }
 };
 
 // 设置背景颜色
 const setBgColor = (color) => {
-    if (editorCtx.value) {
-        editorCtx.value.format('backgroundColor', color);
-        showBgColor.value = false;
-        customBgColor.value = color;
+    if (editorCtx.value && isEditorReady.value && isMounted.value) {
+        try {
+            editorCtx.value.format('backgroundColor', color);
+            showBgColor.value = false;
+            customBgColor.value = color;
 
-        // 格式化后获取当前内容并保存历史记录
-        setTimeout(() => {
-            editorCtx.value.getContents({
-                success: (res) => {
-                    saveHistory(res.html);
+            // 格式化后获取当前内容并保存历史记录
+            setTimeout(() => {
+                if (editorCtx.value && isEditorReady.value && isMounted.value) {
+                    editorCtx.value.getContents({
+                        success: (res) => {
+                            saveHistory(res.html);
+                        },
+                        fail: (error) => {
+                            console.warn('Failed to get contents after background color change:', error);
+                        }
+                    });
                 }
-            });
-        }, 100);
+            }, 100);
+        } catch (error) {
+            console.warn('Failed to set background color:', error);
+        }
     }
 };
 
 // 撤销
 const undo = () => {
-    if (canUndo.value && editorCtx.value) {
-        // 移动到上一个历史记录
-        historyIndex.value--;
+    if (canUndo.value && editorCtx.value && isEditorReady.value && isMounted.value) {
+        try {
+            // 移动到上一个历史记录
+            historyIndex.value--;
 
-        // 恢复内容
-        const content = historyStack.value[historyIndex.value];
-        editorCtx.value.setContents({
-            html: content
-        });
+            // 恢复内容
+            const content = historyStack.value[historyIndex.value];
+            editorCtx.value.setContents({
+                html: content
+            });
 
-        // 更新状态
-        lastContent.value = content;
-        emit('update:modelValue', content);
-        updateUndoRedoStatus();
+            // 更新状态
+            lastContent.value = content;
+            emit('update:modelValue', content);
+            updateUndoRedoStatus();
+        } catch (error) {
+            console.warn('Undo operation failed:', error);
+        }
     }
 };
 
 // 重做
 const redo = () => {
-    if (canRedo.value && editorCtx.value) {
-        // 移动到下一个历史记录
-        historyIndex.value++;
+    if (canRedo.value && editorCtx.value && isEditorReady.value && isMounted.value) {
+        try {
+            // 移动到下一个历史记录
+            historyIndex.value++;
 
-        // 恢复内容
-        const content = historyStack.value[historyIndex.value];
-        editorCtx.value.setContents({
-            html: content
-        });
+            // 恢复内容
+            const content = historyStack.value[historyIndex.value];
+            editorCtx.value.setContents({
+                html: content
+            });
 
-        // 更新状态
-        lastContent.value = content;
-        emit('update:modelValue', content);
-        updateUndoRedoStatus();
+            // 更新状态
+            lastContent.value = content;
+            emit('update:modelValue', content);
+            updateUndoRedoStatus();
+        } catch (error) {
+            console.warn('Redo operation failed:', error);
+        }
     }
 };
 
 // 清除格式
 const clearFormat = () => {
-    if (editorCtx.value) {
-        editorCtx.value.removeFormat();
-        currentFormat.value = '';
+    if (editorCtx.value && isEditorReady.value && isMounted.value) {
+        try {
+            editorCtx.value.removeFormat();
+            currentFormat.value = '';
 
-        // 清除格式后获取当前内容并保存历史记录
-        setTimeout(() => {
-            editorCtx.value.getContents({
-                success: (res) => {
-                    saveHistory(res.html);
+            // 清除格式后获取当前内容并保存历史记录
+            setTimeout(() => {
+                if (editorCtx.value && isEditorReady.value && isMounted.value) {
+                    editorCtx.value.getContents({
+                        success: (res) => {
+                            saveHistory(res.html);
+                        },
+                        fail: (error) => {
+                            console.warn('Failed to get contents after format clear:', error);
+                        }
+                    });
                 }
-            });
-        }, 100);
+            }, 100);
+        } catch (error) {
+            console.warn('Clear format operation failed:', error);
+        }
     }
 };
 
 // 清空内容
 const clearContent = () => {
-    if (editorCtx.value) {
+    if (editorCtx.value && isEditorReady.value && isMounted.value) {
         uni.showModal({
             title: '提示',
             content: '确定要清空所有内容吗？',
             success: (res) => {
-                if (res.confirm) {
-                    editorCtx.value.setContents({
-                        html: ''
-                    });
-                    lastContent.value = '';
-                    emit('update:modelValue', '');
+                if (res.confirm && editorCtx.value && isEditorReady.value && isMounted.value) {
+                    try {
+                        editorCtx.value.setContents({
+                            html: ''
+                        });
+                        lastContent.value = '';
+                        emit('update:modelValue', '');
 
-                    // 保存历史记录
-                    saveHistory('');
+                        // 保存历史记录
+                        saveHistory('');
+                    } catch (error) {
+                        console.warn('Clear content operation failed:', error);
+                    }
                 }
             }
         });
@@ -427,86 +516,122 @@ const formatText = (e) => {
     const format = e.currentTarget.dataset.format;
     const value = e.currentTarget.dataset.value;
 
-    if ((!name && !format) || !editorCtx.value) return;
+    if ((!name && !format) || !editorCtx.value || !isEditorReady.value || !isMounted.value) return;
 
-    // 处理角标特殊逻辑
-    if (name === 'script') {
-        const formatKey = `script-${value}`;
-        // 如果点击的是当前已选中的格式，则取消选中
-        if (currentFormat.value === formatKey) {
-            currentFormat.value = '';
-            // 取消角标格式
-            editorCtx.value.format('script', false);
-        } else {
-            currentFormat.value = formatKey;
-            // 设置角标格式
-            editorCtx.value.format('script', value);
-        }
-
-        // 格式化后获取当前内容并保存历史记录
-        setTimeout(() => {
-            editorCtx.value.getContents({
-                success: (res) => {
-                    saveHistory(res.html);
-                }
-            });
-        }, 100);
-        return;
-    }
-
-    // 处理对齐方式
-    if (format === 'align') {
-        const formatKey = `align${value.charAt(0).toUpperCase() + value.slice(1)}`;
-        // 如果点击的是当前已选中的格式，则取消选中
-        if (currentFormat.value === formatKey) {
-            currentFormat.value = '';
-            // 取消对齐格式
-            editorCtx.value.format('align', 'left');
-        } else {
-            currentFormat.value = formatKey;
-            // 设置对齐格式
-            editorCtx.value.format('align', value);
-        }
-
-        // 格式化后获取当前内容并保存历史记录
-        setTimeout(() => {
-            editorCtx.value.getContents({
-                success: (res) => {
-                    saveHistory(res.html);
-                }
-            });
-        }, 100);
-        return;
-    }
-
-    // 处理其他格式...
-    const targetFormat = name || format;
-
-    // 如果点击的是当前已选中的格式，则取消选中
-    if (currentFormat.value === targetFormat) {
-        currentFormat.value = '';
-    } else {
-        currentFormat.value = targetFormat;
-    }
-
-    if (targetFormat === 'list') {
-        editorCtx.value.format('list', 'unordered');
-    } else if (targetFormat === 'orderedList') {
-        editorCtx.value.format('list', 'ordered');
-    } else {
-        // 普通格式处理
-        editorCtx.value.format(targetFormat, value || true);
-    }
-
-    // 格式化后获取当前内容并保存历史记录
-    setTimeout(() => {
-        editorCtx.value.getContents({
-            success: (res) => {
-                saveHistory(res.html);
+    try {
+        // 处理角标特殊逻辑
+        if (name === 'script') {
+            const formatKey = `script-${value}`;
+            // 如果点击的是当前已选中的格式，则取消选中
+            if (currentFormat.value === formatKey) {
+                currentFormat.value = '';
+                // 取消角标格式
+                editorCtx.value.format('script', false);
+            } else {
+                currentFormat.value = formatKey;
+                // 设置角标格式
+                editorCtx.value.format('script', value);
             }
-        });
-    }, 100);
+
+            // 格式化后获取当前内容并保存历史记录
+            setTimeout(() => {
+                if (editorCtx.value && isEditorReady.value && isMounted.value) {
+                    editorCtx.value.getContents({
+                        success: (res) => {
+                            saveHistory(res.html);
+                        },
+                        fail: (error) => {
+                            console.warn('Failed to get contents after script format:', error);
+                        }
+                    });
+                }
+            }, 100);
+            return;
+        }
+
+        // 处理对齐方式
+        if (format === 'align') {
+            const formatKey = `align${value.charAt(0).toUpperCase() + value.slice(1)}`;
+            // 如果点击的是当前已选中的格式，则取消选中
+            if (currentFormat.value === formatKey) {
+                currentFormat.value = '';
+                // 取消对齐格式
+                editorCtx.value.format('align', 'left');
+            } else {
+                currentFormat.value = formatKey;
+                // 设置对齐格式
+                editorCtx.value.format('align', value);
+            }
+
+            // 格式化后获取当前内容并保存历史记录
+            setTimeout(() => {
+                if (editorCtx.value && isEditorReady.value && isMounted.value) {
+                    editorCtx.value.getContents({
+                        success: (res) => {
+                            saveHistory(res.html);
+                        },
+                        fail: (error) => {
+                            console.warn('Failed to get contents after align format:', error);
+                        }
+                    });
+                }
+            }, 100);
+            return;
+        }
+
+        // 处理其他格式...
+        const targetFormat = name || format;
+
+        // 如果点击的是当前已选中的格式，则取消选中
+        if (currentFormat.value === targetFormat) {
+            currentFormat.value = '';
+        } else {
+            currentFormat.value = targetFormat;
+        }
+
+        if (targetFormat === 'list') {
+            editorCtx.value.format('list', 'unordered');
+        } else if (targetFormat === 'orderedList') {
+            editorCtx.value.format('list', 'ordered');
+        } else {
+            // 普通格式处理
+            editorCtx.value.format(targetFormat, value || true);
+        }
+
+        // 格式化后获取当前内容并保存历史记录
+        setTimeout(() => {
+            if (editorCtx.value && isEditorReady.value && isMounted.value) {
+                editorCtx.value.getContents({
+                    success: (res) => {
+                        saveHistory(res.html);
+                    },
+                    fail: (error) => {
+                        console.warn('Failed to get contents after format:', error);
+                    }
+                });
+            }
+        }, 100);
+    } catch (error) {
+        console.warn('Format text operation failed:', error);
+    }
 };
+
+// 组件挂载时设置状态
+onMounted(() => {
+    isMounted.value = true;
+});
+
+// 组件卸载时清理状态
+onUnmounted(() => {
+    isMounted.value = false;
+    isEditorReady.value = false;
+    editorCtx.value = null;
+    // 清理定时器
+    if (hideTimer.value) {
+        clearTimeout(hideTimer.value);
+        hideTimer.value = null;
+    }
+});
 </script>
 
 <style scoped>
