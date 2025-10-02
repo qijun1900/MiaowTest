@@ -110,7 +110,6 @@ import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import uviewPopup from '../../components/core/uviewPopup.vue';
 import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue';
 
-
 const bankData  =ref([]);// 题库信息数据
 const QuestionData = ref([]);//题库题目数据
 const isLoading = ref(false); // 加载状态

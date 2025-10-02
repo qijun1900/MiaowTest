@@ -7,8 +7,7 @@
         placeholder="请在此处输入题干内容" 
         v-model="formData.stem" 
         height="200rpx" 
-        :id="stemEditorId"
-        :key="`stem_${editorKey}`"/>
+        id="stemEditorId1"/>
     </view>
     <ThemeDivider text="题目选项" />
     <view class="options-container">
@@ -44,8 +43,7 @@
         placeholder="请在此处输入解析内容" 
         v-model="formData.analysis" 
         height="200rpx" 
-        :id="analysisEditorId"
-        :key="`analysis_${editorKey}`"/>
+        id="analysisEditor1"/>
     </view>
     <view class="submit-btn">
       <button type="primary" :loading="butLoading" @click="handleSend">
@@ -56,7 +54,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, computed } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemeDivider from '../../core/ThemeDivider.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
@@ -72,11 +70,6 @@ const props = defineProps({
     default: null
   }
 })
-
-// 为每个编辑器生成唯一ID
-const editorKey = ref(Date.now());
-const stemEditorId = computed(() => `stemEditor_${editorKey.value}`);
-const analysisEditorId = computed(() => `analysisEditor_${editorKey.value}`);
 
 const butLoading = ref(false) // 按钮加载中
 // 使用 reactive 集合所有数据
@@ -175,7 +168,7 @@ const handleSend = async () => {
     if (props.currentBankId) {
       submitData.questionbankId = props.currentBankId;
     }
-    
+    // 发送请求
     const res = await saveQuestion(submitData)
     if (res.code === 200) {
       // 只有在非编辑模式下才重置表单
@@ -185,7 +178,7 @@ const handleSend = async () => {
       butLoading.value = false;
       // 提示提交成功
       uni.showToast({
-        title: props.isEdit ? '更新成功' : res.message,
+        title: res.message,
         icon: 'none',
       })
     }
@@ -215,7 +208,6 @@ const resetForm = () => {
 }
 onMounted(() => {
   if (props.isEdit && props.editData) {
-    console.log('编辑模式下的数据：', props.editData);
     // 编辑模式下初始化表单数据
     formData.stem = props.editData.stem || '';
     formData.analysis = props.editData.analysis || '';
@@ -228,11 +220,6 @@ onMounted(() => {
         isCorrect: option.isCorrect || false
       }));
     }
-    
-    // 延迟更新key以确保编辑器正确重新渲染
-    setTimeout(() => {
-      editorKey.value = Date.now();
-    }, 100);
   }
 })
 </script>

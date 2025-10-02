@@ -271,12 +271,10 @@ const ExamController ={
                 })
                 return;
             }
-            console.log("uid",uid,"questionData",questionData);
             const result = await ExamService.userUpdateQuestion(questionData)
             res.send({
                 code: 200,
                 message: result.message,
-                data: result.data
             });
         }catch (error) {
             console.error('Error fetching userUpdateQuestion details:', error); // 处理错误

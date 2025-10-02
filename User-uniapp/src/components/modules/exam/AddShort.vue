@@ -3,7 +3,11 @@
     <ThemeDivider text="题目题干" />
     <!-- 题干编辑器 -->
     <view class="editor-section">
-      <uniEditor placeholder="请在此处输入题干内容" v-model="formData.stem" height="200rpx" />
+      <uniEditor 
+        placeholder="请在此处输入题干内容" 
+        v-model="formData.stem" 
+        height="200rpx" 
+        id="stemEditor4"/>
     </view>
     <view class="answer-container">
       <view class="answer-header">
@@ -12,28 +16,44 @@
         </view>
         <text class="answer-title">题目答案</text>
       </view>
-      <uniEditor placeholder="请在此处输入参考答案" v-model="formData.content" height="300rpx" />
+      <uniEditor 
+        placeholder="请在此处输入参考答案" 
+        v-model="formData.content" 
+        height="300rpx" 
+        id="answerEditor4"/>
     </view>
     <ThemeDivider text="题目解析(可选)" />
     <!-- 解析编辑器 -->
     <view class="editor-section">
-      <uniEditor placeholder="请在此处输入解析内容" v-model="formData.analysis" height="200rpx" />
+      <uniEditor 
+        placeholder="请在此处输入解析内容"
+         v-model="formData.analysis" 
+         height="200rpx" 
+         id="analysisEditor4"/>
     </view>
     <view class="submit-btn">
-      <button type="primary" :loading="butLoading" @click="handleSend">添加题目</button>
+      <button type="primary" :loading="butLoading" @click="handleSend">
+        {{ props.isEdit ? '更新题目' : '添加题目' }}
+      </button>
     </view>
   </view>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemeDivider from '../../core/ThemeDivider.vue';
-import { addQuestion } from '../../../API/Exam/QuestionAPI';
+import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
 const butLoading = ref(false) // 按钮加载中
 const props = defineProps({
   currentBankId: { // 接收题库ID
+    default: null
+  },
+  isEdit: { // 接收是否编辑模式
+    default: false
+  },
+  editData: { // 接收编辑数据
     default: null
   }
 })
@@ -77,15 +97,24 @@ const handleSend = async () => {
       content: formData.content,
       analysis: formData.analysis
     };
+    
+    // 如果是编辑模式，添加题目ID
+    if (props.isEdit && props.editData && props.editData._id) {
+      submitData._id = props.editData._id;
+    }
+    
     // 如果有题库ID，添加到提交数据中
     if (props.currentBankId) {
       submitData.questionbankId = props.currentBankId;
     }
+    
     // 调用API提交数据
-    const res = await addQuestion(submitData)
+    const res = await saveQuestion(submitData)
     if (res.code === 200) {
-      // 重置表单
-      resetForm()
+      // 只有在非编辑模式下才重置表单
+      if (!props.isEdit) {
+        resetForm()
+      }
       butLoading.value = false;
       // 提示提交成功
       uni.showToast({
@@ -110,6 +139,16 @@ const resetForm = () => {
   formData.content = '';
   formData.analysis = '';
 }
+
+// 编辑模式下的数据初始化
+onMounted(() => {
+  if (props.isEdit && props.editData) {
+    // 编辑模式下初始化表单数据
+    formData.stem = props.editData.stem || '';
+    formData.content = props.editData.content || '';
+    formData.analysis = props.editData.analysis || '';
+  }
+})
 </script>
 
 <style scoped>

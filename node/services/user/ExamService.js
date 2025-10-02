@@ -358,7 +358,6 @@ const ExamService = {
             const result = await userQuestionModel.findByIdAndUpdate(
                 _id, // 题目ID
                 { $set: updateFields }, // 更新内容
-                { new: true } // 返回更新后的文档
             )
             if (!result) {
                 return {
@@ -369,7 +368,6 @@ const ExamService = {
                 return {
                     code: 200,
                     message: '题目更新成功',
-                    data: result
                 }
             }
         }catch (error) {
