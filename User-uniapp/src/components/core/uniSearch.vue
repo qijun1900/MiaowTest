@@ -1,11 +1,12 @@
 <template>
     <uni-search-bar 
-        :focus="false" 
+        :focus="props.focus" 
         v-model="searchValue" 
         cancelButton="none"
         :placeholder="props.placeholder"
         radius="8"
-        :bgColor="props.bgColor">
+        :bgColor="props.bgColor"
+        :disabled="props.disabled">
         <template v-slot:searchIcon>
             <uni-icons color="#007aff"  type="search"/>
         </template>
@@ -29,6 +30,14 @@ const props = defineProps({
     searchText: {
         type: String,
         default: ''
+    },
+    focus: {// 是否自动获取焦点
+        type: Boolean,
+        default: false
+    },
+    disabled: {// 是否禁用搜索框
+        type: Boolean,
+        default: true
     }
 })
 
@@ -48,5 +57,22 @@ watch(() => props.searchText, (newValue) => {
 </script>
 
 <style scoped>
-/* 添加组件样式 */
+/* 移除点击效果样式 */
+:deep(.uni-searchbar) {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+}
+
+:deep(.uni-searchbar__box) {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: none !important;
+}
+
+:deep(.uni-searchbar__text-input) {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  pointer-events: none !important;
+}
 </style>

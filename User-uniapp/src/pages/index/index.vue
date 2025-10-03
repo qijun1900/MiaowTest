@@ -3,7 +3,7 @@
     <view class="search-container">
       <navigator 
         url="/pages/public/searchview" 
-        hover-class="navigator-hover" 
+       hover-class="none"  
         animation-type="pop-in" 
         animation-duration="300">
          <uniSearch placeholder="搜索考试科目~" />

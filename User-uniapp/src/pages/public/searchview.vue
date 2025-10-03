@@ -4,7 +4,9 @@
             placeholder="请输入考试科目~" 
             bgColor="#ebebeb"
             v-model:searchText="searchQuery"
-            @search="handleSearch"/>   
+            @search="handleSearch"
+            :focus="true" 
+            :disabled="false"/>   
         
         <!-- 科目标签区域 -->
         <view class="subject-tags" v-if="!searchQuery && displaySubjects.length > 0 && !isLoading">

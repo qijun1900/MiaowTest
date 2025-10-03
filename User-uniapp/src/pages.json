@@ -24,8 +24,8 @@
 			"style": {
 				"navigationBarTitleText": "我的",
 				"navigationStyle": "custom",
-				"disableScroll": false,
-				"enablePullDownRefresh": false,
+				"disableScroll": false, // 允许页面滚动
+				"enablePullDownRefresh": false, // 启用下拉刷新
 				"backgroundColor": "#F8FDFF" 
 			}
 		},
@@ -38,7 +38,20 @@
 		{
 			"path": "pages/exam/exam",
 			"style": {
-				"navigationBarTitleText": "所有考试"
+				"navigationBarTitleText": "所有考试",
+				"navigationStyle": "custom",
+				"disableScroll": false, // 允许页面滚动
+				"enablePullDownRefresh": true, // 启用下拉刷新
+				"backgroundColor": "#F8FDFF", // 页面背景色
+				"navigationBarTextStyle": "black",  // 导航栏文字颜色
+				"app-plus": {
+					"bounce": "none",
+					"pullToRefresh": {
+						"support": true, // 是否支持下拉刷新
+						"style": "circle",
+						"color": "#007AFF" // 下拉刷新圆圈的颜色
+					}
+				}
 			}
 		},
 		{
