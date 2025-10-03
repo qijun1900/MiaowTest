@@ -1,7 +1,13 @@
 <template>
   <view class="container">
+    <!-- 自定义导航栏 -->
+    <view class="custom-navbar" 
+      :style="{ height: navBarInfo.totalHeight + 'px', paddingTop: navBarInfo.statusBarHeight + 'px' }">
+      <!-- 仅保留状态栏占位，不显示标题 -->
+    </view>
+    
     <!-- 用户信息区域 -->
-    <view class="user-info">
+    <view class="user-info" :style="{ marginTop: (navBarInfo.totalHeight - 5) + 'px' }">
       <view class="avatar-wrapper">
         <image 
           class="avatar" 
@@ -62,16 +68,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import uviewOverlay from '../../components/core/uviewOverlay.vue';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
 import myNavbar from '../../components/modules/my/myNavbar.vue';
 import VipCard from '../../components/modules/my/VipCard.vue';
 import ThemeDivider from '../../components/core/ThemeDivider.vue';
+import navBarHeightUtil from '../../util/navBarHeight.js';
 
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
+const navBarInfo = ref({});
+
+// 获取导航栏高度信息
+onMounted(() => {
+  navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+});
 
 const handleUserinfo = () => {
   if (!userInfoStore.isLoggedIn) {
@@ -120,18 +133,61 @@ const handleUseAccountLogin = () => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 20rpx 15rpx 0 15rpx;
+  height: 100vh; /* 设置固定高度 */
+  overflow-y: auto; /* 内容超出时自动滚动 */
+  background: linear-gradient(180deg, 
+    #F8FDFF 0%, 
+    #F5FCFF 20%,
+    #F0F9FF 40%,
+    #f8f8f8 70%,
+    #f5f5f5 100%
+  ); /* 更细腻的整体背景渐变 */
+  padding: 0 15rpx 0 15rpx;
+  position: relative;
 }
+
+/* 自定义导航栏样式 */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: linear-gradient(180deg, 
+    #87CEEB 0%, 
+    #B0E0E6 25%, 
+    #E0F6FF 50%, 
+    #F0FAFF 75%, 
+    #F8FDFF 90%, 
+    rgba(248, 253, 255, 0.95) 100%
+  ); /* 更丰富的多层渐变 */
+  backdrop-filter: blur(10px); /* 毛玻璃效果 */
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: none; /* 让导航栏不阻挡点击事件 */
+}
+
 
 .user-info {
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg,#f5f5f5, #ecf9ff 100%);
-  border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, 
+    rgba(248, 253, 255, 0.9) 0%, 
+    rgba(236, 249, 255, 0.8) 50%,
+    rgba(240, 250, 255, 0.9) 100%
+  ); /* 与顶部渐变协调，增加透明度 */
+  border-radius: 20rpx;
+  padding: 35rpx;
+  margin: 0 0 25rpx 0;
+  box-shadow: 
+    0 8rpx 32rpx rgba(135, 206, 235, 0.15),
+    0 2rpx 8rpx rgba(135, 206, 235, 0.1); /* 层次阴影 */
+  position: relative;
+  overflow: hidden;
+  z-index: 9999; /* 确保卡片在导航栏上方显示 */
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 细腻边框 */
+  backdrop-filter: blur(5px); /* 轻微模糊效果 */
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.3s ease; /* 动画过渡 */
 }
 
 .avatar-wrapper {
@@ -143,6 +199,8 @@ const handleUseAccountLogin = () => {
   height: 110rpx;
   border-radius: 60rpx;
   background-color: #eaeaea;
+  box-shadow: 0 4rpx 12rpx rgba(135, 206, 235, 0.2); /* 头像阴影 */
+  border: 2px solid rgba(255, 255, 255, 0.8); /* 白色边框 */
 }
 
 .user-detail {
@@ -207,9 +265,14 @@ const handleUseAccountLogin = () => {
 .rect {
   width: 600rpx;
   height: 380rpx;
-  background-color: #ffffff;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+  border-radius: 20rpx;
+  box-shadow: 
+    0 16rpx 48rpx rgba(135, 206, 235, 0.2),
+    0 4rpx 16rpx rgba(135, 206, 235, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .overlay-header{
   display: flex;
@@ -234,6 +297,12 @@ const handleUseAccountLogin = () => {
   align-items: center; /* 垂直居中 */
   gap: 20rpx; /* 添加按钮之间的间距 */
   padding: 10rpx 20rpx;
+}
+
+/* 按钮点击效果 */
+.login-but .u-button:active {
+  transform: scale(0.98); /* 点击缩放效果 */
+  transition: transform 0.2s ease;
 }
 .login-cancel{
   padding: 15rpx 30rpx;

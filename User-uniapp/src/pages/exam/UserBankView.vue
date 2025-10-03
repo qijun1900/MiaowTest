@@ -99,7 +99,7 @@
 </template>
 
 <script  setup>
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { ref,onMounted } from 'vue';
 import ThemDivider from '../../components/core/ThemeDivider.vue';
 import formatTime from '../../util/formatTime'
@@ -196,6 +196,14 @@ onLoad((option)=>{
 
 onMounted(()=>{
   fetchUserQuestion()
+})
+
+// 页面显示时刷新数据（从编辑页面返回时会触发）
+onShow(() => {
+  // 只有在题库数据已加载且不是首次加载时才刷新
+  if (bankData.value.bankId) {
+    fetchUserQuestion()
+  }
 })
 
 </script>
