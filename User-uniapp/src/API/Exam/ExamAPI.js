@@ -129,3 +129,20 @@ export async function getUserBankList() {
   }
   
 }
+/**
+ * 删除用户自建题库
+ * @param {String} bankId 题库ID
+ *  @returns {Promise} 返回删除结果
+ */
+export async function deleteUserBankAPI(bankId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userdelete/bank`,
+      method: 'POST',
+      data: { bankId: bankId }
+    });
+  }catch (error) {
+    console.error("deleteUserBank 失败", error);
+    throw error;
+  }
+}

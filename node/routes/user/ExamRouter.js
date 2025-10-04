@@ -25,5 +25,6 @@ ExamRouter.get("/uniappAPI/Exam/getUserBankList",JWT.verifyTokenMiddleware(),Exa
 ExamRouter.get("/uniappAPI/exam/getUserBankQuestionList/:id",JWT.verifyTokenMiddleware(),ExamController.getUserBankQuestionList)//获取用户的题库题目
 ExamRouter.post("/uniappAPI/exam/userupdate/question",JWT.verifyTokenMiddleware(),ExamController.userUpdateQuestion)//用户更新自己的题目
 ExamRouter.post("/uniappAPI/exam/userdelete/question",JWT.verifyTokenMiddleware(),ExamController.userDeleteQuestion)//用户删除自己的题目
+ExamRouter.post("/uniappAPI/exam/userdelete/bank",JWT.verifyTokenMiddleware(),ExamController.userDeleteBank)//用户删除自己的题库
 
 module.exports = ExamRouter; 

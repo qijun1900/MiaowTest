@@ -414,6 +414,40 @@ const ExamService = {
                 error: error.message
             };
         }
+    },
+    userDeleteBank: async ({uid,bankId}) => {
+        try {
+            //用户题库有题目不能执行删除
+            const isDelete = await userQuestionModel.findOne({ Uid: uid, questionbankId: bankId });// 查找用户的指定题库
+            if (isDelete) {
+                return {
+                    code: 400,
+                    message: '题库存在题目不能删除',
+                }
+            }else{
+                    const result = await ConsumerModel.updateOne(// 更新用户的指定题库  
+                        { _id: uid },// 查找用户的指定题库
+                        { $pull: { questionbanks: { _id: bankId } } }// 删除 questionbanks 数组中 _id 为 bankId 的元素
+                    );
+                    if (result.modifiedCount === 0) {
+                    return {
+                        code: 404,
+                        message: '题库不存在',
+                    }
+                }
+            }
+            return {
+                code: 200,
+                message: '题库删除成功',
+            }
+        }catch (error) {
+            console.error('userDeleteBank 失败:', error);
+            return {
+                code: 500,
+                message: '删除题库失败',
+                error: error.message
+            };
+        }
     }
         
     

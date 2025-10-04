@@ -39,12 +39,14 @@
         <!-- 题目列表 -->
         <view class="question-list" v-else-if="QuestionData.length > 0">
           <!-- 题目项 -->
-          <view class="question-item-wrapper" v-for="(item,index) in QuestionData" :key="item._id">
+          <view class="question-item-wrapper" 
+            v-for="(item,index) in QuestionData" 
+            :key="item._id">
             <view 
               class="question-item" 
               :class="{ 'swiped': swipeIndex === index }"
               @touchstart="handleTouchStart($event, index)"
-              @touchmove.prevent="handleTouchMove($event, index)"
+              @touchmove="handleTouchMove($event, index)"
               @touchend="handleTouchEnd($event, index)">
               <view class="question-number">第{{ (index + 1) }}题</view>
               <view class="question-content">

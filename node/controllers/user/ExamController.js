@@ -299,6 +299,26 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching userDeleteQuestion details:', error); // 处理错误
         }
+    },
+    userDeleteBank:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { bankId } = req.body; // 从请求体中获取bankId
+            if(!uid&&!bankId){
+                res.send({
+                    code: 401,
+                    message: "删除错误",
+                })
+                return;
+            }
+            const result = await ExamService.userDeleteBank({uid,bankId})
+            res.send({
+                code: result.code,
+                message: result.message
+            })
+        }catch (error) {
+            console.error('Error fetching userDeleteBank details:', error); // 处理错误
+        }
     }
 }
 

@@ -7,16 +7,16 @@ var logger = require('morgan');
 
 const JWT = require('./MiddleWares/jwt');
 const clientDetector = require('./MiddleWares/clientDetector');// 引入客户端检测中间件
-var indexRouter = require('./routes/index');
-const UserRouter = require('./routes/admin/UserRouter');
-const NewsRouter = require('./routes/admin/NewsRouter');
-const WebNewsRouter = require('./routes/user/NewsRouter');
-const AdminExamRouter = require('./routes/admin/ExamRouter');
-const WebUserExamRouter = require('./routes/user/ExamRouter');
-const AdminLLMRouter = require('./routes/admin/LLMRouter');
-const WebLLMRouter = require('./routes/user/LLMRouter');
-const FunctionRouter = require('./routes/admin/FunctionRouter');
-const UniUserRouter = require('./routes/user/UserRouter');
+var indexRouter = require('./routes/index'); // 引入路由模块
+const UserRouter = require('./routes/admin/UserRouter'); // 引入Admin用户路由模块
+const NewsRouter = require('./routes/admin/NewsRouter'); // 引入Admin新闻路由模块
+const WebNewsRouter = require('./routes/user/NewsRouter'); // 引入用户端新闻路由模块
+const AdminExamRouter = require('./routes/admin/ExamRouter'); // 引入Admin考试路由模块
+const WebUserExamRouter = require('./routes/user/ExamRouter'); // 引入用户端考试路由模块
+const AdminLLMRouter = require('./routes/admin/LLMRouter'); // 引入AdminLLM路由模块
+const WebLLMRouter = require('./routes/user/LLMRouter'); // 引入用户端LLM路由模块 
+const FunctionRouter = require('./routes/admin/FunctionRouter'); // 引入Admin功能路由模块
+const UniUserRouter = require('./routes/user/UserRouter'); // 引入用户端用户路由模块
 
 var app = express();
 
