@@ -14,4 +14,7 @@ export default {
 
 <style>
 /*每个页面公共css */
+uni-modal{
+  z-index: 19999 !important;
+}
 </style>

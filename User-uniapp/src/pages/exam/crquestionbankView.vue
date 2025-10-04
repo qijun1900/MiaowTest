@@ -221,6 +221,7 @@ const handleManualImport = async () => {
     }
 }
 //拍照
+//TODO拍照导入题目
 const handlePhotoImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
@@ -253,6 +254,7 @@ const handlePhotoImport = async () => {
     }
 }
 //Ai
+//TODO AI导入题目
 const handleAIImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({

@@ -180,6 +180,21 @@ const leftClick = () => {
 
 // 处理清空答案
 const handleCleanAnswer = () => {
+    uni.showModal({
+        title: '提示',
+        content: '确定要清空本次记录吗？',
+        confirmColor: '#FF0000', // 设置确认按钮颜色为红色
+        confirmText: '清空', // 设置确认按钮文本为"清空"
+        cancelText: '取消', // 设置取消按钮文本为"取消"
+        success: (res) => {
+            if (res.confirm) {
+                clearAnswers();
+            }
+        },
+    });
+}
+// 清空答案
+const clearAnswers = () => {
     SubjectiveAnswerStore.clearAllAnswers();
     ObjectiveAnswerStore.clearAllAnswers();
     popupShow.value = false;
