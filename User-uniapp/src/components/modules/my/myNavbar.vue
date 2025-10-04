@@ -24,6 +24,7 @@
 import { ref } from 'vue'
 
 // 导航项数据 - 使用不同的图标
+//TODO我的页面导航栏功能
 const navItems = ref([
   {
     title: '我的收藏',
@@ -49,11 +50,10 @@ const navItems = ref([
 
 // 导航点击处理
 const handleNavClick = (item) => {
-  if (item.path) {
-    uni.navigateTo({
-      url: item.path
-    });
-  }
+  uni.showToast({
+    title: `点击了${item.title}`,
+    icon: 'none'
+  })
 }
 
 </script>
