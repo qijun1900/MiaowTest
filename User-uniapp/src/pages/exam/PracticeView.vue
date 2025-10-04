@@ -40,7 +40,8 @@
                                 v-if="item.Type===2" 
                                 :question="item" 
                                 :questionIndex="index + 1"
-                                :currentMode="currentMode"/>
+                                :currentMode="currentMode"
+                                :key="refreshKey"/>
                             <JudgeQuestion 
                                 v-if="item.Type===3" 
                                 :question="item" 
@@ -51,7 +52,8 @@
                                 v-if="item.Type===4" 
                                 :question="item" 
                                 :questionIndex="index + 1"
-                                :currentMode="currentMode"/>
+                                :currentMode="currentMode"
+                                :key="refreshKey"/>
                         </view>
                     </swiper-item>
                 </swiper>
@@ -188,18 +190,19 @@ const handleCleanAnswer = () => {
         cancelText: '取消', // 设置取消按钮文本为"取消"
         success: (res) => {
             if (res.confirm) {
-                clearAnswers();
+                SubjectiveAnswerStore.clearAllAnswers();
+                ObjectiveAnswerStore.clearAllAnswers();
+                popupShow.value = false;
+                refreshKey.value++
+                uni.showToast({
+                    title: '作答已清空',
+                    icon: 'none'
+                });
             }
         },
     });
 }
-// 清空答案
-const clearAnswers = () => {
-    SubjectiveAnswerStore.clearAllAnswers();
-    ObjectiveAnswerStore.clearAllAnswers();
-    popupShow.value = false;
-    refreshKey.value++
-}
+
 
 // 处理答题卡 Popup 显示
 const handleCheck = () => {
