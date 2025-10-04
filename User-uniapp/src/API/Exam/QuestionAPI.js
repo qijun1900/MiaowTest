@@ -99,3 +99,21 @@ export async function getUserBankQuestionList(bankId) {
     throw error;
   }
 }
+/**
+ * 用户删除题目
+ * @param {String} questionId - 题目ID
+ * @param {String} bankId - 题库ID
+ * @returns {Promise} 返回删除结果
+ */
+export async function deleteQuestionAPI(questionId, bankId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userdelete/question`,
+      method: 'POST',
+      data:{questionId, bankId}
+    });
+  }catch (error) {
+    console.error("deleteQuestion 失败", error);
+    throw error;
+  }
+}

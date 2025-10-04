@@ -142,9 +142,9 @@ const handleLogin = async () => {
       
       // 登录成功后返回上一页
       setTimeout(() => {
-        uni.navigateBack({
-          delta: 1
-        });
+        uni.switchTab({
+          url: '/pages/my/my'
+        })
       }, 1500);
       return;
     }

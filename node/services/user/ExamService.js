@@ -8,6 +8,7 @@ const ExamBlankModel = require('../../models/BlankModel')
 const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const userQuestionModel = require('../../models/UserQuestionModel')
+const ConsumerModel = require('../../models/ConsumerModel');
 
 const ExamService = {
     getExamList: async () => {
@@ -379,6 +380,40 @@ const ExamService = {
             };
         }
         
+    },
+    userDeleteQuestion: async ({uid,questionId,bankId}) => {
+        try {
+            const result = await userQuestionModel.findOneAndDelete({ Uid: uid, _id: questionId,});// 查找用户的指定题库
+            if (!result) {
+                return {
+                    code: 404,
+                    message: '题目不存在',
+                }
+            }
+            // 更新用户的题库信息，减少题目数量
+            const updateResult = await ConsumerModel.updateOne(// 更新用户的指定题库
+                { _id: uid, 'questionbanks._id': bankId },// 查找用户的指定题库
+                { $inc: { 'questionbanks.$.questionCount': -1 } }// 减少 questionCount 字段的值
+            );
+            if (updateResult.modifiedCount === 0) {
+                return {
+                    code: 404,
+                    message: '题库不存在或没有题目可删除',
+                }
+            }
+            return {
+                code: 200,
+                message: '题目删除成功',
+            }
+
+        }catch (error) {
+            console.error('userDeleteQuestion 失败:', error);
+            return {
+                code: 500,
+                message: '删除题目失败',
+                error: error.message
+            };
+        }
     }
         
     

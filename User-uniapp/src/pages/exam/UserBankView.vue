@@ -39,15 +39,28 @@
         <!-- 题目列表 -->
         <view class="question-list" v-else-if="QuestionData.length > 0">
           <!-- 题目项 -->
-          <view class="question-item" v-for="(item,index) in QuestionData" :key="item._id">
-            <view class="question-number">第{{ (index + 1) }}题</view>
-            <view class="question-content">
-              <view class="question-type">{{ item.typeName }}</view>
-              <div class="question-title" v-html="item.stem"></div>
+          <view class="question-item-wrapper" v-for="(item,index) in QuestionData" :key="item._id">
+            <view 
+              class="question-item" 
+              :class="{ 'swiped': swipeIndex === index }"
+              @touchstart="handleTouchStart($event, index)"
+              @touchmove.prevent="handleTouchMove($event, index)"
+              @touchend="handleTouchEnd($event, index)">
+              <view class="question-number">第{{ (index + 1) }}题</view>
+              <view class="question-content">
+                <view class="question-type">{{ item.typeName }}</view>
+                <div class="question-title" v-html="item.stem"></div>
+              </view>
+              <view class="question-action" :class="{ 'hidden': swipeIndex === index }">
+                <button class="edit-btn" @click="handleEditQuestion(item, index)">
+                  <uni-icons type="compose" size="20" color="#4d94ff"></uni-icons>
+                </button>
+              </view>
             </view>
-            <view class="question-action">
-              <button class="edit-btn" @click="handleEditQuestion(item, index)">
-                <uni-icons type="compose" size="20" color="#4d94ff"></uni-icons>
+            <!-- 删除按钮 -->
+            <view class="delete-action" :class="{ 'visible': swipeIndex === index }">
+              <button class="delete-btn" @click="handleDeleteQuestion(item, index)">
+                <uni-icons type="trash" size="24" color="#fff"></uni-icons>
               </button>
             </view>
           </view>
@@ -100,7 +113,7 @@
 
 <script  setup>
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { ref,onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import ThemDivider from '../../components/core/ThemeDivider.vue';
 import formatTime from '../../util/formatTime'
 import { getUserBankQuestionList } from '../../API/Exam/QuestionAPI';
@@ -109,6 +122,8 @@ import ThemeLoading from '../../components/core/ThemeLoading.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import uviewPopup from '../../components/core/uviewPopup.vue';
 import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue';
+import useSwipe from '../../composables/useSwipe.js'; // 导入封装的滑动删除方法
+import { deleteQuestionAPI } from '../../API/Exam/QuestionAPI';
 
 const bankData  =ref([]);// 题库信息数据
 const QuestionData = ref([]);//题库题目数据
@@ -121,6 +136,15 @@ const isRandom = ref(false) // 默认不乱序
 const isOptionRandom = ref(false) // 默认选项不乱序
 const isShowAnswer = ref(false) //是否立即显示答案
 const isShowAIHelp = ref(false)//是否开启AI解析
+
+// 滑动删除相关状态与方法（使用封装的 composable）
+const {
+  swipeIndex,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
+  resetSwipe
+} = useSwipe();
 
 // 添加题目
  const handleAddQuestion = () => {
@@ -167,9 +191,51 @@ const handleEditQuestion = (questionData) => {
 
 // 刷新题目列表
 const handleRefresh = () => {
+  resetSwipe(); // 使用封装的重置方法
   fetchUserQuestion();
 }
 
+// 删除题目
+const handleDeleteQuestion = (questionData, index) => {
+  uni.showModal({
+    title: '确认删除',
+    content: '确定要删除这道题目吗？删除后无法恢复。',
+    confirmColor: '#ff4757',
+    success: (res) => {
+      if (res.confirm) {
+        deleteQuestion(questionData._id, index)
+      }
+      // 重置滑动状态
+      resetSwipe()
+    }
+  })
+}
+
+// 执行删除操作
+const deleteQuestion = async (_id, index) => {
+  try {
+    const res = await deleteQuestionAPI(_id,bankData.value.bankId) // 调用API删除题目
+
+    QuestionData.value.splice(index, 1)// 从数组中删除
+
+    uni.showToast({
+      title: res.message,
+      icon: 'none'
+    })
+  
+    
+    // 更新题库的题目数量
+    bankData.value.questionCount = QuestionData.value.length
+    
+  } catch (error) {
+    console.error('删除题目失败:', error)
+    uni.showToast({
+      title: '删除失败，请稍后再试',
+      icon: 'none'
+    })
+  }
+}
+// 获取题库题目列表
 const fetchUserQuestion = async()=>{
   try{
     isLoading.value = true;
@@ -186,6 +252,7 @@ const fetchUserQuestion = async()=>{
     isLoading.value = false;
   }
 };
+// 页面加载时获取题库信息
 onLoad((option)=>{
   if(option.data){
     const data = JSON.parse(decodeURIComponent(option.data));
@@ -334,15 +401,29 @@ onShow(() => {
   padding: 10rpx 0;
 }
 
+/* 题目项包装器 */
+.question-item-wrapper {
+  position: relative;
+  overflow: hidden;
+  background-color: #fff;
+}
+
 .question-item {
   display: flex;
   align-items: center;
   padding: 25rpx 20rpx;
   border-bottom: 1rpx solid #f0f7ff;
-  transition: background-color 0.2s ease;
+  background-color: #fff;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
-.question-item:hover {
+.question-item.swiped {
+  transform: translateX(-120rpx);
+}
+
+.question-item:active {
   background-color: #fafcff;
 }
 
@@ -374,6 +455,51 @@ onShow(() => {
   width: 120rpx;
   display: flex;
   justify-content: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.question-action.hidden {
+  opacity: 0;
+  transform: translateX(10rpx);
+}
+
+/* 删除操作区域 */
+.delete-action {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff4757;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.delete-action.visible {
+  transform: translateX(0);
+}
+
+/* 删除按钮 */
+.delete-btn {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 40rpx;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.2s ease;
+}
+
+.delete-btn:active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* 编辑按钮 */
@@ -457,7 +583,7 @@ onShow(() => {
   margin-left: 8rpx;
 }
 .empty {
-    margin-top: 150rpx;
+  margin-top: 150rpx;
 }
 
 

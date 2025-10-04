@@ -279,6 +279,26 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching userUpdateQuestion details:', error); // 处理错误
         }
+    },
+    userDeleteQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId , bankId} = req.body; // 从请求体中获取questionId,bankId
+            if(!uid&&!questionId&&!bankId){
+                res.send({
+                    code: 401,
+                    message: "删除错误",
+                })
+                return;
+            }
+            const result = await ExamService.userDeleteQuestion({uid,questionId,bankId})
+            res.send({
+                code: result.code,
+                message: result.message
+            });
+        }catch (error) {
+            console.error('Error fetching userDeleteQuestion details:', error); // 处理错误
+        }
     }
 }
 

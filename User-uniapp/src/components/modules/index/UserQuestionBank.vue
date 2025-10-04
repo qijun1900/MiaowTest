@@ -64,10 +64,6 @@ onMounted(async ()=>{
         questionBanks.value = res.data
     } catch (error) {
         console.error('获取题库失败:', error)
-        uni.showToast({
-            title: '获取题库失败',
-            icon: 'none'
-        })
     } finally {
         isLoading.value = false
     }
