@@ -96,8 +96,7 @@
 		{
 			"path": "pages/exam/PracticeResultsView",
 			"style": {
-				"navigationBarTitleText": "练习结果",
-				"disableScroll": true // 禁止页面滚动
+				"navigationBarTitleText": "练习结果"
 			}
 		},
 		{

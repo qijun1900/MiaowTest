@@ -112,10 +112,10 @@ const handleCreateQuestionBank = () => {
 </script>
 <style scoped lang="scss">
 .search-container {
-  background-color: $uni-bg-color-primary;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  background-color: $uni-bg-color-primary; // 背景颜色
+  position: sticky; // 固定定位
+  top: 0; // 距离顶部的距离
+  z-index: 100; // 层级
 }
 
 .card-container {

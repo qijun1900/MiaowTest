@@ -355,7 +355,7 @@ onMounted(() => {
 
 .subject-arrow {
   font-size: 32rpx;
-  color: #999999;
+  color: #007AFF;
   font-weight: bold;
   margin-left: 20rpx;
 }

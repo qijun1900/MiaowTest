@@ -49,22 +49,23 @@
                 :isShowAnswer="true">
             </AnswerSheet>
         </view>
-        <view class="action-container">
+        <view class="bottom-action-container">
             <up-button
                 :plain="true" 
                 :hairline="true" 
                 type="primary"
-                shape="circle">
+                shape="circle"
+                @click="exportToPDF">
                 导出为PDF
             </up-button>
             <up-button
                 :plain="true"
                 :hairline="true"
-                type="primary"
-                shape="circle">
+                type="error"
+                shape="circle"
+                @click="viewWrongQuestions">
                 查看错题
             </up-button>
-            
         </view>
    </view>  
 </template>
@@ -89,12 +90,32 @@ onMounted(() => {
         fireworkRef.value.handleShowEffect({ type: 'fireworks' })
     }
 })
+
+// 导出PDF功能     // TODO: 实现PDF导出功能
+const exportToPDF = () => {
+    uni.showToast({
+        title: '导出功能开发中',
+        icon: 'none'
+    })
+
+}
+
+// 查看错题功能 //TODO: 实现查看错题功能
+const viewWrongQuestions = () => {
+    // 筛选出错误的题目
+    uni.showToast({
+        title: '导出功能开发中',
+        icon: 'none'
+    })
+}
 </script>
 <style scoped>
 .container{
     padding:10rpx 20rpx;
     background-color: #f8f8f8;
     height: 100vh;
+    /* 为底部固定按钮留出空间 */
+    padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
 .accuracy{
@@ -202,11 +223,21 @@ onMounted(() => {
     border-radius: 20rpx;
     padding: 30rpx;
 }
-.action-container{
-    display: flex; /* 使用flex布局 */
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    gap: 20rpx; /* 添加按钮之间的间距 */
-    margin-top: 20rpx; /* 调整顶部间距 */
+.bottom-action-container{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100rpx;
+    background: linear-gradient(to top, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
+    backdrop-filter: blur(10rpx);
+    border-top: 1rpx solid rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30rpx;
+    padding: 0 30rpx;
+    /* 适配安全区域 */
+    padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
 }
 </style>

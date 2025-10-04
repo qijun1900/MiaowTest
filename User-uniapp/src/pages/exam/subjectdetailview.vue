@@ -19,7 +19,7 @@
                     <text class="info-title">考试年份：</text>
                     <text class="info-content">{{ examInfo.year }}</text>
                 </view>
-
+                
                 <view class="info-item">
                     <image src="/static/other/time.png" class="info-icon"></image>
                     <text class="info-title">更新时间：</text>
