@@ -21,13 +21,33 @@ const environment = process.env.NODE_ENV || 'development';
  */
 async function startApplication() {
   try {
+    // 检测云托管环境
+    const isCloudRuntime = process.env.K_SERVICE || process.env.CONTAINER_NAME || process.env.KUBERNETES_SERVICE_HOST;
+    const mongoProvider = process.env.MONGO_PROVIDER || (isCloudRuntime ? 'cloud' : 'local');
+    
     // 显示启动信息
     console.log('\n========================================');
     console.log('🚀 答题系统正在启动...');
     console.log('========================================');
     console.log(`环境: ${environment}`);
-    console.log(`数据库提供商: ${process.env.MONGO_PROVIDER || '本地MongoDB'}`);
+    console.log(`运行环境: ${isCloudRuntime ? '云托管' : '本地'}`);
+    console.log(`数据库提供商: ${mongoProvider === 'local' ? '本地MongoDB' : mongoProvider === 'cloud' ? '云数据库' : mongoProvider}`);
     console.log(`开发模式: ${isDevelopment ? '开启' : '关闭'}`);
+    
+    // 云托管环境自动切换数据库提供商
+    if (isCloudRuntime && !process.env.MONGO_PROVIDER) {
+      console.log('🔄 检测到云托管环境，自动切换到云数据库');
+      process.env.MONGO_PROVIDER = 'cloud';
+    }
+    
+    // 环境变量检查
+    if (mongoProvider === 'cloud') {
+      console.log('\n🔍 云数据库环境变量检查:');
+      console.log(`   MONGO_CLOUD_HOST: ${process.env.MONGO_CLOUD_HOST ? '✅' : '❌'}`);
+      console.log(`   MONGO_CLOUD_USERNAME: ${process.env.MONGO_CLOUD_USERNAME ? '✅' : '❌'}`);
+      console.log(`   MONGO_CLOUD_PASSWORD: ${process.env.MONGO_CLOUD_PASSWORD ? '✅' : '❌'}`);
+      console.log(`   MONGO_CLOUD_DATABASE: ${process.env.MONGO_CLOUD_DATABASE || 'examinationsystem'}`);
+    }
     
     // 连接数据库
     console.log('\n💾 正在连接数据库...');
@@ -46,10 +66,13 @@ async function startApplication() {
     // 创建 HTTP 服务器
     const server = http.createServer(app);
 
+    // 云托管环境绑定到 0.0.0.0
+    const host = isCloudRuntime ? '0.0.0.0' : 'localhost';
+    
     // 绑定端口和事件监听
-    server.listen(port);
+    server.listen(port, host);
     server.on('error', (error) => onError(error, port));
-    server.on('listening', () => onListening(server, port));
+    server.on('listening', () => onListening(server, port, host, isCloudRuntime));
 
     // 设置优雅关闭处理
     setupGracefulShutdown(server);
@@ -57,8 +80,18 @@ async function startApplication() {
   } catch (error) {
     console.error('\n❌ 应用启动失败:', error.message);
     if (isDevelopment) {
-      console.error(error.stack);
+      console.error('详细错误信息:', error.stack);
     }
+    
+    // 云托管环境的结构化错误输出
+    if (process.env.K_SERVICE || process.env.CONTAINER_NAME) {
+      console.error('\n📋 云托管诊断信息:');
+      console.error(`   环境变量数量: ${Object.keys(process.env).length}`);
+      console.error(`   Node.js版本: ${process.version}`);
+      console.error(`   当前工作目录: ${process.cwd()}`);
+      console.error(`   数据库提供商: ${process.env.MONGO_PROVIDER || '未设置'}`);
+    }
+    
     process.exit(1);
   }
 }
@@ -109,7 +142,7 @@ function onError(error, port) {
 /**
  * HTTP 服务器监听事件处理
  */
-function onListening(server, port) {
+function onListening(server, port, host = 'localhost', isCloudRuntime = false) {
   const addr = server.address();
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
@@ -118,13 +151,22 @@ function onListening(server, port) {
   console.log('\n========================================');
   console.log('✅ 服务器启动成功！');
   console.log('========================================');
-  console.log(`📍 监听地址: ${bind}`);
-  console.log(`🌐 访问地址: http://localhost:${port}`);
-  console.log(`📊 健康检查: http://localhost:${port}/health`);
+  console.log(`📍 监听地址: ${host}:${port}`);
+  if (!isCloudRuntime) {
+    console.log(`🌐 访问地址: http://localhost:${port}`);
+    console.log(`📊 健康检查: http://localhost:${port}/health`);
+  } else {
+    console.log(`🌐 云托管地址: 由平台分配`);
+    console.log(`📊 健康检查: /health`);
+  }
   console.log(`💾 数据库状态: ${dbManager.isHealthy() ? '✅ 健康' : '❌ 异常'}`);
   
   if (isDevelopment) {
     console.log(`🔧 开发模式: 热重载已开启`);
+  }
+  
+  if (isCloudRuntime) {
+    console.log(`☁️  云托管模式: 已优化配置`);
   }
   
   console.log('========================================\n');

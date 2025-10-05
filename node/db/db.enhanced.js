@@ -25,6 +25,8 @@ class DatabaseManager {
   getConnectionString() {
     const provider = process.env.MONGO_PROVIDER || 'local';
     
+    console.log(`🔍 数据库提供商: ${provider}`);
+    
     switch (provider) {
       case 'cloud':
         // 云数据库配置 - 支持云服务器MongoDB ，数据库为cloud如果没有MONGO_CLOUD_URI则使用cloud.mongo.config.js配置文件
@@ -33,17 +35,38 @@ class DatabaseManager {
           return process.env.MONGO_CLOUD_URI;
         }
         
-        // 云服务器MongoDB标准配置
-        const cloudConfig = require('../config/cloud.mongo.config');
-        const { username, password, host, port, databasename, authSource } = cloudConfig;
+        // 检查环境变量配置
+        const cloudHost = process.env.MONGO_CLOUD_HOST;
+        const cloudPort = process.env.MONGO_CLOUD_PORT || '27017';
+        const cloudUsername = process.env.MONGO_CLOUD_USERNAME;
+        const cloudPassword = process.env.MONGO_CLOUD_PASSWORD;
+        const cloudDatabase = process.env.MONGO_CLOUD_DATABASE || 'examinationsystem';
+        const cloudAuthSource = process.env.MONGO_CLOUD_AUTH_SOURCE || 'admin';
         
-        if (!username || !password || !host || !port || !databasename) {
-          throw new Error('云服务器MongoDB配置参数不完整，请检查环境变量');
+        if (!cloudHost || !cloudUsername || !cloudPassword) {
+          console.error('❌ 云数据库环境变量缺失：');
+          console.error(`   MONGO_CLOUD_HOST: ${cloudHost ? '✅' : '❌'}`);
+          console.error(`   MONGO_CLOUD_USERNAME: ${cloudUsername ? '✅' : '❌'}`);
+          console.error(`   MONGO_CLOUD_PASSWORD: ${cloudPassword ? '✅' : '❌'}`);
+          
+          // 尝试使用配置文件作为降级方案
+          try {
+            const cloudConfig = require('../config/cloud.mongo.config');
+            const { username, password, host, port, databasename, authSource } = cloudConfig;
+            
+            if (!username || !password || !host) {
+              throw new Error('云数据库配置文件参数也不完整');
+            }
+            
+            console.log('⚠️ 使用配置文件作为降级方案');
+            return `mongodb://${username}:${password}@${host}:${port || '27017'}/${databasename || 'examinationsystem'}${authSource ? `?authSource=${authSource}` : '?authSource=admin'}`;
+          } catch (configError) {
+            throw new Error(`云数据库配置错误: ${configError.message}`);
+          }
         }
         
-        console.log('🌩️ 使用云服务器MongoDB连接');
-        // 构建标准MongoDB连接字符串
-        return `mongodb://${username}:${password}@${host}:${port}/${databasename}${authSource ? `?authSource=${authSource}` : ''}`;
+        console.log('🌩️ 使用云数据库环境变量连接');
+        return `mongodb://${cloudUsername}:${cloudPassword}@${cloudHost}:${cloudPort}/${cloudDatabase}?authSource=${cloudAuthSource}`;
         
       case '1panel':
         // 1Panel部署环境 ,直接导入配置文件，不使用环境变量
@@ -51,12 +74,14 @@ class DatabaseManager {
         if (!panelUser || !panelPass || !panelHost || !sport || !panelDb) {
           throw new Error('1Panel数据库配置参数不完整，请检查环境变量');
         }
-        return `mongodb://${panelUser}:${panelPass}@${panelHost}:${sport}/${panelDb}`;
+        console.log('🔧 使用1Panel数据库配置');
+        return `mongodb://${panelUser}:${panelPass}@${panelHost}:${sport}/${panelDb}?authSource=admin`;
         
       case 'local':
       default:
         // 本地开发环境，使用本地配置文件，不使用环境变量
         const { DBHOST, DBPORT, DBNAME } = localConfig;
+        console.log('🏠 使用本地数据库配置');
         return `mongodb://${DBHOST}:${DBPORT}/${DBNAME}`;
     }
   }

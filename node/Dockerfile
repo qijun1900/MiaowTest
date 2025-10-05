@@ -74,6 +74,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # 生产环境配置
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV MONGO_PROVIDER=cloud
+
+# 云托管环境标识
+ENV CONTAINER_NAME=answer-system
 
 # 启动应用
 # 使用统一的启动文件，支持多环境配置
