@@ -20,9 +20,7 @@ const UniUserRouter = require('./routes/user/UserRouter'); // 引入用户端用
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// 移除了view engine配置，项目不使用模板引擎
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -52,6 +50,17 @@ app.use((req, res, next) => {
   next();
 });
 app.use(clientDetector); // 使用客户端检测中间件
+
+// 健康检查路由
+app.get('/health', (req, res) => {
+  const { dbManager } = require('./db/db.enhanced');
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: dbManager.isHealthy() ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 app.use('/', indexRouter);
 app.use('/users',UserRouter)
@@ -106,9 +115,13 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
+  // 返回JSON错误信息而不是渲染页面
   res.status(err.status || 500);
-  res.render('error');
+  res.json({
+    errCode: '-1',
+    errInfo: err.message,
+    error: req.app.get('env') === 'development' ? err : {}
+  });
 });
 
 module.exports = app;

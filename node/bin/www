@@ -1,81 +1,104 @@
 #!/usr/bin/env node
 
-/*导入DB*/
-const db = require('../db/db.js')
-
-//调用,必须先连接数据库才可以继续进行下面操作
-db(()=>{
-
 /**
- * Module dependencies.
+ * 答题系统统一启动文件
+ * 支持本地开发和部署环境
+ * 自动根据环境变量适配不同配置
  */
 
-var app = require('../app');
-var debug = require('debug')('project:server');
-var http = require('http');
+// 加载环境变量
+require('dotenv').config();
+
+// 导入增强版数据库管理器
+const { dbManager } = require('../db/db.enhanced.js');
+
+// 开发环境检测
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const environment = process.env.NODE_ENV || 'development';
 
 /**
- * Get port from environment and store in Express.
+ * 异步启动应用
  */
+async function startApplication() {
+  try {
+    // 显示启动信息
+    console.log('\n========================================');
+    console.log('🚀 答题系统正在启动...');
+    console.log('========================================');
+    console.log(`环境: ${environment}`);
+    console.log(`数据库提供商: ${process.env.MONGO_PROVIDER || '本地MongoDB'}`);
+    console.log(`开发模式: ${isDevelopment ? '开启' : '关闭'}`);
+    
+    // 连接数据库
+    console.log('\n💾 正在连接数据库...');
+    await dbManager.connect();
+    console.log('✅ 数据库连接成功');
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+    // 导入应用模块
+    const app = require('../app');
+    const debug = require('debug')('project:server');
+    const http = require('http');
+
+    // 获取端口
+    const port = normalizePort(process.env.PORT || '3000');
+    app.set('port', port);
+
+    // 创建 HTTP 服务器
+    const server = http.createServer(app);
+
+    // 绑定端口和事件监听
+    server.listen(port);
+    server.on('error', (error) => onError(error, port));
+    server.on('listening', () => onListening(server, port));
+
+    // 设置优雅关闭处理
+    setupGracefulShutdown(server);
+
+  } catch (error) {
+    console.error('\n❌ 应用启动失败:', error.message);
+    if (isDevelopment) {
+      console.error(error.stack);
+    }
+    process.exit(1);
+  }
+}
 
 /**
- * Create HTTP server.
+ * 端口规范化
  */
-
-var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
 
   if (isNaN(port)) {
-    // named pipe
-    return val;
+    return val; // named pipe
   }
 
   if (port >= 0) {
-    // port number
-    return port;
+    return port; // port number
   }
 
   return false;
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * HTTP 服务器错误事件处理
  */
-
-function onError(error) {
+function onError(error, port) {
   if (error.syscall !== 'listen') {
     throw error;
   }
 
-  var bind = typeof port === 'string'
+  const bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      console.error(`\n❌ ${bind} 需要管理员权限`);
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      console.error(`\n❌ ${bind} 已被占用`);
       process.exit(1);
       break;
     default:
@@ -84,15 +107,84 @@ function onError(error) {
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * HTTP 服务器监听事件处理
  */
-
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
+function onListening(server, port) {
+  const addr = server.address();
+  const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
+  
+  console.log('\n========================================');
+  console.log('✅ 服务器启动成功！');
+  console.log('========================================');
+  console.log(`📍 监听地址: ${bind}`);
+  console.log(`🌐 访问地址: http://localhost:${port}`);
+  console.log(`📊 健康检查: http://localhost:${port}/health`);
+  console.log(`💾 数据库状态: ${dbManager.isHealthy() ? '✅ 健康' : '❌ 异常'}`);
+  
+  if (isDevelopment) {
+    console.log(`🔧 开发模式: 热重载已开启`);
+  }
+  
+  console.log('========================================\n');
+  
+  // debug 输出
+  const debug = require('debug')('project:server');
   debug('Listening on ' + bind);
 }
 
-})
+/**
+ * 优雅关闭处理
+ */
+function setupGracefulShutdown(server) {
+  const signals = ['SIGTERM', 'SIGINT'];
+  
+  signals.forEach((signal) => {
+    process.on(signal, async () => {
+      console.log(`\n\n🚨 收到 ${signal} 信号，正在优雅关闭...`);
+      
+      // 停止接受新连接
+      server.close(async () => {
+        console.log('✅ HTTP服务器已关闭');
+        
+        // 关闭数据库连接
+        try {
+          await dbManager.disconnect();
+          console.log('✅ 数据库连接已关闭');
+          console.log('👋 再见！');
+          process.exit(0);
+        } catch (error) {
+          console.error('❌ 关闭数据库连接时出错:', error.message);
+          process.exit(1);
+        }
+      });
+      
+      // 设置超时强制退出
+      setTimeout(() => {
+        console.error('⚠️  超时，强制退出应用');
+        process.exit(1);
+      }, 10000); // 10秒超时
+    });
+  });
+  
+  // 捕获未处理的异常
+  process.on('uncaughtException', (error) => {
+    console.error('\n❌ 未捕获异常:', error.message);
+    if (isDevelopment) {
+      console.error(error.stack);
+    }
+    process.exit(1);
+  });
+  
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('\n❌ 未处理的Promise拒绝:', reason);
+    if (isDevelopment) {
+      console.error('Promise:', promise);
+    }
+    process.exit(1);
+  });
+}
+
+// 启动应用
+startApplication();
