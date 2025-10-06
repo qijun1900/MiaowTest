@@ -51,11 +51,11 @@ EXPOSE 3000
 
 # 配置健康检查
 # 定期检查应用是否正常运行，支持容器编排系统的健康监控
-# --interval: 检查间隔时间
+# --interval: 检查间隔时间（6小时）
 # --timeout: 单次检查超时时间
 # --start-period: 容器启动后等待时间
 # --retries: 失败重试次数
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+HEALTHCHECK --interval=6h --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "const http = require('http'); \
     const options = { \
       host: 'localhost', \

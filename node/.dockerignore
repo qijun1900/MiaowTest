@@ -1,35 +1,60 @@
-# Node.js
-node_modules/
+# ===========================================
+# Docker 构建忽略文件
+# 防止不必要的文件被复制到 Docker 镜像中
+# ===========================================
+
+# 版本控制系统
+.git
+.gitignore
+.gitattributes
+
+# 依赖和包管理
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# 环境配置文件（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# 环境变量文件
-.env
-.env.local
-.env.development
-.env.test
-.env.production
+# 压缩包文件
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.tar.bz2
+*.gz
+*.bz2
+*.xz
 
-# 日志文件
-logs/
-*.log
+# 临时文件和缓存
+*.tmp
+*.temp
+.cache
+.tmp
+temp/
+tmp/
 
-# 运行时文件
-*.pid
-*.seed
-*.pid.lock
-
-# 测试覆盖率报告
-coverage/
-.nyc_output/
-
-# 依赖目录
-.npm
-.yarn-integrity
-
-# 可选的 npm 缓存目录
-.npm
+# 操作系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 
 # IDE 和编辑器文件
 .vscode/
@@ -38,38 +63,48 @@ coverage/
 *.swo
 *~
 
-# 操作系统生成的文件
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Git 文件
-.git/
-.gitignore
-
-# Docker 文件
-Dockerfile*
-docker-compose*
-.dockerignore
+# 测试覆盖率报告
+coverage/
+.nyc_output/
 
 # 文档和说明文件
 README.md
-DEPLOY.md
+CHANGELOG.md
+LICENSE
 *.md
 
-# 临时文件
-tmp/
-temp/
-
-# 开发工具配置文件
-.editorconfig
+# 开发工具配置
 .eslintrc*
 .prettierrc*
+.editorconfig
+jsconfig.json
+
+# 构建和部署相关文件
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+check-deploy.sh
+test-docker.sh
+ecosystem.config.js
 
 # 备份文件
 *.bak
 *.backup
+*.old
+
+# 多媒体文件（如果不需要）
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
+# *.svg
+# *.mp4
+# *.avi
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 其他项目特定文件
+CLOUD_DEPLOY_FIX.md

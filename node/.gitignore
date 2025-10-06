@@ -1,37 +1,98 @@
+# ===========================================
+# Git 版本控制忽略文件
+# 防止敏感信息和临时文件被提交到代码仓库
+# ===========================================
 
-# Logs
-logs
+# 依赖目录
+node_modules/
+AdminWeb/node_modules/
+User-uniapp/node_modules/
+# 临时文件
+public/
+
+# 环境配置文件（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
+# 压缩包文件
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.tar.bz2
+*.gz
+*.bz2
+*.xz
 
-node_modules
+# 运行时生成的文件
+dist/
+build/
+.output/
+.nuxt/
+
+# 缓存目录
+.cache/
+.tmp/
+.temp/
+temp/
+tmp/
+
+# 操作系统生成的文件
 .DS_Store
-dist
-dist-ssr
-coverage
-*.local
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 
+# IDE 和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
 
-/cypress/videos/
-/cypress/screenshots/
+# 测试覆盖率
+coverage/
+.nyc_output/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
 
-*.tsbuildinfo
-.env
+# 备份文件
+*.bak
+*.backup
+*.old
 
-# 忽略 public 目录
-public/
+# PM2 进程文件
+.pm2/
+
+# Docker 相关（可选）
+docker-compose.override.yml
+
+# 构建产物
+*.tgz
+*.tar.gz
+
+# 临时上传文件
+uploads/temp/
+public/uploads/temp/
+
+# 配置文件备份
+config/*.backup
+config/*.bak

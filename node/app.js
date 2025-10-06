@@ -20,8 +20,6 @@ const UniUserRouter = require('./routes/user/UserRouter'); // 引入用户端用
 
 var app = express();
 
-// 移除了view engine配置，项目不使用模板引擎
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
