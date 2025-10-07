@@ -97,10 +97,6 @@
 
           <!-- 判断题选项显示 -->
           <view v-if="question.Type === 3" class="judge-options-section">
-            <view class="section-title">
-              <uni-icons type="help" color="#007aff" size="18"></uni-icons>
-              <text class="title-text">判断题选项</text>
-            </view>
             <view v-for="(option, optionIndex) in question.options" :key="optionIndex" class="judge-option-item" :class="{
                 'correct-option': option.isCorrect,
                 'wrong-option': isUserWrongOption(question._id, optionIndex) && isUserSelected(question._id, optionIndex),

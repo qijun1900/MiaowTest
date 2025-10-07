@@ -66,8 +66,9 @@ async function startApplication() {
     // 创建 HTTP 服务器
     const server = http.createServer(app);
 
-    // 云托管环境绑定到 0.0.0.0
-    const host = isCloudRuntime ? '0.0.0.0' : 'localhost';
+    // 云托管环境绑定到 0.0.0.0，本地环境支持灵活配置
+    // 默认使用 0.0.0.0 以支持 localhost 和 127.0.0.1 访问
+    const host = process.env.HOST || (isCloudRuntime ? '0.0.0.0' : '0.0.0.0');
     
     // 绑定端口和事件监听
     server.listen(port, host);
@@ -154,6 +155,7 @@ function onListening(server, port, host = 'localhost', isCloudRuntime = false) {
   console.log(`📍 监听地址: ${host}:${port}`);
   if (!isCloudRuntime) {
     console.log(`🌐 访问地址: http://localhost:${port}`);
+    console.log(`🌐 备用地址: http://127.0.0.1:${port}`);
     console.log(`📊 健康检查: http://localhost:${port}/health`);
   } else {
     console.log(`🌐 云托管地址: 由平台分配`);
