@@ -73,11 +73,7 @@
               <uni-icons type="list" color="#007aff" size="18"></uni-icons>
               <text class="title-text">{{ question.isMultiple === 1 ? '多选题' : '单选题' }}</text>
             </view>
-            <view 
-              v-for="(option, optionIndex) in question.options" 
-              :key="optionIndex" 
-              class="option-item" 
-              :class="{
+            <view v-for="(option, optionIndex) in question.options" :key="optionIndex" class="option-item" :class="{
                 'correct-option': option.isCorrect,
               }">
               <view class="option-wrapper">
@@ -97,24 +93,22 @@
 
           <!-- 判断题选项显示 -->
           <view v-if="question.Type === 3" class="judge-options-section">
-            <view v-for="(option, optionIndex) in question.options" :key="optionIndex" class="judge-option-item" :class="{
-                'correct-option': option.isCorrect,
-                'wrong-option': isUserWrongOption(question._id, optionIndex) && isUserSelected(question._id, optionIndex),
-                'user-selected': isUserSelected(question._id, optionIndex)
+            <view 
+              v-for="(option, index) in judgeOptions" 
+              :key="index" 
+              class="judge-option-item" 
+              :class="{
+                'correct-option': (question.answer === 1 && index === 0) || (question.answer === 0 && index === 1),
               }">
               <view class="judge-option-wrapper">
-                <view class="judge-option-indicator">
-                  <uni-icons :type="optionIndex === 0 ? 'checkmarkempty' : 'closeempty'"
-                    :color="option.isCorrect ? '#4caf50' : '#999'" size="20">
-                  </uni-icons>
-                </view>
-                <text class="judge-option-text">{{ option.content }}</text>
+                <text class="option-tag">{{ String.fromCharCode(65 + index) }}.</text>
+                <text class="option-content">{{ option }}</text>
                 <view class="option-status">
-                  <uni-icons v-if="option.isCorrect" type="checkmarkempty" color="#4caf50" size="18">
-                  </uni-icons>
-                  <uni-icons
-                    v-if="isUserWrongOption(question._id, optionIndex) && isUserSelected(question._id, optionIndex)"
-                    type="closeempty" color="#ff4d4f" size="18">
+                  <uni-icons 
+                    v-if="(question.answer === 1 && index === 0) || (question.answer === 0 && index === 1)" 
+                    type="checkmarkempty" 
+                    color="#4caf50" 
+                    size="18">
                   </uni-icons>
                 </view>
               </view>
@@ -156,7 +150,6 @@
             </view>
           </view>
 
-          <!-- 正确答案显示 -->
           <view class="correct-answer-section">
             <!-- 您的答案(选择题判断题使用) -->
             <view v-if="question.Type === 1 || question.Type === 3">
@@ -166,15 +159,21 @@
               </view>
             </view>
 
+            <!-- 正确答案显示 -->
             <text class="answer-label">正确答案：</text>
             <view class="answer-content correct-answer">
-              <!-- 选择题/判断题正确答案 -->
-              <view v-if="question.Type === 1 || question.Type === 3">
+              <!-- 选择题正确答案 -->
+              <view v-if="question.Type === 1 ">
                 <text v-for="(option, index) in question.options" :key="index">
                   <text v-if="option.isCorrect">{{ String.fromCharCode(65 + index) }}</text>
                 </text>
               </view>
-
+              <!-- 判断题正确答案 -->
+              <view v-else-if="question.Type === 3">
+                <text>
+                  {{ question.answer === 0 ? 'B' : 'A' }}
+                </text>
+              </view>
               <!-- 填空题/简答题正确答案 -->
               <view v-if="question.Type === 2 || question.Type === 4">
                 <view v-for="(option, index) in question.options" :key="index" class="answer-item">
@@ -183,7 +182,6 @@
                 </view>
               </view>
             </view>
-
           </view>
 
           <!-- 解析部分 -->
@@ -251,6 +249,7 @@ const questionTypeList = ref([
   { name: '判断题' },
   { name: '简答题' }
 ])
+const judgeOptions = ['正确', '错误'];// 判断题选项，A代表正确，B代表错误
 
 // 计算属性
 const filteredQuestions = computed(() => { // 过滤后的错题列表
@@ -721,9 +720,7 @@ const goToPractice = () => {
   line-height: 1.5;
 }
 
-.option-status {
-  margin-left: auto;
-}
+
 
 /* 判断题特殊样式 */
 .judge-option-item {
@@ -732,6 +729,7 @@ const goToPractice = () => {
   overflow: hidden;
   transition: all 0.3s ease;
   border: 2rpx solid transparent;
+  background-color: #f8f9fa;
   
   &.correct-option {
     background-color: #e8f5e9;
@@ -739,16 +737,10 @@ const goToPractice = () => {
     box-shadow: 0 2rpx 8rpx rgba(76, 175, 80, 0.2);
   }
   
-  &.wrong-option {
+  &.user-wrong-option {
     background-color: #ffeaea;
     border: 2rpx solid #ff4d4f;
     box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.2);
-  }
-  
-  &.user-selected:not(.correct-option):not(.wrong-option) {
-    background-color: #e3f2fd;
-    border: 2rpx solid #2196f3;
-    box-shadow: 0 2rpx 8rpx rgba(33, 150, 243, 0.2);
   }
 }
 
@@ -757,18 +749,33 @@ const goToPractice = () => {
   align-items: center;
   padding: 20rpx 30rpx;
   gap: 15rpx;
-}
-
-.judge-option-indicator {
-  min-width: 30rpx;
-  text-align: center;
+  justify-content: space-between;
 }
 
 .judge-option-text {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.option-tag {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #007aff;
+  min-width: 40rpx;
+}
+
+.option-content {
   font-size: 30rpx;
   color: #333333;
   line-height: 1.5;
+}
+
+.option-status {
+  display: flex;
+  align-items: center;
+  gap: 5rpx;
 }
 
 /* 填空题答案样式 */
