@@ -102,8 +102,6 @@ const handleClose = () => {
 .popup-content {
   flex: 1;
   padding: 20rpx 0;
-  overflow-y: auto; /* 允许内容滚动 */
-  max-height: calc(50vh - 80rpx); /* 减去标题和内边距的高度 */
 }
 
 /* 隐藏滚动条但保持滚动功能 */

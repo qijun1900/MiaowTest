@@ -126,8 +126,6 @@ const handleUseAccountLogin = () => {
     url: '/pages/my/UserLoginView'
   });
 }
-
-
 </script>
 
 <style scoped>

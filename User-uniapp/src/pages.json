@@ -137,6 +137,12 @@
 			"style": {
 				"navigationBarTitleText": "我的错题"
 			}
+		},
+		{
+			"path": "pages/my/MyFavoriteView",
+			"style": {
+				"navigationBarTitleText": "MyFavoriteView"
+			}
 		}
 	],
 	"globalStyle": {

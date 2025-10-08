@@ -29,7 +29,7 @@ const navItems = ref([
   {
     title: '我的收藏',
     icon: '/static/navMy/my-fav.png',
-    path: '/pages/index/index'
+    path: '/pages/my/MyFavoriteView'
   },
   {
     title: '我的错题',
@@ -54,6 +54,10 @@ const handleNavClick = (item) => {
     title: `点击了${item.title}`,
     icon: 'none'
   })
+  // 跳转到对应页面
+  if (item.path) {
+    uni.navigateTo({ url: item.path })
+  }
 }
 
 </script>
