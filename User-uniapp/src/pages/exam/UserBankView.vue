@@ -264,7 +264,14 @@ onLoad((option)=>{
 })
 
 onMounted(()=>{
-  fetchUserQuestion()
+  fetchUserQuestion();
+  
+  // 设置底部安全区域兼容
+  const safeAreaInsetBottom = uni.getSystemInfoSync().safeAreaInsets?.bottom || 0;
+  if (safeAreaInsetBottom === 0) {
+    // 对于没有底部安全区域的设备，设置默认值
+    document.documentElement.style.setProperty('--safe-area-inset-bottom', '20rpx');
+  }
 })
 
 // 页面显示时刷新数据（从编辑页面返回时会触发）
@@ -281,9 +288,10 @@ onShow(() => {
 .UserBankView {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 50px);
   background-color: #f5f9ff;
-  padding-bottom: 20rpx;
+  padding-bottom: calc(60rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
 }
 
 /* 题库信息头部 */
@@ -357,6 +365,7 @@ onShow(() => {
   border-radius: 20rpx;
   overflow: hidden;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  padding-bottom: 120rpx;
 }
 
 .list-header {
@@ -532,10 +541,20 @@ onShow(() => {
 
 /* 底部按钮 */
 .bottom-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   gap: 20rpx;
   padding: 20rpx 30rpx;
-  margin-top: 10rpx;
+  padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background-color: #f5f9ff;
+  border-top: 1rpx solid #e6f2ff;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
+  z-index: 999;
+  margin: 0;
 }
 
 /* 添加题目按钮 */

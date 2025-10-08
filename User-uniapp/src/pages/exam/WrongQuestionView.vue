@@ -22,9 +22,14 @@
     <view class="filter-section">
       <view class="filter-item">
         <text class="filter-label">题目类型：</text>
-        <up-subsection :list="questionTypeList" :current="currentTypeIndex" @change="handleTypeChange"
-          activeColor="#007aff" inactiveColor="#999" bgColor="#f8f9fa" fontSize="24rpx">
-        </up-subsection>
+        <uviewSubsection 
+          :list="questionTypeList" 
+          :current="currentTypeIndex" 
+          @updateCurrent="handleTypeChange"
+          activeColor="#007aff" 
+          inactiveColor="#999" 
+          bgColor="#f8f9fa"
+          style="flex:1; min-width:0; width:100%;"/>
       </view>
     </view>
 
@@ -37,7 +42,10 @@
 
     <!-- 错题列表 -->
     <view class="question-list" v-else-if="filteredQuestions.length > 0">
-      <view v-for="(question, index) in filteredQuestions" :key="question._id" class="question-card">
+      <view 
+        v-for="(question, index) in filteredQuestions" 
+        :key="question._id" 
+        class="question-card">
 
         <!-- 题目头部 -->
         <view class="question-header">
@@ -75,16 +83,12 @@
             </view>
             <view v-for="(option, optionIndex) in question.options" :key="optionIndex" class="option-item" :class="{
                 'correct-option': option.isCorrect,
-              }">
+                }">
               <view class="option-wrapper">
                 <text class="option-tag">{{ String.fromCharCode(65 + optionIndex) }}.</text>
                 <text class="option-content">{{ option.content }}</text>
                 <view class="option-status">
                   <uni-icons v-if="option.isCorrect" type="checkmarkempty" color="#4caf50" size="18">
-                  </uni-icons>
-                  <uni-icons
-                    v-if="isUserWrongOption(question._id, optionIndex) && isUserSelected(question._id, optionIndex)"
-                    type="closeempty" color="#ff4d4f" size="18">
                   </uni-icons>
                 </view>
               </view>
@@ -93,22 +97,15 @@
 
           <!-- 判断题选项显示 -->
           <view v-if="question.Type === 3" class="judge-options-section">
-            <view 
-              v-for="(option, index) in judgeOptions" 
-              :key="index" 
-              class="judge-option-item" 
-              :class="{
+            <view v-for="(option, index) in judgeOptions" :key="index" class="judge-option-item" :class="{
                 'correct-option': (question.answer === 1 && index === 0) || (question.answer === 0 && index === 1),
               }">
               <view class="judge-option-wrapper">
                 <text class="option-tag">{{ String.fromCharCode(65 + index) }}.</text>
                 <text class="option-content">{{ option }}</text>
                 <view class="option-status">
-                  <uni-icons 
-                    v-if="(question.answer === 1 && index === 0) || (question.answer === 0 && index === 1)" 
-                    type="checkmarkempty" 
-                    color="#4caf50" 
-                    size="18">
+                  <uni-icons v-if="(question.answer === 1 && index === 0) || (question.answer === 0 && index === 1)"
+                    type="checkmarkempty" color="#4caf50" size="18">
                   </uni-icons>
                 </view>
               </view>
@@ -117,13 +114,9 @@
 
           <!-- 填空题用户答案 -->
           <view v-if="question.Type === 2" class="blank-answers-section">
-            <view class="section-title">
-              <uni-icons type="compose" color="#007aff" size="18"></uni-icons>
-              <text class="title-text">填空题答案</text>
-            </view>
             <view class="user-answer-section">
               <text class="answer-label">您的答案：</text>
-              <view class="answer-content error-answer">
+              <view class="answer-content">
                 <view v-for="(answer, answerIndex) in getUserSubjectiveAnswer(question._id)" :key="answerIndex"
                   class="blank-answer-item">
                   <text class="blank-index">空{{ (answerIndex + 1) }}：</text>
@@ -135,13 +128,9 @@
 
           <!-- 简答题用户答案 -->
           <view v-if="question.Type === 4" class="essay-answers-section">
-            <view class="section-title">
-              <uni-icons type="chat" color="#007aff" size="18"></uni-icons>
-              <text class="title-text">简答题答案</text>
-            </view>
             <view class="user-answer-section">
               <text class="answer-label">您的答案：</text>
-              <view class="answer-content error-answer">
+              <view class="answer-content ">
                 <view v-for="(answer, answerIndex) in getUserSubjectiveAnswer(question._id)" :key="answerIndex"
                   class="essay-answer-item">
                   <text class="essay-answer">{{ answer || '未填写' }}</text>
@@ -163,7 +152,7 @@
             <text class="answer-label">正确答案：</text>
             <view class="answer-content correct-answer">
               <!-- 选择题正确答案 -->
-              <view v-if="question.Type === 1 ">
+              <view v-if="question.Type === 1">
                 <text v-for="(option, index) in question.options" :key="index">
                   <text v-if="option.isCorrect">{{ String.fromCharCode(65 + index) }}</text>
                 </text>
@@ -174,12 +163,16 @@
                   {{ question.answer === 0 ? 'B' : 'A' }}
                 </text>
               </view>
-              <!-- 填空题/简答题正确答案 -->
+              <!-- 填空题正确答案 -->
               <view v-if="question.Type === 2 || question.Type === 4">
                 <view v-for="(option, index) in question.options" :key="index" class="answer-item">
                   <text v-if="question.Type === 2">空{{ (index + 1) }}：{{ option.content }}</text>
                   <text v-else>{{ option.content }}</text>
                 </view>
+              </view>
+              <!-- 简答题正确答案 -->
+              <view v-if="question.Type === 4">
+                <view class="answer-item"><rich-text :nodes="question.content"></rich-text></view>
               </view>
             </view>
           </view>
@@ -192,12 +185,14 @@
               </uni-icons>
             </view>
             <view class="analysis-content">
-              <up-markdown :content="question.analysis" v-if="question.analysis && question.analysis !== ''">
+              <up-markdown 
+                :content="question.analysis" 
+                v-if="question.analysis && question.analysis !== ''">
               </up-markdown>
               <text v-else class="no-analysis">暂无解析</text>
             </view>
             <view class="ai-warning" v-if="question.isAIanswer === 1">
-              <up-icon name="error" color="#f4ae2c" size="14rpx"></up-icon>
+              <up-icon name="error" color="#f4ae2c" size="15px"></up-icon>
               <text class="ai-warning-text">本解析由 AI 生成，内容仅供参考，请仔细甄别！</text>
             </view>
           </view>
@@ -216,14 +211,20 @@
         去练习
       </up-button>
     </view>
-  </view>
+    <BackToTop
+      ref="backToTopRef" 
+      position="bottom-right"/>
+  </view> 
 </template>
 
 <script setup>
 import { ref, computed, onMounted, reactive } from 'vue'
+import { onPageScroll } from '@dcloudio/uni-app';
 import { useQuestionStore } from '../../stores/modules/QuestionStore'
 import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerStore'
 import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore'
+import uviewSubsection from '../../components/core/uviewSubsection.vue'
+import BackToTop from '../../components/core/BackToTop.vue'
 // import { addQuestionFavorite, removeQuestionFavorite, getQuestionFavorites } from '../../API/My/FavoriteAPI'
 // import { addToWrongBook, removeFromWrongBook, getWrongBookQuestions } from '../../API/Exam/WrongBookAPI'
 
@@ -240,6 +241,7 @@ const collectedQuestions = ref(new Set())// 收藏的题目ID集合
 const wrongBookQuestions = ref(new Set())// 错题本的题目ID集合
 const collectLoading = reactive({})// 收藏加载状态
 const wrongBookLoading = reactive({})// 错题本加载状态
+const backToTopRef = ref();// 回到顶部组件引用
 
 // 题目类型列表
 const questionTypeList = ref([
@@ -251,7 +253,7 @@ const questionTypeList = ref([
 ])
 const judgeOptions = ['正确', '错误'];// 判断题选项，A代表正确，B代表错误
 
-// 计算属性
+// 计算属性, 过滤后的错题列表
 const filteredQuestions = computed(() => { // 过滤后的错题列表
   if (currentTypeIndex.value === 0) {
     return wrongQuestions.value
@@ -277,6 +279,7 @@ const handleTypeChange = (index) => {
 // 页面加载时获取错题数据
 onMounted(() => {
   loadWrongQuestions()
+
 })
 
 // 方法定义
@@ -321,8 +324,6 @@ const loadWrongQuestions = async () => {
     isLoading.value = false
   }
 }
-
-
 
 
 /**
@@ -397,7 +398,7 @@ const toggleWrongBook = async (questionId) => {
       icon: 'none'
     })
   } finally {
-    // wrongBookLoading[questionId] = false
+    wrongBookLoading[questionId] = false
   }
 }
 
@@ -428,39 +429,6 @@ const getQuestionTypeText = (type) => {
   return typeMap[type] || '未知类型'
 }
 
-/**
- * 判断用户是否选择了某个选项
- */
-const isUserSelected = (questionId, optionIndex) => {
-  const userAnswer = objectiveAnswerStore.getUserAnswer(questionId)
-  if (!userAnswer) return false
-  
-  if (Array.isArray(userAnswer)) {
-    // 多选题：检查选项索引是否在用户答案数组中
-    return userAnswer.includes(optionIndex)
-  } else {
-    // 单选题/判断题：检查选项索引是否等于用户答案
-    return userAnswer == optionIndex
-  }
-}
-
-/**
- * 判断用户选择的选项是否为错误选项
- */
-const isUserWrongOption = (questionId, optionIndex) => {
-  // 首先判断用户是否选择了这个选项
-  if (!isUserSelected(questionId, optionIndex)) {
-    return false
-  }
-  
-  // 然后判断这个选项是否为错误选项（即不是正确答案）
-  const question = wrongQuestions.value.find(q => q._id === questionId)
-  if (!question || !question.options || !question.options[optionIndex]) {
-    return false
-  }
-  
-  return !question.options[optionIndex].isCorrect
-}
 
 /**
  * 获取客观题用户答案文本（用于显示）
@@ -478,9 +446,8 @@ const getUserObjectiveAnswerText = (questionId) => {
   }
 }
 
-
 /**
- * 获取主观题用户答案
+ * 获取主观题用户答案（用于显示）
  */
 const getUserSubjectiveAnswer = (questionId) => {
   const answer = subjectiveAnswerStore.getUserAnswer(questionId)
@@ -495,6 +462,13 @@ const goToPractice = () => {
     url: '/pages/exam/exam'
   })
 }
+// 页面滚动事件
+onPageScroll((e) => {
+  // 调用BackToTop组件的滚动处理方法
+  if (backToTopRef.value) {
+    backToTopRef.value.handlePageScroll(e);
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -566,7 +540,7 @@ const goToPractice = () => {
   font-size: 28rpx;
   color: #333333;
   font-weight: 500;
-  min-width: 140rpx;
+
 }
 
 /* 加载状态 */
@@ -620,27 +594,6 @@ const goToPractice = () => {
   border-radius: 20rpx;
   font-size: 22rpx;
 }
-
-// .question-difficulty {
-//   padding: 6rpx 16rpx;
-//   border-radius: 20rpx;
-//   font-size: 22rpx;
-  
-//   &.difficulty-easy {
-//     background-color: #e8f5e9;
-//     color: #4caf50;
-//   }
-  
-//   &.difficulty-medium {
-//     background-color: #fff3e0;
-//     color: #ff9800;
-//   }
-  
-//   &.difficulty-hard {
-//     background-color: #ffeaea;
-//     color: #f44336;
-//   }
-// }
 
 .question-actions {
   display: flex;
@@ -783,10 +736,9 @@ const goToPractice = () => {
   display: flex;
   align-items: flex-start;
   margin-bottom: 15rpx;
-  padding: 20rpx;
+  padding: 20rpx 10rpx;
   background-color: #f8f9fa;
   border-radius: 12rpx;
-  border-left: 4rpx solid #007aff;
 }
 
 .blank-index {
@@ -808,10 +760,9 @@ const goToPractice = () => {
 /* 简答题答案样式 */
 .essay-answer-item {
   margin-bottom: 15rpx;
-  padding: 25rpx;
+  padding: 25rpx 10rpx;
   background-color: #f8f9fa;
   border-radius: 12rpx;
-  border-left: 4rpx solid #007aff;
 }
 
 .essay-answer {
@@ -843,7 +794,7 @@ const goToPractice = () => {
 
 .answer-content {
   border-radius: 12rpx;
-  padding: 20rpx;
+  padding: 20rpx 5rpx;
   font-size: 30rpx;
   color: #333333;
   line-height: 1.6;
