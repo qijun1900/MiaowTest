@@ -399,7 +399,7 @@ const toggleWrongBook = async (question) => {
         icon: res.code === 200 ? 'success' : 'none'
       })
     }
-  } catch (error) {
+  }catch (error) {
     console.error('错题本操作失败:', error)
     uni.showToast({
       title: '操作失败',

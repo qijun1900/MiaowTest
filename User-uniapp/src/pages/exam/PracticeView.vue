@@ -280,17 +280,24 @@ onMounted(() => {
 }
 .popup-container{
     padding: 0px 5rpx;
+    max-height: 50vh; /* 限制弹窗内容最大高度为视口高度的一半 */
+    display: flex;
+    flex-direction: column;
 }
 .popup-but-container{
     display: flex; /* 使用flex布局 */
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
     gap: 20rpx; /* 添加按钮之间的间距 */
+    padding: 10rpx 0;
+    flex-shrink: 0; /* 防止按钮区域被压缩 */
 }
 .answer-sheet{
     padding: 10rpx 10rpx;
     background-color: #ffffff;
     border-radius: 28rpx;
     margin-top: 20rpx;
+    flex: 1; /* 占据剩余空间 */
+    overflow: hidden; /* 防止内容溢出 */
 }
 </style>

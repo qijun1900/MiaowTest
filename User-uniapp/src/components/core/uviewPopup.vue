@@ -80,6 +80,7 @@ const handleClose = () => {
 .answer-sheet-popup {
   padding: 20rpx;
   min-height: 200rpx;
+  max-height: 50vh; /* 限制弹窗最大高度为视口高度的一半 */
   display: flex;
   flex-direction: column;
   background-color: #f3f3f3;
@@ -100,10 +101,24 @@ const handleClose = () => {
 
 .popup-content {
   flex: 1;
-  padding: 40rpx 0;
-  overflow-y: auto;
+  padding: 20rpx 0;
+  overflow-y: auto; /* 允许内容滚动 */
+  max-height: calc(50vh - 80rpx); /* 减去标题和内边距的高度 */
 }
 
+/* 隐藏滚动条但保持滚动功能 */
+.popup-content::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  color: transparent;
+  background: transparent;
+}
 
+/* 兼容其他浏览器 */
+.popup-content {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 
 </style>
