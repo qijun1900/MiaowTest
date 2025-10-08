@@ -112,7 +112,6 @@
     </view>
   </view>
 </template>
-
 <script  setup>
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import { ref, onMounted } from 'vue';
@@ -193,7 +192,7 @@ const handleEditQuestion = (questionData) => {
 
 // 刷新题目列表
 const handleRefresh = () => {
-  resetSwipe(); // 使用封装的重置方法
+  resetSwipe(); 
   fetchUserQuestion();
 }
 
@@ -217,15 +216,12 @@ const handleDeleteQuestion = (questionData, index) => {
 const deleteQuestion = async (_id, index) => {
   try {
     const res = await deleteQuestionAPI(_id,bankData.value.bankId) // 调用API删除题目
-
     QuestionData.value.splice(index, 1)// 从数组中删除
-
     uni.showToast({
       title: res.message,
       icon: 'none'
     })
-  
-    
+
     // 更新题库的题目数量
     bankData.value.questionCount = QuestionData.value.length
     

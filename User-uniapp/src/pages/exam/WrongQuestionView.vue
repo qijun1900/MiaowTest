@@ -51,13 +51,14 @@
         <view class="question-header">
           <view class="question-info">
             <text class="question-index">第{{ (index + 1) }}题</text>
-            <text class="question-type">{{ getQuestionTypeText(question.Type) }}</text>
+            <text class="question-type">{{ formatInfo.getQuestionTypeText(question.Type) }}</text>
           </view>
           <view class="question-actions">
             <up-button 
               :icon="isCollected(question._id) ? 'star-fill' : 'star'"
               :type="isCollected(question._id) ? 'warning' : 'info'" 
-              :plain="!isCollected(question._id)" size="mini"
+              :plain="!isCollected(question._id)" 
+              size="mini"
               shape="circle" 
               @click="toggleCollect(question)" 
               :loading="collectLoading[question._id]">
@@ -67,7 +68,8 @@
               :icon="isInWrongBook(question._id) ? 'checkmark-circle-fill' : 'plus-circle'"
               :type="isInWrongBook(question._id) ? 'success' : 'primary'" 
               :plain="!isInWrongBook(question._id)"
-              size="mini" shape="circle" 
+              size="mini" 
+              shape="circle" 
               @click="toggleWrongBook(question)"
               :loading="wrongBookLoading[question._id]">
               {{ isInWrongBook(question._id) ? '已加入' : '错题本' }}
@@ -88,7 +90,10 @@
               <uni-icons type="list" color="#007aff" size="18"></uni-icons>
               <text class="title-text">{{ question.isMultiple === 1 ? '多选题' : '单选题' }}</text>
             </view>
-            <view v-for="(option, optionIndex) in question.options" :key="optionIndex" class="option-item" :class="{
+            <view 
+              v-for="(option, optionIndex) in question.options" 
+              :key="optionIndex" class="option-item" 
+              :class="{
                 'correct-option': option.isCorrect,
                 }">
               <view class="option-wrapper">
@@ -104,7 +109,10 @@
 
           <!-- 判断题选项显示 -->
           <view v-if="question.Type === 3" class="judge-options-section">
-            <view v-for="(option, index) in judgeOptions" :key="index" class="judge-option-item" :class="{
+            <view 
+              v-for="(option, index) in judgeOptions" 
+              :key="index" class="judge-option-item" 
+              :class="{
                 'correct-option': (question.answer === 1 && index === 0) || (question.answer === 0 && index === 1),
               }">
               <view class="judge-option-wrapper">
@@ -232,7 +240,13 @@ import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerSto
 import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore'
 import uviewSubsection from '../../components/core/uviewSubsection.vue'
 import BackToTop from '../../components/core/BackToTop.vue'
-import { addWrongQuestionAPI,deleteWrongQuestionAPI } from '../../API/Exam/QuestionAPI';
+import { 
+  addWrongQuestionAPI,
+  deleteWrongQuestionAPI ,
+  addFavoriteQuestionAPI,
+  deleteFavoriteQuestionAPI
+} from '../../API/Exam/QuestionAPI';
+import formatInfo from '../../util/formatInfo';
 
 // Store 实例
 const questionStore = useQuestionStore() // 获取问题数据
@@ -298,7 +312,6 @@ const loadWrongQuestions = async () => {
   try {
     isLoading.value = true
    
-    
     const currentQuestions = questionStore.UserChooseQuestion  // 获取当前选择的题目列表
     const wrongQuestionsData = [] // 存储错题数据
     
@@ -315,10 +328,8 @@ const loadWrongQuestions = async () => {
         })
       }
     })
-    
     wrongQuestions.value = wrongQuestionsData
     console.log("wrongQuestionsData",wrongQuestions.value)
-    
   } catch (error) {
     console.error('加载错题失败:', error)
     uni.showToast({
@@ -330,32 +341,35 @@ const loadWrongQuestions = async () => {
   }
 }
 
-
 /**
  * 切换收藏状态
  * TODO: 实现API调用
  */
 const toggleCollect = async (question) => {
-  // collectLoading[questionId] = true
-  
+  collectLoading[question] = true
   try {
-    const isCurrentlyCollected = isCollected(question)
+    const isCurrentlyCollected = isCollected(question._id)
     
     if (isCurrentlyCollected) {
-      // TODO: 调用取消收藏API
-      // await removeQuestionFavorite(questionId)
-      collectedQuestions.value.delete(question)
+      //调用取消收藏API
+      const res = await deleteFavoriteQuestionAPI(question._id)
+      if(res.code == 200){
+        collectedQuestions.value.delete(question._id)
+      }
+      collectedQuestions.value.delete(question._id)
       uni.showToast({
         title: '已取消收藏',
-        icon: 'success'
+        icon: res.code === 200 ? 'success' : 'none'
       })
     } else {
-      // TODO: 调用添加收藏API
-      // await addQuestionFavorite(questionId)
-      collectedQuestions.value.add(question)
+      //调用添加收藏API
+      const res = await addFavoriteQuestionAPI(question._id,question.examId,question.Type)
+      if(res.code == 200){
+        collectedQuestions.value.add(question._id)
+      }
       uni.showToast({
-        title: '收藏成功',
-        icon: 'success'
+        title: res.message,
+        icon: res.code === 200 ? 'success' : 'none'
       })
     }
   } catch (error) {
@@ -424,18 +438,6 @@ const isInWrongBook = (questionId) => {
   return wrongBookQuestions.value.has(questionId)
 }
 
-/**
- * 获取题目类型文本
- */
-const getQuestionTypeText = (type) => {
-  const typeMap = {
-    1: '选择题',
-    2: '填空题', 
-    3: '判断题',
-    4: '简答题'
-  }
-  return typeMap[type] || '未知类型'
-}
 
 
 /**

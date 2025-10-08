@@ -121,15 +121,15 @@ export async function deleteQuestionAPI(questionId, bankId) {
  * 用户将错题加入错题本
  * @param {String} questionId - 题目ID
  * @param {String} examId - 考试ID
+ * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @returns {Promise} 返回添加结果
  */
 export async function addWrongQuestionAPI(questionId, examId,Type) {
   try {
-    console.log(questionId, examId,Type)  // 调试输出
     return await http({
       url: `/uniappAPI/exam/useradd/wrongquestion`,
       method: 'POST',
-      data:{questionId, examId}
+      data:{questionId, examId,Type}
     });
   }catch (error) {
     console.error("addWrongQuestion 失败", error);
@@ -139,8 +139,6 @@ export async function addWrongQuestionAPI(questionId, examId,Type) {
 /**
  * 用户删除错题本
  * @param {String} questionId - 题目ID
- * @param {String} examId - 考试ID
- * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @returns {Promise} 返回删除结果
  */
 export async function deleteWrongQuestionAPI(questionId) {
@@ -155,4 +153,45 @@ export async function deleteWrongQuestionAPI(questionId) {
     throw error;
   }
 }
+//TODO: 用户获取错题本
+/**
+ * 用户获取错题本
+ * @returns {Promise} 返回错题本列表
+ */
+
+/**
+ * 用户收藏题目
+ * @param {String} questionId - 题目ID
+ * @param {String} examId - 考试ID
+ * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @returns {Promise} 返回收藏结果
+ */
+export async function addFavoriteQuestionAPI(questionId, examId,Type) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/useradd/favoritequestion`,
+      method: 'POST',
+      data:{questionId, examId,Type}
+    })
+  }catch (error) {
+    console.error("addFavoriteQuestion 失败", error);
+  }
+}
+/**
+ * 用户删除收藏
+ * @param {String} questionId - 题目ID
+ * @returns {Promise} 返回删除结果
+ */
+export async function deleteFavoriteQuestionAPI(questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userdelete/favoritequestion`,
+      method: 'POST',
+      data:{questionId,}
+    })
+  }catch (error) {
+    console.error("deleteFavoriteQuestion 失败", error);
+  }
+}
+
 

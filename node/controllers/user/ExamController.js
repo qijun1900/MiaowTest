@@ -206,14 +206,6 @@ const ExamController ={
         try {
             const { uid } = req.user;//获取用户openid
             const { questionId, examId,Type } = req.body; // 从请求体中获取questionId,examId,Type
-            console.log(questionId, examId,Type)
-            if(!uid&&!questionId&&!examId&&!Type){
-                res.send({
-                    code: 401,
-                    message: "添加错误，请检查登录",
-                })
-                return;
-            }
             const result = await ExamService.useraddwrongquestion({uid,questionId,examId,Type})
             res.send({
                 code: result.code,
@@ -228,13 +220,6 @@ const ExamController ={
         try {
             const { uid } = req.user;//获取用户openid
             const { questionId } = req.body; 
-            if(!uid&&!questionId){
-                res.send({
-                    code: 401,
-                    message: "删除错误",
-                })
-                return;
-            }
             const result = await ExamService.userDeleteWrongQuestion({uid,questionId})
             res.send({
                 code: result.code,
@@ -244,6 +229,33 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching userDeleteWrongQuestion details:', error); // 处理错误
 
+        }
+    },
+    userAddFavoriteQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId, examId,Type } = req.body; // 从请求体中获取questionId,examId,Type
+            const result = await ExamService.useraddfavoritequestion({uid,questionId,examId,Type})
+            res.send({
+                code: result.code,
+                message: result.message
+            })
+
+        }catch (error) {
+            console.error('Error fetching userAddFavoriteQuestion details:', error); // 处理错误
+        }
+    },
+    userDeleteFavoriteQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId } = req.body; // 从请求体中获取questionId
+            const result = await ExamService.userDeleteFavoriteQuestion({uid,questionId})  
+            res.send({
+                code: result.code,
+                message: result.message
+            })     
+        }catch (error) {
+            console.error('Error fetching userDeleteFavoriteQuestion details:', error); // 处理错误
         }
     }
 }
