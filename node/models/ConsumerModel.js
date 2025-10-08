@@ -69,8 +69,32 @@ const ConsumerSchema = new mongoose.Schema({
             }
         }],
         default:[]
+    },
+    wrongQuestions:{//用户错题
+        type: [{
+            questionId: { // 题目ID
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'consumer.questionbanks',// 引用用户题库
+                required: true
+            },
+            examId: { // 考试ID
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'consumer.exams',// 引用用户考试
+                required: true
+            },
+            Type: { // 题目类型： 1-选择题 2-填空题 3-判断题 4-简答题
+                type: Number,
+                required: true,
+                enum: [1, 2, 3, 4]// 限定类型
+            },
+            createTime: { // 创建时间
+                type: Date,
+                default: Date.now
+            }   
+        }]
     }
 })
+
 
 const ConsumerModel = mongoose.model("consumer", ConsumerSchema)
 

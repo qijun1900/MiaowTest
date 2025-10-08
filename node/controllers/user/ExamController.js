@@ -201,6 +201,50 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching userDeleteBank details:', error); // 处理错误
         }
+    },
+    userAddWrongQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId, examId,Type } = req.body; // 从请求体中获取questionId,examId,Type
+            console.log(questionId, examId,Type)
+            if(!uid&&!questionId&&!examId&&!Type){
+                res.send({
+                    code: 401,
+                    message: "添加错误，请检查登录",
+                })
+                return;
+            }
+            const result = await ExamService.useraddwrongquestion({uid,questionId,examId,Type})
+            res.send({
+                code: result.code,
+                message: result.message
+            })
+            
+        }catch (error) {
+            
+        }
+    },
+    userDeleteWrongQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId } = req.body; 
+            if(!uid&&!questionId){
+                res.send({
+                    code: 401,
+                    message: "删除错误",
+                })
+                return;
+            }
+            const result = await ExamService.userDeleteWrongQuestion({uid,questionId})
+            res.send({
+                code: result.code,
+                message: result.message
+            })
+            
+        }catch (error) {
+            console.error('Error fetching userDeleteWrongQuestion details:', error); // 处理错误
+
+        }
     }
 }
 

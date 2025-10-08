@@ -54,14 +54,21 @@
             <text class="question-type">{{ getQuestionTypeText(question.Type) }}</text>
           </view>
           <view class="question-actions">
-            <up-button :icon="isCollected(question._id) ? 'star-fill' : 'star'"
-              :type="isCollected(question._id) ? 'warning' : 'info'" :plain="!isCollected(question._id)" size="mini"
-              shape="circle" @click="toggleCollect(question._id)" :loading="collectLoading[question._id]">
+            <up-button 
+              :icon="isCollected(question._id) ? 'star-fill' : 'star'"
+              :type="isCollected(question._id) ? 'warning' : 'info'" 
+              :plain="!isCollected(question._id)" size="mini"
+              shape="circle" 
+              @click="toggleCollect(question)" 
+              :loading="collectLoading[question._id]">
               {{ isCollected(question._id) ? '已收藏' : '收藏' }}
             </up-button>
-            <up-button :icon="isInWrongBook(question._id) ? 'checkmark-circle-fill' : 'plus-circle'"
-              :type="isInWrongBook(question._id) ? 'success' : 'primary'" :plain="!isInWrongBook(question._id)"
-              size="mini" shape="circle" @click="toggleWrongBook(question._id)"
+            <up-button 
+              :icon="isInWrongBook(question._id) ? 'checkmark-circle-fill' : 'plus-circle'"
+              :type="isInWrongBook(question._id) ? 'success' : 'primary'" 
+              :plain="!isInWrongBook(question._id)"
+              size="mini" shape="circle" 
+              @click="toggleWrongBook(question)"
               :loading="wrongBookLoading[question._id]">
               {{ isInWrongBook(question._id) ? '已加入' : '错题本' }}
             </up-button>
@@ -225,8 +232,7 @@ import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerSto
 import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore'
 import uviewSubsection from '../../components/core/uviewSubsection.vue'
 import BackToTop from '../../components/core/BackToTop.vue'
-// import { addQuestionFavorite, removeQuestionFavorite, getQuestionFavorites } from '../../API/My/FavoriteAPI'
-// import { addToWrongBook, removeFromWrongBook, getWrongBookQuestions } from '../../API/Exam/WrongBookAPI'
+import { addWrongQuestionAPI,deleteWrongQuestionAPI } from '../../API/Exam/QuestionAPI';
 
 // Store 实例
 const questionStore = useQuestionStore() // 获取问题数据
@@ -286,7 +292,7 @@ onMounted(() => {
 
 /**
  * 加载错题数据
- * TODO: 实现从后端API获取错题数据
+ *
  */
 const loadWrongQuestions = async () => {
   try {
@@ -311,7 +317,6 @@ const loadWrongQuestions = async () => {
     })
     
     wrongQuestions.value = wrongQuestionsData
-    // 加载收藏和错题本状态
     console.log("wrongQuestionsData",wrongQuestions.value)
     
   } catch (error) {
@@ -330,16 +335,16 @@ const loadWrongQuestions = async () => {
  * 切换收藏状态
  * TODO: 实现API调用
  */
-const toggleCollect = async (questionId) => {
+const toggleCollect = async (question) => {
   // collectLoading[questionId] = true
   
   try {
-    const isCurrentlyCollected = isCollected(questionId)
+    const isCurrentlyCollected = isCollected(question)
     
     if (isCurrentlyCollected) {
       // TODO: 调用取消收藏API
       // await removeQuestionFavorite(questionId)
-      collectedQuestions.value.delete(questionId)
+      collectedQuestions.value.delete(question)
       uni.showToast({
         title: '已取消收藏',
         icon: 'success'
@@ -347,7 +352,7 @@ const toggleCollect = async (questionId) => {
     } else {
       // TODO: 调用添加收藏API
       // await addQuestionFavorite(questionId)
-      collectedQuestions.value.add(questionId)
+      collectedQuestions.value.add(question)
       uni.showToast({
         title: '收藏成功',
         icon: 'success'
@@ -360,35 +365,38 @@ const toggleCollect = async (questionId) => {
       icon: 'none'
     })
   } finally {
-    // collectLoading[questionId] = false
+    collectLoading[question] = false
   }
 }
 
 /**
  * 切换错题本状态
- * TODO: 实现API调用
  */
-const toggleWrongBook = async (questionId) => {
-  // wrongBookLoading[questionId] = true
-  
+const toggleWrongBook = async (question) => {
+  wrongBookLoading[question] = true
+
   try {
-    const isCurrentlyInBook = isInWrongBook(questionId)
+    const isCurrentlyInBook = isInWrongBook(question._id)
     
     if (isCurrentlyInBook) {
-      // TODO: 调用从错题本移除API
-      // await removeFromWrongBook(questionId)
-      wrongBookQuestions.value.delete(questionId)
+      //调用从错题本移除API
+      const res = await deleteWrongQuestionAPI(question._id)
+      if(res.code == 200){
+        wrongBookQuestions.value.delete(question._id)
+      }
       uni.showToast({
-        title: '已从错题本移除',
-        icon: 'success'
+        title: res.message,
+        icon: res.code === 200 ? 'success' : 'none'
       })
     } else {
-      // TODO: 调用加入错题本API
-      // await addToWrongBook(questionId)
-      wrongBookQuestions.value.add(questionId)
+      // 调用加入错题本API
+      const res = await addWrongQuestionAPI(question._id,question.examId,question.Type)
+      if(res.code === 200){
+        wrongBookQuestions.value.add(question._id)
+      }
       uni.showToast({
-        title: '已加入错题本',
-        icon: 'success'
+        title:res.message,
+        icon: res.code === 200 ? 'success' : 'none'
       })
     }
   } catch (error) {
@@ -398,7 +406,7 @@ const toggleWrongBook = async (questionId) => {
       icon: 'none'
     })
   } finally {
-    wrongBookLoading[questionId] = false
+    wrongBookLoading[question] = false
   }
 }
 

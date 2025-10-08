@@ -99,7 +99,7 @@ const exportToPDF = () => {
     })
 }
 
-// 查看错题功能 //TODO: 实现查看错题功能
+// 查看错题
 const viewWrongQuestions = () => {
     uni.navigateTo({ 
         url: '/pages/exam/WrongQuestionView' 

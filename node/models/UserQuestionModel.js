@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+/**
+ * 用户题目模型
+ * 存储用户创建的题目信息，包括题目类型、选项、答案等
+ */
 
 const UserQuestionSchema = new mongoose.Schema({
     // 用户关联信息

@@ -117,3 +117,42 @@ export async function deleteQuestionAPI(questionId, bankId) {
     throw error;
   }
 }
+/**
+ * 用户将错题加入错题本
+ * @param {String} questionId - 题目ID
+ * @param {String} examId - 考试ID
+ * @returns {Promise} 返回添加结果
+ */
+export async function addWrongQuestionAPI(questionId, examId,Type) {
+  try {
+    console.log(questionId, examId,Type)  // 调试输出
+    return await http({
+      url: `/uniappAPI/exam/useradd/wrongquestion`,
+      method: 'POST',
+      data:{questionId, examId}
+    });
+  }catch (error) {
+    console.error("addWrongQuestion 失败", error);
+    throw error;
+  }
+}
+/**
+ * 用户删除错题本
+ * @param {String} questionId - 题目ID
+ * @param {String} examId - 考试ID
+ * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @returns {Promise} 返回删除结果
+ */
+export async function deleteWrongQuestionAPI(questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userdelete/wrongquestion`,
+      method: 'POST',
+      data:{questionId,}
+    })
+  }catch (error) {
+    console.error("deleteWrongQuestion 失败", error);
+    throw error;
+  }
+}
+

@@ -1,4 +1,9 @@
 const mongoose = require('mongoose');
+
+/**
+ * 用户考试题型模型
+ * 用于存储用户的考试题型名称信息，包括考试ID、题目ID集合等
+ */
 const UserSchema = new mongoose.Schema({
   questionTitle: [{
     content: String,                           // 题型名称

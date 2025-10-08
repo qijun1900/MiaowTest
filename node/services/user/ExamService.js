@@ -370,6 +370,80 @@ const ExamService = {
                 error: error.message
             };
         }
+    },
+    useraddwrongquestion: async ({uid, questionId, examId,Type}) => {
+        try {
+            // 检查用户是否已经存在该错题
+            const existingWrongQuestion = await ConsumerModel.findOne({ 
+                _id: uid, 
+                'wrongQuestions.questionId': questionId, 
+                'wrongQuestions.examId': examId 
+            });
+            if (existingWrongQuestion) {
+                //更新时间
+                const updateResult = await ConsumerModel.updateOne(// 更新用户的指定题库
+                    { _id: uid, 'wrongQuestions.questionId': questionId, 'wrongQuestions.examId': examId },// 查找用户的指定题库
+                    { $set: { 'wrongQuestions.$.createTime': new Date() } }// 更新 createTime 字段的值
+                );  
+                return {
+                    code: 200,
+                    message: '错题已存在为你更新时间',
+                };
+            }
+            // 如果不存在，则添加
+            const result = await ConsumerModel.updateOne(// 更新用户的指定题库
+                { _id: uid },// 查找用户的指定题库
+                { $push: 
+                    { wrongQuestions: 
+                        { questionId, examId,Type,createTime: new Date() } 
+                    } 
+                }
+            );
+            if (result.modifiedCount === 0) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                }
+            }
+            return {
+                code: 200,
+                message: '错题添加成功',
+            }
+            
+        }catch (error) {
+            console.error('useraddwrongquestion 失败:', error);
+            return {
+                code: 500,
+                message: '添加错题失败',
+                error: error.message
+            };
+        }
+        
+    },
+    userDeleteWrongQuestion: async ({uid, questionId}) => {
+        try {
+            const result = await ConsumerModel.updateOne(// 更新用户的指定题库
+                { _id: uid },// 查找用户的指定题库
+                { $pull: { wrongQuestions: { questionId } } }// 删除 wrongQuestions 数组中 questionId 为 questionId 的元素
+            );
+            if (result.modifiedCount === 0) {
+                return {
+                    code: 404,
+                    message: '错题不存在',
+                }
+            }
+            return {
+                code: 200,
+                message: '错题删除成功',
+            }
+        }catch (error) {
+            console.error('userDeleteWrongQuestion 失败:', error);
+            return {
+                code: 500,
+                message: '删除错题失败',
+                error: error.message
+            };
+        }
     }
         
     
