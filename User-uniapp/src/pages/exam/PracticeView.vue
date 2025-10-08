@@ -231,7 +231,7 @@ const isEndQuestion = computed(() => {
     }
 });
 
-//handleSubmitAnswer
+// 处理提交答案
 const handleSubmitAnswer = () => {
     popupShow.value = false;
     uni.navigateTo({

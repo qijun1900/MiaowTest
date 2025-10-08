@@ -33,7 +33,7 @@ const ConsumerSchema = new mongoose.Schema({
     createTime: {
         type: Date,
     },
-    favoriteQuestions:{// 收藏的题目
+    favoriteExams:{// 收藏的考试
         type:Array,
         default:[]
     },
