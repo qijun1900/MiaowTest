@@ -5,8 +5,7 @@
         v-for="(item, index) in navItems" 
         :key="index" 
         class="nav-item"
-        @click="handleNavClick(item)"
-      >
+        @click="handleNavClick(item)">
         <view class="nav-icon-wrapper">
           <image 
             class="nav-icon" 
@@ -50,18 +49,12 @@ const navItems = ref([
 
 // 导航点击处理
 const handleNavClick = (item) => {
-  uni.showToast({
-    title: `点击了${item.title}`,
-    icon: 'none'
-  })
   // 跳转到对应页面
   if (item.path) {
     uni.navigateTo({ url: item.path })
   }
 }
-
 </script>
-
 <style scoped lang="scss">
 .navigation-container {
   padding: 30rpx 5rpx;

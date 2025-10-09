@@ -194,5 +194,18 @@ export async function deleteFavoriteQuestionAPI(questionId) {
     console.error("deleteFavoriteQuestion 失败", error);
   }
 }
-//TODO: 用户获取收藏题目
+/**
+ * 用户获取收藏题目
+ * @returns {Promise} 返回收藏题目列表
+ */
+export async function getUserFavoriteQuestionListAPI() {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getUserFavoriteQuestionList`,
+      method: 'GET'
+    })
+  }catch (error) {
+    console.error("getUserFavoriteQuestionList 失败", error);
+  }
+}
 

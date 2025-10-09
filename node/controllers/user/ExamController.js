@@ -257,6 +257,19 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching userDeleteFavoriteQuestion details:', error); // 处理错误
         }
+    },
+    getUserFavoriteQuestionList:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const result = await ExamService.getUserFavoriteQuestionList(uid)
+            res.send({
+                code:result.code,
+                data: result.data
+            })
+            
+        }catch (error) {
+            console.error('Error fetching getUserFavoriteQuestionList details:', error); // 处理错误
+        }
     }
 }
 

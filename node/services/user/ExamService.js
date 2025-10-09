@@ -6,6 +6,7 @@ const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const userQuestionModel = require('../../models/UserQuestionModel')
 const ConsumerModel = require('../../models/ConsumerModel');
+const { options } = require('../../routes/user/ExamRouter')
 
 const ExamService = {
     // uniappAPI
@@ -512,6 +513,64 @@ const ExamService = {
             return {
                 code: 500,
                 message: '删除收藏失败',
+                error: error.message
+            };
+        }
+    },
+    getUserFavoriteQuestionList: async (uid) => {
+        try {
+            const user = await ConsumerModel.findById(uid);
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            const modelMap = {
+                1: ExamSelectModel,
+                2: ExamBlankModel,
+                3: ExamJudgeModel,
+                4: ExamShortModel
+            };
+            // 并发查询所有题目和考试信息
+            const detailList = await Promise.all(
+                user.favoriteQuestions.map(async (question) => {
+                    const model = modelMap[question.Type];
+                    // 根据 Type 动态设置需要返回的字段
+                    let selectFields = { stem: 1, _id: 1, Type: 1 };
+                    if (question.Type === 1) {
+                        selectFields.options = 1;
+                        selectFields.isMultiple = 1;
+                    }
+                    const questionDoc = model ? await model.findById(
+                        question.questionId,
+                        selectFields
+                    ) : null;
+                    const examDoc = await ExamModel.findById(
+                        {
+                            _id: question.examId,
+                        },
+                        { name: 1 }
+                    );
+                    return {
+                        createTime: question.createTime,
+                        questionData: questionDoc,
+                        examName: examDoc ? examDoc.name : null
+                    };
+                })
+            );
+            // 按 createTime 降序排序
+                detailList.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+            return {
+                code: 200,
+                data: detailList
+            };
+        } catch (error) {
+            console.error('getUserFavoriteQuestionDetailList 失败:', error);
+            return {
+                code: 500,
+                message: '获取收藏题目详情失败',
                 error: error.message
             };
         }

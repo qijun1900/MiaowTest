@@ -141,7 +141,8 @@
 		{
 			"path": "pages/my/MyFavoriteView",
 			"style": {
-				"navigationBarTitleText": "MyFavoriteView"
+				"navigationBarTitleText": "我的收藏",
+				"navigationStyle": "custom"//自定义导航栏
 			}
 		}
 	],
