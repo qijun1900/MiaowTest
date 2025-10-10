@@ -1,13 +1,33 @@
 <template>
   <view class="question-favorite-container">
     <ThemeLoading v-if="loading" text="正在加载收藏题目..." />
+    <!-- 科目筛选 -->
+    <view class="subject-filter" v-if="filteredQuestions.length > 0 && loading === false">
+      <scroll-view scroll-x="true" class="subject-scroll">
+        <view class="subject-list">
+          <view 
+            class="subject-item" 
+            :class="{ active: selectedSubject === '全部' }"
+            @click="selectSubject('全部')">
+            全部
+          </view>
+          <view 
+            v-for="subject in subjectList" 
+            :key="subject"
+            class="subject-item" 
+            :class="{ active: selectedSubject === subject }"
+            @click="selectSubject(subject)">
+            {{ subject }}
+          </view>
+        </view>
+      </scroll-view>
+    </view>
     <!-- 题目列表 -->
     <view class="question-list">
       <view 
-        v-for="(question, index) in favoriteQuestions" 
+        v-for="(question, index) in filteredQuestions" 
         :key="question.id"
-        class="question-item"
-        :class="{ 'last-item': index === favoriteQuestions.length - 1 }">
+        class="question-item">
         
         <!-- 题目头部信息 -->
         <view class="question-header">
@@ -59,24 +79,43 @@
     </view>
     
     <!-- 空状态 -->
-    <view v-if="favoriteQuestions.length === 0 && loading ===false" class="empty-state" >
+    <view v-if="filteredQuestions.length === 0 && loading ===false" class="empty-state" >
       <view class="empty-icon">📚</view>
       <text class="empty-text">暂无收藏的题目</text>
       <text class="empty-subtext">快去收藏一些题目吧~</text>
     </view>
   </view>
 </template>
-
 <script setup>
-import { ref ,onMounted} from 'vue';
+import { ref ,onMounted,computed} from 'vue';
 import { getUserFavoriteQuestionListAPI,deleteFavoriteQuestionAPI } from '../../../API/Exam/QuestionAPI';
 import formatInfo from '../../../util/formatInfo';
 import formatTime from '../../../util/formatTime';
 import ThemeLoading from '../../core/ThemeLoading.vue';
 
-// 假数据 - 收藏的题目列表
 const favoriteQuestions = ref([]);
 const loading = ref(false);
+const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全部"
+
+// 获取科目列表
+const subjectList = computed(() => {
+  // 从收藏题目中提取所有不重复的科目
+  const subjects = [...new Set(favoriteQuestions.value.map(q => q.examName))];//使用Set去重
+  return subjects;
+});
+
+// 根据选中的科目筛选题目
+const filteredQuestions = computed(() => {
+  if (selectedSubject.value === '全部') {
+    return favoriteQuestions.value;
+  }
+  return favoriteQuestions.value.filter(question => question.examName === selectedSubject.value);//返回符合条件的题目
+});
+
+// 选择科目
+const selectSubject = (subject) => {
+  selectedSubject.value = subject;
+};
 
 // 开始练习
 const startPractice = (question) => {
@@ -122,8 +161,7 @@ const loadFavoriteQuestions = async () => {
   try {
     const res = await getUserFavoriteQuestionListAPI(); 
     if (res.code === 200) {
-      favoriteQuestions.value = res.data
-      loading.value = false;
+      favoriteQuestions.value = res.data;
     }
   } catch (error) {
     console.error('加载收藏列表失败:', error);
@@ -136,12 +174,49 @@ const loadFavoriteQuestions = async () => {
   }
 };
 </script>
-
 <style scoped>
 .question-favorite-container {
   padding: 8rpx;
   background-color: #f8f9fa;
   min-height: 100vh;
+}
+
+/* 科目筛选样式 */
+.subject-filter {
+  background-color: #ffffff;
+  padding: 20rpx 0;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.subject-scroll {
+  white-space: nowrap;
+}
+
+.subject-list {
+  display: flex;
+  padding: 0 20rpx;
+}
+
+.subject-item {
+  flex-shrink: 0;
+  padding: 12rpx 30rpx;
+  margin-right: 20rpx;
+  border-radius: 30rpx;
+  font-size: 28rpx;
+  color: #666666;
+  background-color: #f5f5f5;
+  transition: all 0.3s ease;
+}
+
+.subject-item.active {
+  color: #ffffff;
+  background-color: #1e6bff;
+  font-weight: 500;
+}
+
+.subject-item:last-child {
+  margin-right: 0;
 }
 
 .question-list {
