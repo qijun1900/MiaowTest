@@ -21,5 +21,5 @@ ExamRouter.post("/uniappAPI/exam/userdelete/wrongquestion",JWT.verifyTokenMiddle
 ExamRouter.post("/uniappAPI/exam/useradd/favoritequestion",JWT.verifyTokenMiddleware(),ExamController.userAddFavoriteQuestion)//用户将题目加入收藏
 ExamRouter.post("/uniappAPI/exam/userdelete/favoritequestion",JWT.verifyTokenMiddleware(),ExamController.userDeleteFavoriteQuestion)//用户将题目从收藏删除
 ExamRouter.get("/uniappAPI/exam/getUserFavoriteQuestionList",JWT.verifyTokenMiddleware(),ExamController.getUserFavoriteQuestionList)//获取用户的收藏题目
-
+ExamRouter.post("/uniappAPI/exam/userpractice/favoritequestion",JWT.verifyTokenMiddleware(),ExamController.userPracticeFavoriteQuestion)//用户收藏的题目进行练习
 module.exports = ExamRouter; 

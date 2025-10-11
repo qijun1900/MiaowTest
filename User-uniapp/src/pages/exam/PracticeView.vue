@@ -246,6 +246,17 @@ onMounted(() => {
    // 获取安全区域信息
    const safeAreaInfo = navBarHeightUtil.getSafeAreaInfo();
    safeAreaBottom.value = safeAreaInfo.bottom;
+   
+   // 检查是否有题目数据，如果没有则返回上一页
+   if (!questionStore.UserChooseQuestion || questionStore.UserChooseQuestion.length === 0) {
+     uni.showToast({
+       title: '没有题目数据',
+       icon: 'none'
+     });
+     setTimeout(() => {
+       uni.navigateBack();
+     }, 1500);
+   }
 })
 </script>
 

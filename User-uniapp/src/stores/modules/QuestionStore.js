@@ -31,7 +31,7 @@ export const useQuestionStore = defineStore("question", () => {
                 throw error; // 抛出错误以便上层处理
             }
         },
-        SetUserBlankquestions: (val) => { // 新增方法，用于设置题目数据
+        SetUserBlankquestions: (val) => { // 新增方法，用于设置题目数据(用户题库题目和用户收藏题目)
             QuestionData.value = val; // 将传入的值赋值给QuestionData.value
         },
     }
@@ -78,7 +78,7 @@ export const useQuestionStore = defineStore("question", () => {
 
                     // 如果问题有选项，则对选项进行乱序
                     // 添加条件：当Type为2时候为填空题目，不进行乱序
-                    if (newQuestion.options && Array.isArray(newQuestion.options) && newQuestion.type !== 2 ) {
+                    if (newQuestion.options && Array.isArray(newQuestion.options) && newQuestion.Type !== 2 ) {
                         // 修复：确保正确复制选项数组
                         const options = JSON.parse(JSON.stringify(newQuestion.options));
                         // Fisher-Yates 洗牌算法

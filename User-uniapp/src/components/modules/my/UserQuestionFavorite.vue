@@ -3,7 +3,7 @@
     <ThemeLoading v-if="loading" text="正在加载收藏题目..." />
     <!-- 科目筛选 -->
     <view class="subject-filter" v-if="filteredQuestions.length > 0 && loading === false">
-      <scroll-view scroll-x="true" class="subject-scroll">
+      <scroll-view scroll-x="true" class="subject-scroll" :show-scrollbar="false">
         <view class="subject-list">
           <view 
             class="subject-item" 
@@ -88,19 +88,22 @@
 </template>
 <script setup>
 import { ref ,onMounted,computed} from 'vue';
-import { getUserFavoriteQuestionListAPI,deleteFavoriteQuestionAPI } from '../../../API/Exam/QuestionAPI';
+import { getUserFavoriteQuestionListAPI,deleteFavoriteQuestionAPI,practiceFavoriteQuestionAPI} from '../../../API/Exam/QuestionAPI';
 import formatInfo from '../../../util/formatInfo';
 import formatTime from '../../../util/formatTime';
 import ThemeLoading from '../../core/ThemeLoading.vue';
+import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 
 const favoriteQuestions = ref([]);
 const loading = ref(false);
 const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全部"
+const QuestionStore = useQuestionStore();
+
 
 // 获取科目列表
 const subjectList = computed(() => {
   // 从收藏题目中提取所有不重复的科目
-  const subjects = [...new Set(favoriteQuestions.value.map(q => q.examName))];//使用Set去重
+  const subjects = [...new Set(favoriteQuestions.value.map(q => q.examName))];//使用Set去重,[... ] - 使用扩展运算符将 Set 对象转换回数组,
   return subjects;
 });
 
@@ -118,13 +121,53 @@ const selectSubject = (subject) => {
 };
 
 // 开始练习
-const startPractice = (question) => {
-  // TODO: 跳转到练习页面
-  console.log('开始练习题目:', question.id);
-  uni.showToast({
-    title: '功能开发中...',
-    icon: 'none'
-  });
+const startPractice = async (question) => { 
+  try {
+    const res = await practiceFavoriteQuestionAPI(question.questionData.Type,question.questionData._id);
+    console.log(res.data);
+    if(res.code === 200){
+      // 将当前收藏的题目设置为练习题目
+      QuestionStore.setCurrentQuestionIds([question.questionData._id]);
+      
+      // 直接设置题目数据，
+      QuestionStore.SetUserBlankquestions([res.data]);
+      
+      // 设置用户选择的题目，并获取返回的题目数组
+      const selectedQuestions = QuestionStore.setSelectedQuestions(1, false, false);
+      
+      // 确保题目数据已正确设置
+      if (selectedQuestions && selectedQuestions.length > 0) {
+        // 清空之前的答案记录
+        const { useObjectiveAnswerStore } = await import('../../../stores/modules/ObjectiveAnswerStore');
+        const { useSubjectiveAnswerStore } = await import('../../../stores/modules/SubjectiveAnswerStore');
+        const objectiveAnswerStore = useObjectiveAnswerStore();
+        const subjectiveAnswerStore = useSubjectiveAnswerStore();
+        objectiveAnswerStore.clearAllAnswers();
+        subjectiveAnswerStore.clearAllAnswers();
+        
+        // 导航到练习页面
+        uni.navigateTo({
+          url: `/pages/exam/PracticeView`
+        });
+      } else {
+        uni.showToast({
+          title: '题目数据设置失败',
+          icon: 'none'
+        });
+      }
+    } else {
+      uni.showToast({
+        title: '请求失败',
+        icon: 'none'
+      });
+    }
+  } catch (error) {
+    console.error('开始练习失败:', error);
+    uni.showToast({
+      title: '请求失败',
+      icon: 'none'
+    });
+  }
 };
 
 // 移除收藏

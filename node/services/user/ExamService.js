@@ -574,6 +574,33 @@ const ExamService = {
                 error: error.message
             };
         }
+    },
+    userPracticeFavoriteQuestion: async ({uid,Type,questionId}) => {
+        try {
+            const user = await ConsumerModel.findById(uid);
+            if (!user) {
+                return {
+                    code: 404,
+                    data: null,
+                };
+            }
+            const modelMap = {
+                1: ExamSelectModel,
+                2: ExamBlankModel,
+                3: ExamJudgeModel,
+                4: ExamShortModel
+            };
+            const model = modelMap[Type];
+            const questionDoc = await model.findById(questionId);
+            return {
+                code: 200,
+                data: questionDoc,
+            }
+            
+        }catch(e){
+            console.error('userPracticeFavoriteQuestion 失败:', e);
+        }
+        
     }
       
 }

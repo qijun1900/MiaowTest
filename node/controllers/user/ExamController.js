@@ -270,6 +270,24 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getUserFavoriteQuestionList details:', error); // 处理错误
         }
+    },
+    userPracticeFavoriteQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;
+            const { Type,questionId } = req.body; // 从请求体中获取questionId
+            const result = await ExamService.userPracticeFavoriteQuestion({
+                uid,
+                Type,
+                questionId
+            })
+            res.send({
+                code: result.code,
+                data: result.data, // 返回的数据
+            })
+            
+        }catch (error) {
+            console.error('Error fetching userPracticeFavoriteQuestion details:', error); // 处理错误
+        }
     }
 }
 

@@ -209,3 +209,20 @@ export async function getUserFavoriteQuestionListAPI() {
   }
 }
 
+/**
+ * 用户点击收藏题目进行练习
+ * @param {Type}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @param {String} questionId - 题目ID
+ * @returns {Promise} 返回练习结果
+ */
+export async function practiceFavoriteQuestionAPI(Type, questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userpractice/favoritequestion`,
+      method: 'POST',
+      data:{Type, questionId}
+    })
+  }catch (error) {
+    console.error("practiceFavoriteQuestion 失败", error);
+  } 
+}
