@@ -2,26 +2,10 @@
   <view class="question-favorite-container">
     <ThemeLoading v-if="loading" text="正在加载收藏题目..." />
     <!-- 科目筛选 -->
-    <view class="subject-filter" v-if="filteredQuestions.length > 0 && loading === false">
-      <scroll-view scroll-x="true" class="subject-scroll" :show-scrollbar="false">
-        <view class="subject-list">
-          <view 
-            class="subject-item" 
-            :class="{ active: selectedSubject === '全部' }"
-            @click="selectSubject('全部')">
-            全部
-          </view>
-          <view 
-            v-for="subject in subjectList" 
-            :key="subject"
-            class="subject-item" 
-            :class="{ active: selectedSubject === subject }"
-            @click="selectSubject(subject)">
-            {{ subject }}
-          </view>
-        </view>
-      </scroll-view>
-    </view>
+    <SubjectFilter 
+      v-model="selectedSubject" 
+      :filter-list="subjectList" 
+      :show-filter="filteredQuestions.length > 0 && loading === false" />
     <!-- 题目列表 -->
     <view class="question-list">
       <view 
@@ -92,13 +76,13 @@ import { getUserFavoriteQuestionListAPI,deleteFavoriteQuestionAPI,practiceFavori
 import formatInfo from '../../../util/formatInfo';
 import formatTime from '../../../util/formatTime';
 import ThemeLoading from '../../core/ThemeLoading.vue';
+import SubjectFilter from '../../core/Filter.vue';
 import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 
 const favoriteQuestions = ref([]);
 const loading = ref(false);
 const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全部"
 const QuestionStore = useQuestionStore();
-
 
 // 获取科目列表
 const subjectList = computed(() => {
@@ -114,11 +98,6 @@ const filteredQuestions = computed(() => {
   }
   return favoriteQuestions.value.filter(question => question.examName === selectedSubject.value);//返回符合条件的题目
 });
-
-// 选择科目
-const selectSubject = (subject) => {
-  selectedSubject.value = subject;
-};
 
 // 开始练习
 const startPractice = async (question) => { 
@@ -194,11 +173,7 @@ const removeFavorite = (question) => {
     }
   });
 };
-
-onMounted(() => {
-  loadFavoriteQuestions();
-});
-
+// 页面加载时加载收藏列表
 const loadFavoriteQuestions = async () => {
   loading.value = true;
   try {
@@ -216,50 +191,15 @@ const loadFavoriteQuestions = async () => {
     loading.value = false;
   }
 };
+onMounted(() => {
+  loadFavoriteQuestions();
+});
 </script>
 <style scoped>
 .question-favorite-container {
   padding: 8rpx;
   background-color: #f8f9fa;
   min-height: 100vh;
-}
-
-/* 科目筛选样式 */
-.subject-filter {
-  background-color: #ffffff;
-  padding: 20rpx 0;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-}
-
-.subject-scroll {
-  white-space: nowrap;
-}
-
-.subject-list {
-  display: flex;
-  padding: 0 20rpx;
-}
-
-.subject-item {
-  flex-shrink: 0;
-  padding: 12rpx 30rpx;
-  margin-right: 20rpx;
-  border-radius: 30rpx;
-  font-size: 28rpx;
-  color: #666666;
-  background-color: #f5f5f5;
-  transition: all 0.3s ease;
-}
-
-.subject-item.active {
-  color: #ffffff;
-  background-color: #1e6bff;
-  font-weight: 500;
-}
-
-.subject-item:last-child {
-  margin-right: 0;
 }
 
 .question-list {
