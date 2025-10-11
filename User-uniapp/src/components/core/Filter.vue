@@ -1,6 +1,9 @@
 <template>
   <view class="subject-filter" v-if="showFilter">
-    <scroll-view scroll-x="true" class="subject-scroll" :show-scrollbar="false">
+    <scroll-view 
+      scroll-x="true" 
+      class="subject-scroll" 
+      :show-scrollbar="false">
       <view class="subject-list">
         <view 
           class="subject-item" 

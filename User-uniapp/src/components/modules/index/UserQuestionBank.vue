@@ -1,5 +1,11 @@
 <template>
     <view class="container">
+        <!-- 提示 -->
+        <Tips 
+            text="左滑即可对题库进行删除操作" 
+            :duration="0" 
+            type="info"/>
+        
         <!-- 加载状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题库..." />
         
@@ -60,6 +66,7 @@ import { getUserBankList ,deleteUserBankAPI} from '../../../API/Exam/ExamAPI'
 import formatTime from '../../../util/formatTime'
 import ThemeLoading from '../../core/ThemeLoading.vue'
 import useSwipe from '../../../composables/useSwipe'
+import Tips from '../../core/Tips.vue'
 
 const questionBanks = ref([])
 const isLoading = ref(false)

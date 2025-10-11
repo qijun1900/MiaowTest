@@ -19,6 +19,8 @@
         </view>
       </view>
     </view>
+
+    <Tips text="左滑即可对题目进行删除操作" :duration="0" />
     
     <!-- 题目列表 -->
     <view class="question-list-container">
@@ -32,7 +34,8 @@
         scroll-y="true" 
         class="question-scroll" 
         :scroll-with-animation="false" 
-        :enable-back-to-top="false">
+        :enable-back-to-top="false"
+        :show-scrollbar="false">
         <!-- 加载中状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题目..." />
         
@@ -125,7 +128,7 @@ import uviewPopup from '../../components/core/uviewPopup.vue';
 import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue';
 import useSwipe from '../../composables/useSwipe.js'; // 导入封装的滑动删除方法
 import { deleteQuestionAPI } from '../../API/Exam/QuestionAPI';
-
+import Tips from '../../components/core/Tips.vue';
 const bankData  =ref([]);// 题库信息数据
 const QuestionData = ref([]);//题库题目数据
 const isLoading = ref(false); // 加载状态
@@ -282,6 +285,7 @@ onShow(() => {
 
 <style scoped>
 .UserBankView {
+  padding: 5rpx 5rpx;
   display: flex;
   flex-direction: column;
   height: calc(100vh - 50px);
@@ -356,7 +360,7 @@ onShow(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin: 0 25rpx;
+  margin: 0 15rpx;
   background-color: #fff;
   border-radius: 20rpx;
   overflow: hidden;

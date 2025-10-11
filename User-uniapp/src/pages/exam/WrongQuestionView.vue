@@ -438,8 +438,6 @@ const isInWrongBook = (questionId) => {
   return wrongBookQuestions.value.has(questionId)
 }
 
-
-
 /**
  * 获取客观题用户答案文本（用于显示）
  */
