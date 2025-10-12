@@ -78,7 +78,11 @@ import formatTime from '../../../util/formatTime';
 import ThemeLoading from '../../core/ThemeLoading.vue';
 import SubjectFilter from '../../core/Filter.vue';
 import { useQuestionStore } from '../../../stores/modules/QuestionStore';
-
+import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
+import { useSubjectiveAnswerStore } from '../../../stores/modules/SubjectiveAnswerStore';
+       
+const objectiveAnswerStore = useObjectiveAnswerStore();
+const subjectiveAnswerStore = useSubjectiveAnswerStore();
 const favoriteQuestions = ref([]);
 const loading = ref(false);
 const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全部"
@@ -103,7 +107,6 @@ const filteredQuestions = computed(() => {
 const startPractice = async (question) => { 
   try {
     const res = await practiceQuestionAPI(question.questionData.Type,question.questionData._id);
-    
     if(res.code === 200){
       // 将当前收藏的题目设置为练习题目
       QuestionStore.setCurrentQuestionIds([question.questionData._id]);
@@ -117,10 +120,6 @@ const startPractice = async (question) => {
       // 确保题目数据已正确设置
       if (selectedQuestions && selectedQuestions.length > 0) {
         // 清空之前的答案记录
-        const { useObjectiveAnswerStore } = await import('../../../stores/modules/ObjectiveAnswerStore');
-        const { useSubjectiveAnswerStore } = await import('../../../stores/modules/SubjectiveAnswerStore');
-        const objectiveAnswerStore = useObjectiveAnswerStore();
-        const subjectiveAnswerStore = useSubjectiveAnswerStore();
         objectiveAnswerStore.clearAllAnswers();
         subjectiveAnswerStore.clearAllAnswers();
         

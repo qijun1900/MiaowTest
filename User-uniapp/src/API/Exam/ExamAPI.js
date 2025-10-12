@@ -75,7 +75,7 @@ export async function getExamSubjectTypes(examSubjectId) {
 }
 
 /** 匹配题目列表
- * @param {Array} extractedData 问题ID数组
+ * @param {Array} extractedData 问题ID数组 [{ _id: '68c57b6f30e5b87cc7790354', category: 1 },]
  * @returns {Promise} 返回匹配的题目列表
  */
 export async function FetchMatchQuestionList(extractedData) {
@@ -85,7 +85,6 @@ export async function FetchMatchQuestionList(extractedData) {
       method: 'POST',
       data: extractedData
     });
-
     return response;
 
   } catch (error) {

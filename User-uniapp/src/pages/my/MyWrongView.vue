@@ -61,28 +61,82 @@
         </view>
       </view>
     </view>
-    
+
+    <BackToTop
+      ref="backToTopRef" 
+      position="bottom-right"/>
+      
     <!-- 空状态 -->
     <view v-if="filteredQuestions.length === 0 && loading ===false" class="empty-state" >
       <view class="empty-icon">📝</view>
       <text class="empty-text">暂无错题记录</text>
       <text class="empty-subtext">继续努力，减少错题吧~</text>
     </view>
+    
+    <!-- 底部立即练习按钮 -->
+    <view 
+      v-if="filteredQuestions.length > 0 && loading === false" 
+      class="bottom-practice-container">
+      <button 
+        class="bottom-practice-btn" 
+        @click="handleOpenSetting">
+        练习所有({{ filteredQuestions.length }})
+      </button>
+    </view>
+    <!-- 弹出层 -->
+    <view>
+      <uviewPopup
+        v-model:show="settingpopupShow" 
+        title="练习设置">
+        <template #popupcontent>
+          <PracticeSettings 
+            v-if="settingpopupShow"
+            v-model:questionCount="questionCount"
+            :maxQuestions="filteredQuestions.length"
+            v-model:isRandom="isRandom"
+            v-model:isOptionRandom="isOptionRandom"
+            v-model:isShowAnswer="isShowAnswer"
+            v-model:isShowAIHelp="isShowAIHelp"/>
+          <view>
+            <button class="practice-btn-popup" @click="startAllPractice">
+              <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
+              <text class="btn-text" >开始练习</text>
+            </button>
+          </view>
+        </template>
+      </uviewPopup>
+    </view>
   </view>
 </template>
 <script setup>
-import { ref ,onMounted,computed} from 'vue';
+import { ref,onMounted,computed,watch} from 'vue';
 import { getUserWrongQuestionListAPI,deleteWrongQuestionAPI,practiceQuestionAPI} from '../../API/Exam/QuestionAPI';
 import formatInfo from '../../util/formatInfo';
 import formatTime from '../../util/formatTime';
 import ThemeLoading from '../../components/core/ThemeLoading.vue';
 import SubjectFilter from '../../components/core/Filter.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
+import { onPageScroll } from '@dcloudio/uni-app';
+import BackToTop from "../../components/core/BackToTop.vue";
+import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerStore';
+import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore';
+import uviewPopup from '../../components/core/uviewPopup.vue';
+import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue';
 
+const objectiveAnswerStore = useObjectiveAnswerStore();
+const subjectiveAnswerStore = useSubjectiveAnswerStore();
 const wrongQuestions = ref([]);
 const loading = ref(false);
 const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全部"
 const QuestionStore = useQuestionStore();
+const backToTopRef = ref();// 回到顶部组件引用
+const settingpopupShow = ref(false); // 弹出层状态
+// 练习设置
+const questionCount = ref(1) 
+const isRandom = ref(false) // 默认不乱序
+const isOptionRandom = ref(false) // 默认选项不乱序
+const isShowAnswer = ref(false) //是否立即显示答案
+const isShowAIHelp = ref(false)//是否开启AI解析
 
 // 获取科目列表
 const subjectList = computed(() => {
@@ -98,6 +152,12 @@ const filteredQuestions = computed(() => {
   }
   return wrongQuestions.value.filter(question => question.examName === selectedSubject.value);//返回符合条件的题目
 });
+// 监听错题列表变化，自动更新题目数量为最大值
+watch(filteredQuestions, (newVal) => {
+  if (newVal.length > 0) {
+    questionCount.value = newVal.length;
+  }
+}, { immediate: true });
 
 // 开始练习
 const startPractice = async (question) => { 
@@ -117,10 +177,6 @@ const startPractice = async (question) => {
       // 确保题目数据已正确设置
       if (selectedQuestions && selectedQuestions.length > 0) {
         // 清空之前的答案记录
-        const { useObjectiveAnswerStore } = await import('../../stores/modules/ObjectiveAnswerStore');
-        const { useSubjectiveAnswerStore } = await import('../../stores/modules/SubjectiveAnswerStore');
-        const objectiveAnswerStore = useObjectiveAnswerStore();
-        const subjectiveAnswerStore = useSubjectiveAnswerStore();
         objectiveAnswerStore.clearAllAnswers();
         subjectiveAnswerStore.clearAllAnswers();
         
@@ -142,6 +198,50 @@ const startPractice = async (question) => {
     }
   } catch (error) {
     console.error('开始练习失败:', error);
+    uni.showToast({
+      title: '请求失败',
+      icon: 'none'
+    });
+  }
+};
+// 打开设置弹出层
+const handleOpenSetting = ()=>{
+    if (filteredQuestions.value.length === 0) {
+    uni.showToast({
+      title: '暂无错题可练习',
+      icon: 'none'
+    });
+    return;
+  }
+  settingpopupShow.value = true;
+}
+// 开始练习所有错题
+const startAllPractice = async () => {
+  try {
+    settingpopupShow.value = false;
+    // 获取所有错题ID
+    const questionIds = filteredQuestions.value.map(q => {
+      return {
+        _id: q.questionData._id,
+        category: q.questionData.Type
+      }
+    });
+    // 设置错题ID列表
+    QuestionStore.setCurrentQuestionIds(questionIds);
+    await QuestionStore.FetchQuestionData();// 数据请求获取题目详细信息
+    // 再进行题目选择和设置
+    QuestionStore.setSelectedQuestions(questionCount.value, isRandom.value, isOptionRandom.value);// 设置选择的题目
+    QuestionStore.setUserShowSettings({ // 设置用户显示设置
+      showAnswer: isShowAnswer.value,
+      showAIHelp: isShowAIHelp.value,
+      OptionRandom: isOptionRandom.value,
+    });
+    // 导航到练习页面
+    uni.navigateTo({
+      url: `/pages/exam/PracticeView`
+    });
+  } catch (error) {
+    console.error('开始练习所有错题失败:', error);
     uni.showToast({
       title: '请求失败',
       icon: 'none'
@@ -191,6 +291,14 @@ const loadWrongQuestions = async () => {
     loading.value = false;
   }
 };
+// 页面滚动事件
+onPageScroll((e) => {
+  // 调用BackToTop组件的滚动处理方法
+  if (backToTopRef.value) {
+    backToTopRef.value.handlePageScroll(e);
+  }
+});
+
 onMounted(() => {
   loadWrongQuestions();
 });
@@ -207,6 +315,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 20rpx; /* 卡片之间的间距 */
   padding: 20rpx;
+  margin-bottom: 20rpx;
 }
 
 .question-item {
@@ -404,6 +513,84 @@ onMounted(() => {
 .empty-subtext {
   font-size: 28rpx;
   color: #95a5a6;
+}
+
+/* 底部练习按钮样式 */
+.bottom-practice-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.92));
+  backdrop-filter: blur(8rpx);
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  border-top: 1rpx solid rgba(230, 240, 255, 0.5);
+}
+
+.bottom-practice-btn {
+  width: 100%;
+  height: 80rpx;
+  background: linear-gradient(135deg, #6BB6FF, #4A9FE8);
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 500;
+  border-radius: 40rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4rpx 15rpx rgba(107, 182, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.bottom-practice-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: left 0.6s;
+}
+
+.bottom-practice-btn:active {
+  background: linear-gradient(135deg, #4A9FE8, #3A8FD8);
+  transform: scale(0.97);
+  box-shadow: 0 2rpx 10rpx rgba(74, 159, 232, 0.5);
+}
+
+.bottom-practice-btn:active::before {
+  left: 100%;
+}
+/* 弹出层练习题目按钮 */
+.practice-btn-popup {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  color: #4d94ff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  border: 2rpx solid #4d94ff;
+  box-shadow: 0 4rpx 12rpx rgba(77, 148, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.practice-btn:active {
+  background-color: #f0f7ff;
+  opacity: 0.8;
+}
+
+/* 按钮文字 */
+.btn-text {
+  margin-left: 8rpx;
 }
 
 /* 响应式设计 */
