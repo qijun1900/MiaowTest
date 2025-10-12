@@ -1,6 +1,6 @@
 <template>
-  <view class="question-favorite-container">
-    <ThemeLoading v-if="loading" text="正在加载收藏题目..." />
+  <view class="question-wrong-container">
+    <ThemeLoading v-if="loading" text="正在加载错题..." />
     <!-- 科目筛选 -->
     <SubjectFilter 
       v-model="selectedSubject" 
@@ -15,14 +15,14 @@
         
         <!-- 题目头部信息 -->
         <view class="question-header">
-          <view class="subject-tag" :style="{ backgroundColor:'#1e6bff' }">
+          <view class="subject-tag" :style="{ backgroundColor:'#e74c3c' }">
             {{ question.examName }}
           </view>
           <view class="question-type type-all" >
             {{ formatInfo.getQuestionTypeText(question.questionData.Type) }}
           </view>
-          <view class="favorite-status">
-            <text class="favorite-icon">⭐</text>
+          <view class="wrong-status">
+            <text class="wrong-icon">❌</text>
           </view>
         </view>
         
@@ -44,18 +44,18 @@
           </view>
         </view>
         
-        <!-- 收藏时间和操作 -->
+        <!-- 错题时间和操作 -->
         <view class="question-footer">
-          <view class="favorite-time">
+          <view class="wrong-time">
             <image src="/static/other/time.png" class="info-icon"></image>
-            <text>收藏于 {{ formatTime.getTime2(question.createTime) }}</text>
+            <text>错题记录于 {{ formatTime.getTime2(question.createTime) }}</text>
           </view>
           <view class="question-actions">
             <button class="action-btn practice-btn" @click="startPractice(question)">
               开始练习
             </button>
-            <button class="action-btn remove-btn" @click="removeFavorite(question.questionData)">
-              移除收藏
+            <button class="action-btn remove-btn" @click="removeWrong(question.questionData)">
+              移除错题
             </button>
           </view>
         </view>
@@ -64,51 +64,51 @@
     
     <!-- 空状态 -->
     <view v-if="filteredQuestions.length === 0 && loading ===false" class="empty-state" >
-      <view class="empty-icon">📚</view>
-      <text class="empty-text">暂无收藏的题目</text>
-      <text class="empty-subtext">快去收藏一些题目吧~</text>
+      <view class="empty-icon">📝</view>
+      <text class="empty-text">暂无错题记录</text>
+      <text class="empty-subtext">继续努力，减少错题吧~</text>
     </view>
   </view>
 </template>
 <script setup>
 import { ref ,onMounted,computed} from 'vue';
-import { getUserFavoriteQuestionListAPI,deleteFavoriteQuestionAPI,practiceQuestionAPI} from '../../../API/Exam/QuestionAPI';
-import formatInfo from '../../../util/formatInfo';
-import formatTime from '../../../util/formatTime';
-import ThemeLoading from '../../core/ThemeLoading.vue';
-import SubjectFilter from '../../core/Filter.vue';
-import { useQuestionStore } from '../../../stores/modules/QuestionStore';
+import { getUserWrongQuestionListAPI,deleteWrongQuestionAPI,practiceQuestionAPI} from '../../API/Exam/QuestionAPI';
+import formatInfo from '../../util/formatInfo';
+import formatTime from '../../util/formatTime';
+import ThemeLoading from '../../components/core/ThemeLoading.vue';
+import SubjectFilter from '../../components/core/Filter.vue';
+import { useQuestionStore } from '../../stores/modules/QuestionStore';
 
-const favoriteQuestions = ref([]);
+const wrongQuestions = ref([]);
 const loading = ref(false);
 const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全部"
 const QuestionStore = useQuestionStore();
 
 // 获取科目列表
 const subjectList = computed(() => {
-  // 从收藏题目中提取所有不重复的科目
-  const subjects = [...new Set(favoriteQuestions.value.map(q => q.examName))];//使用Set去重,[... ] - 使用扩展运算符将 Set 对象转换回数组,
+  // 从错题中提取所有不重复的科目
+  const subjects = [...new Set(wrongQuestions.value.map(q => q.examName))];//使用Set去重,[... ] - 使用扩展运算符将 Set 对象转换回数组,
   return subjects;
 });
 
 // 根据选中的科目筛选题目
 const filteredQuestions = computed(() => {
   if (selectedSubject.value === '全部') {
-    return favoriteQuestions.value;
+    return wrongQuestions.value;
   }
-  return favoriteQuestions.value.filter(question => question.examName === selectedSubject.value);//返回符合条件的题目
+  return wrongQuestions.value.filter(question => question.examName === selectedSubject.value);//返回符合条件的题目
 });
 
 // 开始练习
 const startPractice = async (question) => { 
   try {
     const res = await practiceQuestionAPI(question.questionData.Type,question.questionData._id);
-    
+
     if(res.code === 200){
-      // 将当前收藏的题目设置为练习题目
+      // 将当前错题设置为练习题目
       QuestionStore.setCurrentQuestionIds([question.questionData._id]);
       
-      // 直接设置题目数据，
+      // 直接设置题目数据
       QuestionStore.SetUserBlankquestions([res.data]);
       
       // 设置用户选择的题目，并获取返回的题目数组
@@ -117,8 +117,8 @@ const startPractice = async (question) => {
       // 确保题目数据已正确设置
       if (selectedQuestions && selectedQuestions.length > 0) {
         // 清空之前的答案记录
-        const { useObjectiveAnswerStore } = await import('../../../stores/modules/ObjectiveAnswerStore');
-        const { useSubjectiveAnswerStore } = await import('../../../stores/modules/SubjectiveAnswerStore');
+        const { useObjectiveAnswerStore } = await import('../../stores/modules/ObjectiveAnswerStore');
+        const { useSubjectiveAnswerStore } = await import('../../stores/modules/SubjectiveAnswerStore');
         const objectiveAnswerStore = useObjectiveAnswerStore();
         const subjectiveAnswerStore = useSubjectiveAnswerStore();
         objectiveAnswerStore.clearAllAnswers();
@@ -149,11 +149,11 @@ const startPractice = async (question) => {
   }
 };
 
-// 移除收藏
-const removeFavorite = (question) => {
+// 移除错题
+const removeWrong = (question) => {
   uni.showModal({
-    title: '移除收藏',
-    content: '确定要移除这道题的收藏吗？',
+    title: '移除错题',
+    content: '确定要移除这道错题吗？',
     showCancel: true,
     cancelText: '取消',
     confirmText: '确定',
@@ -162,27 +162,27 @@ const removeFavorite = (question) => {
     success: (res) => {
       if (res.confirm) {
         // 从列表中移除
-        deleteFavoriteQuestionAPI(question._id);
-        favoriteQuestions.value = favoriteQuestions.value.filter(q => q.questionData._id !== question._id); 
+        deleteWrongQuestionAPI(question._id);
+        wrongQuestions.value = wrongQuestions.value.filter(q => q.questionData._id !== question._id); 
         // 显示移除成功提示
         uni.showToast({
-          title: '已移除收藏',
+          title: '已移除错题',
           icon: 'success'
         });
       }
     }
   });
 };
-// 页面加载时加载收藏列表
-const loadFavoriteQuestions = async () => {
+// 页面加载时加载错题列表
+const loadWrongQuestions = async () => {
   loading.value = true;
   try {
-    const res = await getUserFavoriteQuestionListAPI(); 
+    const res = await getUserWrongQuestionListAPI(); 
     if (res.code === 200) {
-      favoriteQuestions.value = res.data;
+      wrongQuestions.value = res.data;
     }
   } catch (error) {
-    console.error('加载收藏列表失败:', error);
+    console.error('加载错题列表失败:', error);
     uni.showToast({
       title: '加载失败',
       icon: 'error'
@@ -192,11 +192,11 @@ const loadFavoriteQuestions = async () => {
   }
 };
 onMounted(() => {
-  loadFavoriteQuestions();
+  loadWrongQuestions();
 });
 </script>
 <style scoped>
-.question-favorite-container {
+.question-wrong-container {
   padding: 8rpx;
   background-color: #f8f9fa;
   min-height: 100vh;
@@ -248,9 +248,9 @@ onMounted(() => {
 }
 
 .type-all {
-  color: #1e6bff;
-  border-color: #1e6bff;
-  background-color: #eaf2ff;
+  color: #e74c3c;
+  border-color: #e74c3c;
+  background-color: #fdf2f2;
 }
 
 
@@ -260,13 +260,13 @@ onMounted(() => {
   background-color: #f1f5f9;
 }
 
-.favorite-status {
+.wrong-status {
   margin-left: auto;
 }
 
-.favorite-icon {
+.wrong-icon {
   font-size: 32rpx;
-  color: #FFD700;
+  color: #e74c3c;
 }
 
 .question-content {
@@ -328,7 +328,7 @@ onMounted(() => {
   border-top: 1rpx dashed #f0f0f0;
 }
 
-.favorite-time {
+.wrong-time {
   display: flex;
   align-items: center;
   font-size: 24rpx;

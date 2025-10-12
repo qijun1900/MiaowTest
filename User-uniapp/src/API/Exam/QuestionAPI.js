@@ -153,7 +153,21 @@ export async function deleteWrongQuestionAPI(questionId) {
     throw error;
   }
 }
-//TODO: 用户获取错题本
+
+/**
+ * 用户获取错题本
+ * @returns {Promise} 返回错题本列表
+ */
+export async function getUserWrongQuestionListAPI() {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getUserWrongQuestionList`,
+      method: 'GET'
+    })
+  }catch (error) {
+    console.error("getUserWrongQuestionList 失败", error);
+  }
+}
 
 /**
  * 用户获取错题本
@@ -210,15 +224,15 @@ export async function getUserFavoriteQuestionListAPI() {
 }
 
 /**
- * 用户点击收藏题目进行练习
+ * 用户点击题目进行练习
  * @param {Type}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @param {String} questionId - 题目ID
  * @returns {Promise} 返回练习结果
  */
-export async function practiceFavoriteQuestionAPI(Type, questionId) {
+export async function practiceQuestionAPI(Type, questionId) {
   try {
     return await http({
-      url: `/uniappAPI/exam/userpractice/favoritequestion`,
+      url: `/uniappAPI/exam/userpractice/question`,
       method: 'POST',
       data:{Type, questionId}
     })
@@ -226,3 +240,4 @@ export async function practiceFavoriteQuestionAPI(Type, questionId) {
     console.error("practiceFavoriteQuestion 失败", error);
   } 
 }
+

@@ -556,7 +556,7 @@ const ExamService = {
                     return {
                         createTime: question.createTime,
                         questionData: questionDoc,
-                        examName: examDoc ? examDoc.name : null
+                        examName: examDoc ? examDoc.name : '未知考试'
                     };
                 })
             );
@@ -601,6 +601,62 @@ const ExamService = {
             console.error('userPracticeFavoriteQuestion 失败:', e);
         }
         
+    },
+    getUserWrongQuestionList: async (uid) => {
+        try {
+            const user = await ConsumerModel.findById(uid);
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            const modelMap = {
+                1: ExamSelectModel,
+                2: ExamBlankModel,
+                3: ExamJudgeModel,
+                4: ExamShortModel
+            };
+            // 并发查询所有题目和考试信息
+            const questionPromises = user.wrongQuestions.map(async (wrongQuestion) => {
+                const Model = modelMap[wrongQuestion.Type];
+                if (!Model) return null;
+                
+                const questionDoc = await Model.findById(wrongQuestion.questionId);
+                if (!questionDoc) return null;
+                
+                // 获取考试信息
+                const examDoc = await ExamModel.findById(wrongQuestion.examId);
+                
+                return {
+                    questionData: questionDoc,
+                    examId: wrongQuestion.examId,
+                    examName: examDoc ? examDoc.name : '未知考试',
+                    createTime: wrongQuestion.createTime,
+                    Type: wrongQuestion.Type
+                };
+            });
+            
+            const results = await Promise.all(questionPromises);
+            // 过滤掉null值并按创建时间倒序排列
+            const validResults = results
+                .filter(result => result !== null)
+                .sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+            
+            return {
+                code: 200,
+                message: '获取错题列表成功',
+                data: validResults
+            };
+        } catch (error) {
+            console.error('getUserWrongQuestionList 失败:', error);
+            return {
+                code: 500,
+                message: '获取错题列表失败',
+                error: error.message
+            };
+        }
     }
       
 }

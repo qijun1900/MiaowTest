@@ -33,7 +33,7 @@ const navItems = ref([
   {
     title: '我的错题',
     icon: '/static/navMy/my-wro.png',
-    path: '/pages/exam/index'
+    path: '/pages/my/MyWrongView'
   },
   {
     title: '所有考试',

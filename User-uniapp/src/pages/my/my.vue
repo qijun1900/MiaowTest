@@ -36,8 +36,6 @@
       <myNavbar/>
      </view>
 
-     <Tips text="这是一条信息提示" :duration="0" />
-
     <ThemeDivider text="更多功能"/>
 
     <uviewOverlay v-model:show="overlayShow">

@@ -288,6 +288,19 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching userPracticeFavoriteQuestion details:', error); // 处理错误
         }
+    },
+    getUserWrongQuestionList:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const result = await ExamService.getUserWrongQuestionList(uid)
+            res.send({
+                code:result.code,
+                data: result.data
+            })
+            
+        }catch (error) {
+            console.error('Error fetching getUserWrongQuestionList details:', error); // 处理错误
+        }
     }
 }
 

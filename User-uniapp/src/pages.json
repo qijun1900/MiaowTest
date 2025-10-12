@@ -142,7 +142,13 @@
 			"path": "pages/my/MyFavoriteView",
 			"style": {
 				"navigationBarTitleText": "我的收藏",
-				"navigationStyle": "custom"//自定义导航栏
+				"navigationStyle": "custom" //自定义导航栏
+			}
+		},
+		{
+			"path": "pages/my/MyWrongView",
+			"style": {
+				"navigationBarTitleText": "我的错题"
 			}
 		}
 	],
