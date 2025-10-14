@@ -38,7 +38,8 @@ const navItems = ref([
   {
     title: '所有考试',
     icon: '/static/tabBar/exam-active.png',
-    path: '/pages/score/index'
+    path: '/pages/exam/exam',
+    istabBar: true
   },
   {
     title: '意见反馈',
@@ -49,8 +50,12 @@ const navItems = ref([
 
 // 导航点击处理
 const handleNavClick = (item) => {
-  // 跳转到对应页面
-  if (item.path) {
+  // 如果是 tabBar 页面，使用 switchTab
+  if (item.istabBar) {
+    uni.switchTab({ url: item.path })
+  } 
+  // 否则使用 navigateTo
+  else if (item.path) {
     uni.navigateTo({ url: item.path })
   }
 }

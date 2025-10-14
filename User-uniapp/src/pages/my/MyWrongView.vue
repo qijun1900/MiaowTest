@@ -306,6 +306,7 @@ onMounted(() => {
 <style scoped>
 .question-wrong-container {
   padding: 8rpx;
+  padding-bottom: 120rpx; /* 增加底部内边距，避免被底部按钮遮挡 */
   background-color: #f8f9fa;
   min-height: 100vh;
 }
