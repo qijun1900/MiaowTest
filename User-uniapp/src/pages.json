@@ -14,7 +14,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页",
+				"navigationBarTitleText": "题喵喵",
 				"navigationBarTextStyle": "white",
 				"navigationBarBackgroundColor": "#007AFF"
 			}
@@ -57,7 +57,10 @@
 		{
 			"path": "pages/function/function",
 			"style": {
-				"navigationBarTitleText": "所有工具"
+				"navigationBarTitleText": "所有工具",
+				"navigationStyle": "custom",
+				"disableScroll": false,
+				"navigationBarTextStyle": "black"
 			}
 		},
 		{
