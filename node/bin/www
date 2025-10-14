@@ -27,7 +27,7 @@ async function startApplication() {
     
     // 显示启动信息
     console.log('\n========================================');
-    console.log('🚀 答题系统正在启动...');
+    console.log('🚀 题喵喵答题系统正在启动...');
     console.log('========================================');
     console.log(`环境: ${environment}`);
     console.log(`运行环境: ${isCloudRuntime ? '云托管' : '本地'}`);
