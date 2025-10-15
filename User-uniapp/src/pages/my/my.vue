@@ -18,7 +18,7 @@
       <view class="user-detail" @click="handleUserinfo">
         <view class="user-info-content">
           <view class="login-btn" v-if="!userInfoStore.isLoggedIn">点击登录</view>
-          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${91}位喵宝` }}</view>
+          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${19}位喵宝` }}</view>
           <view class="user-desc" v-if="!userInfoStore.isLoggedIn">登录后可享受更多服务</view>
           <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.uid || '欢迎回来' }}</text></view>
         </view>
@@ -37,6 +37,12 @@
      </view>
 
     <ThemeDivider text="更多功能"/>
+    
+    <!-- 功能列表 -->
+    <view class="function-list">
+      <CustomNavbar :items="CustomNavbarList" @nav-click="handleClick"/>
+    </view>
+
 
     <uviewOverlay v-model:show="overlayShow">
       <template #overlaycontent>
@@ -76,16 +82,42 @@ import myNavbar from '../../components/modules/my/myNavbar.vue';
 import VipCard from '../../components/modules/my/VipCard.vue';
 import ThemeDivider from '../../components/core/ThemeDivider.vue';
 import navBarHeightUtil from '../../util/navBarHeight.js';
-
+import CustomNavbar from '../../components/core/CustomNavbar.vue';
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
 const navBarInfo = ref({});
+const CustomNavbarList = ref([
+  {
+    title: '清除缓存',
+    icon: '/static/navMy/c-my-clear.png',
+    path: '/pages/my/MyFavoriteView'
+  },
+  {
+    title: '我的错题',
+    icon: '/static/navMy/my-wro.png',
+    path: '/pages/my/MyWrongView'
+  },
+  {
+    title: '所有考试',
+    icon: '/static/tabBar/exam-active.png',
+    path: '/pages/exam/exam',
+  },
+  {
+    title: '我的收藏',
+    icon: '/static/navMy/my-fav.png',
+    path: '/pages/my/MyFavoriteView'
+  }
+])
+// 处理导航栏点击事件
+const handleClick = (item) => {
+console.log(item)
+}
 
 // 获取导航栏高度信息
 onMounted(() => {
   navBarInfo.value = navBarHeightUtil.getNavBarInfo();
 });
-
+//用户信息
 const handleUserinfo = () => {
   if (!userInfoStore.isLoggedIn) {
     overlayShow.value = true;
@@ -304,5 +336,9 @@ const handleUseAccountLogin = () => {
 }
 .login-cancel{
   padding: 15rpx 30rpx;
+}
+
+.function-list {
+  margin-bottom: 20rpx;
 }
 </style>
