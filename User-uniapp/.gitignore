@@ -12,6 +12,9 @@ node_modules
 dist
 *.local
 
+# Build analysis files
+stats.html
+
 # Editor directories and files
 .idea
 *.suo
