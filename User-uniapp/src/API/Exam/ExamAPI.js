@@ -6,6 +6,18 @@ const CACHE_KEY = 'exam_subjects_cache';
 const CACHE_EXPIRY_TIME = 60 * 60 * 1000; // 缓存过期时间(初始为1小时)
 
 /**
+ * 清除考试科目缓存
+ */
+export function clearExamSubjectsCache() {
+  try {
+    cacheManager.remove(CACHE_KEY);
+    console.log('考试科目缓存已清除');
+  } catch (error) {
+    console.error('清除考试科目缓存失败:', error);
+  }
+}
+
+/**
  * 获取考试科目列表（带缓存）
  * @param {boolean} forceRefresh 是否强制刷新缓存
  * @returns {Promise} 返回考试科目数据
