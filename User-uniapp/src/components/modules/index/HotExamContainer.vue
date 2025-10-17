@@ -3,7 +3,8 @@
         <scroll-view 
             class="hot-exam-scroll" 
             scroll-x="true" 
-            scroll-left="0">
+            scroll-left="0"
+            :show-scrollbar="false">
             <view class="hot-exam-list">
                 <view class="exam-item" 
                     v-for="(exam, index) in hotExamList" 

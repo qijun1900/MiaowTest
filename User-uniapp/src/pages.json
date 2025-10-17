@@ -14,7 +14,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页",
+				"navigationBarTitleText": "题喵喵",
 				"navigationBarTextStyle": "white",
 				"navigationBarBackgroundColor": "#007AFF"
 			}
@@ -26,7 +26,7 @@
 				"navigationStyle": "custom",
 				"disableScroll": false, // 允许页面滚动
 				"enablePullDownRefresh": false, // 启用下拉刷新
-				"backgroundColor": "#F8FDFF" 
+				"backgroundColor": "#F8FDFF"
 			}
 		},
 		{
@@ -43,7 +43,7 @@
 				"disableScroll": false, // 允许页面滚动
 				"enablePullDownRefresh": true, // 启用下拉刷新
 				"backgroundColor": "#F8FDFF", // 页面背景色
-				"navigationBarTextStyle": "black",  // 导航栏文字颜色
+				"navigationBarTextStyle": "black", // 导航栏文字颜色
 				"app-plus": {
 					"bounce": "none",
 					"pullToRefresh": {
@@ -57,7 +57,10 @@
 		{
 			"path": "pages/function/function",
 			"style": {
-				"navigationBarTitleText": "所有工具"
+				"navigationBarTitleText": "所有工具",
+				"navigationStyle": "custom",
+				"disableScroll": false,
+				"navigationBarTextStyle": "black"
 			}
 		},
 		{
@@ -130,6 +133,25 @@
 			"style": {
 				"navigationBarTitleText": "题库详情",
 				"disableScroll": true // 禁止页面滚动
+			}
+		},
+		{
+			"path": "pages/exam/WrongQuestionView",
+			"style": {
+				"navigationBarTitleText": "我的错题"
+			}
+		},
+		{
+			"path": "pages/my/MyFavoriteView",
+			"style": {
+				"navigationBarTitleText": "我的收藏",
+				"navigationStyle": "custom" //自定义导航栏
+			}
+		},
+		{
+			"path": "pages/my/MyWrongView",
+			"style": {
+				"navigationBarTitleText": "我的错题"
 			}
 		}
 	],

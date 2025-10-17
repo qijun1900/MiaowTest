@@ -201,6 +201,106 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching userDeleteBank details:', error); // 处理错误
         }
+    },
+    userAddWrongQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId, examId,Type } = req.body; // 从请求体中获取questionId,examId,Type
+            const result = await ExamService.useraddwrongquestion({uid,questionId,examId,Type})
+            res.send({
+                code: result.code,
+                message: result.message
+            })
+            
+        }catch (error) {
+            
+        }
+    },
+    userDeleteWrongQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId } = req.body; 
+            const result = await ExamService.userDeleteWrongQuestion({uid,questionId})
+            res.send({
+                code: result.code,
+                message: result.message
+            })
+            
+        }catch (error) {
+            console.error('Error fetching userDeleteWrongQuestion details:', error); // 处理错误
+
+        }
+    },
+    userAddFavoriteQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId, examId,Type } = req.body; // 从请求体中获取questionId,examId,Type
+            const result = await ExamService.useraddfavoritequestion({uid,questionId,examId,Type})
+            res.send({
+                code: result.code,
+                message: result.message
+            })
+
+        }catch (error) {
+            console.error('Error fetching userAddFavoriteQuestion details:', error); // 处理错误
+        }
+    },
+    userDeleteFavoriteQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId } = req.body; // 从请求体中获取questionId
+            const result = await ExamService.userDeleteFavoriteQuestion({uid,questionId})  
+            res.send({
+                code: result.code,
+                message: result.message
+            })     
+        }catch (error) {
+            console.error('Error fetching userDeleteFavoriteQuestion details:', error); // 处理错误
+        }
+    },
+    getUserFavoriteQuestionList:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const result = await ExamService.getUserFavoriteQuestionList(uid)
+            res.send({
+                code:result.code,
+                data: result.data
+            })
+            
+        }catch (error) {
+            console.error('Error fetching getUserFavoriteQuestionList details:', error); // 处理错误
+        }
+    },
+    userPracticeFavoriteQuestion:async (req,res)=>{
+        try {
+            const { uid } = req.user;
+            const { Type,questionId } = req.body; // 从请求体中获取questionId
+            const result = await ExamService.userPracticeFavoriteQuestion({
+                uid,
+                Type,
+                questionId
+            })
+            res.send({
+                code: result.code,
+                data: result.data, // 返回的数据
+            })
+            
+        }catch (error) {
+            console.error('Error fetching userPracticeFavoriteQuestion details:', error); // 处理错误
+        }
+    },
+    getUserWrongQuestionList:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const result = await ExamService.getUserWrongQuestionList(uid)
+            res.send({
+                code:result.code,
+                data: result.data
+            })
+            
+        }catch (error) {
+            console.error('Error fetching getUserWrongQuestionList details:', error); // 处理错误
+        }
     }
 }
 

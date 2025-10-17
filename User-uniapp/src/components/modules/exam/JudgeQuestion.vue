@@ -45,8 +45,6 @@ import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswer
 import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 import AnalysisCom from '@/components/modules/exam/Analysiscom.vue';
 
-
-
 const props = defineProps({
     question: {
         type: Object,

@@ -6,6 +6,7 @@ const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const userQuestionModel = require('../../models/UserQuestionModel')
 const ConsumerModel = require('../../models/ConsumerModel');
+const { options } = require('../../routes/user/ExamRouter')
 
 const ExamService = {
     // uniappAPI
@@ -370,8 +371,293 @@ const ExamService = {
                 error: error.message
             };
         }
-    }
+    },
+    useraddwrongquestion: async ({uid, questionId, examId,Type}) => {
+        try {
+            // 检查用户是否已经存在该错题
+            const existingWrongQuestion = await ConsumerModel.findOne({ 
+                _id: uid, 
+                'wrongQuestions.questionId': questionId, 
+                'wrongQuestions.examId': examId 
+            });
+            if (existingWrongQuestion) {
+                //更新时间
+                const updateResult = await ConsumerModel.updateOne(// 更新用户的指定题库
+                    { _id: uid, 
+                        'wrongQuestions.questionId': questionId, 
+                        'wrongQuestions.examId': examId },// 查找用户的指定题库
+                    { $set: { 'wrongQuestions.$.createTime': new Date() } }// 更新 createTime 字段的值
+                );  
+                return {
+                    code: 200,
+                    message: '错题已存在',
+                };
+            }
+            // 如果不存在，则添加
+            const result = await ConsumerModel.updateOne(// 更新用户的指定题库
+                { _id: uid },// 查找用户的指定题库
+                { $push: 
+                    { wrongQuestions: 
+                        { questionId, examId,Type,createTime: new Date() } 
+                    } 
+                }
+            );
+            if (result.modifiedCount === 0) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                }
+            }
+            return {
+                code: 200,
+                message: '错题添加成功',
+            }
+            
+        }catch (error) {
+            console.error('useraddwrongquestion 失败:', error);
+            return {
+                code: 500,
+                message: '添加错题失败',
+                error: error.message
+            };
+        }
         
-    
+    },
+    userDeleteWrongQuestion: async ({uid, questionId}) => {
+        try {
+            const result = await ConsumerModel.updateOne(// 更新用户的指定题库
+                { _id: uid },// 查找用户的指定题库
+                { $pull: { wrongQuestions: { questionId } } }// 删除 wrongQuestions 数组中 questionId 为 questionId 的元素
+            );
+            if (result.modifiedCount === 0) {
+                return {
+                    code: 404,
+                    message: '错题不存在',
+                }
+            }
+            return {
+                code: 200,
+                message: '错题删除成功',
+            }
+        }catch (error) {
+            console.error('userDeleteWrongQuestion 失败:', error);
+            return {
+                code: 500,
+                message: '删除错题失败',
+                error: error.message
+            };
+        }
+    },
+    useraddfavoritequestion: async ({uid,questionId,examId,Type}) => {
+        try {
+            // 检查用户是否已经存在该错题
+            const existingfavoriteQuestion = await ConsumerModel.findOne({
+                _id: uid,
+                'favoriteQuestions.questionId': questionId,
+                'favoriteQuestions.examId': examId
+            });
+            if (existingfavoriteQuestion) {
+                return {
+                    code: 200,
+                    message: '收藏已存在',
+                };
+            }
+            // 如果不存在，则添加
+            const result = await ConsumerModel.updateOne(// 更新用户的指定题库
+                { _id: uid },// 查找用户的指定题库
+                { $push:
+                    { 
+                        favoriteQuestions:{ 
+                            questionId, examId,Type,createTime: new Date() 
+                        } 
+                    }
+                }
+            );
+            if (result.modifiedCount === 0) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                }
+            }
+            return {
+                code: 200,
+                message: '收藏添加成功',
+            }
+        }catch (error) {
+            console.error('useraddfavoritequestion 失败:', error);
+            return {
+                code: 500,
+                message: '添加收藏失败',
+                error: error.message
+            };
+        }
+    },
+    userDeleteFavoriteQuestion: async ({uid, questionId}) => {
+        try {
+            const result = await ConsumerModel.updateOne(// 更新用户的指定题库
+                { _id: uid },// 查找用户的指定题库
+                { $pull: { favoriteQuestions: { questionId } } }// 删除 favoriteQuestions 数组中 questionId 为 questionId 的元素
+            );  
+            if (result.modifiedCount === 0) {
+                return {
+                    code: 404,
+                    message: '收藏不存在',
+                }
+            }
+            return {
+                code: 200,
+                message: '收藏删除成功',
+            }
+        }catch(error) {
+            console.error('userDeleteFavoriteQuestion 失败:', error);
+            return {
+                code: 500,
+                message: '删除收藏失败',
+                error: error.message
+            };
+        }
+    },
+    getUserFavoriteQuestionList: async (uid) => {
+        try {
+            const user = await ConsumerModel.findById(uid);
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            const modelMap = {
+                1: ExamSelectModel,
+                2: ExamBlankModel,
+                3: ExamJudgeModel,
+                4: ExamShortModel
+            };
+            // 并发查询所有题目和考试信息
+            const detailList = await Promise.all(
+                user.favoriteQuestions.map(async (question) => {
+                    const model = modelMap[question.Type];
+                    // 根据 Type 动态设置需要返回的字段
+                    let selectFields = { stem: 1, _id: 1, Type: 1 };
+                    if (question.Type === 1) {
+                        selectFields.options = 1;
+                        selectFields.isMultiple = 1;
+                    }
+                    const questionDoc = model ? await model.findById(
+                        question.questionId,
+                        selectFields
+                    ) : null;
+                    const examDoc = await ExamModel.findById(
+                        {
+                            _id: question.examId,
+                        },
+                        { name: 1 }
+                    );
+                    return {
+                        createTime: question.createTime,
+                        questionData: questionDoc,
+                        examName: examDoc ? examDoc.name : '未知考试'
+                    };
+                })
+            );
+            // 按 createTime 降序排序
+                detailList.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+            return {
+                code: 200,
+                data: detailList
+            };
+        } catch (error) {
+            console.error('getUserFavoriteQuestionDetailList 失败:', error);
+            return {
+                code: 500,
+                message: '获取收藏题目详情失败',
+                error: error.message
+            };
+        }
+    },
+    userPracticeFavoriteQuestion: async ({uid,Type,questionId}) => {
+        try {
+            const user = await ConsumerModel.findById(uid);
+            if (!user) {
+                return {
+                    code: 404,
+                    data: null,
+                };
+            }
+            const modelMap = {
+                1: ExamSelectModel,
+                2: ExamBlankModel,
+                3: ExamJudgeModel,
+                4: ExamShortModel
+            };
+            const model = modelMap[Type];
+            const questionDoc = await model.findById(questionId);
+            return {
+                code: 200,
+                data: questionDoc,
+            }
+            
+        }catch(e){
+            console.error('userPracticeFavoriteQuestion 失败:', e);
+        }
+        
+    },
+    getUserWrongQuestionList: async (uid) => {
+        try {
+            const user = await ConsumerModel.findById(uid);
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            const modelMap = {
+                1: ExamSelectModel,
+                2: ExamBlankModel,
+                3: ExamJudgeModel,
+                4: ExamShortModel
+            };
+            // 并发查询所有题目和考试信息
+            const questionPromises = user.wrongQuestions.map(async (wrongQuestion) => {
+                const Model = modelMap[wrongQuestion.Type];
+                if (!Model) return null;
+                
+                const questionDoc = await Model.findById(wrongQuestion.questionId);
+                if (!questionDoc) return null;
+                
+                // 获取考试信息
+                const examDoc = await ExamModel.findById(wrongQuestion.examId);
+                
+                return {
+                    questionData: questionDoc,
+                    examId: wrongQuestion.examId,
+                    examName: examDoc ? examDoc.name : '未知考试',
+                    createTime: wrongQuestion.createTime,
+                    Type: wrongQuestion.Type
+                };
+            });
+            
+            const results = await Promise.all(questionPromises);
+            // 过滤掉null值并按创建时间倒序排列
+            const validResults = results
+                .filter(result => result !== null)
+                .sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+            
+            return {
+                code: 200,
+                message: '获取错题列表成功',
+                data: validResults
+            };
+        } catch (error) {
+            console.error('getUserWrongQuestionList 失败:', error);
+            return {
+                code: 500,
+                message: '获取错题列表失败',
+                error: error.message
+            };
+        }
+    }
+      
 }
 module.exports = ExamService

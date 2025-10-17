@@ -5,8 +5,7 @@
         v-for="(item, index) in navItems" 
         :key="index" 
         class="nav-item"
-        @click="handleNavClick(item)"
-      >
+        @click="handleNavClick(item)">
         <view class="nav-icon-wrapper">
           <image 
             class="nav-icon" 
@@ -29,17 +28,18 @@ const navItems = ref([
   {
     title: '我的收藏',
     icon: '/static/navMy/my-fav.png',
-    path: '/pages/index/index'
+    path: '/pages/my/MyFavoriteView'
   },
   {
     title: '我的错题',
     icon: '/static/navMy/my-wro.png',
-    path: '/pages/exam/index'
+    path: '/pages/my/MyWrongView'
   },
   {
     title: '所有考试',
     icon: '/static/tabBar/exam-active.png',
-    path: '/pages/score/index'
+    path: '/pages/exam/exam',
+    istabBar: true
   },
   {
     title: '意见反馈',
@@ -50,14 +50,23 @@ const navItems = ref([
 
 // 导航点击处理
 const handleNavClick = (item) => {
-  uni.showToast({
-    title: `点击了${item.title}`,
-    icon: 'none'
-  })
+  // 如果是 tabBar 页面，使用 switchTab
+  if (item.istabBar) {
+    uni.switchTab({ url: item.path })
+  } 
+  //TODO 意见反馈
+  if(item.title === '意见反馈'){
+    uni.showToast({
+      title: '功能开发中',
+      icon: 'none'
+    })
+  }
+  // 否则使用 navigateTo
+  else if (item.path) {
+    uni.navigateTo({ url: item.path })
+  }
 }
-
 </script>
-
 <style scoped lang="scss">
 .navigation-container {
   padding: 30rpx 5rpx;

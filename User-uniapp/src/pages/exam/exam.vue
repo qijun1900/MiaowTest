@@ -65,7 +65,6 @@
       <BackToTop 
         ref="backToTopRef" 
         position="bottom-right"/>
-        
       <up-divider text="已经到底了" :dashed="true" v-if="examSubjects.length>0 && !loading"></up-divider>
     </view>
   </view>

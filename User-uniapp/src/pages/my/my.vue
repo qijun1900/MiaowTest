@@ -18,7 +18,7 @@
       <view class="user-detail" @click="handleUserinfo">
         <view class="user-info-content">
           <view class="login-btn" v-if="!userInfoStore.isLoggedIn">点击登录</view>
-          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${91}位喵宝` }}</view>
+          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${19}位喵宝` }}</view>
           <view class="user-desc" v-if="!userInfoStore.isLoggedIn">登录后可享受更多服务</view>
           <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.uid || '欢迎回来' }}</text></view>
         </view>
@@ -37,6 +37,12 @@
      </view>
 
     <ThemeDivider text="更多功能"/>
+    
+    <!-- 功能列表 -->
+    <view class="function-list">
+      <CustomNavbar :items="CustomNavbarList" @nav-click="handleClick"/>
+    </view>
+
 
     <uviewOverlay v-model:show="overlayShow">
       <template #overlaycontent>
@@ -76,16 +82,53 @@ import myNavbar from '../../components/modules/my/myNavbar.vue';
 import VipCard from '../../components/modules/my/VipCard.vue';
 import ThemeDivider from '../../components/core/ThemeDivider.vue';
 import navBarHeightUtil from '../../util/navBarHeight.js';
+import CustomNavbar from '../../components/core/CustomNavbar.vue';
+import { clearExamCache } from '../../util/cacheCleaner.js';
 
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
 const navBarInfo = ref({});
+const CustomNavbarList = ref([
+  {
+    title: '清除缓存',
+    icon: '/static/navMy/c-my-clear.png',
+    path: '/pages/my/MyFavoriteView'
+  },
+  {
+    title: '我的错题',
+    icon: '/static/navMy/my-wro.png',
+    path: '/pages/my/MyWrongView'
+  },
+  {
+    title: '所有考试',
+    icon: '/static/tabBar/exam-active.png',
+    path: '/pages/exam/exam',
+  },
+  {
+    title: '我的收藏',
+    icon: '/static/navMy/my-fav.png',
+    path: '/pages/my/MyFavoriteView'
+  }
+])
+// 处理导航栏点击事件
+const handleClick = (item) => {
+  if(item.title === '清除缓存'){
+   if(clearExamCache().isClear){
+    uni.showToast({
+      title: '清除成功',
+      icon: 'success'
+    })
+  }
 
-// 获取导航栏高度信息
-onMounted(() => {
-  navBarInfo.value = navBarHeightUtil.getNavBarInfo();
-});
+  }else{
+    uni.showToast({
+      title: '功能开发中',
+      icon: 'none'
+    })
+  }
+}
 
+//用户信息
 const handleUserinfo = () => {
   if (!userInfoStore.isLoggedIn) {
     overlayShow.value = true;
@@ -127,7 +170,10 @@ const handleUseAccountLogin = () => {
   });
 }
 
-
+// 获取导航栏高度信息
+onMounted(() => {
+  navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+});
 </script>
 
 <style scoped>
@@ -136,12 +182,12 @@ const handleUseAccountLogin = () => {
   height: 100vh; /* 设置固定高度 */
   overflow-y: auto; /* 内容超出时自动滚动 */
   background: linear-gradient(180deg, 
-    #F8FDFF 0%, 
-    #F5FCFF 20%,
-    #F0F9FF 40%,
-    #f8f8f8 70%,
-    #f5f5f5 100%
-  ); /* 更细腻的整体背景渐变 */
+    #E6F3FF 0%, 
+    #F0F8FF 25%,
+    #F5FAFF 50%,
+    #FAFCFF 75%,
+    #FFFFFF 100%
+  ); /* 优雅的淡蓝色到白色渐变 */
   padding: 0 15rpx 0 15rpx;
   position: relative;
 }
@@ -154,13 +200,13 @@ const handleUseAccountLogin = () => {
   right: 0;
   z-index: 9999;
   background: linear-gradient(180deg, 
-    #87CEEB 0%, 
-    #B0E0E6 25%, 
-    #E0F6FF 50%, 
-    #F0FAFF 75%, 
-    #F8FDFF 90%, 
-    rgba(248, 253, 255, 0.95) 100%
-  ); /* 更丰富的多层渐变 */
+    #C6E2FF 0%, 
+    #D9ECFF 20%, 
+    #E6F3FF 40%, 
+    #F0F8FF 60%, 
+    #F5FAFF 80%, 
+    rgba(245, 250, 255, 0.95) 100%
+  ); /* 优雅的淡蓝色渐变 */
   backdrop-filter: blur(10px); /* 毛玻璃效果 */
   -webkit-backdrop-filter: blur(10px);
   pointer-events: none; /* 让导航栏不阻挡点击事件 */
@@ -171,20 +217,20 @@ const handleUseAccountLogin = () => {
   display: flex;
   align-items: center;
   background: linear-gradient(135deg, 
-    rgba(248, 253, 255, 0.9) 0%, 
-    rgba(236, 249, 255, 0.8) 50%,
-    rgba(240, 250, 255, 0.9) 100%
-  ); /* 与顶部渐变协调，增加透明度 */
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(245, 250, 255, 0.9) 50%,
+    rgba(240, 248, 255, 0.95) 100%
+  ); /* 优雅的白色到淡蓝色渐变 */
   border-radius: 20rpx;
   padding: 35rpx;
   margin: 0 0 25rpx 0;
   box-shadow: 
-    0 8rpx 32rpx rgba(135, 206, 235, 0.15),
-    0 2rpx 8rpx rgba(135, 206, 235, 0.1); /* 层次阴影 */
+    0 8rpx 24rpx rgba(198, 226, 255, 0.15),
+    0 2rpx 8rpx rgba(198, 226, 255, 0.1); /* 柔和的蓝色阴影 */
   position: relative;
   overflow: hidden;
   z-index: 9999; /* 确保卡片在导航栏上方显示 */
-  border: 1px solid rgba(255, 255, 255, 0.5); /* 细腻边框 */
+  border: 1px solid rgba(255, 255, 255, 0.8); /* 细腻边框 */
   backdrop-filter: blur(5px); /* 轻微模糊效果 */
   -webkit-backdrop-filter: blur(5px);
   transition: all 0.3s ease; /* 动画过渡 */
@@ -198,9 +244,9 @@ const handleUseAccountLogin = () => {
   width: 110rpx;
   height: 110rpx;
   border-radius: 60rpx;
-  background-color: #eaeaea;
-  box-shadow: 0 4rpx 12rpx rgba(135, 206, 235, 0.2); /* 头像阴影 */
-  border: 2px solid rgba(255, 255, 255, 0.8); /* 白色边框 */
+  background-color: #f0f8ff;
+  box-shadow: 0 4rpx 12rpx rgba(198, 226, 255, 0.25); /* 柔和的蓝色阴影 */
+  border: 2px solid rgba(255, 255, 255, 0.9); /* 明亮的白色边框 */
 }
 
 .user-detail {
@@ -265,12 +311,12 @@ const handleUseAccountLogin = () => {
 .rect {
   width: 600rpx;
   height: 380rpx;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
   border-radius: 20rpx;
   box-shadow: 
-    0 16rpx 48rpx rgba(135, 206, 235, 0.2),
-    0 4rpx 16rpx rgba(135, 206, 235, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+    0 16rpx 48rpx rgba(198, 226, 255, 0.15),
+    0 4rpx 16rpx rgba(198, 226, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -306,5 +352,9 @@ const handleUseAccountLogin = () => {
 }
 .login-cancel{
   padding: 15rpx 30rpx;
+}
+
+.function-list {
+  margin-bottom: 20rpx;
 }
 </style>

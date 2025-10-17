@@ -91,21 +91,19 @@ onMounted(() => {
     }
 })
 
-// 导出PDF功能     // TODO: 实现PDF导出功能
+// 导出PDF功能     
+// TODO: 实现PDF导出功能
 const exportToPDF = () => {
     uni.showToast({
         title: '导出功能开发中',
         icon: 'none'
     })
-
 }
 
-// 查看错题功能 //TODO: 实现查看错题功能
+// 查看错题
 const viewWrongQuestions = () => {
-    // 筛选出错误的题目
-    uni.showToast({
-        title: '导出功能开发中',
-        icon: 'none'
+    uni.navigateTo({ 
+        url: '/pages/exam/WrongQuestionView' 
     })
 }
 </script>

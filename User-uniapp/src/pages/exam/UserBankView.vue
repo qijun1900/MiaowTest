@@ -19,6 +19,8 @@
         </view>
       </view>
     </view>
+
+    <Tips text="左滑即可对题目进行删除操作" :duration="0" />
     
     <!-- 题目列表 -->
     <view class="question-list-container">
@@ -32,7 +34,8 @@
         scroll-y="true" 
         class="question-scroll" 
         :scroll-with-animation="false" 
-        :enable-back-to-top="false">
+        :enable-back-to-top="false"
+        :show-scrollbar="false">
         <!-- 加载中状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题目..." />
         
@@ -112,7 +115,6 @@
     </view>
   </view>
 </template>
-
 <script  setup>
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import { ref, onMounted } from 'vue';
@@ -126,7 +128,7 @@ import uviewPopup from '../../components/core/uviewPopup.vue';
 import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue';
 import useSwipe from '../../composables/useSwipe.js'; // 导入封装的滑动删除方法
 import { deleteQuestionAPI } from '../../API/Exam/QuestionAPI';
-
+import Tips from '../../components/core/Tips.vue';
 const bankData  =ref([]);// 题库信息数据
 const QuestionData = ref([]);//题库题目数据
 const isLoading = ref(false); // 加载状态
@@ -193,7 +195,7 @@ const handleEditQuestion = (questionData) => {
 
 // 刷新题目列表
 const handleRefresh = () => {
-  resetSwipe(); // 使用封装的重置方法
+  resetSwipe(); 
   fetchUserQuestion();
 }
 
@@ -217,15 +219,12 @@ const handleDeleteQuestion = (questionData, index) => {
 const deleteQuestion = async (_id, index) => {
   try {
     const res = await deleteQuestionAPI(_id,bankData.value.bankId) // 调用API删除题目
-
     QuestionData.value.splice(index, 1)// 从数组中删除
-
     uni.showToast({
       title: res.message,
       icon: 'none'
     })
-  
-    
+
     // 更新题库的题目数量
     bankData.value.questionCount = QuestionData.value.length
     
@@ -264,7 +263,14 @@ onLoad((option)=>{
 })
 
 onMounted(()=>{
-  fetchUserQuestion()
+  fetchUserQuestion();
+  
+  // 设置底部安全区域兼容
+  const safeAreaInsetBottom = uni.getSystemInfoSync().safeAreaInsets?.bottom || 0;
+  if (safeAreaInsetBottom === 0) {
+    // 对于没有底部安全区域的设备，设置默认值
+    document.documentElement.style.setProperty('--safe-area-inset-bottom', '20rpx');
+  }
 })
 
 // 页面显示时刷新数据（从编辑页面返回时会触发）
@@ -279,11 +285,13 @@ onShow(() => {
 
 <style scoped>
 .UserBankView {
+  padding: 5rpx 5rpx;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 50px);
   background-color: #f5f9ff;
-  padding-bottom: 20rpx;
+  padding-bottom: calc(60rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
 }
 
 /* 题库信息头部 */
@@ -352,11 +360,12 @@ onShow(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin: 0 25rpx;
+  margin: 0 15rpx;
   background-color: #fff;
   border-radius: 20rpx;
   overflow: hidden;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  padding-bottom: 120rpx;
 }
 
 .list-header {
@@ -532,10 +541,20 @@ onShow(() => {
 
 /* 底部按钮 */
 .bottom-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   gap: 20rpx;
   padding: 20rpx 30rpx;
-  margin-top: 10rpx;
+  padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background-color: #f5f9ff;
+  border-top: 1rpx solid #e6f2ff;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
+  z-index: 999;
+  margin: 0;
 }
 
 /* 添加题目按钮 */

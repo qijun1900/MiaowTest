@@ -1,6 +1,7 @@
 <template>
     <view class="container">
         <view class="exam-list">
+            
             <ThemeLoading v-if="loading" text="正在加载收藏考试..." />
             <view v-else-if="favoriteExam.length > 0" class="subject-list">
                 <view 
@@ -40,6 +41,7 @@ import { getUserFavorites } from '../../../API/My/FavoriteAPI'
 import formatTime from '../../../util/formatTime'
 import escconfig from '../../../config/esc.config'
 import ThemeLoading from '../../core/ThemeLoading.vue'
+
 
 const favoriteExam = ref([])
 const loading = ref(false)
@@ -122,7 +124,7 @@ onMounted(() => {
     width: 80rpx;
     height: 80rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #c0ccff 0%, #6b9fe8 100%);
     display: flex;
     justify-content: center;
     align-items: center;

@@ -123,13 +123,21 @@
                                     查看练习成绩
                                 </up-button>
                             </view>
-                            <view class="answer-sheet">
-                                <AnswerSheet
-                                    :questions="questionStore.UserChooseQuestion" 
-                                    :currentIndex="currentQuestionIndex"
-                                    @question-click="handleQuestionCardClick"
-                                    :isShowAnswer="questionStore.UserShowSettings.showAnswer"/>
-                            </view>
+                            <!-- 添加支持手势滑动的容器 -->
+                            <scroll-view 
+                                class="answer-sheet-scroll" 
+                                scroll-y="true"
+                                :scroll-top="scrollTop"
+                                :enhanced="true"
+                                :show-scrollbar="false">
+                                <view class="answer-sheet">
+                                    <AnswerSheet
+                                        :questions="questionStore.UserChooseQuestion" 
+                                        :currentIndex="currentQuestionIndex"
+                                        @question-click="handleQuestionCardClick"
+                                        :isShowAnswer="questionStore.UserShowSettings.showAnswer"/>
+                                </view>
+                            </scroll-view>
                        </view>
                     </template>
             </uviewPopup>
@@ -163,6 +171,10 @@ const refreshKey = ref(0);// 用于触发子组件刷新
 const popupShow = ref(false);// 弹窗
 const StatisticsStore = useStatisticsStore();// 统计答题数据Store
 const { correctCount, incorrectCount, accuracyRate } = storeToRefs(StatisticsStore);
+const scrollTop = ref(0); // 用于控制scroll-view的滚动位置
+
+//TODO 优化答题 更加流畅 
+//TODO 优化自定义底部
 
 //选择模式
 const handleSendMode =(value)=>{
@@ -178,7 +190,17 @@ const handleQuestionChange = (e) => {
 const leftClick = () => { 
     SubjectiveAnswerStore.clearAllAnswers();
     ObjectiveAnswerStore.clearAllAnswers();
-};  
+}; 
+
+// 处理答题卡 Popup 显示
+const handleCheck = () => {
+   popupShow.value = true;
+}
+
+// 处理答题卡点击
+const handleQuestionCardClick = (index) => {
+    currentQuestionIndex.value = index; // 更新当前选中的问题索引
+}
 
 // 处理清空答案
 const handleCleanAnswer = () => {
@@ -203,18 +225,6 @@ const handleCleanAnswer = () => {
     });
 }
 
-
-// 处理答题卡 Popup 显示
-const handleCheck = () => {
-   popupShow.value = true;
-   
-}
-
-// 处理答题卡点击
-const handleQuestionCardClick = (index) => {
-    currentQuestionIndex.value = index; // 更新当前选中的问题索引
-}
-
 //当最后一题时候显示提交按钮
 const isEndQuestion = computed(() => {
     if(currentQuestionIndex.value === questionStore.UserChooseQuestion.length - 1 && currentMode.value === 0){
@@ -224,15 +234,13 @@ const isEndQuestion = computed(() => {
     }
 });
 
-//handleSubmitAnswer
+// 处理提交答案
 const handleSubmitAnswer = () => {
     popupShow.value = false;
     uni.navigateTo({
         url: '/pages/exam/PracticeResultsView' 
     })
 }
-
-
 
 onMounted(() => {
    const navInfo = navBarHeightUtil.getNavBarInfo();
@@ -241,6 +249,17 @@ onMounted(() => {
    // 获取安全区域信息
    const safeAreaInfo = navBarHeightUtil.getSafeAreaInfo();
    safeAreaBottom.value = safeAreaInfo.bottom;
+   
+   // 检查是否有题目数据，如果没有则返回上一页
+   if (!questionStore.UserChooseQuestion || questionStore.UserChooseQuestion.length === 0) {
+     uni.showToast({
+       title: '没有题目数据',
+       icon: 'none'
+     });
+     setTimeout(() => {
+       uni.navigateBack();
+     }, 1500);
+   }
 })
 </script>
 
@@ -287,10 +306,16 @@ onMounted(() => {
     align-items: center; /* 垂直居中 */
     gap: 20rpx; /* 添加按钮之间的间距 */
 }
+.answer-sheet-scroll {
+    max-height: 500rpx;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* 添加弹性滚动 */
+}
 .answer-sheet{
     padding: 10rpx 10rpx;
     background-color: #ffffff;
     border-radius: 28rpx;
     margin-top: 20rpx;
+    overflow-y: auto;
 }
 </style>

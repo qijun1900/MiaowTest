@@ -117,3 +117,127 @@ export async function deleteQuestionAPI(questionId, bankId) {
     throw error;
   }
 }
+/**
+ * 用户将错题加入错题本
+ * @param {String} questionId - 题目ID
+ * @param {String} examId - 考试ID
+ * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @returns {Promise} 返回添加结果
+ */
+export async function addWrongQuestionAPI(questionId, examId,Type) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/useradd/wrongquestion`,
+      method: 'POST',
+      data:{questionId, examId,Type}
+    });
+  }catch (error) {
+    console.error("addWrongQuestion 失败", error);
+    throw error;
+  }
+}
+/**
+ * 用户删除错题本
+ * @param {String} questionId - 题目ID
+ * @returns {Promise} 返回删除结果
+ */
+export async function deleteWrongQuestionAPI(questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userdelete/wrongquestion`,
+      method: 'POST',
+      data:{questionId,}
+    })
+  }catch (error) {
+    console.error("deleteWrongQuestion 失败", error);
+    throw error;
+  }
+}
+
+/**
+ * 用户获取错题本
+ * @returns {Promise} 返回错题本列表
+ */
+export async function getUserWrongQuestionListAPI() {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getUserWrongQuestionList`,
+      method: 'GET'
+    })
+  }catch (error) {
+    console.error("getUserWrongQuestionList 失败", error);
+  }
+}
+
+/**
+ * 用户获取错题本
+ * @returns {Promise} 返回错题本列表
+ */
+
+/**
+ * 用户收藏题目
+ * @param {String} questionId - 题目ID
+ * @param {String} examId - 考试ID
+ * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @returns {Promise} 返回收藏结果
+ */
+export async function addFavoriteQuestionAPI(questionId, examId,Type) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/useradd/favoritequestion`,
+      method: 'POST',
+      data:{questionId, examId,Type}
+    })
+  }catch (error) {
+    console.error("addFavoriteQuestion 失败", error);
+  }
+}
+/**
+ * 用户删除收藏
+ * @param {String} questionId - 题目ID
+ * @returns {Promise} 返回删除结果
+ */
+export async function deleteFavoriteQuestionAPI(questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userdelete/favoritequestion`,
+      method: 'POST',
+      data:{questionId,}
+    })
+  }catch (error) {
+    console.error("deleteFavoriteQuestion 失败", error);
+  }
+}
+/**
+ * 用户获取收藏题目
+ * @returns {Promise} 返回收藏题目列表
+ */
+export async function getUserFavoriteQuestionListAPI() {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getUserFavoriteQuestionList`,
+      method: 'GET'
+    })
+  }catch (error) {
+    console.error("getUserFavoriteQuestionList 失败", error);
+  }
+}
+
+/**
+ * 用户点击题目进行练习
+ * @param {Type}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @param {String} questionId - 题目ID
+ * @returns {Promise} 返回练习结果
+ */
+export async function practiceQuestionAPI(Type, questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/userpractice/question`,
+      method: 'POST',
+      data:{Type, questionId}
+    })
+  }catch (error) {
+    console.error("practiceFavoriteQuestion 失败", error);
+  } 
+}
+

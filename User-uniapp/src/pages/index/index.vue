@@ -32,7 +32,12 @@
     </view>
     <view class="my-question-bank">
       <view class="header-section">
-        <view class="hot-exam-title"><uviewSubsection :list="list" @updateCurrent="handleSendMode"/></view>
+        <view class="hot-exam-title">
+          <uviewSubsection 
+          :list="list" 
+          @updateCurrent="handleSendMode"
+          :current="currentMode"/>
+        </view>
         <view class="more-section" @click="handleCreateQuestionBank" v-if="currentMode===0">
           <text class="more-text" >新建题库</text>
           <text class="arrow-icon">›</text>
@@ -45,6 +50,9 @@
       <UserQuestionBank v-if="currentMode===0"/>
       <UserExamFavorite v-if="currentMode===1"/>
     </view>
+    <BackToTop
+      ref="backToTopRef" 
+      position="bottom-right"/>
   </view>
 </template>
 <script setup>
@@ -59,11 +67,14 @@ import escconfig from '../../config/esc.config';
 import uniSearch from '../../components/core/uniSearch.vue';
 import uviewSubsection from '../../components/core/uviewSubsection.vue';
 import UserExamFavorite from '../../components/modules/index/UserExamFavorite.vue';
+import { onPageScroll } from '@dcloudio/uni-app';
+import BackToTop from '../../components/core/BackToTop.vue';
 
 const  noticeData = ref([])// 添加notice需要的数据
 const swiperList = ref([])// 添加swiper需要的数据
 const list = ref(['我的题库', '收藏考试']);// 添加subsection需要的数据
 const currentMode = ref(0); // 当前选中的模式，默认为0
+const backToTopRef = ref();// 回到顶部组件引用
 
 //选择模式
 const handleSendMode =(value)=>{
@@ -106,9 +117,16 @@ const handleViewMore = () => {
 
 const handleCreateQuestionBank = () => {
   uni.navigateTo({
-      url: '/pages/exam/crquestionbankView'
+    url: '/pages/exam/crquestionbankView'
   })
 }
+// 页面滚动事件
+onPageScroll((e) => {
+  // 调用BackToTop组件的滚动处理方法
+  if (backToTopRef.value) {
+    backToTopRef.value.handlePageScroll(e);
+  }
+});
 </script>
 <style scoped lang="scss">
 .search-container {

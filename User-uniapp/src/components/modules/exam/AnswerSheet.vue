@@ -114,6 +114,23 @@ const isAnsweredIncorrectly = (questionId) => {
 <style scoped>
 .answer-sheet-container {
   padding: 15rpx 15rpx 20rpx 48rpx;
+  max-height: calc(50vh - 120rpx); /* 限制最大高度，减去标题和按钮区域的高度 */
+  overflow-y: auto; /* 允许垂直滚动 */
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.answer-sheet-container::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  color: transparent;
+  background: transparent;
+}
+
+/* 兼容其他浏览器 */
+.answer-sheet-container {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .answer-sheet-grid {

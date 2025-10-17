@@ -230,28 +230,32 @@ const handlePhotoImport = async () => {
         })
         return
     }
+    uni.showToast({
+        title: '开发中',
+        icon: 'none'
+    })
     
-    try {
-        const modal = await showModal({
-            title: '拍照导入',
-            content: `即将为题库"${questionBankName.value}"进行拍照导入`
-        });
+    // try {
+    //     const modal = await showModal({
+    //         title: '拍照导入',
+    //         content: `即将为题库"${questionBankName.value}"进行拍照导入`
+    //     });
         
-        if (modal.confirm) {
-            const res = await AddUserBank(questionBankName.value)
-            console.log(res)
+    //     if (modal.confirm) {
+    //         const res = await AddUserBank(questionBankName.value)
+    //         console.log(res)
             
-            if (res.code===200) {
-                // 获取返回的题库ID
-                const bankId = res.data?.bankId;
-                uni.navigateTo({
-                    url: `/pages/exam/photoImportView?bankName=${encodeURIComponent(questionBankName.value)}&bankId=${bankId}`
-                })
-            }
-        }
-    } catch (error) {
-        console.error('拍照导入出错:', error);
-    }
+    //         if (res.code===200) {
+    //             // 获取返回的题库ID
+    //             const bankId = res.data?.bankId;
+    //             uni.navigateTo({
+    //                 url: `/pages/exam/photoImportView?bankName=${encodeURIComponent(questionBankName.value)}&bankId=${bankId}`
+    //             })
+    //         }
+    //     }
+    // } catch (error) {
+    //     console.error('拍照导入出错:', error);
+    // }
 }
 //Ai
 //TODO AI导入题目
@@ -263,28 +267,32 @@ const handleAIImport = async () => {
         })
         return
     }
+    uni.showToast({
+        title: '开发中',
+        icon: 'none'
+    })
     
-    try {
-        const modal = await showModal({
-            title: 'AI导入',
-            content: `即将为题库"${questionBankName.value}"进行AI智能导入`
-        });
+    // try {
+    //     const modal = await showModal({
+    //         title: 'AI导入',
+    //         content: `即将为题库"${questionBankName.value}"进行AI智能导入`
+    //     });
         
-        if (modal.confirm) {
-            const res = await AddUserBank(questionBankName.value)
-            console.log(res)
+    //     if (modal.confirm) {
+    //         const res = await AddUserBank(questionBankName.value)
+    //         console.log(res)
             
-            if (res.code===200) {
-                // 获取返回的题库ID
-                const bankId = res.data?.bankId;
-                uni.navigateTo({
-                    url: `/pages/exam/aiImportView?bankName=${questionBankName.value}&bankId=${bankId}`
-                })
-            }
-        }
-    } catch (error) {
-        console.error('AI导入出错:', error);
-    }
+    //         if (res.code===200) {
+    //             // 获取返回的题库ID
+    //             const bankId = res.data?.bankId;
+    //             uni.navigateTo({
+    //                 url: `/pages/exam/aiImportView?bankName=${questionBankName.value}&bankId=${bankId}`
+    //             })
+    //         }
+    //     }
+    // } catch (error) {
+    //     console.error('AI导入出错:', error);
+    // }
 }
 
 // 页面加载时检查用户是否已登录

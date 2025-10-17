@@ -37,15 +37,11 @@ const ConsumerSchema = new mongoose.Schema({
         type:Array,
         default:[]
     },
-    favoriteQuestions:{// 收藏的题目
-        type:Array,
-        default:[]
-    },
     questionbanks:{// 题库
         type: [{
             _id: { // 题库唯一标识
-                type: mongoose.Schema.Types.ObjectId,
-                default: () => new mongoose.Types.ObjectId()
+                type: mongoose.Schema.Types.ObjectId,// 引用用户题库
+                default: () => new mongoose.Types.ObjectId()// 自动生成ID
             },
             bankName: { // 题库名称
                 type: String,
@@ -69,8 +65,51 @@ const ConsumerSchema = new mongoose.Schema({
             }
         }],
         default:[]
+    },
+    wrongQuestions:{//用户错题
+        type: [{
+            questionId: { // 题目ID
+                type: mongoose.Schema.Types.ObjectId,
+                required: true
+            },
+            examId: { // 考试ID
+                type: mongoose.Schema.Types.ObjectId,
+                required: true
+            },
+            Type: { // 题目类型： 1-选择题 2-填空题 3-判断题 4-简答题
+                type: Number,
+                required: true,
+                enum: [1, 2, 3, 4]// 限定类型
+            },
+            createTime: { // 创建时间
+                type: Date,
+                default: Date.now
+            }   
+        }]
+    },
+    favoriteQuestions: { // 收藏的题目
+        type: [{
+            questionId: { // 题目ID
+                type: mongoose.Schema.Types.ObjectId,
+                required: true
+            },
+            examId: { // 考试ID
+                type: mongoose.Schema.Types.ObjectId,
+                required: true
+            },
+            Type: { // 题目类型： 1-选择题 2-填空题 3-判断题 4-简答题
+                type: Number,
+                required: true,
+                enum: [1, 2, 3, 4]// 限定类型
+            },
+            createTime: { // 创建时间
+                type: Date,
+                default: Date.now
+            }
+        }]
     }
 })
+
 
 const ConsumerModel = mongoose.model("consumer", ConsumerSchema)
 

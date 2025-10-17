@@ -5,10 +5,9 @@
         <view class="grid-item"
          @click="handleNavClick(item)">
           <image 
-            v-if="item.icon === 'github-cat'" 
-            src="/static/navBar/github-cat.png"
+            :src="item.imageSrc"
             :style="{width: '40px', height: '40px'}"
-            mode="aspectFit" />
+            mode="aspectFit"/>
           <text class="nav-title">
             {{ item.title }}
           </text>
@@ -23,27 +22,26 @@ import { ref } from 'vue'
 import  handleCopy from "../../../util/copy"
 
 // 导航项数据
-//TODO导航栏功能
 const navItems = ref([
   {
     title: '开源地址',
-    icon: 'github-cat',
-    path: '/pages/index/index'
+    path: '/pages/index/index',
+    imageSrc: '/static/navBar/github-cat.png'
   },
   {
     title: '题库制作',
-    icon: 'github-cat',
-    path: '/pages/exam/crquestionbankView'
+    path: '/pages/exam/crquestionbankView',
+    imageSrc: '/static/navBar/make-bank.png'
   },
   {
     title: '所有考试',
-    icon: 'github-cat',
-    path: '/pages/exam/exam'
+    path: '/pages/exam/exam',
+    imageSrc: '/static/navBar/all-exam.png'
   },
   {
     title: '意见反馈',
-    icon: 'github-cat',
-    path: '/pages/user/index'
+    path: '/pages/user/index',
+    imageSrc: '/static/navBar/feedback-cat.png'
   }
 ])
 // 处理导航项点击事件
@@ -57,11 +55,24 @@ const handleNavClick = (item) => {
       url: item.path
     })
     return;
-
   }
-  uni.navigateTo({
-    url: item.path
-  })
+  if (item.title==='题库制作') {
+    uni.navigateTo({
+      url: item.path
+    })
+  }
+  //TODO 反馈问题页面
+  if (item.title==='意见反馈') {
+    uni.showToast({
+      title: '功能开发中',
+      icon: 'none'
+    })
+    // uni.navigateTo({
+    //   url: item.path
+    // })
+    return;
+  }
+
 }
 
 

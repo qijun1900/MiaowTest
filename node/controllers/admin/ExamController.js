@@ -5,7 +5,6 @@ const ExamController ={
         const cover = req.file?`/examcoveruploads/${req.file.filename}`:""   
         const {name,category,code,year,isPublish,creator,day } = req.body
         const parsedCategory = JSON.parse(category).map(Number)
-        console.log(name,parsedCategory,code,year,isPublish,cover,creator,day)
         await ExamService.ExamAdd({
             name,
             category:parsedCategory,
@@ -72,7 +71,6 @@ const ExamController ={
     },
     deleteManyExamInfo:async(req,res)=>{
         const {_ids} = req.body
-        console.log(_ids)
         await ExamService.deleteManyExamInfo({_ids})
         res.send({
             ActionType: "OK",
@@ -180,7 +178,6 @@ const ExamController ={
     },
     UpdateBatchQuestion:async(req,res)=>{
         const {Ids,questionType} = req.body;
-        console.log("ss",Ids,questionType)
         await ExamService.UpdateBatchQuestion({Ids,questionType})
         res.send({
             code:200,
@@ -323,7 +320,6 @@ const ExamController ={
     },
     UpdateQuestionTitle:async(req,res)=>{
         const {content,description,examId,_id} = req.body 
-        console.log(content,description,examId,_id)
         await ExamService.UpdateQuestionTitle({
             content,
             description,
@@ -361,7 +357,6 @@ const ExamController ={
     },
     getAddQusetionList:async(req,res)=>{
         const {category,examId} = req.query
-        console.log("ss",category,examId)
         const result = await ExamService.getAddQusetionList({
             category:Number(category),
             examId,
@@ -399,7 +394,6 @@ const ExamController ={
     },
     MatchQusetionList:async(req,res)=>{
         const {extractedData} = req.body
-        console.log(extractedData)
         const result = await ExamService.MatchQusetionList({extractedData})
         res.send({
             code:200,

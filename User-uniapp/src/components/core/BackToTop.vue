@@ -116,7 +116,7 @@ defineExpose({
 }
 
 .position-bottom-right {
-    bottom: 100rpx;
+    bottom: 110rpx;
     right: 40rpx;
 }
 

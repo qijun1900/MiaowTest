@@ -90,7 +90,7 @@ const getGenderText = (genderValue) => {
   return genderMap[genderValue] || '未设置';
 };
 
-// 编辑头像
+// TODO 编辑头像
 const handleEditAvatar = () => {
   uni.showToast({
     title: '功能开发中',
@@ -122,6 +122,7 @@ const handleEditGender = () => {
     }
   });
 };
+
 // 处理账号绑定
 const handleUserRsgister = () => {
   if(!accountBindStatus.value){
@@ -130,6 +131,7 @@ const handleUserRsgister = () => {
     });
   }
 };
+
 // 复制 openid
 const handleCopyOpenid = () => {
   if (userInfoStore.userInfo?.uid) {
