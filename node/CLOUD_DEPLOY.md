@@ -19,6 +19,7 @@
 NODE_ENV=production
 PORT=3000
 MONGO_PROVIDER=cloud
+K_SERVICE = 云托管
 
 # 云数据库连接配置
 MONGO_CLOUD_HOST=47.95.37.174
