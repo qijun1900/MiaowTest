@@ -27,9 +27,9 @@
     </view>
     
     <!-- vip -->
-    <view>
+    <!-- <view>
       <VipCard/>
-    </view>
+    </view> -->
     
     <!-- Core Nav -->
      <view>
@@ -79,7 +79,7 @@ import uviewOverlay from '../../components/core/uviewOverlay.vue';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
 import myNavbar from '../../components/modules/my/myNavbar.vue';
-import VipCard from '../../components/modules/my/VipCard.vue';
+// import VipCard from '../../components/modules/my/VipCard.vue';
 import ThemeDivider from '../../components/core/ThemeDivider.vue';
 import navBarHeightUtil from '../../util/navBarHeight.js';
 import CustomNavbar from '../../components/core/CustomNavbar.vue';

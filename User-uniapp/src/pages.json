@@ -30,12 +30,6 @@
 			}
 		},
 		{
-			"path": "pages/chat/chat",
-			"style": {
-				"navigationBarTitleText": "chat"
-			}
-		},
-		{
 			"path": "pages/exam/exam",
 			"style": {
 				"navigationBarTitleText": "所有考试",
