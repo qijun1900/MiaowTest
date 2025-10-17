@@ -2,8 +2,6 @@ import { ref } from "vue";
 import { defineStore } from 'pinia';
 import { FetchMatchQuestionList } from "../../API/Exam/ExamAPI";
 
-
-
 export const useQuestionStore = defineStore("question", () => {
     const QuestionIDs = ref([]); // 存储问题ID的数组
     const QuestionData = ref([]); // 存储问题的数组
@@ -23,7 +21,7 @@ export const useQuestionStore = defineStore("question", () => {
 
     const QuestionDataActions = {
         FetchQuestionData: async () => {
-            try {
+            try {  //TODO 优化题目的获取与存储
                 const response = await FetchMatchQuestionList(QuestionIDs.value);
                 QuestionData.value = response.data; // 存储获取的数据
             } catch (error) {

@@ -40,23 +40,6 @@ export async function getExamSubjects(forceRefresh = false) {
 }
 
 /**
- * 清除考试科目缓存
- */
-export function clearExamSubjectsCache() {
-  cacheManager.remove(CACHE_KEY);
-  console.log('已清除考试科目缓存');
-}
-
-/**
- * 检查是否有有效的考试科目缓存
- * @returns {boolean} 是否有有效缓存
- */
-export function hasValidExamSubjectsCache() {
-  return cacheManager.has(CACHE_KEY, CACHE_EXPIRY_TIME);
-}
-
-
-/**
  * 获取用户点击的考试科目考试题型
  * @param {string} examSubjectId 考试科目ID
  */

@@ -54,6 +54,13 @@ const handleNavClick = (item) => {
   if (item.istabBar) {
     uni.switchTab({ url: item.path })
   } 
+  //TODO 意见反馈
+  if(item.title === '意见反馈'){
+    uni.showToast({
+      title: '功能开发中',
+      icon: 'none'
+    })
+  }
   // 否则使用 navigateTo
   else if (item.path) {
     uni.navigateTo({ url: item.path })

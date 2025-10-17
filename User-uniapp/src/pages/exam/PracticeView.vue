@@ -173,6 +173,9 @@ const StatisticsStore = useStatisticsStore();// 统计答题数据Store
 const { correctCount, incorrectCount, accuracyRate } = storeToRefs(StatisticsStore);
 const scrollTop = ref(0); // 用于控制scroll-view的滚动位置
 
+//TODO 优化答题 更加流畅 
+//TODO 优化自定义底部
+
 //选择模式
 const handleSendMode =(value)=>{
     currentMode.value = value; // 更新当前选中的模式

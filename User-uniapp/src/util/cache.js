@@ -42,8 +42,8 @@ class CacheManager {
   set(key, data) {
     try {
       const cacheData = {
-        data: data,
-        timestamp: Date.now()
+        data: data,// 缓存的数据
+        timestamp: Date.now()// 记录缓存时间
       };
       uni.setStorageSync(key, JSON.stringify(cacheData));
     } catch (error) {

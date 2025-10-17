@@ -83,6 +83,8 @@ import VipCard from '../../components/modules/my/VipCard.vue';
 import ThemeDivider from '../../components/core/ThemeDivider.vue';
 import navBarHeightUtil from '../../util/navBarHeight.js';
 import CustomNavbar from '../../components/core/CustomNavbar.vue';
+import { clearExamCache } from '../../util/cacheCleaner.js';
+
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
 const navBarInfo = ref({});
@@ -110,13 +112,22 @@ const CustomNavbarList = ref([
 ])
 // 处理导航栏点击事件
 const handleClick = (item) => {
-console.log(item)
+  if(item.title === '清除缓存'){
+   if(clearExamCache().isClear){
+    uni.showToast({
+      title: '清除成功',
+      icon: 'success'
+    })
+  }
+
+  }else{
+    uni.showToast({
+      title: '功能开发中',
+      icon: 'none'
+    })
+  }
 }
 
-// 获取导航栏高度信息
-onMounted(() => {
-  navBarInfo.value = navBarHeightUtil.getNavBarInfo();
-});
 //用户信息
 const handleUserinfo = () => {
   if (!userInfoStore.isLoggedIn) {
@@ -158,6 +169,11 @@ const handleUseAccountLogin = () => {
     url: '/pages/my/UserLoginView'
   });
 }
+
+// 获取导航栏高度信息
+onMounted(() => {
+  navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+});
 </script>
 
 <style scoped>
