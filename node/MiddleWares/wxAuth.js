@@ -4,9 +4,11 @@ const axios = require('axios');
  * 获取微信用户信息的辅助函数
  * @param {string} code - 微信登录凭证
  * @returns {Promise<Object>} - 包含openid, session_key, unionid的对象
+ * @description 使用云调用时建议使用 HTTP 协议以获得更好的性能，如确有需求使用 HTTPS 协议，请参考以下说明
+ * https://developers.weixin.qq.com/miniprogram/dev/wxcloudservice/wxcloudrun/src/guide/weixin/open.html#%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D
  */
 const wxAuth = async (code) => {
-    const wxApiUrl = 'https://api.weixin.qq.com/sns/jscode2session';
+    const wxApiUrl = 'http://api.weixin.qq.com/sns/jscode2session';
     const wxResponse = await axios.get(wxApiUrl, {
         params: {
             appid: process.env.WECHAT_APPID,

@@ -13,7 +13,7 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+# package-lock.json 已移除，需要在 Docker 构建中使用
 
 # 环境配置文件（包含敏感信息）
 .env

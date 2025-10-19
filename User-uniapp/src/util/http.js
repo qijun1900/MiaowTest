@@ -1,7 +1,56 @@
 import escconfig from '../config/esc.config';
 const baseURl = escconfig.useTunnel 
-  ? escconfig.tunnelUrl 
-  : `http://${escconfig.serverHost}:${escconfig.serverPort}`;
+    ? escconfig.tunnelUrl 
+    : `http://${escconfig.serverHost}:${escconfig.serverPort}`;
+
+// 云托管请求封装
+function cloudRequest(options) {
+    return new Promise((resolve, reject) => {
+        if (!wx.cloud) {
+            reject(new Error('请在微信小程序环境下使用云托管API'));
+            return;
+        }
+        wx.cloud.callContainer({
+            config: {
+                env: escconfig.cloudEnv
+            },
+            path: options.url,
+            header: {
+                'X-WX-SERVICE': escconfig.cloudService,
+                ...options.header
+            },
+            method: options.method || 'GET',
+            data: options.data || {},
+            success: res => {
+                // 兼容原有 resolve 行为
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    resolve(res.data);
+                } else if (res.statusCode === 401) {
+                    uni.removeStorageSync('token');
+                    const userInfoStore = UserInfoStore();
+                    userInfoStore.clearUserInfo();
+                    uni.navigateTo({ url: '/pages/my/my' });
+                    reject('登录过期，请重新登录', res);
+                } else {
+                    uni.showToast({
+                        title: res.data.message || '请求错误',
+                        icon: 'none',
+                        mask: true
+                    });
+                    reject(res);
+                }
+            },
+            fail: err => {
+                uni.showToast({
+                    title: '网络异常，请稍后重试',
+                    icon: 'none',
+                    mask: true
+                });
+                reject(err);
+            }
+        });
+    });
+}
 import { UserInfoStore } from '../stores/modules/UserinfoStore';
 
 // 统一的HTTP请求封装
@@ -59,42 +108,41 @@ uni.addInterceptor('request', httpInterceptor)
 uni.addInterceptor('uploadFile', httpInterceptor)
 
 export const http = (options) => {
-    return new Promise((resolve, reject) => {
-        uni.request({
-            ...options,
-            success(res) {
-                //状态码2xx，直接返回结果数据
-                if(res.statusCode >=200 && res.statusCode < 300){
-                    resolve(res.data)//返回数据
-                }else if(res.statusCode === 401){
-                    //token过期，需要重新登录
-                    //清理本地token和用户信息
-                    uni.removeStorageSync('token');
-                    
-                    //清理用户信息
-                    const userInfoStore = UserInfoStore();
-                    userInfoStore.clearUserInfo();
-                    
-                    //跳转登录页
-                    uni.navigateTo({url: '/pages/my/my'});
-                    reject('登录过期，请重新登录',res)
-                } else{
+    if (escconfig.useCloudContainer) {
+        // 云托管请求
+        return cloudRequest(options);
+    } else {
+        // 本地/隧道请求
+        return new Promise((resolve, reject) => {
+            uni.request({
+                ...options,
+                success(res) {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        resolve(res.data);
+                    } else if (res.statusCode === 401) {
+                        uni.removeStorageSync('token');
+                        const userInfoStore = UserInfoStore();
+                        userInfoStore.clearUserInfo();
+                        uni.navigateTo({ url: '/pages/my/my' });
+                        reject('登录过期，请重新登录', res);
+                    } else {
+                        uni.showToast({
+                            title: res.data.message || '请求错误',
+                            icon: 'none',
+                            mask: true
+                        });
+                        reject(res);
+                    }
+                },
+                fail(err) {
                     uni.showToast({
-                        title: res.data.message || '请求错误',//显示错误信息
-                        icon: 'none',//显示错误图标
-                        mask: true//防止用户连续点击按钮
-                    })
+                        title: '网络异常，请稍后重试',
+                        icon: 'none',
+                        mask: true
+                    });
+                    reject(err);
                 }
-            },
-            fail(err) {
-                uni.showToast({
-                    title: '网络异常，请稍后重试',//显示错误信息
-                    icon: 'none',//显示错误图标
-                    mask: true//防止用户连续点击按钮
-                })
-                reject(err)
-            }
-        })
-    })
-
+            });
+        });
+    }
 }

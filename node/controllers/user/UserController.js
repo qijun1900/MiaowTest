@@ -5,6 +5,7 @@ const UserController = {
     Userlogin: async (req, res) => {
         try {
             const { message, code } = req.body;
+            console.log("接收到的 message:", message, "code:", code);
             const result = await UserService.Userlogin(message, code);
             res.send({
                 code: 200,

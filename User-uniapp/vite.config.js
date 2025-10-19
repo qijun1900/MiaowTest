@@ -7,6 +7,9 @@ export default defineConfig({
     uni(),
     visualizer()
   ],
+  define: {
+    'process.env': process.env
+  },
   css: {
     preprocessorOptions: {
       scss: {

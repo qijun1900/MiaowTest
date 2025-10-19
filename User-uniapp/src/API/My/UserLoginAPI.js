@@ -9,6 +9,7 @@ import { http } from '../../util/http.js';
  */
 export const Userlogin = async(message,code) => {
    try{
+    console.log("接收到的 message:", message, "code:", code);
        return await http({
            url: '/uniappAPI/User/Userlogin',
            method: 'POST',
