@@ -1,57 +1,8 @@
 import escconfig from '../config/esc.config';
+import { UserInfoStore } from '../stores/modules/UserinfoStore';
 const baseURl = escconfig.useTunnel 
     ? escconfig.tunnelUrl 
     : `http://${escconfig.serverHost}:${escconfig.serverPort}`;
-
-// 云托管请求封装
-function cloudRequest(options) {
-    return new Promise((resolve, reject) => {
-        if (!wx.cloud) {
-            reject(new Error('请在微信小程序环境下使用云托管API'));
-            return;
-        }
-        wx.cloud.callContainer({
-            config: {
-                env: escconfig.cloudEnv
-            },
-            path: options.url,
-            header: {
-                'X-WX-SERVICE': escconfig.cloudService,
-                ...options.header
-            },
-            method: options.method || 'GET',
-            data: options.data || {},
-            success: res => {
-                // 兼容原有 resolve 行为
-                if (res.statusCode >= 200 && res.statusCode < 300) {
-                    resolve(res.data);
-                } else if (res.statusCode === 401) {
-                    uni.removeStorageSync('token');
-                    const userInfoStore = UserInfoStore();
-                    userInfoStore.clearUserInfo();
-                    uni.navigateTo({ url: '/pages/my/my' });
-                    reject('登录过期，请重新登录', res);
-                } else {
-                    uni.showToast({
-                        title: res.data.message || '请求错误',
-                        icon: 'none',
-                        mask: true
-                    });
-                    reject(res);
-                }
-            },
-            fail: err => {
-                uni.showToast({
-                    title: '网络异常，请稍后重试',
-                    icon: 'none',
-                    mask: true
-                });
-                reject(err);
-            }
-        });
-    });
-}
-import { UserInfoStore } from '../stores/modules/UserinfoStore';
 
 // 统一的HTTP请求封装
 // 适用于uni-app的http请求封装，支持小程序和H5平台
@@ -100,12 +51,97 @@ const httpInterceptor = {
         //添加token
         const token = uni.getStorageSync('token');//从本地获取token
         if (token) {
-            options.header.Authorization = `Bearer ${token}`; // 添加Bearer前缀
+            options.header = {
+                ...options.header,
+                Authorization: `Bearer ${token}`
+            };
         }
     }
 }
 uni.addInterceptor('request', httpInterceptor)
 uni.addInterceptor('uploadFile', httpInterceptor)
+
+// 云托管请求封装
+function cloudRequest(options) {
+    return new Promise((resolve, reject) => {
+        if (!wx.cloud) {
+            reject(new Error('请在微信小程序环境下使用云托管API'));
+            return;
+        }
+        
+        // 手动应用拦截器逻辑，因为uni.addInterceptor对wx.cloud.callContainer无效
+        const processedOptions = { ...options };
+        
+        // 处理URL
+        if (!processedOptions.url.startsWith('http')) {
+            processedOptions.url = baseURl + processedOptions.url;
+        }
+        
+        // 设置超时
+        processedOptions.timeout = processedOptions.timeout || 40000;
+        
+        // 添加平台标识
+        const platform = getPlatform();
+        const clientHeader = platform === 'h5' ? 'web' : 'miniapp';
+        
+        // 初始化header
+        processedOptions.header = {
+            ...processedOptions.header,
+            'source-client': clientHeader,
+            'platform': platform
+        };
+        
+        // 添加token
+        const token = uni.getStorageSync('token');
+        if (token) {
+            processedOptions.header.Authorization = `Bearer ${token}`;
+        }
+        
+        // 构建最终的请求头
+        const finalHeader = {
+            'X-WX-SERVICE': escconfig.cloudService,
+            ...processedOptions.header
+        };
+        
+        wx.cloud.callContainer({
+            config: {
+                env: escconfig.cloudEnv
+            },
+            path: options.url, // 注意：path应该使用原始URL，而不是处理后的URL
+            header: finalHeader,
+            method: processedOptions.method || 'GET',
+            data: processedOptions.data || {},
+            success: res => {
+                // 兼容原有 resolve 行为
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    resolve(res.data);
+                } else if (res.statusCode === 401) {
+                    // 处理401错误，清除token并跳转登录页
+                    uni.removeStorageSync('token');
+                    const userInfoStore = UserInfoStore();
+                    userInfoStore.clearUserInfo();
+                    uni.navigateTo({ url: '/pages/my/my' });
+                    reject('登录过期，请重新登录', res);
+                } else {
+                    uni.showToast({
+                        title: res.data.message || '请求错误',
+                        icon: 'none',
+                        mask: true
+                    });
+                    reject(res);
+                }
+            },
+            fail: err => {
+                uni.showToast({
+                    title: '网络异常，请稍后重试',
+                    icon: 'none',
+                    mask: true
+                });
+                reject(err);
+            }
+        });
+    });
+}
 
 export const http = (options) => {
     if (escconfig.useCloudContainer) {

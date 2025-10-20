@@ -2,7 +2,7 @@
 export default {
     onLaunch: function() {
 	//#ifdef MP-WEIXIN
-      wx.cloud.init({
+    wx.cloud.init({
 		env: 'prod-4gx4oupb178049a1'
 	});
 	//#endif
