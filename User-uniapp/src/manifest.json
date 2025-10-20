@@ -73,8 +73,7 @@
             "useApiHostProcess" : true
         },
     "usingComponents" : true,
-    "cloud": true,
-    "cloud_env": "prod-4gx4oupb178049a1"
+    "cloud": true
     },
     "mp-alipay" : {
         "usingComponents" : true

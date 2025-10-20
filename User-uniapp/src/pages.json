@@ -30,12 +30,6 @@
 			}
 		},
 		{
-			"path": "pages/chat/chat",
-			"style": {
-				"navigationBarTitleText": "chat"
-			}
-		},
-		{
 			"path": "pages/exam/exam",
 			"style": {
 				"navigationBarTitleText": "所有考试",
@@ -178,12 +172,6 @@
 				"text": "考试",
 				"iconPath": "static/tabBar/exam.png",
 				"selectedIconPath": "static/tabBar/exam-active.png"
-			},
-			{
-				"pagePath": "pages/chat/chat",
-				"text": "喵喵智答",
-				"iconPath": "static/tabBar/chat.png",
-				"selectedIconPath": "static/tabBar/chat.png"
 			},
 			{
 				"pagePath": "pages/function/function",
