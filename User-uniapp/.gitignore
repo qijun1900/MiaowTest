@@ -20,14 +20,7 @@ dist
 .env.test.local
 .env.production.local
 
-# 配置文件 - 包含服务器地址和敏感信息
-src/config/esc.config.js
 
-# App.vue - 包含云开发环境ID
-src/App.vue
-
-# manifest.json - 包含小程序AppID等敏感信息
-src/manifest.json
 
 # Build analysis files
 stats.html
