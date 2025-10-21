@@ -3,7 +3,6 @@ const mongoose = require('mongoose')
 const ConsumerSchema = new mongoose.Schema({
     username: {
         type: String,
-        unique: true,// 唯一索引
         index: true// 索引
     },
     email: { 

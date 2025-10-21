@@ -1,6 +1,6 @@
 const escconfig = {
-  serverHost: "localhost", // 服务器地址
-  serverPort: 3000,// 服务器端口
+  serverHost: "47.95.37.174", // 服务器地址
+  serverPort: 3001,// 服务器端口
   tunnelUrl: "https://1142zt884zj05.vicp.fun", // 内网穿透地址
   useTunnel:false, // 是否使用内网穿透地址
   //#ifdef MP-WEIXIN
