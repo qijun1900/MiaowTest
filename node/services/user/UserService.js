@@ -6,9 +6,7 @@ const ExamModel = require("../../models/ExamModel");
 const UserService = {
     Userlogin: async (message, code) => {
         try {
-
             const { openid, session_key } = await wxAuth.wxAuth(code);
-            console.log("openid:", openid, "session_key:", session_key);
 
             // 查找或创建用户
             let user = await ConsumerModel.findOne({ openid });

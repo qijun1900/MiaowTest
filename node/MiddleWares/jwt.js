@@ -16,7 +16,6 @@ const JWT = {
       return (req, res, next) => {
         // 获取请求头中的token
         const token = req.headers.authorization?.split(' ')[1]; // Bearer token
-        
         if (!token) {
           return res.status(401).json({
             code: 401,
