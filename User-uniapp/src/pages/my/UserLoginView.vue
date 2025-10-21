@@ -74,7 +74,7 @@
       </view>
       <view class="wechat-login-container">
         <view class="wechat-login-btn" @click="handleUseWXLogin">
-          <u-icon name="weixin-fill" color="#ffffff" size="28"></u-icon>
+          <u-icon name="weixin-fill" color="#ffffff" size="40"></u-icon>
         </view>
         <text class="wechat-login-text">微信一键登录</text>
       </view>
@@ -203,9 +203,13 @@ const handleUseWXLogin = async () => {
 };
 
 const goToRegister = () => {
-  uni.navigateTo({
-    url: '/pages/my/UserRegisterView'
+  uni.showToast({
+    title: '请使用微信登录',
+    icon: 'error'
   });
+  // uni.navigateTo({
+  //   url: '/pages/my/UserRegisterView'
+  // });
 };
 
 // 显示用户服务协议

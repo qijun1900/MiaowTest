@@ -125,11 +125,16 @@ const handleEditGender = () => {
 
 // 处理账号绑定
 const handleUserRsgister = () => {
-  if(!accountBindStatus.value){
-    uni.navigateTo({
-      url: '/pages/my/UserRegisterView?isBind=true',
-    });
-  }
+
+  uni.showToast({
+    title: '暂时未开放',
+    icon: 'error',
+   }) 
+  // if(!accountBindStatus.value){
+  //   uni.navigateTo({
+  //     url: '/pages/my/UserRegisterView?isBind=true',
+  //   });
+  // }
 };
 
 // 复制 openid
