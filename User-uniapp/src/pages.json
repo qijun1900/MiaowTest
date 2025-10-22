@@ -153,6 +153,14 @@
 			"style": {
 				"navigationBarTitleText": "我的错题"
 			}
+		},
+		{
+			"path": "pages/function/TimerfunView",
+			"style": {
+				"navigationBarTitleText": "计时器",
+				"disableScroll": false,
+				"navigationBarTextStyle": "black"
+			}
 		}
 	],
 	"globalStyle": {
