@@ -32,6 +32,6 @@ const displayText = computed(() => {
         }
         return firstNotice.title || '';
     }
-    return 'uni-app 版正式发布，开发一次，同时发布iOS、Android、H5、微信小程序、支付宝小程序、百度小程序、头条小程序等7大平台。';
+    return '服务器为微信云托管，可能出现服务器自动关闭导致网络请求失败，请耐心等待服务器自动启动。';
 })
 </script>
