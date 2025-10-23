@@ -55,7 +55,7 @@
 			}
 		},
 		{
-			"path": "pages/function/function",
+			"path": "pages/tools/tools",
 			"style": {
 				"navigationBarTitleText": "所有工具",
 				"navigationStyle": "custom",
@@ -155,7 +155,7 @@
 			}
 		},
 		{
-			"path": "pages/function/TimerfunView",
+			"path": "pages/tools/TimerToolView",
 			"style": {
 				"navigationBarTitleText": "计时器",
 				"disableScroll": false,
@@ -194,10 +194,10 @@
 				"selectedIconPath": "static/tabBar/chat.png"
 			},
 			{
-				"pagePath": "pages/function/function",
+				"pagePath": "pages/tools/tools",
 				"text": "工具",
-				"iconPath": "static/tabBar/function.png",
-				"selectedIconPath": "static/tabBar/function-active.png"
+				"iconPath": "static/tabBar/tool.png",
+				"selectedIconPath": "static/tabBar/tool-active.png"
 			},
 			{
 				"pagePath": "pages/my/my",
