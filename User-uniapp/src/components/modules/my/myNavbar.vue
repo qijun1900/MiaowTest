@@ -43,7 +43,7 @@ const navItems = ref([
   },
   {
     title: '意见反馈',
-    icon: '/static/tabBar/function-active.png',
+    icon: '/static/tabBar/tool-active.png',
     path: '/pages/user/index'
   }
 ])
@@ -57,7 +57,7 @@ const handleNavClick = (item) => {
   //TODO 意见反馈
   if(item.title === '意见反馈'){
     uni.showToast({
-      title: '功能开发中',
+      title: '功能未开放',
       icon: 'none'
     })
   }

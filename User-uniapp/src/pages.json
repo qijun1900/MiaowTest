@@ -182,12 +182,6 @@
 				"selectedIconPath": "static/tabBar/exam-active.png"
 			},
 			{
-				"pagePath": "pages/chat/chat",
-				"text": "喵喵智答",
-				"iconPath": "static/tabBar/chat.png",
-				"selectedIconPath": "static/tabBar/chat.png"
-			},
-			{
 				"pagePath": "pages/tools/tools",
 				"text": "工具",
 				"iconPath": "static/tabBar/tool.png",
