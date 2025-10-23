@@ -39,7 +39,7 @@ const contentPaddingTop = computed(() => {
 // 导航到计时器页面
 const navigateToTimer = () => {
   uni.navigateTo({
-    url: '/pages/function/TimerfunView'
+    url: '/pages/tools/TimerToolView'
   });
 };
 
