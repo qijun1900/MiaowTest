@@ -3,12 +3,6 @@
         <!-- 圆环进度条和倒计时显示 -->
         <view class="timer-display">
             <view class="progress-ring">
-                <!-- 使用Canvas实现圆环进度条 -->
-                <canvas 
-                    class="progress-canvas" 
-                    :canvas-id="progressCanvasId"
-                    :style="{ width: canvasSize + 'px', height: canvasSize + 'px' }"
-                ></canvas>
                 <!-- 倒计时显示 -->
                 <view class="timer-text">
                     <text class="time-display">{{ formattedTime }}</text>
@@ -21,7 +15,7 @@
         <!-- 控制面板 -->
         <view class="control-panel">
             <!-- 预设时间选项 -->
-            <view class="preset-times-container">
+            <view class="preset-times-container" v-if="!isRunning">
                 <text class="section-title">快速选择</text>
                 <view class="preset-times">
                     <view v-for="preset in presetTimes" :key="preset.label" @click="setPresetTime(preset)"
@@ -33,7 +27,7 @@
             </view>
 
             <!-- 自定义时间输入 -->
-            <view class="custom-time-container">
+            <view class="custom-time-container" v-if="!isRunning">
                 <text class="section-title">自定义时间</text>
                 <view class="custom-time-input">
                     <input v-model="customMinutes" type="number" placeholder="输入分钟数" min="1" max="180"
@@ -44,17 +38,27 @@
 
             <!-- 控制按钮 -->
             <view class="control-buttons">
-                <view class="control-btn start-btn" @click="startTimer" :class="{ disabled: isRunning || totalSeconds <= 0 }">
-                    <text class="btn-icon">▶</text>
-                    <text>开始</text>
+                <view 
+                    class="control-btn start-btn" 
+                    @click="startTimer" 
+                    :class="{ disabled: isRunning || totalSeconds <= 0 }"
+                    v-if="!isRunning">
+                     <uni-icons type="checkmarkempty" size="26" color="#ffffff"></uni-icons>
+                    <text class="but-text">开始</text>
                 </view>
-                <view class="control-btn pause-btn" @click="pauseTimer" :class="{ disabled: !isRunning }">
-                    <text class="btn-icon">⏸</text>
-                    <text>暂停</text>
+                <view 
+                    class="control-btn pause-btn" 
+                    @click="pauseTimer" 
+                    :class="{ disabled: !isRunning }">
+                    <uni-icons type="circle-filled" size="25" color="#ffffff"></uni-icons>
+                    <text class="but-text">暂停</text>
                 </view>
-                <view class="control-btn reset-btn" @click="resetTimer">
-                    <text class="btn-icon">⟲</text>
-                    <text>重置</text>
+                <view 
+                    class="control-btn reset-btn" 
+                    @click="resetTimer"
+                    v-if="!isRunning">
+                    <uni-icons type="reload" size="25" color="#ffffff"></uni-icons>
+                    <text class="but-text">重置</text>
                 </view>
             </view>
         </view>
@@ -62,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 // 预设时间选项
 const presetTimes = [
     { label: '25分钟', minutes: 25 },
@@ -70,7 +74,6 @@ const presetTimes = [
     { label: '1小时', minutes: 60 },
     { label: '2小时', minutes: 120 }
 ]
-
 // 状态变量
 const totalSeconds = ref(0) // 总秒数
 const remainingSeconds = ref(0) // 剩余秒数
@@ -81,12 +84,6 @@ const customMinutes = ref('') // 自定义分钟数
 const overtimeSeconds = ref(0) // 超时秒数
 let timer = null // 定时器ID
 
-// Canvas相关
-const progressCanvasId = 'progressCanvas'
-const canvasSize = 240 // Canvas尺寸
-const canvasRadius = 100 // 圆环半径
-const canvasLineWidth = 8 // 线宽
-const canvasContext = ref(null)
 
 // 格式化时间显示
 const formattedTime = computed(() => {
@@ -100,47 +97,6 @@ const overtimeMinutes = computed(() => {
     return Math.floor(overtimeSeconds.value / 60)
 })
 
-// 绘制圆环进度条
-const drawProgressRing = () => {
-    if (!canvasContext.value) return
-
-    const ctx = canvasContext.value
-    const centerX = canvasSize / 2
-    const centerY = canvasSize / 2
-
-    // 清空画布
-    ctx.clearRect(0, 0, canvasSize, canvasSize)
-
-    // 绘制背景圆环
-    ctx.beginPath()
-    ctx.arc(centerX, centerY, canvasRadius, 0, 2 * Math.PI)
-    ctx.strokeStyle = '#eaeaea'
-    ctx.lineWidth = canvasLineWidth
-    ctx.stroke()
-
-    // 绘制进度圆环
-    if (totalSeconds.value > 0) {
-        const progress = remainingSeconds.value / totalSeconds.value
-        const startAngle = -Math.PI / 2
-        const endAngle = startAngle + (2 * Math.PI * progress)
-
-        ctx.beginPath()
-        ctx.arc(centerX, centerY, canvasRadius, startAngle, endAngle)
-        ctx.strokeStyle = isTimeUp.value ? '#FF4757' : '#3498db'
-        ctx.lineWidth = canvasLineWidth
-        ctx.lineCap = 'round'
-        ctx.stroke()
-    }
-}
-
-// 初始化Canvas
-const initCanvas = () => {
-    nextTick(() => {
-        const ctx = uni.createCanvasContext(progressCanvasId)
-        canvasContext.value = ctx
-        drawProgressRing()
-    })
-}
 
 // 设置预设时间
 const setPresetTime = (preset) => {
@@ -152,7 +108,6 @@ const setPresetTime = (preset) => {
     customMinutes.value = ''
     isTimeUp.value = false
     overtimeSeconds.value = 0
-    drawProgressRing()
 }
 
 // 设置自定义时间
@@ -173,7 +128,6 @@ const setCustomTime = () => {
     currentPreset.value = ''
     isTimeUp.value = false
     overtimeSeconds.value = 0
-    drawProgressRing()
 }
 
 // 处理自定义时间输入变化
@@ -204,9 +158,6 @@ const startTimer = () => {
             // 超时后继续计时
             overtimeSeconds.value++
         }
-        
-        // 更新圆环进度
-        drawProgressRing()
     }, 1000)
 }
 
@@ -225,18 +176,12 @@ const resetTimer = () => {
     remainingSeconds.value = totalSeconds.value
     isTimeUp.value = false
     overtimeSeconds.value = 0
-    drawProgressRing()
 }
 
-// 监听时间变化，更新圆环
-watch([remainingSeconds, isTimeUp], () => {
-    drawProgressRing()
-})
 
 // 组件挂载时设置默认时间和初始化Canvas
 onMounted(() => {
     setPresetTime(presetTimes[0]) // 默认选择25分钟
-    initCanvas()
 })
 
 // 组件卸载时清除定时器
@@ -276,12 +221,6 @@ onUnmounted(() => {
     box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.08);
 }
 
-.progress-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
 .timer-text {
     display: flex;
     flex-direction: column;
@@ -291,8 +230,8 @@ onUnmounted(() => {
 }
 
 .time-display {
-    font-size: 72rpx;
-    font-weight: 300;
+    font-size: 75rpx;
+    font-weight: 460;
     color: #2c3e50;
     letter-spacing: 2rpx;
 }
@@ -477,9 +416,9 @@ onUnmounted(() => {
 .reset-btn {
     background-color: #e74c3c;
 }
-
-.btn-icon {
-    font-size: 48rpx;
-    margin-bottom: 10rpx;
+.but-text{
+    font-size: 31rpx;
+    font-weight: 520;
+    color: white;
 }
 </style>
