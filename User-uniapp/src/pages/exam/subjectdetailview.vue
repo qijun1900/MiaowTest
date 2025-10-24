@@ -1,41 +1,64 @@
 <template>
     <view class="container">
-        <view class="exam-detail">
-            <!-- 左侧考试封面 -->
-            <view class="exam-cover">
-                <image :src="examInfo.coverImage" mode="aspectFill" class="cover-image"></image>
-            </view>
-
-            <!-- 右侧考试信息 -->
-            <view class="exam-info">
-                <view class="info-item">
-                    <image src="/static/other/subject-name.png" class="info-icon"></image>
-                    <text class="info-title">考试名称：</text>
-                    <text class="info-content">{{ examInfo.name }}</text>
+        <!-- 顶部卡片式布局 -->
+        <view class="exam-detail-card">
+            <!-- 考试封面与信息 -->
+            <view class="exam-detail">
+                <!-- 左侧考试封面 -->
+                <view class="exam-cover">
+                    <image :src="examInfo.coverImage" mode="aspectFill" class="cover-image"></image>
                 </view>
 
-                <view class="info-item">
-                    <image src="/static/other/year.png" class="info-icon"></image>
-                    <text class="info-title">考试年份：</text>
-                    <text class="info-content">{{ examInfo.year }}</text>
-                </view>
-                
-                <view class="info-item">
-                    <image src="/static/other/time.png" class="info-icon"></image>
-                    <text class="info-title">更新时间：</text>
-                    <text class="info-content">{{ examInfo.updateTime }}</text>
-                </view>
+                <!-- 右侧考试信息 -->
+                <view class="exam-info">
+                    <view class="info-item">
+                        <view class="info-icon-wrapper">
+                            <image src="/static/other/subject-name.png" class="info-icon"></image>
+                        </view>
+                        <view class="info-content-wrapper">
+                            <text class="info-title">考试名称</text>
+                            <text class="info-content">{{ examInfo.name }}</text>
+                        </view>
+                    </view>
 
-                <view class="info-item">
-                    <image src="/static/other/open-time.png" class="info-icon"></image>
-                    <text class="info-title">开考时间：</text>
-                    <text class="info-content">{{ examInfo.startTime }}</text>
+                    <view class="info-item">
+                        <view class="info-icon-wrapper">
+                            <image src="/static/other/year.png" class="info-icon"></image>
+                        </view>
+                        <view class="info-content-wrapper">
+                            <text class="info-title">考试年份</text>
+                            <text class="info-content">{{ examInfo.year }}</text>
+                        </view>
+                    </view>
+                    
+                    <view class="info-item">
+                        <view class="info-icon-wrapper">
+                            <image src="/static/other/time.png" class="info-icon"></image>
+                        </view>
+                        <view class="info-content-wrapper">
+                            <text class="info-title">更新时间</text>
+                            <text class="info-content">{{ examInfo.updateTime }}</text>
+                        </view>
+                    </view>
+
+                    <view class="info-item">
+                        <view class="info-icon-wrapper">
+                            <image src="/static/other/open-time.png" class="info-icon"></image>
+                        </view>
+                        <view class="info-content-wrapper">
+                            <text class="info-title">开考时间</text>
+                            <text class="info-content">{{ examInfo.startTime }}</text>
+                        </view>
+                    </view>
                 </view>
             </view>
         </view>
 
-        <up-divider text="|考试题型|" textPosition="left" textColor="#007AFF" lineColor="#86bbf5">
-        </up-divider>
+        <!-- 分隔线 -->
+        <view class="divider-container">
+            <up-divider text="考试题型" textPosition="center" textColor="#409EFF" lineColor="#E4E7ED">
+            </up-divider>
+        </view>
 
         <!-- 加载状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题型数据..." />
@@ -57,7 +80,7 @@
                             </view>
                         </view>
                         <view class="arrow-container">
-                            <uni-icons type="forward" size="16" color="#007AFF"></uni-icons>
+                            <uni-icons type="forward" size="16" color="#409EFF"></uni-icons>
                         </view>
                     </view>
                 </view>
@@ -71,7 +94,7 @@
         <view class="bottom">
             <up-button type="primary" class="bottom-button" :icon="isFavorited ? 'star-fill' : 'star'"
                 :plain="!isFavorited" @click="handleFavoriteExam" shape="circle"
-                :iconColor="isFavorited ? '#ffae34' : '#007AFF'">
+                :iconColor="isFavorited ? '#F7BA2A' : '#409EFF'">
                 {{ isFavorited ? '已收藏' : '收藏考试' }}
             </up-button>
         </view>
