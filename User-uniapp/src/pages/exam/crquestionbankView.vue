@@ -131,30 +131,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { AddUserBank } from '../../API/Exam/ExamAPI';
 import navBarHeightUtil from '../../util/navBarHeight';
+import checkLogin from '../../util/checkLogin';
+import showModal from '../../util/showModal';
 
 const navBarInfo = ref(0);// 导航栏高度信息
 // 题库名称和验证状态
 const questionBankName = ref('')
 const nameError = ref('')
-const userInfoStore = UserInfoStore()
-
-// 封装 uni.showModal 为 Promise
-const showModal = (options) => {
-  return new Promise((resolve) => {
-    uni.showModal({
-      ...options,
-      success: (res) => {
-        resolve(res);
-      },
-      fail: () => {
-        resolve({ confirm: false }); // 如果用户关闭模态框，返回确认为 false
-      }
-    });
-  });
-};
 // 计算返回按钮的top位置
 const backBtnTop = computed(() => {
   // 根据导航栏高度信息计算返回按钮位置
@@ -298,26 +283,15 @@ const handleAIImport = async () => {
 // 页面加载时检查用户是否已登录
 onMounted(async () => {
   // 获取导航栏高度信息
-   const info = navBarHeightUtil.getNavBarInfo();
+    const info = navBarHeightUtil.getNavBarInfo();
     navBarInfo.value = info.totalHeight;
-  
-  if (!userInfoStore.isLoggedIn) {
-    try {
-      const res = await showModal({
-        title: '您未登录',
-        content: '请先登录后再创建题库',
-        showCancel: false
-      });
-      
-      if (res.confirm) {
-        uni.redirectTo({
-          url: '/pages/my/UserLoginView'
-        }) 
-      }
-    } catch (error) {
-      console.error('登录检查出错:', error);
+    
+    // 检查用户是否已登录
+    const isLoggedIn = await checkLogin("请登录后再创建题库");
+    if (!isLoggedIn) {
+        // 用户未登录，函数已自动跳转到登录页，无需继续执行
+        return;
     }
-  }
 })
 </script>
 

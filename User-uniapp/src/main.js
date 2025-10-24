@@ -10,7 +10,6 @@ export function createApp() {
 	app.use(pinia);
 	//注册uview-plus
 	app.use(uviewPlus);
-
 	return {
 		app,
 	};
