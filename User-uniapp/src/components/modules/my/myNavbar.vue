@@ -42,11 +42,7 @@ const navItems = ref([
     istabBar: true
   },
   {
-<<<<<<< HEAD
-    title: '意见反馈',
-=======
     title: '收藏工具',
->>>>>>> 1170d5c01da43d480167d33be50ebee8e489150e
     icon: '/static/tabBar/tool-active.png',
     path: '/pages/user/index'
   }

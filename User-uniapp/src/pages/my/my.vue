@@ -111,17 +111,9 @@ const handleClick = (item) => {
       })
     } 
   }
-<<<<<<< HEAD
-
-  }else{
-    uni.showToast({
-      title: '功能未开发',
-      icon: 'none'
-=======
   if (item.title === '问题反馈') {
     uni.navigateTo({
       url: '/pages/public/feedbackview'
->>>>>>> 1170d5c01da43d480167d33be50ebee8e489150e
     })
   }
 }
