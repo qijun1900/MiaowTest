@@ -181,13 +181,18 @@ cd AdminWeb
 npm install
 ```
 
-### ⚙️ 环境配置
+### ⚙️ 环境数据库配置
 
 #### 后端配置
 1. 复制环境配置文件：
 ```bash
 cd node
 cp .env.example .env
+```
+2. 初始化数据库(确保在连接状态)：
+```bash
+cd node
+node script/init-database.js
 ```
 
 #### 前端配置
