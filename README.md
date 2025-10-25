@@ -8,7 +8,7 @@
     <h3>📱 扫码体验</h3>
     <img src="https://img.shields.io/badge/微信小程序-预览体验-brightgreen?style=flat-square&logo=wechat" alt="WeChat Mini Program">
     <br><br>
-    <img src="/Img/miaowtest.jpg" alt="微信小程序二维码" width="200" height="200" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <img src="https://youke1.picui.cn/s1/2025/10/25/68fca1c2bf66f.jpg" alt="微信小程序二维码" width="200" height="200" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
     <p><em>微信扫一扫，立即体验题喵喵小程序</em></p>
   </div>
   
