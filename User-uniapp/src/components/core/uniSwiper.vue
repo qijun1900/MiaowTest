@@ -39,7 +39,7 @@ const props = defineProps({
   },
   indicatorDots: {// 是否显示指示器
     type: Boolean,
-    default: true
+    default: false
   },
   autoplay: {// 是否自动播放
     type: Boolean,

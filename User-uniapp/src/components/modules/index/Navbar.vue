@@ -40,7 +40,7 @@ const navItems = ref([
   },
   {
     title: '意见反馈',
-    path: '/pages/user/index',
+    path: '/pages/public/feedbackview',
     imageSrc: '/static/navBar/feedback-cat.png'
   }
 ])
@@ -56,23 +56,11 @@ const handleNavClick = (item) => {
     })
     return;
   }
-  if (item.title==='题库制作') {
+  if (item.title==='题库制作' || item.title==='意见反馈') {
     uni.navigateTo({
       url: item.path
     })
   }
-  //TODO 反馈问题页面
-  if (item.title==='意见反馈') {
-    uni.showToast({
-      title: '功能开发中',
-      icon: 'none'
-    })
-    // uni.navigateTo({
-    //   url: item.path
-    // })
-    return;
-  }
-
 }
 
 

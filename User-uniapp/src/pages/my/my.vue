@@ -40,7 +40,9 @@
     
     <!-- 功能列表 -->
     <view class="function-list">
-      <CustomNavbar :items="CustomNavbarList" @nav-click="handleClick"/>
+      <CustomNavbar 
+        :items="CustomNavbarList" 
+        @nav-click="handleClick"/>
     </view>
 
 
@@ -94,35 +96,32 @@ const CustomNavbarList = ref([
     path: '/pages/my/MyFavoriteView'
   },
   {
-    title: '我的错题',
-    icon: '/static/navMy/my-wro.png',
+    title: '问题反馈',
+    icon: '/static/navMy/c-my-feedback.png',
     path: '/pages/my/MyWrongView'
   },
-  {
-    title: '所有考试',
-    icon: '/static/tabBar/exam-active.png',
-    path: '/pages/exam/exam',
-  },
-  {
-    title: '我的收藏',
-    icon: '/static/navMy/my-fav.png',
-    path: '/pages/my/MyFavoriteView'
-  }
 ])
 // 处理导航栏点击事件
 const handleClick = (item) => {
-  if(item.title === '清除缓存'){
-   if(clearExamCache().isClear){
-    uni.showToast({
-      title: '清除成功',
-      icon: 'success'
-    })
+  if (item.title === '清除缓存') {
+    if (clearExamCache().isClear) {
+      uni.showToast({
+        title: '清除成功',
+        icon: 'success'
+      })
+    } 
   }
+<<<<<<< HEAD
 
   }else{
     uni.showToast({
       title: '功能未开发',
       icon: 'none'
+=======
+  if (item.title === '问题反馈') {
+    uni.navigateTo({
+      url: '/pages/public/feedbackview'
+>>>>>>> 1170d5c01da43d480167d33be50ebee8e489150e
     })
   }
 }

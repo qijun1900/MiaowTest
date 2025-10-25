@@ -155,6 +155,12 @@
 				"disableScroll": false,
 				"navigationBarTextStyle": "black"
 			}
+		},
+		{
+			"path": "pages/public/feedbackview",
+			"style": {
+				"navigationBarTitleText": "意见反馈"
+			}
 		}
 	],
 	"globalStyle": {

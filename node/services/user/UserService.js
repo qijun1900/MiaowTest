@@ -2,6 +2,7 @@ const wxAuth = require("../../MiddleWares/wxAuth");
 const JWT = require("../../MiddleWares/jwt");
 const ConsumerModel = require("../../models/ConsumerModel");
 const ExamModel = require("../../models/ExamModel");
+const FeedbackModel = require("../../models/ConsumerFeedbackModel");
 
 const UserService = {
     Userlogin: async (message, code) => {
@@ -403,6 +404,47 @@ const UserService = {
                 success: false
             }
         }
+    },
+    userFeedback: async ({
+        uid,
+        type,
+        content,
+        contactInfo,
+        relatedId
+    }) => {
+        try {
+            // 检查用户是否存在,只有用户存在才能提交反馈
+            const user = await ConsumerModel.findOne({ _id: uid });
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            // 创建新的反馈记录
+            const newFeedback = new FeedbackModel({
+                uid, // 用户ID
+                type, // 反馈类型，例如问题、建议
+                content, // 反馈内容
+                contactInfo, // 联系方式（可选）
+                relatedId, // 相关ID（例如问题ID、考试ID等），可选
+                createTime: new Date(), // 创建时间
+            })
+            await newFeedback.save();// 保存到数据库
+            return {
+                code: 200,
+                message: '反馈提交成功',
+                success: true,
+            };
+        } catch (error) {
+            console.error("userFeedback 失败", error);
+            return {
+                code: 500,
+                success: false
+            }
+        }
+
     }
 }
 
