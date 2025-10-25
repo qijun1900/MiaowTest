@@ -42,8 +42,8 @@ const navItems = ref([
     istabBar: true
   },
   {
-    title: '意见反馈',
-    icon: '/static/tabBar/function-active.png',
+    title: '收藏工具',
+    icon: '/static/tabBar/tool-active.png',
     path: '/pages/user/index'
   }
 ])

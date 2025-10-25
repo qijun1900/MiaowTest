@@ -13,5 +13,9 @@ UserRouter.post("/uniappAPI/UserFavorite/removeExamFavorite", JWT.verifyTokenMid
 UserRouter.get("/uniappAPI/UserFavorite/getUserFavoritesExams", JWT.verifyTokenMiddleware(),UserController.getUserFavoritesExam)//用户获取收藏的考试接口
 UserRouter.post("/uniappAPI/User/BindAccount", JWT.verifyTokenMiddleware(),UserController.BindAccount)//用户绑定账号接口(wx)
 UserRouter.get("/uniappAPI/User/checkUserBind", JWT.verifyTokenMiddleware(),UserController.checkUserBind)//用户检测是否绑定账号接口(wx)
+UserRouter.post("/uniappAPI/Feedback/submitFeedback", JWT.verifyTokenMiddleware(),UserController.userFeedback)//用户提交反馈接口(wx)
+
+
+
 
 module.exports = UserRouter;

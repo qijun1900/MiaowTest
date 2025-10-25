@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 /**
  * @description: 消费者反馈模型
- * @param {*} userId 提交反馈的用户ID，关联consumer表
+ * @param {*} uid 提交反馈的用户ID，关联consumer表
  * @param {*} type 反馈类型，1-系统反馈 2-题目反馈 3-功能建议 4-其他
- * @param {*} title 反馈标题，必填
  * @param {*} content 反馈内容，必填
  * @param {*} relatedId 关联ID（如题目ID、考试ID等），可选
  * @param {*} contactInfo 联系方式，可选
@@ -15,7 +14,7 @@ const mongoose = require('mongoose');
  * @return {*}
  */
 const FeedbackSchema = new mongoose.Schema({
-    userId: {
+    uid: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'consumer',
         required: true,//必填
@@ -27,10 +26,6 @@ const FeedbackSchema = new mongoose.Schema({
         enum: [1, 2, 3, 4], // 1-系统反馈 2-题目反馈 3-功能建议 4-其他
         default: 1
     }, // 反馈类型
-    title: {
-        type: String,
-        required: true,
-    }, // 反馈标题
     content: {
         type: String,
         required: true,

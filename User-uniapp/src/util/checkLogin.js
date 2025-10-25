@@ -8,7 +8,6 @@ import showModal from './showModal.js';
 export default async function checkLogin(content) {
     try {
         const token = uni.getStorageSync('token');
-        console.log("已经登录",token);
         
         // 检查 token 是否存在
         if (!token) {
@@ -25,7 +24,6 @@ export default async function checkLogin(content) {
             }
             return false; // 用户未登录，返回 false
         }
-        
         return true; // 用户已登录，返回 true
     } catch (error) {
         console.error('登录检查出错:', error);

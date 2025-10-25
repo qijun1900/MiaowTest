@@ -218,7 +218,29 @@ const UserController = {
                 });
             }
         } catch (error) {
-
+            console.error("checkUserBind 失败", error);
+        }
+    },
+    userFeedback: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { type, content, contactInfo, relatedId } = req.body; // 从请求体中获取反馈信息
+            const result = await UserService.userFeedback({ uid, type, content, contactInfo, relatedId }); // 调用服务层方法处理反馈
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message, // 返回成功消息
+                })
+            }else{
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message:"反馈失败"
+                })
+            }
+        }catch(e){
+            console.error("userFeedback 失败", e);
         }
     }
 }
