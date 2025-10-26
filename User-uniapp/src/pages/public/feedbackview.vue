@@ -30,10 +30,10 @@
       
       <!-- 联系方式 -->
       <view class="form-item">
-        <text class="label">联系方式</text>
+        <text class="label">联系方式(可选)</text>
         <input 
           v-model="contactInfo" 
-          placeholder="请输入您的手机号或邮箱，方便我们联系您" 
+          placeholder="请输入您的手机号或邮箱，方便我们联系您(可选)" 
           class="input"
         />
       </view>
@@ -52,7 +52,6 @@
 <script setup>
 import { ref ,onMounted} from 'vue';
 import { submitFeedbackAPI } from '../../API/public/FeedbackAPI';
-import checkLogin from '../../util/checkLogin';
 
 // 反馈类型选项
 const feedbackTypes = [
@@ -125,8 +124,6 @@ const submitFeedback = async () => {
 };
 
 onMounted(()=>{
-  // 检查用户是否已登录
-  checkLogin("请登录后再创反馈问题");
 })
 </script>
 
