@@ -17,8 +17,8 @@ const FeedbackSchema = new mongoose.Schema({
     uid: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'consumer',
-        required: true,//必填
-        index: true//添加索引
+        index: true,//添加索引
+        default:null    // 默认为空
     }, // 提交反馈的用户ID，关联consumer表
     type: {
         type: Number,

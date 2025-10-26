@@ -39,6 +39,29 @@ const JWT = {
         req.user = decoded; 
         next();
       };
+    },
+    // 可选的JWT验证中间件 - 如果有token则验证，没有token则继续处理
+    optionalTokenMiddleware() {
+      return (req, res, next) => {
+        // 获取请求头中的token
+        const token = req.headers.authorization?.split(' ')[1]; // Bearer token
+        
+        if (!token) {
+          // 没有token，继续处理请求
+          return next();
+        }
+        
+        // 有token，尝试验证
+        const decoded = JWT.verify(token);
+        
+        if (decoded) {
+          // token有效，将解码后的用户信息添加到请求对象中
+          req.user = decoded;
+        }
+        
+        // 无论token是否有效，都继续处理请求
+        next();
+      };
     }
 }
 

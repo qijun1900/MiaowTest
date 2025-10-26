@@ -413,18 +413,9 @@ const UserService = {
         relatedId
     }) => {
         try {
-            // 检查用户是否存在,只有用户存在才能提交反馈
-            const user = await ConsumerModel.findOne({ _id: uid });
-            if (!user) {
-                return {
-                    code: 404,
-                    message: '用户不存在',
-                    success: false
-                };
-            }
             // 创建新的反馈记录
             const newFeedback = new FeedbackModel({
-                uid, // 用户ID
+                uid, // 用户ID，可选，如果未登录则为null
                 type, // 反馈类型，例如问题、建议
                 content, // 反馈内容
                 contactInfo, // 联系方式（可选）

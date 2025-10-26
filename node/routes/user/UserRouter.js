@@ -1,19 +1,19 @@
 var express = require('express');
 const UserController = require('../../controllers/user/UserController');
-const JWT = require('../../MiddleWares/jwt');// ÒıÈëJWTÖĞ¼ä¼ş£¬ÓÃÓÚÑéÖ¤token
+const JWT = require('../../MiddleWares/jwt');// å¼•å…¥JWTä¸­é—´ä»¶ï¼Œç”¨äºéªŒè¯token
 var UserRouter = express.Router();
 
-UserRouter.post("/uniappAPI/User/Userlogin", UserController.Userlogin)//Î¢ĞÅµÇÂ¼½Ó¿Ú
-UserRouter.post("/uniappAPI/User/UserRegister", UserController.UserRegister)//ÓÃ»§×¢²á½Ó¿Ú
-UserRouter.post("/uniappAPI/User/UserAccountLogin", UserController.UserAccountLogin)//ÓÃ»§ÕËºÅµÇÂ¼½Ó¿Ú
-UserRouter.post("/uniappAPI/User/updateUserInfo", JWT.verifyTokenMiddleware(), UserController.updateUserInfo)//ÓÃ»§¸üĞÂĞÅÏ¢½Ó¿Ú
-UserRouter.post("/uniappAPI/UserFavorite/addExamFavorite", JWT.verifyTokenMiddleware(),UserController.addExamFavorite)//Ìí¼ÓÓÃ»§ÊÕ²Ø¿¼ÊÔ½Ó¿Ú
-UserRouter.post("/uniappAPI/UserFavorite/getExamFavorites", JWT.verifyTokenMiddleware(),UserController.getExamFavorites)//¼ì²âÊÇ·ñÊÕ²Ø¿¼ÊÔ½Ó¿Ú
-UserRouter.post("/uniappAPI/UserFavorite/removeExamFavorite", JWT.verifyTokenMiddleware(),UserController.removeExamFavorite)//ÓÃ»§È¡ÏûÊÕ²Ø¿¼ÊÔ½Ó¿Ú
-UserRouter.get("/uniappAPI/UserFavorite/getUserFavoritesExams", JWT.verifyTokenMiddleware(),UserController.getUserFavoritesExam)//ÓÃ»§»ñÈ¡ÊÕ²ØµÄ¿¼ÊÔ½Ó¿Ú
-UserRouter.post("/uniappAPI/User/BindAccount", JWT.verifyTokenMiddleware(),UserController.BindAccount)//ÓÃ»§°ó¶¨ÕËºÅ½Ó¿Ú(wx)
-UserRouter.get("/uniappAPI/User/checkUserBind", JWT.verifyTokenMiddleware(),UserController.checkUserBind)//ÓÃ»§¼ì²âÊÇ·ñ°ó¶¨ÕËºÅ½Ó¿Ú(wx)
-UserRouter.post("/uniappAPI/Feedback/submitFeedback", JWT.verifyTokenMiddleware(),UserController.userFeedback)//ÓÃ»§Ìá½»·´À¡½Ó¿Ú(wx)
+UserRouter.post("/uniappAPI/User/Userlogin", UserController.Userlogin)//å¾®ä¿¡ç™»å½•æ¥å£
+UserRouter.post("/uniappAPI/User/UserRegister", UserController.UserRegister)//ç”¨æˆ·æ³¨å†Œæ¥å£
+UserRouter.post("/uniappAPI/User/UserAccountLogin", UserController.UserAccountLogin)//ç”¨æˆ·è´¦å·ç™»å½•æ¥å£
+UserRouter.post("/uniappAPI/User/updateUserInfo", JWT.verifyTokenMiddleware(), UserController.updateUserInfo)//ç”¨æˆ·æ›´æ–°ä¿¡æ¯æ¥å£
+UserRouter.post("/uniappAPI/UserFavorite/addExamFavorite", JWT.verifyTokenMiddleware(),UserController.addExamFavorite)//æ·»åŠ ç”¨æˆ·æ”¶è—è€ƒè¯•æ¥å£
+UserRouter.post("/uniappAPI/UserFavorite/getExamFavorites", JWT.verifyTokenMiddleware(),UserController.getExamFavorites)//æ£€æµ‹æ˜¯å¦æ”¶è—è€ƒè¯•æ¥å£
+UserRouter.post("/uniappAPI/UserFavorite/removeExamFavorite", JWT.verifyTokenMiddleware(),UserController.removeExamFavorite)//ç”¨æˆ·å–æ¶ˆæ”¶è—è€ƒè¯•æ¥å£
+UserRouter.get("/uniappAPI/UserFavorite/getUserFavoritesExams", JWT.verifyTokenMiddleware(),UserController.getUserFavoritesExam)//ç”¨æˆ·è·å–æ”¶è—çš„è€ƒè¯•æ¥å£
+UserRouter.post("/uniappAPI/User/BindAccount", JWT.verifyTokenMiddleware(),UserController.BindAccount)//ç”¨æˆ·ç»‘å®šè´¦å·æ¥å£(wx)
+UserRouter.get("/uniappAPI/User/checkUserBind", JWT.verifyTokenMiddleware(),UserController.checkUserBind)//ç”¨æˆ·æ£€æµ‹æ˜¯å¦ç»‘å®šè´¦å·æ¥å£(wx)
+UserRouter.post("/uniappAPI/Feedback/submitFeedback", JWT.optionalTokenMiddleware(), UserController.userFeedback)//ç”¨æˆ·æäº¤åé¦ˆæ¥å£(wx) - ä½¿ç”¨å¯é€‰JWTä¸­é—´ä»¶
 
 
 

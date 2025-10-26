@@ -1,5 +1,5 @@
 const UserService = require("../../services/user/UserService");
-
+const JWT = require('../../MiddleWares/jwt');// 引入JWT中间件，用于验证token
 
 const UserController = {
     Userlogin: async (req, res) => {
@@ -223,8 +223,11 @@ const UserController = {
     },
     userFeedback: async (req, res) => {
         try {
-            const { uid } = req.user;
             const { type, content, contactInfo, relatedId } = req.body; // 从请求体中获取反馈信息
+            
+            // 获取用户uid，如果用户未登录则设为null
+            const uid = req.user && req.user.uid ? req.user.uid : null;
+            
             const result = await UserService.userFeedback({ uid, type, content, contactInfo, relatedId }); // 调用服务层方法处理反馈
             if (result.success) {
                 res.send({
@@ -241,6 +244,11 @@ const UserController = {
             }
         }catch(e){
             console.error("userFeedback 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: "服务器错误"
+            });
         }
     }
 }
