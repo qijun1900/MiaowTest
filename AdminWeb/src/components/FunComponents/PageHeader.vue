@@ -79,6 +79,8 @@ const Title = computed(() => {
       return '考试题型管理';
     case '/model/chat':
       return '模型对话';
+    case '/consumer/message':
+      return '用户意见';
     default:
       return '后台管理系统';
   }

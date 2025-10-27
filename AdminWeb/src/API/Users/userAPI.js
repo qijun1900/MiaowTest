@@ -64,7 +64,7 @@ export async function PostDeleteManyUser(_ids) {
     }
     
 }
-
+// 编辑用户信息
 export async function postEditUser(userData) {
   try {
     const response = await axios.post("/adminapi/user/edituser", userData)

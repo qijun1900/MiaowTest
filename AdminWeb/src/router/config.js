@@ -10,6 +10,7 @@ import ModelManage from "@/views/LLM/ModelManage.vue"
 import QuestionTypeManage from "@/views/Exam/QuestionTypeManage.vue"
 import QuestionBatchAdd from "@/views/Exam/QuestionBatchAdd.vue"
 import LLMChat from "@/views/Chat/LLMChat.vue"
+import consumerMessage from "../views/Consumer/ConsumerMessage.vue"
 
 const routes= [
     {
@@ -71,6 +72,11 @@ const routes= [
         path: '/model/chat',
         name: 'LLMChat',
         component: LLMChat,
+    },
+    {
+        path: '/consumer/message',
+        name: 'consumerMessage',
+        component: consumerMessage,
     }
 
 ]
