@@ -86,6 +86,7 @@ import ThemeDivider from '../../components/core/ThemeDivider.vue';
 import navBarHeightUtil from '../../util/navBarHeight.js';
 import CustomNavbar from '../../components/core/CustomNavbar.vue';
 import { clearExamCache } from '../../util/cacheCleaner.js';
+import showShareMenu from '../../util/wechatShare.js';
 
 const overlayShow = ref(false);
 const userInfoStore = UserInfoStore();
@@ -164,6 +165,7 @@ const handleUseAccountLogin = () => {
 // 获取导航栏高度信息
 onMounted(() => {
   navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+  showShareMenu()
 });
 </script>
 

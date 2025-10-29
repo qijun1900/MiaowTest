@@ -69,6 +69,7 @@ import uviewSubsection from '../../components/core/uviewSubsection.vue';
 import UserExamFavorite from '../../components/modules/index/UserExamFavorite.vue';
 import { onPageScroll } from '@dcloudio/uni-app';
 import BackToTop from '../../components/core/BackToTop.vue';
+import showShareMenu from '../../util/wechatShare.js';
 
 const  noticeData = ref([])// 添加notice需要的数据
 const swiperList = ref([])// 添加swiper需要的数据
@@ -105,10 +106,8 @@ const fetchBannerInfo = async ()=>{
   }
 }
 
-onMounted(() => {
-  fetchNoticeInfo()
-  fetchBannerInfo()
-})
+
+
 const handleViewMore = () => {
   uni.switchTab({
 	url: '/pages/exam/exam'
@@ -120,6 +119,7 @@ const handleCreateQuestionBank = () => {
     url: '/pages/exam/crquestionbankView'
   })
 }
+
 // 页面滚动事件
 onPageScroll((e) => {
   // 调用BackToTop组件的滚动处理方法
@@ -127,6 +127,11 @@ onPageScroll((e) => {
     backToTopRef.value.handlePageScroll(e);
   }
 });
+onMounted(() => {
+  fetchNoticeInfo()
+  fetchBannerInfo()
+  showShareMenu()
+})
 </script>
 <style scoped lang="scss">
 .search-container {
