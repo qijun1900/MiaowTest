@@ -50,6 +50,18 @@
         <el-menu-item index="/exam/exammanage">科目管理</el-menu-item>
       </el-sub-menu>
 
+      <el-sub-menu index="/Feedback-manage">
+        <template #title>
+          <el-icon>
+            <ChatDotSquare />
+          </el-icon>
+          <span>反馈管理</span>
+        </template>
+        <el-menu-item index="/consumer/message">用户意见</el-menu-item>
+      </el-sub-menu>
+      
+      
+
       <el-sub-menu index="/Model-manage">
         <template #title>
           <el-icon><Cpu /></el-icon>
@@ -71,7 +83,16 @@
 
 <script setup>
 import { useAppStore } from '@/stores/index';
-import { HomeFilled, Avatar, UserFilled, MessageBox,DocumentCopy,Cpu ,ChatLineRound} from '@element-plus/icons-vue'
+import { 
+  HomeFilled, 
+  Avatar, 
+  UserFilled, 
+  MessageBox,
+  DocumentCopy,
+  Cpu ,
+  ChatLineRound,
+  ChatDotSquare} 
+  from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
 
 const route = useRoute()

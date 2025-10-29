@@ -28,6 +28,7 @@
 import { ref, onMounted,computed } from 'vue';
 import navBarHeightUtil from '../../util/navBarHeight.js';
 import TimerIcon from '../../components/icons/TimerIcon.vue';
+import showShareMenu from '../../util/wechatShare.js';
 
 const navBarInfo = ref({});
 // 计算内容区域的 padding-top，确保不被导航栏遮挡
@@ -46,6 +47,7 @@ const navigateToTimer = () => {
 // 获取导航栏高度信息
 onMounted(() => {
   navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+  showShareMenu();
 });
 </script>
 

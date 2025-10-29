@@ -80,6 +80,7 @@ import formatTime from '../../util/formatTime';
 import uniSearch from '../../components/core/uniSearch.vue';
 import ThemeLoading from '../../components/core/ThemeLoading.vue';
 import navBarHeightUtil from '../../util/navBarHeight';
+import showShareMenu from '../../util/wechatShare.js';
 
 // 响应式数据
 const examSubjects = ref([]);
@@ -155,6 +156,7 @@ onPageScroll((e) => {
 // 页面加载时获取数据
 onMounted(() => {
   fetchExamSubjects();
+  showShareMenu(); // 显示分享菜单
 });
 
 </script>

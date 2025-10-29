@@ -136,7 +136,6 @@ const QuestionPreview = defineAsyncComponent(() =>
     import('@/components/Exam/QuestionPreview.vue')
 )
 
-
 const appStore = useAppStore();
 const isSendValue = ref(false);// 是否发送消息
 const chatHistory = ref([]);// 聊天记录

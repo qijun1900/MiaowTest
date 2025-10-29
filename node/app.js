@@ -12,11 +12,12 @@ const UserRouter = require('./routes/admin/UserRouter'); // 引入Admin用户路
 const NewsRouter = require('./routes/admin/NewsRouter'); // 引入Admin新闻路由模块
 const WebNewsRouter = require('./routes/user/NewsRouter'); // 引入用户端新闻路由模块
 const AdminExamRouter = require('./routes/admin/ExamRouter'); // 引入Admin考试路由模块
-const WebUserExamRouter = require('./routes/user/ExamRouter'); // 引入用户端考试路由模块
+const ConsumerExamRouter = require('./routes/user/ExamRouter'); // 引入用户端考试路由模块
 const AdminLLMRouter = require('./routes/admin/LLMRouter'); // 引入AdminLLM路由模块
-const WebLLMRouter = require('./routes/user/LLMRouter'); // 引入用户端LLM路由模块 
+const ConsumerLLMRouter = require('./routes/user/LLMRouter'); // 引入用户端LLM路由模块 
 const FunctionRouter = require('./routes/admin/FunctionRouter'); // 引入Admin功能路由模块
 const UniUserRouter = require('./routes/user/UserRouter'); // 引入用户端用户路由模块
+const AdminConsumerRouter = require('./routes/admin/ConsumerRouter'); // 引入Admin用户端用户路由模块
 
 var app = express();
 
@@ -61,11 +62,11 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/', indexRouter);
-app.use('/users',UserRouter)
-app.use(WebNewsRouter)
-app.use(WebUserExamRouter)
-app.use(WebLLMRouter)
-app.use(UniUserRouter)// 注册用户路由(uni)
+app.use('/users',UserRouter)// 注册用户路由(后台端)
+app.use(UniUserRouter)// 注册用户路由(用户端)
+app.use(WebNewsRouter)// 注册新闻路由(用户端)
+app.use(ConsumerExamRouter)// 注册考试路由(用户端)
+app.use(ConsumerLLMRouter)// 注册llm路由(用户端)
 
 
 /*
@@ -101,6 +102,7 @@ app.use(NewsRouter)//信息路由(admin)
 app.use(AdminExamRouter)//考试路由(admin)
 app.use(AdminLLMRouter)//llm路由(admin)
 app.use(FunctionRouter)//功能路由(admin)
+app.use(AdminConsumerRouter)//用户路由(admin)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

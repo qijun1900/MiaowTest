@@ -106,18 +106,18 @@ onMounted(()=>{
 }
 
 .exam-title {
-    padding: 15rpx;
+    padding: 10rpx 8rpx;
     font-size: 23rpx;
     font-weight: bold;
     color: #333333;
     text-align: center;
-    white-space: normal;
+    white-space: nowrap;
     line-height: 1.4;
     height: 30rpx;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+    display: block;
+    max-width: 100%;
 }
 
 /* 占位图样式 */
