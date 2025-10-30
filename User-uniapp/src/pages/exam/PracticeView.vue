@@ -25,37 +25,37 @@
                     class="question-swiper"
                     :current="currentIndex"
                     @change="handleSwiperChange"
-                    :duration="300"
+                    :duration="200"
                     :vertical="false"
-                    circular>
+                    :circular="true">
                     <swiper-item 
                         v-for="(itemIndex, i) in visibleIndexes" 
-                        :key="i">
+                        :key="`${itemIndex}-${questionStore.UserChooseQuestion[itemIndex]?._id || i}`">
                         <view class="question-container">
                             <SelectQuestion 
                                 v-if="questionStore.UserChooseQuestion[itemIndex]?.Type===1" 
                                 :question="questionStore.UserChooseQuestion[itemIndex]" 
                                 :questionIndex="itemIndex + 1"
                                 :currentMode="currentMode"
-                                :key="refreshKey"/>
+                                :key="`select-${questionStore.UserChooseQuestion[itemIndex]?._id || itemIndex}-${refreshKey}`"/>
                             <BlankQuestion 
                                 v-if="questionStore.UserChooseQuestion[itemIndex]?.Type===2" 
                                 :question="questionStore.UserChooseQuestion[itemIndex]" 
                                 :questionIndex="itemIndex + 1"
                                 :currentMode="currentMode"
-                                :key="refreshKey"/>
+                                :key="`blank-${questionStore.UserChooseQuestion[itemIndex]?._id || itemIndex}-${refreshKey}`"/>
                             <JudgeQuestion 
                                 v-if="questionStore.UserChooseQuestion[itemIndex]?.Type===3" 
                                 :question="questionStore.UserChooseQuestion[itemIndex]" 
                                 :questionIndex="itemIndex + 1" 
                                 :currentMode="currentMode" 
-                                :key="refreshKey"/>
+                                :key="`judge-${questionStore.UserChooseQuestion[itemIndex]?._id || itemIndex}-${refreshKey}`"/>
                             <ShortQuestion 
                                 v-if="questionStore.UserChooseQuestion[itemIndex]?.Type===4" 
                                 :question="questionStore.UserChooseQuestion[itemIndex]" 
                                 :questionIndex="itemIndex + 1"
                                 :currentMode="currentMode"
-                                :key="refreshKey"/>
+                                :key="`short-${questionStore.UserChooseQuestion[itemIndex]?._id || itemIndex}-${refreshKey}`"/>
                         </view>
                     </swiper-item>
                 </swiper>
@@ -146,7 +146,7 @@
     </view>
 </template>
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'; // 导入Vue的核心功能
+import { onMounted, ref, computed, watch } from 'vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import UviewSubsection from "../../components/core/uviewSubsection.vue";
 import SelectQuestion from '../../components/modules/exam/SelectQuestion.vue';//Type=1
@@ -190,7 +190,10 @@ const handleSendMode =(value)=>{
 
 // 处理轮播切换事件
 const handleSwiperChange = (event) => {
-    currentIndex.value = event.detail.current;
+    // 延迟更新索引，避免与swiper动画冲突
+    setTimeout(() => {
+        currentIndex.value = event.detail.current;
+    }, 60);
 }
 
 // 处理滑动方向变化
@@ -200,12 +203,14 @@ const handleDirectionChange = (newIndex, oldIndex) => {
         (newIndex > oldIndex && !(newIndex === 2 && oldIndex === 0)) || 
         (newIndex === 0 && oldIndex === 2);
     
-    isLeftSwipe ? handleLeftSwipe() : handleRightSwipe();
+    // 延迟处理，等待swiper动画完成
+    setTimeout(() => {
+        isLeftSwipe ? handleLeftSwipe() : handleRightSwipe();
+    }, 100);
 }
 
 // 处理向左滑动（下一个）
 const handleLeftSwipe = () => {
-    const nextIndex = (currentIndex.value + 1) % 3;
     const currentListIndex = visibleIndexes.value[currentIndex.value];
     
     // 计算下一个要显示的项目索引
@@ -213,19 +218,40 @@ const handleLeftSwipe = () => {
     
     // 边界检查
     if (nextListIndex < questionStore.UserChooseQuestion.length) {
-        visibleIndexes.value[nextIndex] = nextListIndex;
+        // 创建新的可见索引数组
+        const newVisibleIndexes = [...visibleIndexes.value];
+        
+        // 计算当前swiper-item位置
+        const currentSwiperIndex = currentIndex.value;
+        
+        // 计算下一个swiper-item位置
+        const nextSwiperIndex = (currentSwiperIndex + 1) % 3;
+        
+        // 只有当新索引与当前不同时才更新
+        if (newVisibleIndexes[nextSwiperIndex] !== nextListIndex) {
+            // 更新下一个位置的题目索引
+            newVisibleIndexes[nextSwiperIndex] = nextListIndex;
+            
+            // 更新visibleIndexes
+            visibleIndexes.value = newVisibleIndexes;
+            
+            // 延迟触发组件重新渲染，确保动画完成
+            setTimeout(() => {
+                refreshKey.value++;
+            }, 50);
+        }
     } else {
-        // 到达列表末尾
+        // 到达列表末尾，使用更平滑的提示
         uni.showToast({
             title: '已经是最后一题',
-            icon: 'none'
+            icon: 'none',
+            duration: 1000
         });
     }
 }
 
 // 处理向右滑动（上一个）
 const handleRightSwipe = () => {
-    const prevIndex = (currentIndex.value + 2) % 3;
     const currentListIndex = visibleIndexes.value[currentIndex.value];
     
     // 计算上一个要显示的项目索引
@@ -233,12 +259,34 @@ const handleRightSwipe = () => {
     
     // 边界检查
     if (prevListIndex >= 0) {
-        visibleIndexes.value[prevIndex] = prevListIndex;
+        // 创建新的可见索引数组
+        const newVisibleIndexes = [...visibleIndexes.value];
+        
+        // 计算当前swiper-item位置
+        const currentSwiperIndex = currentIndex.value;
+        
+        // 计算上一个swiper-item位置
+        const prevSwiperIndex = (currentSwiperIndex + 2) % 3;
+        
+        // 只有当新索引与当前不同时才更新
+        if (newVisibleIndexes[prevSwiperIndex] !== prevListIndex) {
+            // 更新上一个位置的题目索引
+            newVisibleIndexes[prevSwiperIndex] = prevListIndex;
+            
+            // 更新visibleIndexes
+            visibleIndexes.value = newVisibleIndexes;
+            
+            // 延迟触发组件重新渲染，确保动画完成
+            setTimeout(() => {
+                refreshKey.value++;
+            }, 50);
+        }
     } else {
-        // 到达列表开头
+        // 到达列表开头，使用更平滑的提示
         uni.showToast({
             title: '已经是第一题',
-            icon: 'none'
+            icon: 'none',
+            duration: 1000
         });
     }
 }
@@ -260,20 +308,25 @@ const handleQuestionCardClick = (index) => {
     const currentQuestionIndex = visibleIndexes.value[currentIndex.value];
     const diff = index - currentQuestionIndex;
     
-    if (diff === 0) return; // 点击当前题目，不做处理
+    if (diff === 0) {
+        // 点击当前题目，关闭弹窗即可
+        popupShow.value = false;
+        return;
+    }
     
     // 直接更新visibleIndexes数组，根据点击的题目重新计算三个可见项
     const totalQuestions = questionStore.UserChooseQuestion.length;
     
     // 计算新的可见索引范围
     let newVisibleIndexes = [];
+    let newCurrentIndex = 0;
     
     // 确保点击的题目在可见范围内
     if (totalQuestions <= 3) {
         // 如果题目总数不超过3，显示所有题目
         newVisibleIndexes = Array.from({ length: totalQuestions }, (_, i) => i);
         // 设置currentIndex为点击的题目索引
-        currentIndex.value = index;
+        newCurrentIndex = index;
     } else {
         // 题目总数大于3，需要计算显示范围
         // 确保点击的题目在可见范围内，并尽量保持居中显示
@@ -282,27 +335,38 @@ const handleQuestionCardClick = (index) => {
         let startIndex = index - 1; // 尝试让点击的题目居中显示
         
         // 边界检查
-        if (startIndex < 0) startIndex = 0;
-        if (startIndex > totalQuestions - 3) startIndex = totalQuestions - 3;
+        if (startIndex < 0) startIndex = 0;// 确保起始索引不小于0
+        if (startIndex > totalQuestions - 3) startIndex = totalQuestions - 3;// 确保不会超出索引范围
         
         // 生成新的可见索引数组
         newVisibleIndexes = [startIndex, startIndex + 1, startIndex + 2];
         
         // 计算点击的题目在可见数组中的位置
         if (index === startIndex) {
-            currentIndex.value = 0;
+            newCurrentIndex = 0;
         } else if (index === startIndex + 1) {
-            currentIndex.value = 1;
+            newCurrentIndex = 1;
         } else {
-            currentIndex.value = 2;
+            newCurrentIndex = 2;
         }
     }
     
-    // 更新visibleIndexes
-    visibleIndexes.value = newVisibleIndexes;
-    
     // 关闭弹窗
     popupShow.value = false;
+    
+    // 延迟更新索引，确保弹窗关闭动画完成
+    setTimeout(() => {
+        // 更新visibleIndexes
+        visibleIndexes.value = newVisibleIndexes;
+        
+        // 更新currentIndex
+        currentIndex.value = newCurrentIndex;
+        
+        // 延迟触发组件重新渲染，确保动画完成
+        setTimeout(() => {
+            refreshKey.value++;
+        }, 50);
+    }, 300);
 }
 
 // 处理清空答案
@@ -398,6 +462,11 @@ onMounted(() => {
     flex: 1; /* 使用flex占满剩余空间 */
     overflow: hidden; /* 防止滚动条重复 */
     transition: all 0.3s ease; /* 添加过渡效果 */
+    /* 添加硬件加速 */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    /* 开启GPU加速 */
+    will-change: transform;
 }
 .question-container {
     height: 100%;
@@ -405,6 +474,11 @@ onMounted(() => {
     padding: 10rpx; /* 添加适当内边距 */
     box-sizing: border-box; /* 确保padding不影响总高度 */
     -webkit-overflow-scrolling: touch; /* 添加弹性滚动 */
+    /* 添加平滑滚动 */
+    scroll-behavior: smooth;
+    /* 优化渲染性能 */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 .but-container{
     z-index: 100;
