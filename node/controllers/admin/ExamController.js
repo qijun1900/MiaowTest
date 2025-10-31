@@ -331,6 +331,14 @@ const ExamController ={
             ActionType:"OK",
         })
     },
+    CheckQuestionTitle:async(req,res)=>{
+        const {_id,examId} = req.body
+        const result = await ExamService.CheckQuestionTitle({_id,examId})
+        res.send({
+            code:200,
+            data:result,
+        })
+    },
     DeleteOneQuestionTitle:async(req,res)=>{
         const {_id,examId} = req.body
         await ExamService.DeleteOneQuestionTitle({_id,examId})

@@ -36,8 +36,33 @@ export async function UpdateQuestionTitleList(data) {
         console.error("Error during update question title list:", error);
     }
 }
+
+/**
+ * @description: 先检查该题型下是否还有题目，有则不能删除
+ * @param {*} _id 
+ * @param {*} examId 
+ * @returns  {code: 200, data: {hasQuestion: true}} 有题目，不能删除
+ */
+export async function CheckQuestionTitle(_id, examId) {
+    // 检查题目标题是否还有题目
+    try {
+        const response = await axios.post("/adminapi/questionTitle/checkQuestionTitle", {_id, examId});
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error during check question title:", error);
+    }
+}
+
+/**
+ * @description: 删除单个题目标题
+ * @param {*} _id 题目标题id
+ * @param {*} examId 考试id
+ * @returns {code: 200} 删除成功
+ */
+
 export async function DeleteOneQuestionTitle(_id, examId) {
-    // 删除题目标题
+    // 删除题目题型标题
     try {
         const response = await axios.post("/adminapi/questionTitle/deleteOneQuestionTitle", {_id, examId});
         return response.data;

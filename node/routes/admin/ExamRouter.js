@@ -29,6 +29,7 @@ ExamRouter.post("/adminapi/exam/updateExamStatus",ExamController.UpdateExamStatu
 ExamRouter.post("/adminapi/questionTitle/addQuestionTitle",ExamController.AddquestionTitle)//增加题型
 ExamRouter.get("/adminapi/questionTitle/getQuestionTitleList",ExamController.getQuestionTitle)//获取用户端的考试题型列表
 ExamRouter.post("/adminapi/questionTitle/updateQuestionTitle",ExamController.UpdateQuestionTitle)//更新用户端的考试题型信息
+ExamRouter.post("/adminapi/questionTitle/checkQuestionTitle",ExamController.CheckQuestionTitle)//检查用户端的考试题型是否还有题目
 ExamRouter.post("/adminapi/questionTitle/deleteOneQuestionTitle",ExamController.DeleteOneQuestionTitle)//删除用户端的单个考试题型信息
 ExamRouter.post('/adminapi/questionTitle/deleteManyQuestionTitle',ExamController.DeleteManyQuestionTitle)//删除用户端的多个考试题型信息
 ExamRouter.post("/adminapi/questionTitle/updateQuestionOneTitleState",ExamController.UpdateOneQuestionTitleState)//更新单条考试题型目状态

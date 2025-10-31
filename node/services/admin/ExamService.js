@@ -346,6 +346,20 @@ const ExamService = {
             }
         )
     },
+    CheckQuestionTitle: async ({ examId, _id }) => {
+        const userExam = await UserExamModel.findOne(
+            { examId, "questionTitle._id": _id },//匹配examId和questionTitle._id
+            { "questionTitle.$": 1 } // 只返回匹配的questionTitle元素
+        )
+        
+        // 检查是否存在匹配的文档以及questionIdS数组长度是否大于0
+        if (userExam && userExam.questionTitle && userExam.questionTitle.length > 0) {
+            const hasQuestion = userExam.questionTitle[0].questionIdS && userExam.questionTitle[0].questionIdS.length > 0;
+            return { hasQuestion };
+        }
+        
+        return { hasQuestion: false };
+    },
     DeleteOneQuestionTitle: async ({ examId, _id }) => {
         return UserExamModel.updateOne(
             { examId },//匹配examId
