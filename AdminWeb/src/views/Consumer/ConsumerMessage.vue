@@ -6,7 +6,9 @@
                 <el-icon><User /></el-icon>
                 用户反馈管理
             </h1>
-            <el-button type="primary">
+            <el-button 
+                type="primary"
+                @click="handleRefresh">
                 <el-icon><Refresh /></el-icon>
                 刷新数据
             </el-button>
@@ -59,15 +61,19 @@
             <template #header>
                 <div class="table-header">
                     <span>反馈列表</span>
-                    <span class="total-count">共 {{ feedbackList.total }} 条记录</span>
+                    <span class="total-count">共 {{ total }} 条记录</span>
                 </div>
             </template>
             
-            <el-table :data="filteredFeedbackList" v-loading="loading" stripe>
+            <el-table 
+                :data="filteredFeedbackList" 
+                v-loading="loading" 
+                stripe>
                 <el-table-column 
                     type="index" 
                     label="序号" 
-                    width="60" align="center" />
+                    width="60" 
+                    align="center" />
                 
                 <!-- 用户信息列 -->
                 <el-table-column label="用户信息" min-width="180">
@@ -133,8 +139,7 @@
                             size="small" 
                             type="primary" 
                             link 
-                            @click="handleView(row)"
-                        >
+                            @click="handleView(row)">
                             <el-icon><View /></el-icon>
                             查看详情
                         </el-button>
@@ -143,19 +148,22 @@
                             type="warning" 
                             link 
                             @click="handleEdit(row)"
-                            v-if="row.status !== 2"
-                        >
+                            v-if="row.status !== 2">
                             <el-icon><Edit /></el-icon>
                             处理
                         </el-button>
+                        <Popconfirm
+                        title="您确定删除吗？" 
+                        @confirm="handleDelete(row)">
                         <el-button 
                             size="small" 
                             type="danger" 
                             link 
-                            @click="handleDelete(row)">
+                            >
                             <el-icon><Delete /></el-icon>
                             删除
                         </el-button>
+                        </Popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
@@ -227,6 +235,32 @@
                 </el-descriptions>
             </template>
         </Dialog>
+        <!-- 处理反馈对话框 -->
+        <Dialog
+            DilogTitle="处理反馈"
+            DilogWidth="600px"
+            :draggable="true"
+            top="6vh"
+            DilogButContent="提交"
+            v-model="editDialogVisible"
+            @dialog-confirm="handleSubmit">
+            <template #dialogcontent>
+                <el-form :model="handleForm" label-width="100px">
+                    <el-form-item label="处理状态">
+                        <el-select v-model="handleForm.status" placeholder="请选择处理状态">
+                            <el-option label="待处理" :value="0" />
+                            <el-option label="处理中" :value="1" />
+                            <el-option label="已处理" :value="2" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="回复内容">
+                        <el-input type="textarea" 
+                        v-model="handleForm.adminReply" 
+                        :autosize="{ minRows: 3, maxRows: 5 }" />
+                    </el-form-item>
+                </el-form>
+            </template>
+        </Dialog>
     </div>
 </template>
 <script setup>
@@ -238,28 +272,44 @@ import Pagination from '@/components/ReuseComponents/Pagination.vue'
 import {getMessageList} from '../../API/consumer/consumer_messageAPI'
 import formatInfo from '@/util/formatInfo'
 import formatTime from '@/util/formatTime'
+import { handleFeedback,deleteFeedback } from '../../API/consumer/consumer_messageAPI'
+import { ElMessage } from 'element-plus'
+import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/ReuseComponents/Dialog .vue')
 )
 
 // 响应式数据
+const feedbackList = ref([])// 反馈列表
 const loading = ref(false)
 const detailDialogVisible = ref(false)
 const currentFeedback = ref(null)
+const editDialogVisible = ref(false)
 //表格分页器
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-
 // 筛选表单
 const filterForm = ref({
     type: '',
     status: '',
     userStatus: ''
 })
-
-const feedbackList = ref([])
+// 处理表单
+const handleForm = ref({
+    status: 1,
+    adminReply: ''
+})
+// 重置筛选条件
+const handleReset = () => {
+    filterForm.value = {
+        type: '',
+        status: '',
+        userStatus: ''
+    }
+    currentPage.value = 1
+}
 
 // 计算属性 - 筛选后的列表
 const filteredFeedbackList = computed(() => {
@@ -287,7 +337,6 @@ const filteredFeedbackList = computed(() => {
     return list
 })
 
-
 // 添加分页变化处理方法
 const handlePageChange = ({ page, size }) => {
     currentPage.value = page
@@ -304,7 +353,6 @@ const handleRefreshMessageList = async () => {
             size: pageSize.value,
         })
         if (res.code === 200) {
-            console.log(res)
             feedbackList.value = res.data.data// 数据列表
             total.value = res.data.total// 总条数
         }
@@ -316,30 +364,51 @@ const handleRefreshMessageList = async () => {
     }
 }
 
-const handleReset = () => {
-    filterForm.value = {
-        type: '',
-        status: '',
-        userStatus: ''
-    }
-    currentPage.value = 1
+// 刷新数据
+const handleRefresh = () => {
+    handleRefreshMessageList()
 }
-
+// 搜索
 const handleSearch = () => {
     currentPage.value = 1
     handleRefreshMessageList()
 }
-
+// 查看详情
 const handleView = (row) => {
     currentFeedback.value = row
     detailDialogVisible.value = true
 }
-
+// 编辑
 const handleEdit = (row) => {
     currentFeedback.value = row
-    // 这里可以打开处理反馈的对话框
+    editDialogVisible.value = true
 }
-
+// 删除
+const handleDelete = async (row) => {
+    try {
+        const res = await deleteFeedback(row._id)
+        if (res.code === 200) {
+            ElMessage.success('删除用户信息成功')
+            handleRefreshMessageList()
+        }   
+    }catch (error) {
+        console.error('删除用户信息失败:', error)
+    }
+}
+// 处理反馈 - 提交
+const handleSubmit = async () => {
+    try {
+        // 发送处理请求
+        const res = await handleFeedback(currentFeedback.value._id, handleForm.value)
+        if (res.code === 200) {
+            editDialogVisible.value = false
+            ElMessage.success('反馈处理成功')
+            handleRefreshMessageList()
+        }
+    }catch (error) {
+        console.error('处理反馈失败:', error)
+    }  
+}
 
 // 生命周期
 onMounted(() => {

@@ -28,7 +28,24 @@ const ConsumerService = {
             console.error("获取用户消息列表失败",error);
             throw error;
         }
-        
+    },
+    HandleFeedback:async({_id,status,adminReply})=>{
+        try{
+            const result = await FeedbackModel.findByIdAndUpdate(_id,{status,adminReply});
+            return true;
+        }catch(error){
+            console.error("处理反馈失败",error);
+            throw error;
+        }
+    },
+    DeleteFeedback:async({_id})=>{
+        try{
+            const result = await FeedbackModel.findByIdAndDelete(_id);
+            return true;
+        }catch(error){
+            console.error("删除反馈失败",error);
+            throw error;
+        }
     }
 }
 module.exports = ConsumerService;

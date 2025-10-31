@@ -67,8 +67,11 @@
                             <span class="card-title">消息中心</span>
                         </div>
                         <div class="card-body">
-                            <el-statistic title="未读消息" :value="3" />
-                            <el-button type="primary" class="card-button">查看消息</el-button>
+                            <el-statistic title="未读消息" :value="messageTotal" />
+                            <el-button 
+                                type="primary" 
+                                class="card-button"
+                                @click="handleCheeckMessage">查看消息</el-button>
                         </div>
                     </div>
                 </el-card>
@@ -91,9 +94,12 @@ import { onMounted,ref} from 'vue';
 import {getUserList} from '@/API/Users/userAPI'//API
 import {getAnnouncementList} from '@/API/News/announcementAPI'//APi
 import { getExamList } from '@/API/Exam/subjectAPI';
+import { getMessageCount } from '@/API/consumer/consumer_messageAPI';
+
 const userTotal = ref(0)
 const announcementTotal = ref(0)
 const examTotal = ref(0)
+const messageTotal = ref(0)
 
 const handleAddUser = () => {
     RouterPush("/users",{showAddDialog:true })
@@ -104,12 +110,16 @@ const handleCheeckAnnouncement = () => {
 const handleCheeckExam = () => {
     RouterPush("/exam/exammanage")
 }
+const handleCheeckMessage = () => {
+    RouterPush("/consumer/message")
+}
 const fetchData = async() => {
     try {
-        const [res1, res2,res3] = await Promise.all([
+        const [res1, res2,res3,res4] = await Promise.all([
             getUserList(),
             getAnnouncementList(),
-            getExamList()
+            getExamList(),
+            getMessageCount()
         ])
         
         if(res1.ActionType === "OK"){
@@ -127,6 +137,11 @@ const fetchData = async() => {
             examTotal.value = res3.data.total
         } else {
             console.log("获取科目总数失败")
+        }
+        if(res4.code === 200){
+            messageTotal.value = res4.data
+        }else {
+            console.log("获取消息总数失败")
         }
 
     } catch (error) {

@@ -9,11 +9,9 @@ const ConsumerController ={
                 data:result,
             })
         }
-       
     },
     GetMessageList:async(req,res)=>{
         const {page,size} = req.query
-        console.log("sss",page,size)
         const result = await ConumerService.GetMessageList({
             page: Number(page),
             size: Number(size),
@@ -22,6 +20,24 @@ const ConsumerController ={
             res.send({
                 code:200,
                 data:result,
+            })
+        }
+    },
+    HandleFeedback:async(req,res)=>{
+        const {_id,status,adminReply} = req.body;
+        const result = await ConumerService.HandleFeedback({_id,status,adminReply});
+        if(result) {
+            res.send({
+                code:200,
+            })
+        }
+    },
+    DeleteFeedback:async(req,res)=>{
+        const {_id} = req.body;
+        const result = await ConumerService.DeleteFeedback({_id});
+        if(result) {
+            res.send({
+                code:200,
             })
         }
     }
