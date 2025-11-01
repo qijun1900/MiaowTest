@@ -35,6 +35,34 @@ const formatInfo = {
             2: 'success'
         }
         return statusMap[status] || 'info'
+    },
+
+    // 获取性别文本
+    getGenderText: (gender) => {
+        switch (gender) {
+            case 0:
+                return '未知'
+            case 1:
+                return '男性'
+            case 2:
+                return '女性'
+            default:
+                return '未知'
+        }
+    },
+
+    // 获取性别标签类型
+    getGenderTagType: (gender) => {
+        switch (gender) {
+            case 0:
+                return 'info'
+            case 1:
+                return 'primary'
+            case 2:
+                return 'danger'
+            default:
+                return 'info'
+        }
     }
 }
 export default formatInfo

@@ -1,4 +1,21 @@
 const mongoose = require('mongoose')
+/**
+ * 客户端用户表
+ * @param {String} username 用户名，唯一
+ * @param {String} email 邮箱，唯一
+ * @param {String} password 密码，加密存储 
+ * @param {String} openid openid，唯一
+ * @param {String} session_key session_key，唯一
+ * @param {String} nickname 昵称，默认空字符串
+ * @param {String} avatar 头像，默认空字符串
+ * @param {Number} gender 性别，0: 未知、1: 男性、2: 女性，默认0
+ * @param {Date} createTime 创建时间，默认当前时间
+ * @param {Array} favoriteExams 收藏的考试，默认空数组
+ * @param {Array} questionbanks 题库，默认空数组
+ * @param {Array} wrongQuestions 用户错题，默认空数组
+ * @param {Array} favoriteQuestions 收藏的题目，默认空数组
+ * @return {*}
+ */
 
 const ConsumerSchema = new mongoose.Schema({
     username: {

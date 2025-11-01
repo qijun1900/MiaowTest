@@ -6,6 +6,7 @@ ConsumerRouter.get("/adminapi/consumermessage/getcount",ConsumerController.GetMe
 ConsumerRouter.get("/adminapi/consumermessage/getlist",ConsumerController.GetMessageList)// 获取用户消息列表
 ConsumerRouter.post("/adminapi/consumermessage/handlefeedback",ConsumerController.HandleFeedback)// 处理反馈
 ConsumerRouter.post("/adminapi/consumermessage/deletefeedback",ConsumerController.DeleteFeedback)// 删除反馈
+ConsumerRouter.get("/adminapi/consumer/getlist",ConsumerController.GetConsumerList)// 获取用户列表
 
 
 

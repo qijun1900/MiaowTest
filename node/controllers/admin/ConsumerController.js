@@ -40,6 +40,19 @@ const ConsumerController ={
                 code:200,
             })
         }
+    },
+    GetConsumerList:async(req,res)=>{
+        const {page,size} = req.query;
+        const result = await ConumerService.GetConsumerList({
+            page: Number(page),
+            size: Number(size),
+        });
+        if(result) {
+            res.send({
+                code:200,
+                data:result,
+            })
+        }
     }
 }
 module.exports = ConsumerController;

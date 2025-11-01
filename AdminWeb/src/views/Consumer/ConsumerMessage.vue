@@ -22,7 +22,9 @@
                     <span>筛选条件</span>
                 </div>
             </template>
-            <el-form :model="filterForm" inline>
+            <el-form 
+                :model="filterForm" 
+                inline>
                 <el-form-item label="反馈类型：">
                     <el-select v-model="filterForm.type" placeholder="请选择反馈类型" clearable>
                         <el-option label="系统反馈" :value="1" />
@@ -264,7 +266,7 @@
     </div>
 </template>
 <script setup>
-import { ref, computed, onMounted,defineAsyncComponent } from 'vue'
+import { ref, onMounted,defineAsyncComponent } from 'vue'
 import {
     User, Refresh, Filter, Search, View, Edit, Delete, Message
 } from '@element-plus/icons-vue'
@@ -275,6 +277,7 @@ import formatTime from '@/util/formatTime'
 import { handleFeedback,deleteFeedback } from '../../API/consumer/consumer_messageAPI'
 import { ElMessage } from 'element-plus'
 import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
+import { useFeedbackFilter } from '@/util/SearchFilter'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/ReuseComponents/Dialog .vue')
@@ -296,6 +299,8 @@ const filterForm = ref({
     status: '',
     userStatus: ''
 })
+// 使用筛选函数
+const filteredFeedbackList = useFeedbackFilter(feedbackList, filterForm)
 // 处理表单
 const handleForm = ref({
     status: 1,
@@ -311,31 +316,6 @@ const handleReset = () => {
     currentPage.value = 1
 }
 
-// 计算属性 - 筛选后的列表
-const filteredFeedbackList = computed(() => {
-    let list = feedbackList.value
-    
-    // 按反馈类型筛选
-    if (filterForm.value.type !== '') {
-        list = list.filter(item => item.type === filterForm.value.type)
-    }
-    
-    // 按处理状态筛选
-    if (filterForm.value.status !== '') {
-        list = list.filter(item => item.status === filterForm.value.status)
-    }
-    
-    // 按用户状态筛选
-    if (filterForm.value.userStatus !== '') {
-        if (filterForm.value.userStatus === 'loggedIn') {
-            list = list.filter(item => item.uid !== null)
-        } else if (filterForm.value.userStatus === 'notLoggedIn') {
-            list = list.filter(item => item.uid === null)
-        }
-    }
-    
-    return list
-})
 
 // 添加分页变化处理方法
 const handlePageChange = ({ page, size }) => {
@@ -367,6 +347,7 @@ const handleRefreshMessageList = async () => {
 // 刷新数据
 const handleRefresh = () => {
     handleRefreshMessageList()
+    ElMessage.success('数据已刷新')
 }
 // 搜索
 const handleSearch = () => {

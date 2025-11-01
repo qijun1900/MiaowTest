@@ -1,4 +1,5 @@
 const FeedbackModel = require("../../models/ConsumerFeedbackModel");
+const ConsumerModel = require("../../models/ConsumerModel");
 
 const ConsumerService = {
     GetMessageCount:async()=>{
@@ -11,7 +12,7 @@ const ConsumerService = {
             console.error("获取用户消息数量失败",error);
             throw error;
         }
-    },
+    },  
     GetMessageList:async({
         page, size
     })=>{
@@ -44,6 +45,30 @@ const ConsumerService = {
             return true;
         }catch(error){
             console.error("删除反馈失败",error);
+            throw error;
+        }
+    },
+    GetConsumerList:async({page,size})=>{
+        try{
+            const [data,total] = await Promise.all([
+                ConsumerModel
+                .find({},{
+                    //排除敏感字段
+                    password: 0,
+                    session_key: 0,
+                    favoriteExams: 0,
+                    favoriteQuestions: 0,
+                    wrongQuestions: 0,
+                    questionbanks: 0,
+                })
+                .sort({createdAt:-1})// 按创建时间降序排列
+               .skip((page-1) * size)
+               .limit(size),
+                ConsumerModel.countDocuments()
+            ])
+            return {data,total}
+        }catch(error){
+            console.error("获取用户列表失败",error);
             throw error;
         }
     }

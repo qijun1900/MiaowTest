@@ -47,7 +47,7 @@
 <script setup>
 import { reactive } from 'vue'
 import Tooltip from '@/components/ReuseComponents/Tooltip.vue'
-import useSearchFilter from '@/util/SearchFilter'
+import { useSearchFilter } from '@/util/SearchFilter'
 import { Search, CloseBold } from '@element-plus/icons-vue'
 
 const props = defineProps({

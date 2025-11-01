@@ -1,14 +1,20 @@
 <template>
-  <el-page-header @back="goBack" title="返回">
+  <el-page-header 
+    @back="goBack" 
+    title="返回">
     <template #content>
       <div class="header-content">
-        <span> {{ Title }} </span>
-       <div v-if="/^\/exam\/(questionadd|questionlist|batchadd)\//.test(route.path)" class="custom-style">
-          <el-segmented 
-            v-model="value" 
-            :options="options" 
-            @change="handleSegmentedChange"
-          />
+        <div>
+          <el-tag 
+            type="primary" 
+            effect="dark">
+            {{ Title }}
+          </el-tag>
+        </div>
+        <div
+          v-if="/^\/exam\/(questionadd|questionlist|batchadd)\//.test(route.path) || /^\/(users|consumer)$/.test(route.path)"
+          class="custom-style">
+          <el-segmented v-model="value" :options="options" @change="handleSegmentedChange" />
         </div>
       </div>
     </template>
@@ -30,28 +36,43 @@ const goBack = ()=>{
 const value = ref(
   route.path.startsWith('/exam/questionlist/') ? 'questionlist' :
   route.path.startsWith('/exam/questionadd/') ? 'questionadd' :
-  route.path.startsWith('/exam/batchadd/') ? 'batchadd' : 'questionadd'
+  route.path.startsWith('/exam/batchadd/') ? 'batchadd' :
+  route.path.startsWith('/users') ? 'users' :
+  route.path.startsWith('/consumer') ? 'consumer' : 'questionadd'
 )
 
-const options = [
-  { label: '题目列表', value: 'questionlist' },
-  { label: '添加题目', value: 'questionadd' },
-  { label: '批量添加', value: 'batchadd' }
-]
+// 根据当前路径类型获取选项
+const getOptions = () => {
+  if (route.path.startsWith('/exam/')) {
+    return [
+      { label: '题目列表', value: 'questionlist' },
+      { label: '添加题目', value: 'questionadd' },
+      { label: '批量添加', value: 'batchadd' }
+    ]
+  } else if (route.path === '/users' || route.path === '/consumer') {
+    return [
+      { label: '管理端', value: 'users' },
+      { label: '用户端', value: 'consumer' }
+    ]
+  }
+  return []
+}
+
+const options = computed(() => getOptions())
 
 const handleSegmentedChange = (newValue) => {
   const examId = route.params.id
   const query = route.query
-  if (!examId) {
-    console.error('缺少 examId 参数')
-    return
-  }
   if (newValue === 'questionlist') {
     router.push(`/exam/questionlist/${examId}?category=${query.category}`)
   } else if (newValue === 'questionadd') {
     router.push(`/exam/questionadd/${examId}?category=${query.category}`)
-  } else {
+  } else if (newValue === 'batchadd') {
     router.push(`/exam/batchadd/${examId}?category=${query.category}`)
+  } else if (newValue === 'users') {
+    router.push('/users')
+  } else if (newValue === 'consumer') {
+    router.push('/consumer')
   }
 }
 
@@ -62,7 +83,9 @@ const Title = computed(() => {
     case '/center':
       return '个人中心';
     case '/users':
-      return '用户管理';
+      return '管理端';
+    case '/consumer':
+      return '用户端';
     case '/news/announcement':
       return '通知公告';
     case '/exam/exammanage':
@@ -93,6 +116,10 @@ watch(() => route.path, (newPath) => {
     value.value = 'questionadd'
   } else if (newPath.startsWith('/exam/batchadd/')) {
     value.value = 'batchadd'
+  } else if (newPath.startsWith('/users')) {
+    value.value = 'users'
+  } else if (newPath.startsWith('/consumer')) {
+    value.value = 'consumer'
   }
 })
 </script>
