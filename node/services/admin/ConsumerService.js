@@ -20,7 +20,7 @@ const ConsumerService = {
            const [data,total] = await Promise.all([
             FeedbackModel
             .find()
-            .sort({createdAt:-1})
+            .sort({createTime:-1})
             .skip((page-1)*size)
             .limit(size),
             FeedbackModel.countDocuments()])
@@ -61,7 +61,7 @@ const ConsumerService = {
                     wrongQuestions: 0,
                     questionbanks: 0,
                 })
-                .sort({createdAt:-1})// 按创建时间降序排列
+                .sort({createTime:-1}) // 按创建时间降序排序
                .skip((page-1) * size)
                .limit(size),
                 ConsumerModel.countDocuments()

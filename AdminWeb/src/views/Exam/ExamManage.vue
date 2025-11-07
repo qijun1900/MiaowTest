@@ -180,7 +180,8 @@
                             type="info" 
                             plain 
                             @click="handleCreate(scope.row)">
-                            创建考试<el-icon><CirclePlusFilled /></el-icon>
+                            考试/资料
+                            <el-icon><CirclePlusFilled /></el-icon>
                         </el-button>
                     </template>
                 </el-table-column>

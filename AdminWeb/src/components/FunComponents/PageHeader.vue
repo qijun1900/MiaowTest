@@ -12,9 +12,14 @@
           </el-tag>
         </div>
         <div
-          v-if="/^\/exam\/(questionadd|questionlist|batchadd)\//.test(route.path) || /^\/(users|consumer)$/.test(route.path)"
+          v-if="/^\/exam\/(questionadd|questionlist|batchadd)\//.test(route.path) 
+          || /^\/(users|consumer)$/.test(route.path) 
+          || /^\/exam\/(createExamType|examfilemanage)\//.test(route.path)"
           class="custom-style">
-          <el-segmented v-model="value" :options="options" @change="handleSegmentedChange" />
+          <el-segmented 
+            v-model="value" 
+            :options="options" 
+            @change="handleSegmentedChange" />
         </div>
       </div>
     </template>
@@ -38,16 +43,25 @@ const value = ref(
   route.path.startsWith('/exam/questionadd/') ? 'questionadd' :
   route.path.startsWith('/exam/batchadd/') ? 'batchadd' :
   route.path.startsWith('/users') ? 'users' :
-  route.path.startsWith('/consumer') ? 'consumer' : 'questionadd'
+  route.path.startsWith('/consumer') ? 'consumer' :
+  route.path.startsWith('/exam/createExamType/') ? 'questiontype' :
+  route.path.startsWith('/exam/examfilemanage/') ? 'examfile' : 'questionadd'
 )
 
 // 根据当前路径类型获取选项
 const getOptions = () => {
-  if (route.path.startsWith('/exam/')) {
+  if (route.path.startsWith('/exam/questionlist/') 
+      || route.path.startsWith('/exam/questionadd/') 
+      || route.path.startsWith('/exam/batchadd/')) {
     return [
       { label: '题目列表', value: 'questionlist' },
       { label: '添加题目', value: 'questionadd' },
       { label: '批量添加', value: 'batchadd' }
+    ]
+  } else if (route.path.startsWith('/exam/createExamType/') || route.path.startsWith('/exam/examfilemanage/')) {
+    return [
+      { label: '考试题型管理', value: 'questiontype' },
+      { label: '考试资料管理', value: 'examfile' }
     ]
   } else if (route.path === '/users' || route.path === '/consumer') {
     return [
@@ -69,6 +83,10 @@ const handleSegmentedChange = (newValue) => {
     router.push(`/exam/questionadd/${examId}?category=${query.category}`)
   } else if (newValue === 'batchadd') {
     router.push(`/exam/batchadd/${examId}?category=${query.category}`)
+  } else if (newValue === 'questiontype') {
+    router.push(`/exam/createExamType/${examId}`)
+  } else if (newValue === 'examfile') {
+    router.push(`/exam/examfilemanage/${examId}`)
   } else if (newValue === 'users') {
     router.push('/users')
   } else if (newValue === 'consumer') {
@@ -100,6 +118,8 @@ const Title = computed(() => {
       return '模型管理';
     case (route.path.match(/^\/exam\/createExamType\//) ? route.path : ''):
       return '考试题型管理';
+    case (route.path.match(/^\/exam\/examfilemanage\//) ? route.path : ''):
+      return '考试资料管理';
     case '/model/chat':
       return '模型对话';
     case '/consumer/message':
@@ -116,6 +136,10 @@ watch(() => route.path, (newPath) => {
     value.value = 'questionadd'
   } else if (newPath.startsWith('/exam/batchadd/')) {
     value.value = 'batchadd'
+  } else if (newPath.startsWith('/exam/createExamType/')) {
+    value.value = 'questiontype'
+  } else if (newPath.startsWith('/exam/examfilemanage/')) {
+    value.value = 'examfile'
   } else if (newPath.startsWith('/users')) {
     value.value = 'users'
   } else if (newPath.startsWith('/consumer')) {
@@ -137,7 +161,7 @@ watch(() => route.path, (newPath) => {
 /* 保留原有的分段控件样式 */
 .custom-style .el-segmented {
   --el-segmented-item-selected-color: var(--el-text-color-primary);
-  --el-segmented-item-selected-bg-color: #ffd000;
+  --el-segmented-item-selected-bg-color: #ffb300;
   --el-border-radius-base: 16px;
 }
 </style>
