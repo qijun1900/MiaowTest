@@ -68,6 +68,7 @@
             </template>
             
             <el-table 
+                height="440"
                 :data="filteredFeedbackList" 
                 v-loading="loading" 
                 stripe>

@@ -70,13 +70,14 @@
     <el-card class="table-card" shadow="hover">
       
       <el-table 
+        height="440"
         :data="filteredConsumerList" 
         style="width: 100%" 
         stripe 
         v-loading="loading"
         element-loading-text="加载中..."
         :header-cell-style="{ backgroundColor: '#f5f7fa', color: '#606266' }"
-      >
+        >
         <el-table-column prop="_id" label="用户UID" width="210" sortable />
         <el-table-column prop="username" label="用户名" width="150">
           <template #default="scope">

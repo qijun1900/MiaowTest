@@ -283,7 +283,7 @@ const ExamService = {
         }
     },
     AddquestionTitle: async ({ content, description, isPublish, questionIdS, examId }) => {
-        return UserExamModel.updateOne(
+        return  UserExamModel.updateOne(
             { examId }, // 匹配 examId 字段
             {
                 $push:
@@ -543,7 +543,7 @@ const ExamService = {
     },
     AddNetDisk: async ({ title,type,url,description,isPublish,examId}) => {
        try {
-        return UserExamModel.updateOne(
+        return await UserExamModel.updateOne(
             { examId }, //检查是否有存在 examId 的考试
             { $push: { 
                 netDiskTitle: 
@@ -559,6 +559,79 @@ const ExamService = {
         console.error("添加网盘链接资料失败",error);
         throw error;
        }  
+    },
+    getNetDiskList: async ({ page, size, examId }) => {
+        try{
+            const skip = (page - 1) * size;
+            return await UserExamModel.aggregate([
+            { $match: { examId } },//匹配examId
+            {
+                $facet: {//返回两个字段，data和total
+                    data: [// 数据
+                        { $unwind: "$netDiskTitle" },//解包netDiskTitle数组
+                        {
+                            $project: {// 选择需要的字段
+                                title: "$netDiskTitle.title",
+                                description: "$netDiskTitle.description",
+                                _id: "$netDiskTitle._id",
+                                isPublish: "$netDiskTitle.isPublish",
+                                content: "$netDiskTitle.content",
+                                createTime: "$netDiskTitle.createTime"
+                            }   
+                        },
+                        { $skip: skip },// 跳过前面的数据
+                        { $limit: size }// 限制返回的数量
+                    ],
+                    total: [// 计算总数
+                        { $unwind: "$netDiskTitle" },
+                        { $count: "total" }
+                    ]
+                }
+
+            }
+        ])
+        }catch(error){
+            console.error("获取网盘资料列表失败",error);
+            throw error;
+        }
+    },
+    UpdateNetDisk: async ({ _id, title,type,url,description,isPublish,examId }) => {
+        try{
+            return await UserExamModel.updateOne(
+                { examId, "netDiskTitle._id": _id },//匹配examId和netDiskTitle._id
+                { $set: 
+                    { "netDiskTitle.$.title": title,
+                        "netDiskTitle.$.description": description,
+                        "netDiskTitle.$.isPublish": isPublish,
+                        "netDiskTitle.$.content": [{type,url}]
+                    } 
+                }
+            )
+        }catch(error){
+            console.error("更新网盘资料信息失败",error);
+            throw error;
+        }
+    },
+    UpdateNetDiskState: async ({ _id, state, examId }) => {
+        try{
+            return await UserExamModel.updateOne(
+                { examId, "netDiskTitle._id": _id },//匹配examId和netDiskTitle._id
+                { $set: { "netDiskTitle.$.isPublish": state } }
+            )
+        }catch(error){
+            console.error("更新网盘资料状态失败",error);
+            throw error;
+        }
+    },
+    DeleteOneNetDisk: async ({ _id, examId }) => {
+        try{
+            return await UserExamModel.updateOne(
+                { examId },//匹配examId
+                { $pull: { netDiskTitle: { _id } } }//删除netDiskTitle数组中_id匹配的元素
+            )
+        }catch(error){
+            console.error("删除单个网盘资料信息失败",error);
+        }
     }
 
 }

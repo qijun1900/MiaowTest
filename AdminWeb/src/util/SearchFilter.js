@@ -100,4 +100,34 @@ const useFeedbackFilter = (data, filterForm) => {
     return filteredData;
 };
 
-export { useSearchFilter, useConsumerFilter,useFeedbackFilter }
+// 网盘资料筛选函数
+const useNetDiskFilter = (data, filterForm) => {
+    const filteredData = computed(() => {
+        let list = Array.isArray(data) ? data : data.value;
+        
+        // 按资料名称筛选
+        if (filterForm.title) {
+            list = list.filter(item => 
+                String(item.title || '').toLowerCase().includes(filterForm.title.toLowerCase())
+            );
+        }
+        
+        // 按网盘类型筛选
+        if (filterForm.diskType !== null && filterForm.diskType !== '') {
+            list = list.filter(item => 
+                item.content && item.content[0] && item.content[0].type === filterForm.diskType
+            );
+        }
+        
+        // 按发布状态筛选
+        if (filterForm.isPublish !== null && filterForm.isPublish !== '') {
+            list = list.filter(item => item.isPublish === filterForm.isPublish);
+        }
+        
+        return list;
+    });
+    
+    return filteredData;
+};
+
+export { useSearchFilter, useConsumerFilter, useFeedbackFilter, useNetDiskFilter }

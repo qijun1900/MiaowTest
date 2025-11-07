@@ -23,7 +23,10 @@
             <template #header>
                 <div class="card-header">
                     <span>网盘资料管理</span>
-                    <el-button type="primary" @click="handleAdd">添加网盘资料</el-button>
+                    <div class="header-buttons">
+                        <el-button type="success" :icon="Refresh" @click="handleRefresh">刷新数据</el-button>
+                        <el-button type="primary" :icon="Plus" @click="handleAdd">添加网盘资料</el-button>
+                    </div>
                 </div>
             </template>
 
@@ -45,57 +48,68 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="handleSearch">搜索</el-button>
+                        <el-button type="primary">搜索</el-button>
                         <el-button @click="resetSearch">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
 
-            <el-table :data="tableData" style="width: 100%" v-loading="loading"
-                @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="55" />
-                <el-table-column prop="title" label="资料名称" min-width="150" />
+            <el-table 
+              :data="tableData" 
+              style="width: 100%" 
+              v-loading="loading"
+              height="440">
+                <el-table-column prop="title" label="资料名称" min-width="100" />
                 <el-table-column prop="diskType" label="网盘类型" width="120">
                     <template #default="scope">
-                        <el-tag :type="scope.row.type === 1 ? 'success' : 'primary'">
-                            {{ scope.row.diskType === 1 ? '夸克网盘' : '百度网盘' }}
+                        <el-tag :type="scope.row.content[0].type === 1 ? 'success' : 'primary'">
+                            {{ scope.row.content[0].type === 1 ? '夸克网盘' : '百度网盘' }}
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="url" label="链接" min-width="200" show-overflow-tooltip />
+                <el-table-column 
+                  prop="url" label="链接" min-width="180" show-overflow-tooltip >
+                    <template #default="scope">
+                        <a 
+                          :href="scope.row.content[0].url" 
+                          target="_blank" rel="noopener noreferrer" 
+                          class="url-link">
+                            {{ scope.row.content[0].url }}
+                        </a>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="isPublish" label="发布状态" width="100">
                     <template #default="scope">
-                        <el-switch v-model="scope.row.isPublish" @change="handlePublishChange(scope.row)" />
+                        <el-switch 
+                          v-model="scope.row.isPublish"
+                         @change="handlePublishChange(scope.row)" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="createTime" label="创建时间" width="180">
                     <template #default="scope">
-                        {{ formatTime.getTime2(scope.row.createTime) }}
+                        {{ formatTime.formatTime(scope.row.createTime) }}
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" fixed="right">
+                <el-table-column label="操作" width="200" fixed="right">
                     <template #default="scope">
                         <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
                         <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
-
-            <div class="pagination-container">
-                <el-button type="danger" :disabled="!selectedRows.length" @click="handleBatchDelete">
-                    批量删除
-                </el-button>
-                <div class="pagination">
-                    <Pagination :total="total" v-model:current-page="currentPage" v-model:page-size="pageSize"
-                        @page-change="handlePageChange" />
-                </div>
-            </div>
         </el-card>
+        <div class="pagination">
+          <Pagination 
+            :total="total" 
+            v-model:current-page="currentPage" 
+            v-model:page-size="pageSize"
+            @page-change="handlePageChange" />
+        </div>
 
         <!-- 添加/编辑对话框 -->
         <Dialog 
             :DilogTitle="isEditMode ? '编辑网盘资料' : '添加网盘资料'" 
-            :DilogButContent="isEditMode ? '编辑' : '添加'"
+            :DilogButContent="isEditMode ? '更新' : '添加'"
             v-model="dialogVisible" 
             :draggable="true" 
             DilogWidth="600px"
@@ -139,30 +153,23 @@
 import { useAppStore } from '@/stores';
 import { ref, reactive, onMounted,defineAsyncComponent } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getNetDiskListAPI, postAddNetDiskAPI, updateNetDisk, deleteOneNetDisk, deleteManyNetDisk, updateNetDiskState } from '@/API/Exam/netDiskAPI.js'
+import { Plus, Refresh } from '@element-plus/icons-vue'
+import { getNetDiskListAPI, postAddNetDiskAPI, updateNetDiskAPI, deleteOneNetDiskAPI, updateNetDiskStateAPI } from '@/API/Exam/netDiskAPI.js'
 import { useRoute } from 'vue-router'
 import formatTime from '@/util/formatTime'
 import Pagination from '@/components/ReuseComponents/Pagination.vue'
+import { useNetDiskFilter } from '@/util/SearchFilter.js'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
-    import('@/components/ReuseComponents/Dialog .vue')
+  import('@/components/ReuseComponents/Dialog .vue')
 )
-
 
 const appStore = useAppStore();
 const route = useRoute()
 const loading = ref(false)
 const dialogVisible = ref(false)// 对话框状态
 const formRef = ref(null)
-const tableData = ref([])
-const selectedRows = ref([])
-//表格分页器
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
-// 添加编辑状态
-const isEditMode = ref(false)
-
+const rawData = ref([]) // 存储原始数据
 
 // 搜索表单
 const searchForm = reactive({
@@ -171,10 +178,21 @@ const searchForm = reactive({
   isPublish: null
 })
 
+// 使用筛选函数处理数据
+const tableData = useNetDiskFilter(rawData, searchForm)
+
+//表格分页器
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+// 添加编辑状态
+const isEditMode = ref(false)
+
 // 添加分页变化处理方法
 const handlePageChange = ({ page, size }) => {
-    currentPage.value = page
-    pageSize.value = size
+  currentPage.value = page
+  pageSize.value = size
+  fetchNetDiskList()
 }
 
 // 表单数据
@@ -199,44 +217,6 @@ const formRules = {
   ]
 }
 
-
-// 获取网盘资料列表
-const fetchNetDiskList = async () => {
-  loading.value = true
-  try {
-    const res = await getNetDiskListAPI({
-        page: currentPage.value,
-        size: pageSize.value,
-        examId:route.params.id,
-    })
-    console.log(res)
-   
-  } catch (error) {
-    console.error('获取网盘资料列表失败:', error)
-    ElMessage.error('获取网盘资料列表失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-// 搜索
-const handleSearch = () => {
-  currentPage.value = 1
-  fetchNetDiskList()
-}
-
-// 重置搜索
-const resetSearch = () => {
-  Object.assign(searchForm, {
-    title: '',
-    diskType: null,
-    isPublish: null
-  })
-  currentPage.value = 1
-  fetchNetDiskList()
-
-}
-
 // 处理添加
 const handleAdd = () => {
   Object.assign(formData, {
@@ -247,6 +227,7 @@ const handleAdd = () => {
     isPublish: false
   })
   dialogVisible.value = true
+  isEditMode.value = false
 }
 
 // 处理编辑
@@ -254,13 +235,52 @@ const handleEdit = (row) => {
   Object.assign(formData, {
     _id: row._id,
     title: row.title,
-    type: row.diskType,
-    url: row.url,
+    type: row.content[0].type,
+    url: row.content[0].url,
     description: row.description || '',
     isPublish: row.isPublish
   })
   dialogVisible.value = true
+  isEditMode.value = true
 }
+
+// 重置搜索
+const resetSearch = () => {
+  Object.assign(searchForm, {
+    title: '',
+    diskType: null,
+    isPublish: null
+  })
+}
+
+// 处理刷新数据
+const handleRefresh = () => {
+  fetchNetDiskList()
+  ElMessage.success('数据已刷新')
+}
+
+// 获取网盘资料列表
+const fetchNetDiskList = async () => {
+  loading.value = true
+  try {
+    const res = await getNetDiskListAPI({
+        page: currentPage.value,
+        size: pageSize.value,
+        examId:route.params.id,
+    })
+    if (res.code === 200) {
+      rawData.value = res.data[0].data
+      total.value = res.data[0].total[0].total
+    }
+   
+  } catch (error) {
+    console.error('获取网盘资料列表失败:', error)
+    ElMessage.error('获取网盘资料列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+
 
 // 处理删除
 const handleDelete = (row) => {
@@ -270,7 +290,7 @@ const handleDelete = (row) => {
     type: 'warning'
   }).then(async () => {
     try {
-      const res = await deleteOneNetDisk(row._id, route.params.examId)
+      const res = await deleteOneNetDiskAPI(row._id, route.params.id)
       if (res.code === 200) {
         ElMessage.success('删除成功')
         fetchNetDiskList()
@@ -286,53 +306,23 @@ const handleDelete = (row) => {
   })
 }
 
-// 批量删除
-const handleBatchDelete = () => {
-  if (!selectedRows.value.length) {
-    ElMessage.warning('请选择要删除的数据')
-    return
-  }
-  
-  ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 条网盘资料吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    try {
-      const ids = selectedRows.value.map(row => row._id)
-      const res = await deleteManyNetDisk(ids, route.params.examId)
-      if (res.code === 200) {
-        ElMessage.success('批量删除成功')
-        fetchNetDiskList()
-      } else {
-        ElMessage.error(res.message || '批量删除失败')
-      }
-    } catch (error) {
-      console.error('批量删除失败:', error)
-      ElMessage.error('批量删除失败')
-    }
-  }).catch(() => {
-    // 用户取消删除
-  })
-}
-
 // 处理发布状态变更
 const handlePublishChange = async (row) => {
   try {
-    const res = await updateNetDiskState({
+    const res = await updateNetDiskStateAPI({
       _id: row._id,
-      examId: route.params.examId,
+      examId: route.params.id,
       state: row.isPublish
-    })
+    });
     if (res.code === 200) {
       ElMessage.success('状态更新成功')
+      fetchNetDiskList()
     } else {
       // 恢复原状态
       row.isPublish = !row.isPublish
       ElMessage.error(res.message || '状态更新失败')
     }
   } catch (error) {
-    // 恢复原状态
     row.isPublish = !row.isPublish
     console.error('状态更新失败:', error)
     ElMessage.error('状态更新失败')
@@ -352,39 +342,28 @@ const handleSubmit = async () => {
         }
         
         let res
-        if (formData._id) {
+        if (formData._id && formData._id !== '' && isEditMode.value === true) {
           // 编辑
-          res = await updateNetDisk(data)
+          res = await updateNetDiskAPI(data)
         } else {
           // 添加
           res = await postAddNetDiskAPI(data)
         }
-        console.log(res)
-        
-        // if (res.code === 200) {
-        //   ElMessage.success(formData._id ? '更新成功' : '添加成功')
-        //   dialogVisible.value = false
-        //   fetchNetDiskList()
-        // } else {
-        //   ElMessage.error(res.message || (formData._id ? '更新失败' : '添加失败'))
-        // }
+        if (res.code === 200) {
+          ElMessage.success(isEditMode.value ? '更新成功' : '添加成功')
+          dialogVisible.value = false
+          fetchNetDiskList()
+        }
       } catch (error) {
-        console.error(formData._id ? '更新失败:' : '添加失败:', error)
-        ElMessage.error(formData._id ? '更新失败' : '添加失败')
+        console.error(isEditMode.value ? '更新失败:' : '添加失败:', error)
+        ElMessage.error(isEditMode.value ? '更新失败' : '添加失败')
       }
     }
   })
 }
 
-// 处理表格选择变化
-const handleSelectionChange = (selection) => {
-  selectedRows.value = selection
-}
-
-// 初始化
 onMounted(() => {
-  // 获取网盘资料列表
-  fetchNetDiskList()
+  fetchNetDiskList()// 初始化时获取数据
 })
 </script>
 
@@ -407,6 +386,17 @@ onMounted(() => {
   align-items: center;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.header-buttons .el-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .filter-container {
   margin-bottom: 20px;
 }
@@ -416,15 +406,46 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.pagination-container {
+.pagination {
+  margin-top: 15px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-top: 20px;
 }
 
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+.url-link {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #409EFF;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 2px 4px;
+  border-radius: 3px;
+  position: relative;
+}
+
+.url-link:hover {
+  color: #66b1ff;
+  text-decoration: underline;
+  background-color: rgba(64, 158, 255, 0.1);
+}
+
+.url-link:active {
+  color: #3a8ee6;
+  transform: translateY(1px);
+}
+
+.url-link::before {
+  content: "🔗";
+  margin-right: 4px;
+  font-size: 12px;
 }
 </style>

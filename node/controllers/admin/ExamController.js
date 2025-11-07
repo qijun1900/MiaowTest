@@ -459,7 +459,6 @@ const ExamController ={
     },
     AddNetDisk:async(req,res)=>{
         const { title,type ,url,description,isPublish,examId } = req.body;
-        console.log(title,type ,url,description,isPublish,examId)
         await ExamService.AddNetDisk({ 
             title,
             type,
@@ -471,7 +470,47 @@ const ExamController ={
         res.send({
             code:200,
         })
-        
+    },
+    getNetDiskList:async(req,res)=>{
+        const {page,size,examId} = req.query
+        const result = await ExamService.getNetDiskList({
+            page: Number(page),
+            size: Number(size),
+            examId,
+        })
+        res.send({
+            code:200,
+            data:result,
+        })
+    },
+    UpdateNetDisk:async(req,res)=>{
+        const {_id,title,type,url,description,isPublish,examId} = req.body;
+        await ExamService.UpdateNetDisk({
+            _id,
+            title,
+            type,
+            url,
+            description,
+            isPublish,
+            examId,
+        })
+        res.send({
+            code:200,
+        })
+    },
+    UpdateNetDiskState:async(req,res)=>{
+        const {_id,examId,state} = req.body;
+        await ExamService.UpdateNetDiskState({_id,examId,state})
+        res.send({
+            code:200,
+        })
+    },
+    DeleteOneNetDisk:async(req,res)=>{
+        const {_id,examId,state} = req.body;
+        await ExamService.DeleteOneNetDisk({_id,examId,state})
+        res.send({
+            code:200,
+        })
     }
 }
 module.exports = ExamController

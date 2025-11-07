@@ -3,16 +3,16 @@ import axios from "axios";
 /**
  * @description: 添加网盘资料
  * @param {*} data 网盘资料信息
- * @param {*} data.title 网盘资料名称，必填
- * @param {*} data.type 网盘类型，1-夸克，2-百度，必填
- * @param {*} data.url 网盘资料链接，必填
- * @param {*} data.description 网盘资料描述，可选
- * @param {*} data.isPublish 发布状态，0-未发布，1-已发布，默认0
- * @return {*} 成功返回true，失败返回false
+ * @param {*String} data.title 网盘资料名称，必填
+ * @param {*Number} data.type 网盘类型，1-夸克，2-百度，必填
+ * @param {*String} data.url 网盘资料链接，必填
+ * @param {*String} data.description 网盘资料描述，可选
+ * @param {*Boolean} data.isPublish 发布状态，0-未发布，1-已发布，默认0
+ * @param {*String} data.examId 考试ID，必填
+ * @return {* Object}  
  **/
 export async function postAddNetDiskAPI(data) {
     try {
-        console.log("Adding net disk:", data);
         const response = await axios.post("/adminapi/netDisk/addNetDisk", data);
         return response.data;
     } catch (error) {
@@ -22,9 +22,9 @@ export async function postAddNetDiskAPI(data) {
 
 /**
  * @description: 获取网盘资料列表
- * @param {*} params.page 当前页码，默认为1
- * @param {*} params.size 每页显示的数量，默认为10
- * @return {* Array}  网盘资料列表
+ * @param {*Number} params.page 当前页码，默认为1
+ * @param {*Number} params.size 每页显示的数量，默认为10
+ * @return {*Object}  网盘资料列表
  */
 export async function getNetDiskListAPI(params) {
     try {
@@ -41,8 +41,19 @@ export async function getNetDiskListAPI(params) {
     }
 }
 
-export async function updateNetDisk(data) {
-    // 更新网盘资料信息
+/**
+ * @description: 更新网盘资料信息
+ * @param {*String} data 网盘资料信息
+ * @param {*String} data._id 网盘资料ID，******必填 *****
+ * @param {*String} data.title 网盘资料名称，必填
+ * @param {*Number} data.type 网盘类型，1-夸克，2-百度，必填
+ * @param {*String} data.url 网盘资料链接，必填
+ * @param {*String} data.description 网盘资料描述，可选
+ * @param {*Boolean} data.isPublish 发布状态，0-未发布，1-已发布，默认0
+ * @param {*String} data.examId 考试ID，必填
+ * @returns 
+ */
+export async function updateNetDiskAPI(data) {
     try {
         const response = await axios.post("/adminapi/netDisk/updateNetDisk", data);
         return response.data;
@@ -51,30 +62,35 @@ export async function updateNetDisk(data) {
     }
 }
 
-export async function deleteOneNetDisk(_id, examId) {
-    // 删除单个网盘资料
+/**
+ * 
+ * @param {*String} _id 
+ * @param {*String} examId 
+ * @returns 
+ */
+export async function deleteOneNetDiskAPI(_id, examId) {
     try {
-        const response = await axios.post("/adminapi/netDisk/deleteOneNetDisk", { _id, examId });
+        console.log("deleteOneNetDiskAPI", _id, examId);
+        const response = await axios.post("/adminapi/netDisk/deleteOneNetDisk", 
+            { _id, examId }
+        );
         return response.data;
     } catch (error) {
         console.error("Error during delete one net disk:", error);
     }
 }
 
-export async function deleteManyNetDisk(_ids, examId) {
-    // 删除多个网盘资料
+/**
+ * @param {*String} params._id 网盘资料ID，必填
+ * @param {*String} params.examId 考试ID，必填
+ * @param {*Boolean} params.state 发布状态，true-发布，false-未发布，默认false
+ * @returns {*Object}
+ */
+export async function updateNetDiskStateAPI({ _id, examId, state }) {
     try {
-        const response = await axios.post("/adminapi/netDisk/deleteManyNetDisk", { _ids, examId });
-        return response.data;
-    } catch (error) {
-        console.error("Error during delete many net disk:", error);
-    }
-}
-
-export async function updateNetDiskState({ _id, examId, state }) {
-    // 更新单个网盘资料状态
-    try {
-        const response = await axios.post("/adminapi/netDisk/updateNetDiskState", { _id, examId, state });
+        const response = await axios.post("/adminapi/netDisk/updateNetDiskState", 
+            { _id, examId, state }
+        );
         return response.data;
     } catch (error) {
         console.error("Error during update net disk state:", error);

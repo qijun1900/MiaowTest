@@ -45,5 +45,9 @@ ExamRouter.post("/adminapi/exam/UserquestionlistDown/:id",ExamController.Userque
 
 // ==============网盘资料管理相关API ========== //
 ExamRouter.post("/adminapi/netDisk/addNetDisk",ExamController.AddNetDisk)//添加网盘资料
+ExamRouter.get("/adminapi/netDisk/getNetDiskList",ExamController.getNetDiskList)//获取网盘资料列表
+ExamRouter.post("/adminapi/netDisk/updateNetDisk",ExamController.UpdateNetDisk)//更新网盘资料信息
+ExamRouter.post("/adminapi/netDisk/updateNetDiskState",ExamController.UpdateNetDiskState)//更新网盘资料状态
+ExamRouter.post("/adminapi/netDisk/deleteOneNetDisk",ExamController.DeleteOneNetDisk)//删除单个网盘资料信息
 
 module.exports = ExamRouter; 
