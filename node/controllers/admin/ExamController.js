@@ -456,7 +456,22 @@ const ExamController ={
             ActionType:"OK",
             data:result, 
         })
-
+    },
+    AddNetDisk:async(req,res)=>{
+        const { title,type ,url,description,isPublish,examId } = req.body;
+        console.log(title,type ,url,description,isPublish,examId)
+        await ExamService.AddNetDisk({ 
+            title,
+            type,
+            url,
+            description,
+            isPublish,
+            examId 
+        })
+        res.send({
+            code:200,
+        })
+        
     }
 }
 module.exports = ExamController

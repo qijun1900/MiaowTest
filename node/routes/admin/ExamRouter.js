@@ -43,5 +43,7 @@ ExamRouter.post("/adminapi/exam/batchPublishedUserQuestionsList",ExamController.
 ExamRouter.get("/adminapi/exam/publishedUserQuestionsList/:id",ExamController.getUserQuestionsList)//获取用户端已发布的题目
 ExamRouter.post("/adminapi/exam/UserquestionlistDown/:id",ExamController.UserquestionlistDown)//不同类型题目用户端的题目全部下架操作
 
+// ==============网盘资料管理相关API ========== //
+ExamRouter.post("/adminapi/netDisk/addNetDisk",ExamController.AddNetDisk)//添加网盘资料
 
 module.exports = ExamRouter; 

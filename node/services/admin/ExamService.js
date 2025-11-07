@@ -540,6 +540,25 @@ const ExamService = {
             4: ExamShortModel
         };
         return modelMap[questionType]?.updateMany({ examId, isAddUserList }, { isAddUserList: 0 }) || null;
+    },
+    AddNetDisk: async ({ title,type,url,description,isPublish,examId}) => {
+       try {
+        return UserExamModel.updateOne(
+            { examId }, //检查是否有存在 examId 的考试
+            { $push: { 
+                netDiskTitle: 
+                    { 
+                        title,description,isPublish,createTime:new Date(),
+                        content:[{type,url}] 
+                    } 
+                } 
+            },
+            { upsert: true } // 如果不存在匹配的文档，则创建一个新文档
+        )
+       }catch(error){
+        console.error("添加网盘链接资料失败",error);
+        throw error;
+       }  
     }
 
 }

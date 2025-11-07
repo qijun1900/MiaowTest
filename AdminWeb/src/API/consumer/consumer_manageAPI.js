@@ -3,7 +3,7 @@ import axios from "axios";
  * 获取客户端用户信息列表
  * @param {*} params 分页参数
  * @param {*} params.page 当前页码，默认为1
- * @param {*} params.pageSize 每页显示的数量，默认为10
+ * @param {*} params.size 每页显示的数量，默认为10
  * @returns {Promise<Array>} 用户信息列表
  */
 export async function getConsumerList(params) {

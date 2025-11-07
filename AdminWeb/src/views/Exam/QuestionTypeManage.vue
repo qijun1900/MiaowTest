@@ -438,7 +438,11 @@ const handlePublishChange = async (row) => {
 }
 //提交表单
 const handleConfirm = async() => {
-    const submitData= {...Form, _id: currentEditId.value, examId: route.params.id}
+    const submitData= {
+        ...Form, 
+        _id: currentEditId.value, 
+        examId: route.params.id
+    }
     try{
         if(isEditMode.value){
             const res = await UpdateQuestionTitleList(submitData)
@@ -477,7 +481,6 @@ const handleRefreshData = async() => {
         tableData.value = res.data[0].data
         total.value = res.data[0].total
     }
-
   }catch(error){
     console.log(error)
   }
