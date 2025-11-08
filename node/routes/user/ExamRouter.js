@@ -23,4 +23,6 @@ ExamRouter.post("/uniappAPI/exam/userdelete/favoritequestion",JWT.verifyTokenMid
 ExamRouter.get("/uniappAPI/exam/getUserFavoriteQuestionList",JWT.verifyTokenMiddleware(),ExamController.getUserFavoriteQuestionList)//获取用户的收藏题目
 ExamRouter.post("/uniappAPI/exam/userpractice/question",JWT.verifyTokenMiddleware(),ExamController.userPracticeFavoriteQuestion)//用户点击题目进行练习(收藏与错题本)
 ExamRouter.get("/uniappAPI/exam/getUserWrongQuestionList",JWT.verifyTokenMiddleware(),ExamController.getUserWrongQuestionList)//获取用户的错题列表
+ExamRouter.post("/uniappAPI/exam/getexamsubjectmaterials",ExamController.getExamSubjectMaterials)//获取考试科目对应的网盘资源
+
 module.exports = ExamRouter;

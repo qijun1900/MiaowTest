@@ -53,12 +53,12 @@ export async function getExamSubjects(forceRefresh = false) {
 
 /**
  * 获取用户点击的考试科目考试题型
- * @param {string} examSubjectId 考试科目ID
+ * @param {*string} examId 考试科目ID
  */
-export async function getExamSubjectTypes(examSubjectId) {
+export async function getExamSubjectTypes(examId) {
   try {
     const response = await http({
-      url: `/uniappAPI/Exam/getExamSubjectTypes/${examSubjectId}`,
+      url: `/uniappAPI/Exam/getExamSubjectTypes/${examId}`,
       method: 'GET',
     });
     return response;
@@ -90,7 +90,7 @@ export async function FetchMatchQuestionList(extractedData) {
 
 /**
  * 添加用户自建题库
- * @param {String} bankName 题库名称
+ * @param {*String} bankName 题库名称
 **/
 export async function AddUserBank(bankName) {
   try {
@@ -106,10 +106,10 @@ export async function AddUserBank(bankName) {
 }
 /**
  * 获取用户题库列表
- * @returns {blankName} 返回用户题库名称
- * @returns {questionCount} 返回用户题库题目数量
- * @returns {bankId} 返回用户题库ID
- * @returns {createTime} 返回用户题库创建时间
+ * @returns {*blankName} 返回用户题库名称
+ * @returns {*questionCount} 返回用户题库题目数量
+ * @returns {*bankId} 返回用户题库ID
+ * @returns {*createTime} 返回用户题库创建时间
  */
 export async function getUserBankList() {
   try {
@@ -137,6 +137,25 @@ export async function deleteUserBankAPI(bankId) {
     });
   }catch (error) {
     console.error("deleteUserBank 失败", error);
+    throw error;
+  }
+}
+
+/**
+ * @description  获取该考试科目下的资料列表
+ * @method POST
+ * @param {*String} examId 考试科目ID - 必填
+ * @returns {*String} title 资料标题 
+ */
+export async function getExamSubjectNetMaterials(examId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getexamsubjectmaterials`,
+      data: { examId: examId },
+      method: 'POST',
+    });
+  }catch (error) {
+    console.error("getExamSubjectMaterials 失败", error);
     throw error;
   }
 }

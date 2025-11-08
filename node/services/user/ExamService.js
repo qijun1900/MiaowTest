@@ -1,12 +1,11 @@
 const ExamModel = require('../../models/ExamModel')
-const  UserExamModel = require('../../models/UserExamModel')
+const UserExamModel = require('../../models/UserExamModel')
 const ExamSelectModel = require('../../models/SelectModel')
 const ExamBlankModel = require('../../models/BlankModel')
 const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const userQuestionModel = require('../../models/UserQuestionModel')
 const ConsumerModel = require('../../models/ConsumerModel');
-const { options } = require('../../routes/user/ExamRouter')
 
 const ExamService = {
     // uniappAPI
@@ -657,6 +656,40 @@ const ExamService = {
                 error: error.message
             };
         }
+    },
+    getExamSubjectMaterials: async (examId) => {
+        try {
+            const exam = await UserExamModel.findOne({examId:examId});
+
+            if (!exam) {
+                return {
+                    code: 404,
+                    message: '考试科目不存在',
+                }
+            }
+
+            // 提取所有已发布的网盘资料的标题
+            const materials = exam.netDiskTitle
+                .filter(item => item.isPublish) // 只返回已发布的资料
+                .map(item => ({
+                    title: item.title, // 提取标题
+                }));
+
+            return {
+                code: 200,
+                message: '获取考试科目资源成功',
+                data: materials
+            }
+
+        }catch (error) {
+            console.error('getExamSubjectMaterials 失败:', error);
+            return {
+                code: 500,
+                message: '获取考试科目资源失败',
+                error: error.message
+            }
+        }
+        
     }
       
 }

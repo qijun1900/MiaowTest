@@ -301,6 +301,20 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getUserWrongQuestionList details:', error); // 处理错误
         }
+    },
+    getExamSubjectMaterials:async (req,res)=>{
+        try {
+            const {examId} = req.body;
+            const result = await ExamService.getExamSubjectMaterials(examId)
+            res.send({
+                code: result.code,
+                data: result.data, // 返回的数据
+            })
+
+        }catch (error) {
+            console.error('Error fetching getExamSubjectMaterials details:', error); // 处理错误
+        }
+        
     }
 }
 
