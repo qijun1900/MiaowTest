@@ -1,16 +1,19 @@
 <template>
   <view class="container">
-    <!-- 自定义导航栏 -->
-    <view class="custom-navbar" 
-      :style="{ height: navBarInfo.totalHeight + 'px', paddingTop: navBarInfo.statusBarHeight + 'px' }">
-      <!-- 导航栏标题 -->
-      <view class="navbar-title">所有工具</view>
-    </view>
+    <!-- 使用PageHead组件 -->
+    <PageHead 
+      ref="pageHeadRef"
+      title="所有工具" 
+    />
     
     <!-- 工具列表区域 -->
-    <view class="tools-container" :style="{ paddingTop: contentPaddingTop + 'px' }">
+    <view 
+      class="tools-container" 
+      :style="{ paddingTop: pageHeadRef?.contentPaddingTop + 10 +'px' }">
       <!-- 计时器工具卡片 -->
-      <view class="tool-card" @tap="navigateToTimer">
+      <view 
+        class="tool-card" 
+        @tap="navigateToTimer">
         <view class="tool-info">
           <view class="tool-title">计时器</view>
           <view class="tool-desc">精确计时，支持倒计时和正计时模式</view>
@@ -25,17 +28,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted,computed } from 'vue';
-import navBarHeightUtil from '../../util/navBarHeight.js';
+import { ref, onMounted } from 'vue';
 import TimerIcon from '../../components/icons/TimerIcon.vue';
+import PageHead from '../../components/core/PageHead.vue';
 import showShareMenu from '../../util/wechatShare.js';
 
-const navBarInfo = ref({});
-// 计算内容区域的 padding-top，确保不被导航栏遮挡
-const contentPaddingTop = computed(() => {
-  // 导航栏总高度 + 搜索框高度 + 一些边距
-  return navBarInfo.value.totalHeight + 51; 
-});
+const pageHeadRef = ref();
 
 // 导航到计时器页面
 const navigateToTimer = () => {
@@ -44,9 +42,8 @@ const navigateToTimer = () => {
   });
 };
 
-// 获取导航栏高度信息
+// 页面加载时执行
 onMounted(() => {
-  navBarInfo.value = navBarHeightUtil.getNavBarInfo();
   showShareMenu();
 });
 </script>
@@ -58,30 +55,6 @@ onMounted(() => {
   overflow-y: auto;
   background: linear-gradient(to bottom, #deeeff 0%, #FFFFFF 100%);
   position: relative;
-}
-
-/* 自定义导航栏样式 */
-.custom-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  display: flex;
-  align-items: center;
-  padding-left: 30rpx;
-  transition: all 0.3s ease;
-}
-
-.navbar-title {
-  font-size: 34rpx;
-  font-weight: 500;
-  color: #2c3e50;
-  text-shadow: 0 1rpx 2rpx rgba(255, 255, 255, 0.7);
-  opacity: 0.85;
 }
 
 .tools-container {
