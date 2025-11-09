@@ -147,7 +147,7 @@
                         </el-table-column>
                         <el-table-column label="创建时间" width="200">
                             <template #default="scope">
-                                {{ formatTime.getTime(scope.row.createTime) }}
+                                {{ formatTime.getTime2(scope.row.createTime) }}
                             </template>
                         </el-table-column>
                         <el-table-column label="操作">

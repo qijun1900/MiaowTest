@@ -45,11 +45,12 @@
                                 @click="handleAdd">新建科目
                             </el-button>
                             <Popconfirm
-                                title="您确定删除吗？"
+                                :title="`您确定删除选中的 ${selectedRows ? selectedRows.length : 0} 个科目吗？删除后不可恢复！`"
                                 @confirm="handleDeleteMany">
                                 <el-button type="danger" 
                                     plain 
-                                    :disabled="!selectedRows || selectedRows.length === 0">删除科目
+                                    :disabled="!selectedRows || selectedRows.length === 0 || isDeleting"
+                                    :loading="isDeleting">删除科目
                                 </el-button>
                             </Popconfirm>
                         </el-col>
@@ -159,11 +160,12 @@
                             编辑
                         </el-button>
                         <Popconfirm 
-                            title="您确定删除吗？" 
+                            :title="`您确定删除科目「${scope.row.name}」吗？删除后不可恢复！`" 
                             @confirm="handleDeleteOne(scope.row)">
                             <el-button 
                                 type="danger" 
-                                plain>
+                                plain
+                                :loading="isDeleting">
                                 删除
                             </el-button>
                         </Popconfirm>
@@ -178,7 +180,8 @@
                             type="info" 
                             plain 
                             @click="handleCreate(scope.row)">
-                            创建考试<el-icon><CirclePlusFilled /></el-icon>
+                            考试/资料
+                            <el-icon><CirclePlusFilled /></el-icon>
                         </el-button>
                     </template>
                 </el-table-column>
@@ -278,7 +281,7 @@ import {ref,reactive ,defineAsyncComponent,onMounted} from 'vue'
 import formatTime from '@/util/formatTime'
 import Pagination from '@/components/ReuseComponents/Pagination.vue'
 import { useAppStore } from '@/stores';
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
         postAddExam,
         getExamList,
@@ -312,6 +315,10 @@ const currentEditId = ref(null)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+// 删除操作冷却状态
+const isDeleting = ref(false)
+// 删除操作冷却时间（毫秒）
+const DELETE_COOLDOWN = 2000
 
 // UI 状态与方法管理
 const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTableState()
@@ -466,13 +473,94 @@ const handlePublishChange = async (row) => {
 }
 //删除单个
 const handleDeleteOne = async (row) => {
-    await handleDelete(row,PostDeleteOneExam)
-    handleRefreshExamData()
+    // 如果正在删除中，则阻止操作
+    if (isDeleting.value) {
+        ElMessage.warning('操作过于频繁，请稍后再试')
+        return
+    }
+    
+    // 二次验证
+    try {
+        await ElMessageBox.confirm(
+            `请再次确认：您即将删除科目「${row.name}」，此操作不可恢复！`,
+            '删除确认',
+            {
+                confirmButtonText: '确认删除',
+                cancelButtonText: '取消',
+                type: 'error',
+                center: true
+            }
+        )
+    } catch {
+        // 用户取消删除
+        return
+    }
+    
+    // 设置删除状态
+    isDeleting.value = true
+    
+    try {
+        await handleDelete(row, PostDeleteOneExam)
+        ElMessage.success('科目删除成功')
+        handleRefreshExamData()
+    } catch (error) {
+        ElMessage.error('删除失败，请稍后重试')
+        console.error('删除科目时发生错误:', error)
+    } finally {
+        // 冷却时间后重置状态
+        setTimeout(() => {
+            isDeleting.value = false
+        }, DELETE_COOLDOWN)
+    }
 }
+
 //删除多个
 const handleDeleteMany = async () => {
-    await handleDelete(selectedRows.value,PostDeleteManyExam)
-    handleRefreshExamData()
+    // 如果正在删除中，则阻止操作
+    if (isDeleting.value) {
+        ElMessage.warning('操作过于频繁，请稍后再试')
+        return
+    }
+    
+    // 检查是否有选中的项目
+    if (!selectedRows.value || selectedRows.value.length === 0) {
+        ElMessage.warning('请先选择要删除的科目')
+        return
+    }
+    
+    // 二次验证
+    try {
+        await ElMessageBox.confirm(
+            `请再次确认：您即将删除选中的 ${selectedRows.value.length} 个科目，此操作不可恢复！`,
+            '批量删除确认',
+            {
+                confirmButtonText: '确认删除',
+                cancelButtonText: '取消',
+                type: 'error',
+                center: true
+            }
+        )
+    } catch {
+        // 用户取消删除
+        return
+    }
+    
+    // 设置删除状态
+    isDeleting.value = true
+    
+    try {
+        await handleDelete(selectedRows.value, PostDeleteManyExam)
+        ElMessage.success(`成功删除 ${selectedRows.value.length} 个科目`)
+        handleRefreshExamData()
+    } catch (error) {
+        ElMessage.error('批量删除失败，请稍后重试')
+        console.error('批量删除科目时发生错误:', error)
+    } finally {
+        // 冷却时间后重置状态
+        setTimeout(() => {
+            isDeleting.value = false
+        }, DELETE_COOLDOWN)
+    }
 }
 //确认添加
 const handleConfirm =async()=>{

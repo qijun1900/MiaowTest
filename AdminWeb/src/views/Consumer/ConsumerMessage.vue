@@ -6,7 +6,9 @@
                 <el-icon><User /></el-icon>
                 用户反馈管理
             </h1>
-            <el-button type="primary">
+            <el-button 
+                type="primary"
+                @click="handleRefresh">
                 <el-icon><Refresh /></el-icon>
                 刷新数据
             </el-button>
@@ -20,7 +22,9 @@
                     <span>筛选条件</span>
                 </div>
             </template>
-            <el-form :model="filterForm" inline>
+            <el-form 
+                :model="filterForm" 
+                inline>
                 <el-form-item label="反馈类型：">
                     <el-select v-model="filterForm.type" placeholder="请选择反馈类型" clearable>
                         <el-option label="系统反馈" :value="1" />
@@ -59,15 +63,20 @@
             <template #header>
                 <div class="table-header">
                     <span>反馈列表</span>
-                    <span class="total-count">共 {{ feedbackList.total }} 条记录</span>
+                    <span class="total-count">共 {{ total }} 条记录</span>
                 </div>
             </template>
             
-            <el-table :data="filteredFeedbackList" v-loading="loading" stripe>
+            <el-table 
+                height="440"
+                :data="filteredFeedbackList" 
+                v-loading="loading" 
+                stripe>
                 <el-table-column 
                     type="index" 
                     label="序号" 
-                    width="60" align="center" />
+                    width="60" 
+                    align="center" />
                 
                 <!-- 用户信息列 -->
                 <el-table-column label="用户信息" min-width="180">
@@ -133,8 +142,7 @@
                             size="small" 
                             type="primary" 
                             link 
-                            @click="handleView(row)"
-                        >
+                            @click="handleView(row)">
                             <el-icon><View /></el-icon>
                             查看详情
                         </el-button>
@@ -143,19 +151,22 @@
                             type="warning" 
                             link 
                             @click="handleEdit(row)"
-                            v-if="row.status !== 2"
-                        >
+                            v-if="row.status !== 2">
                             <el-icon><Edit /></el-icon>
                             处理
                         </el-button>
+                        <Popconfirm
+                        title="您确定删除吗？" 
+                        @confirm="handleDelete(row)">
                         <el-button 
                             size="small" 
                             type="danger" 
                             link 
-                            @click="handleDelete(row)">
+                            >
                             <el-icon><Delete /></el-icon>
                             删除
                         </el-button>
+                        </Popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
@@ -227,10 +238,36 @@
                 </el-descriptions>
             </template>
         </Dialog>
+        <!-- 处理反馈对话框 -->
+        <Dialog
+            DilogTitle="处理反馈"
+            DilogWidth="600px"
+            :draggable="true"
+            top="6vh"
+            DilogButContent="提交"
+            v-model="editDialogVisible"
+            @dialog-confirm="handleSubmit">
+            <template #dialogcontent>
+                <el-form :model="handleForm" label-width="100px">
+                    <el-form-item label="处理状态">
+                        <el-select v-model="handleForm.status" placeholder="请选择处理状态">
+                            <el-option label="待处理" :value="0" />
+                            <el-option label="处理中" :value="1" />
+                            <el-option label="已处理" :value="2" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="回复内容">
+                        <el-input type="textarea" 
+                        v-model="handleForm.adminReply" 
+                        :autosize="{ minRows: 3, maxRows: 5 }" />
+                    </el-form-item>
+                </el-form>
+            </template>
+        </Dialog>
     </div>
 </template>
 <script setup>
-import { ref, computed, onMounted,defineAsyncComponent } from 'vue'
+import { ref, onMounted,defineAsyncComponent } from 'vue'
 import {
     User, Refresh, Filter, Search, View, Edit, Delete, Message
 } from '@element-plus/icons-vue'
@@ -238,54 +275,47 @@ import Pagination from '@/components/ReuseComponents/Pagination.vue'
 import {getMessageList} from '../../API/consumer/consumer_messageAPI'
 import formatInfo from '@/util/formatInfo'
 import formatTime from '@/util/formatTime'
+import { handleFeedback,deleteFeedback } from '../../API/consumer/consumer_messageAPI'
+import { ElMessage } from 'element-plus'
+import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
+import { useFeedbackFilter } from '@/util/SearchFilter'
 // 动态导入较大的组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/ReuseComponents/Dialog .vue')
 )
 
 // 响应式数据
+const feedbackList = ref([])// 反馈列表
 const loading = ref(false)
 const detailDialogVisible = ref(false)
 const currentFeedback = ref(null)
+const editDialogVisible = ref(false)
 //表格分页器
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-
 // 筛选表单
 const filterForm = ref({
     type: '',
     status: '',
     userStatus: ''
 })
-
-const feedbackList = ref([])
-
-// 计算属性 - 筛选后的列表
-const filteredFeedbackList = computed(() => {
-    let list = feedbackList.value
-    
-    // 按反馈类型筛选
-    if (filterForm.value.type !== '') {
-        list = list.filter(item => item.type === filterForm.value.type)
-    }
-    
-    // 按处理状态筛选
-    if (filterForm.value.status !== '') {
-        list = list.filter(item => item.status === filterForm.value.status)
-    }
-    
-    // 按用户状态筛选
-    if (filterForm.value.userStatus !== '') {
-        if (filterForm.value.userStatus === 'loggedIn') {
-            list = list.filter(item => item.uid !== null)
-        } else if (filterForm.value.userStatus === 'notLoggedIn') {
-            list = list.filter(item => item.uid === null)
-        }
-    }
-    
-    return list
+// 使用筛选函数
+const filteredFeedbackList = useFeedbackFilter(feedbackList, filterForm)
+// 处理表单
+const handleForm = ref({
+    status: 1,
+    adminReply: ''
 })
+// 重置筛选条件
+const handleReset = () => {
+    filterForm.value = {
+        type: '',
+        status: '',
+        userStatus: ''
+    }
+    currentPage.value = 1
+}
 
 
 // 添加分页变化处理方法
@@ -304,7 +334,6 @@ const handleRefreshMessageList = async () => {
             size: pageSize.value,
         })
         if (res.code === 200) {
-            console.log(res)
             feedbackList.value = res.data.data// 数据列表
             total.value = res.data.total// 总条数
         }
@@ -316,30 +345,52 @@ const handleRefreshMessageList = async () => {
     }
 }
 
-const handleReset = () => {
-    filterForm.value = {
-        type: '',
-        status: '',
-        userStatus: ''
-    }
-    currentPage.value = 1
+// 刷新数据
+const handleRefresh = () => {
+    handleRefreshMessageList()
+    ElMessage.success('数据已刷新')
 }
-
+// 搜索
 const handleSearch = () => {
     currentPage.value = 1
     handleRefreshMessageList()
 }
-
+// 查看详情
 const handleView = (row) => {
     currentFeedback.value = row
     detailDialogVisible.value = true
 }
-
+// 编辑
 const handleEdit = (row) => {
     currentFeedback.value = row
-    // 这里可以打开处理反馈的对话框
+    editDialogVisible.value = true
 }
-
+// 删除
+const handleDelete = async (row) => {
+    try {
+        const res = await deleteFeedback(row._id)
+        if (res.code === 200) {
+            ElMessage.success('删除用户信息成功')
+            handleRefreshMessageList()
+        }   
+    }catch (error) {
+        console.error('删除用户信息失败:', error)
+    }
+}
+// 处理反馈 - 提交
+const handleSubmit = async () => {
+    try {
+        // 发送处理请求
+        const res = await handleFeedback(currentFeedback.value._id, handleForm.value)
+        if (res.code === 200) {
+            editDialogVisible.value = false
+            ElMessage.success('反馈处理成功')
+            handleRefreshMessageList()
+        }
+    }catch (error) {
+        console.error('处理反馈失败:', error)
+    }  
+}
 
 // 生命周期
 onMounted(() => {

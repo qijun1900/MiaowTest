@@ -301,6 +301,40 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getUserWrongQuestionList details:', error); // 处理错误
         }
+    },
+    getExamSubjectMaterials:async (req,res)=>{
+        try {
+            const {examId} = req.body;
+            const result = await ExamService.getExamSubjectMaterials(examId)
+            res.send({
+                code: result.code,
+                data: result.data, // 返回的数据
+            })
+
+        }catch (error) {
+            console.error('Error fetching getExamSubjectMaterials details:', error); // 处理错误
+        }
+        
+    },
+    getExamSubjectTitleUrl:async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            if(!uid){
+                res.send({
+                    code: 401,
+                    message: "您未登录",
+                })
+                return;
+            }
+            const {examId,titleid} = req.body;
+            const result = await ExamService.getExamSubjectTitleUrl({examId,titleid})
+            res.send({
+                code: result.code,
+                data: result.data, // 返回的url数据
+            })
+        }catch (error) {
+            console.error('Error fetching getExamSubjectTitleUrl details:', error); // 处理错误
+        }
     }
 }
 

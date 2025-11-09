@@ -161,6 +161,13 @@
 			"style": {
 				"navigationBarTitleText": "意见反馈"
 			}
+		},
+		{
+			"path": "pages/exam/ExamDiskView",
+			"style": {
+				"navigationBarTitleText": "资料详情",
+				"disableScroll": true
+			}	
 		}
 	],
 	"globalStyle": {

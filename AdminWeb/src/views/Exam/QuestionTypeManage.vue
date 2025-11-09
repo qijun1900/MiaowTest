@@ -269,6 +269,7 @@ import {
         DeleteOneQuestionTitle,
         DeleteManyQuestionTitle,
         UpdateQuestionTitleOneState,
+        CheckQuestionTitle
     } from '@/API/Exam/questionTitleAPI';
 import { ElMessage } from 'element-plus';
 import Drawer from '@/components/ReuseComponents/Drawer.vue';
@@ -364,21 +365,64 @@ const handleOnSearch = (data) => {
 }
 //删除单个
 const handleDeleteOne = async (row) => {
-   const res = await DeleteOneQuestionTitle(row._id,route.params.id)
-   if(res.code===200){
-    ElMessage.success('题型删除成功')
-    await handleRefreshData()
-   }
+    CheckQuestionTitle(row._id,route.params.id).then(res=>{
+        console.log(res)
+        if(res.code===200&&res.data.hasQuestion===true){
+            ElMessage.error('该题型下有题目，无法删除')
+            return   
+        }
+        if(res.code===200&&res.data.hasQuestion===false){
+            DeleteOneQuestionTitle(row._id,route.params.id).then(res=>{
+                if(res.code===200){
+                    ElMessage.success('题型删除成功')
+                    handleRefreshData()
+                }
+            })
+        }
+    })
 }
 //删除多个
 const handleDeleteMany = async () => {
     const ids = selectedRows.value.map(item => item._id)
-    const res = await DeleteManyQuestionTitle(ids,route.params.id)
-    if(res.code===200){
+    
+    // 检查每个选中的题型下是否有题目
+    const checkPromises = ids.map(id => CheckQuestionTitle(id, route.params.id))
+    const checkResults = await Promise.all(checkPromises)
+    
+    // 找出有题目的题型
+    const hasQuestionTypes = []
+    const canDeleteIds = []
+    
+    checkResults.forEach((result, index) => {
+        if (result.code === 200 && result.data.hasQuestion === true) {
+            // 找到对应的题型名称
+            const questionType = selectedRows.value.find(item => item._id === ids[index])
+            hasQuestionTypes.push(questionType.content)
+        } else if (result.code === 200 && result.data.hasQuestion === false) {
+            canDeleteIds.push(ids[index])
+        }
+    })
+    
+    // 如果有题型下有题目，提示用户
+    if (hasQuestionTypes.length > 0) {
+        ElMessage.error(`以下题型下有题目，无法删除：${hasQuestionTypes.join(', ')}`)
+        // 如果有可以删除的题型，继续删除
+        if (canDeleteIds.length > 0) {
+            const res = await DeleteManyQuestionTitle(canDeleteIds, route.params.id)
+            if (res.code === 200) {
+                ElMessage.success(`成功删除${canDeleteIds.length}个题型`)
+                await handleRefreshData()
+            }
+        }
+        return
+    }
+    
+    // 所有题型都可以删除
+    const res = await DeleteManyQuestionTitle(ids, route.params.id)
+    if (res.code === 200) {
         ElMessage.success('题型删除成功')
         await handleRefreshData()
     }
-  
 }
 //发布状态改变
 const handlePublishChange = async (row) => {
@@ -394,7 +438,11 @@ const handlePublishChange = async (row) => {
 }
 //提交表单
 const handleConfirm = async() => {
-    const submitData= {...Form, _id: currentEditId.value, examId: route.params.id}
+    const submitData= {
+        ...Form, 
+        _id: currentEditId.value, 
+        examId: route.params.id
+    }
     try{
         if(isEditMode.value){
             const res = await UpdateQuestionTitleList(submitData)
@@ -433,7 +481,6 @@ const handleRefreshData = async() => {
         tableData.value = res.data[0].data
         total.value = res.data[0].total
     }
-
   }catch(error){
     console.log(error)
   }

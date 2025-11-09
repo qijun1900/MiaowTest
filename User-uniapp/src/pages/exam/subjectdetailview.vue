@@ -54,20 +54,28 @@
             </view>
         </view>
 
-        <!-- 分隔线 -->
+        <!-- 切换刷题/资料 -->
         <view class="divider-container">
-            <up-divider text="考试题型" textPosition="center" textColor="#409EFF" lineColor="#E4E7ED">
-            </up-divider>
+            <uviewSubsection
+            :list="list" 
+            @updateCurrent="handleSendMode"
+            :current="currentMode"
+            />
         </view>
 
         <!-- 加载状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题型数据..." />
         
         <!-- 题型列表 -->
-        <view class="subject-types-container" v-else-if="subjectTypes && subjectTypes.length > 0">
+        <view 
+            class="subject-types-container" 
+            v-else-if="currentMode === 0 && subjectTypes && subjectTypes.length  > 0">
             <scroll-view scroll-y class="subject-types-scroll">
                 <view class="subject-types-list">
-                    <view class="subject-type-item" v-for="(item, index) in subjectTypes" :key="index"
+                    <view 
+                        class="subject-type-item" 
+                        v-for="(item, index) in subjectTypes" 
+                        :key="index"
                         @click="navigateToQuestions(item)">
                         <view class="subject-type-info">
                             <view class="type-header">
@@ -80,20 +88,82 @@
                             </view>
                         </view>
                         <view class="arrow-container">
-                            <uni-icons type="forward" size="16" color="#409EFF"></uni-icons>
+                            <uni-icons 
+                                type="forward" 
+                                size="16" 
+                                color="#409EFF">
+                            </uni-icons>
                         </view>
                     </view>
                 </view>
             </scroll-view>
         </view>
 
+        <!-- 资料列表 -->
+        <view 
+            class="subject-types-container" 
+            v-else-if="currentMode === 1 && subjectnetDisks && subjectnetDisks.length > 0 ">
+            <scroll-view scroll-y class="subject-types-scroll">
+                <view class="subject-types-list">
+                    <view 
+                    class="subject-type-item"
+                    v-for="(item,index) in subjectnetDisks"
+                    :key="index"
+                    @click="navigateTonetDisksDetail(item)">
+                    <view class="subject-type-info">
+                            <view class="type-header">
+                                <text class="subject-type-name">{{ item.title }}</text>
+                                <view class="question-badge">
+                                    <text class="question-count">{{ item.content[0].type === 1 ? "夸克" : "百度"  }}</text>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="arrow-container">
+                        <uni-icons 
+                            type="forward" 
+                            size="16" 
+                            color="#409EFF">
+                        </uni-icons>
+                    </view>
+                    </view>
+                </view>
+            </scroll-view>
+        </view>
+
         <!-- 数据为空 -->
-        <Empty description="暂无题型数据" class="empty" v-else />
+        <view v-else class="empty">
+            <Empty 
+                :description="currentMode === 0 ? '暂无题型数据' : '暂无资料数据'" />
+            <view class="empty-tip">
+                <text v-if="currentMode === 0">
+                    暂无题型数据，您可以尝试
+                    <text class="empty-tip-action">查看资料</text>
+                </text>
+                <text v-else>
+                    暂无资料数据，您可以尝试
+                    <text class="empty-tip-action">查看题型</text>
+                </text>
+            </view>
+            <button 
+                v-if="currentMode === 0" 
+                @click="currentMode = 1" 
+                class="switch-btn">查看资料</button>
+            <button 
+                v-else 
+                @click="currentMode = 0" 
+                class="switch-btn">查看题型</button>   
+        </view>
+
 
         <!-- 自定义底部 -->
         <view class="bottom">
-            <up-button type="primary" class="bottom-button" :icon="isFavorited ? 'star-fill' : 'star'"
-                :plain="!isFavorited" @click="handleFavoriteExam" shape="circle"
+            <up-button 
+                type="primary" 
+                class="bottom-button" 
+                :icon="isFavorited ? 'star-fill' : 'star'"
+                :plain="!isFavorited" 
+                @click="handleFavoriteExam" 
+                shape="circle"
                 :iconColor="isFavorited ? '#F7BA2A' : '#409EFF'">
                 {{ isFavorited ? '已收藏' : '收藏考试' }}
             </up-button>
@@ -105,17 +175,26 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import formatTime from '../../util/formatTime';
-import { getExamSubjectTypes } from '../../API/Exam/ExamAPI';
+import { getExamSubjectTypes,getExamSubjectNetMaterials } from '../../API/Exam/ExamAPI';
 import Empty from '../../components/core/Empty.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import { addExamFavorite, removeExamFavorite, getExamFavorites } from '../../API/My/FavoriteAPI';
 import ThemeLoading from '../../components/core/ThemeLoading.vue';
+import uviewSubsection from '../../components/core/uviewSubsection.vue';
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据
 const questionStore = useQuestionStore();
 const isFavorited = ref(false); // 添加收藏状态变量
 const isLoading = ref(false); // 加载状态
+const list = ref(['考试题型', '考试资料']);// 切换刷题/资料的选项 0-刷题 1-资料
+const currentMode = ref(0); 
+const subjectnetDisks = ref([]); // 考试资料数据
+
+// 切换模式
+const handleSendMode = (index) => {
+    currentMode.value = index;
+}
 
 // 页面加载时接收参数
 onLoad((options) => {
@@ -138,6 +217,11 @@ onLoad((options) => {
             fetchClickSubjectData(subjectData.id);
             // 检测收藏状态
             checkFavoriteStatus(subjectData.id);
+            // 资料数据
+            getExamSubjectNetMaterials(subjectData.id).then(response => {
+                console.log('获取到的资料数据:', response.data);
+                subjectnetDisks.value = response.data;
+            })
         } catch (error) {
             console.error('解析科目数据失败:', error);
             uni.showToast({
@@ -154,11 +238,11 @@ onLoad((options) => {
     }
 });
 
-// 异步请求点击的科目数据
-const fetchClickSubjectData = async (subjectId) => {
+// 异步请求点击的题型数据
+const fetchClickSubjectData = async (examId) => {
     try {
         isLoading.value = true;
-        const response = await getExamSubjectTypes(subjectId);
+        const response = await getExamSubjectTypes(examId);
         subjectTypes.value = response.data;
     } catch (error) {
         console.error('获取点击的科目数据失败:', error);
@@ -245,6 +329,12 @@ const navigateToQuestions = (subjectType) => {
         }))}`
     });
 }
+// 导航到资料复制链接页面
+const navigateTonetDisksDetail = (item) => {
+   uni.navigateTo({
+    url:`/pages/exam/ExamDiskView?titleid=${item._id}&type=${item.content[0].type}&title=${item.title}&time=${item.time}&examId=${examInfo.value.id}`
+   })
+}
 </script>
 
 <style scoped>
@@ -318,14 +408,59 @@ const navigateToQuestions = (subjectType) => {
     flex: 1;
     word-break: break-all;
 }
+.divider-container{
+    margin-top: 20rpx;
+    margin-bottom: 21rpx;
+    margin-left: auto;
+    margin-right: auto;
+    width: 62%;
+}
 
 .empty {
-    margin-top: 150rpx;
+    margin-top: 100rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-tip {
+    margin: 20rpx 0 18rpx 0;
+    color: #888;
+    font-size: 26rpx;
+    text-align: center;
+}
+
+.empty-tip-action {
+    color: #1b89ff;
+    font-weight: bold;
+    margin: 0 6rpx;
+}
+
+.switch-btn {
+    margin-top: 10rpx;
+    width: 260rpx;
+    height: 72rpx;
+    background: linear-gradient(90deg, #409EFF 0%, #1b89ff 100%);
+    color: #fff;
+    border: none;
+    border-radius: 36rpx;
+    font-size: 28rpx;
+    font-weight: 600;
+    box-shadow: 0 4rpx 16rpx rgba(64,158,255,0.12);
+    transition: background 0.2s;
+    outline: none;
+    letter-spacing: 2rpx;
+}
+
+.switch-btn:active {
+    background: linear-gradient(90deg, #1b89ff 0%, #409EFF 100%);
+    opacity: 0.92;
 }
 
 /* 题型列表样式 */
 .subject-types-container {
-    padding: 0 6rpx;
+    padding: 5rpx 6rpx;
     flex: 1;
     overflow: hidden;
     margin-bottom: 120rpx;

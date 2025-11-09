@@ -60,8 +60,6 @@
         <el-menu-item index="/consumer/message">用户意见</el-menu-item>
       </el-sub-menu>
       
-      
-
       <el-sub-menu index="/Model-manage">
         <template #title>
           <el-icon><Cpu /></el-icon>

@@ -29,6 +29,7 @@ ExamRouter.post("/adminapi/exam/updateExamStatus",ExamController.UpdateExamStatu
 ExamRouter.post("/adminapi/questionTitle/addQuestionTitle",ExamController.AddquestionTitle)//增加题型
 ExamRouter.get("/adminapi/questionTitle/getQuestionTitleList",ExamController.getQuestionTitle)//获取用户端的考试题型列表
 ExamRouter.post("/adminapi/questionTitle/updateQuestionTitle",ExamController.UpdateQuestionTitle)//更新用户端的考试题型信息
+ExamRouter.post("/adminapi/questionTitle/checkQuestionTitle",ExamController.CheckQuestionTitle)//检查用户端的考试题型是否还有题目
 ExamRouter.post("/adminapi/questionTitle/deleteOneQuestionTitle",ExamController.DeleteOneQuestionTitle)//删除用户端的单个考试题型信息
 ExamRouter.post('/adminapi/questionTitle/deleteManyQuestionTitle',ExamController.DeleteManyQuestionTitle)//删除用户端的多个考试题型信息
 ExamRouter.post("/adminapi/questionTitle/updateQuestionOneTitleState",ExamController.UpdateOneQuestionTitleState)//更新单条考试题型目状态
@@ -42,5 +43,11 @@ ExamRouter.post("/adminapi/exam/batchPublishedUserQuestionsList",ExamController.
 ExamRouter.get("/adminapi/exam/publishedUserQuestionsList/:id",ExamController.getUserQuestionsList)//获取用户端已发布的题目
 ExamRouter.post("/adminapi/exam/UserquestionlistDown/:id",ExamController.UserquestionlistDown)//不同类型题目用户端的题目全部下架操作
 
+// ==============网盘资料管理相关API ========== //
+ExamRouter.post("/adminapi/netDisk/addNetDisk",ExamController.AddNetDisk)//添加网盘资料
+ExamRouter.get("/adminapi/netDisk/getNetDiskList",ExamController.getNetDiskList)//获取网盘资料列表
+ExamRouter.post("/adminapi/netDisk/updateNetDisk",ExamController.UpdateNetDisk)//更新网盘资料信息
+ExamRouter.post("/adminapi/netDisk/updateNetDiskState",ExamController.UpdateNetDiskState)//更新网盘资料状态
+ExamRouter.post("/adminapi/netDisk/deleteOneNetDisk",ExamController.DeleteOneNetDisk)//删除单个网盘资料信息
 
 module.exports = ExamRouter; 

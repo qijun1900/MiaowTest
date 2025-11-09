@@ -11,6 +11,8 @@ import QuestionTypeManage from "@/views/Exam/QuestionTypeManage.vue"
 import QuestionBatchAdd from "@/views/Exam/QuestionBatchAdd.vue"
 import LLMChat from "@/views/Chat/LLMChat.vue"
 import consumerMessage from "../views/Consumer/ConsumerMessage.vue"
+import ConsumerManage from "@/views/Users/Consumer.vue"
+import ExamFileManage from "@/views/Exam/ExamFileManage.vue"
 
 const routes= [
     {
@@ -77,6 +79,16 @@ const routes= [
         path: '/consumer/message',
         name: 'consumerMessage',
         component: consumerMessage,
+    },
+    {
+        path: '/consumer',
+        name: 'ConsumerManage',
+        component: ConsumerManage,
+    },
+    {
+        path: '/exam/examfilemanage/:id',
+        name: 'ExamFileManage',
+        component: ExamFileManage,
     }
 
 ]

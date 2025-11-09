@@ -67,11 +67,22 @@ const handleLogout = () => {
     appStore.clearUserInfo() 
     router.push('/login')
 }
+
 // 跳转消息页面
 const handleMessage = () => {
-  console.log("跳转消息页面")
   router.push('/consumer/message')
 }
+
+//设置定时器，每30秒刷新消息数量
+setInterval(() => {
+    getMessageCount().then(res=>{
+        if(res.code === 200){
+            messageCount.value = res.data
+        }
+    })
+}, 30000);
+
+// 页面加载时获取消息数量
 onMounted(()=>{
     getMessageCount().then(res=>{
         if(res.code === 200){
