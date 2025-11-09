@@ -159,3 +159,24 @@ export async function getExamSubjectNetMaterials(examId) {
     throw error;
   }
 }
+
+/**
+ * @description  获取详细资料URL
+ * @method POST
+ * @param {*String} examId 科目Id - 必填
+ * @param {*String}  titleid 资料ID - 必填
+ * @returns {*String} url 资料URL
+ */
+export async function getExamTitleNetUrlAPI({examId,titleid}) {
+  try {
+    console.log("getExamTitleNetUrlAPI", examId,titleid);
+    return await http({
+      url: `/uniappAPI/exam/getexamsubjecttitleurl`,
+      data: { examId: examId,titleid:titleid },
+      method: 'POST',
+    });
+  }catch (error) {
+    console.error("getExamSubjectMaterials 失败", error);
+  }
+  
+}

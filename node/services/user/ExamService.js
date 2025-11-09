@@ -6,6 +6,7 @@ const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const userQuestionModel = require('../../models/UserQuestionModel')
 const ConsumerModel = require('../../models/ConsumerModel');
+const mongoose = require('mongoose');
 
 const ExamService = {
     // uniappAPI
@@ -673,6 +674,11 @@ const ExamService = {
                 .filter(item => item.isPublish) // 只返回已发布的资料
                 .map(item => ({
                     title: item.title, // 提取标题
+                    _id: item._id, // 提取ID
+                    content:item.content.map(contentItem => ({ // 提取每个内容项的类型和URL
+                        type: contentItem.type, // 提取类型
+                    })),
+                    time:item.createTime, // 提取创建时间
                 }));
 
             return {
@@ -690,6 +696,77 @@ const ExamService = {
             }
         }
         
+    },
+    getExamSubjectTitleUrl:async ({examId, titleid})=>{
+        try {
+            // 使用聚合管道直接查询并返回URL数组
+            const result = await UserExamModel.aggregate([
+                // 第一步：匹配examId
+                { $match: { examId: examId } },
+                
+                // 第二步：展开netDiskTitle数组
+                { $unwind: "$netDiskTitle" },
+                
+                // 第三步：匹配指定的titleid和已发布状态
+                { 
+                    $match: { 
+                        "netDiskTitle._id": new mongoose.Types.ObjectId(titleid),
+                        "netDiskTitle.isPublish": true
+                    } 
+                },
+                
+                // 第四步：展开content数组
+                { $unwind: "$netDiskTitle.content" },
+                
+                // 第五步：只提取URL字段
+                {
+                    $project: {
+                        _id: 0,
+                        url: "$netDiskTitle.content.url"
+                    }
+                },
+                
+                // 第六步：将URL组合成数组
+                {
+                    $group: {
+                        _id: null,
+                        urls: { $push: "$url" }
+                    }
+                }
+            ]);
+            
+            // 检查结果
+            if (result.length === 0) {
+                // 检查是考试不存在还是资料不存在
+                const examExists = await UserExamModel.findOne({examId: examId}).select('_id');
+                if (!examExists) {
+                    return {
+                        code: 404,
+                        message: '考试科目不存在',
+                        data: null
+                    }
+                } else {
+                    return {
+                        code: 404,
+                        message: '网盘资料不存在或未发布',
+                        data: null
+                    }
+                }
+            }
+            
+            // 返回URL数组
+            return {
+                code: 200,
+                data: result[0].urls
+            }
+        } catch (error) {
+            console.error('getExamSubjectTitleUrl 失败:', error);
+            return {
+                code: 500,
+                message: '获取网盘资料URL失败',
+                error: error.message
+            }
+        }
     }
       
 }

@@ -69,7 +69,7 @@
         <!-- 题型列表 -->
         <view 
             class="subject-types-container" 
-            v-else-if="currentMode === 0 &&subjectTypes && subjectTypes.length  > 0">
+            v-else-if="currentMode === 0 && subjectTypes && subjectTypes.length  > 0">
             <scroll-view scroll-y class="subject-types-scroll">
                 <view class="subject-types-list">
                     <view 
@@ -101,11 +101,31 @@
 
         <!-- 资料列表 -->
         <view 
-            class="materials-container" 
-            v-else-if="currentMode === 1">
-            <scroll-view scroll-y class="materials-scroll">
-                <view class="materials-list">
-                    资料列表
+            class="subject-types-container" 
+            v-else-if="currentMode === 1 && subjectnetDisks && subjectnetDisks.length > 0 ">
+            <scroll-view scroll-y class="subject-types-scroll">
+                <view class="subject-types-list">
+                    <view 
+                    class="subject-type-item"
+                    v-for="(item,index) in subjectnetDisks"
+                    :key="index"
+                    @click="navigateTonetDisksDetail(item)">
+                    <view class="subject-type-info">
+                            <view class="type-header">
+                                <text class="subject-type-name">{{ item.title }}</text>
+                                <view class="question-badge">
+                                    <text class="question-count">{{ item.content[0].type === 1 ? "夸克" : "百度"  }}</text>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="arrow-container">
+                        <uni-icons 
+                            type="forward" 
+                            size="16" 
+                            color="#409EFF">
+                        </uni-icons>
+                    </view>
+                    </view>
                 </view>
             </scroll-view>
         </view>
@@ -169,6 +189,7 @@ const isFavorited = ref(false); // 添加收藏状态变量
 const isLoading = ref(false); // 加载状态
 const list = ref(['考试题型', '考试资料']);// 切换刷题/资料的选项 0-刷题 1-资料
 const currentMode = ref(0); 
+const subjectnetDisks = ref([]); // 考试资料数据
 
 // 切换模式
 const handleSendMode = (index) => {
@@ -196,9 +217,10 @@ onLoad((options) => {
             fetchClickSubjectData(subjectData.id);
             // 检测收藏状态
             checkFavoriteStatus(subjectData.id);
-            // 检查是否有资料数据
+            // 资料数据
             getExamSubjectNetMaterials(subjectData.id).then(response => {
-                console.log('获取资料数据:', response);
+                console.log('获取到的资料数据:', response.data);
+                subjectnetDisks.value = response.data;
             })
         } catch (error) {
             console.error('解析科目数据失败:', error);
@@ -306,6 +328,12 @@ const navigateToQuestions = (subjectType) => {
             amount: subjectType.questionIdS ? subjectType.questionIdS.length : 0
         }))}`
     });
+}
+// 导航到资料复制链接页面
+const navigateTonetDisksDetail = (item) => {
+   uni.navigateTo({
+    url:`/pages/exam/ExamDiskView?titleid=${item._id}&type=${item.content[0].type}&title=${item.title}&time=${item.time}&examId=${examInfo.value.id}`
+   })
 }
 </script>
 
