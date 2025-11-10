@@ -147,6 +147,7 @@
 </template>
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import UviewSubsection from "../../components/core/uviewSubsection.vue";
 import SelectQuestion from '../../components/modules/exam/SelectQuestion.vue';//Type=1
@@ -175,6 +176,18 @@ const popupShow = ref(false);// 弹窗
 const StatisticsStore = useStatisticsStore();// 统计答题数据Store
 const { correctCount, incorrectCount, accuracyRate } = storeToRefs(StatisticsStore);
 const scrollTop = ref(0); // 用于控制scroll-view的滚动位置
+const bankInfo = ref(null); // 题库信息
+
+// 页面加载时接收参数
+onLoad((options) => {
+  if (options.bankInfo) {
+    try {
+      bankInfo.value = JSON.parse(decodeURIComponent(options.bankInfo));
+    } catch (error) {
+      console.error('解析题库信息失败:', error);
+    }
+  }
+});
 
 //TODO 优化自定义底部
 
@@ -405,9 +418,18 @@ const isEndQuestion = computed(() => {
 // 处理提交答案
 const handleSubmitAnswer = () => {
     popupShow.value = false;
-    uni.navigateTo({
-        url: '/pages/exam/PracticeResultsView' 
-    })
+    
+    // 延迟跳转，确保弹窗关闭动画完成
+    setTimeout(() => {
+        // 构建URL，传递题库信息
+        let url = '/pages/exam/PracticeResultsView';
+        if (bankInfo.value) {
+            url += `?bankInfo=${encodeURIComponent(JSON.stringify(bankInfo.value))}`;
+        }
+        uni.navigateTo({
+            url: url
+        });
+    }, 300);
 }
 
 onMounted(() => {

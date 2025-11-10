@@ -169,7 +169,6 @@ export async function getExamSubjectNetMaterials(examId) {
  */
 export async function getExamTitleNetUrlAPI({examId,titleid}) {
   try {
-    console.log("getExamTitleNetUrlAPI", examId,titleid);
     return await http({
       url: `/uniappAPI/exam/getexamsubjecttitleurl`,
       data: { examId: examId,titleid:titleid },

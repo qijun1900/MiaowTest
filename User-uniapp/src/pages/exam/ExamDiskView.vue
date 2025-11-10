@@ -95,8 +95,7 @@ const copySuccess = ref(false);
 const examId = ref(null);
 
 onLoad((option) => {
-  console.log('ExamDiskView onLoad',option); // 输出 titleid 和 type 1-夸克网盘 2-百度网盘
-  if(!option.titleid && !option.type){
+  if(!option.titleid && !option.type && !option.examId){
     uni.showToast({
       title: '参数错误',
       icon: 'none',
