@@ -61,7 +61,7 @@
 <script setup>
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import handleCopy from '../../util/copy';
-import { updateUserInfo,checkUserBind } from '../../API/My/UserInfoUpdateAPI';
+import { updateUserInfo } from '../../API/My/UserInfoUpdateAPI';//checkUserBind
 import { onMounted,ref } from 'vue';
 
 const  accountBindStatus = ref(false);// 账号绑定状态
@@ -72,18 +72,18 @@ const genderMap = {// 性别映射表
   2: '女'
 };
 
-// 账号绑定状态计算属性，使用API来获取
-const CheckaccountBindStatus =async()=> {
-  try{
-    const response = await checkUserBind();
-    if(response.code===200){
-      accountBindStatus.value = response.data.isBind;
-    }
-  }catch(e){
-    console.error("获取账号绑定状态失败:",e);
-    return false;
-  }
-}
+// // 账号绑定状态计算属性，使用API来获取
+// const CheckaccountBindStatus =async()=> {
+//   try{
+//     const response = await checkUserBind();
+//     if(response.code===200){
+//       accountBindStatus.value = response.data.isBind;
+//     }
+//   }catch(e){
+//     console.error("获取账号绑定状态失败:",e);
+//     return false;
+//   }
+// }
 
 // 将性别数字转换为文本
 const getGenderText = (genderValue) => {
@@ -198,7 +198,7 @@ const handleLogout = () => {
   });
 };
 onMounted(() => {
-  CheckaccountBindStatus();
+  // CheckaccountBindStatus();
 })
 
 </script>
