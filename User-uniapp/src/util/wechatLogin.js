@@ -34,7 +34,7 @@ export const wechatLogin = async (options = {}) => {
       uni.showToast({
         title: '登录成功',
         icon: 'success'
-      });
+      },1000);
       
       const userInfoStore = UserInfoStore();
       userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息

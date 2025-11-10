@@ -181,6 +181,7 @@ import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import { addExamFavorite, removeExamFavorite, getExamFavorites } from '../../API/My/FavoriteAPI';
 import ThemeLoading from '../../components/core/ThemeLoading.vue';
 import uviewSubsection from '../../components/core/uviewSubsection.vue';
+import checkLogin from '../../util/checkLogin';
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据
@@ -219,7 +220,6 @@ onLoad((options) => {
             checkFavoriteStatus(subjectData.id);
             // 资料数据
             getExamSubjectNetMaterials(subjectData.id).then(response => {
-                console.log('获取到的资料数据:', response.data);
                 subjectnetDisks.value = response.data;
             })
         } catch (error) {
@@ -331,6 +331,11 @@ const navigateToQuestions = (subjectType) => {
 }
 // 导航到资料复制链接页面
 const navigateTonetDisksDetail = (item) => {
+    // 检查用户是否已登录
+    const isLoggedIn =  checkLogin("请登录后再获取");
+    if (!isLoggedIn) {
+        return;
+    }
    uni.navigateTo({
     url:`/pages/exam/ExamDiskView?titleid=${item._id}&type=${item.content[0].type}&title=${item.title}&time=${item.time}&examId=${examInfo.value.id}`
    })

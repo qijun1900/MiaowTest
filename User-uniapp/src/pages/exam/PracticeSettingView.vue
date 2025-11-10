@@ -89,6 +89,7 @@ import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue
 const QuestionStore = useQuestionStore();
 const QuestionTypeData = ref({}); // 考试题型基本数据
 const isLoading = ref(false); // 加载状态
+const bankInfo = ref(null); // 题库信息
 
 // 练习设置
 const questionCount = ref(1); 
@@ -107,6 +108,13 @@ onLoad((options) => {
             
             // 设置默认题目数量为总题数（最大值）
             questionCount.value = Data.amount || 1;
+            
+            // 准备题库信息（系统题库）
+            bankInfo.value = {
+                bankId: Data._id,
+                bankName: Data.examName,
+                isUserBank: false // 标识这是系统题库
+            };
         } catch (error) {
             console.error('解析科目数据失败:', error);
             uni.showToast({
@@ -159,8 +167,13 @@ const handleStart = () => {
     // 添加延迟，确保状态更新完成
     setTimeout(() => {
         isLoading.value = false;
+        // 构建URL，传递题库信息
+        let url = '/pages/exam/PracticeView';
+        if (bankInfo.value) {
+            url += `?bankInfo=${encodeURIComponent(JSON.stringify(bankInfo.value))}`;
+        }
         uni.navigateTo({
-            url: `/pages/exam/PracticeView`
+            url: url
         });
     }, 300);
 };

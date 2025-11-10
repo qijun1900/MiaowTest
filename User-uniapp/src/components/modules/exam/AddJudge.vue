@@ -76,11 +76,11 @@ const formData = reactive({
     Type: 3, // 题目类型，默认为3（判断题）
     stem: '', // 题干
     analysis: '', // 解析
-    answer: null, // 答案，1为正确，2为错误
+    answer: null,//0:错误，1：正确
     // 选项数据
     options: [
-        { text: '正确', value: 1 },
-        { text: '错误', value: 2 }
+        { text: '正确', value: 1},
+        { text: '错误', value: 0 }
     ]
 })
 

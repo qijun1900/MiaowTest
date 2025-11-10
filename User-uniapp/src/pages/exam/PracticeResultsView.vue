@@ -59,6 +59,7 @@
                 导出为PDF
             </up-button>
             <up-button
+                v-if="!isUserBank"
                 :plain="true"
                 :hairline="true"
                 type="error"
@@ -66,23 +67,49 @@
                 @click="viewWrongQuestions">
                 查看错题
             </up-button>
+            <up-button
+                v-else
+                :plain="true"
+                :hairline="true"
+                type="error"
+                shape="circle"
+                @click="handleBack">
+                返回题库
+            </up-button>
         </view>
    </view>  
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { storeToRefs } from 'pinia'
 import FireworkEffect from '@/components/plug-in/firework-effect/firework-effect.vue'//特效
 import AnswerSheet from '../../components/modules/exam/AnswerSheet.vue'
 import { useQuestionStore } from '../../stores/modules/QuestionStore'
 import {useStatisticsStore} from '../../stores/modules/StatisticsStore'
 
-
 const fireworkRef = ref(null)
 const QuestionStore = useQuestionStore()
 const StatisticsStore = useStatisticsStore()
 const {correctCount,incorrectCount,unansweredCount,accuracyRate} = storeToRefs(StatisticsStore)
+const bankInfo = ref(null) // 题库信息
+
+// 计算是否为用户题库
+const isUserBank = computed(() => {
+  return bankInfo.value?.isUserBank || false
+})
+
+// 页面加载时接收参数
+onLoad((options) => {
+  if (options.bankInfo) {
+    try {
+      bankInfo.value = JSON.parse(decodeURIComponent(options.bankInfo));
+    } catch (error) {
+      console.error('解析题库信息失败:', error);
+    }
+  }
+})
 
 onMounted(() => {
     // 页面加载完成后触发烟花效果
@@ -90,8 +117,7 @@ onMounted(() => {
         fireworkRef.value.handleShowEffect({ type: 'fireworks' })
     }
 })
-
-// 导出PDF功能     
+ 
 // TODO: 实现PDF导出功能
 const exportToPDF = () => {
     uni.showToast({
@@ -105,6 +131,10 @@ const viewWrongQuestions = () => {
     uni.navigateTo({ 
         url: '/pages/exam/WrongQuestionView' 
     })
+}
+//用户题库返回
+const handleBack = () => {
+    uni.navigateBack({ delta: 2 })
 }
 </script>
 <style scoped>

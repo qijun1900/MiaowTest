@@ -181,8 +181,14 @@ const handleStart = ()=>{
     showAIHelp: isShowAIHelp.value,
     OptionRandom: isOptionRandom.value,
   });
+  // 传递题库信息到练习页面
+  const bankInfo = {
+    bankId: bankData.value.bankId,
+    bankName: bankData.value.bankName,
+    isUserBank: true // 标识这是用户题库
+  };
   uni.navigateTo({
-    url: `/pages/exam/PracticeView`
+    url: `/pages/exam/PracticeView?bankInfo=${encodeURIComponent(JSON.stringify(bankInfo))}`
   })
 }
 // 编辑题目
@@ -264,13 +270,6 @@ onLoad((option)=>{
 
 onMounted(()=>{
   fetchUserQuestion();
-  
-  // 设置底部安全区域兼容
-  const safeAreaInsetBottom = uni.getSystemInfoSync().safeAreaInsets?.bottom || 0;
-  if (safeAreaInsetBottom === 0) {
-    // 对于没有底部安全区域的设备，设置默认值
-    document.documentElement.style.setProperty('--safe-area-inset-bottom', '20rpx');
-  }
 })
 
 // 页面显示时刷新数据（从编辑页面返回时会触发）
