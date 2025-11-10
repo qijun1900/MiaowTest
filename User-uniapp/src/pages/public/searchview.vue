@@ -54,7 +54,7 @@
         
         <!-- 无搜索结果提示 -->
         <view class="no-results" v-else-if="searchQuery && searchResults.length === 0 && !isLoading">
-            <text>没有找到相关科目</text>
+            <Empty description="暂无搜索结果"/>
         </view>
         
         <!-- 加载中提示 -->
@@ -69,6 +69,7 @@ import { ref, onMounted } from 'vue';
 import uniSearch from '../../components/core/uniSearch.vue';
 import { getExamSubjects } from '../../API/Exam/ExamAPI';
 import escconfig from '../../config/esc.config';
+import Empty from '../../components/core/Empty.vue';
 
 const examSubjects = ref([]); // 考试科目数据
 const searchQuery = ref(''); // 搜索关键词
