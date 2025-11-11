@@ -1,6 +1,7 @@
 <template>
   <view class="feedback-container">
-    <view class="form-container">
+    <view class="form-container" v-if="!isSuccess">
+      <view >
       <!-- 反馈类型 -->
       <view class="form-item">
         <text class="label">反馈类型 <text class="required">*</text></text>
@@ -40,10 +41,29 @@
       
       <!-- 提交按钮 -->
       <button 
+        v-if="!isSuccess"
         class="submit-btn" 
         @click="submitFeedback" 
         :disabled="isSubmitting">
         {{ isSubmitting ? '提交中...' : '提交反馈' }}
+      </button>
+      </view>
+    </view>
+    <!-- 显示提交成功页面 -->
+    <view v-if="isSuccess" class="success-content">
+      <image src="/static/other/feedback.png" mode="aspectFit"></image>
+      <text class="success-text">
+        感谢您的反馈！我们会尽快处理您的问题。
+      </text>
+      <button 
+        class="resubmit-btn" 
+        @click="resubmitFeedback">
+        再次提交
+      </button>
+      <button 
+        class="back-btn" 
+        @click="backTo">
+        返回
       </button>
     </view>
   </view>
@@ -66,6 +86,7 @@ const type = ref(1); // 默认选择系统反馈
 const content = ref('');// 反馈内容
 const contactInfo = ref('');// 联系方式
 const isSubmitting = ref(false);// 提交状态
+const isSuccess = ref(false);// 提交成功状态
 
 // 反馈类型改变
 const onTypeChange = (e) => {
@@ -85,7 +106,8 @@ const submitFeedback = async () => {
   
   try {
     isSubmitting.value = true;
-    
+    isSuccess.value = false;
+     
     // 准备提交数据
     const feedbackData = {
       type: type.value,
@@ -96,15 +118,11 @@ const submitFeedback = async () => {
     // 调用API提交反馈
     const result = await submitFeedbackAPI(feedbackData);
     if (result.code === 200) {
+      isSuccess.value = true;
       uni.showToast({
         title: result.message,
         icon: 'success'
       });
-
-      // 重置表单
-      content.value = '';
-      contactInfo.value = '';
-      type.value = 1;
     }else{
       uni.showToast({
         title: result.message,
@@ -121,6 +139,22 @@ const submitFeedback = async () => {
   } finally {
     isSubmitting.value = false;
   }
+};
+
+// 再次提交反馈
+const resubmitFeedback = () => {
+  isSuccess.value = false;
+  // 重置表单
+  content.value = '';
+  contactInfo.value = '';
+  type.value = 1;
+};
+
+// 返回上一页
+const backTo = () => {
+  uni.navigateBack({
+    delta: 1
+  })
 };
 
 onMounted(()=>{
@@ -212,5 +246,47 @@ onMounted(()=>{
 
 .submit-btn[disabled] {
   background-color: #ccc;
+}
+
+.success-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.success-content image {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 40rpx;
+}
+
+.success-text {
+  font-size: 32rpx;
+  color: #333;
+  text-align: center;
+  margin-bottom: 60rpx;
+  line-height: 1.5;
+}
+
+.resubmit-btn, .back-btn {
+  width: 80%;
+  height: 80rpx;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+}
+
+.resubmit-btn {
+  background-color: #007aff;
+  color: #fff;
+}
+
+.back-btn {
+  background-color: #f5f5f5;
+  color: #333;
 }
 </style>
