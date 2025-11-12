@@ -35,10 +35,13 @@ export const wechatLogin = async (options = {}) => {
         title: '登录成功',
         icon: 'success'
       },1000);
+
+      console.log(response);
       
       const userInfoStore = UserInfoStore();
       userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
       uni.setStorageSync('token', response.data.token); // 存储 Token
+      
       
       // 执行成功回调
       if (onSuccess && typeof onSuccess === 'function') {

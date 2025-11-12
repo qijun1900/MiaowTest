@@ -3,6 +3,10 @@ const JWT = require("../../MiddleWares/jwt");
 const ConsumerModel = require("../../models/ConsumerModel");
 const ExamModel = require("../../models/ExamModel");
 const FeedbackModel = require("../../models/ConsumerFeedbackModel");
+const { CounterModel, getNextUserCount } = require("../../models/CounterModel"); // 引入计数器模型和函数
+const mongoose = require('mongoose');
+
+
 
 const UserService = {
     Userlogin: async (message, code) => {
@@ -13,20 +17,33 @@ const UserService = {
             let user = await ConsumerModel.findOne({ openid });
 
             if (!user) {
+                // 为新用户生成注册顺序号
+                const userCount = await getNextUserCount();
+                
                 // 创建新用户
                 user = new ConsumerModel({
                     openid,
                     session_key,
                     createTime: new Date(),
+                    userCount: userCount, // 设置用户注册顺序号
                 });
                 await user.save();
 
-                console.log('创建新微信用户:', openid);
+                console.log('创建新微信用户:', openid, '注册顺序号:', userCount);
             }
 
             // 生成token，包含openid和过期时间（例如7天），如果过期将生成新的token
             const token = JWT.generate({ uid: user._id}, '7d');
-
+            
+            // 确保用户有注册顺序号（兼容性处理）
+            if (!user.userCount) {
+                // 为老用户分配注册顺序号
+                const userCount = await getNextUserCount();
+                user.userCount = userCount;
+                await user.save();
+                console.log('为老用户分配注册顺序号:', user._id, userCount);
+            }
+            
             return {
                 success: true,
                 data: {
@@ -38,7 +55,7 @@ const UserService = {
                         avatar: user.avatar || '',
                         gender: user.gender || 0,
                         username: user.username || '',
-
+                        userCount: user.userCount,
                     }
                 }
             };
@@ -58,11 +75,15 @@ const UserService = {
             // 假设验证码验证通过，直接注册用户
             console.log(account, verifyCode, password);
 
+            // 为新用户生成注册顺序号
+            const userCount = await getNextUserCount();
+
             const newUser = new ConsumerModel({ 
                 username: account,
                 email: account, 
                 password,
                 createTime: new Date(),
+                userCount: userCount, // 设置用户注册顺序号
             });
 
             await newUser.save();
@@ -71,6 +92,9 @@ const UserService = {
                 code: 200,
                 success: true,
                 message: '注册成功',
+                data: {
+                    userCount: userCount // 返回注册顺序号
+                }
             }
         }catch (error) {
             console.error("UserRegister 失败", error);
@@ -104,6 +128,15 @@ const UserService = {
                 };
             }
 
+            // 确保用户有注册顺序号（兼容性处理）
+            if (!user.userCount) {
+                // 为老用户分配注册顺序号
+                const userCount = await getNextUserCount();
+                user.userCount = userCount;
+                await user.save();
+                console.log('为老用户分配注册顺序号:', user._id, userCount);
+            }
+
             // 生成token，包含用户ID和过期时间（7天）
             const token = JWT.generate({ uid: user._id }, '7d');
             
@@ -118,6 +151,8 @@ const UserService = {
                         nickname: user.nickname || '',
                         avatar: user.avatar || '',
                         gender: user.gender || 0,
+                        username: user.username || '',
+                        userCount: user.userCount,
                     }
                 }
             };

@@ -18,7 +18,7 @@
       <view class="user-detail" @click="handleUserinfo">
         <view class="user-info-content">
           <view class="login-btn" v-if="!userInfoStore.isLoggedIn">点击登录</view>
-          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${19}位喵宝` }}</view>
+          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${userInfoStore.userInfo.userCount}位哈基米` }}</view>
           <view class="user-desc" v-if="!userInfoStore.isLoggedIn">登录后可享受更多服务</view>
           <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.uid || '欢迎回来' }}</text></view>
         </view>
