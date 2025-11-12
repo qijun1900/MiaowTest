@@ -45,7 +45,6 @@
         @nav-click="handleClick"/>
     </view>
 
-
     <uviewOverlay v-model:show="LoginOverlayShow">
       <template #overlaycontent>
         <view class="rect">
@@ -69,16 +68,6 @@
             <up-button @click="handleCancelLogin">暂不登录</up-button>
           </view>
         </view>
-      </template>
-    </uviewOverlay>
-    <uviewOverlay v-model:show="AuthorOverlayShow">
-      <template #overlaycontent>
-        <view class="rect">
-          <view class="overlay-header">
-            <view class="overlay-title">开发作者</view>
-            <img class="author-image" src="/static/other/author-wechat.jpg" alt="作者微信二维码">
-          </view>
-          </view>
       </template>
     </uviewOverlay>
   </view>
@@ -112,10 +101,6 @@ const CustomNavbarList = ref([
     icon: '/static/navMy/c-my-feedback.png',
     path: '/pages/my/MyWrongView'
   },
-  {
-    title: '开发作者',
-    icon: '/static/navMy/c-my-author.png',
-  }
 ])
 // 处理导航栏点击事件
 const handleClick = (item) => {
@@ -130,8 +115,6 @@ const handleClick = (item) => {
     uni.navigateTo({
       url: '/pages/public/feedbackview'
     })
-  }else if (item.title === '开发作者') {
-    AuthorOverlayShow.value = true;
   }
 }
 
