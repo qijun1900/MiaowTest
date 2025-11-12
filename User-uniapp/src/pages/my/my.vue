@@ -18,7 +18,7 @@
       <view class="user-detail" @click="handleUserinfo">
         <view class="user-info-content">
           <view class="login-btn" v-if="!userInfoStore.isLoggedIn">点击登录</view>
-          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${19}位哈基咪` }}</view>
+          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${userInfoStore.userInfo.userCount}位哈基米` }}</view>
           <view class="user-desc" v-if="!userInfoStore.isLoggedIn">登录后可享受更多服务</view>
           <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.uid || '欢迎回来' }}</text></view>
         </view>
@@ -46,7 +46,7 @@
     </view>
 
 
-    <uviewOverlay v-model:show="overlayShow">
+    <uviewOverlay v-model:show="LoginOverlayShow">
       <template #overlaycontent>
         <view class="rect">
           <view class="overlay-header">
@@ -71,6 +71,16 @@
         </view>
       </template>
     </uviewOverlay>
+    <uviewOverlay v-model:show="AuthorOverlayShow">
+      <template #overlaycontent>
+        <view class="rect">
+          <view class="overlay-header">
+            <view class="overlay-title">开发作者</view>
+            <img class="author-image" src="/static/other/author-wechat.jpg" alt="作者微信二维码">
+          </view>
+          </view>
+      </template>
+    </uviewOverlay>
   </view>
 </template>
 
@@ -87,7 +97,8 @@ import CustomNavbar from '../../components/core/CustomNavbar.vue';
 import { clearExamCache } from '../../util/cacheCleaner.js';
 import showShareMenu from '../../util/wechatShare.js';
 
-const overlayShow = ref(false);
+const LoginOverlayShow = ref(false);
+const AuthorOverlayShow = ref(false);
 const userInfoStore = UserInfoStore();
 const navBarInfo = ref({});
 const CustomNavbarList = ref([
@@ -101,6 +112,10 @@ const CustomNavbarList = ref([
     icon: '/static/navMy/c-my-feedback.png',
     path: '/pages/my/MyWrongView'
   },
+  {
+    title: '开发作者',
+    icon: '/static/navMy/c-my-author.png',
+  }
 ])
 // 处理导航栏点击事件
 const handleClick = (item) => {
@@ -111,18 +126,19 @@ const handleClick = (item) => {
         icon: 'success'
       })
     } 
-  }
-  if (item.title === '问题反馈') {
+  }else if (item.title === '问题反馈') {
     uni.navigateTo({
       url: '/pages/public/feedbackview'
     })
+  }else if (item.title === '开发作者') {
+    AuthorOverlayShow.value = true;
   }
 }
 
 //用户信息
 const handleUserinfo = () => {
   if (!userInfoStore.isLoggedIn) {
-    overlayShow.value = true;
+    LoginOverlayShow.value = true;
   }else{
     uni.navigateTo({
       url: '/pages/my/UserInfoView'
@@ -131,17 +147,17 @@ const handleUserinfo = () => {
 };
 
 const handleCancelLogin = () => {
-  overlayShow.value = false;
+  LoginOverlayShow.value = false;
 };
 
 // 微信程序端登录 - 使用工具函数
 const handleUseWXLogin = async () => {
-  overlayShow.value = false;
+  LoginOverlayShow.value = false;
   try {
     await wechatLogin({
       onSuccess: () => {
         // 登录成功后关闭弹窗
-        overlayShow.value = false;
+        LoginOverlayShow.value = false;
       }
     });
   } catch (error) {
@@ -155,7 +171,7 @@ const handleUseWXLogin = async () => {
 
 // 处理账号登录 h5端和小程序端
 const handleUseAccountLogin = () => {
-  overlayShow.value = false;
+  LoginOverlayShow.value = false;
   uni.navigateTo({
     url: '/pages/my/UserLoginView'
   });
@@ -348,5 +364,27 @@ onMounted(() => {
 
 .function-list {
   margin-bottom: 20rpx;
+}
+
+/* 作者图片样式 */
+.author-image {
+  width: 270rpx;
+  height: 280rpx;
+  border-radius: 20rpx;
+  box-shadow: 
+    0 8rpx 24rpx rgba(0, 0, 0, 0.15),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  margin-top: 20rpx;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+/* 图片悬停效果 */
+.author-image:hover {
+  transform: scale(1.02);
+  box-shadow: 
+    0 12rpx 32rpx rgba(0, 0, 0, 0.2),
+    0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 }
 </style>

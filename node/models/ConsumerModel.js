@@ -49,6 +49,11 @@ const ConsumerSchema = new mongoose.Schema({
     createTime: {
         type: Date,
     },
+    userCount: { // 用户注册顺序号
+        type: Number,
+        unique: true,
+        sparse: true // 允许唯一值为null
+    },
     favoriteExams:{// 收藏的考试
         type:Array,
         default:[]

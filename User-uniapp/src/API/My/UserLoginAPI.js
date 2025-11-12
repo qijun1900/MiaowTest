@@ -4,8 +4,7 @@ import { http } from '../../util/http.js';
  * 微信用户登录/注册 
  * @param {string} message - 登录信息
  * @param {string} code - 登录凭证
- * @returns {Promise} 返回用户登录结果
- * 
+ * @returns {Promise} 返回用户登录结果,包括用户信息和token
  */
 export const Userlogin = async(message,code) => {
    try{
