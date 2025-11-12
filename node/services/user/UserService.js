@@ -3,7 +3,7 @@ const JWT = require("../../MiddleWares/jwt");
 const ConsumerModel = require("../../models/ConsumerModel");
 const ExamModel = require("../../models/ExamModel");
 const FeedbackModel = require("../../models/ConsumerFeedbackModel");
-const { CounterModel, getNextUserCount } = require("../../models/CounterModel"); // 引入计数器模型和函数
+const { getNextUserCount } = require("../../models/CounterModel"); // 引入计数器模型和函数
 const mongoose = require('mongoose');
 
 

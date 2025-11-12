@@ -36,8 +36,6 @@ export const wechatLogin = async (options = {}) => {
         icon: 'success'
       },1000);
 
-      console.log(response);
-      
       const userInfoStore = UserInfoStore();
       userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
       uni.setStorageSync('token', response.data.token); // 存储 Token
