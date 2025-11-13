@@ -103,7 +103,7 @@
             v-model:isRandom="isRandom"
             v-model:isOptionRandom="isOptionRandom"
             v-model:isShowAnswer="isShowAnswer"
-            v-model:isShowAIHelp="isShowAIHelp"/>
+            v-model:isShowHelper="isShowHelper"/>
           <view>
             <button class="practice-btn" @click="handleStart">
               <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
@@ -139,7 +139,7 @@ const questionCount = ref(1)
 const isRandom = ref(false) // 默认不乱序
 const isOptionRandom = ref(false) // 默认选项不乱序
 const isShowAnswer = ref(false) //是否立即显示答案
-const isShowAIHelp = ref(false)//是否开启AI解析
+const isShowHelper = ref(false)//是否开启AI解析
 
 // 滑动删除相关状态与方法（使用封装的 composable）
 const {
@@ -178,7 +178,7 @@ const handleStart = ()=>{
   QuestionStore.setSelectedQuestions(questionCount.value, isRandom.value, isOptionRandom.value);// 设置选择的题目
   QuestionStore.setUserShowSettings({ // 设置用户显示设置
     showAnswer: isShowAnswer.value,
-    showAIHelp: isShowAIHelp.value,
+    showHelper: isShowHelper.value,
     OptionRandom: isOptionRandom.value,
   });
   // 传递题库信息到练习页面

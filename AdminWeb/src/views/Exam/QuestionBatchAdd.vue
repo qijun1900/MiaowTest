@@ -61,9 +61,9 @@
                     :bubbleHeaderTitle="message.role === 'user' ? appStore.userInfo.username : message.role"
                     :isLoading="message.isLoading || false"
                     :bubbleAvatarSrc="message.role ==='user' ? `http://${escconfig.serverHost}:${escconfig.serverPort}` + appStore.userInfo.avatar :'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'"
-                    :typingsteps="4" 
-                    :typinginterval="30" 
-                    typingsuffix="💩"
+                    :typingsteps="message.role === 'user' ? 0 : 4" 
+                    :typinginterval="message.role === 'user' ? 0 : 30" 
+                    :typingsuffix="message.role === 'user' ? '' : '💩'"
                     :isFog="true"/> 
             </div>
             <div v-if="response && response.data && response.data.data.length > 0">
