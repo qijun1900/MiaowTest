@@ -222,12 +222,30 @@ export async function getUserFavoriteQuestionListAPI() {
     console.error("getUserFavoriteQuestionList 失败", error);
   }
 }
+/**
+ * @description 刷题时候检测当前题目是否收藏
+ * @param {String} questionId - 题目ID
+ * @returns {Promise} 返回收藏结果
+*/
+export async function checkFavoriteQuestionAPI(questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/checkFavoriteQuestion`,
+      method: 'POST',
+      data:{questionId,}
+    })
+  }catch (error) {
+    console.error("checkFavoriteQuestion 失败", error);
+  }
+}
+
 
 /**
  * 用户点击题目进行练习
  * @param {Type}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @param {String} questionId - 题目ID
- * @returns {Promise} 返回练习结果
+ * @returns {Promise} 返回练习结果 code: 200,isFavorited: true / false
+ * @example
  */
 export async function practiceQuestionAPI(Type, questionId) {
   try {

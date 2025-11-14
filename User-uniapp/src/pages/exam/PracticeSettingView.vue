@@ -105,13 +105,14 @@ onLoad((options) => {
             // 解析传递过来的科目数据
             const Data = JSON.parse(decodeURIComponent(options.data));
             QuestionTypeData.value = Data;
+
             
             // 设置默认题目数量为总题数（最大值）
             questionCount.value = Data.amount || 1;
             
             // 准备题库信息（系统题库）
             bankInfo.value = {
-                bankId: Data._id,
+                bankId: Data.examId,
                 bankName: Data.examName,
                 isUserBank: false // 标识这是系统题库
             };

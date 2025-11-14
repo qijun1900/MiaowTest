@@ -322,8 +322,9 @@ const navigateToQuestions = (subjectType) => {
     questionStore.FetchQuestionData();// 数据请求获取题目详细信息
     uni.navigateTo({
         url: `/pages/exam/PracticeSettingView?data=${encodeURIComponent(JSON.stringify({
-            subjectTypeName: subjectType.content,
-            examName: examInfo.value.name,
+            examId: examInfo.value.id,
+            subjectTypeName: subjectType.content, // 这个是考试题型
+            examName: examInfo.value.name, // 这个是考试名称
             updateTime: examInfo.value.updateTime,
             amount: subjectType.questionIdS ? subjectType.questionIdS.length : 0
         }))}`

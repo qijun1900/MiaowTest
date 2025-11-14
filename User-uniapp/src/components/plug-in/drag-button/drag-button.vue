@@ -41,7 +41,8 @@
 				<uni-icons 
 					v-else-if="item.iconType" 
 					:type="item.iconType" 
-					:size="item.iconSize || 27" color="#fff">
+					:size="item.iconSize || 27" 
+					:color="item.iconType==='star-filled' ? '#f7ba2a':'#fff'">
 				</uni-icons>
 				<image 
 					v-else-if="item.icon" 
@@ -186,8 +187,8 @@
 				return style;
 			},
 			// 处理菜单项点击
-			handleMenuItemClick(item, index) {
-				this.$emit('menuItemClick', item, index);
+			handleMenuItemClick(item) {
+				this.$emit('menuItemClick', item);
 				this.closeMenu();
 			},
 			// 关闭菜单
