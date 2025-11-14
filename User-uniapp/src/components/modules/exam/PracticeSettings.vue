@@ -30,8 +30,9 @@
         <view class="setting-item">
             <text class="label">开启刷题助手：</text>
             <view class="switch-wrapper">
-                <up-switch v-model="localIsShowHelper" size="20"></up-switch>
+                <up-switch v-model="localIsShowHelper" size="20" :disabled="disableHelper"></up-switch>
             </view>
+            <text v-if="disableHelper" class="helper-tip">个人题库不支持此功能</text>
         </view>
     </view>
 </template>
@@ -68,6 +69,11 @@ const props = defineProps({
     isShowHelper: {
         type: Boolean,
         default: true
+    },
+    // 是否禁用刷题助手
+    disableHelper: {
+        type: Boolean,
+        default: false
     },
 })
 
@@ -196,6 +202,13 @@ watch(() => props.isShowHelper, (newVal) => {
     min-width: 50rpx;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+.helper-tip {
+    font-size: 24rpx;
+    color: #999;
+    margin-left: 20rpx;
+    white-space: nowrap;
 }
 
 .switch-wrapper {

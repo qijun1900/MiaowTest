@@ -180,6 +180,7 @@ import { storeToRefs } from 'pinia'; // 从Pinia导入storeToRefs
 import navBarHeightUtil from '../../util/navBarHeight';
 import dragButton from '../../components/plug-in/drag-button/drag-button.vue';
 import { checkFavoriteQuestionAPI,addFavoriteQuestionAPI,deleteFavoriteQuestionAPI } from '../../API/Exam/QuestionAPI';
+import checkLogin from '../../util/checkLogin';
 
 const questionStore = useQuestionStore();// 问题Store,存储问题和用户设置
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
@@ -201,6 +202,10 @@ const currenIsFavorited = ref(false); // 当前问题是否收藏
 const currenQuestionType = ref(null); // 当前问题的类型
 
 const handleBtnClick = async() => {
+    const loginResult = await checkLogin();
+    if (!loginResult) {
+        return;
+    }
     if (currentQuestionId.value) {
        const result = await checkFavoriteQuestionAPI(currentQuestionId.value);
        if(result.code===200){

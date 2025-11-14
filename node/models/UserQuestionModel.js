@@ -39,7 +39,7 @@ const UserQuestionSchema = new mongoose.Schema({
         type: Array,
         default:null,
     },
-    answer: { 
+    answer: {  //0:错误，1：正确
         type: Number, //答案，针对判断题
         default: null
     },
