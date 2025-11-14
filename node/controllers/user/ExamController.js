@@ -271,6 +271,21 @@ const ExamController ={
             console.error('Error fetching getUserFavoriteQuestionList details:', error); // 处理错误
         }
     },
+    checkFavoriteQuestion :async (req,res)=>{
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { questionId } = req.body; // 从请求体中获取questionId
+            const result = await ExamService.checkFavoriteQuestion({uid,questionId})
+            res.send({
+                code: result.code,
+                isFavorited: result.isFavorited
+            })
+        }catch (error) {
+            console.error('Error fetching checkFavoriteQuestion details:', error); // 处理错误
+            
+        }
+        
+    },
     userPracticeFavoriteQuestion:async (req,res)=>{
         try {
             const { uid } = req.user;

@@ -575,6 +575,67 @@ const ExamService = {
             };
         }
     },
+    checkFavoriteQuestion: async ({uid,questionId}) => {
+        try {
+            // 使用聚合管道进行单次查询，更高效地检查用户是否存在和题目是否已收藏
+            const result = await ConsumerModel.aggregate([
+                {
+                    $match: { _id: new mongoose.Types.ObjectId(uid) }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        isFavorited: {
+                            $gt: [
+                                {
+                                    $size: {
+                                        $filter: {
+                                            input: "$favoriteQuestions",
+                                            cond: { $eq: ["$$this.questionId", new mongoose.Types.ObjectId(questionId)] }
+                                        }
+                                    }
+                                },
+                                0
+                            ]
+                        }
+                    }
+                }
+            ]);
+            
+            // 检查用户是否存在
+            if (result.length === 0) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+            
+            const isFavorited = result[0].isFavorited;
+            if (isFavorited) {
+                return {
+                    code: 200,
+                    isFavorited: true
+                };
+                
+            }else{
+                return {
+                    code: 200,
+                    isFavorited: false
+                };
+            }
+           
+        }catch(error){
+            console.error('checkFavoriteQuestion 失败:', error);
+            return {
+                code: 500,
+                message: '检查收藏状态失败',
+                success: false,
+                error: error.message
+            };
+        }
+        
+    },
     userPracticeFavoriteQuestion: async ({uid,Type,questionId}) => {
         try {
             const user = await ConsumerModel.findById(uid);

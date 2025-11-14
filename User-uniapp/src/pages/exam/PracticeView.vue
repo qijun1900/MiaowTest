@@ -100,7 +100,7 @@
                 @click="handleCheck"></up-tabbar-item>
             </up-tabbar>
         </view>
-        <!-- 答题卡  -->
+            <!-- 答题卡  -->
             <uviewPopup 
                 v-model:show="popupShow"
                 :round="30" 
@@ -143,6 +143,23 @@
                        </view>
                     </template>
             </uviewPopup>
+        <!-- 答题助手 -->
+        <dragButton
+            :isDock="true"
+			:existTabBar="true"
+            iconType='plusempty'
+            @btnClick="handleBtnClick"
+            :bottomOffset="150"
+            :horizontal="'right'" 
+            :vertical="'top'" 
+            :direction="'horizontal'"
+            :popMenu="true"
+            :content="[
+                { text: '设置', iconType: 'gear' ,value:0 },
+                { text: '笔记', iconType: 'compose'  ,value:1 },
+                { text: '收藏', iconType: currenIsFavorited ? 'star-filled':'star' ,value:2 }
+            ]"
+            @menuItemClick="handleMenuClick"/>
     </view>
 </template>
 <script setup>
@@ -161,6 +178,9 @@ import AnswerSheet from '../../components/modules/exam/AnswerSheet.vue';
 import { useStatisticsStore } from '../../stores/modules/StatisticsStore';
 import { storeToRefs } from 'pinia'; // 从Pinia导入storeToRefs
 import navBarHeightUtil from '../../util/navBarHeight';
+import dragButton from '../../components/plug-in/drag-button/drag-button.vue';
+import { checkFavoriteQuestionAPI,addFavoriteQuestionAPI,deleteFavoriteQuestionAPI } from '../../API/Exam/QuestionAPI';
+import checkLogin from '../../util/checkLogin';
 
 const questionStore = useQuestionStore();// 问题Store,存储问题和用户设置
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
@@ -177,6 +197,55 @@ const StatisticsStore = useStatisticsStore();// 统计答题数据Store
 const { correctCount, incorrectCount, accuracyRate } = storeToRefs(StatisticsStore);
 const scrollTop = ref(0); // 用于控制scroll-view的滚动位置
 const bankInfo = ref(null); // 题库信息
+const currentQuestionId = ref(null); // 当前问题的ID
+const currenIsFavorited = ref(false); // 当前问题是否收藏
+const currenQuestionType = ref(null); // 当前问题的类型
+
+const handleBtnClick = async() => {
+    const loginResult = await checkLogin();
+    if (!loginResult) {
+        return;
+    }
+    if (currentQuestionId.value) {
+       const result = await checkFavoriteQuestionAPI(currentQuestionId.value);
+       if(result.code===200){
+        currenIsFavorited.value  = result.isFavorited 
+       }
+    }
+}
+
+const handleMenuClick = async (item) => {
+    if(item.value===2 && currentQuestionId.value && !currenIsFavorited.value){
+        // 收藏当前问题
+        const res = await addFavoriteQuestionAPI(
+            currentQuestionId.value, // 当前问题ID
+            bankInfo.value.bankId, // 考试ID
+            currenQuestionType.value // 问题类型   
+        );
+        if (res.code === 200) {
+            currenIsFavorited.value = true; // 更新收藏状态
+            uni.showToast({
+                title: '收藏成功',
+                icon: 'none'
+            });
+            return;
+        }
+    }
+    if(item.value===2 && currentQuestionId.value && currenIsFavorited.value){
+        // 取消收藏当前问题
+        const res = await deleteFavoriteQuestionAPI(
+            currentQuestionId.value, 
+        );
+        if (res.code === 200) {
+            currenIsFavorited.value = false; // 更新收藏状态
+            uni.showToast({
+                title: '取消收藏',
+                icon: 'none'
+            });
+            return;
+        }
+    }
+}
 
 // 页面加载时接收参数
 onLoad((options) => {
@@ -193,8 +262,27 @@ onLoad((options) => {
 
 // 监听当前索引变化
 watch(currentIndex, (newIndex, oldIndex) => {
+    // 处理滑动方向变化
     handleDirectionChange(newIndex, oldIndex);
+    // 更新当前问题ID
+    updateCurrentQuestionId();
 });
+
+// 监听visibleIndexes变化
+watch(visibleIndexes, () => {
+    // 更新当前问题ID
+    updateCurrentQuestionId();
+}, { deep: true });
+
+// 更新当前问题ID的函数
+const updateCurrentQuestionId = () => {
+    const currentQuestionIndex = visibleIndexes.value[currentIndex.value];
+    if (currentQuestionIndex !== undefined && questionStore.UserChooseQuestion[currentQuestionIndex]) {
+        currentQuestionId.value = questionStore.UserChooseQuestion[currentQuestionIndex]._id;
+        // 同时更新当前问题的类型
+        currenQuestionType.value = questionStore.UserChooseQuestion[currentQuestionIndex].Type;
+    }
+};
 
 //选择模式
 const handleSendMode =(value)=>{
@@ -460,6 +548,9 @@ onMounted(() => {
     // 如果题目少于3道，则只显示实际数量的题目
     visibleIndexes.value = Array.from({ length: questionCount }, (_, i) => i);
    }
+   
+   // 初始化当前问题ID
+   updateCurrentQuestionId();
 })
 </script>
 

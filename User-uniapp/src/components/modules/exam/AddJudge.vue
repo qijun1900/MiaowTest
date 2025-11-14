@@ -17,7 +17,8 @@
                     :class="{ 'selected': formData.answer === option.value }" @click="setAnswer(option.value)">
                     <!-- 选项图标 -->
                     <view class="option-icon" :class="option.value === 1 ? 'correct-icon' : 'wrong-icon'">
-                        <uni-icons :type="option.value === 1 ? 'checkmarkempty' : 'closeempty'" size="18"
+                        <uni-icons 
+                            :type="option.value === 1 ? 'checkmarkempty' : 'closeempty'" size="18"
                             :color="formData.answer === option.value ? '#ffffff' : (option.value === 1 ? '#52c41a' : '#ff4d4f')">
                         </uni-icons>
                     </view>
@@ -169,7 +170,7 @@ onMounted(() => {
         // 编辑模式下初始化表单数据
         formData.stem = props.editData.stem || '';
         formData.analysis = props.editData.analysis || '';
-        formData.answer = props.editData.answer || null;
+        formData.answer = props.editData.answer
     }
 })
 

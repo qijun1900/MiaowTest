@@ -65,7 +65,7 @@
                 v-model:isRandom="isRandom"
                 v-model:isOptionRandom="isOptionRandom"
                 v-model:isShowAnswer="isShowAnswer"
-                v-model:isShowAIHelp="isShowAIHelp"/>
+                v-model:isShowHelper="isShowHelper"/>
         </view>
         
         <view class="action-container">
@@ -95,8 +95,8 @@ const bankInfo = ref(null); // 题库信息
 const questionCount = ref(1); 
 const isRandom = ref(false); // 默认不乱序
 const isOptionRandom = ref(false); // 默认选项不乱序
-const isShowAnswer = ref(false); // 是否立即显示答案
-const isShowAIHelp = ref(false); // 是否开启AI解析
+const isShowAnswer = ref(true); // 是否立即显示答案
+const isShowHelper = ref(true); // 是否开启AI解析
 
 // 页面加载时
 onLoad((options) => {
@@ -105,13 +105,14 @@ onLoad((options) => {
             // 解析传递过来的科目数据
             const Data = JSON.parse(decodeURIComponent(options.data));
             QuestionTypeData.value = Data;
+
             
             // 设置默认题目数量为总题数（最大值）
             questionCount.value = Data.amount || 1;
             
             // 准备题库信息（系统题库）
             bankInfo.value = {
-                bankId: Data._id,
+                bankId: Data.examId,
                 bankName: Data.examName,
                 isUserBank: false // 标识这是系统题库
             };
@@ -160,7 +161,7 @@ const handleStart = () => {
     // 设置用户显示设置
     QuestionStore.setUserShowSettings({
         showAnswer: isShowAnswer.value,
-        showAIHelp: isShowAIHelp.value,
+        showHelper: isShowHelper.value,
         OptionRandom: isOptionRandom.value,
     });
     
@@ -369,6 +370,6 @@ const handleStart = () => {
 
 .info-item:nth-child(1) { animation-delay: 0.2s; }
 .info-item:nth-child(2) { animation-delay: 0.3s; }
-.info-item:nth-child(3) { animation-delay: 0.4s; }
-.info-item:nth-child(4) { animation-delay: 0.5s; }
+.info-item:nth-child(3) { animation-delay: 0.5s; }
+.info-item:nth-child(4) { animation-delay: 0.7s; }
 </style>

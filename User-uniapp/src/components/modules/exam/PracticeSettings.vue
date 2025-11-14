@@ -28,10 +28,11 @@
             </view>
         </view>
         <view class="setting-item">
-            <text class="label">开启AI解析：</text>
+            <text class="label">开启刷题助手：</text>
             <view class="switch-wrapper">
-                <up-switch v-model="localIsShowAIHelp" size="20"></up-switch>
+                <up-switch v-model="localIsShowHelper" size="20" :disabled="disableHelper"></up-switch>
             </view>
+            <text v-if="disableHelper" class="helper-tip">个人题库不支持此功能</text>
         </view>
     </view>
 </template>
@@ -62,16 +63,21 @@ const props = defineProps({
     // 立即显示答案
     isShowAnswer: {
         type: Boolean,
-        default: false
+        default: true
     },
     // 开启AI解析
-    isShowAIHelp: {
+    isShowHelper: {
+        type: Boolean,
+        default: true
+    },
+    // 是否禁用刷题助手
+    disableHelper: {
         type: Boolean,
         default: false
     },
 })
 
-// 定义 emits
+// 定义 emits 
 const emit = defineEmits([
     'update:questionCount',
     'update:isRandom', 
@@ -85,7 +91,7 @@ const localQuestionCount = ref(props.questionCount)
 const localIsRandom = ref(props.isRandom)
 const localIsOptionRandom = ref(props.isOptionRandom)
 const localIsShowAnswer = ref(props.isShowAnswer)
-const localIsShowAIHelp = ref(props.isShowAIHelp)
+const localIsShowHelper = ref(props.isShowHelper)
 
 
 
@@ -106,8 +112,8 @@ watch(localIsShowAnswer, (newVal) => {
     emit('update:isShowAnswer', newVal)
 })
 
-watch(localIsShowAIHelp, (newVal) => {
-    emit('update:isShowAIHelp', newVal)
+watch(localIsShowHelper, (newVal) => {
+    emit('update:isShowHelper', newVal)
 })
 
 // 监听 props 变化，更新本地数据
@@ -127,8 +133,8 @@ watch(() => props.isShowAnswer, (newVal) => {
     localIsShowAnswer.value = newVal
 })
 
-watch(() => props.isShowAIHelp, (newVal) => {
-    localIsShowAIHelp.value = newVal
+watch(() => props.isShowHelper, (newVal) => {
+    localIsShowHelper.value = newVal
 })
 </script>
 
@@ -196,6 +202,13 @@ watch(() => props.isShowAIHelp, (newVal) => {
     min-width: 50rpx;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+.helper-tip {
+    font-size: 24rpx;
+    color: #999;
+    margin-left: 20rpx;
+    white-space: nowrap;
 }
 
 .switch-wrapper {
