@@ -10,7 +10,18 @@
 			@click.stop.prevent="click"
 			:class="{transition: isDock && !isMove }">
 			
-			<text>{{ text }}</text>
+			<text v-if="!icon && !iconType" class="drag-text">{{ text }}</text>
+			<uni-icons 
+				v-else-if="iconType" 
+				:type="iconType" 
+				:size="iconSize || 30" color="#fff">
+			</uni-icons>
+			<image 
+				v-else-if="icon" 
+				:src="icon" 
+				class="drag-image" 
+				mode="aspectFit">
+			</image>
 		</view>
 		
 		<!-- 弹出菜单 -->
@@ -23,12 +34,30 @@
 				:key="index" 
 				class="menu-item"
 				@click.stop="handleMenuItemClick(item, index)">
-				<text>{{ item.text }}</text>
+				<text 
+					v-if="!item.icon && !item.iconType" 
+					class="menu-text">{{ item.text }}
+				</text>
+				<uni-icons 
+					v-else-if="item.iconType" 
+					:type="item.iconType" 
+					:size="item.iconSize || 27" color="#fff">
+				</uni-icons>
+				<image 
+					v-else-if="item.icon" 
+					:src="item.icon" 
+					class="menu-image" 
+					mode="aspectFit">
+				</image>
 			</view>
 		</view>
 		
 		<!-- 遮罩层，用于点击关闭菜单 -->
-		<view v-if="popMenu && showMenu" class="menu-mask" @click.stop="closeMenu"></view>
+		<view 
+			v-if="popMenu && showMenu" 
+			class="menu-mask" 
+			@click.stop="closeMenu">
+		</view>
 	</view>
 </template>
 
@@ -69,9 +98,21 @@
 				type: Boolean,
 				default: true
 			},
-			content: { // 菜单内容，数组形式，每个元素包含 text 属性
+			content: { // 菜单内容，数组形式，每个元素包含 text 和可选的 icon 或 iconType 属性
 				type: Array,
 				default: () => []
+			},
+			icon: { // 拖拽按钮图标路径，可选
+				type: String,
+				default: ''
+			},
+			iconType: { // 拖拽按钮图标类型，用于uni-icons，可选
+				type: String,
+				default: ''
+			},
+			iconSize: { // 拖拽按钮图标大小，可选
+				type: Number,
+				default: 30
 			}
 		},
 		data() {
@@ -203,15 +244,23 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: rgba(21, 134, 255, 0.725);
 		box-shadow: 0 0 6upx rgba(0, 0, 0, 0.4);
 		color: $uni-text-color-inverse;
-		width: 80upx;
-		height: 80upx;
+		width: 100upx;
+		height: 100upx;
 		border-radius: 50%;
 		font-size: $uni-font-size-sm;
 		position: fixed;
 		z-index: 999999;
+		
+		.drag-text {
+			font-size: $uni-font-size-sm;
+		}
+		
+		.drag-icon {
+			font-size: 40upx;
+		}
 		
 		&.transition {
 			transition: left .3s ease,top .3s ease;
@@ -221,7 +270,7 @@
 	// 弹出菜单样式
 	.pop-menu {
 		position: fixed;
-		background-color: rgba(0, 0, 0, 0.7);
+		background-color: rgba(255, 255, 255, 0);
 		border-radius: 8upx;
 		padding: 10upx;
 		z-index: 999998;
@@ -264,15 +313,23 @@
 		}
 		
 		.menu-item {
-			background-color: rgba(255, 255, 255, 0.2);
+			background-color: rgba(25, 159, 255, 0.676);
 			border-radius: 50%;
-			width: 60upx;
-			height: 60upx;
+			width: 80upx;
+			height: 80upx;
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			color: #fff;
-			font-size: 24upx;
+			color: #ffffff;
+			
+			.menu-text {
+				font-size: 24upx;
+			}
+			
+			.menu-image {
+				width: 30upx;
+				height: 30upx;
+			}
 			
 			&:active {
 				background-color: rgba(255, 255, 255, 0.4);

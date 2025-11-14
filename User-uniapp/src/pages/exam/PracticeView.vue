@@ -147,6 +147,7 @@
         <dragButton
             :isDock="true"
 			:existTabBar="true"
+            iconType='plusempty'
 			@btnClick="btnClick"
 			@btnTouchstart="btnTouchstart"
 			@btnTouchend="btnTouchend"
@@ -156,9 +157,9 @@
             :direction="'horizontal'"
             :popMenu="true"
             :content="[
-                { text: 'A', value: 0 },
-                { text: 'B', value: 1 },
-                { text: 'C', value: 2 }
+                { text: '首页', iconType: 'gear' },
+                { text: '笔记', iconType: 'compose' },
+                { text: '收藏', iconType: 'star' }
             ]"
             @menuItemClick="handleMenuClick"/>
     </view>
