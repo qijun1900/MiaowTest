@@ -100,7 +100,7 @@
                 @click="handleCheck"></up-tabbar-item>
             </up-tabbar>
         </view>
-        <!-- 答题卡  -->
+            <!-- 答题卡  -->
             <uviewPopup 
                 v-model:show="popupShow"
                 :round="30" 
@@ -143,6 +143,24 @@
                        </view>
                     </template>
             </uviewPopup>
+        <!-- 答题助手 -->
+        <dragButton
+            :isDock="true"
+			:existTabBar="true"
+			@btnClick="btnClick"
+			@btnTouchstart="btnTouchstart"
+			@btnTouchend="btnTouchend"
+            :bottomOffset="100"
+            :horizontal="'right'" 
+            :vertical="'top'" 
+            :direction="'horizontal'"
+            :popMenu="true"
+            :content="[
+                { text: 'A', value: 0 },
+                { text: 'B', value: 1 },
+                { text: 'C', value: 2 }
+            ]"
+            @menuItemClick="handleMenuClick"/>
     </view>
 </template>
 <script setup>
@@ -161,6 +179,7 @@ import AnswerSheet from '../../components/modules/exam/AnswerSheet.vue';
 import { useStatisticsStore } from '../../stores/modules/StatisticsStore';
 import { storeToRefs } from 'pinia'; // 从Pinia导入storeToRefs
 import navBarHeightUtil from '../../util/navBarHeight';
+import dragButton from '../../components/plug-in/drag-button/drag-button.vue';
 
 const questionStore = useQuestionStore();// 问题Store,存储问题和用户设置
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
@@ -177,6 +196,22 @@ const StatisticsStore = useStatisticsStore();// 统计答题数据Store
 const { correctCount, incorrectCount, accuracyRate } = storeToRefs(StatisticsStore);
 const scrollTop = ref(0); // 用于控制scroll-view的滚动位置
 const bankInfo = ref(null); // 题库信息
+
+const btnClick = () => {
+    console.log('btnClick');
+}
+
+const btnTouchstart = () => {
+    console.log('btnTouchstart');
+  
+}
+const btnTouchend = () => {
+    console.log('btnTouchend');
+}
+const handleMenuClick = (item, index) => {
+    console.log('menuItemClick', item, index);
+  
+}
 
 // 页面加载时接收参数
 onLoad((options) => {
