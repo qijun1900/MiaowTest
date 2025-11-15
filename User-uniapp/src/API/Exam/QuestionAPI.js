@@ -242,7 +242,7 @@ export async function checkFavoriteQuestionAPI(questionId) {
 
 /**
  * 用户点击题目进行练习
- * @param {Type}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @param {Number}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @param {String} questionId - 题目ID
  * @returns {Promise} 返回练习结果 code: 200,isFavorited: true / false
  * @example

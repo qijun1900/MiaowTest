@@ -173,7 +173,13 @@
 			"style": {
 				"navigationBarTitleText": "资料详情",
 				"disableScroll": true
-			}	
+			}
+		},
+		{
+			"path": "pages/my/MyNoteView",
+			"style": {
+				"navigationBarTitleText": "我的笔记",
+			}
 		}
 	],
 	"globalStyle": {
