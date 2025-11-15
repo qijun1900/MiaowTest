@@ -160,6 +160,31 @@
                 { text: '收藏', iconType: currenIsFavorited ? 'star-filled':'star' ,value:2 }
             ]"
             @menuItemClick="handleMenuClick"/>
+        <!-- 笔记弹窗 -->
+        <uviewPopup
+            v-model:show="iSopenNotePopupShow"
+            :round="30"
+            title="添加题目笔记" >
+                <template #popupcontent>
+                    <view class="popup-container">
+                        <uniEditor 
+                            placeholder="请在此处输入笔记内容" 
+                            v-model="noteContent" 
+                            height="320rpx" 
+                            id="noteEditor"/>
+                        <view class="popup-but-container">
+                            <up-button
+                                :plain="true"
+                                :hairline="true"
+                                type="primary"
+                                @click="handleSaveNote"
+                                shape="circle">
+                                保存
+                            </up-button>
+                        </view>
+                    </view>
+                </template>
+        </uviewPopup>
     </view>
 </template>
 <script setup>
@@ -179,8 +204,15 @@ import { useStatisticsStore } from '../../stores/modules/StatisticsStore';
 import { storeToRefs } from 'pinia'; // 从Pinia导入storeToRefs
 import navBarHeightUtil from '../../util/navBarHeight';
 import dragButton from '../../components/plug-in/drag-button/drag-button.vue';
-import { checkFavoriteQuestionAPI,addFavoriteQuestionAPI,deleteFavoriteQuestionAPI } from '../../API/Exam/QuestionAPI';
+import { 
+    checkFavoriteQuestionAPI,
+    addFavoriteQuestionAPI,
+    deleteFavoriteQuestionAPI,
+    savePracticeNoteAPI,
+    getPracticeNoteAPI
+} from '../../API/Exam/QuestionAPI';
 import checkLogin from '../../util/checkLogin';
+import uniEditor from '../../components/core/uniEditor.vue'
 
 const questionStore = useQuestionStore();// 问题Store,存储问题和用户设置
 const list = ref(['答题模式', '学习模式']);// 添加subsection需要的数据
@@ -192,7 +224,7 @@ const visibleIndexes = ref([0, 1, 2]); // 当前可见的三个项目索引
 const ObjectiveAnswerStore = useObjectiveAnswerStore();// 客观题答案Store
 const SubjectiveAnswerStore = useSubjectiveAnswerStore();// 主观题答案Store
 const refreshKey = ref(0);// 用于触发子组件刷新
-const popupShow = ref(false);// 弹窗
+const popupShow = ref(false);//答题卡弹窗
 const StatisticsStore = useStatisticsStore();// 统计答题数据Store
 const { correctCount, incorrectCount, accuracyRate } = storeToRefs(StatisticsStore);
 const scrollTop = ref(0); // 用于控制scroll-view的滚动位置
@@ -200,6 +232,8 @@ const bankInfo = ref(null); // 题库信息
 const currentQuestionId = ref(null); // 当前问题的ID
 const currenIsFavorited = ref(false); // 当前问题是否收藏
 const currenQuestionType = ref(null); // 当前问题的类型
+const iSopenNotePopupShow = ref(false);// 笔记弹窗
+const noteContent = ref('');// 笔记内容
 
 const handleBtnClick = async() => {
     const loginResult = await checkLogin();
@@ -245,6 +279,37 @@ const handleMenuClick = async (item) => {
             return;
         }
     }
+    if(item.value===1 && currentQuestionId.value && !iSopenNotePopupShow.value){
+        // 打开笔记弹窗
+        iSopenNotePopupShow.value = true;
+        // 加载已有的笔记(检测是否有笔记)
+        const res = await getPracticeNoteAPI(currentQuestionId.value);
+        if (res.code === 200 && res.data.hasNote) {
+            noteContent.value = res.data.note.content; // 加载笔记内容
+        }else{
+            noteContent.value = ''; // 清空笔记内容
+        }
+    }
+}
+const handleSaveNote = async () => {
+    // 保存笔记
+    if (currentQuestionId.value && noteContent.value) {
+        // 调用API保存笔记
+        const res = await savePracticeNoteAPI({
+            questionId: currentQuestionId.value, // 问题ID
+            questionType: currenQuestionType.value, // 问题类型
+            examId: bankInfo.value.bankId, // 考试ID
+            content: noteContent.value, // 笔记内容
+        });
+        if (res.code === 200) {
+            uni.showToast({
+                title:res.message,
+                icon: 'none'
+            });
+            iSopenNotePopupShow.value = false; // 关闭笔记弹窗
+            noteContent.value = ''; // 清空笔记内容
+        }
+    }
 }
 
 // 页面加载时接收参数
@@ -257,8 +322,6 @@ onLoad((options) => {
     }
   }
 });
-
-//TODO 优化自定义底部
 
 // 监听当前索引变化
 watch(currentIndex, (newIndex, oldIndex) => {
@@ -278,9 +341,8 @@ watch(visibleIndexes, () => {
 const updateCurrentQuestionId = () => {
     const currentQuestionIndex = visibleIndexes.value[currentIndex.value];
     if (currentQuestionIndex !== undefined && questionStore.UserChooseQuestion[currentQuestionIndex]) {
-        currentQuestionId.value = questionStore.UserChooseQuestion[currentQuestionIndex]._id;
-        // 同时更新当前问题的类型
-        currenQuestionType.value = questionStore.UserChooseQuestion[currentQuestionIndex].Type;
+        currentQuestionId.value = questionStore.UserChooseQuestion[currentQuestionIndex]._id; // 更新当前问题ID
+        currenQuestionType.value = questionStore.UserChooseQuestion[currentQuestionIndex].Type; // 更新当前问题的类型
     }
 };
 
@@ -529,7 +591,9 @@ onMounted(() => {
    safeAreaBottom.value = safeAreaInfo.bottom;
    
    // 检查是否有题目数据，如果没有则返回上一页
-   if (!questionStore.UserChooseQuestion || questionStore.UserChooseQuestion.length === 0) {
+   if (
+    !questionStore.UserChooseQuestion 
+    || questionStore.UserChooseQuestion.length === 0) {
      uni.showToast({
        title: '没有题目数据',
        icon: 'none'

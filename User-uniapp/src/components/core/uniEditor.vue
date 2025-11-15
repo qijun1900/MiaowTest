@@ -205,7 +205,7 @@ const handleBlur = () => {
     // 延迟隐藏工具栏，给用户时间点击工具栏按钮
     hideTimer.value = setTimeout(() => {
         showtoolbar.value = false;
-    }, 300); // 300ms延迟，用户有足够时间点击工具栏
+    }, 1500); //1500ms延迟，用户有足够时间点击工具栏
 }
 
 // 定义事件
@@ -682,7 +682,6 @@ onUnmounted(() => {
     position: relative;
 }
 
-/* 小程序不支持:active伪类，移除此样式 */
 
 .toolbar-item.active {
     background-color: #007aff;
@@ -694,7 +693,6 @@ onUnmounted(() => {
 
 .toolbar-item.disabled {
     opacity: 0.5;
-    /* pointer-events 在小程序中不被支持，移除此属性 */
 }
 
 .toolbar-divider {
@@ -713,7 +711,6 @@ onUnmounted(() => {
     border-radius: 8rpx;
     padding: 10rpx;
     z-index: 100;
-    /* box-shadow 在小程序中支持有限，简化阴影效果 */
     display: flex;
     flex-wrap: wrap;
     max-width: 400rpx;
@@ -746,7 +743,6 @@ onUnmounted(() => {
     width: 100%;
     height: 40rpx;
     border: none;
-    /* outline 在小程序中不被支持，移除此属性 */
 }
 
 .font-size-picker {
@@ -758,7 +754,6 @@ onUnmounted(() => {
     border-radius: 8rpx;
     padding: 10rpx;
     z-index: 100;
-    /* box-shadow 在小程序中支持有限，简化阴影效果 */
     display: flex;
     flex-direction: column;
     min-width: 120rpx;
@@ -773,8 +768,6 @@ onUnmounted(() => {
 .font-size-option-last {
     border-bottom: none;
 }
-
-/* 小程序不支持:active伪类，移除此样式 */
 
 .editor-wrapper {
     height: v-bind('props.height');

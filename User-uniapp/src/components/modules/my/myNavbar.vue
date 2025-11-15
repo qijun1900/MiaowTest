@@ -36,10 +36,9 @@ const navItems = ref([
     path: '/pages/my/MyWrongView'
   },
   {
-    title: '所有考试',
-    icon: '/static/tabBar/exam-active.png',
+    title: '我的笔记',
+    icon: '/static/navMy/my-note.png',
     path: '/pages/exam/exam',
-    istabBar: true
   },
   {
     title: '收藏工具',

@@ -3,6 +3,7 @@ const JWT = require("../../MiddleWares/jwt");
 const ConsumerModel = require("../../models/ConsumerModel");
 const ExamModel = require("../../models/ExamModel");
 const FeedbackModel = require("../../models/ConsumerFeedbackModel");
+const QuestionNoteModel = require("../../models/QuestionNoteModel");
 const { getNextUserCount } = require("../../models/CounterModel"); // 引入计数器模型和函数
 const mongoose = require('mongoose');
 
@@ -471,6 +472,110 @@ const UserService = {
             }
         }
 
+    },
+    // 保存练习笔记
+    savePracticeNote: async ({
+        uid,
+        questionId,
+        questionType,
+        examId,
+        content,
+        tags = [],// 标签数组，默认为空数组
+        isPublic = false // 是否公开，默认为false
+    }) => {
+        try {
+            // 检查是否已存在该用户对该题目的笔记
+            const existingNote = await QuestionNoteModel.findOne({
+                Uid: uid,
+                questionId: questionId
+            });
+
+            if (existingNote) {
+                // 更新现有笔记
+                existingNote.content = content;
+                existingNote.questionType = questionType;
+                existingNote.examId = examId;
+                existingNote.tags = tags;
+                existingNote.isPublic = isPublic;
+                existingNote.updateTime = new Date();
+                
+                await existingNote.save();
+                
+                return {
+                    code: 200,
+                    message: '笔记更新成功',
+                    success: true,
+                };
+            } else {
+                // 创建新笔记
+                const newNote = new QuestionNoteModel({
+                    Uid: uid,
+                    questionId: questionId,
+                    questionType: questionType,
+                    examId: examId,
+                    content: content,
+                    tags: tags,
+                    isPublic: isPublic,
+                    updateTime: new Date()
+                });
+
+                await newNote.save();
+
+                return {
+                    code: 200,
+                    message: '笔记保存成功',
+                    success: true,
+                };
+            }
+        } catch (error) {
+            console.error("savePracticeNote 失败", error);
+            return {
+                code: 500,
+                message: '笔记保存失败',
+                error: error.message,
+                success: false
+            };
+        }
+    },
+    // 获取用户特定题目的笔记
+    getPracticeNote: async ({ uid, questionId }) => {
+        try {
+            // 查找用户对特定题目的笔记
+            const note = await QuestionNoteModel.findOne({
+                Uid: uid,
+                questionId: questionId
+            });
+
+            if (note) {
+                return {
+                    code: 200,
+                    success: true,
+                    data: {
+                        hasNote: true,
+                        note: {
+                            content: note.content,
+                        }
+                    }
+                };
+            } else {
+                return {
+                    code: 200,
+                    success: true,
+                    data: {
+                        hasNote: false,
+                        note: null
+                    }
+                };
+            }
+        } catch (error) {
+            console.error("getPracticeNote 失败", error);
+            return {
+                code: 500,
+                message: '获取笔记失败',
+                error: error.message,
+                success: false
+            };
+        }
     }
 }
 
