@@ -13,7 +13,7 @@
   </div>
   
   <p>
-    <img src="https://img.shields.io/badge/version-0.7.0-blue.svg" alt="Version">
+    <img src="https://img.shields.io/badge/version-1.6.0-blue.svg" alt="Version">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
     <img src="https://img.shields.io/badge/platform-Uniapp-blueviolet.svg" alt="Platform">
     <img src="https://img.shields.io/badge/frontend-Vue3-teal.svg" alt="Vue3">
@@ -36,9 +36,9 @@
 
 ### ✨ 核心亮点
 
-- 🚀 **跨平台兼容**：基于 Uniapp，支持微信、支付宝、百度等主流小程序平台
-- 📚 **题型丰富**：支持选择题、填空题、判断题等多种题型
-- 🤖 **智能分析**：AI驱动的题目分析和个性化推荐
+- 🚀 **跨平台兼容**：基于 Uniapp，支持微信等主流小程序平台
+- 📚 **题型丰富**：支持选择题、填空题、判断题、简答题
+- 🤖 **智能分析**：AI驱动的题目分析
 - 📊 **数据可视化**：详细的练习数据统计和分析
 - 🎨 **界面美观**：现代化的UI设计，用户体验优秀
 - ⚡ **性能优化**：响应式布局，流畅的交互体验

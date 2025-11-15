@@ -302,11 +302,11 @@ const handleSaveNote = async () => {
             content: noteContent.value, // 笔记内容
         });
         if (res.code === 200) {
+            iSopenNotePopupShow.value = false; // 关闭笔记弹窗
             uni.showToast({
                 title:res.message,
                 icon: 'none'
             });
-            iSopenNotePopupShow.value = false; // 关闭笔记弹窗
             noteContent.value = ''; // 清空笔记内容
         }
     }

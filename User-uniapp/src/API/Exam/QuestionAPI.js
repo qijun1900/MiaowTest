@@ -274,7 +274,6 @@ export async function savePracticeNoteAPI({
   content
 }) {
   try {
-    console.log(questionId, questionType, examId, content);
     return await http({
       url: `/uniappAPI/exam/savePracticeNote`,
       method: 'POST',
