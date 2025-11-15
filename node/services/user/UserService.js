@@ -554,6 +554,7 @@ const UserService = {
                         hasNote: true,
                         note: {
                             content: note.content,
+                            updateTime: note.updateTime,
                         }
                     }
                 };
@@ -563,7 +564,7 @@ const UserService = {
                     success: true,
                     data: {
                         hasNote: false,
-                        note: null
+                        note: null,
                     }
                 };
             }
