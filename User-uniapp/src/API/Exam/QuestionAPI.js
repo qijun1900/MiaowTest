@@ -255,7 +255,7 @@ export async function practiceQuestionAPI(Type, questionId) {
       data:{Type, questionId}
     })
   }catch (error) {
-    console.error("practiceFavoriteQuestion 失败", error);
+    console.error("practiceQuestion 失败", error);
   } 
 }
 /**

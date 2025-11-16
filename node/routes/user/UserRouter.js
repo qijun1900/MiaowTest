@@ -16,7 +16,8 @@ UserRouter.get("/uniappAPI/User/checkUserBind", JWT.verifyTokenMiddleware(),User
 UserRouter.post("/uniappAPI/Feedback/submitFeedback", JWT.optionalTokenMiddleware(), UserController.userFeedback)//用户提交反馈接口
 UserRouter.post("/uniappAPI/exam/savePracticeNote", JWT.verifyTokenMiddleware(), UserController.savePracticeNote)//用户保存练习笔记接口- 
 UserRouter.post("/uniappAPI/exam/getPracticeNote", JWT.verifyTokenMiddleware(), UserController.getPracticeNote)//用户获取练习笔记接口-
-
+UserRouter.get("/uniappAPI/UserNote/getNoteExamList", JWT.verifyTokenMiddleware(), UserController.getNoteExamList)//用户获取笔记科目列表接口-
+UserRouter.post("/uniappAPI/UserNote/getNoteListByExamId", JWT.verifyTokenMiddleware(), UserController.getNoteListByExamId)//根据科目id用户获取笔记列表接口-
 
 
 

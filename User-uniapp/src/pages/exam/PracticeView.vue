@@ -177,7 +177,9 @@
                                 id="noteEditor"
                                 :focus="iSopenNotePopupShow"/>
                         </view>
-                        <view class="note-info" v-if="lastSavedTime">
+                        <view 
+                            class="note-info" 
+                            v-if="lastSavedTime">
                             <text class="note-info-text">上次保存: {{ formatTime.getTime2(lastSavedTime) }}</text>
                         </view>
                         <view class="note-button-container">

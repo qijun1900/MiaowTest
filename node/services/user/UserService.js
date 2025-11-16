@@ -8,7 +8,6 @@ const { getNextUserCount } = require("../../models/CounterModel"); // 引入计�
 const mongoose = require('mongoose');
 
 
-
 const UserService = {
     Userlogin: async (message, code) => {
         try {
@@ -573,6 +572,145 @@ const UserService = {
             return {
                 code: 500,
                 message: '获取笔记失败',
+                error: error.message,
+                success: false
+            };
+        }
+    },
+    // 获取用户笔记的考试列表
+    getNoteExamList: async ({ uid }) => {
+        try {
+            // 使用聚合查询获取用户所有笔记关联的考试信息
+            const examList = await QuestionNoteModel.aggregate([
+                // 第一步：匹配用户ID
+                { $match: { Uid: new mongoose.Types.ObjectId(uid) } },
+                
+                // 第二步：按examId分组，获取每个考试的最新笔记时间和笔记数量
+                {
+                    $group: {
+                        _id: "$examId",
+                        latestNoteTime: { $max: "$updateTime" },
+                        noteCount: { $sum: 1 }
+                    }
+                },
+                
+                // 第三步：关联考试表获取考试详情
+                {
+                    $lookup: {
+                        from: "exams",
+                        localField: "_id",
+                        foreignField: "_id",
+                        as: "examInfo"
+                    }
+                },
+                
+                // 第四步：处理关联结果
+                {
+                    $unwind: "$examInfo"
+                },
+                
+                // 第五步：整理输出格式
+                {
+                    $project: {
+                        _id: "$examInfo._id",
+                        name: "$examInfo.name",
+                        cover: "$examInfo.cover",
+                        noteCount: 1// 包含笔记数量
+                    }
+                },
+                
+                // 第六步：按最新笔记时间降序排序
+                { $sort: { latestNoteTime: -1 } }
+            ]);
+
+            return {
+                code: 200,
+                success: true,
+                data: examList
+            };
+        } catch (error) {
+            console.error("getNoteExamList 失败", error);
+            return {
+                code: 500,
+                message: '获取笔记考试列表失败',
+                error: error.message,
+                success: false
+            };
+        }
+    },
+    // 根据考试ID和用户ID获取带笔记的题目列表
+    getNoteListByExamId: async ({ uid, examId }) => {
+        try {
+            // 引入各种题目模型
+            const SelectModel = require("../../models/SelectModel");
+            const JudgeModel = require("../../models/JudgeModel");
+            const BlankModel = require("../../models/BlankModel");
+            const ShortModel = require("../../models/ShortModel");
+            
+            // 1. 查询用户在该考试下的所有笔记
+            const notes = await QuestionNoteModel.find({
+                Uid: uid,
+                examId: examId
+            }).sort({ updateTime: -1 });
+
+            if (notes.length === 0) {
+                return {
+                    code: 200,
+                    success: true,
+                    message: '该考试下暂无笔记',
+                    data: []
+                };
+            }
+
+            // 2. 根据笔记中的题目ID和题目类型，查询对应的题目信息
+            const questionsWithNotes = [];
+
+            for (const note of notes) {
+                let question = null;
+                
+                // 根据题目类型查询对应的题目
+                switch (note.questionType) {
+                    case 1: // 选择题
+                        question = await SelectModel.findById(note.questionId);
+                        break;
+                    case 2: // 填空题
+                        question = await BlankModel.findById(note.questionId);
+                        break;
+                    case 3: // 判断题
+                        question = await JudgeModel.findById(note.questionId);
+                        break;
+                    case 4: // 简答题
+                        question = await ShortModel.findById(note.questionId);
+                        break;
+                }
+
+                // 如果找到题目，则将题目信息和笔记合并
+                if (question) {
+                    questionsWithNotes.push({
+                        questionId: question._id,
+                        questionType: note.questionType,
+                        stem: question.stem,
+                        options: question.options || null,
+                        answer: question.answer || null,
+                        analysis: question.analysis || '',
+                        content: question.content || '',
+                        note: {
+                            content: note.content,
+                            updateTime: note.updateTime
+                        }
+                    });
+                }
+            }
+            return {
+                code: 200,
+                success: true,
+                data: questionsWithNotes
+            };
+        } catch (error) {
+            console.error("getNoteListByExamId 失败", error);
+            return {
+                code: 500,
+                message: '获取笔记列表失败',
                 error: error.message,
                 success: false
             };

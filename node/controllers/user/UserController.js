@@ -331,6 +331,82 @@ const UserController = {
                 message: '服务器错误'
             });
         }
+    },
+    getNoteExamList: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                });
+            }
+            const result = await UserService.getNoteExamList({uid}); // 调用服务层方法获取用户笔记的考试列表
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data,
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message,
+                });
+            }
+        } catch(e) {
+            console.error("getNoteExamList 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+    },
+    getNoteListByExamId: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                });
+            }
+            const { examId } = req.body; // 从请求体中获取考试ID
+            if (!examId) {
+                return res.send({
+                    code: 400,
+                    ActionType: "ERROR",
+                    message: '缺少考试ID'
+                });
+            }
+            const result = await UserService.getNoteListByExamId({uid, examId}); // 调用服务层方法获取指定考试ID的笔记列表   
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                });
+            }
+        }catch(e) {
+            console.error("getNoteListByExamId 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+        
     }
 }
 

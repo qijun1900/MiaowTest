@@ -116,7 +116,7 @@
             </view>
         </view>
         <!-- 编辑器 -->
-        <view class="editor-wrapper">
+        <view class="editor-wrapper" @touchmove.prevent.stop>
             <editor 
                 :id="props.id" 
                 class="editor" 
@@ -124,7 +124,8 @@
                 @input="handleInput"
                 @ready="handleReady" 
                 @focus="hanleFocus"
-                @blur="handleBlur"/>
+                @blur="handleBlur"
+                @touchmove.prevent.stop />
         </view>
     </view>
 </template>
