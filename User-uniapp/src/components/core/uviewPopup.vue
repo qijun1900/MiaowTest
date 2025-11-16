@@ -7,7 +7,7 @@
     :closeOnClickOverlay="closeOnClickOverlay"
     @close="handleClose"
     :overlay="overlay"
-    :safeAreaInsetBottom="false">
+    :safeAreaInsetBottom="true">
     <view class="answer-sheet-popup" @touchmove.prevent.stop>
       <!-- 标题区域 -->
       <view class="popup-header" v-if="title">
@@ -18,7 +18,6 @@
       <view class="popup-content" @touchmove.prevent.stop>
         <slot name="popupcontent"></slot>
       </view>
-      
     </view>
   </up-popup>
 </template>

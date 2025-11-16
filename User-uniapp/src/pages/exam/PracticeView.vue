@@ -321,6 +321,12 @@ const handleMenuClick = async (item) => {
         // 保存原始内容，用于取消操作
         originalNoteContent.value = noteContent.value;
     }
+    if(item.value===0){
+        // 打开设置
+        uni.navigateTo({
+            url: `/pages/public/feedbackview`
+        });    
+    }
 }
 const handleSaveNote = async () => {
     // 保存笔记
