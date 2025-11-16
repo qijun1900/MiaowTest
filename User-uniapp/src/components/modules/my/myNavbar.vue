@@ -21,6 +21,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import checkLogin from '../../../util/checkLogin'
 
 // 导航项数据 - 使用不同的图标
 //TODO我的页面导航栏功能
@@ -36,10 +37,9 @@ const navItems = ref([
     path: '/pages/my/MyWrongView'
   },
   {
-    title: '所有考试',
-    icon: '/static/tabBar/exam-active.png',
-    path: '/pages/exam/exam',
-    istabBar: true
+    title: '我的笔记',
+    icon: '/static/navMy/my-note.png',
+    path: '/pages/my/MyNoteView',
   },
   {
     title: '收藏工具',
@@ -49,7 +49,12 @@ const navItems = ref([
 ])
 
 // 导航点击处理
-const handleNavClick = (item) => {
+const handleNavClick = async (item) => {
+  // 检查是否需要登录
+    const loginResult = await checkLogin();
+    if (!loginResult) {
+      return;
+    }
   // 如果是 tabBar 页面，使用 switchTab
   if (item.istabBar) {
     uni.switchTab({ url: item.path })

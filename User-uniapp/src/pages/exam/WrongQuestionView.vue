@@ -329,7 +329,6 @@ const loadWrongQuestions = async () => {
       }
     })
     wrongQuestions.value = wrongQuestionsData
-    console.log("wrongQuestionsData",wrongQuestions.value)
   } catch (error) {
     console.error('加载错题失败:', error)
     uni.showToast({

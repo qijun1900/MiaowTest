@@ -32,7 +32,7 @@
             <view class="switch-wrapper">
                 <up-switch v-model="localIsShowHelper" size="20" :disabled="disableHelper"></up-switch>
             </view>
-            <text v-if="disableHelper" class="helper-tip">个人题库不支持此功能</text>
+            <text v-if="disableHelper" class="helper-tip">{{ helpertip }}</text>
         </view>
     </view>
 </template>
@@ -75,6 +75,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    helpertip:{
+        type: String,
+        default: '个人题库不支持此功能'
+    }
 })
 
 // 定义 emits 

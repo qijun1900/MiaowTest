@@ -13,8 +13,11 @@ UserRouter.post("/uniappAPI/UserFavorite/removeExamFavorite", JWT.verifyTokenMid
 UserRouter.get("/uniappAPI/UserFavorite/getUserFavoritesExams", JWT.verifyTokenMiddleware(),UserController.getUserFavoritesExam)//用户获取收藏的考试接口
 UserRouter.post("/uniappAPI/User/BindAccount", JWT.verifyTokenMiddleware(),UserController.BindAccount)//用户绑定账号接口(wx)
 UserRouter.get("/uniappAPI/User/checkUserBind", JWT.verifyTokenMiddleware(),UserController.checkUserBind)//用户检测是否绑定账号接口(wx)
-UserRouter.post("/uniappAPI/Feedback/submitFeedback", JWT.optionalTokenMiddleware(), UserController.userFeedback)//用户提交反馈接口(wx) - 使用可选JWT中间件
-
+UserRouter.post("/uniappAPI/Feedback/submitFeedback", JWT.optionalTokenMiddleware(), UserController.userFeedback)//用户提交反馈接口
+UserRouter.post("/uniappAPI/exam/savePracticeNote", JWT.verifyTokenMiddleware(), UserController.savePracticeNote)//用户保存练习笔记接口- 
+UserRouter.post("/uniappAPI/exam/getPracticeNote", JWT.verifyTokenMiddleware(), UserController.getPracticeNote)//用户获取练习笔记接口-
+UserRouter.get("/uniappAPI/UserNote/getNoteExamList", JWT.verifyTokenMiddleware(), UserController.getNoteExamList)//用户获取笔记科目列表接口-
+UserRouter.post("/uniappAPI/UserNote/getNoteListByExamId", JWT.verifyTokenMiddleware(), UserController.getNoteListByExamId)//根据科目id用户获取笔记列表接口-
 
 
 

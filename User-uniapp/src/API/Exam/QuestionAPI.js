@@ -242,7 +242,7 @@ export async function checkFavoriteQuestionAPI(questionId) {
 
 /**
  * 用户点击题目进行练习
- * @param {Type}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @param {Number}  Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @param {String} questionId - 题目ID
  * @returns {Promise} 返回练习结果 code: 200,isFavorited: true / false
  * @example
@@ -255,7 +255,49 @@ export async function practiceQuestionAPI(Type, questionId) {
       data:{Type, questionId}
     })
   }catch (error) {
-    console.error("practiceFavoriteQuestion 失败", error);
+    console.error("practiceQuestion 失败", error);
   } 
 }
+/**
+ * @description 刷题时候保存用户记录的笔记内容
+ * @param {*String} questionId - 题目ID
+ * @param {*Number} questionType - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
+ * @param {*String} examId - 考试ID 
+ * @param {*String} content - 笔记内容
+ * @returns {Promise} 返回保存结果-code -   message -  ActionType 
+ * 
+ */
+export async function savePracticeNoteAPI({
+  questionId,
+  questionType,
+  examId,
+  content
+}) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/savePracticeNote`,
+      method: 'POST',
+      data: { questionId, questionType, examId, content }
+    })
 
+  } catch (error) {
+    console.error("savePracticeNote 失败", error);
+  }
+}
+
+/**
+ * @description 刷题时获取用户记录的笔记内容(检测是否存在笔记)
+ * @param {*String} questionId - 题目ID
+ * @returns {Promise} 返回笔记内容
+ */
+export async function getPracticeNoteAPI(questionId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/getPracticeNote`,
+      method: 'POST',
+      data:{questionId}
+    })
+  }catch (error) {
+    console.error("getPracticeNote 失败", error);
+  }
+}

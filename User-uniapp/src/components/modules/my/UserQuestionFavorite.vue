@@ -52,7 +52,7 @@
           </view>
           <view class="question-actions">
             <button class="action-btn practice-btn" @click="startPractice(question)">
-              开始练习
+              查看题目
             </button>
             <button class="action-btn remove-btn" @click="removeFavorite(question.questionData)">
               移除收藏
@@ -87,6 +87,7 @@ const favoriteQuestions = ref([]);
 const loading = ref(false);
 const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全部"
 const QuestionStore = useQuestionStore();
+const bankInfo = ref(null); // 题库信息
 
 // 获取科目列表
 const subjectList = computed(() => {
@@ -108,6 +109,12 @@ const startPractice = async (question) => {
   try {
     const res = await practiceQuestionAPI(question.questionData.Type,question.questionData._id);
     if(res.code === 200){
+      // 先构建题库信息
+      bankInfo.value = {
+        bankId: res.data.examId,
+        bankName: "系统题库",
+        isUserBank: false // 标识这是系统题库
+      }
       // 将当前收藏的题目设置为练习题目
       QuestionStore.setCurrentQuestionIds([question.questionData._id]);
       
@@ -124,9 +131,17 @@ const startPractice = async (question) => {
         subjectiveAnswerStore.clearAllAnswers();
         
         // 导航到练习页面
-        uni.navigateTo({
-          url: `/pages/exam/PracticeView`
-        });
+        // 添加延迟，确保状态更新完成
+        setTimeout(() => {
+          // 构建URL，传递题库信息
+          let url = '/pages/exam/PracticeView';
+          if (bankInfo.value) {
+            url += `?bankInfo=${encodeURIComponent(JSON.stringify(bankInfo.value))}`;
+          }
+          uni.navigateTo({
+            url: url
+          });
+        }, 300);
       } else {
         uni.showToast({
           title: '题目数据设置失败',

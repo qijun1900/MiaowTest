@@ -52,7 +52,7 @@
           </view>
           <view class="question-actions">
             <button class="action-btn practice-btn" @click="startPractice(question)">
-              开始练习
+              查看题目
             </button>
             <button class="action-btn remove-btn" @click="removeWrong(question.questionData)">
               移除错题
@@ -96,7 +96,9 @@
             v-model:isRandom="isRandom"
             v-model:isOptionRandom="isOptionRandom"
             v-model:isShowAnswer="isShowAnswer"
-            v-model:isShowAIHelp="isShowAIHelp"/>
+             v-model:isShowHelper="isShowHelper"
+             :disableHelper="true"
+             helpertip="练习所有错题不支持此功能"/>
           <view>
             <button class="practice-btn-popup" @click="startAllPractice">
               <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
@@ -131,12 +133,13 @@ const selectedSubject = ref('全部'); // 当前选中的科目，默认为"全�
 const QuestionStore = useQuestionStore();
 const backToTopRef = ref();// 回到顶部组件引用
 const settingpopupShow = ref(false); // 弹出层状态
+const bankInfo = ref(null); // 题库信息
 // 练习设置
 const questionCount = ref(1) 
 const isRandom = ref(false) // 默认不乱序
 const isOptionRandom = ref(false) // 默认选项不乱序
 const isShowAnswer = ref(false) //是否立即显示答案
-const isShowAIHelp = ref(false)//是否开启AI解析
+const isShowHelper = ref(false)
 
 // 获取科目列表
 const subjectList = computed(() => {
@@ -165,6 +168,12 @@ const startPractice = async (question) => {
     const res = await practiceQuestionAPI(question.questionData.Type,question.questionData._id);
 
     if(res.code === 200){
+      // 先构建题库信息
+      bankInfo.value = {
+        bankId: res.data.examId,
+        bankName: "系统题库",
+        isUserBank: false // 标识这是系统题库
+      }
       // 将当前错题设置为练习题目
       QuestionStore.setCurrentQuestionIds([question.questionData._id]);
       
@@ -181,9 +190,17 @@ const startPractice = async (question) => {
         subjectiveAnswerStore.clearAllAnswers();
         
         // 导航到练习页面
-        uni.navigateTo({
-          url: `/pages/exam/PracticeView`
-        });
+        // 添加延迟，确保状态更新完成
+        setTimeout(() => {
+          // 构建URL，传递题库信息
+          let url = '/pages/exam/PracticeView';
+          if (bankInfo.value) {
+            url += `?bankInfo=${encodeURIComponent(JSON.stringify(bankInfo.value))}`;
+          }
+          uni.navigateTo({
+            url: url
+          });
+        }, 300);
       } else {
         uni.showToast({
           title: '题目数据设置失败',
@@ -233,7 +250,7 @@ const startAllPractice = async () => {
     QuestionStore.setSelectedQuestions(questionCount.value, isRandom.value, isOptionRandom.value);// 设置选择的题目
     QuestionStore.setUserShowSettings({ // 设置用户显示设置
       showAnswer: isShowAnswer.value,
-      showAIHelp: isShowAIHelp.value,
+      showHelper: isShowHelper.value,
       OptionRandom: isOptionRandom.value,
     });
     // 导航到练习页面

@@ -250,6 +250,163 @@ const UserController = {
                 message: "服务器错误"
             });
         }
+    },
+    savePracticeNote: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({ 
+                    code: 401, 
+                    message: '您未登录' 
+                }); // 如果用户未登录，返回错误信息
+            }
+            const {questionId, questionType, examId, content} = req.body; // 从请求体中获取笔记信息
+            const result = await UserService.savePracticeNote({
+                uid, questionId, questionType, examId, content
+            });
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message
+                });
+            }
+        }catch(e) {
+            console.error("savePracticeNote 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+    },
+    getPracticeNote: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                }); 
+            }
+            const { questionId } = req.body; // 通过questionId获取笔记信息
+            
+            // 验证questionId是否存在
+            if (!questionId) {
+                return res.send({
+                    code: 400,
+                    ActionType: "ERROR",
+                    message: '缺少题目ID'
+                });
+            }
+            
+            const result = await UserService.getPracticeNote({ uid, questionId });
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message
+                });
+            }
+        }catch(e) {
+            console.error("getPracticeNote 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+    },
+    getNoteExamList: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                });
+            }
+            const result = await UserService.getNoteExamList({uid}); // 调用服务层方法获取用户笔记的考试列表
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data,
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message,
+                });
+            }
+        } catch(e) {
+            console.error("getNoteExamList 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+    },
+    getNoteListByExamId: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                });
+            }
+            const { examId } = req.body; // 从请求体中获取考试ID
+            if (!examId) {
+                return res.send({
+                    code: 400,
+                    ActionType: "ERROR",
+                    message: '缺少考试ID'
+                });
+            }
+            const result = await UserService.getNoteListByExamId({uid, examId}); // 调用服务层方法获取指定考试ID的笔记列表   
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                });
+            }
+        }catch(e) {
+            console.error("getNoteListByExamId 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+        
     }
 }
 
