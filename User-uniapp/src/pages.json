@@ -91,6 +91,12 @@
 			}
 		},
 		{
+			"path": "pages/exam/PracticeInGameSettingsView",
+			"style": {
+				"navigationBarTitleText": "练习设置"
+			}
+		},
+		{
 			"path": "pages/exam/PracticeResultsView",
 			"style": {
 				"navigationBarTitleText": "练习结果"

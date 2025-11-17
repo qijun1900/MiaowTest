@@ -145,6 +145,7 @@
             </uviewPopup>
         <!-- 答题助手 -->
         <dragButton
+            v-if="questionStore.UserShowSettings.showHelper"
             :isDock="true"
 			:existTabBar="true"
             iconType='plusempty'
@@ -324,7 +325,7 @@ const handleMenuClick = async (item) => {
     if(item.value===0){
         // 打开设置
         uni.navigateTo({
-            url: `/pages/public/feedbackview`
+            url: `/pages/exam/PracticeInGameSettingsView`
         });    
     }
 }

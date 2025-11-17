@@ -7,8 +7,8 @@ export const useQuestionStore = defineStore("question", () => {
     const QuestionData = ref([]); // 存储问题的数组
     const UserChooseQuestion = ref([]); // 存储用户选择的问题的数组
     const UserShowSettings = ref({ // 存储用户显示设置的对象
-        showAnswer: false, // 是否显示答案(默认显示 )
-        showHelper: false, // 是否显示AI解析(默认显示 )
+        showAnswer: true, // 是否立即显示答案(默认显示 )
+        showHelper: true, // 是否显示Helper (默认显示 )
         OptionRandom: false, // 是否选项乱序(默认显示 )
     });
 
@@ -36,7 +36,9 @@ export const useQuestionStore = defineStore("question", () => {
 
     const UserShowSettingsActions = {
         setUserShowSettings: (val) => { // 定义函数，用于设置用户显示设置
-            UserShowSettings.value = val; // 将传入的值赋值给UserShowSettings.value
+            UserShowSettings.value = { 
+                ...UserShowSettings.value, ...val 
+            }; // 合并更新对象，保留原有属性
         },
     }
 

@@ -3,7 +3,7 @@
         <!-- 提示 -->
         <Tips 
             text="左滑即可对题库进行删除操作" 
-            :duration="0" 
+            :duration="10000" 
             type="info"/>
         
         <!-- 加载状态 -->
