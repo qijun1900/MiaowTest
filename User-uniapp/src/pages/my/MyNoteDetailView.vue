@@ -1,6 +1,9 @@
 <template>
   <view class="container">
     <view class="question-list">
+      <!-- Loading -->
+      <ThemeLoading v-if="isLoading" text="正在加载笔记内容..." />
+      <!-- 笔记列表 -->
       <view 
         v-for="(question, index) in noteList" 
         :key="question.questionId" 
@@ -130,6 +133,7 @@ import uniEditor from '../../components/core/uniEditor.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerStore';
 import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore';
+import ThemeLoading from '../../components/core/ThemeLoading.vue';
 
 
 const QuestionStore = useQuestionStore();
@@ -144,6 +148,7 @@ const isSavingNote = ref(false)
 const originalNoteContent = ref('');// 原始笔记内容，用于取消操作
 const currentQuestionId = ref(null)
 const bankInfo = ref(null); // 题库信息
+const isLoading = ref(false); // 加载状态
 
 const handleEditNote = async (question) => {
   // 打开笔记弹窗
@@ -252,12 +257,16 @@ const handleSaveNote = async () => {
 
 const fetchNoteList = async () => {
   try {
+    isLoading.value = true;
     const response = await getNoteListByExamIdAPI(examId.value)
     if (response.code === 200) {
+      isLoading.value = false;
       noteList.value = response.data
     }
   } catch (error) {
     console.error('获取笔记列表失败', error)
+  }finally {
+    isLoading.value = false;
   }
 }
 

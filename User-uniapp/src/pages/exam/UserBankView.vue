@@ -20,7 +20,7 @@
       </view>
     </view>
 
-    <Tips text="左滑即可对题目进行删除操作" :duration="0" />
+    <Tips text="左滑即可对题目进行删除操作" :duration="10000" />
     
     <!-- 题目列表 -->
     <view class="question-list-container">

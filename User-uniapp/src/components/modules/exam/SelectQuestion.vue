@@ -84,7 +84,7 @@ const props = defineProps({
 const answerStore = useObjectiveAnswerStore();
 const selectedOptions = ref([]);
 const questionStore = useQuestionStore();
-const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否显示答案
+const showAnswerSetting = ref(questionStore.UserShowSettings.showAnswer)
 // 控制多选题答案显示
 const multiAnswerSubmitted = ref(false);
 
@@ -114,7 +114,7 @@ const handleOptionClick = (index) => {
             selectedOptions.value.push(index);
         }
         // 当 showAnswerSetting 为 false 时，多选题直接保存答案
-        if (!showAnswerSetting) {
+        if (!showAnswerSetting.value) {
             // 如果没有选中任何选项，从store中移除答案
             if (selectedOptions.value.length === 0) {
                 answerStore.removeUserAnswer(props.question._id);
@@ -184,7 +184,8 @@ const showAnswerComputed = computed(() => {
         return multiAnswerSubmitted.value;
     }
     // 单选题，只有用户选择后才显示
-    return showAnswerSetting && selectedOptions.value.length > 0;
+     return showAnswerSetting.value && selectedOptions.value.length > 0;
+    // return showAnswerSetting.value && selectedOptions.value.length > 0;
 });
 
 // 多选题提交按钮事件

@@ -1,11 +1,21 @@
 <template>
-	<view v-if="visible" class="tips-container" :class="type">
+	<view 
+		v-if="visible" 
+		class="tips-container" 
+		:class="type" 
+		@click="handleClick">
 		<view class="tips-content">
-			<view v-if="showIcon" class="tips-icon">
-				<text class="iconfont" :class="iconClass"></text>
+			<view 
+				v-if="showIcon" 
+				class="tips-icon">
+				<text class="iconfont" 
+				:class="iconClass">
+			</text>
 			</view>
 			<view class="tips-text">{{ text }}</view>
-			<view v-if="closable" class="tips-close" @click="close">
+			<view 
+				v-if="closable && !clickable" 
+				class="tips-close" @click.stop="close">
 				<text class="iconfont icon-close"></text>
 			</view>
 		</view>
@@ -41,6 +51,11 @@ const props = defineProps({
 	duration: {
 		type: Number,
 		default: 3000
+	},
+	// 是否可点击
+	clickable: {
+		type: Boolean,
+		default: false
 	}
 })
 
@@ -66,6 +81,12 @@ const iconClass = computed(() => {
 const close = () => {
 	visible.value = false
 	emit('close')
+}
+
+const handleClick = () => {
+	if (props.clickable) {
+		emit('click')
+	}
 }
 
 // 生命周期
@@ -104,6 +125,22 @@ onBeforeUnmount(() => {
 	
 	&.error {
 		background-color: rgba(245, 108, 108, 0.1);
+	}
+	
+	// 可点击样式
+	&.clickable {
+		cursor: pointer;
+		transition: all 0.3s ease;
+		
+		&:hover {
+			opacity: 0.8;
+			transform: translateY(-2rpx);
+			box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+		}
+		
+		&:active {
+			transform: translateY(0);
+		}
 	}
 }
 

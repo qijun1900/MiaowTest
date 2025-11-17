@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed} from 'vue';
 import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
 import { useQuestionStore } from '../../../stores/modules/QuestionStore';
 import AnalysisCom from '@/components/modules/exam/Analysiscom.vue';
@@ -63,7 +63,7 @@ const judgeOptions = ['正确', '错误'];// 判断题选项，A代表正确，B
 const answerStore = useObjectiveAnswerStore();// 答案存储
 const selectedOption = ref(null);// 选中的选项
 const questionStore = useQuestionStore();// 问题存储
-const showAnswerSetting = questionStore.UserShowSettings.showAnswer; // 是否显示答案
+const showAnswerSetting = ref(questionStore.UserShowSettings.showAnswer);// 是否显示答案
 
 
 // 判断选项是否被选中
@@ -100,7 +100,7 @@ const showAnswerComputed = computed(() => {
         return true;
     }
     // 判断题，只有用户选择后才显示
-    return showAnswerSetting && selectedOption.value !== null;
+    return showAnswerSetting.value && selectedOption.value !== null;
 });
 </script>
 
