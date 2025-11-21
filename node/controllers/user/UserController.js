@@ -407,6 +407,22 @@ const UserController = {
             });
         }
         
+    },
+    useLLMChat: async (req, res) => {
+        try {
+            
+            const {message,model} = req.body;
+            console.log(message,model);
+            const result = await UserService.useLLMChat({message,model});
+            res.send({
+                code: 200,
+                ActionType: "OK",
+                data: result
+            })
+        }catch(e) {
+            
+        }
+        
     }
 }
 

@@ -116,6 +116,11 @@ const CustomNavbarList = ref([
   {
     title: '开发作者',
     icon: '/static/navMy/c-my-author.png',
+  },
+  {
+    title: '我的设置',
+    icon: '/static/navMy/c-my-setting.png',
+    path: '/pages/my/MySettingView'
   }
 ])
 // 处理导航栏点击事件
@@ -133,6 +138,11 @@ const handleClick = (item) => {
     })
   }else if (item.title === '开发作者') {
     AuthorOverlayShow.value = true;
+  }
+  else if (item.title === '我的设置') {
+    uni.navigateTo({
+      url: '/pages/my/MySettingView'
+    })
   }
 }
 

@@ -192,6 +192,12 @@
 			"style": {
 				"navigationBarTitleText": "笔记详情"
 			}
+		},
+		{
+			"path": "pages/my/MySettingView",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
 		}
 	],
 	"globalStyle": {
