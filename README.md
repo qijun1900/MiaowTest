@@ -120,7 +120,6 @@ UI组件：uView Plus + Element Plus
 UI组件：Element Plus
 图表展示：Chart.js + vue-chartjs
 富文本编辑器：wangEditor
-样式预处理：Sass/SCSS
 代码规范：ESLint
 ```
 
@@ -203,16 +202,16 @@ node script/init-database.js
 #### 方式一：分别启动各个服务
 ```bash
 # 启动后端服务
-npm run start:node
+npm  start
 
 # 启动管理端
-npm run start:admin
+npm run dev
 
 # 启动用户端（微信小程序）
-npm run start:uniapp
+npm run dev:mp-weixin
 
 # 启动用户端（H5）
-npm run start:uniapp:h5
+npm run dev:h5
 ```
 
 #### 方式二：一键启动所有服务（Windows）
