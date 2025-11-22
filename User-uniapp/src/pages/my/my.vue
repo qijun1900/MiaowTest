@@ -95,7 +95,6 @@ import uviewOverlay from '../../components/core/uviewOverlay.vue';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
 import myNavbar from '../../components/modules/my/myNavbar.vue';
-// import VipCard from '../../components/modules/my/VipCard.vue';
 import ThemeDivider from '../../components/core/ThemeDivider.vue';
 import navBarHeightUtil from '../../util/navBarHeight.js';
 import CustomNavbar from '../../components/core/CustomNavbar.vue';
@@ -121,6 +120,17 @@ const CustomNavbarList = ref([
   {
     title: '开发作者',
     icon: '/static/navMy/c-my-author.png',
+  },
+  {
+    title: '我的设置',
+    icon: '/static/navMy/c-my-setting.png',
+    path: 'pages/my/MySettingView'
+    
+  },
+  {
+    title: '我的消息',
+    icon: '/static/navMy/c-my-message.png',
+    path: '/pages/my/MyMessageView'
   }
 ])
 // 处理导航栏点击事件
@@ -136,6 +146,9 @@ const handleClick = (item) => {
     uni.navigateTo({
       url: '/pages/public/feedbackview'
     })
+  }
+  else if (item.title === '开发作者') {
+    AuthorOverlayShow.value = true;
   }
   else if (item.title === '我的设置') {
     uni.navigateTo({
