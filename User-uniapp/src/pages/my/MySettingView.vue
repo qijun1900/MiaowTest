@@ -1,10 +1,13 @@
 <template>
-  <div class="container">
+  <view class="container">
+    <Empty description="暂无设置"/>
 
-  </div>
+  </view>
 </template>
 
-<scriptsetupsetup>
-</scriptsetupsetup>
+<script setup>
+import Empty from '../../components/core/Empty.vue';
+
+</script>
 
 <style scoped></style>

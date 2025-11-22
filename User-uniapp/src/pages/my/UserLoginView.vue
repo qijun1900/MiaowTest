@@ -81,15 +81,10 @@
     </view>
     <!-- #endif -->
     
-    <!-- 底部提示 - 改进兼容性 -->
-    <view class="tips-section">
-      <view class="tips-content">
-        <view class="tips-text">登录即表示您同意</view>
-        <view class="tips-link" @tap="showUserAgreement">《用户服务协议》</view>
-        <view class="tips-text">和</view>
-        <view class="tips-link" @tap="showPrivacyPolicy">《隐私政策》</view>
-      </view>
-    </view> 
+    <!-- 底部提示 - 使用通用组件 -->
+    <UserAgreementTips 
+      @showUserAgreement="showUserAgreement" 
+      @showPrivacyPolicy="showPrivacyPolicy" /> 
   </view>
 </template>
 
@@ -99,6 +94,7 @@ import { UserAccountLogin } from '../../API/My/UserLoginAPI';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
 import navBarHeightUtil from '../../util/navBarHeight';
+import UserAgreementTips from '../../components/modules/my/UserAgreementTips.vue';
 
 const showPassword = ref(true);
 const rememberMe = ref([]);
@@ -208,21 +204,17 @@ const goToRegister = () => {
   });
 };
 
-// 显示用户服务协议
+// 用户服务协议
 const showUserAgreement = () => {
-  uni.showModal({
-    title: '用户服务协议',
-    content: '用户服务协议内容...\n\n这里是用户服务协议的详细内容，包括服务条款、使用规则、责任限制等相关信息。',
-    showCancel: false
-  });
+  uni.navigateTo({
+    url: '/pages/public/UserAgreementView'
+  })
 };
 
-// 显示隐私政策
+//隐私政策
 const showPrivacyPolicy = () => {
-  uni.showModal({
-    title: '隐私政策',
-    content: '隐私政策内容...\n\n这里是隐私政策的详细内容，包括信息收集、使用、保护等相关政策。',
-    showCancel: false
+  uni.navigateTo({
+    url: '/pages/public/PrivacyPolicyView'
   });
 };
 
@@ -463,28 +455,5 @@ onMounted(() => {
   }
 }
 
-.tips-section {
-  margin-top: auto;
-  margin-bottom: 10rpx;
-  position: relative;
-  z-index: 1;
-  
-  .tips-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    
-    .tips-text {
-      font-size: 24rpx;
-      color: #909193;
-    }
-    
-    .tips-link {
-      font-size: 24rpx;
-      color: #3c9cff;
-      margin: 0 6rpx;
-    }
-  }
-}
+
 </style>

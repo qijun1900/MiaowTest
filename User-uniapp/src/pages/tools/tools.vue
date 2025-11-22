@@ -19,17 +19,33 @@
           <view class="tool-desc">精确计时，支持倒计时和正计时模式</view>
         </view>
         <view class="tool-icon">
-          <TimerIcon :size="0.31" />
+          <image
+            src="/static/tools/tools-timer.png"
+            mode="aspectFit"
+          />
         </view>
       </view>
-      
+      <!-- 计划日程表 -->
+      <view 
+        class="tool-card" 
+        @tap="navigateToTimer">
+        <view class="tool-info">
+          <view class="tool-title">TODO</view>
+          <view class="tool-desc">记录待办事项，管理学习任务，制定学习计划</view>
+        </view>
+        <view class="tool-icon">
+          <image
+            src="/static/tools/tools-todo.png"
+            mode="aspectFit"
+          />
+        </view>
+      </view>
     </view>
   </view>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import TimerIcon from '../../components/icons/TimerIcon.vue';
 import PageHead from '../../components/core/PageHead.vue';
 import showShareMenu from '../../util/wechatShare.js';
 

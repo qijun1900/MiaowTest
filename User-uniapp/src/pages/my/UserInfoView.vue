@@ -41,6 +41,20 @@
         </view>
       </view>
 
+      <view class="info-item" @click="handleUserAgreeMent">
+        <view class="info-label">用户协议</view>
+        <view class="info-value">
+          <up-icon name="arrow-right" size="18px"></up-icon>
+        </view>
+      </view>
+
+      <view class="info-item" @click="handlePolicy">
+        <view class="info-label">隐私政策</view>
+        <view class="info-value">
+          <up-icon name="arrow-right" size="18px"></up-icon>
+        </view>
+      </view>
+
       <!-- #ifdef MP-WEIXIN -->
       <view class="info-item" @click="handleUserRsgister">
         <view class="info-label">{{ accountBindStatus?"已绑定账号":"尚未绑定账号" }}</view>
@@ -190,6 +204,20 @@ const handleLogout = () => {
         uni.navigateBack();
       }
     }
+  });
+};
+
+// 用户服务协议
+const handleUserAgreeMent = () => {
+  uni.navigateTo({
+    url: '/pages/public/UserAgreementView'
+  })
+};
+
+//隐私政策
+const  handlePolicy= () => {
+  uni.navigateTo({
+    url: '/pages/public/PrivacyPolicyView'
   });
 };
 onMounted(() => {

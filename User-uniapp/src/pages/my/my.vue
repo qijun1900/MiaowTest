@@ -44,8 +44,7 @@
         :items="CustomNavbarList" 
         @nav-click="handleClick"/>
     </view>
-
-
+    <!-- 登录显示 -->
     <uviewOverlay v-model:show="LoginOverlayShow">
       <template #overlaycontent>
         <view class="rect">
@@ -66,12 +65,18 @@
             <up-button color="#09B83E" type="success" icon="weixin-fill" @click="handleUseWXLogin">微信登录</up-button>
             <!-- #endif -->
           </view>
+          <view class="tips-container">
+             <UserAgreementTips 
+              @showUserAgreement="showUserAgreement" 
+              @showPrivacyPolicy="showPrivacyPolicy"/> 
+          </view>
           <view class="login-cancel">
             <up-button @click="handleCancelLogin">暂不登录</up-button>
           </view>
         </view>
       </template>
     </uviewOverlay>
+    <!-- 开发者 -->
     <uviewOverlay v-model:show="AuthorOverlayShow">
       <template #overlaycontent>
         <view class="rect">
@@ -97,6 +102,7 @@ import navBarHeightUtil from '../../util/navBarHeight.js';
 import CustomNavbar from '../../components/core/CustomNavbar.vue';
 import { clearExamCache } from '../../util/cacheCleaner.js';
 import showShareMenu from '../../util/wechatShare.js';
+import UserAgreementTips from '../../components/modules/my/UserAgreementTips.vue';
 
 const LoginOverlayShow = ref(false);
 const AuthorOverlayShow = ref(false);
@@ -148,6 +154,10 @@ const handleClick = (item) => {
     uni.navigateTo({
       url: '/pages/my/MySettingView'
     })
+  }else if (item.title === '我的消息') {
+    uni.navigateTo({
+      url: '/pages/my/MyMessageView'
+    })
   }
 }
 
@@ -192,6 +202,20 @@ const handleUseAccountLogin = () => {
     url: '/pages/my/UserLoginView'
   });
 }
+
+// 用户服务协议
+const showUserAgreement = () => {
+  uni.navigateTo({
+    url: '/pages/public/UserAgreementView'
+  })
+};
+
+// 显示隐私政策
+const showPrivacyPolicy = () => {
+  uni.navigateTo({
+    url: '/pages/public/PrivacyPolicyView'
+  });
+};
 
 // 获取导航栏高度信息
 onMounted(() => {
