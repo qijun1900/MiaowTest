@@ -407,6 +407,94 @@ const UserController = {
             });
         }
         
+    },
+    saveUserBankPracticeNote: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                });
+            }
+            const { questionId, questionType, examId, content } = req.body; // 从请求体中获取笔记信息
+            const result = await UserService.saveUserBankPracticeNote({ 
+                uid, 
+                questionId, 
+                questionType, 
+                examId, 
+                content 
+            }); // 调用服务层方法保存用户笔记
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message
+                });
+            }
+        }catch(e) {
+            console.error("saveUserBankPracticeNote 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+        
+    },
+    getUserBankPracticeNote: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                });
+            }
+            const { questionId } = req.body; // 从请求体中获取笔记信息
+            const result = await UserService.getUserBankPracticeNote({ uid, questionId }); // 调用服务层方法获取用户笔记
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    data: result.data,
+                });
+            }else{
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message
+                });
+            }
+        }catch(e) {
+            console.error("getUserBankPracticeNote 失败", e);
+        }
+        
+    },
+    useLLMChat: async (req, res) => {
+        try {
+            
+            const {message,model} = req.body;
+            console.log(message,model);
+            const result = await UserService.useLLMChat({message,model});
+            res.send({
+                code: 200,
+                ActionType: "OK",
+                data: result
+            })
+        }catch(e) {
+            
+        }
+        
     }
 }
 

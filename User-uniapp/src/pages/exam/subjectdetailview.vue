@@ -133,15 +133,15 @@
         <!-- 数据为空 -->
         <view v-else class="empty">
             <Empty 
-                :description="currentMode === 0 ? '暂无题型数据' : '暂无资料数据'" />
+                :description="currentMode === 0 ? '暂无题目数据' : '暂无资料数据'" />
             <view class="empty-tip">
                 <text v-if="currentMode === 0">
-                    暂无题型数据，您可以尝试
+                    暂无题目数据，您可以尝试
                     <text class="empty-tip-action">查看资料</text>
                 </text>
                 <text v-else>
                     暂无资料数据，您可以尝试
-                    <text class="empty-tip-action">查看题型</text>
+                    <text class="empty-tip-action">查看题目</text>
                 </text>
             </view>
             <button 
@@ -151,7 +151,7 @@
             <button 
                 v-else 
                 @click="currentMode = 0" 
-                class="switch-btn">查看题型</button>   
+                class="switch-btn">查看题目</button>   
         </view>
 
 
@@ -188,7 +188,7 @@ const subjectTypes = ref([]); // 考试题型数据
 const questionStore = useQuestionStore();
 const isFavorited = ref(false); // 添加收藏状态变量
 const isLoading = ref(false); // 加载状态
-const list = ref(['考试题型', '考试资料']);// 切换刷题/资料的选项 0-刷题 1-资料
+const list = ref(['题目', '资料']);// 切换刷题/资料的选项 0-刷题 1-资料
 const currentMode = ref(0); 
 const subjectnetDisks = ref([]); // 考试资料数据
 

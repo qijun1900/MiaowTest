@@ -70,6 +70,7 @@ const LLMController = {
     },
     useLLMChat: async (req, res) => {
         const {message,model} = req.body;
+        console.log(message,model)
         const result = await LLMService.useLLMChat(message,model)
         res.send({
             code: 200,

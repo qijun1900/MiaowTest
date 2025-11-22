@@ -1,12 +1,13 @@
 import axios from "axios";
 
-//  批量导入题目
 export async function modelappBatchaddQuestion(message, examId, category) {
     try {
-        const res = await axios.post("/adminapi/modelapp/batchaddquestion", 
-            { message, examId, category },
-            { timeout: 600000 } // 设置超时时间为600秒（10分钟）
-        )
+        const res = await axios({
+            url: '/adminapi/modelapp/batchaddquestion',
+            method: 'POST',
+            data: { message, examId, category },
+            timeout: 600000 // 设置超时时间为600秒（10分钟）
+        })
         return res.data
     } catch (error) {
         console.error("Error:", error);

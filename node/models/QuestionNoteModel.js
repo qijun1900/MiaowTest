@@ -38,8 +38,8 @@ const QuestionNoteSchema = new mongoose.Schema({
 });
 
 // 添加索引以提高查询性能
-QuestionNoteSchema.index({ userId: 1, questionId: 1 });
-QuestionNoteSchema.index({ userId: 1, updateTime: -1 });
+QuestionNoteSchema.index({ Uid: 1, questionId: 1 });
+QuestionNoteSchema.index({ Uid: 1, updateTime: -1 });
 
 const QuestionNoteModel = mongoose.model("question_note", QuestionNoteSchema);
 module.exports = QuestionNoteModel;

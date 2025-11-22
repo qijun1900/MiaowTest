@@ -103,8 +103,7 @@
             v-model:isRandom="isRandom"
             v-model:isOptionRandom="isOptionRandom"
             v-model:isShowAnswer="isShowAnswer"
-            v-model:isShowHelper="isShowHelper"
-            :disableHelper="true"/>
+            v-model:isShowHelper="isShowHelper"/>
           <view>
             <button class="practice-btn" @click="handleStart">
               <uni-icons type="arrow-right" size="20" color="#4d94ff"></uni-icons>
@@ -140,9 +139,7 @@ const questionCount = ref(1)
 const isRandom = ref(false) // 默认不乱序
 const isOptionRandom = ref(false) // 默认选项不乱序
 const isShowAnswer = ref(true) //是否立即显示答案
-
-//用户题库不支持开启isShowHelper
-const isShowHelper = ref(false)
+const isShowHelper = ref(true) //是否显示Helper
 
 
 // 滑动删除相关状态与方法（使用封装的 composable）

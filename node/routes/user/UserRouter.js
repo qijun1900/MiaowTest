@@ -18,7 +18,11 @@ UserRouter.post("/uniappAPI/exam/savePracticeNote", JWT.verifyTokenMiddleware(),
 UserRouter.post("/uniappAPI/exam/getPracticeNote", JWT.verifyTokenMiddleware(), UserController.getPracticeNote)//用户获取练习笔记接口-
 UserRouter.get("/uniappAPI/UserNote/getNoteExamList", JWT.verifyTokenMiddleware(), UserController.getNoteExamList)//用户获取笔记科目列表接口-
 UserRouter.post("/uniappAPI/UserNote/getNoteListByExamId", JWT.verifyTokenMiddleware(), UserController.getNoteListByExamId)//根据科目id用户获取笔记列表接口-
+UserRouter.post("/uniappAPI/exam/saveUserBankPracticeNote", JWT.verifyTokenMiddleware(), UserController.saveUserBankPracticeNote)//用户保存自己题库题目练习笔记接口-
+UserRouter.post("/uniappAPI/exam/getUserBankPracticeNote", JWT.verifyTokenMiddleware(), UserController.getUserBankPracticeNote)//用户获取自己题库题目练习笔记接口-
 
 
+//测试
+UserRouter.post("/uniappAPI/llm/chat", UserController.useLLMChat)//单次对话
 
 module.exports = UserRouter;

@@ -80,7 +80,7 @@ function cloudRequest(options) {
         }
         
         // 设置超时
-        processedOptions.timeout = processedOptions.timeout || 40000;
+        processedOptions.timeout = processedOptions.timeout ||15000; // 默认15秒
         
         // 添加平台标识
         const platform = getPlatform();

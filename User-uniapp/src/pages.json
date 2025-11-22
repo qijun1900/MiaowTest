@@ -186,6 +186,30 @@
 			"style": {
 				"navigationBarTitleText": "笔记详情"
 			}
+		},
+		{
+			"path": "pages/my/MySettingView",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		},
+		{
+			"path": "pages/my/MyMessageView",
+			"style": {
+				"navigationBarTitleText": "我的消息"
+			}
+		},
+		{
+			"path": "pages/public/PrivacyPolicyView",
+			"style": {
+				"navigationBarTitleText": "隐私政策"
+			}
+		},
+		{
+			"path": "pages/public/UserAgreementView",
+			"style": {
+				"navigationBarTitleText": "用户协议"
+			}
 		}
 	],
 	"globalStyle": {

@@ -163,7 +163,7 @@
 				}
 				this.$emit('btnClick');
 			},
-			touchstart(e) {
+			touchstart() {
 				this.$emit('btnTouchstart');
 			},
 			// 获取菜单样式
@@ -221,7 +221,7 @@
 				}
 				
 			},
-			touchend(e) {
+			touchend() {
 				if (this.isDock) {
 					let edgeRigth = this.windowWidth - this.width - this.edge;
 					
