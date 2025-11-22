@@ -148,13 +148,13 @@
             v-if="questionStore.UserShowSettings.showHelper"
             :isDock="true"
 			:existTabBar="true"
-            iconType='plusempty'
+            :iconType="bankInfo.isUserBank ? 'compose':'plusempty'"
             @btnClick="handleBtnClick"
             :bottomOffset="150"
             :horizontal="'right'" 
             :vertical="'top'" 
             :direction="'horizontal'"
-            :popMenu="true"
+            :popMenu="bankInfo.isUserBank ? false:true"
             :content="[
                 { text: '设置', iconType: 'gear' ,value:0 },
                 { text: '笔记', iconType: 'compose'  ,value:1 },
@@ -265,7 +265,12 @@ const handleBtnClick = async() => {
     if (!loginResult) {
         return;
     }
-    if (currentQuestionId.value) {
+    if(bankInfo.value.isUserBank){
+        // 直接打开笔记记录
+        handleMenuClick({value:1})
+        return;
+    }
+    if (currentQuestionId.value && !bankInfo.value.isUserBank) {
        const result = await checkFavoriteQuestionAPI(currentQuestionId.value);
        if(result.code===200){
         currenIsFavorited.value  = result.isFavorited 
@@ -311,7 +316,7 @@ const handleMenuClick = async (item) => {
         isSavingNote.value = false;
         
         // 加载已有的笔记(检测是否有笔记)
-        const res = await getPracticeNoteAPI(currentQuestionId.value);
+        const res = await getPracticeNoteAPI(bankInfo.value.isUserBank,currentQuestionId.value);
         if (res.code === 200 && res.data.hasNote) {
             noteContent.value = res.data.note.content; // 加载笔记内容
             lastSavedTime.value = res.data.note.updateTime; // 加载上次保存时间
@@ -345,6 +350,7 @@ const handleSaveNote = async () => {
     try {
         // 调用API保存笔记
         const res = await savePracticeNoteAPI({
+            isUserBank: bankInfo.value.isUserBank, // 是否为用户题库
             questionId: currentQuestionId.value, // 问题ID
             questionType: currenQuestionType.value, // 问题类型
             examId: bankInfo.value.bankId, // 考试ID

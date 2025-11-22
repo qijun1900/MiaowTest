@@ -260,6 +260,7 @@ export async function practiceQuestionAPI(Type, questionId) {
 }
 /**
  * @description 刷题时候保存用户记录的笔记内容
+ * @param {*Boolean} isUserBank 是否是用户题库
  * @param {*String} questionId - 题目ID
  * @param {*Number} questionType - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @param {*String} examId - 考试ID 
@@ -268,14 +269,17 @@ export async function practiceQuestionAPI(Type, questionId) {
  * 
  */
 export async function savePracticeNoteAPI({
+  isUserBank,
   questionId,
   questionType,
   examId,
   content
 }) {
   try {
+    // 根据是否为用户题库选择不同的API URL
+    const url = isUserBank ? "/uniappAPI/exam/saveUserBankPracticeNote" : "/uniappAPI/exam/savePracticeNote";
     return await http({
-      url: `/uniappAPI/exam/savePracticeNote`,
+      url,
       method: 'POST',
       data: { questionId, questionType, examId, content }
     })
@@ -287,13 +291,15 @@ export async function savePracticeNoteAPI({
 
 /**
  * @description 刷题时获取用户记录的笔记内容(检测是否存在笔记)
+ * @param {*Boolean} isUserBank 是否是用户题库
  * @param {*String} questionId - 题目ID
  * @returns {Promise} 返回笔记内容
  */
-export async function getPracticeNoteAPI(questionId) {
+export async function getPracticeNoteAPI(isUserBank,questionId) {
   try {
+    const url = isUserBank? "/uniappAPI/exam/getUserBankPracticeNote" : "/uniappAPI/exam/getPracticeNote";
     return await http({
-      url: `/uniappAPI/exam/getPracticeNote`,
+      url: url,
       method: 'POST',
       data:{questionId}
     })

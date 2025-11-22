@@ -121,6 +121,11 @@ const CustomNavbarList = ref([
     title: '我的设置',
     icon: '/static/navMy/c-my-setting.png',
     path: '/pages/my/MySettingView'
+  },
+  {
+    title: '我的消息',
+    icon: '/static/navMy/c-my-message.png',
+    path: '/pages/my/MyMessageView',
   }
 ])
 // 处理导航栏点击事件

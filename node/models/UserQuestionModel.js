@@ -53,7 +53,19 @@ const UserQuestionSchema = new mongoose.Schema({
         type:Number,
         default:null
     },
-    
+    note_content: { // 笔记内容（包含内容和保存时间）
+        type: {
+            content: { // 笔记内容
+                type: String,
+                default: ''
+            },
+            saveTime: { // 笔记保存时间
+                type: Date,
+                default: null
+            }
+        },
+        default: null
+    },
     // 状态管理
     status: { // 状态：0-草稿 1-已发布 2-审核中 3-审核不通过
         type: Number,

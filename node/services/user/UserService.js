@@ -7,6 +7,7 @@ const QuestionNoteModel = require("../../models/QuestionNoteModel");
 const { getNextUserCount } = require("../../models/CounterModel"); // 引入计数器模型和函数
 const mongoose = require('mongoose');
 const chat  = require("../../llm/admin/Chat/chat");
+const UserQuestionModel = require("../../models/UserQuestionModel");
 
 
 const UserService = {
@@ -715,6 +716,74 @@ const UserService = {
                 error: error.message,
                 success: false
             };
+        }
+    },
+    saveUserBankPracticeNote: async ({ 
+        uid, 
+        questionId, 
+        questionType, 
+        examId, 
+        content, }) => {
+        try {
+            // 检查是否已存在题目笔记
+            const existingNote = await UserQuestionModel.findOne({
+                Uid: uid,
+                _id: questionId,
+            });
+            if (existingNote) {
+                // 更新笔记内容和时间
+                existingNote.note_content = {
+                    content: content,
+                    saveTime: new Date()
+                };
+                await existingNote.save();
+            }
+            return {
+                code: 200,
+                message: '保存笔记成功',
+                success: true,
+            }
+        }catch (error) {
+            console.error("saveUserBankPracticeNote 失败", error);
+            return {
+                code: 500,
+                message: '保存笔记失败',
+                error: error.message,
+                success: false
+            }
+        }
+    },
+    getUserBankPracticeNote: async ({ uid, questionId }) => {
+        try {
+            // 查找用户对特定题目的笔记
+            const note = await UserQuestionModel.findOne({
+                Uid: uid,
+                _id: questionId,
+            });
+            if (note && note.note_content) {
+                return {
+                    code: 200,
+                    success: true,
+                    data: {
+                        hasNote: true,
+                        note: {
+                            content: note.note_content.content,
+                            updateTime: note.note_content.saveTime,
+                        }
+                    }
+                }
+            }else {
+                return {
+                    code: 200,
+                    success: true,
+                    data: {
+                        hasNote: false,
+                        note: null,
+                    }
+                }
+            }
+        }catch (error) {
+            console.error("getUserBankPracticeNote 失败", error);
         }
     },
     useLLMChat: async ({ message, model }) => {
