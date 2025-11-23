@@ -28,7 +28,7 @@
       <!-- 计划日程表 -->
       <view 
         class="tool-card" 
-        @tap="navigateToTimer">
+        @tap="navigateToTodo">
         <view class="tool-info">
           <view class="tool-title">TODO</view>
           <view class="tool-desc">记录待办事项，管理学习任务，制定学习计划</view>
@@ -55,6 +55,12 @@ const pageHeadRef = ref();
 const navigateToTimer = () => {
   uni.navigateTo({
     url: '/pages/tools/TimerToolView'
+  });
+};
+// 导航到TODO页面
+const navigateToTodo = () => {
+  uni.navigateTo({
+    url: '/pages/tools/TodoToolView'
   });
 };
 
