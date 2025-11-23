@@ -220,7 +220,7 @@
 		{
 			"path": "pages/tools/TodoToolView",
 			"style": {
-				"navigationBarTitleText": "待办事项"
+				"navigationBarTitleText": "TODO"
 			}
 		}
 	],

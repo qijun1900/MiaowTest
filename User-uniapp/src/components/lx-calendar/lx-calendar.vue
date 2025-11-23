@@ -75,7 +75,7 @@ export default {
 			nowYear:'',
 			nowMonth:'',
 			nowDay:'',
-			retract:false,
+			retract:true,
 			to_week_index:0,
 			to_prev_week_index:0,
 			to_next_week_index:0,
@@ -109,7 +109,7 @@ export default {
 			return this.retract ?  this.week_list_next_week : this.week_list_next
 		}
 	},
-	created(){
+	mounted(){
 		this.init();
 	},
 	methods:{
@@ -121,7 +121,6 @@ export default {
 			this.$emit('change',value)
 		},
 		init(){
-			console.log(this.value)
 			if(this.value){
 				this.get_date(this.date_parse(this.value));
 			}else{
