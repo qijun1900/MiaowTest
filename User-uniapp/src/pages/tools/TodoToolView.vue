@@ -94,6 +94,7 @@ import { ref, onMounted } from 'vue';
 import getTodayDate from '../../util/getTodayDate';
 import dragButton from '../../components/plug-in/drag-button/drag-button.vue';
 import uviewPopup from '../../components/core/uviewPopup.vue';
+import { setTodayTodos } from '../../API/Tools/TodosAPI';
 
 // 初始日期设置为今天
 const initialDate = ref(getTodayDate());
@@ -119,9 +120,7 @@ const inputFocus = ref({
 });
 
 const handleChange = (e) => {
-  console.log('日期改变:', e);
   selectedDate.value = e.fulldate;
-  console.log('选中日期:', selectedDate.value);
 }
 
 const handleBtnClick = () => {
@@ -166,23 +165,23 @@ const handleSave = async () => {
   isSaving.value = true;
   
   try {
-    // TODO: 这里后续添加API调用
-    console.log('保存代办数据:', {
-      date: selectedDate.value,
-      ...todoForm.value
+    const res = await setTodayTodos({
+      fulldate: selectedDate.value,
+      todoForm: {
+        title: todoForm.value.title,
+        description: todoForm.value.description,
+      }
     });
-    
-    // 模拟保存延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('保存成功:', res);
     
     // 保存成功后关闭弹窗
     popupShow.value = false;
     resetForm();
     
-    uni.showToast({
-      title: '代办事项已保存',
-      icon: 'success'
-    });
+    // uni.showToast({
+    //   title: '代办事项已保存',
+    //   icon: 'success'
+    // });
   } catch (error) {
     console.error('保存失败:', error);
     uni.showToast({
@@ -209,9 +208,7 @@ const resetForm = () => {
   errors.value = { title: '' };
 };
 onMounted(() => {
-  // 初始化时也设置选中日期为今天
-  selectedDate.value = initialDate.value;
-  console.log('初始化日期:', initialDate.value);
+selectedDate.value = initialDate.value;  // 初始化时也设置选中日期为今天
 })
 </script>
 

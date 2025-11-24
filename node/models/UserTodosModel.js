@@ -28,6 +28,10 @@ const UserTodosSchema = new mongoose.Schema({
     }
 })
 
+
+// 添加索引以提高查询性能
+UserTodosSchema.index({ Uid: 1, fulldate: 1 })
+
 const UserTodosModel = mongoose.model("user_todo", UserTodosSchema)
 
 module.exports = UserTodosModel

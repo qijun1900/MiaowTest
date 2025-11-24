@@ -21,6 +21,12 @@ UserRouter.post("/uniappAPI/UserNote/getNoteListByExamId", JWT.verifyTokenMiddle
 UserRouter.post("/uniappAPI/exam/saveUserBankPracticeNote", JWT.verifyTokenMiddleware(), UserController.saveUserBankPracticeNote)//用户保存自己题库题目练习笔记接口-
 UserRouter.post("/uniappAPI/exam/getUserBankPracticeNote", JWT.verifyTokenMiddleware(), UserController.getUserBankPracticeNote)//用户获取自己题库题目练习笔记接口-
 
+/************工具api*********** */
+UserRouter.post("/uniappAPI/set/TodayTodos", JWT.verifyTokenMiddleware(), UserController.setTodayTodos)//设置今日待办事项接口-
+
+
+
+
 
 //测试
 UserRouter.post("/uniappAPI/llm/chat", UserController.useLLMChat)//单次对话

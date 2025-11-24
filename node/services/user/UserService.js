@@ -801,7 +801,121 @@ const UserService = {
             }
         }
         
-    }
+    },
+    //设置今日待办事项
+    setTodayTodos: async ({ uid, fulldate, todos_content }) => {
+        try {
+            const UserTodosModel = require("../../models/UserTodosModel");
+            
+            // 查找是否已存在该日期的待办事项
+            const existingTodos = await UserTodosModel.findOne({
+                Uid: uid,
+                fulldate: fulldate
+            });
+
+            if (existingTodos) {
+                //如果存在 ,继续插入 todos_content
+                existingTodos.todos_content.push(todos_content);
+                await existingTodos.save();
+                
+                return {
+                    code: 200,
+                    message: '待办事项更新成功',
+                    success: true,
+                };
+            } else {
+                // 创建新的待办事项
+                const newTodos = new UserTodosModel({
+                    Uid: uid,
+                    fulldate: fulldate,
+                    todos_content: todos_content
+                });
+                
+                await newTodos.save();
+                
+                return {
+                    code: 200,
+                    message: '待办事项创建成功',
+                    success: true,
+                };
+            }
+        } catch (error) {
+            console.error("setTodayTodos 失败", error);
+            return {
+                code: 500,
+                message: '待办事项保存失败',
+                error: error.message,
+                success: false
+            };
+        }
+    },
+    // // 获取用户指定日期的待办事项
+    // getTodayTodos: async ({ uid, fulldate }) => {
+    //     try {
+    //         const UserTodosModel = require("../../models/UserTodosModel");
+            
+    //         const todos = await UserTodosModel.findOne({
+    //             Uid: uid,
+    //             fulldate: fulldate
+    //         });
+
+    //         if (todos) {
+    //             return {
+    //                 code: 200,
+    //                 success: true,
+    //                 data: todos
+    //             };
+    //         } else {
+    //             return {
+    //                 code: 200,
+    //                 success: true,
+    //                 data: null,
+    //                 message: '该日期暂无待办事项'
+    //             };
+    //         }
+    //     } catch (error) {
+    //         console.error("getTodayTodos 失败", error);
+    //         return {
+    //             code: 500,
+    //             message: '获取待办事项失败',
+    //             error: error.message,
+    //             success: false
+    //         };
+    //     }
+    // },
+    // // 获取用户待办事项列表（支持日期范围查询）
+    // getUserTodosList: async ({ uid, startDate, endDate }) => {
+    //     try {
+    //         const UserTodosModel = require("../../models/UserTodosModel");
+            
+    //         let query = { Uid: uid };
+            
+    //         // 如果提供了日期范围，添加日期过滤条件
+    //         if (startDate && endDate) {
+    //             query.fulldate = {
+    //                 $gte: startDate,
+    //                 $lte: endDate
+    //             };
+    //         }
+            
+    //         const todosList = await UserTodosModel.find(query)
+    //             .sort({ fulldate: -1 }); // 按日期降序排列
+
+    //         return {
+    //             code: 200,
+    //                 success: true,
+    //             data: todosList
+    //         };
+    //     } catch (error) {
+    //         console.error("getUserTodosList 失败", error);
+    //         return {
+    //             code: 500,
+    //             message: '获取待办事项列表失败',
+    //             error: error.message,
+    //             success: false
+    //         };
+    //     }
+    // }
 }
 
 

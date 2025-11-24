@@ -495,7 +495,129 @@ const UserController = {
             
         }
         
-    }
+    },
+    setTodayTodos: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    ActionType: "ERROR",
+                    message: '您未登录'
+                });
+            }
+            const { fulldate, todos_content } = req.body; // 从请求体中获取待办事项信息
+            
+            
+            const result = await UserService.setTodayTodos({ uid, fulldate, todos_content });
+            
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    ActionType: "OK",
+                    message: result.message,
+                    data: result.data
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    ActionType: "ERROR",
+                    message: result.message
+                });
+            }
+        } catch (e) {
+            console.error("setTodayTodos 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+    },
+    // // 获取指定日期的待办事项
+    // getTodayTodos: async (req, res) => {
+    //     try {
+    //         const { uid } = req.user; // 获取用户uid
+    //         if (!uid) {
+    //             return res.send({
+    //                 code: 401,
+    //                 ActionType: "ERROR",
+    //                 message: '您未登录'
+    //             });
+    //         }
+    //         const { fulldate } = req.body; // 从请求体中获取日期
+            
+    //         // 验证必填参数
+    //         if (!fulldate) {
+    //             return res.send({
+    //                 code: 400,
+    //                 ActionType: "ERROR",
+    //                 message: '缺少日期参数'
+    //             });
+    //         }
+            
+    //         const result = await UserService.getTodayTodos({ uid, fulldate });
+            
+    //         if (result.success) {
+    //             res.send({
+    //                 code: 200,
+    //                 ActionType: "OK",
+    //                 data: result.data,
+    //                 message: result.message
+    //             });
+    //         } else {
+    //             res.send({
+    //                 code: result.code,
+    //                 ActionType: "ERROR",
+    //                 message: result.message
+    //             });
+    //         }
+    //     } catch (e) {
+    //         console.error("getTodayTodos 失败", e);
+    //         res.send({
+    //             code: 500,
+    //             ActionType: "ERROR",
+    //             message: '服务器错误'
+    //         });
+    //     }
+    // },
+    // // 获取用户待办事项列表
+    // getUserTodosList: async (req, res) => {
+    //     try {
+    //         const { uid } = req.user; // 获取用户uid
+    //         if (!uid) {
+    //             return res.send({
+    //                 code: 401,
+    //                 ActionType: "ERROR",
+    //                 message: '您未登录'
+    //             });
+    //         }
+    //         const { startDate, endDate } = req.body; // 从请求体中获取日期范围（可选）
+            
+    //         const result = await UserService.getUserTodosList({ uid, startDate, endDate });
+            
+    //         if (result.success) {
+    //             res.send({
+    //                 code: 200,
+    //                 ActionType: "OK",
+    //                 data: result.data
+    //             });
+    //         } else {
+    //             res.send({
+    //                 code: result.code,
+    //                 ActionType: "ERROR",
+    //                 message: result.message
+    //             });
+    //         }
+    //     } catch (e) {
+    //         console.error("getUserTodosList 失败", e);
+    //         res.send({
+    //             code: 500,
+    //             ActionType: "ERROR",
+    //             message: '服务器错误'
+    //         });
+    //     }
+    // }
 }
 
 
