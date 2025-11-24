@@ -7,6 +7,80 @@
         @change="handleChange"
       />
     </view>
+    <view class="todos-list">
+      <!-- Loading 状态 -->
+      <view v-if="loading" class="loading-container">
+       <ThemeLoading text="正在加载数据..."/>
+      </view>
+      
+      <!-- 空状态 -->
+      <view v-else-if="TodayTODOList.length === 0" class="empty-container">
+        <up-icon name="calendar" size="80" color="#007aff"></up-icon>
+        <text class="empty-title">暂无待办事项</text>
+        <text class="empty-desc">点击下方 + 按钮创建新的待办事项</text>
+      </view>
+      
+      <!-- 待办事项列表头部 -->
+      <view v-else class="todos-container">
+        <view class="todos-header">
+          <text class="todos-title">{{ selectedDate }} 待办事项</text>
+          <view class="header-actions">
+            <view class="progress-info">
+              <text class="progress-text">{{ completedCount }}/{{ TodayTODOList.length }}</text>
+              <view class="progress-bar">
+                <view class="progress-fill" :style="{ width: progressPercentage + '%' }"></view>
+              </view>
+            </view>
+            <up-icon name="reload" size="24" color="#007aff" @click="refreshTodos"></up-icon>
+          </view>
+        </view>
+        
+        <!-- 完成祝贺提示 -->
+        <view 
+          v-if="progressPercentage === 100 
+          && TodayTODOList.length > 0" 
+          class="congratulations">
+          <up-icon name="checkmark-circle-fill" size="40" color="#4CAF50"></up-icon>
+          <text class="congratulations-text">🎉 恭喜！今日待办事项全部完成！</text>
+        </view>
+        
+        <view class="todo-item" 
+              v-for="(todo) in TodayTODOList" 
+              :key="todo._id"
+              :class="{ 'completed': todo.isCompleted }">
+          <view class="todo-checkbox" @click="toggleTodo(todo)">
+            <up-icon v-if="todo.isCompleted" name="checkmark-circle-fill" size="28" color="#4CAF50"></up-icon>
+             <uni-icons v-else type="smallcircle" size="32" color="#c0c4cc"></uni-icons>
+          </view>
+          
+          <view class="todo-content">
+            <text 
+              class="todo-title" 
+              :class="{ 'completed-text': todo.isCompleted }">
+              {{ todo.title }}
+            </text>
+            <text v-if="todo.description" class="todo-desc">
+              {{ todo.description }}
+            </text>
+          </view>
+          
+          <view class="todo-actions">
+            <up-icon 
+              name="edit-pen" 
+              size="20" 
+              color="#007aff" 
+              @click="editTodo(todo)">
+            </up-icon>
+            <up-icon 
+              name="trash" 
+              size="20" 
+              color="#ff4757" 
+              @click="deleteTodo(todo)">
+            </up-icon>
+          </view>
+        </view>
+      </view>
+    </view>
     <!-- 添加按钮 -->
     <dragButton
       :isDock="true"
@@ -90,33 +164,45 @@
 
 <script setup>
 import lxCalendar from '../../components/lx-calendar/lx-calendar.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import getTodayDate from '../../util/getTodayDate';
 import dragButton from '../../components/plug-in/drag-button/drag-button.vue';
 import uviewPopup from '../../components/core/uviewPopup.vue';
-import { setTodayTodos } from '../../API/Tools/TodosAPI';
+import { 
+  setTodayTodosAPI,
+  getDotDatesAPI,
+  getTodayTodosAPI
+} from '../../API/Tools/TodosAPI';
+import ThemeLoading from '../../components/core/ThemeLoading.vue';
 
-// 初始日期设置为今天
-const initialDate = ref(getTodayDate());
-const dotDates = ref([getTodayDate()]);// 下方显示圆点的日期
+const initialDate = ref(getTodayDate());// 初始日期设置为今天
+const dotDates = ref([]); // 下方显示圆点的日期，挂载时候获取
 const popupShow = ref(false);
-// 选中的日期
-const selectedDate = ref('');
-// 表单数据
+const selectedDate = ref('');// 选中的日期
+const TodayTODOList = ref([]);// 代办列表
 const todoForm = ref({
   title: '',
   description: ''
 });
-// 表单验证错误
-const errors = ref({
+const errors = ref({// 表单验证错误
   title: ''
 });
-// 保存状态
-const isSaving = ref(false);
-// 输入框焦点状态
-const inputFocus = ref({
+const isSaving = ref(false);// 保存状态
+const inputFocus = ref({// 输入框焦点状态
   title: false,
   description: false
+});
+const loading = ref(false);// 加载状态
+
+// 计算属性：完成的待办事项数量
+const completedCount = computed(() => {
+  return TodayTODOList.value.filter(todo => todo.isCompleted).length;
+});
+
+// 计算属性：完成百分比
+const progressPercentage = computed(() => {
+  if (TodayTODOList.value.length === 0) return 0;
+  return Math.round((completedCount.value / TodayTODOList.value.length) * 100);
 });
 
 const handleChange = (e) => {
@@ -139,60 +225,6 @@ const handleInputBlur = (field) => {
     errors.value[field] = '';
   }
 };
-
-// 表单验证
-const validateForm = () => {
-  errors.value = { title: '' };
-  let isValid = true;
-
-  if (!todoForm.value.title.trim()) {
-    errors.value.title = '请输入代办标题';
-    isValid = false;
-  } else if (todoForm.value.title.trim().length > 50) {
-    errors.value.title = '标题不能超过50个字符';
-    isValid = false;
-  }
-
-  return isValid;
-};
-
-// 保存代办
-const handleSave = async () => {
-  if (!validateForm()) {
-    return;
-  }
-
-  isSaving.value = true;
-  
-  try {
-    const res = await setTodayTodos({
-      fulldate: selectedDate.value,
-      todoForm: {
-        title: todoForm.value.title,
-        description: todoForm.value.description,
-      }
-    });
-    console.log('保存成功:', res);
-    
-    // 保存成功后关闭弹窗
-    popupShow.value = false;
-    resetForm();
-    
-    // uni.showToast({
-    //   title: '代办事项已保存',
-    //   icon: 'success'
-    // });
-  } catch (error) {
-    console.error('保存失败:', error);
-    uni.showToast({
-      title: '保存失败，请重试',
-      icon: 'error'
-    });
-  } finally {
-    isSaving.value = false;
-  }
-};
-
 // 取消操作
 const handleCancel = () => {
   popupShow.value = false;
@@ -207,8 +239,144 @@ const resetForm = () => {
   };
   errors.value = { title: '' };
 };
+
+// 表单验证
+const validateForm = () => {
+  errors.value = { title: '' };
+  let isValid = true;
+  if (!todoForm.value.title.trim()) {
+    errors.value.title = '请输入代办标题';
+    isValid = false;
+  } else if (todoForm.value.title.trim().length > 50) {
+    errors.value.title = '标题不能超过50个字符';
+    isValid = false;
+  }
+  return isValid;
+};
+
+// 保存代办
+const handleSave = async () => {
+  if (!validateForm()) {
+    return;
+  }
+
+  isSaving.value = true;
+  
+  try {
+    const res = await setTodayTodosAPI({
+      fulldate: selectedDate.value,
+      todoForm: {
+        title: todoForm.value.title,
+        description: todoForm.value.description,
+      }
+    });
+   if(res.code === 200){
+    uni.showToast({
+      title: res.message,
+      icon:'success'
+    });
+    console.log('保存成功:', res);
+    popupShow.value = false;
+    resetForm();
+   }
+  } catch (error) {
+    console.error('保存失败:', error);
+    uni.showToast({
+      title: '保存失败，请重试',
+      icon: 'error'
+    });
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+//获取dotDates
+const getDotDates = async () => {
+  try {
+    const res = await getDotDatesAPI();
+    if(res.code === 200){
+      dotDates.value = res.data;
+    }
+  }catch (error) {
+    console.error('获取dotDates失败:', error);
+  }
+}
+
+//获取今日所有todos列表
+const getTodayTodos = async () => {
+  loading.value = true;
+  try {
+    const res = await getTodayTodosAPI(selectedDate.value);
+    if(res.code === 200){
+      TodayTODOList.value = res.data;
+      console.log('获取今日todos成功:', res);
+    }
+  }catch (error) {
+    console.error('获取今日todos失败:', error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+// 切换待办事项完成状态
+const toggleTodo = (todo) => {
+  todo.isCompleted = !todo.isCompleted;
+  //TODO 切换待办状态
+  console.log('切换待办状态:', todo);
+}
+
+// 编辑待办事项
+const editTodo = (todo) => {
+  // 填充表单数据
+  todoForm.value = {
+    title: todo.title,
+    description: todo.description
+  };
+  popupShow.value = true;
+  console.log('编辑待办:', todo);
+}
+
+// 删除待办事项
+const deleteTodo = (todo) => {
+  uni.showModal({
+    title: '确认删除',
+    content: `确定要删除"${todo.title}"吗？`,
+    success: (res) => {
+      if (res.confirm) {
+        // 从列表中移除
+        const index = TodayTODOList.value.findIndex(item => item._id === todo._id);
+        if (index > -1) {
+          TodayTODOList.value.splice(index, 1);
+        }
+        uni.showToast({
+          title: '删除成功',
+          icon: 'success'
+        });
+      }
+    }
+  });
+}
+
+// 刷新待办事项列表
+const refreshTodos = () => {
+  getTodayTodos();
+}
+
+// 监听 selectedDate 的变化获取后端数据
+watch(selectedDate, (newVal, oldVal) => {
+  if (newVal && oldVal && newVal !== oldVal) { // 检查日期是否有变化且不为空
+    getTodayTodos(); // 调用获取今日 getTodayTodos 的方法
+  }
+})
+
 onMounted(() => {
-selectedDate.value = initialDate.value;  // 初始化时也设置选中日期为今天
+  selectedDate.value = initialDate.value;  // 初始化时也设置选中日期为今天
+  getDotDates();
+
+  // #ifdef H5 
+  getTodayTodos();//h5端首次进入页面获取今日todos列表 
+  // #endif
+
 })
 </script>
 
@@ -221,6 +389,217 @@ selectedDate.value = initialDate.value;  // 初始化时也设置选中日期为
 
 .calendar-section {
   margin-bottom: 40rpx;
+}
+
+/* 待办事项列表样式 */
+.todos-list {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  min-height: 400rpx;
+}
+
+/* Loading 状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  color: #666;
+  font-size: 28rpx;
+}
+
+/* 空状态样式 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.empty-title {
+  margin-top: 30rpx;
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 600;
+}
+
+.empty-desc {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 待办事项容器 */
+.todos-container {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.todos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.header-actions .u-icon {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.header-actions .u-icon:hover {
+  transform: rotate(180deg);
+}
+
+/* 进度信息样式 */
+.progress-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.progress-bar {
+  width: 100rpx;
+  height: 8rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+/* 祝贺提示样式 */
+.congratulations {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx;
+  background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  animation: celebrate 0.6s ease-in-out;
+}
+
+.congratulations-text {
+  margin-left: 16rpx;
+  font-size: 28rpx;
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.todos-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.todos-count {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 单个待办事项 */
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+  transition: all 0.3s ease;
+  animation: slideInLeft 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.todo-item:nth-child(1) { animation-delay: 0.1s; }
+.todo-item:nth-child(2) { animation-delay: 0.2s; }
+.todo-item:nth-child(3) { animation-delay: 0.3s; }
+.todo-item:nth-child(4) { animation-delay: 0.4s; }
+.todo-item:nth-child(5) { animation-delay: 0.5s; }
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-item:hover {
+  background: #fafafa;
+  border-radius: 12rpx;
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+  margin: 0 -20rpx;
+}
+
+.todo-item.completed {
+  opacity: 0.7;
+}
+
+.todo-checkbox {
+  margin-right: 20rpx;
+  cursor: pointer;
+}
+
+.todo-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-title {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+  transition: all 0.3s ease;
+}
+
+.todo-title.completed-text {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.todo-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-left: 20rpx;
+}
+
+.todo-actions .u-icon {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.todo-actions .u-icon:hover {
+  transform: scale(1.1);
 }
 
 /* 弹窗样式 */
@@ -421,6 +800,22 @@ selectedDate.value = initialDate.value;  // 初始化时也设置选中日期为
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes celebrate {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 .form-item:nth-child(1) { animation-delay: 0.1s; }

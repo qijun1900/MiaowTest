@@ -28,7 +28,7 @@
       <!-- 计划日程表 -->
       <view 
         class="tool-card" 
-        @tap="navigateToTodo">
+        @click="navigateToTodo">
         <view class="tool-info">
           <view class="tool-title">TODO</view>
           <view class="tool-desc">记录待办事项，管理学习任务，制定学习计划</view>
@@ -48,6 +48,7 @@
 import { ref, onMounted } from 'vue';
 import PageHead from '../../components/core/PageHead.vue';
 import showShareMenu from '../../util/wechatShare.js';
+import checkLogin from '../../util/checkLogin.js';
 
 const pageHeadRef = ref();
 
@@ -58,7 +59,10 @@ const navigateToTimer = () => {
   });
 };
 // 导航到TODO页面
-const navigateToTodo = () => {
+const navigateToTodo = async () => {
+  const isLoggedIn = await checkLogin("请登录后再操作");
+  if (!isLoggedIn) return;
+  
   uni.navigateTo({
     url: '/pages/tools/TodoToolView'
   });
