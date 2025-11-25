@@ -492,7 +492,142 @@ const UserController = {
                 data: result
             })
         }catch(e) {
+            console.error("useLLMChat 失败", e);
+  
+        }
+    },
+    setTodayTodos: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid，前端阻拦了未登录的情况
+            const { fulldate, todos_content } = req.body; // 从请求体中获取待办事项信息
+            const result = await UserService.setTodayTodos({ uid, fulldate, todos_content });
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    message: result.message,
+                });
+            } else {
+                res.send({
+                    code: result.code,
+                    message: result.message
+                });
+            }
+        } catch (e) {
+            console.error("setTodayTodos 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+    },
+    getDotDates : async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid，前端阻拦了未登录的情况
+            const result = await UserService.getDotDates({ uid });
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    data: result.data,
+                })
+            }else{
+                res.send({
+                    code: result.code,
+                    message: result.message
+                })
+            }
             
+        }catch(e) {
+            console.error("getDotDates 失败", e);
+            res.send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+        
+    },
+    getTodayTodos : async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid，前端阻拦了未登录的情况
+            const { fulldate } = req.body; // 从请求体中获取日期信息
+            const result = await UserService.getTodayTodos({ uid, fulldate });
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    data: result.data,
+                })
+            }
+        }catch(e) {
+            console.error("getTodayTodos 失败", e);
+        }
+        
+    },
+    toggleTodoStatus:async(req, res)=> {
+        try{
+            const { uid } = req.user; 
+            const { fulldate, todoId } = req.body; // 从请求体中获取日期和待办事项ID信息
+            const result = await UserService.toggleTodoStatus({ uid, fulldate, todoId });
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    message: result.message,
+                });
+            }else{
+                res.send({
+                    code: result.code,
+                    message: result.message,
+                })
+            }
+        }catch(e) {
+            console.error("toggleTodoStatus 失败", e);
+        } 
+    },
+    deleteTodo: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid，前端阻拦了未登录的情况
+            const { fulldate, todoId } = req.body; // 从请求体中获取日期和待办事项ID信息
+            const result = await UserService.deleteTodo({ uid, fulldate, todoId });
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    message: result.message,
+                });
+            }else{
+                res.send({
+                    code: result.code,
+                    message: result.message,
+                })
+            }
+        }catch{
+            console.error("deleteTodo 失败", e);
+        }
+    },
+    editTodo: async (req, res) => {
+        try {
+            const { uid } = req.user; // 获取用户uid，前端阻拦了未登录的情况
+            const { fulldate, todoId, todoForm } = req.body; // 从请求体中获取日期和待办事项ID信息
+            const result = await UserService.editTodo({ 
+                uid, 
+                fulldate, 
+                todoId, 
+                todoForm 
+            });
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    message: result.message,
+                });
+                
+            }else{
+                res.send({
+                    code: result.code,
+                    message: result.message,
+                })
+            }
+            
+        }catch(e) {
+            console.error("editTodo 失败", e);
         }
         
     }

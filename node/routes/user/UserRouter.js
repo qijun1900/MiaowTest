@@ -21,6 +21,17 @@ UserRouter.post("/uniappAPI/UserNote/getNoteListByExamId", JWT.verifyTokenMiddle
 UserRouter.post("/uniappAPI/exam/saveUserBankPracticeNote", JWT.verifyTokenMiddleware(), UserController.saveUserBankPracticeNote)//用户保存自己题库题目练习笔记接口-
 UserRouter.post("/uniappAPI/exam/getUserBankPracticeNote", JWT.verifyTokenMiddleware(), UserController.getUserBankPracticeNote)//用户获取自己题库题目练习笔记接口-
 
+/************工具api*********** */
+UserRouter.post("/uniappAPI/set/TodayTodos", JWT.verifyTokenMiddleware(), UserController.setTodayTodos)//设置今日待办事项接口-
+UserRouter.get("/uniappAPI/get/dotDates", JWT.verifyTokenMiddleware(), UserController.getDotDates)//获取待办事项日期列表接口-用来显示圆点
+UserRouter.post("/uniappAPI/get/TodayTodos", JWT.verifyTokenMiddleware(), UserController.getTodayTodos)//获取今日待办事项接口-
+UserRouter.post("/uniappAPI/set/toggleTodoStatus", JWT.verifyTokenMiddleware(), UserController.toggleTodoStatus)//切换待办事项完成状态接口-
+UserRouter.post("/uniappAPI/set/deleteTodo", JWT.verifyTokenMiddleware(), UserController.deleteTodo)//删除待办事项接口-
+UserRouter.post("/uniappAPI/set/editTodo", JWT.verifyTokenMiddleware(), UserController.editTodo)//编辑待办事项接口-
+
+
+
+
 
 //测试
 UserRouter.post("/uniappAPI/llm/chat", UserController.useLLMChat)//单次对话
