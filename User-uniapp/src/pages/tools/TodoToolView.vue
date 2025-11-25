@@ -45,12 +45,12 @@
         </view>
         
         <view class="todo-item" 
-              v-for="(todo) in TodayTODOList" 
-              :key="todo._id"
-              :class="{ 'completed': todo.isCompleted }">
+          v-for="(todo) in TodayTODOList" 
+          :key="todo._id"
+          :class="{ 'completed': todo.isCompleted }">
           <view class="todo-checkbox" @click="toggleTodo(todo)">
             <up-icon v-if="todo.isCompleted" name="checkmark-circle-fill" size="28" color="#4CAF50"></up-icon>
-             <uni-icons v-else type="smallcircle" size="32" color="#c0c4cc"></uni-icons>
+             <view v-else class="todo-checkbox-circle"></view>
           </view>
           
           <view class="todo-content">
@@ -94,7 +94,7 @@
     <uviewPopup
       :closeable="false"
       v-model:show="popupShow"
-      :title="'新建' + selectedDate + '-TODO'">
+      :title="(isEditing ? '编辑' : '新建') + selectedDate + '-TODO'">
       <template #popupcontent>
         <view class="popup-container">
           <!-- 表单内容区域 -->
@@ -152,7 +152,7 @@
               :loading="isSaving"
               @click="handleSave"
             >
-              {{ isSaving ? '保存中...' : '保存' }}
+              {{ isSaving ? '保存中...' : (isEditing ? '更新' : '保存') }}
             </up-button>
           </view>
           </view>
@@ -171,7 +171,10 @@ import uviewPopup from '../../components/core/uviewPopup.vue';
 import { 
   setTodayTodosAPI,
   getDotDatesAPI,
-  getTodayTodosAPI
+  getTodayTodosAPI,
+  toggleTodoStatusAPI,
+  deleteTodoAPI,
+  editTodoAPI,
 } from '../../API/Tools/TodosAPI';
 import ThemeLoading from '../../components/core/ThemeLoading.vue';
 
@@ -193,6 +196,8 @@ const inputFocus = ref({// 输入框焦点状态
   description: false
 });
 const loading = ref(false);// 加载状态
+const isEditing = ref(false);// 编辑模式状态
+const editingTodoId = ref(null);// 正在编辑的待办事项ID
 
 // 计算属性：完成的待办事项数量
 const completedCount = computed(() => {
@@ -238,6 +243,8 @@ const resetForm = () => {
     description: ''
   };
   errors.value = { title: '' };
+  isEditing.value = false;
+  editingTodoId.value = null;
 };
 
 // 表单验证
@@ -263,13 +270,28 @@ const handleSave = async () => {
   isSaving.value = true;
   
   try {
-    const res = await setTodayTodosAPI({
-      fulldate: selectedDate.value,
-      todoForm: {
-        title: todoForm.value.title,
-        description: todoForm.value.description,
-      }
-    });
+    let res;
+    if (isEditing.value) {
+      // 编辑模式
+      res = await editTodoAPI({
+        fulldate: selectedDate.value,
+        todoId: editingTodoId.value,
+        todoForm: {
+          title: todoForm.value.title,
+          description: todoForm.value.description,
+        }
+      });
+    } else {
+      // 新增模式
+      res = await setTodayTodosAPI({
+        fulldate: selectedDate.value,
+        todoForm: {
+          title: todoForm.value.title,
+          description: todoForm.value.description,
+        }
+      });
+    }
+   
    if(res.code === 200){
     uni.showToast({
       title: res.message,
@@ -278,6 +300,8 @@ const handleSave = async () => {
     console.log('保存成功:', res);
     popupShow.value = false;
     resetForm();
+    // 刷新列表
+    getTodayTodos();
    }
   } catch (error) {
     console.error('保存失败:', error);
@@ -309,7 +333,6 @@ const getTodayTodos = async () => {
     const res = await getTodayTodosAPI(selectedDate.value);
     if(res.code === 200){
       TodayTODOList.value = res.data;
-      console.log('获取今日todos成功:', res);
     }
   }catch (error) {
     console.error('获取今日todos失败:', error);
@@ -319,21 +342,35 @@ const getTodayTodos = async () => {
 }
 
 // 切换待办事项完成状态
-const toggleTodo = (todo) => {
-  todo.isCompleted = !todo.isCompleted;
-  //TODO 切换待办状态
-  console.log('切换待办状态:', todo);
+const toggleTodo = async (todo) => {
+  if(todo.isCompleted){
+    todo.isCompleted = false;
+  }else{
+    todo.isCompleted = true;
+  }
+  const res = await toggleTodoStatusAPI({
+    fulldate: selectedDate.value,
+    todoId: todo._id,
+  })
+  if(res.code === 200){
+    uni.showToast({
+      title: res.message,
+      icon:'success'
+    });
+  }
 }
 
 // 编辑待办事项
-const editTodo = (todo) => {
+const editTodo = async(todo) => {
+  // 设置编辑模式
+  isEditing.value = true;
+  editingTodoId.value = todo._id;
   // 填充表单数据
   todoForm.value = {
     title: todo.title,
     description: todo.description
   };
   popupShow.value = true;
-  console.log('编辑待办:', todo);
 }
 
 // 删除待办事项
@@ -345,13 +382,22 @@ const deleteTodo = (todo) => {
       if (res.confirm) {
         // 从列表中移除
         const index = TodayTODOList.value.findIndex(item => item._id === todo._id);
-        if (index > -1) {
+        if (index !== -1) {
           TodayTODOList.value.splice(index, 1);
         }
-        uni.showToast({
-          title: '删除成功',
-          icon: 'success'
-        });
+        deleteTodoAPI({
+          fulldate: selectedDate.value,
+          todoId: todo._id,
+        }).then(res => {
+          if(res.code === 200){
+            uni.showToast({
+              title: res.message,
+              icon:'success'
+            });
+            // 刷新dotDates
+            getDotDates();
+          }
+        })
       }
     }
   });
@@ -374,7 +420,7 @@ onMounted(() => {
   getDotDates();
 
   // #ifdef H5 
-  getTodayTodos();//h5端首次进入页面获取今日todos列表 
+    getTodayTodos();//h5端首次进入页面获取今日todos列表 
   // #endif
 
 })
@@ -784,6 +830,13 @@ onMounted(() => {
   .action-btn {
     height: 88rpx;
   }
+}
+.todo-checkbox-circle {
+  width: 38rpx;
+  height: 38rpx;
+  border: 2rpx solid #c0c4cc;
+  border-radius: 50%;
+  background-color: #ffffff;
 }
 
 /* 微交互动画 */

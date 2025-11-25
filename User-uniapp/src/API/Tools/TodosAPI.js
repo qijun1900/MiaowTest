@@ -56,6 +56,70 @@ export async function getTodayTodosAPI(fulldate) {
         })
     }catch (error) {
         console.error("getTodayTodos 失败", error);
+    }	
+}
+/**
+ * 切换待办事项完成状态
+ * @method POST
+ * @param {*String} fulldate 日期 格式为 yyyy-MM-dd
+ * @param {*String} todoId 待办事项id
+ * @returns {Promise} 返回结果
+ */
+export async function toggleTodoStatusAPI({fulldate,todoId}) {
+    try {
+        return  await http({
+            url: '/uniappAPI/set/toggleTodoStatus',
+            method: 'POST',
+            data: {
+                fulldate: fulldate,
+                todoId: todoId,
+            }
+        })	
+    }catch (error) {
+        console.error("toggleTodoStatus 失败", error);
     }
-		
+}
+
+/**
+ * 删除待办事项
+ * @param {*String} fulldate 日期 格式为 yyyy-MM-dd
+ * @param {*String} todoId 待办事项id
+ * @returns {Promise} 返回结果
+ */
+export async function deleteTodoAPI({fulldate,todoId}) {
+    try {
+        return  await http({
+            url: '/uniappAPI/set/deleteTodo',
+            method: 'POST',
+            data: {
+                fulldate: fulldate,
+                todoId: todoId,
+            }
+        })
+    }catch (error) {
+        console.error("deleteTodo 失败", error);
+    }	
+}
+
+/**
+ * 编辑待办事项
+ * @param {*String} fulldate 日期 格式为 yyyy-MM-dd
+ * @param {*String} todoId 待办事项id
+ * @param {*Object} todoForm 待办事项 格式为 {title: '标题', description: '描述',}
+ * @returns {Promise} 返回结果
+ */
+export async function editTodoAPI({fulldate,todoId,todoForm}) {
+    try {
+        return  await http({
+            url: '/uniappAPI/set/editTodo',
+            method: 'POST',
+            data: {
+                fulldate: fulldate,
+                todoId: todoId,
+                todoForm: todoForm,
+            }
+        })
+    }catch (error) {
+        console.error("editTodo 失败", error);
+    }
 }

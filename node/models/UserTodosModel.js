@@ -12,6 +12,10 @@ const UserTodosSchema = new mongoose.Schema({
     },
     todos_content:{
         type:[{ // 代办内容数组，可以包含添加多个代办项
+            _id: { // 数组元素的唯一标识
+                type: mongoose.Schema.Types.ObjectId,
+                default: () => new mongoose.Types.ObjectId()
+            },
             title: { // 代办标题
                 type: String,
                 default: ''

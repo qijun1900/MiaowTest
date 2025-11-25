@@ -854,8 +854,10 @@ const UserService = {
             const UserTodosModel = require("../../models/UserTodosModel");
             // 查找用户的所有待办事项
             const todosList = await UserTodosModel.find({ Uid: uid });
-            // 提取所有的日期
-            const dates = todosList.map(todo => todo.fulldate);
+            // todos_content不为空的日期
+            const filteredDates = todosList.filter(todo => todo.todos_content.length > 0);
+            // 提取日期
+            const dates = filteredDates.map(todo => todo.fulldate);
             // 按日期排序
             const DotDates = dates.sort();
             return {
@@ -906,6 +908,149 @@ const UserService = {
             };
         }
     },
+    toggleTodoStatus: async ({ uid, fulldate, todoId }) => {
+        try {
+            const UserTodosModel = require("../../models/UserTodosModel");
+            
+            // 首先找到用户的待办事项文档
+            const userTodos = await UserTodosModel.findOne({
+                Uid: uid,
+                fulldate: fulldate
+            });
+
+            if (!userTodos) {
+                return {
+                    code: 404,
+                    success: false,
+                    message: '未找到待办事项'
+                };
+            }
+
+            // 查找指定的待办事项
+            const todo = userTodos.todos_content.find(
+                todo => todo._id.toString() === todoId
+            );
+            
+            if (!todo) {
+                return {
+                    code: 404,
+                    success: false,
+                    message: '未找到指定的待办事项'
+                };
+            }
+
+            // 切换完成状态
+            todo.isCompleted = !todo.isCompleted;
+            
+            // 保存更新
+            await userTodos.save();
+
+            return {
+                code: 200,
+                success: true,
+                message: '更新成功',
+            };
+
+        } catch (error) {
+            console.error("toggleTodoStatus 失败", error);
+            return {
+                code: 500,
+                success: false,
+                message: '更新失败',
+                error: error.message
+            };
+        }
+    },
+    deleteTodo: async ({ uid, fulldate, todoId }) => {
+        try {
+            const UserTodosModel = require("../../models/UserTodosModel");
+            // 查找用户的待办事项文档
+            const userTodos = await UserTodosModel.findOne({
+                Uid: uid,
+                fulldate: fulldate
+            });
+
+            if (!userTodos) {
+                return {
+                    code: 404,
+                    success: false,
+                    message: '未找到待办事项'
+                }
+            }
+            // 查找指定的待办事项索引
+            const todoIndex = userTodos.todos_content.findIndex(
+                todo => todo._id.toString() === todoId
+            );
+
+            if (todoIndex === -1) {
+                return {
+                    code: 404,
+                    success: false,
+                    message: '未找到指定的待办事项'
+                }
+            }
+            // 删除待办事项
+            userTodos.todos_content.splice(todoIndex, 1);
+
+            // 保存更新
+            await userTodos.save();
+
+            return {
+                code: 200,
+                success: true,
+                message: '删除成功'
+            }
+            
+        }catch (error) {
+            console.error("deleteTodo 失败", error);
+        }
+        
+    },
+    editTodo: async ({ uid, fulldate, todoId,todoForm }) => {
+        try {
+            const UserTodosModel = require("../../models/UserTodosModel");
+            // 查找用户的待办事项文档
+            const userTodos = await UserTodosModel.findOne({
+                Uid: uid,
+                fulldate: fulldate
+            });
+
+            if (!userTodos) {
+                return {
+                    code: 404,
+                    success: false,
+                    message: '未找到待办事项'
+                } 
+            }
+            // 查找指定的待办事项索引
+            const todoIndex = userTodos.todos_content.findIndex(
+                todo => todo._id.toString() === todoId
+            );
+
+            if (todoIndex === -1) {
+                return {
+                    code: 404,
+                    success: false,
+                    message: '未找到指定的待办事项'
+                }
+            }
+            // 更新待办事项内容
+            userTodos.todos_content[todoIndex] = { ...userTodos.todos_content[todoIndex], ...todoForm };
+
+            // 保存更新
+            await userTodos.save();
+
+            return {
+                code: 200,
+                success: true,
+                message: '更新成功'
+            }
+        }catch (error) {
+            console.error("editTodo 失败", error);
+            
+        }
+        
+    }
 }
 
 
