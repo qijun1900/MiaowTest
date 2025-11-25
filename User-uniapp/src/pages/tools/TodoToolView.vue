@@ -297,11 +297,12 @@ const handleSave = async () => {
       title: res.message,
       icon:'success'
     });
-    console.log('保存成功:', res);
     popupShow.value = false;
     resetForm();
     // 刷新列表
     getTodayTodos();
+    // 刷新dotDates
+    getDotDates();
    }
   } catch (error) {
     console.error('保存失败:', error);
