@@ -71,16 +71,18 @@
         v-model:show="iSopenNotePopupShow" 
         :closeable="false" 
         :round="30" 
-        :closeOnClickOverlay="false"
+        :closeOnClickOverlay="true"
         title="修改题目笔记">
         <template #popupcontent>
           <view class="note-popup-container">
             <view class="note-editor-wrapper">
-              <uniEditor 
-                placeholder="请在此处输入笔记内容..." 
-                v-model="noteContent" 
-                height="300rpx"
-                id="noteEditor" />
+              <sp-editor 
+                :placeholder="'请在此处输入笔记内容...'" 
+                :toolbar-config="toolbarConfig"
+                @input="handleEditorInput"
+                @init="handleEditorInit"
+                :editor-id="'noteEditor'"
+              />
             </view>
             <view class="note-info" 
               v-if="currentQuestionId
@@ -129,7 +131,6 @@ import formatInfo from '../../util/formatInfo';
 import formatTime from '../../util/formatTime';
 import BackToTop from "../../components/core/BackToTop.vue";
 import { onPageScroll } from '@dcloudio/uni-app';
-import uniEditor from '../../components/core/uniEditor.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerStore';
 import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore';
@@ -149,6 +150,13 @@ const originalNoteContent = ref('');// 原始笔记内容，用于取消操作
 const currentQuestionId = ref(null)
 const bankInfo = ref(null); // 题库信息
 const isLoading = ref(false); // 加载状态
+// sp-editor相关配置
+const editorCtx = ref(null); // 编辑器上下文
+const toolbarConfig = ref({
+  keys: ['header', 'fontFamily', 'fontSize', 'bold', 'italic', 'underline', 'strike', 'color', 'backgroundColor', 'align', 'lineHeight', 'letterSpacing', 'listOrdered', 'listBullet', 'listCheck', 'indentInc', 'indentDec', 'divider', 'scriptSub', 'scriptSuper', 'date',  'undo', 'redo', 'removeFormat', 'clear',],
+  iconSize: '18px',
+  iconColumns: 10
+});
 
 const handleEditNote = async (question) => {
   // 打开笔记弹窗
@@ -156,20 +164,54 @@ const handleEditNote = async (question) => {
   
   // 设置当前编辑的题目ID
   currentQuestionId.value = question.questionId;
-  // 加载笔记内容(掉用接口保持格式相同)
-  const res = await getPracticeNoteAPI(currentQuestionId.value)
+  // 加载笔记内容
+  const res = await getPracticeNoteAPI(false,currentQuestionId.value)
   if (res.code === 200) {
     noteContent.value = res.data.note.content; // 加载笔记内容
+    
+    // 如果编辑器已经初始化，立即设置内容
+    if (editorCtx.value) {
+      editorCtx.value.setContents({
+        html: noteContent.value
+      });
+    } else {
+      // 添加延迟，确保在编辑器初始化后内容能被正确设置
+      setTimeout(() => {
+        if (editorCtx.value) {
+          editorCtx.value.setContents({
+            html: noteContent.value
+          });
+        }
+      }, 300);
+    }
   }
   // 保存原始内容，用于取消操作
   originalNoteContent.value = noteContent.value;
-
 }
+
+// 编辑器初始化完成
+const handleEditorInit = (ctx) => {
+  editorCtx.value = ctx;
+  // 确保在编辑器初始化后，如果有笔记内容，立即设置到编辑器中
+  // 添加一个小延迟以确保DOM已经完全渲染
+  setTimeout(() => {
+    if (noteContent.value && editorCtx.value) {
+      editorCtx.value.setContents({
+        html: noteContent.value
+      });
+    }
+  }, 100);
+};
+
+// 编辑器内容变化
+const handleEditorInput = ({ html} ) => {
+  noteContent.value = html;
+};
+
 // 获取当前编辑的题目
 const getCurrentQuestion = () => {
   return noteList.value.find(q => q.questionId === currentQuestionId.value) || {};
 }
-
 
 // 取消笔记编辑
 const handleCancelNote = () => {
@@ -194,6 +236,15 @@ const handleCancelNote = () => {
   }
 }
 const handleSaveNote = async () => {
+  // 保存前先从编辑器获取最新内容，确保内容是最新的
+  if (editorCtx.value) {
+    editorCtx.value.getContents({
+      success: (res) => {
+        noteContent.value = res.html;
+      }
+    });
+  }
+  
   // 保存笔记
   if (!currentQuestionId.value || !noteContent.value.trim()) {
     uni.showToast({
@@ -366,7 +417,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20rpx;
-  /* 卡片之间的间距 */
   padding: 20rpx;
 }
 
@@ -654,6 +704,16 @@ onMounted(() => {
   border-radius: 12rpx;
   overflow: hidden;
   border: 1px solid #eee;
+  height: 600rpx;
+}
+
+/* sp-editor 样式调整 */
+.note-editor-wrapper :deep(.sp-editor) {
+  height: 100%;
+}
+
+.note-editor-wrapper :deep(.sp-editor-wrapper) {
+  height: calc(100% - 60rpx);
 }
 
 .note-info {
