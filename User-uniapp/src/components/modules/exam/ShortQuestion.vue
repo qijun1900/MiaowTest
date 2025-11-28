@@ -194,6 +194,7 @@ onMounted(()=>{
     justify-content: space-between;
     align-items: center;
     padding: 0 8rpx;
+    gap: 10rpx;
 }
 .user-judgment-but{
     flex: 1; /* 让按钮占据相同的宽度 */
