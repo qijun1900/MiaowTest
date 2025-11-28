@@ -1,23 +1,23 @@
 <template>
 	<view 
-		v-if="visible" 
+		v-show="visible" 
 		class="tips-container" 
-		:class="type" 
+		:class="[type, { 'tips-hidden': isHiding }]" 
 		@click="handleClick">
 		<view class="tips-content">
 			<view 
 				v-if="showIcon" 
 				class="tips-icon">
-				<text class="iconfont" 
-				:class="iconClass">
-			</text>
-			</view>
+					<text class="iconfont" 
+					:class="iconClass">
+				</text>
+				</view>
 			<view class="tips-text">{{ text }}</view>
 			<view 
 				v-if="closable && !clickable" 
 				class="tips-close" @click.stop="close">
-				<text class="iconfont icon-close"></text>
-			</view>
+					<text class="iconfont icon-close"></text>
+				</view>
 		</view>
 	</view>
 </template>
@@ -64,6 +64,7 @@ const emit = defineEmits(['close'])
 
 // 响应式数据
 const visible = ref(true)
+const isHiding = ref(false)
 let timer = null
 
 // 计算属性
@@ -79,8 +80,12 @@ const iconClass = computed(() => {
 
 // 方法
 const close = () => {
-	visible.value = false
-	emit('close')
+	isHiding.value = true
+	// 等待动画结束后再隐藏
+	setTimeout(() => {
+		visible.value = false
+		emit('close')
+	}, 300)
 }
 
 const handleClick = () => {
@@ -110,6 +115,9 @@ onBeforeUnmount(() => {
 	margin: 20rpx 0;
 	border-radius: 16rpx;
 	overflow: hidden;
+	opacity: 1;
+	transform: translateY(0);
+	transition: all 0.3s ease;
 	
 	&.info {
 		background-color: rgba(64, 158, 255, 0.1);
@@ -130,7 +138,6 @@ onBeforeUnmount(() => {
 	// 可点击样式
 	&.clickable {
 		cursor: pointer;
-		transition: all 0.3s ease;
 		
 		&:hover {
 			opacity: 0.8;
@@ -141,6 +148,12 @@ onBeforeUnmount(() => {
 		&:active {
 			transform: translateY(0);
 		}
+	}
+	
+	// 隐藏动画
+	&.tips-hidden {
+		opacity: 0;
+		transform: translateY(-10px);
 	}
 }
 
@@ -210,4 +223,6 @@ onBeforeUnmount(() => {
 .icon-close::before {
 	content: "×";
 }
+
+
 </style>

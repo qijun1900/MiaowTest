@@ -36,7 +36,7 @@
                 type="primary" 
                 :text= "showAnswerComputed ? '隐藏答案' : '显示答案'"
                 shape="circle" 
-                icon="eye-fill">
+                :icon="showAnswerComputed? 'eye-off':'eye-fill'">>
             </up-button>
         </view>
         <!-- 答案 -->
@@ -52,7 +52,7 @@
         <uni-transition name="fade" mode="out-in" :show="showAnswerComputed && props.currentMode === 0">
             <view class="user-judgment-container" key="judgment">
                 <up-button 
-                    icon="close"
+                    icon="close-circle-fill"
                     type="primary" 
                     :plain="true" 
                     text="答错了" 
@@ -60,7 +60,7 @@
                     class="user-judgment-but"
                     @click="handleSelfEvaluation(false)"></up-button>
                 <up-button 
-                    icon="checkmark"
+                    icon="checkmark-circle-fill"
                     type="primary" 
                     :plain="true" 
                     text="答对了" 
