@@ -36,7 +36,7 @@
                 type="primary" 
                 :text= "showAnswerComputed ? '隐藏答案' : '显示答案'"
                 shape="circle" 
-                :icon="showAnswerComputed? 'eye-off':'eye-fill'">>
+                :icon="showAnswerComputed? 'eye-off':'eye-fill'">
             </up-button>
         </view>
         <!-- 答案 -->
