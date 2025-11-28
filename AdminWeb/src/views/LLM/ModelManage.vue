@@ -46,8 +46,8 @@
         <div class="eidt-card">
             <el-card style="border-radius: 4px," shadow="never">
                 <div class="edit-btn">
-                    <el-row :gutter="200">
-                        <el-col :span="18">
+                    <el-row :gutter="20" type="flex" justify="space-between" align="middle">
+                        <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18" class="left-buttons">
                             <el-button 
                                 type="success" 
                                 plain 
@@ -62,7 +62,7 @@
                             </el-button>
                             </Popconfirm>
                         </el-col>
-                        <el-col :span="6">
+                        <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="right-buttons">
                             <Tooltip content="隐藏/显示搜索">
                                 <template #description>
                                     <el-button 
@@ -419,6 +419,36 @@ onMounted(() => {
 <style scoped>
 .eidt-card {
     margin-top: 10px;
+}
+
+.edit-btn {
+    width: 100%;
+}
+
+.left-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.right-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 4px 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .left-buttons,
+    .right-buttons {
+        justify-content: center;
+        margin: 8px 0;
+    }
 }
 
 .edit-table {

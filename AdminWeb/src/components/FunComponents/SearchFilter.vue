@@ -1,17 +1,26 @@
 <template>
-    <el-row :gutter="30">
-        <el-col v-for="(item, index) in filterConfig" :key="index" :span="7">
+    <el-row :gutter="20" type="flex" flex-wrap="wrap" align="middle">
+        <el-col 
+            v-for="(item, index) in filterConfig" 
+            :key="index" 
+            :xs="24" 
+            :sm="12" 
+            :md="8" 
+            :lg="7" 
+            :xl="7"
+            class="filter-item"
+        >
             <el-form-item :label="item.label" style="margin-bottom: 0;">
                 <el-input
                     v-if="item.type === 'input'"
                     v-model="searchFilters[item.field]"
-                    style="width: 270px"
+                    style="width: 100%"
                     :placeholder="item.placeholder"
                     clearable/>
                 <el-select
                     v-else-if="item.type === 'select'"
                     v-model="searchFilters[item.field]"
-                    style="width: 270px"
+                    style="width: 100%"
                     :placeholder="item.placeholder"
                     clearable>
                     <el-option
@@ -22,14 +31,21 @@
                 </el-select>
             </el-form-item>
         </el-col>
-        <el-col :span="3">
-                <Tooltip content="搜索内容">
+        <el-col 
+            :xs="24" 
+            :sm="24" 
+            :md="8" 
+            :lg="3" 
+            :xl="3"
+            class="action-buttons"
+        >
+            <Tooltip content="搜索内容">
                 <template #description>
                     <el-button 
-                    type="primary" 
-                    :icon="Search" 
-                    circle 
-                    @click="handleSearch" />
+                        type="primary" 
+                        :icon="Search" 
+                        circle 
+                        @click="handleSearch" />
                 </template>
             </Tooltip>
             <Tooltip content="重置条件">
@@ -124,3 +140,31 @@ const handleReset = () => {
     });
 };
 </script>
+<style scoped>
+.filter-item {
+    margin-bottom: 8px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 4px 0;
+    margin-bottom: 8px;
+}
+
+/* 响应式调整 */
+@media (min-width: 1024px) {
+    .action-buttons {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        justify-content: center;
+    }
+}
+</style>

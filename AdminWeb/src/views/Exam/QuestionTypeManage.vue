@@ -58,8 +58,8 @@
                     <div class="eidt-card">
                         <el-card style="border-radius: 4px," shadow="never">
                             <div class="edit-btn">
-                                <el-row :gutter="200">
-                                    <el-col :span="17">
+                                <el-row :gutter="20" type="flex" justify="space-between" align="middle">
+                                    <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18" class="left-buttons">
                                         <el-button type="success" plain @click="handleAdd">
                                             增加题型
                                         </el-button>
@@ -70,7 +70,7 @@
                                             </el-button>
                                         </Popconfirm>
                                     </el-col>
-                                    <el-col :span="7">
+                                    <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" class="right-buttons">
                                         <Tooltip content="隐藏/显示搜索">
                                             <template #description>
                                                 <el-button type="primary" :icon="Hide" circle
