@@ -26,7 +26,7 @@
             <!-- 反馈提示组件 -->
             <view class="feedback-section">
                 <Tips 
-                    text="题目有问题？ 点击立即反馈"
+                    text="题目有问题？ 点击立即反馈->"
                     type="warning"
                     :duration="0"
                     :showIcon="true"

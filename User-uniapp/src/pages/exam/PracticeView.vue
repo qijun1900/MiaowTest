@@ -171,12 +171,13 @@
                 <template #popupcontent>
                     <view class="note-popup-container">
                         <view class="note-editor-wrapper">
-                            <uniEditor 
-                                placeholder="请在此处输入笔记内容..." 
-                                v-model="noteContent" 
-                                height="300rpx" 
-                                id="noteEditor"
-                                :focus="iSopenNotePopupShow"/>
+                            <sp-editor 
+                                :placeholder="'请在此处输入笔记内容...'" 
+                                :toolbar-config="toolbarConfig"
+                                @input="handleEditorInput"
+                                @init="handleEditorInit"
+                                :editor-id="'noteEditor'"
+                            />
                         </view>
                         <view 
                             class="note-info" 
@@ -233,7 +234,6 @@ import {
     getPracticeNoteAPI
 } from '../../API/Exam/QuestionAPI';
 import checkLogin from '../../util/checkLogin';
-import uniEditor from '../../components/core/uniEditor.vue'
 import formatTime from '../../util/formatTime';
 
 const questionStore = useQuestionStore();// 问题Store,存储问题和用户设置
@@ -259,6 +259,13 @@ const noteContent = ref('');// 笔记内容
 const isSavingNote = ref(false);// 笔记保存状态
 const lastSavedTime = ref('');// 上次保存时间
 const originalNoteContent = ref('');// 原始笔记内容，用于取消操作
+// sp-editor相关配置
+const editorCtx = ref(null); // 编辑器上下文
+const toolbarConfig = ref({
+  keys: ['header', 'fontFamily', 'fontSize', 'bold', 'italic', 'underline', 'strike', 'color', 'backgroundColor', 'align', 'lineHeight', 'letterSpacing', 'listOrdered', 'listBullet', 'listCheck', 'indentInc', 'indentDec', 'divider', 'scriptSub', 'scriptSuper', 'date',  'undo', 'redo', 'removeFormat', 'clear',],
+  iconSize: '18px',
+  iconColumns: 10
+});
 
 const handleBtnClick = async() => {
     const loginResult = await checkLogin();
@@ -309,12 +316,12 @@ const handleMenuClick = async (item) => {
             return;
         }
     }
-    if(item.value===1 && currentQuestionId.value && !iSopenNotePopupShow.value){
+    if (item.value === 1 && currentQuestionId.value && !iSopenNotePopupShow.value) {
         // 打开笔记弹窗
         iSopenNotePopupShow.value = true;
         // 重置保存状态
         isSavingNote.value = false;
-        
+
         // 加载已有的笔记(检测是否有笔记)
         const res = await getPracticeNoteAPI(bankInfo.value.isUserBank,currentQuestionId.value);
         if (res.code === 200 && res.data.hasNote) {
@@ -324,6 +331,28 @@ const handleMenuClick = async (item) => {
             noteContent.value = ''; // 清空笔记内容
         }
         
+        // 设置内容到编辑器
+        setEditorContent(noteContent.value);
+        
+        // 设置内容到编辑器的函数
+        function setEditorContent(content) {
+            // 如果编辑器已经初始化，立即设置内容
+            if (editorCtx.value) {
+                editorCtx.value.setContents({
+                    html: content
+                });
+            } else {
+                // 添加延迟，确保在编辑器初始化后内容能被正确设置
+                setTimeout(() => {
+                    if (editorCtx.value) {
+                        editorCtx.value.setContents({
+                            html: content
+                        });
+                    }
+                }, 300);
+            }
+        }
+
         // 保存原始内容，用于取消操作
         originalNoteContent.value = noteContent.value;
     }
@@ -334,7 +363,36 @@ const handleMenuClick = async (item) => {
         });    
     }
 }
+
+// 编辑器初始化完成
+const handleEditorInit = (ctx) => {
+  editorCtx.value = ctx;
+  // 确保在编辑器初始化后，如果有笔记内容，立即设置到编辑器中
+  // 添加一个小延迟以确保DOM已经完全渲染
+  setTimeout(() => {
+    if (noteContent.value && editorCtx.value) {
+      editorCtx.value.setContents({
+        html: noteContent.value
+      });
+    }
+  }, 100);
+};
+
+// 编辑器内容变化
+const handleEditorInput = ({ html} ) => {
+  noteContent.value = html;
+};
+
 const handleSaveNote = async () => {
+    // 保存前先从编辑器获取最新内容，确保内容是最新的
+    if (editorCtx.value) {
+        editorCtx.value.getContents({
+            success: (res) => {
+                noteContent.value = res.html;
+            }
+        });
+    }
+    
     // 保存笔记
     if (!currentQuestionId.value || !noteContent.value.trim()) {
         uni.showToast({
@@ -785,6 +843,16 @@ onMounted(() => {
     border-radius: 12rpx;
     overflow: hidden;
     border: 1px solid #eee;
+    height: 600rpx;
+}
+
+/* sp-editor 样式调整 */
+.note-editor-wrapper :deep(.sp-editor) {
+  height: 100%;
+}
+
+.note-editor-wrapper :deep(.sp-editor-wrapper) {
+  height: calc(100% - 60rpx);
 }
 
 .note-info {

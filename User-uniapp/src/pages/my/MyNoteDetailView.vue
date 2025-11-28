@@ -168,25 +168,32 @@ const handleEditNote = async (question) => {
   const res = await getPracticeNoteAPI(false,currentQuestionId.value)
   if (res.code === 200) {
     noteContent.value = res.data.note.content; // 加载笔记内容
-    
+  }
+  
+  // 设置内容到编辑器
+  setEditorContent(noteContent.value);
+  
+  // 保存原始内容，用于取消操作
+  originalNoteContent.value = noteContent.value;
+  
+  // 设置内容到编辑器的函数
+  function setEditorContent(content) {
     // 如果编辑器已经初始化，立即设置内容
     if (editorCtx.value) {
       editorCtx.value.setContents({
-        html: noteContent.value
+        html: content
       });
     } else {
       // 添加延迟，确保在编辑器初始化后内容能被正确设置
       setTimeout(() => {
         if (editorCtx.value) {
           editorCtx.value.setContents({
-            html: noteContent.value
+            html: content
           });
         }
       }, 300);
     }
   }
-  // 保存原始内容，用于取消操作
-  originalNoteContent.value = noteContent.value;
 }
 
 // 编辑器初始化完成

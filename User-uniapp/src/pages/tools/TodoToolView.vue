@@ -419,9 +419,7 @@ watch(selectedDate, (newVal, oldVal) => {
 onMounted(() => {
   selectedDate.value = initialDate.value;  // 初始化时也设置选中日期为今天
   getDotDates();
-
-  getTodayTodos();//h5端首次进入页面获取今日todos列表 
-
+  getTodayTodos();
 })
 </script>
 
