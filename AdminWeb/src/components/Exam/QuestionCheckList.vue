@@ -37,7 +37,11 @@
                 v-if="tableData.length>0">
                 <el-table-column type="selection" width="65" />
                 <el-table-column type="index" label="序号" width="90" :index="(index) => index + 1"/>
-                <el-table-column label="题目题干" width="200">
+                <el-table-column 
+                    label="题目题干" 
+                    width="200"
+                    :show-overflow-tooltip="true"
+                >
                     <template #default="scope">
                         <div v-html="scope.row.stem"></div>
                     </template>

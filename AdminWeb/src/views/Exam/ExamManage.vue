@@ -151,7 +151,11 @@
                         {{ formatTime.getTime2(scope.row.createdTime) }}
                     </template>
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column 
+                    label="操作"
+                    fixed="right"
+                    min-width="380"
+                    >
                     <template #default="scope">
                         <el-button 
                             type="primary" 

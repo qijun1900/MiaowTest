@@ -146,7 +146,11 @@
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
                 <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/> 
-                <el-table-column label="题目题干" width="250">
+                <el-table-column 
+                    label="题目题干" 
+                    width="250"
+                    :show-overflow-tooltip="true"
+                >
                     <template #default="scope">
                         <div v-html="scope.row.stem"></div>
                     </template>
@@ -201,7 +205,11 @@
                         {{ formatTime.getTime2(scope.row.createTime) }}
                     </template>
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column 
+                    label="操作" 
+                    fixed="right"
+                    min-width="360"
+                    >
                     <template #default="scope">
                         <el-button 
                             type="primary" 
