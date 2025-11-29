@@ -755,28 +755,79 @@ onMounted(()=>{
 .question-tags-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 4px 0;
+    gap: 10px;
+    padding: 6px 0;
 }
 
 .question-tag {
     margin: 0;
-    padding: 6px 12px;
-    border-radius: 14px;
-    font-size: 14px;  /* 增大字体 */
+    padding: 8px 16px;
+    border-radius: 20px;
     font-size: 13px;
-    transition: all 0.2s ease;
-    background-color: #cde8fa;  /* 添加浅蓝色背景 */
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: #409eff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* 为不同类型的标签添加不同颜色 */
+.question-tag:nth-child(4n+1) {
+    background-color: #409eff;
+}
+
+.question-tag:nth-child(4n+2) {
+    background-color: #67c23a;
+}
+
+.question-tag:nth-child(4n+3) {
+    background-color: #e6a23c;
+}
+
+.question-tag:nth-child(4n+4) {
+    background-color: #f56c6c;
+}
 
 .question-tag:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.question-tag:active {
+    transform: translateY(-1px) scale(0.98);
 }
 
 .tag-icon {
-    margin-right: 4px;
+    margin-right: 6px;
     font-size: 14px;
+    vertical-align: middle;
+    transition: transform 0.3s ease;
+}
+
+.question-tag:hover .tag-icon {
+    transform: rotate(15deg);
+}
+
+/* 添加标签点击波纹效果 */
+.question-tag::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.question-tag:active::after {
+    width: 300px;
+    height: 300px;
 }
 </style>
