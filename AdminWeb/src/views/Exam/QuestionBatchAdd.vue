@@ -68,8 +68,8 @@
             </div>
             <div v-if="response && response.data && response.data.data.length > 0">
                 <el-card style="border-radius: 10px ;width: 650px;">
-                <el-table :data="response.data.data" style="width: 600px;">
-                    <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/> 
+                <el-table :data="response.data.data" style="width: 600px;" v-loading="tableLoading" element-loading-text="加载中...">
+                    <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/>
                     <el-table-column label="题目题干" width="250">
                         <template #default="scope">
                             <div v-html="scope.row.stem"></div>
@@ -146,6 +146,8 @@ const route = useRoute();
 const QuestionType = appStore.examInfo.category;// 题目类型
 const QuestionData = ref(null);// 题目数据
 const PreviewdialogVisible = ref(false)// 预览对话框
+// 表格加载状态
+const tableLoading = ref(false);
 
 // 提交方法
 const response = ref(null);
@@ -166,6 +168,7 @@ const handleUserSend = async (data) => {
 
         //  AI 回复的过程
         isLoading.value = true;
+        tableLoading.value = true;
         try {
             response.value = await modelappBatchaddQuestion(chatHistory.value,route.params.id,QuestionType); 
             if(response.value.code===200){
@@ -186,6 +189,7 @@ const handleUserSend = async (data) => {
             };
         } finally {
            isSenderloading.value = false; // 结束加载
+           tableLoading.value = false; // 结束表格加载
         }
     }
 }

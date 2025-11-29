@@ -97,7 +97,9 @@
                         style="width: 100%" 
                         @selection-change="handleSelectionChange"
                         max-height="690" 
-                        :stripe="IsOpenStripe">
+                        :stripe="IsOpenStripe"
+                        v-loading="tableLoading"
+                        element-loading-text="加载中...">
                         <el-table-column type="selection" width="55" />
                         <el-table-column 
                             type="index" 
@@ -269,6 +271,8 @@ const Upload = defineAsyncComponent(() =>
 )
 //tableData数据
 const tableData = ref([]);
+// 表格加载状态
+const tableLoading = ref(false);
 // 对话框状态
 const dialogVisible = ref(false)
 // 添加编辑状态
@@ -439,6 +443,7 @@ const handleMore = (row) => {
 }
 //获取用户列表+刷新
 const handleRefreshUserData = async () => {
+    tableLoading.value = true;
     try {
         const res = await handleRefresh({
             page: currentPage.value,
@@ -449,6 +454,8 @@ const handleRefreshUserData = async () => {
     } catch (error) {
         ElMessage.error('表格数据获取失败')
         console.log(error)
+    } finally {
+        tableLoading.value = false;
     }
 }
 //按下搜索按钮

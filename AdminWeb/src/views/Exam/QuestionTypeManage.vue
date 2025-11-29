@@ -103,7 +103,9 @@
                 style="width: 100%" 
                 max-height="690"
                 :stripe="IsOpenStripe"
-                @selection-change="handleSelectionChange">
+                @selection-change="handleSelectionChange"
+                v-loading="tableLoading"
+                element-loading-text="加载中...">
                 <el-table-column type="selection" width="55" />
                 <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/> 
                 <el-table-column label="题型名称" width="300">
@@ -296,6 +298,8 @@ const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTabl
 const { selectedRows, handleSelectionChange, handleRefresh} = useTableActions()
 //tableData数据
 const tableData = ref([]);
+// 表格加载状态
+const tableLoading = ref(false);
 //表格分页器
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -475,6 +479,7 @@ const handleConfirm = async() => {
 }
 //获取列表+刷新
 const handleRefreshData = async() => {
+  tableLoading.value = true;
   try{
     const res = await handleRefresh({
         page: currentPage.value,
@@ -487,6 +492,8 @@ const handleRefreshData = async() => {
     }
   }catch(error){
     console.log(error)
+  }finally{
+    tableLoading.value = false;
   }
 }
 //查看已添加题目

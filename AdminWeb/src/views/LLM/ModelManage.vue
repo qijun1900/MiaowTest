@@ -101,7 +101,9 @@
                 style="width: 100%"
                 @selection-change="handleSelectionChange"
                 max-height="690"
-                :stripe="IsOpenStripe">
+                :stripe="IsOpenStripe"
+                v-loading="tableLoading"
+                element-loading-text="加载中...">
                 <el-table-column type="selection" width="40" />
                 <el-table-column 
                     type="index" 
@@ -259,6 +261,8 @@ const { selectedRows, handleSelectionChange, handleDelete, handleRefresh } = use
 const appStore = useAppStore()
 //tableData数据
 const tableData = ref([]);
+// 表格加载状态
+const tableLoading = ref(false);
 // 对话框状态
 const dialogVisible = ref(false)
 //表格分页器
@@ -398,6 +402,7 @@ const handleConfirm = async () => {
 }
 //获取列表+刷新
 const handleRefreshModelData = async () => {
+    tableLoading.value = true;
     try {
         const res = await handleRefresh({
             page: currentPage.value,
@@ -409,6 +414,8 @@ const handleRefreshModelData = async () => {
         }
     }catch (error) {
         console.error('刷新数据失败:', error)
+    }finally{
+        tableLoading.value = false;
     }
 }
 onMounted(() => {

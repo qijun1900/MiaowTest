@@ -143,7 +143,9 @@
                 style="width: 100%" 
                 max-height="690" 
                 :stripe="IsOpenStripe"
-                @selection-change="handleSelectionChange">
+                @selection-change="handleSelectionChange"
+                v-loading="tableLoading"
+                element-loading-text="加载中...">
                 <el-table-column type="selection" width="55" />
                 <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1"/> 
                 <el-table-column 
@@ -317,6 +319,8 @@ const route = useRoute();
 const appStore = useAppStore()
 //tableData数据
 const tableData = ref([]);
+// 表格加载状态
+const tableLoading = ref(false);
 //表格分页器
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -425,6 +429,7 @@ const handleEdit = (row) => {
 }
 //获取考试列表+刷新+分页
 const handleRefreshQuestionData = async () => {
+    tableLoading.value = true;
     try{
         const res = await handleRefresh({
             examId: ExamID,
@@ -439,6 +444,8 @@ const handleRefreshQuestionData = async () => {
         }
     }catch(error){
         console.error('获取题目列表失败:',error)
+    }finally{
+        tableLoading.value = false;
     }
 }
 //预览

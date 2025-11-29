@@ -91,7 +91,9 @@
                 style="width: 100%" 
                 max-height="690" 
                 :stripe="IsOpenStripe"
-                @selection-change="handleSelectionChange">
+                @selection-change="handleSelectionChange"
+                v-loading="tableLoading"
+                element-loading-text="加载中...">
                 <el-table-column type="selection" width="55" />
                 <el-table-column type="index" label="序号" width="70" :index="(index) => index + 1" />
                 <el-table-column label="信息标题" width="180">
@@ -253,6 +255,8 @@ const Upload = defineAsyncComponent(() =>
 const appStore = useAppStore()
 //tableData数据
 const tableData = ref([]);
+// 表格加载状态
+const tableLoading = ref(false);
 // 对话框状态
 const dialogVisible = ref(false)
 // 添加编辑状态
@@ -424,6 +428,7 @@ const handlePublishChange = async (row) => {
 }
 //获取用户列表+刷新
 const handleRefreshAnData = async() => {
+    tableLoading.value = true;
     try{
         const res = await handleRefresh({
             page: currentPage.value,
@@ -436,6 +441,8 @@ const handleRefreshAnData = async() => {
     }catch(error){
         ElMessage.error('获取列表失败')
         console.error('获取列表失败:', error)
+    }finally{
+        tableLoading.value = false;
     }
 }
 // 添加分页变化处理方法

@@ -93,7 +93,9 @@
                 style="width: 100%" 
                 @selection-change="handleSelectionChange"
                 max-height="690" 
-                :stripe="IsOpenStripe">
+                :stripe="IsOpenStripe"
+                v-loading="tableLoading"
+                element-loading-text="加载中...">
                 <el-table-column type="selection" width="40" />
                 <el-table-column 
                     type="index" 
@@ -310,6 +312,8 @@ const Upload = defineAsyncComponent(() =>
 const appStore = useAppStore()
 //tableData数据
 const tableData = ref([]);
+// 表格加载状态
+const tableLoading = ref(false);
 // 对话框状态
 const dialogVisible = ref(false)
 // 添加编辑状态
@@ -623,6 +627,7 @@ const handleCreate = (data) => {
 }
 //获取考试列表+刷新+分页
 const handleRefreshExamData = async()=>{
+    tableLoading.value = true;
     try{
         const res = await handleRefresh({
             page: currentPage.value,
@@ -635,6 +640,8 @@ const handleRefreshExamData = async()=>{
     }catch(error){
         ElMessage.error("获取考试列表失败")
         console.error('获取考试列表时发生错误:', error)
+    }finally{
+        tableLoading.value = false;
     }
 }
 onMounted(()=>{
