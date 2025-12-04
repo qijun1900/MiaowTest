@@ -24,7 +24,8 @@ async function AutoAddQuestion(prompt) {
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            timeout: 8 * 60 * 1000  ///设置为8分钟
         });
 
         if (response.status === 200) {
@@ -38,7 +39,6 @@ async function AutoAddQuestion(prompt) {
     }
 }
 
-// 仅导出函数供外部调用
 module.exports = {
     AutoAddQuestion
 };

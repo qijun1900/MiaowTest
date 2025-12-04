@@ -115,7 +115,7 @@ const LLMService = {
             // 使用重试机制包装API调用
             const data = await withRetry.withRetry(async () => {
                 return await AutoAnalysisQuestionmodelapp.AutoAnalysisQuestion(message);
-            }, 5, 2000); // 最多重试3次，初始延迟2秒
+            }, 5, 2000); // 重试5次，每次间隔2秒
 
             // 移除Markdown代码块标记
             const cleanData = data.replace(/```json/g, '').replace(/```/g, '').trim();

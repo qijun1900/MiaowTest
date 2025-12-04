@@ -44,7 +44,11 @@
       <BackToTop 
         ref="backToTopRef" 
         position="bottom-right"/>
-      <up-divider text="已经到底了" :dashed="true" v-if="examSubjects.length>0 && !loading"></up-divider>
+      <up-divider 
+        text="已经到底了" 
+        :dashed="true" 
+        v-if="examSubjects.length>0 && !loading">
+      </up-divider>
     </view>
   </view>
 </template>
@@ -59,6 +63,7 @@ import { onPageScroll, onPullDownRefresh } from '@dcloudio/uni-app';
 import formatTime from '../../util/formatTime';
 import ThemeLoading from '../../components/core/ThemeLoading.vue';
 import showShareMenu from '../../util/wechatShare.js';
+import checkLogin  from '../../util/checkLogin.js';
 
 // 响应式数据
 const examSubjects = ref([]);
@@ -92,8 +97,12 @@ const fetchExamSubjects = async (forceRefresh = false) => {
   }
 };
 
-const handleSubjectClick = (subject) => {
+const handleSubjectClick = async (subject) => {
   // 跳转到考试详情页，传递完整科目数据作为参数
+  const isLoggedIn = await checkLogin("请登录后再操作");
+  if (!isLoggedIn) {
+    return;
+  }
   uni.navigateTo({
     url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
   });

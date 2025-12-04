@@ -7,7 +7,6 @@ async function AutoAnalysisQuestion(prompt) {
 
     const url = `https://dashscope.aliyuncs.com/api/v1/apps/${appId}/completion`;
     
-    
     const data = {
         input: {
             prompt: prompt,
@@ -22,7 +21,7 @@ async function AutoAnalysisQuestion(prompt) {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
             },
-            timeout: 30000 // 设置超时时间为30秒
+            timeout:  5 * 60 * 1000  ///设置为5分钟
         });
 
         if (response.status === 200) {
@@ -33,7 +32,6 @@ async function AutoAnalysisQuestion(prompt) {
     } catch (error) {
         console.error(`Error calling DashScope: ${error.message}`);
         
-
         if (error.response && error.response.status === 429) {
             console.error('API rate limit exceeded. Please check your usage limits.');
             error.message = 'API rate limit exceeded. Please check your usage limits.';
@@ -42,7 +40,6 @@ async function AutoAnalysisQuestion(prompt) {
         throw error;
     }
 }
-
 
 module.exports = {
     AutoAnalysisQuestion

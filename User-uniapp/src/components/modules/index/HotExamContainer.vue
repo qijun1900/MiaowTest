@@ -31,6 +31,7 @@
 import { ref ,onMounted} from 'vue'
 import { getHotExamList } from '../../../API/Index/HotExamAPI' 
 import escconfig from '../../../config/esc.config'
+import checkLogin from '../../../util/checkLogin'
 
 const hotExamList = ref([])
 const isLoading = ref(true)
@@ -52,7 +53,14 @@ const fetchHotExamData = async () => {
     }
 }
 
-const handleClickExam = (subject) => {
+const handleClickExam = async (subject) => {
+    
+  // 检查用户是否登录
+  const isLogin = await checkLogin();
+  if (!isLogin) {
+    return; // 如果未登录，不执行后续操作
+  }
+
   // 跳转到考试详情页，传递完整科目数据作为参数
   uni.navigateTo({
     url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
