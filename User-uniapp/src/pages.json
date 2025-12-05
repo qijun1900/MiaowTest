@@ -20,6 +20,12 @@
 			}
 		},
 		{
+			"path": "pages/test/translateTest",
+			"style": {
+				"navigationBarTitleText": "翻译测试"
+			}
+		},
+		{
 			"path": "pages/my/my",
 			"style": {
 				"navigationBarTitleText": "我的",

@@ -25,6 +25,15 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5050,//启动端口
       open: true, // 启动时自动打开浏览器
+      proxy: {
+        '/youdao/api': {
+          target: 'https://openapi.youdao.com',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/youdao/api': '/api'
+          }
+        }
+      }
     }
   }
 })
