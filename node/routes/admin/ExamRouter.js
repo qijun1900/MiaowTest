@@ -26,6 +26,7 @@ ExamRouter.post("/adminapi/exam/update/blankquestion",ExamController.UpdateBlank
 ExamRouter.post("/adminapi/exam/update/judgequestion",ExamController.UpdateJudgeQuestion)//更新单条判断题
 ExamRouter.post("/adminapi/exam/update/shortquestion",ExamController.UpdateShortQuestionList)//更新单条简答题
 ExamRouter.post("/adminapi/exam/updateExamStatus",ExamController.UpdateExamStatus)//更新考试状态
+ExamRouter.post("/adminapi/exam/updateExamAuthStatus",ExamController.UpdateExamAuthStatus)//更新考试认证状态
 ExamRouter.post("/adminapi/questionTitle/addQuestionTitle",ExamController.AddquestionTitle)//增加题型
 ExamRouter.get("/adminapi/questionTitle/getQuestionTitleList",ExamController.getQuestionTitle)//获取用户端的考试题型列表
 ExamRouter.post("/adminapi/questionTitle/updateQuestionTitle",ExamController.UpdateQuestionTitle)//更新用户端的考试题型信息

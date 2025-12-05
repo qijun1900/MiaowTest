@@ -113,7 +113,7 @@
             <span>{{ formatTime.getTime2(scope.row.createTime) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right">
+        <el-table-column label="操作" fixed="right" min-width="300">
           <template #default="scope">
             <el-button size="small" type="primary" @click="handleView(scope.row)">
               <el-icon><View /></el-icon>
@@ -123,10 +123,15 @@
               <el-icon><Edit /></el-icon>
               编辑
             </el-button>
+            <el-button 
+              size="small" 
+              @click="handleAddExamAuth(scope.row._id)">
+              <el-icon><CirclePlusFilled /></el-icon>
+              添加考试权限
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
-      
       <div class="pagination-container">
         <Pagination 
           :total="total"
@@ -135,18 +140,57 @@
           @page-change="handlePageChange"/>
       </div>
     </el-card>
+    <Drawer
+      v-model="drawerVisible"
+      drawerTitle="添加考试权限"
+      drawerSize="35%"
+      >
+      <template #drawercontent>
+        <div class="exam-permission-container">
+          <el-table 
+            :data="AuthExamList" 
+            style="width: 100%" 
+            v-loading="examLoading"
+            element-loading-text="加载中..."
+            :header-cell-style="{ backgroundColor: '#f5f7fa', color: '#606266' }"
+          >
+            <el-table-column prop="name" label="科目名称" width="180" />
+            <el-table-column label="更新时间" width="130">
+                    <template #default="scope">
+                        {{ formatTime.getTime2(scope.row.createdTime) }}
+                    </template>
+                </el-table-column>
+            <el-table-column prop="isAuthRequired" label="权限状态">
+              <template #default="scope">
+                <el-switch
+                  size="large"
+                  v-model="scope.row.isOpenAuth"
+                  inline-prompt
+                  :active-value="true"
+                  :inactive-value="false"
+                  active-text="已开启"
+                  inactive-text="未开启"
+                  @change="handlePermissionChange(scope.row)">
+              </el-switch>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </template>
+    </Drawer>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { User, Refresh, RefreshLeft, View, Edit } from '@element-plus/icons-vue'
-import { getConsumerList } from "../../API/consumer/consumer_manageAPI"
+import { User, Refresh, RefreshLeft, View, Edit,CirclePlusFilled } from '@element-plus/icons-vue'
+import { getConsumerList ,GetAuthExamListAPI,updateExamAuthStatusAPI} from "../../API/consumer/consumer_manageAPI"
 import Pagination from '@/components/ReuseComponents/Pagination.vue'
 import formatInfo from '@/util/formatInfo'
 import formatTime from '@/util/formatTime'
 import { useConsumerFilter } from '@/util/SearchFilter'
+import Drawer from '@/components/ReuseComponents/Drawer.vue'
 
 // 默认头像
 const defaultAvatar = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
@@ -158,6 +202,14 @@ const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+
+const drawerVisible = ref(false)
+// 正在操作的用户ID
+const currentUserId = ref('')
+// 加载状态
+const examLoading = ref(false)
+// 考试列表数据
+const AuthExamList = ref([])
 
 // 筛选表单
 const filterForm = ref({
@@ -184,6 +236,43 @@ const handleReset = () => {
   currentPage.value = 1
 }
 
+// 处理添加考试权限
+const handleAddExamAuth = (row) => {
+  currentUserId.value = row
+  drawerVisible.value = true
+  fetchAuthExamList()
+}
+
+const  fetchAuthExamList = async () => {
+  try {
+    examLoading.value = true
+    const res = await GetAuthExamListAPI({
+      uid : currentUserId.value
+    })
+    if(res.code === 200) {
+      AuthExamList.value = res.data
+    }
+  }catch(error) {
+    console.error('获取考试列表失败:', error)
+  }finally {
+    examLoading.value = false
+  }
+}
+// 处理权限变化
+const handlePermissionChange = async (row) => {
+  try {
+    const res = await updateExamAuthStatusAPI({
+      uid: currentUserId.value,
+      examId: row._id,
+    })
+    if (res.code === 200) {
+      ElMessage.success('权限更新成功')
+    }
+  } catch (error) {
+    ElMessage.error('权限更新失败')
+    console.error('更新权限失败:', error)
+  }
+}
 //获取用户信息列表+刷新+分页
 const handleRefreshConsumerList = async () => {
   try {

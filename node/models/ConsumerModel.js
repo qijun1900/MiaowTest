@@ -14,6 +14,7 @@ const mongoose = require('mongoose')
  * @param {Array} questionbanks 题库，默认空数组
  * @param {Array} wrongQuestions 用户错题，默认空数组
  * @param {Array} favoriteQuestions 收藏的题目，默认空数组
+ * @param {Number} AuthRequiredExams 认证要求的考试，默认空数组
  * @return {*}
  */
 
@@ -55,6 +56,10 @@ const ConsumerSchema = new mongoose.Schema({
         sparse: true // 允许唯一值为null
     },
     favoriteExams:{// 收藏的考试
+        type:Array,
+        default:[]
+    },
+    AuthRequiredExams:{// 认证要求的考试
         type:Array,
         default:[]
     },

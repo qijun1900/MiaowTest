@@ -276,11 +276,13 @@ const ExamService = {
             ExamModel.updateOne({ _id: examId }, { isPublish }),
             UserExamModel.updateOne({ examId }, { isPublish })
         ]);
-
         return {
             matchedCount: examUpdate.matchedCount + userExamUpdate.matchedCount,
             modifiedCount: examUpdate.modifiedCount + userExamUpdate.modifiedCount
         }
+    },
+    UpdateExamAuthStatus: async ({ examId, state }) => {
+        return ExamModel.updateOne({ _id: examId }, { isAuthRequired: state })
     },
     AddquestionTitle: async ({ content, description, isPublish, questionIdS, examId }) => {
         return  UserExamModel.updateOne(

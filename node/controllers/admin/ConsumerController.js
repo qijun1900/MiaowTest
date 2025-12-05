@@ -53,6 +53,24 @@ const ConsumerController ={
                 data:result,
             })
         }
+    },
+    GetAuthExamList:async(req,res)=>{
+        const {uid } = req.body;
+        console.log(uid);
+        const result = await ConumerService.GetAuthExamList({uid});    
+        res.send({
+            code:200,
+            data:result,
+        })    
+    },
+    updateExamAuthStatus:async(req,res)=>{
+        const {uid,examId} = req.body;
+        const result = await ConumerService.updateExamAuthStatus({uid,examId});
+        if(result) {
+            res.send({
+                code:200,
+            })
+        }
     }
 }
 module.exports = ConsumerController;

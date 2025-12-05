@@ -84,3 +84,23 @@ export async function PostDeleteManyExam(_ids) {
     }
     
 }
+
+/**
+ * @description: 开启/关闭 考试认证权限
+ * @param {*} _id 考试id
+ * @param {*} state 状态 0-关闭 1-开启
+ */
+export async function updateExamAuthStatusAPI(_id, state) {
+    try {
+        const response = await axios.post("/adminapi/exam/updateExamAuthStatus", { 
+            examId:_id, state 
+        });
+        if(response.data.code === 200) {
+            return response.data;
+        }
+    }catch (error) {
+        console.error("Error during update exam auth status:", error);
+    }
+    
+}
+

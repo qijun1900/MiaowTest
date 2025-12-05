@@ -22,3 +22,36 @@ export async function getConsumerList(params) {
         throw error;
     }
 }
+/**
+ * @description: 获取全部考试认证列表 
+ * @param {*} uid 用户ID
+ */
+export async function GetAuthExamListAPI({uid}) {
+    try {
+        const response = await axios.post("/adminapi/exam/getAuthExamList", { 
+            uid 
+        });
+        return response.data;
+    }catch (error) {
+        console.error("Error during get auth exam list:", error);
+    }
+    
+}
+
+/**
+ * @description: 为用户添加认证考试
+ * @param {*} uid 用户ID
+ * @param {*} examId 考试ID
+ */
+export async function updateExamAuthStatusAPI({uid,examId}) {
+    try {
+        const response = await axios.post("/adminapi/exam/updateExamAuth", {
+            uid,
+            examId
+        });
+        return response.data;
+        
+    }catch (error) {
+        console.error("Error during add auth exam:", error);
+    }
+}

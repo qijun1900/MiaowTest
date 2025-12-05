@@ -143,14 +143,28 @@
                         </el-switch>
                     </template>
                 </el-table-column>
-                <el-table-column label="创建者" width="140">
+                <el-table-column label="创建者" width="90">
                     <template #default="scope">
                         {{ scope.row.creator }}
                     </template>
                 </el-table-column>
-                <el-table-column label="更新时间" width="180">
+                <el-table-column label="更新时间" width="130">
                     <template #default="scope">
                         {{ formatTime.getTime2(scope.row.createdTime) }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="开启权限认证" width="120">
+                    <template #default="scope">
+                        <el-switch
+                            size="large"
+                            v-model="scope.row.isAuthRequired"
+                            inline-prompt
+                            :active-value="1"
+                            :inactive-value="0"
+                            active-text="已开启"
+                            inactive-text="未开启"
+                            @change="handleAuthRequiredChange(scope.row)">
+                        </el-switch>
                     </template>
                 </el-table-column>
                 <el-table-column 
@@ -294,7 +308,8 @@ import {
         postUpdateExam,
         updateExamStatus,
         PostDeleteOneExam,
-        PostDeleteManyExam
+        PostDeleteManyExam,
+        updateExamAuthStatusAPI
     } 
 from '@/API/Exam/subjectAPI'//api
 import { getCategoryName } from '@/util/formatExamname'
@@ -475,6 +490,18 @@ const handlePublishChange = async (row) => {
             ElMessage.success('考试科目状态更新成功')
         }
     } catch (error) {
+        ElMessage.error('状态更新失败')
+        console.error(error)
+    }
+}
+//处理权限认证状态变化
+const handleAuthRequiredChange = async (row) => {
+    try {
+        const res = await updateExamAuthStatusAPI(row._id, row.isAuthRequired)
+        if (res.code === 200) {
+            ElMessage.success('考试科目权限认证状态更新成功')
+        }
+    }catch (error) {
         ElMessage.error('状态更新失败')
         console.error(error)
     }

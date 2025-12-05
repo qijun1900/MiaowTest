@@ -1,5 +1,6 @@
 const FeedbackModel = require("../../models/ConsumerFeedbackModel");
 const ConsumerModel = require("../../models/ConsumerModel");
+const ExamModel = require("../../models/ExamModel");
 
 const ConsumerService = {
     GetMessageCount:async()=>{
@@ -69,6 +70,64 @@ const ConsumerService = {
             return {data,total}
         }catch(error){
             console.error("获取用户列表失败",error);
+            throw error;
+        }
+    },
+    GetAuthExamList: async ({ uid }) => {
+        try {
+            // 查询所有需要认证的考试
+            const allAuthExams = await ExamModel.find(
+                { isAuthRequired: 1 }, 
+                { name: 1, createdTime: 1 }
+            );
+            
+            // 查询用户已有的认证要求考试
+            const consumer = await ConsumerModel.findById(uid);
+            const userAuthExams = consumer?.AuthRequiredExams || [];
+            
+            // 为每个考试添加isOpenAuth字段，区分用户是否已添加
+            const result = allAuthExams.map(exam => ({
+                _id: exam._id,
+                name: exam.name,
+                createdTime: exam.createdTime,
+                isOpenAuth: userAuthExams.includes(exam._id.toString())
+            }));
+            
+            return result;
+        } catch (error) {
+            console.error("获取认证要求的考试列表失败", error);
+            throw error;
+        }
+    },
+    updateExamAuthStatus: async ({ uid, examId }) => {
+        try {
+            // 首先查询用户当前的AuthRequiredExams数组
+            const consumer = await ConsumerModel.findById(uid);
+            const userAuthExams = consumer?.AuthRequiredExams || [];
+            
+            let updateResult;
+            if (userAuthExams.includes(examId)) {
+                // 如果已存在，则从数组中删除
+                updateResult = await ConsumerModel.findByIdAndUpdate(
+                    uid,
+                    { $pull: { AuthRequiredExams: examId } },
+                    { new: true }
+                );
+            } else {
+                // 如果不存在，则添加到数组中
+                updateResult = await ConsumerModel.findByIdAndUpdate(
+                    uid,
+                    { $addToSet: { AuthRequiredExams: examId } },
+                    { new: true }
+                );
+            }
+            
+            return {
+                success: true,
+               // AuthRequiredExams: updateResult.AuthRequiredExams
+            };
+        }catch (error) {
+            console.error("为用户添加/删除认证考试失败", error);
             throw error;
         }
     }

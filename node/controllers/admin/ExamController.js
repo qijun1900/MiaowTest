@@ -291,6 +291,17 @@ const ExamController ={
             ActionType:"OK",
         })
     },
+    UpdateExamAuthStatus:async(req,res)=>{
+        const {examId,state} = req.body
+        await ExamService.UpdateExamAuthStatus({
+            examId,
+            state:Number(state),
+        })
+        res.send({
+            code:200,
+            ActionType:"OK",
+        })
+    },
     AddquestionTitle:async(req,res)=>{
         const {content,description,isPublish,questionIdS,examId} = req.body
         await ExamService.AddquestionTitle({
