@@ -175,7 +175,7 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import formatTime from '../../util/formatTime';
-import { getExamSubjectTypes,getExamSubjectNetMaterials } from '../../API/Exam/ExamAPI';
+import { getExamSubjectTypes,getExamSubjectNetMaterialsAPI,checkExamVerifyAPI } from '../../API/Exam/ExamAPI';
 import Empty from '../../components/core/Empty.vue';
 import { useQuestionStore } from '../../stores/modules/QuestionStore';
 import { addExamFavorite, removeExamFavorite, getExamFavorites } from '../../API/My/FavoriteAPI';
@@ -214,12 +214,21 @@ onLoad((options) => {
                 updateTime: formatTime.getTime2(subjectData.createdTime),
                 startTime: formatTime.getTime2(subjectData.day) || '待定'
             };
+            //检测是否登录
+            const isLoggedIn =  checkLogin("请登录后再获取");
+            if (!isLoggedIn) {
+                return;
+            }
+            //检测改科目是否需要验证，检测是否为认证用户
+            checkExamVerifyAPI(subjectData.id).then(response => {
+                console.log(response.data);
+            })
             //获取题型详细 在后台异步请求最新数据（不影响页面初始加载速度）
             fetchClickSubjectData(subjectData.id);
             // 检测收藏状态
             checkFavoriteStatus(subjectData.id);
             // 资料数据
-            getExamSubjectNetMaterials(subjectData.id).then(response => {
+            getExamSubjectNetMaterialsAPI(subjectData.id).then(response => {
                 subjectnetDisks.value = response.data;
             })
         } catch (error) {
@@ -332,11 +341,6 @@ const navigateToQuestions = (subjectType) => {
 }
 // 导航到资料复制链接页面
 const navigateTonetDisksDetail = (item) => {
-    // 检查用户是否已登录
-    const isLoggedIn =  checkLogin("请登录后再获取");
-    if (!isLoggedIn) {
-        return;
-    }
    uni.navigateTo({
     url:`/pages/exam/ExamDiskView?titleid=${item._id}&type=${item.content[0].type}&title=${item.title}&time=${item.time}&examId=${examInfo.value.id}`
    })

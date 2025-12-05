@@ -147,7 +147,7 @@ export async function deleteUserBankAPI(bankId) {
  * @param {*String} examId 考试科目ID - 必填
  * @returns {*String} title 资料标题 
  */
-export async function getExamSubjectNetMaterials(examId) {
+export async function getExamSubjectNetMaterialsAPI(examId) {
   try {
     return await http({
       url: `/uniappAPI/exam/getexamsubjectmaterials`,
@@ -176,6 +176,23 @@ export async function getExamTitleNetUrlAPI({examId,titleid}) {
     });
   }catch (error) {
     console.error("getExamSubjectMaterials 失败", error);
+  }
+  
+}
+/**
+ * @description  检查是否需要验证及其是否为认证用户
+ * @method POST
+ * @param {*String} examId 考试科目ID - 必填
+ */
+export async function checkExamVerifyAPI(examId) {
+  try {
+    return await http({
+      url: `/uniappAPI/exam/checkexamverify`,
+      data: { examId: examId },
+      method: 'POST',
+    });
+  }catch (error){
+    console.error("checkExamVerify 失败", error);
   }
   
 }

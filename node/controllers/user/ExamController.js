@@ -350,6 +350,22 @@ const ExamController ={
         }catch (error) {
             console.error('Error fetching getExamSubjectTitleUrl details:', error); // 处理错误
         }
+    },
+    checkExamVerify: async (req, res) => {
+        try {
+            const { uid } = req.user;//获取用户openid
+            const { examId } = req.body;
+            const result = await ExamService.checkExamVerify({ uid, examId })
+            if (result.success) {
+                res.send({
+                    code: 200,
+                    data: result.data
+                })
+            }
+        } catch (error) {
+            console.error('Error fetching checkExamVerify details:', error);
+        }
+
     }
 }
 

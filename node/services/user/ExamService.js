@@ -828,6 +828,75 @@ const ExamService = {
                 error: error.message
             }
         }
+    },
+    checkExamVerify:async({examId,uid})=>{
+        try {
+            // 1. 检查该科目是否需要认证
+            const exam = await ExamModel.findById(examId);
+            if (!exam) {
+                return {
+                    success: false,
+                    data:{
+                        code: 404,
+                        message: '考试科目不存在',
+                    }
+                };
+            }
+            
+            // 如果不需要认证，直接返回结果1
+            if (exam.isAuthRequired === 0) {
+                return {
+                    success: true,
+                    data:{
+                        code: 200,
+                        message: '该科目不需要认证',
+                        result: 1, // 不需要认证
+                    }
+                };
+            }
+            
+            // 2. 如果需要认证，检查用户是否为认证用户
+            const consumer = await ConsumerModel.findById(uid);
+            if (!consumer) {
+                return {
+                    success: false
+                };
+            }
+            
+            const userAuthExams = consumer?.AuthRequiredExams || [];
+            const isAuthUser = userAuthExams.includes(examId);
+            
+            // 根据用户是否为认证用户返回结果
+            if (isAuthUser) {
+                return {
+                    success: true,
+                    data:{
+                        code: 200,
+                        message: '用户已认证，可访问该科目',
+                        result: 1, // 已认证
+                    }
+
+                };
+            } else {
+                return {
+                    success: true,
+                    data:{
+                        code: 200,
+                        message: '用户未认证，无法访问该科目',
+                        result: 0, // 未认证
+                    }
+                };
+            }
+        }catch (error) {
+            console.error('检查考试认证状态失败:', error);
+            return {
+                code: 500,
+                message: '检查考试认证状态失败',
+                success: false,
+                error: error.message
+            };
+        }
+        
     }
       
 }

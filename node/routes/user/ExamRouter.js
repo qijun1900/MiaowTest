@@ -26,4 +26,7 @@ ExamRouter.post("/uniappAPI/exam/userpractice/question",JWT.verifyTokenMiddlewar
 ExamRouter.get("/uniappAPI/exam/getUserWrongQuestionList",JWT.verifyTokenMiddleware(),ExamController.getUserWrongQuestionList)//获取用户的错题列表
 ExamRouter.post("/uniappAPI/exam/getexamsubjectmaterials",ExamController.getExamSubjectMaterials)//获取考试科目对应的网盘资源列表
 ExamRouter.post("/uniappAPI/exam/getexamsubjecttitleurl",JWT.verifyTokenMiddleware(),ExamController.getExamSubjectTitleUrl)//获取考试科目对应的网盘资源url
+ExamRouter.post("/uniappAPI/exam/checkexamverify",JWT.verifyTokenMiddleware(),ExamController.checkExamVerify)//检查考试是否已认证
+
+
 module.exports = ExamRouter;
