@@ -76,7 +76,7 @@
                         class="subject-type-item" 
                         v-for="(item, index) in subjectTypes" 
                         :key="index"
-                        @click="navigateToQuestions(item)">
+                        @click="isAuthAllowed && navigateToQuestions(item)">
                         <view class="subject-type-info">
                             <view class="type-header">
                                 <text class="subject-type-name">{{ item.content }}</text>
@@ -97,6 +97,23 @@
                     </view>
                 </view>
             </scroll-view>
+            <!-- 认证失败遮罩层 -->
+            <view v-if="!isAuthAllowed" class="auth-mask">
+                <view class="auth-mask-content">
+                    <text class="auth-title">该科目需要权限才能访问</text>
+                    <text class="auth-desc">请联系管理员获取访问权限</text>
+                    <text class="auth-note">科目说明：</text>
+                    <text class="auth-info"> 此科目为个人上传不具备查看权限 </text>
+                    
+                    <up-button 
+                        type="primary" 
+                        class="auth-button" 
+                        shape="circle"
+                        @click="handleAuth">
+                        申请访问
+                    </up-button>
+                </view>
+            </view>
         </view>
 
         <!-- 资料列表 -->
@@ -109,7 +126,7 @@
                     class="subject-type-item"
                     v-for="(item,index) in subjectnetDisks"
                     :key="index"
-                    @click="navigateTonetDisksDetail(item)">
+                    @click="isAuthAllowed && navigateTonetDisksDetail(item)">
                     <view class="subject-type-info">
                             <view class="type-header">
                                 <text class="subject-type-name">{{ item.title }}</text>
@@ -128,6 +145,15 @@
                     </view>
                 </view>
             </scroll-view>
+            <!-- 认证失败遮罩层 -->
+            <view v-if="!isAuthAllowed" class="auth-mask">
+                <view class="auth-mask-content">
+                    <text class="auth-title">该科目需要权限才能访问</text>
+                    <text class="auth-desc">请联系管理员获取访问权限</text>
+                    <text class="auth-note">科目说明：</text>
+                    <text class="auth-info"> 此科目为个人上传不具备查看权限 </text>
+                </view>
+            </view>
         </view>
 
         <!-- 数据为空 -->
@@ -153,7 +179,6 @@
                 @click="currentMode = 0" 
                 class="switch-btn">查看题目</button>   
         </view>
-
 
         <!-- 自定义底部 -->
         <view class="bottom">
@@ -191,6 +216,7 @@ const isLoading = ref(false); // 加载状态
 const list = ref(['题目', '资料']);// 切换刷题/资料的选项 0-刷题 1-资料
 const currentMode = ref(0); 
 const subjectnetDisks = ref([]); // 考试资料数据
+const isAuthAllowed = ref(true); // 认证结果，默认为允许访问
 
 // 切换模式
 const handleSendMode = (index) => {
@@ -221,7 +247,8 @@ onLoad((options) => {
             }
             //检测改科目是否需要验证，检测是否为认证用户
             checkExamVerifyAPI(subjectData.id).then(response => {
-                console.log(response.data);
+                // 根据返回的result设置认证结果
+                isAuthAllowed.value = response.data.result === 1;
             })
             //获取题型详细 在后台异步请求最新数据（不影响页面初始加载速度）
             fetchClickSubjectData(subjectData.id);
@@ -344,6 +371,15 @@ const navigateTonetDisksDetail = (item) => {
    uni.navigateTo({
     url:`/pages/exam/ExamDiskView?titleid=${item._id}&type=${item.content[0].type}&title=${item.title}&time=${item.time}&examId=${examInfo.value.id}`
    })
+}
+
+// 处理认证申请
+const handleAuth = () => {
+    // 跳转到反馈页面
+    let content = '申请访问科目访问科目：' + examInfo.value.name 
+    uni.navigateTo({
+      url: `/pages/public/feedbackview?content=${content}&type=4`
+    })
 }
 </script>
 
@@ -474,6 +510,7 @@ const navigateTonetDisksDetail = (item) => {
     flex: 1;
     overflow: hidden;
     margin-bottom: 120rpx;
+    position: relative;
 }
 
 .subject-types-scroll {
@@ -556,6 +593,68 @@ const navigateTonetDisksDetail = (item) => {
 .arrow-container {
     margin-left: 16rpx;
     z-index: 1;
+}
+
+/* 认证失败遮罩层样式 */
+.auth-mask {
+    position: absolute; /* 相对于父容器定位 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-mask-content {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 18rpx;
+    box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+    padding: 40rpx 30rpx;
+    text-align: center;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30rpx;
+}
+
+.auth-title {
+    color: #ff6b6b;
+    font-size: 32rpx;
+    font-weight: bold;
+    margin-top: 10rpx;
+}
+
+.auth-desc {
+    color: #666666;
+    font-size: 26rpx;
+    line-height: 40rpx;
+    margin-bottom: 10rpx;
+}
+
+.auth-note {
+    color: #333333;
+    font-size: 28rpx;
+    font-weight: bold;
+    align-self: flex-start;
+    margin-top: 5rpx;
+}
+
+.auth-info {
+    color: #555555;
+    font-size: 24rpx;
+    line-height: 36rpx;
+    align-self: flex-start;
+    text-indent: 20rpx;
+}
+
+.auth-button {
+    margin-top: 20rpx;
+    width: 200rpx;
 }
 
 /* 底部按钮样式 */

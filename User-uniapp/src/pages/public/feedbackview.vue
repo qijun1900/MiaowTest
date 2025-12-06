@@ -70,9 +70,9 @@
 </template>
 
 <script setup>
-import { ref ,onMounted} from 'vue';
+import { ref} from 'vue';
 import { submitFeedbackAPI } from '../../API/public/FeedbackAPI';
-
+import { onLoad } from '@dcloudio/uni-app';
 // 反馈类型选项
 const feedbackTypes = [
   { value: 1, label: '系统反馈' },
@@ -157,8 +157,20 @@ const backTo = () => {
   })
 };
 
-onMounted(()=>{
+onLoad((option) => {
+  // 页面加载时执行的逻辑
+  console.log('FeedbackView页面加载',option);
+  if(option.type){
+    type.value = Number(option.type);
+  }
+
+  if(option.content){
+    content.value = option.content;
+    
+  } 
+
 })
+
 </script>
 
 <style scoped>

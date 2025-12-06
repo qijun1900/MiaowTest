@@ -110,7 +110,6 @@ onLoad((option) => {
     title.value = option.title || '';
     updateTime.value = option.time || '';
     examId.value = option.examId || null;
-    
   }
 })
 
