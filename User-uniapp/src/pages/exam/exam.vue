@@ -136,7 +136,9 @@ onPageScroll((e) => {
 // 页面加载时获取数据
 onMounted(() => {
   fetchExamSubjects();
-  showShareMenu(); // 显示分享菜单
+  //#ifdef MP-WEIXIN
+    showShareMenu()
+  //#endif
 });
 
 </script>

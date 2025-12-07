@@ -220,7 +220,9 @@ const showPrivacyPolicy = () => {
 // 获取导航栏高度信息
 onMounted(() => {
   navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+  //#ifdef MP-WEIXIN
   showShareMenu()
+  //#endif
 });
 </script>
 

@@ -10,7 +10,7 @@
         <ThemeLoading v-if="isLoading" text="正在加载题库..." />
         
         <!-- 有题库数据时显示题库列表 -->
-        <view v-else-if="questionBanks.length > 0">
+        <view v-else-if="questionBanks && questionBanks.length > 0">
             <view class="question-bank-item" 
                 v-for="(item, index) in questionBanks" 
                 :key="index" 
@@ -129,9 +129,10 @@ onMounted(async ()=>{
     try {
         isLoading.value = true
         const res = await getUserBankList()
-        questionBanks.value = res.data
+        questionBanks.value = res.data || []
     } catch (error) {
         console.error('获取题库失败:', error)
+        questionBanks.value = []
     } finally {
         isLoading.value = false
     }

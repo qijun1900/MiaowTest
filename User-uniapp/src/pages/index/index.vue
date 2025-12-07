@@ -130,7 +130,9 @@ onPageScroll((e) => {
 onMounted(() => {
   fetchNoticeInfo()
   fetchBannerInfo()
+  //#ifdef MP-WEIXIN
   showShareMenu()
+  //#endif
 })
 </script>
 <style scoped lang="scss">

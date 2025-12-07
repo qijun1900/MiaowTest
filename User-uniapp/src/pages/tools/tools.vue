@@ -70,7 +70,9 @@ const navigateToTodo = async () => {
 
 // 页面加载时执行
 onMounted(() => {
+  //#ifdef MP-WEIXIN
   showShareMenu();
+  //#endif
 });
 </script>
 
