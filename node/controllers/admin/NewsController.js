@@ -54,7 +54,26 @@ const NewsController ={
             code:200,
         })
         
-    }
+    },
+    editAnnouncement:async (req,res)=>{
+        const {title,content,category,isPublish,creator,_id,cover:oldCover } = req.body
+        const cover = req.file?`/newsuploads/${req.file.filename}`:oldCover
+        console.log(cover);
+        await NewsService.editAnnouncement({ 
+        _id,
+        title,
+        content,
+        category:Number(category),
+        isPublish:Number(isPublish),
+        cover,
+        creator,
+        editTime:new Date()
+    })
+    res.send({
+        ActionType: "OK",
+        code:200,
+    })
+}
 }
 
 

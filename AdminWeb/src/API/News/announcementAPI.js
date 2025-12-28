@@ -78,6 +78,11 @@ export async function updateAnnouncementPublishStatus(_id, state) {
 
     
 }
+/**
+ * @description: 编辑通知公告
+ * @param {Object} data - 包含公告信息的对象
+ * @returns {Object} - 服务器响应
+ */
 export async function postEditAnnouncement(data) {
     try {
         const response = await upload("/adminapi/announcement/edit", data);

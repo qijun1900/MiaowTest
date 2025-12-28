@@ -30,6 +30,9 @@ const NewsService ={
     },
     updateStatus: async ({_id,state})=>{
         return NewsModel.updateOne({_id},{isPublish:state})
+    },
+    editAnnouncement: async ({_id,title,content,category,isPublish,cover,creator})=>{
+        return NewsModel.updateOne({_id},{title,content,category,isPublish,cover,creator})
     }
 }
 

@@ -380,6 +380,7 @@ const handleEdit = (row) => {
 }
 // 新增信息
 const handleAddNews = () => {
+    resetForm()
     dialogVisible.value = true
 }
 // 确认添加信息
