@@ -30,8 +30,8 @@ const ossStaticRedirect = (req, res, next) => {
         // 获取 OSS 文件 URL
         const ossUrl = ossHelper.getFileUrl(ossFilePath);
         
-        // 重定向到 OSS URL
-        res.redirect(ossUrl);
+        // 重定向到 OSS URL（前端会出现302重定向）
+        res.redirect(ossUrl);  
     } else {
         // 不是静态文件请求，继续处理
         next();

@@ -28,7 +28,7 @@ app.use(cookieParser());
 // 静态文件重定向到阿里云 OSS
 const ossStaticRedirect = require('./MiddleWares/ossStaticRedirect');
 app.use(ossStaticRedirect);
-// 保留本地静态文件服务作为 fallback
+// 保留本地静态文件服务作为 fallback 
 app.use(express.static(path.join(__dirname, 'public')));
 // CORS跨域资源共享中间件配置
 // 用于处理跨域请求，允许前端应用从不同域访问后端API
@@ -71,7 +71,6 @@ app.use(UniUserRouter)// 注册用户路由(用户端)
 app.use(WebNewsRouter)// 注册新闻路由(用户端)
 app.use(ConsumerExamRouter)// 注册考试路由(用户端)
 app.use(ConsumerLLMRouter)// 注册llm路由(用户端)
-
 
 /*
 adminapi===后台管理接口

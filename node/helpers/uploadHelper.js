@@ -16,7 +16,7 @@ if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
 }
 
-// 配置 multer 临时存储
+// 配置 multer 临时存储，文件上传到本地临时目录，稍后上传到 OSS，然后删除临时文件
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, tempDir);
@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage }); 
 
 /**
  * 处理文件上传到 OSS 的中间件
@@ -39,16 +39,16 @@ function uploadToOSS(ossDir) {
             if (req.file) {
                 // 上传到 OSS
                 const ossFilePath = `${ossDir}/${req.file.filename}`;
-                const fileUrl = await ossHelper.uploadFile(req.file.path, ossFilePath);
+                const fileUrl = await ossHelper.uploadFile(req.file.path, ossFilePath); 
                 
                 // 将文件 URL 保存到 req.file
                 req.file.ossUrl = fileUrl;
                 req.file.ossPath = ossFilePath;
                 
                 // 删除临时文件
-                fs.unlinkSync(req.file.path);
+                fs.unlinkSync(req.file.path); // 删除临时文件
                 
-                // 保存相对路径（用于数据库存储）
+                // 保存相对路径（用于数据库存储）冗余代码，或者修改所有控制器来使用
                 req.file.relativePath = `/${ossDir}/${req.file.filename}`;
             }
             
