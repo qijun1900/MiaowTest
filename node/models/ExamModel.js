@@ -12,6 +12,10 @@ const ExamSchema  = new mongoose.Schema({
     creator:String,
     day:Date,
     createdTime:Date,
+    clickTimes:{
+        type:Number,
+        default:0
+    }
 })
 const ExamModel  = mongoose.model("exam",ExamSchema)
 module.exports = ExamModel

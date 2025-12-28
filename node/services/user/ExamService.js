@@ -25,9 +25,15 @@ const ExamService = {
             createdTime:1,
             day:1,
             year:1,
-        }).sort({createdTime:-1})
+        }).sort({clickTimes: -1, createdTime: -1})
     },
     getExamSubjectTypes: async (id) => {
+        // 增加点击次数
+        await ExamModel.updateOne(
+            { _id: id }, 
+            { $inc: { clickTimes: 1 } }
+        );
+        
         return await UserExamModel.aggregate([// 聚合查询
             { $match: { examId: id } }, // 匹配 examId 为指定 id 的文档
             { $unwind: "$questionTitle" }, // 先展开数组
