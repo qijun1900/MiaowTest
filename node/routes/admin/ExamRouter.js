@@ -1,13 +1,12 @@
 var express = require('express');
 const ExamController = require('../../controllers/admin/ExamController');
 var ExamRouter = express.Router();
-const multer  = require('multer')
-const upload = multer({ dest: 'public/examcoveruploads/' })
+const { upload, uploadToOSS } = require('../../helpers/uploadHelper')
 
 
-ExamRouter.post('/adminapi/exam/add',upload.single('file'),ExamController.ExamAdd)//添加考试科目
+ExamRouter.post('/adminapi/exam/add',upload.single('file'),uploadToOSS('examcoveruploads'),ExamController.ExamAdd)//添加考试科目
 ExamRouter.get('/adminapi/exam/list',ExamController.getexamList)//获取多个考试科目
-ExamRouter.post("/adminapi/exam/update",upload.single('file'),ExamController.updateInfo)//更新考试科目信息
+ExamRouter.post("/adminapi/exam/update",upload.single('file'),uploadToOSS('examcoveruploads'),ExamController.updateInfo)//更新考试科目信息
 ExamRouter.post('/adminapi/exam/updateExamStatus',ExamController.updateExamStatus)//更新考试科目状态
 ExamRouter.post("/adminapi/exam/deloneExam",ExamController.deleteOneExamInfo)//删除单个考试科目信息
 ExamRouter.post("/adminapi/exam/delmanyExam",ExamController.deleteManyExamInfo)//删除多个考试科目信息

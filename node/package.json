@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "start": "node-dev ./bin/www",
-    "prod": "NODE_ENV=production node ./bin/www",
-    "dev": "NODE_ENV=development node-dev ./bin/www",
-    "docker": "NODE_ENV=production node ./bin/www"
+    "prod": "set NODE_ENV=production&&node ./bin/www",
+    "dev": "set NODE_ENV=development&&node-dev ./bin/www",
+    "docker": "set NODE_ENV=production&&node ./bin/www",
+    "migrate:oss": "node ./script/migrateToOSS.js"
   },
   "dependencies": {
+    "ali-oss": "^6.23.0",
     "axios": "^1.11.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",

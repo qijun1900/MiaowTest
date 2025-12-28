@@ -25,6 +25,10 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+// 静态文件重定向到阿里云 OSS
+const ossStaticRedirect = require('./MiddleWares/ossStaticRedirect');
+app.use(ossStaticRedirect);
+// 保留本地静态文件服务作为 fallback
 app.use(express.static(path.join(__dirname, 'public')));
 // CORS跨域资源共享中间件配置
 // 用于处理跨域请求，允许前端应用从不同域访问后端API
