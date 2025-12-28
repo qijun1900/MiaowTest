@@ -28,7 +28,7 @@ async function uploadFile(localFilePath, ossFilePath) {
             fileUrl = `https://${ossConfig.cdnDomain}/${fullOssPath}`;
         } else {
             // 使用 OSS 原始域名
-            fileUrl = result.url;
+            fileUrl = `https://${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com/${fullOssPath}`;
         }
         
         return fileUrl;
@@ -59,7 +59,7 @@ async function uploadStream(stream, ossFilePath) {
             fileUrl = `https://${ossConfig.cdnDomain}/${fullOssPath}`;
         } else {
             // 使用 OSS 原始域名
-            fileUrl = result.url;
+            fileUrl = `https://${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com/${fullOssPath}`;
         }
         
         return fileUrl;
