@@ -210,7 +210,7 @@
                             :height="300" 
                             :content="Form.content"/>
                     </el-form-item>
-                    <el-form-item label="封面" prop="cover">
+                    <el-form-item label="封面" prop="cover" v-if="Form.category === 1">
                         <Upload 
                             height="220px" 
                             width="380px" 
@@ -228,7 +228,7 @@ import { useTableState } from '@/composables/State/useTableState'
 import Tooltip from '@/components/ReuseComponents/Tooltip.vue'
 import { useTableActions } from '@/composables/Action/useTableActions'
 import Pagination from '@/components/ReuseComponents/Pagination.vue'
-import { ref, defineAsyncComponent, reactive,onMounted } from 'vue'
+import { ref, defineAsyncComponent, reactive,onMounted, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import Editor from '@/components/FunComponents/Editor.vue'
 import {
@@ -271,43 +271,46 @@ const FormRef = ref()
 const Form = reactive({
     title: "",
     content: "",
-    category: 1,//1:通知，2：公告
+    category: 1,
     cover: "",
     file: null,
     isPublish: 0,//0:未发布，1：发布，（状态）
     creator:appStore.userInfo.username,
 })
-const Formrules = reactive({
-    title: [
-        {
-            required: true,
-            message: '请输入标题',
-            trigger: 'blur'
-        }
-    ],
-    content: [
-        {
-            required: true,
-            message: '请输入内容',
-            trigger: 'blur'
-        }
-    ],
-    category: [
-        {
-            required: true,
-            message: '请选择分类',
-            trigger: 'blur'
-        }
-    ],
-    cover: [
-        {
-            required: true,
-            message: '请选择图片',
-            trigger: 'blur'
-        }
-    ],
-
+// 动态表单验证规则，根据类别决定封面是否必填
+const Formrules = computed(() => {
+    return {
+        title: [
+            {
+                required: true,
+                message: '请输入标题',
+                trigger: 'blur'
+            }
+        ],
+        content: [
+            {
+                required: true,
+                message: '请输入内容',
+                trigger: 'blur'
+            }
+        ],
+        category: [
+            {
+                required: true,
+                message: '请选择分类',
+                trigger: 'blur'
+            }
+        ],
+        cover: Form.category === 1 ? [ // 只有公告类型需要封面
+            {
+                required: true,
+                message: '请选择图片',
+                trigger: 'blur'
+            }
+        ] : [],
+    }
 })
+
 //类别选择字段
 const options = [
     {
@@ -332,6 +335,13 @@ const handleChange = (file) => {
     Form.cover = URL.createObjectURL(file)
     Form.file = file
 }
+// 监听类别变化，当切换到通知时清空封面
+watch(() => Form.category, (newVal) => {
+    if (newVal === 2) {
+        Form.cover = ''
+        Form.file = null
+    }
+})
 // 重置表单方法
 const resetForm = () => {
     Form.title = ''
