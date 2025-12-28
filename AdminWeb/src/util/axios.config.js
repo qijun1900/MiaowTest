@@ -1,8 +1,10 @@
 import axios from "axios";
+import escconfig from '@/config/esc.config';
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
     const token = localStorage.getItem("token")
     config.headers.Authorization = `Bearer ${token}`
+    config.headers['oss-enabled'] = escconfig.oss.enabled ? 'true' : 'false' // 添加 OSS 启用状态到请求头
 
     return config;
 }, function (error) {

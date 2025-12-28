@@ -74,13 +74,20 @@ import { computed, ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 import Upload from '@/components/upload/Upload.vue';
 import escconfig from '@/config/esc.config';
+import formatImageUrl from '@/util/formatImageUrl';
 import { useAppStore } from '@/stores';
 import { postUploadInfo } from '@/API/Users/postUploadInfo';
 import { List } from '@element-plus/icons-vue'
 import TodoList from '@/components/FunComponents/TodoList.vue';
 const appStore = useAppStore()
 
-const avatarUrl = computed(() => appStore.userInfo.avatar ? `http://${escconfig.serverHost}:${escconfig.serverPort}` + appStore.userInfo.avatar : `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`)
+const avatarUrl = computed(() => {
+  if (appStore.userInfo.avatar) {
+    return formatImageUrl(appStore.userInfo.avatar);
+  }
+  // 默认头像
+  return `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`;
+})
 const { username, gender, introduction, avatar } = appStore.userInfo
 const userFormRef = ref(username, gender, introduction, avatar)
 const userFormrules = reactive({

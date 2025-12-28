@@ -95,7 +95,7 @@
         <el-table-column prop="nickname" label="昵称" width="150">
           <template #default="scope">
             <div class="nickname-cell">
-              <el-avatar :src="scope.row.avatar || defaultAvatar" size="small" />
+              <el-avatar :src="scope.row.avatar ? formatImageUrl(scope.row.avatar) : defaultAvatar" size="small" />
               <span class="nickname-text">{{ scope.row.nickname }}</span>
             </div>
           </template>
@@ -189,6 +189,7 @@ import { getConsumerList ,GetAuthExamListAPI,updateExamAuthStatusAPI} from "../.
 import Pagination from '@/components/ReuseComponents/Pagination.vue'
 import formatInfo from '@/util/formatInfo'
 import formatTime from '@/util/formatTime'
+import formatImageUrl from '@/util/formatImageUrl'
 import { useConsumerFilter } from '@/util/SearchFilter'
 import Drawer from '@/components/ReuseComponents/Drawer.vue'
 
