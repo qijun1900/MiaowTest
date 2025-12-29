@@ -99,7 +99,7 @@ const fetchBannerInfo = async ()=>{
   if (res.data && Array.isArray(res.data)) {
     swiperList.value = res.data.map(item => ({
       type: 'image',
-      src: `${escconfig.useTunnel ? escconfig.tunnelUrl : `http://${escconfig.serverHost}:${escconfig.serverPort}`}${item.cover}`,
+      src: `${escconfig.ossDomain}${item.cover}`,
     }))
   }}catch(error){
     console.error('获取轮播图信息失败:',error)

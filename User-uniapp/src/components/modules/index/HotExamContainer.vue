@@ -43,7 +43,7 @@ const fetchHotExamData = async () => {
         hotExamList.value = res.data.map(item => ({
             id: item._id,
             name: item.name,
-            coverImage: `${escconfig.useTunnel ? escconfig.tunnelUrl : `http://${escconfig.serverHost}:${escconfig.serverPort}`}${item.cover}`, // 根据实际情况调整URL
+            coverImage: `${escconfig.ossDomain}${item.cover}`, // 根据实际情况调整URL
             ...item
         }))
     } catch (error) {

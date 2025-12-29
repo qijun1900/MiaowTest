@@ -1,4 +1,4 @@
-// 阿里云 OSS 工具类
+// 阿里云 OSS 工具类（上传，流式上传，删除 OSS 上的文件，获取 OSS 文件的访问 URL，遍历）
 const OSS = require('ali-oss');
 const fs = require('fs');
 const path = require('path');
@@ -19,7 +19,7 @@ async function uploadFile(localFilePath, ossFilePath) {
         const fullOssPath = ossConfig.prefix + ossFilePath;
         
         // 上传文件
-        const result = await client.put(fullOssPath, localFilePath);
+        const result = await client.put(fullOssPath, localFilePath); //fullOssPath 是上传到 OSS 中的路径，localFilePath 是本地文件的路径
         
         // 生成文件访问 URL
         let fileUrl;

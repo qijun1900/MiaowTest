@@ -12,7 +12,7 @@
           >
           <view class="subject-icon">
             <image
-              :src="subject.coverImage || `${escconfig.useTunnel ? escconfig.tunnelUrl : `http://${escconfig.serverHost}:${escconfig.serverPort}`}${subject.cover}`"
+              :src="subject.coverImage || `${escconfig.ossDomain}${subject.cover}`"
               mode="aspectFill" class="subject-image" />
           </view>
           <view class="subject-info">
@@ -58,7 +58,7 @@ const fetchUserNoteExam = async () => {
             _id: item._id,
             name: item.name,
             cover: item.cover,
-            coverImage: `${escconfig.useTunnel ? escconfig.tunnelUrl : `http://${escconfig.serverHost}:${escconfig.serverPort}`}${item.cover}`,
+            coverImage: `${escconfig.ossDomain}${item.cover}`,
             noteCount: item.noteCount || 0,
             ...item
         }))

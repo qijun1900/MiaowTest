@@ -39,7 +39,7 @@ function uploadToOSS(ossDir) {
             if (req.file) {
                 // 上传到 OSS
                 const ossFilePath = `${ossDir}/${req.file.filename}`;
-                const fileUrl = await ossHelper.uploadFile(req.file.path, ossFilePath); 
+                const fileUrl = await ossHelper.uploadFile(req.file.path, ossFilePath);  
                 
                 // 将文件 URL 保存到 req.file
                 req.file.ossUrl = fileUrl;

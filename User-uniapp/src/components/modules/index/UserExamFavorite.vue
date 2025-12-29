@@ -12,7 +12,7 @@
                 >
                     <view class="subject-icon">
                         <image 
-                            :src="subject.coverImage || `${escconfig.useTunnel ? escconfig.tunnelUrl : `http://${escconfig.serverHost}:${escconfig.serverPort}`}${subject.cover}`" 
+                            :src="subject.coverImage || `${escconfig.ossDomain}${subject.cover}`" 
                             mode="aspectFill"
                             class="subject-image"
                         />
@@ -54,7 +54,7 @@ const fetchFavoriteExam = async () => {
             favoriteExam.value = response.data.map(item => ({
                 id: item._id,
                 name: item.name,
-                coverImage: `${escconfig.useTunnel ? escconfig.tunnelUrl : `http://${escconfig.serverHost}:${escconfig.serverPort}`}${item.cover}`,
+                coverImage: `${escconfig.ossDomain}${item.cover}`,
                 updateTime: item.createdTime,
                 ...item
             }))

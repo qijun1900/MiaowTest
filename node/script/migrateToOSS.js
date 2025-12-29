@@ -1,4 +1,11 @@
-// 本地静态文件迁移到阿里云 OSS 脚本
+/**
+ * @description: 将本地静态文件迁移到阿里云 OSS
+ * @script node script/migrateToOSS.js
+ * @example
+ * 开始迁移本地静态文件到阿里云 OSS...
+ * 本地静态文件目录: /Users/liuxiang/Documents/WorkSpace/ExamSystem/public
+ */
+
 const path = require('path');
 const ossHelper = require('../helpers/ossHelper');
 
