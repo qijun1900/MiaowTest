@@ -111,8 +111,6 @@ const handleEditAvatar = () => {
     mediaType: ['image'],// 只允许选择图片
     sourceType: ['album', 'camera'],
     success:  (res) => {
-      res.tempFiles[0]
-      console.log(res.tempFiles[0])
       uni.uploadFile({
         url: '/uniappAPI/uploadFile/useravatar',
         fileType: 'image',
