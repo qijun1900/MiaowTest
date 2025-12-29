@@ -11,7 +11,7 @@
       <view class="avatar-wrapper">
         <image 
           class="avatar" 
-          :src="userInfoStore.isLoggedIn ? '/static/other/default-avatar.png' : '/static/other/default-user.png'" 
+          :src="userInfoStore.userInfo?.avatar || '/static/other/default-avatar.png'" 
           mode="aspectFill"
         ></image>
       </view>

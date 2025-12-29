@@ -10,3 +10,4 @@ module.exports = {
     cdnDomain: process.env.OSS_CDN_DOMAIN || '', // CDN 域名（可选）
     prefix: process.env.OSS_PREFIX || '' // 文件存储前缀
 };
+

@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <!-- 用户头像区域 -->
-    <view class="avatar-section">
+    <view class="avatar-section" @click="handleEditAvatar">
       <view class="avatar-wrapper">
         <image 
           class="avatar" 
@@ -9,7 +9,7 @@
           mode="aspectFill"
         ></image>
       </view>
-      <view class="edit-avatar-btn" @click="handleEditAvatar">
+      <view class="edit-avatar-btn" >
         <up-icon name="edit-pen" size="16px"></up-icon>
         <text>更换头像</text>
       </view>
@@ -106,10 +106,32 @@ const getGenderText = (genderValue) => {
 
 // TODO 编辑头像
 const handleEditAvatar = () => {
-  uni.showToast({
-    title: '功能开发中',
-    icon: 'none'
-  });
+  uni.chooseMedia({
+    count: 1,// 最多选择一张图片
+    mediaType: ['image'],// 只允许选择图片
+    sourceType: ['album', 'camera'],
+    success:  (res) => {
+      res.tempFiles[0]
+      console.log(res.tempFiles[0])
+      uni.uploadFile({
+        url: '/uniappAPI/uploadFile/useravatar',
+        fileType: 'image',
+        filePath: res.tempFiles[0].tempFilePath,
+        name: 'file',
+        success: ({ data }) => {
+          const parsedData = JSON.parse(data);
+          if(parsedData.code===200){
+            uni.showToast({
+              title:parsedData.message,
+              icon:'success'
+            })
+            // 更新用户信息
+            updateUserData({ avatar: parsedData.data.url }, '头像');
+          }
+        },
+      })
+    } 
+  })
 };
 
 // 编辑昵称

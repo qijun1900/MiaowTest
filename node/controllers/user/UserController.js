@@ -1,5 +1,19 @@
 const UserService = require("../../services/user/UserService");
-const JWT = require('../../MiddleWares/jwt');// 引入JWT中间件，用于验证token
+const multer = require('multer');
+const OSS = require('ali-oss');
+const ossConfig = require('../../config/oss.config');
+const path = require('path');
+
+// 使用内存存储，方便后续上传到OSS
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage: storage, 
+  limits: { fileSize: 5 * 1024 * 1024 } // 限制5MB
+});
+
+// 创建OSS客户端
+const client = new OSS(ossConfig);
+
 
 const UserController = {
     Userlogin: async (req, res) => {
@@ -80,6 +94,67 @@ const UserController = {
             });
         }
     },
+    // 处理头像上传
+    uploadUserAvatar: [
+        upload.single('file'), // 使用multer中间件处理文件上传
+        async (req, res) => {
+            try {
+                // 检查是否有文件上传
+                if (!req.file) {
+                    return res.send({
+                        code: 400,
+                        ActionType: "ERROR",
+                        message: '请选择要上传的图片'
+                    });
+                }
+
+                // 获取用户信息
+                const { uid } = req.user;
+                if (!uid) {
+                    return res.send({
+                        code: 401,
+                        ActionType: "ERROR",
+                        message: '用户未登录'
+                    });
+                }
+
+                // 生成唯一的文件名
+                const fileExtension = path.extname(req.file.originalname);
+                const fileName = `user/avatar/${uid}/${Date.now()}${fileExtension}`;
+
+                // 上传文件到OSS
+                const result = await client.put(fileName, req.file.buffer);
+                
+                // 获取上传后的URL
+                const avatarUrl = result.url;
+
+                const databaseResult = await UserService.updateUserAvatar({ 
+                    uid, 
+                    avatarUrl: avatarUrl 
+                });
+                if(databaseResult.success){
+                    // 返回成功响应
+                    res.send({
+                        code: databaseResult.code,
+                        message:databaseResult.message,
+                        data: { avatar: avatarUrl }
+                    });
+                }else{
+                    res.send({
+                        code: databaseResult.code,
+                        message: databaseResult.message,
+                    });
+                }
+            } catch (e) {
+                console.error("uploadUserAvatar失败", e);
+                res.send({
+                    code: 500,
+                    ActionType: "ERROR",
+                    message: '服务器错误'
+                });
+            }
+        }
+    ],
     //收藏考试
     addExamFavorite: async (req, res) => {
         try {

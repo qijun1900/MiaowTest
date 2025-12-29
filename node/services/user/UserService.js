@@ -217,6 +217,40 @@ const UserService = {
             };
         }
     },
+    updateUserAvatar: async ({ uid, avatarUrl }) => {
+        try {
+            const user = await ConsumerModel.findOne({ _id:uid });
+
+            if (!user) {
+                return {
+                    code: 404,
+                    message: '用户不存在',
+                    success: false
+                };
+            }
+
+            // 更新用户头像
+            user.avatar = avatarUrl;
+            await user.save();// 保存更新
+
+            return {
+                code: 200,
+                message: '更新成功',
+                success: true,
+            }
+            
+        }catch (error) {
+            console.error("updateUserAvatar 失败", error);
+            return {
+                code: 500,
+                message: '更新失败',
+                error: error.message,
+                success: false
+            };
+
+        }
+
+    },
     addExamFavorite: async (examId, uid) => {
         try {
             const result = await ConsumerModel.findOneAndUpdate(
