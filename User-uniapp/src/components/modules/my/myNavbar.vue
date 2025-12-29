@@ -24,7 +24,6 @@ import { ref } from 'vue'
 import checkLogin from '../../../util/checkLogin'
 
 // 导航项数据 - 使用不同的图标
-//TODO我的页面导航栏功能
 const navItems = ref([
   {
     title: '我的收藏',
@@ -59,13 +58,6 @@ const handleNavClick = async (item) => {
   if (item.istabBar) {
     uni.switchTab({ url: item.path })
   } 
-  //TODO 意见反馈
-  if(item.title === '意见反馈'){
-    uni.showToast({
-      title: '功能未开放',
-      icon: 'none'
-    })
-  }
   // 否则使用 navigateTo
   else if (item.path) {
     uni.navigateTo({ url: item.path })
