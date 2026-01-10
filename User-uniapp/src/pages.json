@@ -222,6 +222,12 @@
 			"style": {
 				"navigationBarTitleText": "TODO"
 			}
+		},
+		{
+			"path": "pages/tools/WordsToolView",
+			"style": {
+				"navigationBarTitleText": "喵喵单词"
+			}
 		}
 	],
 	"globalStyle": {

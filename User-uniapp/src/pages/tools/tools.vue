@@ -40,6 +40,23 @@
           />
         </view>
       </view>
+      <!-- 喵喵单词 -->
+      <view 
+        class="tool-card" 
+        @click="navigateToWords">
+        <view class="tool-info">
+          <view class="tool-title">喵喵单词</view>
+          <view class="tool-desc">
+            单词记忆工具，帮助你快速学习单词
+          </view>
+        </view>
+        <view class="tool-icon">
+          <image
+            src="/static/tools/tools-words.png"
+            mode="aspectFit"
+          />
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -65,6 +82,15 @@ const navigateToTodo = async () => {
   
   uni.navigateTo({
     url: '/pages/tools/TodoToolView'
+  });
+};
+// 导航到喵喵单词页面
+const navigateToWords = async () => {
+  const isLoggedIn = await checkLogin("请登录后再操作");
+  if (!isLoggedIn) return;
+
+  uni.navigateTo({
+    url: '/pages/tools/WordsToolView'
   });
 };
 
