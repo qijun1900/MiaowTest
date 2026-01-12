@@ -41,9 +41,9 @@ const navItems = ref([
     path: '/pages/my/MyNoteView',
   },
   {
-    title: '收藏工具',
-    icon: '/static/tabBar/tool-active.png',
-    path: '/pages/user/index'
+    title: '我的题库',
+    icon: '/static/other/my-questionbank.png',
+    path: '/pages/my/UserQuestionBankView'
   }
 ])
 

@@ -228,6 +228,12 @@
 			"style": {
 				"navigationBarTitleText": "喵喵单词"
 			}
+		},
+		{
+			"path": "pages/my/UserQuestionBankView",
+			"style": {
+				"navigationBarTitleText": "我的题库"
+			}
 		}
 	],
 	"globalStyle": {
