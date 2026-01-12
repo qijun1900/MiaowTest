@@ -5,7 +5,8 @@
       ref="pageHeadRef"
       title="所有工具" 
     />
-    
+    <!-- TODO 工具拖拽 -->
+     
     <!-- 工具列表区域 -->
     <view 
       class="tools-container" 

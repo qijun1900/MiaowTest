@@ -226,7 +226,8 @@
 		{
 			"path": "pages/tools/WordsToolView",
 			"style": {
-				"navigationBarTitleText": "喵喵单词"
+				"navigationBarTitleText": "喵喵单词",
+				"navigationStyle": "custom" //自定义导航栏
 			}
 		},
 		{
