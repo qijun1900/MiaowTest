@@ -1,7 +1,7 @@
 //单词书对应模型
 const mongoose = require('mongoose');
 
-// 系统默认词书（哈希表）
+// 系统默认词书数据（哈希表）
 const bookIdToImageMap = {
     'CET4luan_1': { title: '四级真题核心词（图片记忆）', words: 1162, fileSize: 788457, reciteCount: 875260, tags: ['四级', '有道'] },
     'CET6luan_1': { title: '六级真题核心词（图片记忆）', words: 1228, fileSize: 591417, reciteCount: 218418, tags: ['六级', '有道'] },
@@ -52,7 +52,7 @@ const WordBooksSchema = new mongoose.Schema({
     reciteCount: { 
         type: Number, 
         default: 0 
-    },         // 背诵人数
+    },         // 默认背诵人数
     tags: { 
         type: [String], 
         default: [],
@@ -61,12 +61,20 @@ const WordBooksSchema = new mongoose.Schema({
     createdAt: { 
         type: Date, 
         default: Date.now 
-    },         // 创建时间
+    },         // 创建时间  
     updatedAt: { 
         type: Date, 
         default: Date.now 
-    }          // 更新时间
-});
+    },          // 更新时间
+    cover:{
+        type: String,
+        default: ''
+    }  ,        // 封面图片URL
+    starredNumber:{
+        type: Number,
+        default: 0  // 学习人数
+    },
+}); 
 
 // 自动更新updatedAt字段
 WordBooksSchema.pre('save', function(next) {
