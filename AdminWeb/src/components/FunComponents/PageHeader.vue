@@ -124,6 +124,8 @@ const Title = computed(() => {
       return '模型对话';
     case '/consumer/message':
       return '用户意见';
+    case '/learn/wordbooks':
+      return '词书管理';
     default:
       return '后台管理系统';
   }

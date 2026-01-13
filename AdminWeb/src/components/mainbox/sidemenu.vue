@@ -40,14 +40,15 @@
         <el-menu-item index="/news/announcement">通知公告</el-menu-item>
       </el-sub-menu>
 
-      <el-sub-menu index="/Exam-manage">
+      <el-sub-menu index="/learn-manage">
         <template #title>
           <el-icon>
             <DocumentCopy />
           </el-icon>
-          <span>考试管理</span>
+          <span>学习管理</span>
         </template>
         <el-menu-item index="/exam/exammanage">科目管理</el-menu-item>
+        <el-menu-item index="/learn/wordbooks">词书管理</el-menu-item>
       </el-sub-menu>
 
       <el-sub-menu index="/Feedback-manage">
