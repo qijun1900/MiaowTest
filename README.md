@@ -151,7 +151,7 @@ AI集成：OpenAI API
 
 ```bash
 Node.js >= 16.0.0
-npm >= 8.0.0 或 yarn >= 1.22.0
+npm >= 8.0.0 
 MongoDB >= 4.4
 ```
 
