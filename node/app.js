@@ -19,6 +19,7 @@ const FunctionRouter = require('./routes/admin/FunctionRouter'); // 引入Admin�
 const UniUserRouter = require('./routes/user/UserRouter'); // 引入用户端用户路由模块
 const AdminConsumerRouter = require('./routes/admin/ConsumerRouter'); // 引入Admin用户端用户路由模块
 const WordBooksRouter = require('./routes/admin/WordBooksRouter'); // 引入Admin词书路由模块
+const VocabularyRouter = require('./routes/user/VocabularyRouter'); // 引入用户端词汇相关路由模块
 
 var app = express();
 
@@ -72,6 +73,7 @@ app.use(UniUserRouter)// 注册用户路由(用户端)
 app.use(WebNewsRouter)// 注册新闻路由(用户端)
 app.use(ConsumerExamRouter)// 注册考试路由(用户端)
 app.use(ConsumerLLMRouter)// 注册llm路由(用户端)
+app.use(VocabularyRouter)// 注册词汇相关路由(用户端)
 
 /*
 adminapi===后台管理接口

@@ -1,5 +1,6 @@
+require('dotenv').config()
 const jsonwebtoken = require('jsonwebtoken');
-const secret = "qijundawang"
+const secret = process.env.TOKEN_SECRET 
 const JWT = {
     generate(value,expires){
        return jsonwebtoken.sign(value,secret,{expiresIn:expires})

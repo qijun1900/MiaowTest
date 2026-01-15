@@ -15,7 +15,7 @@
     <view    
       class="content" 
       :style="{ paddingTop: navBarHeight + 'px',}">
-      <wordBooks v-if="currentMode===0"/>
+      <wordBooks v-if="currentMode===1"/>
     </view>
   </view>
 </template>
@@ -25,9 +25,13 @@ import navBarHeightUtil from '../../util/navBarHeight';
 import UviewSubsection from "../../components/core/uviewSubsection.vue";
 import wordBooks from '../../components/modules/tools/wordBooks.vue';
 
-const list = ref(['单词本','背单词']);
+const list = ref(['背单词','单词本']);
 const navBarHeight = ref(0); // 导航栏高度
 const currentMode = ref(0);
+
+const handleSendMode = (mode) => {
+  currentMode.value = mode;
+}
 
 onMounted(() => {
   const navInfo = navBarHeightUtil.getNavBarInfo();

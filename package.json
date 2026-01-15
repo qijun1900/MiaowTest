@@ -1,7 +1,7 @@
 {
   "name": "tmm-system",
   "version": "1.0.0",
-  "description": "答题系统",
+  "description": "TMM System Monorepo",
   "scripts": {
     "start:node": "cd node && npm start",
     "start:admin": "cd AdminWeb && npm run dev",
