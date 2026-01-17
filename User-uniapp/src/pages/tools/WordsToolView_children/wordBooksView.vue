@@ -84,7 +84,7 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue';
 import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
-import ThemeLoading from '../../core/ThemeLoading.vue';
+import ThemeLoading from '../../../components/core/ThemeLoading.vue';
 import escconfig from '../../../config/esc.config';
 
 const defaultBooks = ref([]);
@@ -108,7 +108,6 @@ const fetchWordBooks = async () => {
         const response = await getWordBooksAPI();
         if (response.code == 200) {
             defaultBooks.value = response.data.wordBooks;
-            console.log("Fetched default word books:", defaultBooks.value);
             loading.value = false;
         }
     } catch (error) {
