@@ -1,4 +1,5 @@
 import axios from "axios";
+import upload from "@/util/upload";
 
 /**
  * 获取词书列表
@@ -67,10 +68,8 @@ export async function deleteManyWordBooks(_ids) {
  */
 export async function updateWordBook(data) {
     try {
-        const response = await axios.post("/adminapi/wordbooks/update", data);
-        if (response.data.code === 200) {
-            return response.data;
-        }
+        const response = await upload("/adminapi/wordbooks/update", data);
+        return response;
     } catch (error) {
         console.error("Error during update wordbook:", error);
         throw error;

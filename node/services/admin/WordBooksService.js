@@ -19,7 +19,7 @@ const getWordBooksList = async (page = 1, size = 10) => {
     };
 };
 
-const updateWordBook = async (_id, title, tags, words, reciteCount) => {
+const updateWordBook = async (_id, title, tags, words, reciteCount, cover) => {
     const updateData = {
         updatedAt: Date.now()
     };
@@ -28,6 +28,7 @@ const updateWordBook = async (_id, title, tags, words, reciteCount) => {
     if (tags !== undefined) updateData.tags = tags;
     if (words !== undefined) updateData.words = words;
     if (reciteCount !== undefined) updateData.reciteCount = reciteCount;
+    if (cover !== undefined && cover !== "") updateData.cover = cover; // 确保 cover 不为空字符串
 
     const result = await WordBooksModel.findByIdAndUpdate(
         _id,

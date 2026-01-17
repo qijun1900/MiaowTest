@@ -39,7 +39,7 @@
                 :key="index" 
                 v-else
                 >
-                <image :src="book.cover || 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
+                <image :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
                 <view class="book-content">
                     <view class="book-info">
                         <text class="book-title">{{ book.title }}</text>
@@ -85,6 +85,7 @@
 import { onMounted, ref, computed } from 'vue';
 import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../core/ThemeLoading.vue';
+import escconfig from '../../../config/esc.config';
 
 const defaultBooks = ref([]);
 const currentType = ref('default'); // 'default' 或 'user'
@@ -95,6 +96,10 @@ const UserWordBooks = ref([]);
 const currentBooks = computed(() => {
     return currentType.value === 'default' ? defaultBooks.value : UserWordBooks.value;
 });
+
+const baseImageUrl = computed(() => {
+    return escconfig.ossDomain 
+})
 
 // 获取词书
 const fetchWordBooks = async () => {

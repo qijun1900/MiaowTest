@@ -490,9 +490,9 @@ const handleConfirm = async () => {
             _id: currentEditId.value,
             ...bookForm
         }
-        console.log("data",submitData)
 
         const res = await updateWordBook(submitData)
+
         if (res.ActionType === 'OK') {
             ElMessage.success('词书信息更新成功')
             await handleRefreshData()

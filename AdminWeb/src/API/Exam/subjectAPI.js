@@ -2,13 +2,7 @@ import axios from "axios";
 import upload from "@/util/upload";
 
 export async function postAddExam(data) {
-    // 添加考试
-    try {
-        const response = await upload("/adminapi/exam/add", data);
-        return response;
-    } catch (error) {
-        console.error("Error during add exam:", error);
-    }
+    // 添加考试信息
     try {
         const response = await upload("/adminapi/exam/add", data);
         return response;

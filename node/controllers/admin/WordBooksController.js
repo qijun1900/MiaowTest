@@ -1,4 +1,3 @@
-const { WordBooksModel } = require('../../models/WordBooksModel');
 const WordBooksService = require('../../services/admin/WordBooksService');
 
 /**
@@ -29,7 +28,10 @@ const getWordBooksList = async (req, res) => {
  */
 const updateWordBook = async (req, res) => {
     try {
-        const { _id, title, tags, words, reciteCount } = req.body;
+        // 使用 uploadToOSS 中间件处理后的相对路径，如果没有文件则为 ""
+        const cover = req.file ? req.file.relativePath : "";
+        const { _id, title, tags, words, reciteCount} = req.body;
+        console.log('Received:', cover,_id,title,tags,words,reciteCount);
 
         if (!_id) {
             return res.status(400).send({
@@ -39,7 +41,12 @@ const updateWordBook = async (req, res) => {
             });
         }
 
-        const result = await WordBooksService.updateWordBook(_id, title, tags, words, reciteCount);
+        let handleTag;
+        if (typeof tags === 'string') {
+            handleTag = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        }
+
+        const result = await WordBooksService.updateWordBook(_id, title, handleTag, words, reciteCount, cover);
 
         if (!result) {
             return res.status(404).send({
