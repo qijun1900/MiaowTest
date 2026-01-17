@@ -69,7 +69,7 @@ const WordBooksSchema = new mongoose.Schema({
     cover:{
         type: String,
         default: ''
-    }  ,        // 封面图片URL
+    },        // 封面图片URL
     starredNumber:{
         type: Number,
         default: 0  // 学习人数

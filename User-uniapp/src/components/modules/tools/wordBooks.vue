@@ -87,16 +87,13 @@ import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../core/ThemeLoading.vue';
 
 const defaultBooks = ref([]);
-const userBooks = ref([]);
 const currentType = ref('default'); // 'default' 或 'user'
 const loading = ref(false);
-
-// 用户词书假数据
-const mockUserBooks = [];
+const UserWordBooks = ref([]);
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
-    return currentType.value === 'default' ? defaultBooks.value : userBooks.value;
+    return currentType.value === 'default' ? defaultBooks.value : UserWordBooks.value;
 });
 
 // 获取词书
@@ -109,7 +106,6 @@ const fetchWordBooks = async () => {
             console.log("Fetched default word books:", defaultBooks.value);
             loading.value = false;
         }
-
     } catch (error) {
         console.error("Error fetching word books:", error);
     }
@@ -139,11 +135,6 @@ const viewAllWords = (book) => {
     });
     
     // TODO: 跳转到单词列表页面或显示单词列表
-    uni.showToast({
-        title: `正在加载《${book.title}》`,
-        icon: 'loading',
-        duration: 1500
-    });
 
 };
 
@@ -165,9 +156,6 @@ onMounted(() => {
     
     // 获取默认词书
     fetchWordBooks();
-    
-    // 加载用户词书（使用假数据）
-    userBooks.value = mockUserBooks;
 });
 </script>
 <style scoped>

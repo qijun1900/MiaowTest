@@ -288,6 +288,14 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
+                
+                    <el-form-item label="封面图片" prop="cover">
+                        <Upload 
+                            height="250px" 
+                            width="180px" 
+                            :avatar="bookForm.cover" 
+                            @AvatarChange="handleChange" />
+                    </el-form-item>
                 </el-form>
             </template>
         </Dialog>
@@ -315,6 +323,10 @@ import {
 // 动态导入对话框组件
 const Dialog = defineAsyncComponent(() =>
     import('@/components/ReuseComponents/Dialog .vue')
+)
+
+const Upload = defineAsyncComponent(() =>
+    import('@/components/upload/Upload.vue')
 )
 
 // 表格数据
@@ -374,7 +386,9 @@ const bookForm = reactive({
     title: '',
     tags: [],
     words: 0,
-    reciteCount: 0
+    reciteCount: 0,
+    cover: '',
+    file: null
 })
 
 // 表单验证规则
@@ -420,10 +434,10 @@ const getTagType = (tag) => {
         '考研': 'warning',
         '专四': 'danger',
         '专八': 'info',
-        '有道': '',
-        '新东方': ''
+        '有道': 'info',
+        '新东方': "info"
     }
-    return tagTypeMap[tag] || ''
+    return tagTypeMap[tag] || undefined
 }
 
 /**
@@ -450,7 +464,9 @@ const handleEdit = (row) => {
         title: row.title,
         tags: row.tags || [],
         words: row.words || 0,
-        reciteCount: row.reciteCount || 0
+        reciteCount: row.reciteCount || 0,
+        cover: row.cover || '',
+        file: null
     })
     dialogVisible.value = true
 }
@@ -474,6 +490,7 @@ const handleConfirm = async () => {
             _id: currentEditId.value,
             ...bookForm
         }
+        console.log("data",submitData)
 
         const res = await updateWordBook(submitData)
         if (res.ActionType === 'OK') {
@@ -489,6 +506,14 @@ const handleConfirm = async () => {
     } finally {
         tableLoading.value = false
     }
+}
+
+/**
+ * 处理封面图片更改
+ */
+const handleChange = (file)=>{
+    bookForm.cover = URL.createObjectURL(file)
+    bookForm.file = file
 }
 
 /**
