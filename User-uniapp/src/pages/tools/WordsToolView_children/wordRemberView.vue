@@ -17,7 +17,13 @@
                         <text class="fire-icon">🔥</text>
                         <text class="streak-days">12 天</text>
                     </view>
-                    <view class="notification-icon">🔔</view>
+                    <view class="notification-icon">
+                        <image
+                            class="header-setting-icon"
+                            src="/static/navMy/c-my-setting.png"
+                            mode="aspectFit"
+                        />
+                    </view>
                 </view>
             </view>
 
@@ -29,36 +35,65 @@
 
             <!-- 进度卡片 -->
             <view class="progress-card">
+                <!-- 装饰性背景元素 -->
+                <view class="card-decoration">
+                    <view class="decoration-circle decoration-1"></view>
+                    <view class="decoration-circle decoration-2"></view>
+                    <view class="decoration-circle decoration-3"></view>
+                </view>
+
                 <view class="progress-content">
                     <!-- 圆形进度条 -->
                     <view class="progress-circle">
                         <view class="circle-container">
+                            <!-- 外层光晕效果 -->
+                            <view class="circle-glow"></view>
+                            
                             <!-- 背景圆环 -->
                             <view class="circle-bg"></view>
+                            
                             <!-- 进度圆环 -->
-                            <view class="circle-progress"></view>
+                            <view class="circle-progress">
+                                <!-- 进度端点装饰 -->
+                                <view class="progress-dot"></view>
+                            </view>
+                            
                             <!-- 中心内容 -->
                             <view class="circle-content">
                                 <view class="percentage-container">
                                     <text class="percentage">70</text>
                                     <text class="percent-sign">%</text>
                                 </view>
+                                <!-- 完成度文字 -->
+                                <text class="completion-text">完成度</text>
                             </view>
+                            
+                            <!-- 装饰性星星 -->
+                            <view class="star-decoration star-1">⭐</view>
+                            <view class="star-decoration star-2">✨</view>
                         </view>
                     </view>
 
                     <!-- 进度信息 -->
-                    <view class="progress-info">
-                        <text class="current">35</text>
-                        <text class="separator">/</text>
-                        <text class="total">50</text>
-                        <text class="unit">词</text>
+                    <view class="progress-info-wrapper">
+                        <view class="progress-info">
+                            <text class="current">35</text>
+                            <text class="separator">/</text>
+                            <text class="total">50</text>
+                            <text class="unit">词</text>
+                        </view>
+                        <view class="progress-bar-mini">
+                            <view class="progress-bar-fill" style="width: 70%"></view>
+                        </view>
+                        <view class="progress-label-wrapper">
+                            <text class="progress-label">今日目标</text>
+                            <text class="progress-tip">还差 15 词就完成啦！</text>
+                        </view>
                     </view>
-                    <text class="progress-label">今日目标</text>
                 </view>
-
                 <!-- 继续学习按钮 -->
                 <view class="continue-btn">
+                    <view class="btn-shine"></view>
                     <text class="btn-text">继续学习</text>
                     <text class="arrow">→</text>
                 </view>
@@ -96,9 +131,9 @@ const iSshowGuide = ref(true);
 
 // 处理引导完成事件
 const handleGuideComplete = (settings) => {
-    console.log('引导完成，设置:', settings);
     iSshowGuide.value = false;
     // 这里可以保存用户设置
+    console.log('引导完成，设置:', settings);
 };
 </script>
 
@@ -192,10 +227,15 @@ const handleGuideComplete = (settings) => {
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
 
+.header-setting-icon{
+    width: 46rpx;
+    height: 46rpx;
+}
+
 /* 主标题区域 */
 .main-title {
     text-align: center;
-    margin-bottom: 60rpx;
+    margin-bottom: 30rpx;
 }
 
 .title {
@@ -214,30 +254,110 @@ const handleGuideComplete = (settings) => {
 
 /* 进度卡片 */
 .progress-card {
+    position: relative;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 40rpx;
     padding: 60rpx 40rpx;
     margin: 0 20rpx 60rpx;
     box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10rpx);
+    overflow: hidden;
+}
+
+/* 装饰性背景元素 */
+.card-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.decoration-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.05;
+}
+
+.decoration-1 {
+    width: 200rpx;
+    height: 200rpx;
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    top: -50rpx;
+    right: -50rpx;
+    animation: float 6s ease-in-out infinite;
+}
+
+.decoration-2 {
+    width: 150rpx;
+    height: 150rpx;
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    bottom: 50rpx;
+    left: -30rpx;
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+.decoration-3 {
+    width: 100rpx;
+    height: 100rpx;
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    top: 50%;
+    right: 20rpx;
+    animation: float 7s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20rpx) rotate(180deg);
+    }
 }
 
 .progress-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 60rpx;
+    margin-bottom: 35rpx;
+    position: relative;
+    z-index: 1;
 }
 
 .progress-circle {
     position: relative;
-    margin-bottom: 40rpx;
+    margin-bottom: 34rpx;
 }
 
 .circle-container {
     position: relative;
     width: 320rpx;
     height: 320rpx;
+}
+
+/* 外层光晕效果 */
+.circle-glow {
+    position: absolute;
+    top: -20rpx;
+    left: -20rpx;
+    width: calc(100% + 40rpx);
+    height: calc(100% + 40rpx);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(33, 150, 243, 0.2) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
 }
 
 .circle-bg {
@@ -263,11 +383,47 @@ const handleGuideComplete = (settings) => {
     border-radius: 50%;
     background: conic-gradient(from -90deg,
             #2196F3 0deg,
+            #64B5F6 126deg,
             #2196F3 252deg,
             transparent 252deg,
             transparent 360deg);
     mask: radial-gradient(circle at center, transparent 110rpx, black 110rpx, black 140rpx, transparent 140rpx);
     -webkit-mask: radial-gradient(circle at center, transparent 110rpx, black 110rpx, black 140rpx, transparent 140rpx);
+    animation: progressRotate 2s ease-out;
+}
+
+@keyframes progressRotate {
+    from {
+        transform: rotate(-90deg);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* 进度端点装饰 */
+.progress-dot {
+    position: absolute;
+    top: 20rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24rpx;
+    height: 24rpx;
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    border-radius: 50%;
+    box-shadow: 0 4rpx 12rpx rgba(33, 150, 243, 0.5);
+    animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.2);
+    }
 }
 
 
@@ -294,6 +450,7 @@ const handleGuideComplete = (settings) => {
     display: flex;
     align-items: baseline;
     justify-content: center;
+    margin-bottom: 8rpx;
 }
 
 .percentage {
@@ -306,6 +463,18 @@ const handleGuideComplete = (settings) => {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: numberCount 1.5s ease-out;
+}
+
+@keyframes numberCount {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .percent-sign {
@@ -316,17 +485,73 @@ const handleGuideComplete = (settings) => {
     opacity: 0.8;
 }
 
+.completion-text {
+    font-size: 22rpx;
+    color: #999;
+    letter-spacing: 2rpx;
+}
+
+/* 装饰性星星 */
+.star-decoration {
+    position: absolute;
+    font-size: 32rpx;
+    animation: starTwinkle 2s ease-in-out infinite;
+}
+
+.star-1 {
+    top: 10rpx;
+    right: 30rpx;
+    animation-delay: 0s;
+}
+
+.star-2 {
+    bottom: 20rpx;
+    left: 20rpx;
+    animation-delay: 1s;
+}
+
+@keyframes starTwinkle {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+
+/* 进度信息包装器 */
+.progress-info-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16rpx;
+}
 
 .progress-info {
     display: flex;
     align-items: baseline;
-    margin-bottom: 10rpx;
 }
 
 .current {
-    font-size: 36rpx;
-    color: #2196F3;
-    font-weight: 600;
+    font-size: 40rpx;
+    color: #FF9800;
+    font-weight: 700;
+    animation: numberSlide 1s ease-out;
+}
+
+@keyframes numberSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-20rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .separator {
@@ -346,19 +571,158 @@ const handleGuideComplete = (settings) => {
     margin-left: 8rpx;
 }
 
+/* 迷你进度条 */
+.progress-bar-mini {
+    width: 200rpx;
+    height: 8rpx;
+    background: rgba(33, 150, 243, 0.1);
+    border-radius: 4rpx;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2196F3, #64B5F6);
+    border-radius: 4rpx;
+    transition: width 1s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.progress-label-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rpx;
+}
+
 .progress-label {
     font-size: 28rpx;
     color: #666;
 }
 
+.progress-tip {
+    font-size: 24rpx;
+    color: #2196F3;
+    font-weight: 500;
+}
+
+/* 学习时长统计 */
+.time-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40rpx;
+    padding: 30rpx 0;
+    margin-bottom: 30rpx;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(33, 150, 243, 0.02));
+    border-radius: 20rpx;
+    position: relative;
+    z-index: 1;
+}
+
+.time-item {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+}
+
+.time-icon {
+    font-size: 28rpx;
+}
+
+.time-value {
+    font-size: 32rpx;
+    color: #333;
+    font-weight: 700;
+}
+
+.time-unit {
+    font-size: 24rpx;
+    color: #666;
+}
+
+.time-divider {
+    width: 2rpx;
+    height: 40rpx;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+}
+
 .continue-btn {
+    position: relative;
     background: linear-gradient(135deg, #2196F3, #1976D2);
     border-radius: 30rpx;
-    padding: 24rpx 0;
+    padding: 28rpx 0;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 8rpx 24rpx rgba(33, 150, 243, 0.3);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.continue-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #64B5F6, #2196F3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.continue-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 4rpx 16rpx rgba(33, 150, 243, 0.4);
+}
+
+.continue-btn:active::before {
+    opacity: 1;
+}
+
+/* 按钮光泽效果 */
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: btnShine 3s infinite;
+    z-index: 1;
+}
+
+@keyframes btnShine {
+    0% {
+        left: -100%;
+    }
+    50%, 100% {
+        left: 150%;
+    }
 }
 
 .btn-text {
@@ -366,11 +730,25 @@ const handleGuideComplete = (settings) => {
     font-size: 32rpx;
     font-weight: 600;
     margin-right: 12rpx;
+    position: relative;
+    z-index: 2;
 }
 
 .arrow {
     color: #fff;
     font-size: 28rpx;
+    position: relative;
+    z-index: 2;
+    animation: arrowMove 1.5s ease-in-out infinite;
+}
+
+@keyframes arrowMove {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(8rpx);
+    }
 }
 
 /* 统计数据区域 */

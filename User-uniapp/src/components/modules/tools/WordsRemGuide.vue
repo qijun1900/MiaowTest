@@ -87,7 +87,9 @@
 
                 <!-- 预设目标选项 -->
                 <view class="preset-options">
-                    <view v-for="option in presetOptions" :key="option" class="option-item"
+                    <view 
+                        v-for="option in presetOptions" 
+                        :key="option" class="option-item"
                         :class="{ 'active': dailyGoal === option }" @click="selectGoal(option)">
                         <text class="option-text">{{ option }}词/天</text>
                         <text class="option-subtitle">{{ getOptionLabel(option) }}</text>
@@ -98,7 +100,7 @@
                 <view class="slider-section">
                     <view class="slider-labels">
                         <text class="label-text">轻松</text>
-                        <text class="label-text">挑战</text>
+                        <text class="label-text">极限</text>
                     </view>
                     <slider class="goal-slider" 
                         :value="dailyGoal" 
@@ -278,9 +280,9 @@ const confirmSettings = () => {
     uni.showToast({
         title: '设置成功',
         icon: 'success',
-        duration: 2000
+        duration: 1200
     });
-
+    
     // 添加触觉反馈
     uni.vibrateShort({
         type: 'medium'
