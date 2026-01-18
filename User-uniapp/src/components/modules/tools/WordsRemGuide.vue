@@ -63,8 +63,25 @@
                         <view class="circle-content">
                             <text class="goal-label">每日新词</text>
                             <text class="goal-number">{{ dailyGoal }}</text>
-                            <text class="estimate-text">预计 {{ estimatedDays }} 天完成此书</text>
+                            <text class="estimate-text">预计 {{ estimatedDays }} 天完成</text>
+                            <view class="intensity-badge" :class="intensityLevel.class">
+                                <text class="badge-text">{{ intensityLevel.text }}</text>
+                            </view>
                         </view>
+                    </view>
+                </view>
+
+                <!-- 学习统计卡片 -->
+                <view class="stats-cards">
+                    <view class="stat-card">
+                        <uni-icons type="calendar" size="32" color="#2196F3"></uni-icons>
+                        <text class="stat-value">{{ estimatedDays }}</text>
+                        <text class="stat-label">完成天数</text>
+                    </view>
+                    <view class="stat-card">
+                        <uni-icons type="fire" size="32" color="#F44336"></uni-icons>
+                        <text class="stat-value">{{ dailyProgress }}%</text>
+                        <text class="stat-label">每日进度</text>
                     </view>
                 </view>
 
@@ -73,14 +90,15 @@
                     <view v-for="option in presetOptions" :key="option" class="option-item"
                         :class="{ 'active': dailyGoal === option }" @click="selectGoal(option)">
                         <text class="option-text">{{ option }}词/天</text>
+                        <text class="option-subtitle">{{ getOptionLabel(option) }}</text>
                     </view>
                 </view>
 
                 <!-- 滑块调节 -->
                 <view class="slider-section">
                     <view class="slider-labels">
-                        <text class="label-text">较慢</text>
-                        <text class="label-text">较快</text>
+                        <text class="label-text">轻松</text>
+                        <text class="label-text">挑战</text>
                     </view>
                     <slider class="goal-slider" 
                         :value="dailyGoal" 
@@ -99,7 +117,8 @@
 
                 <!-- 提示信息 -->
                 <view class="tip-box">
-                    <text class="tip-text">根据您的词书总量，当前计划是一个非常科学的选择。保持每天稳定的学习节奏比偶尔的高强度更有助于长期记忆。您可以随时更改目标。</text>
+                    <uni-icons type="info" size="20" color="#2196F3" style="margin-right: 12rpx;"></uni-icons>
+                    <text class="tip-text">{{ dynamicTipText }}</text>
                 </view>
             </view>
         </transition>
@@ -135,7 +154,7 @@ const selectedBook = ref(null);
 // 每日目标
 const dailyGoal = ref(30);
 // 预设选项
-const presetOptions = [10, 20, 30, 50];
+const presetOptions = [20, 30, 50,100];
 // 词书列表数据
 const wordBooks = ref([]);
 
@@ -151,15 +170,54 @@ const estimatedDays = computed(() => {
 
 // 计算进度条旋转角度
 const progressRotation = computed(() => {
-    const percentage = (dailyGoal.value - 5) / (100 - 5);
+    const percentage = (dailyGoal.value - 10) / (200 - 10);
     return percentage * 270 - 135; // -135度到135度的范围
 });
+// 计算学习强度等级
+const intensityLevel = computed(() => {
+    if (dailyGoal.value <= 30) {
+        return { text: '轻松', class: 'easy' };
+    } else if (dailyGoal.value <= 60) {
+        return { text: '适中', class: 'medium' };
+    } else if (dailyGoal.value <= 100) {
+        return { text: '挑战', class: 'hard' };
+    } else {
+        return { text: '极限', class: 'extreme' };
+    }
+});
+
+// 计算每日进度百分比
+const dailyProgress = computed(() => {
+    if (!selectedBook.value) return 0;
+    return ((dailyGoal.value / selectedBook.value.words) * 100).toFixed(2);
+});
+
+// 动态提示文案
+const dynamicTipText = computed(() => {
+    if (dailyGoal.value <= 20) {
+        return '稳扎稳打的节奏！这个计划非常适合长期坚持，每天轻松完成目标，积少成多。';
+    } else if (dailyGoal.value <= 40) {
+        return '科学合理的选择！保持每天稳定的学习节奏比偶尔的高强度更有助于长期记忆。';
+    } else if (dailyGoal.value <= 80) {
+        return '有挑战性的目标！需要每天投入更多时间，但能更快完成词书。记得劳逸结合哦。';
+    } else if (dailyGoal.value <= 120) {
+        return '高强度学习计划！适合有充足时间和强大毅力的学习者。注意不要给自己太大压力。';
+    } else {
+        return '极限挑战模式！这需要极强的自律和大量时间投入。建议根据实际情况适当调整。';
+    }
+});
+
+// 获取预设选项标签
+const getOptionLabel = (option) => {
+    if (option <= 30) return '轻松';
+    if (option <= 60) return '适中';
+    return '挑战';
+};
 
 // 获取词书
 const fetchWordBooks = async () => {
     try {
         const response = await getWordBooksAPI();
-        console.log('获取词书成功:', response);
         wordBooks.value = response.data.wordBooks;
     } catch (error) {
         console.error('获取词书失败:', error);
@@ -225,7 +283,7 @@ const confirmSettings = () => {
 
     // 添加触觉反馈
     uni.vibrateShort({
-        type: 'heavy'
+        type: 'medium'
     });
 };
 onMounted(() => {
@@ -476,6 +534,114 @@ onMounted(() => {
     font-weight: 500;
 }
 
+/* 强度徽章 */
+.intensity-badge {
+    margin-top: 16rpx;
+    padding: 8rpx 24rpx;
+    border-radius: 40rpx;
+    font-size: 24rpx;
+    font-weight: 600;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.intensity-badge.easy {
+    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+    box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.3);
+}
+
+.intensity-badge.medium {
+    background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+    box-shadow: 0 4rpx 12rpx rgba(255, 152, 0, 0.3);
+}
+
+.intensity-badge.hard {
+    background: linear-gradient(135deg, #F44336 0%, #E91E63 100%);
+    box-shadow: 0 4rpx 12rpx rgba(244, 67, 54, 0.3);
+}
+
+.intensity-badge.extreme {
+    background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
+    box-shadow: 0 4rpx 12rpx rgba(156, 39, 176, 0.3);
+}
+
+.badge-text {
+    color: #FFFFFF;
+    font-size: 24rpx;
+}
+
+/* 学习统计卡片 */
+.stats-cards {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 30rpx;
+    margin-bottom: 50rpx;
+    gap: 20rpx;
+}
+
+.stat-card {
+    flex: 1;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+    border-radius: 20rpx;
+    padding: 30rpx 20rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+    border: 2rpx solid #E8EAF6;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease backwards;
+}
+
+.stat-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card:active {
+    transform: scale(0.95);
+}
+
+.stat-value {
+    font-size: 30rpx;
+    font-weight: 700;
+    color: #1A202C;
+    margin: 12rpx 0 8rpx;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 24rpx;
+    color: #718096;
+    font-weight: 500;
+}
+
 /* 预设选项 */
 .preset-options {
     display: flex;
@@ -507,9 +673,18 @@ onMounted(() => {
     font-size: 28rpx;
     color: #4A5568;
     font-weight: 600;
+    display: block;
 }
 
-.option-item.active .option-text {
+.option-subtitle {
+    font-size: 22rpx;
+    color: #A0AEC0;
+    margin-top: 6rpx;
+    display: block;
+}
+
+.option-item.active .option-text,
+.option-item.active .option-subtitle {
     color: #FFFFFF;
 }
 
