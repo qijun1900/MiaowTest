@@ -11,17 +11,33 @@
 
                 <!-- 词书列表 -->
                 <scroll-view class="book-list" scroll-y>
-                    <view v-for="(book, index) in wordBooks" :key="book.id" class="book-card"
-                        :class="{ 'selected': selectedBook?.id === book.id }"
-                        :style="{ animationDelay: `${index * 0.1}s` }" @click="selectBook(book)">
+                    <view 
+                        v-for="(book, index) in wordBooks" 
+                        :key="book._id" 
+                        class="book-card"
+                        :class="{ 'selected': selectedBook?._id === book._id }"
+                        :style="{ animationDelay: `${index * 0.1}s` }" 
+                        @click="selectBook(book)">
                         <view class="card-content">
-                            <image class="book-cover" :src="book.cover"></image>
+                            <image class="book-cover" 
+                            :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" ></image>
                             <view class="book-info">
-                                <text class="book-name">{{ book.name }}</text>
-                                <text class="book-desc">{{ book.description }}</text>
+                                <text class="book-name">{{ book.title }}</text>
+                                <view class="book-tags">                            
+                                    <up-tag 
+                                    v-for="(tag, tagIndex) in book.tags" 
+                                    :key="tagIndex" 
+                                    :text="tag" 
+                                    plain 
+                                    size="mini" 
+                                    type="warning" 
+                                    plainFill 
+                                    style="margin-right: 12rpx;">
+                                    </up-tag>
+                                </view>
                                 <view class="book-count">
-                                    <text class="count-icon">📚</text>
-                                    <text class="count-text">{{ book.wordCount.toLocaleString() }} 单词</text>
+                                    <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
+                                    <text class="count-text">{{ book.words }} 单词</text>
                                 </view>
                             </view>
                         </view>
@@ -66,17 +82,24 @@
                         <text class="label-text">较慢</text>
                         <text class="label-text">较快</text>
                     </view>
-                    <slider class="goal-slider" :value="dailyGoal" :min="5" :max="100" :step="5" activeColor="#2196F3"
-                        backgroundColor="#E0E0E0" block-size="24" @change="onSliderChange" />
+                    <slider class="goal-slider" 
+                        :value="dailyGoal" 
+                        :min="10" 
+                        :max="200" 
+                        :step="5" 
+                        activeColor="#2196F3"
+                        backgroundColor="#E0E0E0" 
+                        block-size="24" 
+                        @change="onSliderChange" />
                     <view class="slider-range">
-                        <text class="range-text">5词/日</text>
-                        <text class="range-text">100词/日</text>
+                        <text class="range-text">10词/日</text>
+                        <text class="range-text">200词/日</text>
                     </view>
                 </view>
 
                 <!-- 提示信息 -->
                 <view class="tip-box">
-                    <text class="tip-text">根据您的词书总量，当前计划是一个非常科学的选择。保持每天稳定的学习节奏比偶尔的高强度更有助于长期记忆。</text>
+                    <text class="tip-text">根据您的词书总量，当前计划是一个非常科学的选择。保持每天稳定的学习节奏比偶尔的高强度更有助于长期记忆。您可以随时更改目标。</text>
                 </view>
             </view>
         </transition>
@@ -99,111 +122,31 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed,onMounted } from 'vue';
+import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
+import escconfig from '../../../config/esc.config';
 
 // 定义 emit
 const emit = defineEmits(['complete']);
-
 // 当前步骤
 const currentStep = ref(1);
-
 // 选中的词书
 const selectedBook = ref(null);
-
 // 每日目标
 const dailyGoal = ref(30);
-
 // 预设选项
 const presetOptions = [10, 20, 30, 50];
-
 // 词书列表数据
-const wordBooks = ref([
-    {
-        id: 1,
-        name: '大学英语四级',
-        description: '夯实基础，轻松过级',
-        wordCount: 4520,
-        cover: 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067',
-        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    },
-    {
-        id: 2,
-        name: '雅思核心词汇',
-        description: '出国留学必备高频词',
-        wordCount: 3800,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #5f9ea0 0%, #2e8b57 100%)'
-    },
-    {
-        id: 3,
-        name: '托福金级词汇',
-        description: '学术场景全覆盖',
-        wordCount: 5200,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #87ceeb 0%, #4682b4 100%)'
-    },
-    {
-        id: 4,
-        name: 'GRE词汇精选',
-        description: '攻克高级学术难关',
-        wordCount: 6000,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #f0e68c 0%, #daa520 100%)'
-    },
-    {
-        id: 5,
-        name: '考研英语核心',
-        description: '历年真题高频收录',
-        wordCount: 5500,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)'
-    },
-    {
-        id: 6,
-        name: '大学英语四级',
-        description: '夯实基础，轻松过级',
-        wordCount: 4520,
-        cover: 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067',
-        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    },
-    {
-        id: 7,
-        name: '雅思核心词汇',
-        description: '出国留学必备高频词',
-        wordCount: 3800,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #5f9ea0 0%, #2e8b57 100%)'
-    },
-    {
-        id: 8,
-        name: '托福金级词汇',
-        description: '学术场景全覆盖',
-        wordCount: 5200,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #87ceeb 0%, #4682b4 100%)'
-    },
-    {
-        id: 9,
-        name: 'GRE词汇精选',
-        description: '攻克高级学术难关',
-        wordCount: 6000,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #f0e68c 0%, #daa520 100%)'
-    },
-    {
-        id: 10,
-        name: '考研英语核心',
-        description: '历年真题高频收录',
-        wordCount: 5500,
-        cover: '/static/other/cover.jpg',
-        gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)'
-    }
-]);
+const wordBooks = ref([]);
+
+const baseImageUrl = computed(() => {
+    return escconfig.ossDomain 
+})
 
 // 计算预计完成天数
 const estimatedDays = computed(() => {
-    if (!selectedBook.value || !dailyGoal.value) return 0;
-    return Math.ceil(selectedBook.value.wordCount / dailyGoal.value);
+    if (!selectedBook.value ||  !dailyGoal.value) return 0;
+    return Math.ceil(selectedBook.value.words / dailyGoal.value);
 });
 
 // 计算进度条旋转角度
@@ -211,6 +154,17 @@ const progressRotation = computed(() => {
     const percentage = (dailyGoal.value - 5) / (100 - 5);
     return percentage * 270 - 135; // -135度到135度的范围
 });
+
+// 获取词书
+const fetchWordBooks = async () => {
+    try {
+        const response = await getWordBooksAPI();
+        console.log('获取词书成功:', response);
+        wordBooks.value = response.data.wordBooks;
+    } catch (error) {
+        console.error('获取词书失败:', error);
+    } 
+};
 
 // 选择词书
 const selectBook = (book) => {
@@ -274,6 +228,9 @@ const confirmSettings = () => {
         type: 'heavy'
     });
 };
+onMounted(() => {
+    fetchWordBooks();
+});
 </script>
 
 <style scoped>
@@ -403,26 +360,19 @@ const confirmSettings = () => {
 }
 
 .book-name {
-    font-size: 36rpx;
+    font-size: 30rpx;
     font-weight: 600;
     color: #1A202C;
     margin-bottom: 12rpx;
 }
 
-.book-desc {
-    font-size: 26rpx;
-    color: #718096;
+.book-tags {
     margin-bottom: 20rpx;
 }
 
 .book-count {
     display: flex;
     align-items: center;
-}
-
-.count-icon {
-    font-size: 28rpx;
-    margin-right: 8rpx;
 }
 
 .count-text {
