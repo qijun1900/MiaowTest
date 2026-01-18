@@ -112,6 +112,7 @@ const fetchWordBooks = async () => {
         }
     } catch (error) {
         console.error("Error fetching word books:", error);
+        loading.value = false;
     }
 };
 

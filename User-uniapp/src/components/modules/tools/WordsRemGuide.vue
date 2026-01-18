@@ -11,7 +11,10 @@
 
                 <!-- 词书列表 -->
                 <scroll-view class="book-list" scroll-y>
+                    <!-- 加载中提示 -->
+                    <ThemeLoading v-if="loading" text="正在加载中..." />
                     <view 
+                        v-else 
                         v-for="(book, index) in wordBooks" 
                         :key="book._id" 
                         class="book-card"
@@ -89,8 +92,10 @@
                 <view class="preset-options">
                     <view 
                         v-for="option in presetOptions" 
-                        :key="option" class="option-item"
-                        :class="{ 'active': dailyGoal === option }" @click="selectGoal(option)">
+                        :key="option" 
+                        class="option-item"
+                        :class="{ 'active': dailyGoal === option }" 
+                        @click="selectGoal(option)">
                         <text class="option-text">{{ option }}词/天</text>
                         <text class="option-subtitle">{{ getOptionLabel(option) }}</text>
                     </view>
@@ -146,6 +151,7 @@
 import { ref, computed,onMounted } from 'vue';
 import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import escconfig from '../../../config/esc.config';
+import ThemeLoading from '../../core/ThemeLoading.vue';
 
 // 定义 emit
 const emit = defineEmits(['complete']);
@@ -159,6 +165,7 @@ const dailyGoal = ref(30);
 const presetOptions = [20, 30, 50,100];
 // 词书列表数据
 const wordBooks = ref([]);
+const loading = ref(false);
 
 const baseImageUrl = computed(() => {
     return escconfig.ossDomain 
@@ -218,11 +225,14 @@ const getOptionLabel = (option) => {
 
 // 获取词书
 const fetchWordBooks = async () => {
+    loading.value = true;
     try {
         const response = await getWordBooksAPI();
         wordBooks.value = response.data.wordBooks;
+        loading.value = false;
     } catch (error) {
         console.error('获取词书失败:', error);
+        loading.value = false;
     } 
 };
 

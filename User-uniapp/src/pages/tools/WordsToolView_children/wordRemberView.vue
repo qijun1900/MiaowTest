@@ -148,7 +148,7 @@ import { getGreetingInfo } from '../../../util/greet';
 import userAvatar from '../../../components/core/userAvatar.vue';
 
 // 控制是否显示引导页
-const iSshowGuide = ref(false);
+const iSshowGuide = ref(true);
 
 
 // 处理引导完成事件
