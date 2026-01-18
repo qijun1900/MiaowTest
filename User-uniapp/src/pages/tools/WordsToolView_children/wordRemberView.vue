@@ -18,11 +18,7 @@
                         <text class="streak-days">12 天</text>
                     </view>
                     <view class="notification-icon">
-                        <image
-                            class="header-setting-icon"
-                            src="/static/navMy/c-my-setting.png"
-                            mode="aspectFit"
-                        />
+                        <uni-icons type="gear-filled" size="26" color="#FF9800"></uni-icons>
                     </view>
                 </view>
             </view>
@@ -102,6 +98,7 @@
             <!-- 统计数据区域 -->
             <view class="stats-section">
                 <view class="stat-item">
+                    <view class="stat-glow stat-glow-blue"></view>
                     <view class="stat-icon blue-icon">
                         <image
                             class="stat-icon-image"
@@ -113,6 +110,7 @@
                     <text class="stat-label">新词学习</text>
                 </view>
                 <view class="stat-item">
+                    <view class="stat-glow stat-glow-purple"></view>
                     <view class="stat-icon purple-icon">
                          <image
                             class="stat-icon-image"
@@ -124,6 +122,7 @@
                     <text class="stat-label">待复习</text>
                 </view>
                 <view class="stat-item">
+                    <view class="stat-glow stat-glow-green"></view>
                     <view class="stat-icon green-icon">
                         <image
                             class="stat-icon-image"
@@ -772,54 +771,194 @@ const handleGuideComplete = (settings) => {
 .stats-section {
     display: flex;
     justify-content: space-between;
-    padding: 0 40rpx;
+    gap: 20rpx;
+    padding: 0rpx 20rpx;
     margin-bottom: 120rpx;
 }
 
+/* 光晕效果 */
+.stat-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    opacity: 0;
+    filter: blur(30rpx);
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.stat-glow-blue {
+    background: radial-gradient(circle, rgba(33, 150, 243, 0.4), transparent);
+}
+
+.stat-glow-purple {
+    background: radial-gradient(circle, rgba(156, 39, 176, 0.4), transparent);
+}
+
+.stat-glow-green {
+    background: radial-gradient(circle, rgba(76, 175, 80, 0.4), transparent);
+}
+
+.stat-item:active .stat-glow {
+    opacity: 1;
+}
+
 .stat-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+    backdrop-filter: blur(20rpx);
+    -webkit-backdrop-filter: blur(20rpx);
+    border-radius: 28rpx;
+    padding: 40rpx 20rpx 32rpx;
+    margin: 0 4rpx;
+    box-shadow: 
+        0 8rpx 32rpx rgba(0, 0, 0, 0.08),
+        0 2rpx 8rpx rgba(0, 0, 0, 0.04),
+        inset 0 1rpx 2rpx rgba(255, 255, 255, 1);
+    border: 1rpx solid rgba(255, 255, 255, 0.6);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.stat-item::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: all 0.6s ease;
+    pointer-events: none;
+}
+
+.stat-item:active {
+    transform: translateY(-6rpx) scale(0.98);
+    box-shadow: 
+        0 12rpx 40rpx rgba(0, 0, 0, 0.12),
+        0 4rpx 12rpx rgba(0, 0, 0, 0.06),
+        inset 0 1rpx 2rpx rgba(255, 255, 255, 1);
+}
+
+.stat-item:active::before {
+    opacity: 1;
+}
+
+.stat-item:active::after {
+    opacity: 1;
+    top: -25%;
+    left: -25%;
 }
 
 .stat-icon {
     width: 100rpx;
     height: 100rpx;
-    border-radius: 20rpx;
+    border-radius: 24rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 32rpx;
-    margin-bottom: 20rpx;
+    margin-bottom: 24rpx;
+    position: relative;
+    box-shadow: 
+        0 4rpx 16rpx rgba(0, 0, 0, 0.06),
+        inset 0 1rpx 1rpx rgba(255, 255, 255, 0.8);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 24rpx;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.stat-item:active .stat-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 
+        0 6rpx 20rpx rgba(0, 0, 0, 0.1),
+        inset 0 2rpx 4rpx rgba(255, 255, 255, 1);
 }
 
 .blue-icon {
-    background: rgba(33, 150, 243, 0.1);
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(33, 150, 243, 0.08));
+    border: 1rpx solid rgba(33, 150, 243, 0.2);
 }
 
 .purple-icon {
-    background: rgba(156, 39, 176, 0.1);
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.15), rgba(156, 39, 176, 0.08));
+    border: 1rpx solid rgba(156, 39, 176, 0.2);
 }
 
 .green-icon {
-    background: rgba(76, 175, 80, 0.1);
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.08));
+    border: 1rpx solid rgba(76, 175, 80, 0.2);
 }
-.stat-icon-image{
+
+.stat-icon-image {
     width: 52rpx;
     height: 52rpx;
 }
 
 .stat-number {
-    font-size: 40rpx;
+    font-size: 44rpx;
     color: #333;
     font-weight: 700;
-    margin-bottom: 8rpx;
+    margin-bottom: 12rpx;
+    line-height: 1;
+    text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: numberFadeIn 0.6s ease-out;
+}
+
+@keyframes numberFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .stat-label {
     font-size: 24rpx;
     color: #666;
+    letter-spacing: 0.5rpx;
+    opacity: 0.9;
+    font-weight: 500;
 }
 
 .badge {
@@ -836,5 +975,6 @@ const handleGuideComplete = (settings) => {
     justify-content: center;
     font-size: 20rpx;
     font-weight: 600;
+    box-shadow: 0 2rpx 8rpx rgba(255, 87, 34, 0.4);
 }
 </style>
