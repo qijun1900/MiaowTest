@@ -1,7 +1,7 @@
 <template>
     <view class="word-remember-container">
         <view v-if="iSshowGuide">
-          <WordsRemGuide @complete="handleGuideComplete" />
+            <WordsRemGuide @complete="handleGuideComplete" />
         </view>
         <view v-else>
             <!-- 顶部用户信息栏 -->

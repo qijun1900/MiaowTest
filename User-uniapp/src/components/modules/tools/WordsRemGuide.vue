@@ -11,14 +11,9 @@
 
                 <!-- 词书列表 -->
                 <scroll-view class="book-list" scroll-y>
-                    <view 
-                        v-for="(book, index) in wordBooks" 
-                        :key="book.id"
-                        class="book-card"
+                    <view v-for="(book, index) in wordBooks" :key="book.id" class="book-card"
                         :class="{ 'selected': selectedBook?.id === book.id }"
-                        :style="{ animationDelay: `${index * 0.1}s` }"
-                        @click="selectBook(book)"
-                    >
+                        :style="{ animationDelay: `${index * 0.1}s` }" @click="selectBook(book)">
                         <view class="card-content">
                             <image class="book-cover" :src="book.cover"></image>
                             <view class="book-info">
@@ -59,13 +54,8 @@
 
                 <!-- 预设目标选项 -->
                 <view class="preset-options">
-                    <view 
-                        v-for="option in presetOptions" 
-                        :key="option"
-                        class="option-item"
-                        :class="{ 'active': dailyGoal === option }"
-                        @click="selectGoal(option)"
-                    >
+                    <view v-for="option in presetOptions" :key="option" class="option-item"
+                        :class="{ 'active': dailyGoal === option }" @click="selectGoal(option)">
                         <text class="option-text">{{ option }}词/天</text>
                     </view>
                 </view>
@@ -76,17 +66,8 @@
                         <text class="label-text">较慢</text>
                         <text class="label-text">较快</text>
                     </view>
-                    <slider 
-                        class="goal-slider"
-                        :value="dailyGoal" 
-                        :min="5" 
-                        :max="100" 
-                        :step="5"
-                        activeColor="#2196F3"
-                        backgroundColor="#E0E0E0"
-                        block-size="24"
-                        @change="onSliderChange"
-                    />
+                    <slider class="goal-slider" :value="dailyGoal" :min="5" :max="100" :step="5" activeColor="#2196F3"
+                        backgroundColor="#E0E0E0" block-size="24" @change="onSliderChange" />
                     <view class="slider-range">
                         <text class="range-text">5词/日</text>
                         <text class="range-text">100词/日</text>
@@ -101,30 +82,16 @@
         </transition>
 
         <view class='bottom'>
-            <up-button
-                @click="goToStep2"
-                v-if="currentStep === 1" 
-                type="primary"
-                :disabled="selectedBook === null"
-                :plain="selectedBook === null ? true : false"
-                :icon="selectedBook === null ? '' : 'checkmark'"
-                >
-                {{  '下一步'  }}
+            <up-button @click="goToStep2" v-if="currentStep === 1" type="primary" :disabled="selectedBook === null"
+                :plain="selectedBook === null ? true : false" :icon="selectedBook === null ? '' : 'checkmark'">
+                {{ '下一步' }}
             </up-button>
-            <view
-                v-if="currentStep === 2"
-                class="step2-buttons">
-                <up-button
-                    @click="goToStep1"
-                    type="primary"
-                    >
-                    {{  ' 上一步'  }}
+            <view v-if="currentStep === 2" class="step2-buttons">
+                <up-button @click="goToStep1" type="primary">
+                    {{ ' 上一步' }}
                 </up-button>
-                <up-button
-                    @click="confirmSettings"
-                    type="primary"
-                    >
-                    {{  '确认设置'  }}
+                <up-button @click="confirmSettings" type="primary">
+                    {{ '确认设置' }}
                 </up-button>
             </view>
         </view>
@@ -291,17 +258,17 @@ const confirmSettings = () => {
         goal: dailyGoal.value,
         estimatedDays: estimatedDays.value
     };
-    
+
     // 触发完成事件
     emit('complete', settings);
-    
+
     // 显示成功提示
     uni.showToast({
         title: '设置成功',
         icon: 'success',
         duration: 2000
     });
-    
+
     // 添加触觉反馈
     uni.vibrateShort({
         type: 'heavy'
@@ -498,7 +465,7 @@ const confirmSettings = () => {
     height: 100%;
     border-radius: 50%;
     background: #F7FAFC;
-    box-shadow: 
+    box-shadow:
         inset 0 0 0 20rpx #E2E8F0;
 }
 
@@ -509,26 +476,20 @@ const confirmSettings = () => {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: conic-gradient(
-        from 0deg at 50% 50%,
-        #2196F3 0deg,
-        #2196F3 135deg,
-        transparent 135deg
-    );
-    mask: radial-gradient(
-        circle at center,
-        transparent 160rpx,
-        black 160rpx,
-        black 180rpx,
-        transparent 180rpx
-    );
-    -webkit-mask: radial-gradient(
-        circle at center,
-        transparent 160rpx,
-        black 160rpx,
-        black 180rpx,
-        transparent 180rpx
-    );
+    background: conic-gradient(from 0deg at 50% 50%,
+            #2196F3 0deg,
+            #2196F3 135deg,
+            transparent 135deg);
+    mask: radial-gradient(circle at center,
+            transparent 160rpx,
+            black 160rpx,
+            black 180rpx,
+            transparent 180rpx);
+    -webkit-mask: radial-gradient(circle at center,
+            transparent 160rpx,
+            black 160rpx,
+            black 180rpx,
+            transparent 180rpx);
     transition: transform 0.3s ease;
 }
 
@@ -652,7 +613,7 @@ const confirmSettings = () => {
 }
 
 /* 底部按钮样式 */
-.bottom{
+.bottom {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -660,7 +621,7 @@ const confirmSettings = () => {
     height: 110rpx;
     background-color: #ffffff;
     display: flex;
-    justify-content: space-between; 
+    justify-content: space-between;
     align-items: center;
     padding: 0 30rpx;
     z-index: 100;
@@ -672,6 +633,7 @@ const confirmSettings = () => {
         transform: translateY(100%);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -692,6 +654,7 @@ const confirmSettings = () => {
         opacity: 0;
         transform: scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
