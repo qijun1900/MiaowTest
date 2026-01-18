@@ -7,9 +7,12 @@
             <!-- 顶部用户信息栏 -->
             <view class="top-header">
                 <view class="user-info">
-                    <image class="avatar" src="/static/other/default-avatar.png" mode="aspectFill"></image>
-                    <view class="online-dot"></view>
-                    <text class="greeting">早上好</text>
+                    <userAvatar
+                        :width="80"
+                        :height="80"
+                        :show-online="true"
+                        />
+                    <text class="greeting">{{ getGreetingInfo().text }}</text>
                     <text class="username">同学</text>
                 </view>
                 <view class="streak-info">
@@ -141,9 +144,12 @@
 <script setup>
 import { ref } from 'vue';
 import WordsRemGuide from '../../../components/modules/tools/WordsRemGuide.vue';
+import { getGreetingInfo } from '../../../util/greet';
+import userAvatar from '../../../components/core/userAvatar.vue';
 
 // 控制是否显示引导页
 const iSshowGuide = ref(false);
+
 
 // 处理引导完成事件
 const handleGuideComplete = (settings) => {
@@ -175,28 +181,12 @@ const handleGuideComplete = (settings) => {
     position: relative;
 }
 
-.avatar {
-    width: 80rpx;
-    height: 80rpx;
-    border-radius: 50%;
-    margin-right: 20rpx;
-}
-
-.online-dot {
-    position: absolute;
-    left: 60rpx;
-    top: 60rpx;
-    width: 20rpx;
-    height: 20rpx;
-    background: #4CAF50;
-    border-radius: 50%;
-    border: 4rpx solid #fff;
-}
 
 .greeting {
     font-size: 28rpx;
     color: #666;
     margin-right: 10rpx;
+    margin-left: 15rpx;
 }
 
 .username {

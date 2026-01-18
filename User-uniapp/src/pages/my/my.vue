@@ -9,11 +9,9 @@
     <!-- 用户信息区域 -->
     <view class="user-info" :style="{ marginTop: (navBarInfo.totalHeight - 5) + 'px' }">
       <view class="avatar-wrapper">
-        <image 
-          class="avatar" 
-          :src="userInfoStore.isLoggedIn ? (userInfoStore.userInfo?.avatar || '/static/other/default-avatar.png') : '/static/other/default-user.png'"  
-          mode="aspectFill"
-        ></image>
+        <userAvatar
+          :showOnline="false"
+          />
       </view>
       <view class="user-detail" @click="handleUserinfo">
         <view class="user-info-content">
@@ -101,6 +99,7 @@ import CustomNavbar from '../../components/core/CustomNavbar.vue';
 import { clearExamCache } from '../../util/cacheCleaner.js';
 import showShareMenu from '../../util/wechatShare.js';
 import UserAgreementTips from '../../components/modules/my/UserAgreementTips.vue';
+import userAvatar from '../../components/core/userAvatar.vue';
 
 const LoginOverlayShow = ref(false);
 const AuthorOverlayShow = ref(false);

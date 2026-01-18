@@ -3,11 +3,11 @@
     <!-- 用户头像区域 -->
     <view class="avatar-section" @click="handleEditAvatar">
       <view class="avatar-wrapper">
-        <image 
-          class="avatar" 
-          :src="userInfoStore.userInfo?.avatar || '/static/other/default-avatar.png'" 
-          mode="aspectFill"
-        ></image>
+        <userAvatar
+          :width="160"
+          :height="160"
+          :showOnline="true"
+          />
       </view>
       <view class="edit-avatar-btn" >
         <up-icon name="edit-pen" size="16px"></up-icon>
@@ -77,6 +77,7 @@ import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import handleCopy from '../../util/copy';
 import { updateUserInfo } from '../../API/My/UserInfoUpdateAPI';//checkUserBind
 import { onMounted,ref } from 'vue';
+import userAvatar from '../../components/core/userAvatar.vue';
 
 const  accountBindStatus = ref(false);// 账号绑定状态
 const userInfoStore = UserInfoStore();
@@ -271,13 +272,6 @@ onMounted(() => {
 
 .avatar-wrapper {
   margin-bottom: 20rpx;
-}
-
-.avatar {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 80rpx;
-  background-color: #eaeaea;
 }
 
 .edit-avatar-btn {
