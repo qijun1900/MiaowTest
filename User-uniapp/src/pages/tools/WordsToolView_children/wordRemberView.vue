@@ -102,20 +102,37 @@
             <!-- 统计数据区域 -->
             <view class="stats-section">
                 <view class="stat-item">
-                    <view class="stat-icon blue-icon">📚</view>
+                    <view class="stat-icon blue-icon">
+                        <image
+                            class="stat-icon-image"
+                            src="/static/tools/tools-view-words.png"
+                            mode="aspectFit"
+                        />
+                    </view>
                     <text class="stat-number">15</text>
                     <text class="stat-label">新词学习</text>
                 </view>
                 <view class="stat-item">
-                    <view class="stat-icon purple-icon">📖</view>
+                    <view class="stat-icon purple-icon">
+                         <image
+                            class="stat-icon-image"
+                            src="/static/tools/tools-view-review.png"
+                            mode="aspectFit"
+                        />
+                    </view>
                     <text class="stat-number">20</text>
                     <text class="stat-label">待复习</text>
                 </view>
                 <view class="stat-item">
-                    <view class="stat-icon green-icon">✅</view>
+                    <view class="stat-icon green-icon">
+                        <image
+                            class="stat-icon-image"
+                            src="/static/other/right.png"
+                            mode="aspectFit"
+                        />
+                    </view>
                     <text class="stat-number">850</text>
                     <text class="stat-label">已掌握</text>
-                    <view class="badge">1</view>
                 </view>
             </view>
         </view>
@@ -127,7 +144,7 @@ import { ref } from 'vue';
 import WordsRemGuide from '../../../components/modules/tools/WordsRemGuide.vue';
 
 // 控制是否显示引导页
-const iSshowGuide = ref(true);
+const iSshowGuide = ref(false);
 
 // 处理引导完成事件
 const handleGuideComplete = (settings) => {
@@ -767,8 +784,8 @@ const handleGuideComplete = (settings) => {
 }
 
 .stat-icon {
-    width: 80rpx;
-    height: 80rpx;
+    width: 100rpx;
+    height: 100rpx;
     border-radius: 20rpx;
     display: flex;
     align-items: center;
@@ -787,6 +804,10 @@ const handleGuideComplete = (settings) => {
 
 .green-icon {
     background: rgba(76, 175, 80, 0.1);
+}
+.stat-icon-image{
+    width: 52rpx;
+    height: 52rpx;
 }
 
 .stat-number {
