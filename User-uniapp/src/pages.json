@@ -235,6 +235,12 @@
 			"style": {
 				"navigationBarTitleText": "我的题库"
 			}
+		},
+		{
+			"path": "pages/tools/WordsToolView_children/wordSettingView",
+			"style": {
+				"navigationBarTitleText": "单词设置"
+			}
 		}
 	],
 	"globalStyle": {

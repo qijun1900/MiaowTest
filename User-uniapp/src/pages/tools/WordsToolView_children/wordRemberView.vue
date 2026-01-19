@@ -20,7 +20,7 @@
                         <text class="fire-icon">🔥</text>
                         <text class="streak-days">12 天</text>
                     </view>
-                    <view class="notification-icon">
+                    <view class="notification-icon" @click="handleGoWordSetting">
                         <uni-icons type="gear-filled" size="26" color="#FF9800"></uni-icons>
                     </view>
                 </view>
@@ -78,7 +78,7 @@
                         <view class="progress-info">
                             <text class="current">35</text>
                             <text class="separator">/</text>
-                            <text class="total">50</text>
+                            <text class="total">{{ goal }}</text>
                             <text class="unit">词</text>
                         </view>
                         <view class="progress-bar-mini">
@@ -150,12 +150,15 @@ import {setWordRember,checkWordRember} from '../../../API/Vocabulary/WordRemberA
 
 // 控制是否显示引导页
 const iSshowGuide = ref(false);
+const goal = ref(0);
+
 onMounted(async () => {
     try {
         const res = await checkWordRember();
         if (res.code === 200) {
             const { currentBook_id, dailyGoal } = res.data;
             iSshowGuide.value = !currentBook_id || !dailyGoal;
+            goal.value = dailyGoal;
         } else {
             iSshowGuide.value = true;
         }
@@ -163,6 +166,10 @@ onMounted(async () => {
         console.error('检查用户设置失败:', error);
         iSshowGuide.value = true;
     }
+    uni.$on('updateWordRember', (newSettings) => {
+        goal.value = newSettings.dailyGoal;
+        console.log(newSettings);
+    });
 });
 
 // 处理引导完成事件
@@ -176,6 +183,7 @@ const handleGuideComplete = (settings) => {
     }).then(res => {
        if(res.code===200){
         // 显示成功提示
+        goal.value = settings.dailyGoal;
         uni.showToast({
             title: '设置成功',
             icon: 'success',
@@ -195,6 +203,12 @@ const handleGuideComplete = (settings) => {
        }
     });
 };
+
+const handleGoWordSetting = () => {
+    uni.navigateTo({
+        url: '/pages/tools/WordsToolView_children/wordSettingView'
+    });
+}
 </script>
 
 <style scoped>

@@ -12,7 +12,7 @@
                 <!-- 词书列表 -->
                 <scroll-view class="book-list" scroll-y>
                     <!-- 加载中提示 -->
-                    <ThemeLoading v-if="loading" text="正在加载中..." />
+                    <ThemeLoading v-if="loading" text="正在加载词书..." />
                     <view 
                         v-else 
                         v-for="(book, index) in wordBooks" 
