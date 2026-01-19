@@ -1,6 +1,35 @@
 <template>
   <view class="container">
     <view class="content">
+      <!-- 当前正在学习的词书卡片 -->
+      <view class="current-book-card">
+        <view class="current-header">
+          <text class="current-label">当前正在学习</text>
+        </view>
+        <view class="current-content">
+          <view class="current-book-cover-wrapper">
+            <image 
+              src="https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067" 
+              class="current-book-cover" 
+              mode="aspectFill"
+            />
+          </view>
+          <view class="current-book-info">
+            <text class="current-book-title">雅思核心词汇</text>
+            <view class="current-stats">
+              <view class="stat-item">
+                <text class="stat-value">3500</text>
+                <text class="stat-label">词</text>
+              </view>
+              <view class="stat-divider"></view>
+              <view class="stat-item">
+                <text class="stat-label">词书总量</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
       <view class="setting-card">
         <view class="card-header">
           <view class="header-icon">
@@ -169,11 +198,110 @@ onMounted(() => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #E3F2FD 0%, #F5F5F5 100%);
+  background: linear-gradient(180deg, #e8f5ff 0%, #F5F5F5 100%);
 }
 
 .content {
   padding: 20rpx 24rpx 120rpx;
+}
+
+/* 当前正在学习的词书卡片 */
+.current-book-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #cee9ff 100%);
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(33, 150, 243, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.current-book-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200rpx;
+  height: 200rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+  border-radius: 50%;
+}
+
+.current-header {
+  margin-bottom: 24rpx;
+}
+
+.current-label {
+  font-size: 26rpx;
+  color: #1976D2;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+.current-content {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.current-book-cover-wrapper {
+  width: 100rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.15);
+  border: 3rpx solid rgba(255, 255, 255, 0.8);
+}
+
+.current-book-cover {
+  width: 100%;
+  height: 100%;
+}
+
+.current-book-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.current-book-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1565C0;
+  line-height: 1.3;
+}
+
+.current-stats {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.stat-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+}
+
+.stat-value {
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #FF9800;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #64B5F6;
+  font-weight: 500;
+}
+
+.stat-divider {
+  width: 2rpx;
+  height: 32rpx;
+  background: rgba(33, 150, 243, 0.3);
 }
 
 .setting-card {
@@ -241,8 +369,8 @@ onMounted(() => {
 }
 
 .book-cover-wrapper {
-  width: 100rpx;
-  height: 140rpx;
+  width: 110rpx;
+  height: 150rpx;
   border-radius: 12rpx;
   overflow: hidden;
   flex-shrink: 0;
