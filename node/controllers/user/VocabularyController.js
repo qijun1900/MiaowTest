@@ -50,6 +50,36 @@ const VocabularyController = {
                 message: "设置词书和每日词数失败" 
             });
         }
+    },
+    checkWordRember: async (req, res) => {
+        try {
+            const { uid } = req.user
+            if (!uid) {
+                return res.send({ 
+                    code: 401, 
+                    message: '您未登录' 
+                }); 
+            }
+            const data = await VocabularyService.checkWordRember({ uid });
+            if (!data.currentBook_id && !data.dailyGoal) {
+                return res.send({ 
+                    code: 400, 
+                    isInit: false
+                }); 
+            }else{
+                res.send({
+                    code: 200,
+                    data,
+                    isInit: true
+                });
+            }
+        } catch (error) {
+            console.error("检查词书和每日词数失败", error);
+            res.status(500).send({ 
+                code: 500,
+                message: "检查词书和每日词数失败" 
+            });
+        }
     }
 };
 

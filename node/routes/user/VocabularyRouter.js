@@ -7,5 +7,7 @@ var VocabularyRouter = express.Router();
 VocabularyRouter.get("/uniappAPI/tools/vocabulary/getWordBooks", JWT.verifyTokenMiddleware(),VocabularyController.getWordBooks)
 //设置词书和每日词数
 VocabularyRouter.post("/uniappAPI/tools/vocabulary/setting/setWordRember", JWT.verifyTokenMiddleware(),VocabularyController.setWordRember)
+//检查用户是否设置了词书和每日词数
+VocabularyRouter.get("/uniappAPI/tools/vocabulary/check/getWordRember", JWT.verifyTokenMiddleware(),VocabularyController.checkWordRember)
 
 module.exports = VocabularyRouter;

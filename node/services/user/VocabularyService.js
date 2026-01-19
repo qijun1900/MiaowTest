@@ -52,6 +52,18 @@ const VocabularyService = {
             console.error("设置用户单词书和每日词数失败", error);
             throw error;
         }
+    },
+    checkWordRember: async ({ uid }) => {
+        try{
+            const userSettings = await ConsumerWordModel.findOne({ uid }, { 'settings.currentBook_id': 1, 'settings.dailyGoal': 1 });
+            return {
+                currentBook_id: userSettings?.settings?.currentBook_id || null,
+                dailyGoal: userSettings?.settings?.dailyGoal || null
+            };
+        }catch (error) {
+            console.error("检查用户单词书设置失败", error);
+            throw error;
+        }
     }
 }
 module.exports = VocabularyService;

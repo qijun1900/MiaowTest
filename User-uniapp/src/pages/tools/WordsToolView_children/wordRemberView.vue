@@ -142,14 +142,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import WordsRemGuide from '../../../components/modules/tools/WordsRemGuide.vue';
 import { getGreetingInfo } from '../../../util/greet';
 import userAvatar from '../../../components/core/userAvatar.vue';
-import {setWordRember} from '../../../API/Vocabulary/WordRemberAPI.js';
+import {setWordRember,checkWordRember} from '../../../API/Vocabulary/WordRemberAPI.js';
 
 // 控制是否显示引导页
-const iSshowGuide = ref(true);
+const iSshowGuide = ref(false);
+onMounted(async () => {
+    try {
+        const res = await checkWordRember();
+        if (res.code === 200) {
+            const { currentBook_id, dailyGoal } = res.data;
+            iSshowGuide.value = !currentBook_id || !dailyGoal;
+        } else {
+            iSshowGuide.value = true;
+        }
+    } catch (error) {
+        console.error('检查用户设置失败:', error);
+        iSshowGuide.value = true;
+    }
+});
 
 // 处理引导完成事件
 const handleGuideComplete = (settings) => {
