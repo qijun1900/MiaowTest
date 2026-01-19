@@ -151,6 +151,7 @@ import {setWordRember,checkWordRember} from '../../../API/Vocabulary/WordRemberA
 // 控制是否显示引导页
 const iSshowGuide = ref(false);
 const goal = ref(0);
+const wordBook_id = ref('');
 
 onMounted(async () => {
     try {
@@ -159,6 +160,7 @@ onMounted(async () => {
             const { currentBook_id, dailyGoal } = res.data;
             iSshowGuide.value = !currentBook_id || !dailyGoal;
             goal.value = dailyGoal;
+            wordBook_id.value = currentBook_id;
         } else {
             iSshowGuide.value = true;
         }
@@ -168,7 +170,7 @@ onMounted(async () => {
     }
     uni.$on('updateWordRember', (newSettings) => {
         goal.value = newSettings.dailyGoal;
-        console.log(newSettings);
+        wordBook_id.value= newSettings.currentBook_id;
     });
 });
 
@@ -184,6 +186,7 @@ const handleGuideComplete = (settings) => {
        if(res.code===200){
         // 显示成功提示
         goal.value = settings.dailyGoal;
+        wordBook_id.value = settings.selectedBook._id;
         uni.showToast({
             title: '设置成功',
             icon: 'success',
@@ -207,6 +210,7 @@ const handleGuideComplete = (settings) => {
 const handleGoWordSetting = () => {
     uni.navigateTo({
         url: '/pages/tools/WordsToolView_children/wordSettingView'
+        + '?currentBook_id=' + wordBook_id.value
     });
 }
 </script>

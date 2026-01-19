@@ -6,19 +6,19 @@
         <view class="current-header">
           <text class="current-label">当前正在学习</text>
         </view>
-        <view class="current-content">
+        <view class="current-content" v-if="currentBook">
           <view class="current-book-cover-wrapper">
             <image 
-              src="https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067" 
+              :src="baseImageUrl + currentBook.cover" 
               class="current-book-cover" 
               mode="aspectFill"
             />
           </view>
           <view class="current-book-info">
-            <text class="current-book-title">雅思核心词汇</text>
+            <text class="current-book-title">{{ currentBook.title || '未选择词书' }}</text>
             <view class="current-stats">
               <view class="stat-item">
-                <text class="stat-value">3500</text>
+                <text class="stat-value">{{ currentBook.words || 0 }}</text>
                 <text class="stat-label">词</text>
               </view>
               <view class="stat-divider"></view>
@@ -26,6 +26,12 @@
                 <text class="stat-label">词书总量</text>
               </view>
             </view>
+          </view>
+        </view>
+        <view class="current-content empty" v-else>
+          <view class="current-book-info">
+            <text class="current-book-title">暂未选择词书</text>
+            <text class="stat-label">请在下方选择一本词书开始学习</text>
           </view>
         </view>
       </view>
@@ -70,7 +76,7 @@
               </view>
             </view>
 
-            <view v-if="wordBooks.length === 0" class="empty-state">
+            <view v-if="wordBooks.length === 0 && loading ===false" class="empty-state">
               <image class="empty-image" src="/static/other/empty.png" mode="aspectFit" />
               <text class="empty-text">暂无词书</text>
             </view>
@@ -119,6 +125,7 @@ import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import escconfig from '../../../config/esc.config';
 import { setWordRember } from '../../../API/Vocabulary/WordRemberAPI';
 import ThemeLoading from '../../../components/core/ThemeLoading.vue';
+import { onLoad } from '@dcloudio/uni-app';
 
 const wordBooks = ref([]);
 const selectedBook = ref(null);
@@ -126,13 +133,26 @@ const dailyGoal = ref(20);
 const goalOptions = [10, 20, 30, 50, 80, 100];
 const loading = ref(true);
 const baseImageUrl = escconfig.ossDomain;
+const wordBook_id = ref('');
+const currentBook = ref(null);
 
-const fetchWordBooks = async () => {
+onLoad((options) => {
+  wordBook_id.value = options.currentBook_id || '';
+});
+
+const LoadCurrentBook = () => {
+  if(wordBook_id.value){
+    currentBook.value = wordBooks.value.find(book => book._id === wordBook_id.value);
+  }
+}
+
+const fetchWordBooksList = async () => {
   try {
     const response = await getWordBooksAPI();
     if (response.code === 200) {
       wordBooks.value = response.data.wordBooks;
       loading.value = false;
+      LoadCurrentBook();
     }
   } catch (error) {
     console.error('获取词书失败:', error);
@@ -191,7 +211,7 @@ const handleSave = () => {
 };
 
 onMounted(() => {
-  fetchWordBooks();
+  fetchWordBooksList();
 });
 </script>
 
