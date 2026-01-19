@@ -278,25 +278,13 @@ const onSliderChange = (e) => {
 // 确认设置
 const confirmSettings = () => {
     const settings = {
-        book: selectedBook.value,
-        goal: dailyGoal.value,
-        estimatedDays: estimatedDays.value
+        selectedBook: selectedBook.value,
+        dailyGoal: dailyGoal.value,
     };
 
     // 触发完成事件
     emit('complete', settings);
 
-    // 显示成功提示
-    uni.showToast({
-        title: '设置成功',
-        icon: 'success',
-        duration: 1200
-    });
-    
-    // 添加触觉反馈
-    uni.vibrateShort({
-        type: 'medium'
-    });
 };
 onMounted(() => {
     fetchWordBooks();

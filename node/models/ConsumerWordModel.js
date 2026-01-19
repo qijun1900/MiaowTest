@@ -6,15 +6,15 @@ const mongoose = require('mongoose');
  */
 
 const ConsumerWordSchema = new mongoose.Schema({
-    // 用户ID，关联到 Consumer
-    Uid: {
+    // 用户uid，关联到 Consumer
+    uid: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'consumer',
         required: true,
         index: true
     },
 
-    // ==================== 每日学习设置 ====================
+    // ==================== 每日学习设置（设置） ====================
     settings: {
         // 每日学习目标（单词数量）
         dailyGoal: {
@@ -24,10 +24,15 @@ const ConsumerWordSchema = new mongoose.Schema({
             max: 500
         },
         // 当前学习的词书ID
-        currentBookId: {
+        currentBook_id: {
             type: String,
             default: '',
             ref: 'word_books'
+        },
+        //
+        currentBookTitle: {
+            type: String,
+            default: ''
         },
         // // 学习模式：1-顺序学习 2-乱序学习 3-智能复习
         // learningMode: {
@@ -45,11 +50,13 @@ const ConsumerWordSchema = new mongoose.Schema({
         //     type: String,
         //     default: '09:00'
         // },
+
         // 是否自动播放发音
         autoPlayAudio: {
             type: Boolean,
             default: true
         },
+
         // 发音类型：1-美式 2-英式
         pronunciationType: {
             type: Number,
@@ -58,9 +65,9 @@ const ConsumerWordSchema = new mongoose.Schema({
         }
     },
 
-    // ==================== 学习进度 ====================
+    // ==================== 学习进度(数据) ====================
     progress: {
-        // 当前学习到的单词序号（wordRank）
+        //当前学习到的单词序号（wordRank）
         currentWordRank: {
             type: Number,
             default: 0

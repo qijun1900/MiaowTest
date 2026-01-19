@@ -146,16 +146,40 @@ import { ref } from 'vue';
 import WordsRemGuide from '../../../components/modules/tools/WordsRemGuide.vue';
 import { getGreetingInfo } from '../../../util/greet';
 import userAvatar from '../../../components/core/userAvatar.vue';
+import {setWordRember} from '../../../API/Vocabulary/WordRemberAPI.js';
 
 // 控制是否显示引导页
 const iSshowGuide = ref(true);
 
-
 // 处理引导完成事件
 const handleGuideComplete = (settings) => {
     iSshowGuide.value = false;
-    // 这里可以保存用户设置
-    console.log('引导完成，设置:', settings);
+    // 调用设置接口
+    setWordRember({
+        currentBook_id: settings.selectedBook._id,
+        dailyGoal: settings.dailyGoal,
+        currentBookTitle: settings.selectedBook.title,
+    }).then(res => {
+       if(res.code===200){
+        // 显示成功提示
+        uni.showToast({
+            title: '设置成功',
+            icon: 'success',
+            duration: 1000
+        });
+        // 添加触觉反馈
+        uni.vibrateShort({
+            type: 'medium'
+        });
+       }else{
+        // 显示失败提示
+        uni.showToast({
+            title: '设置失败',
+            icon: 'none',
+            duration: 1200
+        });
+       }
+    });
 };
 </script>
 
