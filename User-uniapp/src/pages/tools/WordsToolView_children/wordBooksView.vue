@@ -1,6 +1,9 @@
 <template>
 <view class="container">
-    <view>
+    <!-- 固定头部 -->
+    <view 
+    class="fixed-header" 
+    :style="{ top: navBarInfo.totalHeight + 'px' }">
         <!-- 切换按钮 -->
         <view class="switch-container">
             <view 
@@ -28,56 +31,58 @@
                 <text class="count-number">{{ currentBooks.length }}</text> 本
             </text>
         </view>
+    </view>
 
-        <!-- 词书列表 -->
-        <view class="books-list">
-            <!-- 加载中 -->
-            <ThemeLoading v-if="loading" text="正在加载中..." />
-            <view 
-                class="book-item" 
-                v-for="(book, index) in currentBooks" 
-                :key="index" 
-                v-else
-                >
-                <image 
-                :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
-                <view class="book-content">
-                    <view class="book-info">
-                        <text class="book-title">{{ book.title }}</text>
-                        <view class="book-words">
-                            <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
-                            <text>{{ book.words }}词</text>
-                        </view>
-                        <view class="book-tags">
-                            <up-tag 
-                                v-for="(tag, tagIndex) in book.tags" 
-                                :key="tagIndex" 
-                                :text="tag" 
-                                plain size="mini" 
-                                type="warning" plainFill 
-                                style="margin-right: 12rpx;">
-                            </up-tag>
-                        </view>
+    <!-- 词书列表 -->
+    <view 
+    class="books-list" 
+    :style="{ paddingTop: (navBarInfo.totalHeight + 105) + 'px' }">
+        <!-- 加载中 -->
+        <ThemeLoading v-if="loading" text="正在加载中..." />
+        <view 
+            class="book-item" 
+            v-for="(book, index) in currentBooks" 
+            :key="index" 
+            v-else
+            >
+            <image 
+            :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
+            <view class="book-content">
+                <view class="book-info">
+                    <text class="book-title">{{ book.title }}</text>
+                    <view class="book-words">
+                        <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
+                        <text>{{ book.words }}词</text>
                     </view>
-                    <view class="book-action">
-                        <view class="view-words-btn" @click="viewAllWords(book)">
-                            <up-icon name="eye" size="32rpx" color="#ffffff"></up-icon>
-                            <text class="btn-text">查看单词</text>
-                        </view>
+                    <view class="book-tags">
+                        <up-tag 
+                            v-for="(tag, tagIndex) in book.tags" 
+                            :key="tagIndex" 
+                            :text="tag" 
+                            plain size="mini" 
+                            type="warning" plainFill 
+                            style="margin-right: 12rpx;">
+                        </up-tag>
+                    </view>
+                </view>
+                <view class="book-action">
+                    <view class="view-words-btn" @click="viewAllWords(book)">
+                        <up-icon name="eye" size="32rpx" color="#ffffff"></up-icon>
+                        <text class="btn-text">查看单词</text>
                     </view>
                 </view>
             </view>
-            
-            <!-- 空状态 -->
-            <view v-if="currentBooks.length === 0 && !loading" class="empty-state">
-                <image
-                    class="empty-image"
-                    src="/static/other/empty.png"
-                    mode="aspectFit"
-                />
-                <text class="empty-text">{{ currentType === 'default' ? '暂无默认词书' : '暂无自定义词书' }}</text>
-                <text class="empty-hint">{{ currentType === 'user' ? '快去创建你的第一本词书吧~' : '' }}</text>
-            </view>
+        </view>
+        
+        <!-- 空状态 -->
+        <view v-if="currentBooks.length === 0 && !loading" class="empty-state">
+            <image
+                class="empty-image"
+                src="/static/other/empty.png"
+                mode="aspectFit"
+            />
+            <text class="empty-text">{{ currentType === 'default' ? '暂无默认词书' : '暂无自定义词书' }}</text>
+            <text class="empty-hint">{{ currentType === 'user' ? '快去创建你的第一本词书吧~' : '' }}</text>
         </view>
     </view>
 </view>
@@ -87,11 +92,13 @@ import { onMounted, ref, computed } from 'vue';
 import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../../components/core/ThemeLoading.vue';
 import escconfig from '../../../config/esc.config';
+import navBarHeightUtil from '../../../util/navBarHeight';
 
 const defaultBooks = ref([]);
 const currentType = ref('default'); // 'default' 或 'user'
 const loading = ref(false);
 const UserWordBooks = ref([]);
+const navBarInfo = ref({});
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
@@ -140,8 +147,9 @@ const viewAllWords = (book) => {
         type: 'medium'
     });
     
-    // TODO: 跳转到单词列表页面或显示单词列表
-
+    uni.navigateTo({
+        url: `/pages/tools/WordsToolView_children/wordListView?bookId=${book.bookId}`
+    });
 };
 
 // 加载用户偏好
@@ -157,6 +165,9 @@ const loadUserPreference = () => {
 };
 
 onMounted(() => {
+    // 获取导航栏高度信息
+    navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+    
     // 加载用户偏好
     loadUserPreference();
     
@@ -166,9 +177,18 @@ onMounted(() => {
 </script>
 <style scoped>
 .container {
-    padding: 32rpx;
+    padding: 0;
     background-color: #f0f8ff;
     min-height: 100vh;
+}
+/* ========== 固定头部区域 ========== */
+.fixed-header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: #f0f8ff;
+  padding: 24rpx 32rpx;
 }
 
 /* 切换按钮容器 */
@@ -177,7 +197,7 @@ onMounted(() => {
     background-color: #ffffff;
     border-radius: 24rpx;
     padding: 8rpx;
-    margin-bottom: 32rpx;
+    margin-bottom: 0;
     border: 4rpx solid #74b9ff;
     box-shadow: 0 6rpx 0 #0984e3;
 }
@@ -222,7 +242,7 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40rpx;
+    margin-top: 24rpx;
     padding: 24rpx 32rpx;
     background-color: #ffffff;
     border-radius: 24rpx;
@@ -257,6 +277,7 @@ onMounted(() => {
 /* 词书列表 */
 .books-list {
     animation: fadeIn 0.3s ease;
+    padding: 0 32rpx 32rpx 40rpx;
 }
 
 @keyframes fadeIn {

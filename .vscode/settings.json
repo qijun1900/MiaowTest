@@ -1,5 +1,5 @@
 {
-    "trae.tab.enableRename": true,
-    "trae.tab.enableAutoImport": true,
-    "trae.tab.cue": true
+    "trae.tab.enableRename": false,
+    "trae.tab.enableAutoImport": false,
+    "trae.tab.cue": false
 }

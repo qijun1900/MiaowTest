@@ -241,6 +241,12 @@
 			"style": {
 				"navigationBarTitleText": "单词设置"
 			}
+		},
+		{
+			"path": "pages/tools/WordsToolView_children/wordListView",
+			"style": {
+				"navigationBarTitleText": "单词列表"
+			}
 		}
 	],
 	"globalStyle": {

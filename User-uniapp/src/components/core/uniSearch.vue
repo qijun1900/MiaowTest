@@ -43,8 +43,8 @@ const props = defineProps({
 
 // 监听searchValue变化，通知父组件
 watch(searchValue, (newValue) => {
-    emit('update:searchText', newValue)
-    emit('search', newValue)
+  emit('update:searchText', newValue)
+  emit('search', newValue)
 })
 
 // 监听props.searchText变化，同步到本地
