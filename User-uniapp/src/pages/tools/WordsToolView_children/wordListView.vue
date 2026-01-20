@@ -24,7 +24,7 @@
         </view>
       </scroll-view>
     </view>
-
+    
     <!-- 单词列表 -->
     <view class="word-list-container">
       <!-- 单词卡片 -->
@@ -345,8 +345,8 @@ onLoad((options) => {
 }
 
 .word-phonetic {
-  font-size: 28rpx;
-  font-weight: 660;
+  font-size: 30rpx;
+  font-weight: 680;
   color: #666666;
   margin-right: 16rpx;
   font-family: 'Courier New', monospace;

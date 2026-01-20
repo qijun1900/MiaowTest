@@ -35,8 +35,7 @@
 
     <!-- 词书列表 -->
     <view 
-    class="books-list" 
-    :style="{ paddingTop: (navBarInfo.totalHeight + 105) + 'px' }">
+    class="books-list" >
         <!-- 加载中 -->
         <ThemeLoading v-if="loading" text="正在加载中..." />
         <view 
@@ -183,7 +182,7 @@ onMounted(() => {
 }
 /* ========== 固定头部区域 ========== */
 .fixed-header {
-  position: fixed;
+  position: sticky;
   left: 0;
   right: 0;
   z-index: 100;
