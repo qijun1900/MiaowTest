@@ -6,10 +6,10 @@ const VocabularyService = {
     /**
      * 获取单词书列表和单词书总数
      */
-    getWordBooks: async () => { 
+    getWordBooks: async () => {
         try {
-            const wordBooks = await WordBooksModel.find({},{
-                updatedAt: 0, 
+            const wordBooks = await WordBooksModel.find({}, {
+                updatedAt: 0,
                 createdAt: 0,
                 fileSize: 0,
                 starredNumber: 0,
@@ -17,21 +17,21 @@ const VocabularyService = {
                 reciteNumber: 0,
             });
             const totalCount = await WordBooksModel.countDocuments();
-            return { 
-                wordBooks, 
-                totalCount 
+            return {
+                wordBooks,
+                totalCount
             };
-        }catch (error) {
+        } catch (error) {
             console.error("获取单词书列表失败", error);
             throw error;
         }
-    
+
     },
     /**
      * 设置用户单词书和每日词数
      */
     setWordRember: async ({ uid, currentBook_id, dailyGoal, currentBookTitle }) => {
-        try{
+        try {
             const existing = await ConsumerWordModel.findOne({ uid });
             if (existing) {
                 await ConsumerWordModel.updateOne({ uid }, {
@@ -50,48 +50,65 @@ const VocabularyService = {
                 });
             }
             return { success: true };
-        }catch (error) {
+        } catch (error) {
             console.error("设置用户单词书和每日词数失败", error);
             throw error;
         }
     },
     checkWordRember: async ({ uid }) => {
-        try{
+        try {
             const userSettings = await ConsumerWordModel.findOne({ uid }, { 'settings.currentBook_id': 1, 'settings.dailyGoal': 1 });
             return {
                 currentBook_id: userSettings?.settings?.currentBook_id || null,
                 dailyGoal: userSettings?.settings?.dailyGoal || null
             };
-        }catch (error) {
+        } catch (error) {
             console.error("检查用户单词书设置失败", error);
             throw error;
         }
     },
+    /**
+     * @description 需要的字段：
+        1._id : 单词_id
+        2. headWord: 对应粗体的单词
+        3. usphone: 音标 (需要加/ /)
+        4. trans0.pos: 词性
+        5. trans0.tranCn: 中文释义
+        6. trans0.tranOther: 英文释义
+        7. sentence.sentences0.sContent: 例句
+     */
     getWordBookList: async ({ bookId }) => {
-        try{
-            const words = await WordModel.find({ bookId }, {
-                _id: 1,
-                'headWord': 1,
-                'content.word.content.usphone': 1,
-                'content.word.content.trans': 1,
-                'content.word.content.sentence': 1,
-                'content.word.content.usspeech': 1,
-                'bookId': 1,
-                'wordRank': 1,
-            }).sort({ wordRank: 1 });
-
-            const result = words.map(word => ({
-                _id: word._id,
-                headWord: word.headWord,
-                phonetic: `/${word.content.word.content.usphone}/`,
-                pos: word.content.word.content.trans[0]?.pos || '',
-                cn: word.content.word.content.trans[0]?.tranCn || '',
-                en: word.content.word.content.trans[0]?.tranOther || '',
-                sentence: word.content.word.content.sentence?.sentences[0]?.sContent || '',
-            }));
+        try {
+            const result = await WordModel.aggregate([
+                { $match: { bookId: bookId } }, // 1. 筛选
+                { $sort: { wordRank: 1 } },     // 2. 排序
+                {
+                    $project: {                 // 3. 投影并重塑结构
+                        _id: 1,
+                        headWord: 1,
+                        phonetic: {
+                            $concat: ["/", { $ifNull: ["$content.word.content.usphone", ""] }, "/"]
+                        },
+                        // 获取数组第一个元素的字段
+                        firstTrans: { $arrayElemAt: ["$content.word.content.trans", 0] },
+                        firstSentence: { $arrayElemAt: ["$content.word.content.sentence.sentences", 0] }
+                    }
+                },
+                {
+                    $project: { // 4. 再次投影整理最终字段
+                        _id: 1,
+                        headWord: 1,
+                        phonetic: 1,
+                        pos: { $ifNull: ["$firstTrans.pos", ""] },
+                        cn: { $ifNull: ["$firstTrans.tranCn", ""] },
+                        en: { $ifNull: ["$firstTrans.tranOther", ""] },
+                        sentence: { $ifNull: ["$firstSentence.sContent", ""] }
+                    }
+                }
+            ]);
 
             return result;
-        }catch (error) {
+        } catch (error) {
             console.error("获取单词书列表失败", error);
             throw error;
         }
