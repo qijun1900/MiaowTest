@@ -9,5 +9,7 @@ VocabularyRouter.get("/uniappAPI/tools/vocabulary/getWordBooks", JWT.verifyToken
 VocabularyRouter.post("/uniappAPI/tools/vocabulary/setting/setWordRember", JWT.verifyTokenMiddleware(),VocabularyController.setWordRember)
 //检查用户是否设置了词书和每日词数
 VocabularyRouter.get("/uniappAPI/tools/vocabulary/check/getWordRember", JWT.verifyTokenMiddleware(),VocabularyController.checkWordRember)
+//获取单词书列表
+VocabularyRouter.post("/uniappAPI/tools/vocabulary/getWordBookList", JWT.verifyTokenMiddleware(),VocabularyController.getWordBookList)
 
 module.exports = VocabularyRouter;

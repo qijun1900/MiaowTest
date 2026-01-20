@@ -24,7 +24,7 @@
         </view>
       </scroll-view>
     </view>
-    
+
     <!-- 单词列表 -->
     <view class="word-list-container">
       <!-- 单词卡片 -->
@@ -95,6 +95,7 @@
 import { ref, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import uniSearch from '../../../components/core/uniSearch.vue';
+import { WordBookListAPI } from '../../../API/Vocabulary/WordBooksAPI';
 
 // 搜索文本
 const searchText = ref('');
@@ -219,7 +220,15 @@ const playAudio = (word) => {
 
 // 页面加载
 onLoad((options) => {
-  console.log('页面参数:', options);
+  if (options && options.bookId) {
+    // 加载单词书数据
+    WordBookListAPI(options.bookId).then(res => {
+      console.log('单词书数据:', res);
+    })
+    .catch(err => {
+      console.error('加载单词书失败:', err);
+    });
+  }
 });
 </script>
 

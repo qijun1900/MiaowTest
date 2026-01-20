@@ -80,6 +80,37 @@ const VocabularyController = {
                 message: "检查词书和每日词数失败" 
             });
         }
+    },
+    getWordBookList: async (req, res) => {
+        try {
+            const { uid } = req.user
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    message: '您未登录'
+                });
+            }
+            const { bookId } = req.body;
+            const data = await VocabularyService.getWordBookList({ bookId });
+            if (!data) {
+                return res.send({
+                    code: 400,
+                    message: '获取单词书列表失败'
+                });
+            }
+            res.send({
+                code: 200,
+                data,
+            })
+            
+        }catch (error) {
+            console.error("获取单词书列表失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "获取单词书列表失败"
+            });
+        }
+        
     }
 };
 

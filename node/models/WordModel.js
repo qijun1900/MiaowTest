@@ -75,6 +75,4 @@ WordSchema.index({ bookId: 1, headWord: 1 });
 const WordModel = mongoose.model('word', WordSchema);
 
 // 导出模型和哈希表相关功能
-module.exports = {
-    WordModel,
-};
+module.exports = WordModel;

@@ -1,5 +1,7 @@
 const { WordBooksModel } = require('../../models/WordBooksModel');
 const ConsumerWordModel = require('../../models/ConsumerWordModel');
+const WordModel = require('../../models/WordModel');
+
 const VocabularyService = {
     /**
      * 获取单词书列表和单词书总数
@@ -62,6 +64,35 @@ const VocabularyService = {
             };
         }catch (error) {
             console.error("检查用户单词书设置失败", error);
+            throw error;
+        }
+    },
+    getWordBookList: async ({ bookId }) => {
+        try{
+            const words = await WordModel.find({ bookId }, {
+                _id: 1,
+                'headWord': 1,
+                'content.word.content.usphone': 1,
+                'content.word.content.trans': 1,
+                'content.word.content.sentence': 1,
+                'content.word.content.usspeech': 1,
+                'bookId': 1,
+                'wordRank': 1,
+            }).sort({ wordRank: 1 });
+
+            const result = words.map(word => ({
+                _id: word._id,
+                headWord: word.headWord,
+                phonetic: `/${word.content.word.content.usphone}/`,
+                pos: word.content.word.content.trans[0]?.pos || '',
+                cn: word.content.word.content.trans[0]?.tranCn || '',
+                en: word.content.word.content.trans[0]?.tranOther || '',
+                sentence: word.content.word.content.sentence?.sentences[0]?.sContent || '',
+            }));
+
+            return result;
+        }catch (error) {
+            console.error("获取单词书列表失败", error);
             throw error;
         }
     }
