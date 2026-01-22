@@ -66,11 +66,11 @@
 	export default {
 		name: 'drag-button',
 		props: {
-			isDock:{
+			isDock:{ // 是否固定
 				type: Boolean,
 				default: false
 			},
-			existTabBar:{
+			existTabBar:{ // 是否存在底部导航栏
 				type: Boolean,
 				default: false
 			},

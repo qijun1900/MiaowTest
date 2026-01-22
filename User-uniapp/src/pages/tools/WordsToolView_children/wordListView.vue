@@ -54,7 +54,7 @@
         <view class="word-info-row">
           <text class="word-phonetic" :user-select="true">{{ word.phonetic }}</text>
           <view class="word-type-badge">
-            <text class="word-type-text" :user-select="true"      >{{ word.pos + '.'}}</text>
+            <text class="word-type-text" >{{ word.pos + '.'}}</text>
           </view>
         </view>
 
@@ -111,7 +111,43 @@
         <text class="no-more-text">没有更多了</text>
       </view>
     </scroll-view>
+
+    <!-- 悬浮按钮 -->
+    <dragButton
+      :isDock="true"
+      :existTabBar="true"
+      iconType="settings"
+      :bottomOffset="85"
+      :popMenu="false"
+      @btnClick="handleBtnClick"
+      />
+    <!-- 设置弹窗 -->
   </view>
+  <uviewPopup 
+    v-model:show="popupShow" 
+    title="设置" 
+    :closeable="true">
+     <template #popupcontent>
+      <view class="popup-content">
+        <view class="setting-item">
+          <view class="setting-left">
+            <view class="setting-icon"><uni-icons type="sound" size="30"></uni-icons></view>
+            <view class="setting-info">
+              <text class="setting-label">音频类型</text>
+              <view class="setting-desc"><text class="setting-desc-type">{{ setting.audioType === 0 ? '美式' : '英式' }}</text>发音</view>
+            </view>
+          </view>
+          <view class="setting-switch">
+            <switch
+              :checked="setting.audioType === 0"
+              @change="handleAudioTypeChange"
+              color="#1989fa">
+            </switch>
+          </view>
+        </view>
+      </view>
+     </template>
+    </uviewPopup>
 </template>
 
 <script setup>
@@ -120,7 +156,9 @@ import { onLoad } from '@dcloudio/uni-app';
 import uniSearch from '../../../components/core/uniSearch.vue';
 import { WordBookListAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import highlightWord from '../../../util/highlightWord.js';
-
+import { playWordPronunciation } from '../../../API/Vocabulary/WordAPI.js';
+import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
+import uviewPopup from '../../../components/core/uviewPopup.vue';
 // 搜索文本
 const searchText = ref('');
 //  当前选中的分类
@@ -138,6 +176,11 @@ const pageSize = ref(20);
 const total = ref(0);
 const hasMore = ref(true);
 const isLoading = ref(false);
+//setting
+const setting = ref({
+  audioType:0,//0:美音, 1:英音
+});
+const popupShow = ref(false);
 
 // 过滤后的单词列表
 const filteredWords = computed(() => {
@@ -168,13 +211,17 @@ const filteredWords = computed(() => {
 //   activeCategory.value = category;
 // };
 
+const handleBtnClick = () => {
+  popupShow.value = true;
+}
+
+const handleAudioTypeChange = (e) => {
+  setting.value.audioType = e.detail.value ? 0 : 1;
+}
+
 // 播放音频
 const playAudio = (word) => {
-  uni.showToast({
-    title: `播放: ${word.word}`,
-    icon: 'none',
-    duration: 1500
-  });
+  playWordPronunciation(word.headWord,setting.value.audioType);
 };
 
 // 加载单词数据
@@ -240,15 +287,7 @@ onLoad((options) => {
 
 /* ========== 固定头部区域 ========== */
 .fixed-header {
-  position: sticky; 
-  /* 
-  固定在顶部
-  - fixed 会脱离文档流 → 需手动添加padding避免遮挡
-  - sticky 保留文档流 → 自动无遮挡问题
-  */
-  top: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   z-index: 100;
   background-color: #ffffff;
 }
@@ -256,7 +295,7 @@ onLoad((options) => {
 /* ========== 搜索栏区域 ========== */
 .search-section {
   padding: 10rpx 12rpx 6rpx 12rpx;
-  background-color: #ffffff;
+  background-color: #f7f8fa;
 }
 
 /* ========== 分类标签栏 ========== */
@@ -373,7 +412,8 @@ onLoad((options) => {
 }
 
 .word-type-text {
-  font-size: 24rpx;
+  font-size: 30rpx;
+  font-weight: 500;
   color: #2979ff;
   font-weight: 600;
 }
@@ -493,5 +533,64 @@ onLoad((options) => {
 .no-more-text {
   font-size: 24rpx;
   color: #cccccc;
+}
+
+.popup-content {
+  padding: 20rpx 0;
+}
+
+.setting-item {
+  padding: 32rpx 30rpx;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.setting-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 16rpx;
+}
+
+.setting-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-label {
+  font-size: 32rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.setting-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+.setting-desc-type{
+  color: #ff9800;
+}
+
+.setting-switch {
+  transform: scale(1.15);
 }
 </style>

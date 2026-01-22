@@ -7,6 +7,7 @@
     :closeOnClickOverlay="closeOnClickOverlay"
     @close="handleClose"
     :overlay="overlay"
+    :zIndex="9999"
     :safeAreaInsetBottom="true">
     <view class="answer-sheet-popup" @touchmove.prevent.stop>
       <!-- 标题区域 -->
