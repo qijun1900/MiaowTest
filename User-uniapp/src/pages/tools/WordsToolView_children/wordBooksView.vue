@@ -1,90 +1,110 @@
 <template>
-<view class="container">
-    <!-- 固定头部 -->
-    <view 
-    class="fixed-header" 
-    :style="{ top: navBarInfo.totalHeight + 'px' }">
-        <!-- 切换按钮 -->
-        <view class="switch-container">
-            <view 
-                class="switch-button" 
-                :class="{ active: currentType === 'default' }"
-                @click="switchBookType('default')"
-            >
-                <text class="switch-text">默认词书</text>
-                <view v-if="currentType === 'default'" class="active-indicator"></view>
-            </view>
-            <view 
-                class="switch-button" 
-                :class="{ active: currentType === 'user' }"
-                @click="switchBookType('user')"
-            >
-                <text class="switch-text">我的词书</text>
-                <view v-if="currentType === 'user'" class="active-indicator"></view>
-            </view>
-        </view>
-
-        <!-- 词书头部信息 -->
-        <view class="books-header">
-            <text class="books-title">{{ currentType === 'default' ? '默认词书' : '我的词书' }}</text>
-            <text class="books-count">
-                <text class="count-number">{{ currentBooks.length }}</text> 本
-            </text>
-        </view>
-    </view>
-
-    <!-- 词书列表 -->
-    <view 
-    class="books-list" >
-        <!-- 加载中 -->
-        <ThemeLoading v-if="loading" text="正在加载中..." />
+    <view class="container">
+        <!-- 固定头部 -->
         <view 
-            class="book-item" 
-            v-for="(book, index) in currentBooks" 
-            :key="index" 
-            v-else
-            >
-            <image 
-            :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
-            <view class="book-content">
-                <view class="book-info">
-                    <text class="book-title">{{ book.title }}</text>
-                    <view class="book-words">
-                        <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
-                        <text>{{ book.words }}词</text>
-                    </view>
-                    <view class="book-tags">
-                        <up-tag 
-                            v-for="(tag, tagIndex) in book.tags" 
-                            :key="tagIndex" 
-                            :text="tag" 
-                            plain size="mini" 
-                            type="warning" plainFill 
-                            style="margin-right: 12rpx;">
-                        </up-tag>
-                    </view>
+        class="fixed-header" 
+        :style="{ top: navBarInfo.totalHeight + 'px' }">
+            <!-- 切换按钮 -->
+            <view class="switch-container">
+                <view 
+                    class="switch-button" 
+                    :class="{ active: currentType === 'default' }"
+                    @click="switchBookType('default')"
+                >
+                    <text class="switch-text">系统词书</text>
+                    <view v-if="currentType === 'default'" class="active-indicator"></view>
                 </view>
-                <view class="book-action">
-                    <view class="view-words-btn" @click="viewAllWords(book)">
-                        <up-icon name="eye" size="32rpx" color="#ffffff"></up-icon>
-                        <text class="btn-text">查看单词</text>
+                <view 
+                    class="switch-button" 
+                    :class="{ active: currentType === 'user' }"
+                    @click="switchBookType('user')"
+                >
+                    <text class="switch-text">我的词书</text>
+                    <view v-if="currentType === 'user'" class="active-indicator"></view>
+                </view>
+            </view>
+
+            <!-- 词书头部信息 -->
+            <view class="books-header">
+                <text class="books-title">{{ currentType === 'default' ? '默认词书' : '我的词书' }}</text>
+                <text class="books-count">
+                    <text class="count-number">{{ currentBooks.length }}</text> 本
+                </text>
+            </view>
+        </view>
+
+        <!-- 词书列表 -->
+        <view 
+        class="books-list" >
+            <!-- 加载中 -->
+            <ThemeLoading v-if="loading" text="正在加载中..." />
+            <view 
+                class="book-item" 
+                v-for="(book, index) in currentBooks" 
+                :key="index" 
+                v-else
+                >
+                <image 
+                :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
+                <view class="book-content">
+                    <view class="book-info">
+                        <text class="book-title">{{ book.title }}</text>
+                        <view class="book-words">
+                            <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
+                            <text>{{ book.words }}词</text>
+                        </view>
+                        <view class="book-tags">
+                            <up-tag 
+                                v-for="(tag, tagIndex) in book.tags" 
+                                :key="tagIndex" 
+                                :text="tag" 
+                                plain size="mini" 
+                                type="warning" plainFill 
+                                style="margin-right: 12rpx;">
+                            </up-tag>
+                        </view>
+                    </view>
+                    <view class="book-action">
+                        <view class="view-words-btn" @click="viewAllWords(book)">
+                            <up-icon name="eye" size="32rpx" color="#ffffff"></up-icon>
+                            <text class="btn-text">查看单词</text>
+                        </view>
                     </view>
                 </view>
             </view>
+            
+            <!-- 空状态 -->
+            <view v-if="currentBooks.length === 0 && !loading" class="empty-state">
+                <image
+                    class="empty-image"
+                    src="/static/other/empty.png"
+                    mode="aspectFit"
+                />
+                <text class="empty-text">{{ currentType === 'default' ? '暂无默认词书' : '暂无自定义词书' }}</text>
+                <text class="empty-hint">{{ currentType === 'user' ? '快去创建你的第一本词书吧~' : '' }}</text>
+            </view>
         </view>
-        
-        <!-- 空状态 -->
-        <view v-if="currentBooks.length === 0 && !loading" class="empty-state">
-            <image
-                class="empty-image"
-                src="/static/other/empty.png"
-                mode="aspectFit"
-            />
-            <text class="empty-text">{{ currentType === 'default' ? '暂无默认词书' : '暂无自定义词书' }}</text>
-            <text class="empty-hint">{{ currentType === 'user' ? '快去创建你的第一本词书吧~' : '' }}</text>
-        </view>
+        <dragButton
+            :show=" isShowdragButton"
+            :isDock="true"
+            :existTabBar="true" 
+            iconType="folder-add-filled"
+            :bottomOffset="100"
+            :popMenu="false"
+            @btnClick="handleBtnClick"
+        />
     </view>
-</view>
+    <!-- 底部弹出框 -->
+    <uviewPopup
+        v-model:show="popupShow"
+        title="创建新词书" 
+        :closeable="false">
+        <template #popupcontent>
+            <view class="popup-content">
+
+            </view>
+        </template>
+    </uviewPopup>
 </template>
 <script setup>
 import { onMounted, ref, computed } from 'vue';
@@ -92,21 +112,29 @@ import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../../components/core/ThemeLoading.vue';
 import escconfig from '../../../config/esc.config';
 import navBarHeightUtil from '../../../util/navBarHeight';
+import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
+import uviewPopup from '../../../components/core/uviewPopup.vue';
 
 const defaultBooks = ref([]);
-const currentType = ref('default'); // 'default' 或 'user'
+const currentType = ref('user'); // 'default' 或 'user'
 const loading = ref(false);
 const UserWordBooks = ref([]);
 const navBarInfo = ref({});
+const popupShow = ref(false);
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
-    return currentType.value === 'default' ? defaultBooks.value : UserWordBooks.value;
+    return currentType.value === 'user' ? UserWordBooks.value: defaultBooks.value ;
 });
 
 const baseImageUrl = computed(() => {
     return escconfig.ossDomain 
 })
+
+// 是否显示拖拽按钮
+const isShowdragButton = computed(() => {
+    return currentType.value === 'user' && !loading.value && !popupShow.value;
+});
 
 // 获取词书
 const fetchWordBooks = async () => {
@@ -123,7 +151,7 @@ const fetchWordBooks = async () => {
     }
 };
 
-// 切换词书类型
+//切换词书类型 
 const switchBookType = (type) => {
     if (currentType.value === type) return;
     
@@ -137,10 +165,12 @@ const switchBookType = (type) => {
     });
 };
 
+const handleBtnClick = () => {
+  popupShow.value = true;
+}
+
 // 查看所有单词
 const viewAllWords = (book) => {
-    console.log('查看词书所有单词:', book);
-    
     // 触发触觉反馈
     uni.vibrateShort({
         type: 'medium'
@@ -154,10 +184,9 @@ const viewAllWords = (book) => {
 // 加载用户偏好
 const loadUserPreference = () => {
     try {
-        const savedType = uni.getStorageSync('wordBookType');
-        if (savedType) {
-            currentType.value = savedType;
-        }
+        // 将本地存储的 wordBookType 设置为 ' default' 或 'user'
+        uni.setStorageSync('wordBookType', 'user');
+        currentType.value = 'user';
     } catch (error) {
         console.error("Error loading user preference:", error);
     }

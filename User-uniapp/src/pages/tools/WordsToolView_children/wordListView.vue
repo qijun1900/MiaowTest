@@ -97,7 +97,10 @@
 
       <!-- 空状态提示 -->
       <view v-if="filteredWords.length === 0 && !isLoading" class="empty-state">
-        <text class="empty-icon">📚</text>
+        <image
+          class="empty-image"
+          src="/static/other/empty.png"
+          mode="aspectFit"/>
         <text class="empty-text">暂无单词</text>
       </view>
 
@@ -411,7 +414,7 @@ onLoad((options) => {
 }
 
 .word-type-text {
-  font-size: 30rpx;
+  font-size: 27rpx;
   font-weight: 500;
   color: #2979ff;
   font-weight: 600;
@@ -499,12 +502,6 @@ onLoad((options) => {
   align-items: center;
   justify-content: center;
   padding: 120rpx 0;
-}
-
-.empty-icon {
-  font-size: 120rpx;
-  margin-bottom: 24rpx;
-  opacity: 0.5;
 }
 
 .empty-text {

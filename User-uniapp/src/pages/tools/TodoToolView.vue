@@ -83,6 +83,7 @@
     </view>
     <!-- 添加按钮 -->
     <dragButton
+      :show="popupShow===false"
       :isDock="true"
       :existTabBar="true"
       iconType="plusempty"
@@ -659,9 +660,10 @@ onMounted(() => {
 }
 
 .form-item {
-  margin-bottom: 20rpx;
+  margin-bottom: 10rpx;
   position: relative;
 }
+
 .head-title-container{
   display: flex;
   align-items: center;

@@ -1,14 +1,15 @@
-<template>
-	<view>
-		<view
-			id="_drag_button"
-			class="drag"
-			:style="'left: ' + left + 'px; top:' + top + 'px;'"
-			@touchstart="touchstart"
-			@touchmove.stop.prevent="touchmove"
-			@touchend="touchend"
-			@click.stop.prevent="click"
-			:class="{transition: isDock && !isMove }">
+	<template>
+		<view>
+			<view
+				id="_drag_button"
+				class="drag"
+				:style="'left: ' + left + 'px; top:' + top + 'px;'"
+				@touchstart="touchstart"
+				@touchmove.stop.prevent="touchmove"
+				@touchend="touchend"
+				@click.stop.prevent="click"
+				:class="{transition: isDock && !isMove }"
+				v-if="show">
 			
 			<text v-if="!icon && !iconType" class="drag-text">{{ text }}</text>
 			<uni-icons 
@@ -66,6 +67,10 @@
 	export default {
 		name: 'drag-button',
 		props: {
+			show: { // 是否显示按钮
+				type: Boolean,
+				default: true
+			},
 			isDock:{ // 是否固定
 				type: Boolean,
 				default: false
@@ -114,7 +119,7 @@
 			iconSize: { // 拖拽按钮图标大小，可选
 				type: Number,
 				default: 30
-			}
+			},
 		},
 		data() {
 			return {
@@ -240,7 +245,7 @@
 		}}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	.drag {
 		display: flex;
 		justify-content: center;
