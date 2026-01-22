@@ -54,7 +54,7 @@
         <view class="word-info-row">
           <text class="word-phonetic">{{ word.phonetic }}</text>
           <view class="word-type-badge">
-            <text class="word-type-text">{{ word.pos }}</text>
+            <text class="word-type-text">{{ word.pos + '.' }}</text>
           </view>
         </view>
 
