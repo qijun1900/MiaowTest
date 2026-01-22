@@ -77,37 +77,50 @@ const VocabularyService = {
         6. trans0.tranOther: 英文释义
         7. sentence.sentences0.sContent: 例句
      */
-    getWordBookList: async ({ bookId }) => {
+    getWordBookList: async ({ bookId, page = 1, pageSize = 20 }) => {
         try {
-            const result = await WordModel.aggregate([
-                { $match: { bookId: bookId } }, // 1. 筛选
-                { $sort: { wordRank: 1 } },     // 2. 排序
-                {
-                    $project: {                 // 3. 投影并重塑结构
-                        _id: 1,
-                        headWord: 1,
-                        phonetic: {
-                            $concat: ["/", { $ifNull: ["$content.word.content.usphone", ""] }, "/"]
-                        },
-                        // 获取数组第一个元素的字段
-                        firstTrans: { $arrayElemAt: ["$content.word.content.trans", 0] },
-                        firstSentence: { $arrayElemAt: ["$content.word.content.sentence.sentences", 0] }
+            const skip = (page - 1) * pageSize;
+
+            const [result, total] = await Promise.all([
+                WordModel.aggregate([
+                    { $match: { bookId: bookId } }, // 1. 筛选
+                    { $sort: { wordRank: 1 } },     // 2. 排序
+                    { $skip: skip },                // 3. 跳过
+                    { $limit: pageSize },          // 4. 限制
+                    {
+                        $project: {                 // 5. 投影并重塑结构
+                            _id: 1,
+                            headWord: 1,
+                            phonetic: {
+                                $concat: ["/", { $ifNull: ["$content.word.content.usphone", ""] }, "/"]
+                            },
+                            // 获取数组第一个元素的字段
+                            firstTrans: { $arrayElemAt: ["$content.word.content.trans", 0] },
+                            firstSentence: { $arrayElemAt: ["$content.word.content.sentence.sentences", 0] }
+                        }
+                    },
+                    {
+                        $project: { // 6. 再次投影整理最终字段
+                            _id: 1,
+                            headWord: 1,
+                            phonetic: 1,
+                            pos: { $ifNull: ["$firstTrans.pos", ""] },
+                            cn: { $ifNull: ["$firstTrans.tranCn", ""] },
+                            en: { $ifNull: ["$firstTrans.tranOther", ""] },
+                            sentence: { $ifNull: ["$firstSentence.sContent", ""] }
+                        }
                     }
-                },
-                {
-                    $project: { // 4. 再次投影整理最终字段
-                        _id: 1,
-                        headWord: 1,
-                        phonetic: 1,
-                        pos: { $ifNull: ["$firstTrans.pos", ""] },
-                        cn: { $ifNull: ["$firstTrans.tranCn", ""] },
-                        en: { $ifNull: ["$firstTrans.tranOther", ""] },
-                        sentence: { $ifNull: ["$firstSentence.sContent", ""] }
-                    }
-                }
+                ]),
+                WordModel.countDocuments({ bookId: bookId })
             ]);
 
-            return result;
+            return {
+                list: result,
+                total,
+                page,
+                pageSize,
+                hasMore: skip + pageSize < total
+            };
         } catch (error) {
             console.error("获取单词书列表失败", error);
             throw error;

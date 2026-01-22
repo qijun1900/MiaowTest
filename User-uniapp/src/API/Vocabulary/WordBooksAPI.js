@@ -23,27 +23,36 @@ export async function getWordBooksAPI() {
     }
 }
 
-/**
- * @description 根据_id获取单词书列表
- * @URL /uniappAPI/tools/vocabulary/getWordBookList
- * @method POST
- * @param {string} bookId- 单词书_id
- * @returns {
- *   code: number,
- *   data: {
- *   }
- * }
- */
-export async function WordBookListAPI(bookId) {
-    try {
-        return  await http({
-            url: '/uniappAPI/tools/vocabulary/getWordBookList',
-            method: 'POST',
-            data: {
-                bookId: bookId,
-            }
-        })
-    }catch (error) {
-        console.error("getWordBookList 失败", error);
-    }
-}
+ /**
+  * @description 根据_id获取单词书列表
+  * @URL /uniappAPI/tools/vocabulary/getWordBookList
+  * @method POST
+  * @param {string} bookId- 单词书_id
+  * @param {number} page - 页码，默认1
+  * @param {number} pageSize - 每页数量，默认20
+  * @returns {
+  *   code: number,
+  *   data: {
+  *     list: Array,
+  *     total: number,
+  *     page: number,
+  *     pageSize: number,
+  *     hasMore: boolean
+  *   }
+  * }
+  */
+ export async function WordBookListAPI(bookId, page = 1, pageSize = 20) {
+     try {
+         return  await http({
+             url: '/uniappAPI/tools/vocabulary/getWordBookList',
+             method: 'POST',
+             data: {
+                 bookId: bookId,
+                 page,
+                 pageSize
+             }
+         })
+     }catch (error) {
+         console.error("getWordBookList 失败", error);
+     }
+ }

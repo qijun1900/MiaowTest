@@ -8,7 +8,7 @@
       </view>
 
       <!-- 分类标签栏 -->
-      <scroll-view 
+      <!-- <scroll-view 
         class="category-scroll" 
         scroll-x 
         show-scrollbar="false">
@@ -22,11 +22,15 @@
             <text class="category-text">{{ category }}</text>
           </view>
         </view>
-      </scroll-view>
+      </scroll-view> -->
     </view>
 
     <!-- 单词列表 -->
-    <view class="word-list-container">
+    <scroll-view 
+      class="word-list-container" 
+      scroll-y 
+      @scrolltolower="loadMore"
+      show-scrollbar="false">
       <!-- 单词卡片 -->
       <view 
         v-for="(word, index) in filteredWords" 
@@ -35,7 +39,7 @@
       >
         <!-- 单词标题行 -->
         <view class="word-title-row">
-          <text class="word-name">{{ word.word }}</text>
+          <text class="word-name">{{ word.headWord }}</text>
           <view 
             class="audio-btn" 
             @click="playAudio(word)">
@@ -50,23 +54,23 @@
         <view class="word-info-row">
           <text class="word-phonetic">{{ word.phonetic }}</text>
           <view class="word-type-badge">
-            <text class="word-type-text">{{ word.difficulty }}</text>
+            <text class="word-type-text">{{ word.pos }}</text>
           </view>
         </view>
 
         <!-- 中文翻译 -->
         <view class="word-translation-row">
-          <text class="word-translation">{{ word.translation }}</text>
+          <text class="word-translation">{{ word.cn }}</text>
         </view>
 
         <!-- 英文释义 -->
         <view class="word-definition-row">
-          <text class="word-definition">{{ word.definition }}</text>
+          <text class="word-definition">{{ word.en }}</text>
         </view>
 
         <!-- 例句 -->
         <view class="word-example-row">
-          <text class="word-example">"{{ word.example }}"</text>
+          <text class="word-example">"{{ word.sentence }}"</text>
         </view>
 
         <!-- 标签组 -->
@@ -83,11 +87,21 @@
       </view>
 
       <!-- 空状态提示 -->
-      <view v-if="filteredWords.length === 0" class="empty-state">
+      <view v-if="filteredWords.length === 0 && !isLoading" class="empty-state">
         <text class="empty-icon">📚</text>
         <text class="empty-text">暂无单词</text>
       </view>
-    </view>
+
+      <!-- 加载中 -->
+      <view v-if="isLoading" class="loading-state">
+        <text class="loading-text">加载中...</text>
+      </view>
+
+      <!-- 没有更多数据 -->
+      <view v-if="!hasMore && filteredWords.length > 0" class="no-more-state">
+        <text class="no-more-text">没有更多了</text>
+      </view>
+    </scroll-view>
   </view>
 </template>
 
@@ -99,115 +113,50 @@ import { WordBookListAPI } from '../../../API/Vocabulary/WordBooksAPI';
 
 // 搜索文本
 const searchText = ref('');
-
-// 当前选中的分类
-const activeCategory = ref('All');
-
+//  当前选中的分类
+// const activeCategory = ref('All');
 // 分类列表
-const categories = ref(['All', 'Academic', 'Business', 'Daily Life', 'Travel']);
+// const categories = ref(['All']);
 
 // 单词数据
-const words = ref([
-  {
-    word: 'Epiphany',
-    phonetic: '/ɪˈpɪfəni/',
-    difficulty: 'N.',
-    translation: '顿悟',
-    definition: 'A moment of sudden and great revelation or realization.',
-    example: 'He had an epiphany about his career path.',
-    tags: ['Daily Life']
-  },
-  {
-    word: 'Algorithm',
-    phonetic: '/ˈælɡərɪðəm/',
-    difficulty: 'N.',
-    translation: '算法',
-    definition: 'A process or set of rules to be followed in calculations.',
-    example: 'The search algorithm is very complex.',
-    tags: ['Tech', 'Academic']
-  },
-  {
-    word: 'Ubiquitous',
-    phonetic: '/juːˈbɪkwɪtəs/',
-    difficulty: 'ADJ.',
-    translation: '无所不在的',
-    definition: 'Present, appearing, or found everywhere.',
-    example: 'Smartphones have become ubiquitous.',
-    tags: ['Academic']
-  },
-  {
-    word: 'Serenity',
-    phonetic: '/səˈrenəti/',
-    difficulty: 'N.',
-    translation: '宁静',
-    definition: 'The state of being calm, peaceful, and untroubled.',
-    example: 'The garden was a place of serenity.',
-    tags: ['Daily Life']
-  },
-  {
-    word: 'Entrepreneur',
-    phonetic: '/ˌɑːntrəprəˈnɜːr/',
-    difficulty: 'N.',
-    translation: '企业家',
-    definition: 'A person who organizes and operates a business.',
-    example: 'She is a successful entrepreneur.',
-    tags: ['Business']
-  },
-  {
-    word: 'Resilience',
-    phonetic: '/rɪˈzɪliəns/',
-    difficulty: 'N.',
-    translation: '韧性',
-    definition: 'The capacity to recover quickly from difficulties.',
-    example: 'The team showed great resilience.',
-    tags: ['Daily Life', 'Academic']
-  },
-  {
-    word: 'Paradigm',
-    phonetic: '/ˈpærədaɪm/',
-    difficulty: 'N.',
-    translation: '范式',
-    definition: 'A typical example or pattern of something; a model.',
-    example: 'The new paradigm shift changed everything.',
-    tags: ['Academic']
-  },
-  {
-    word: 'Eloquent',
-    phonetic: '/ˈeləkwənt/',
-    difficulty: 'ADJ.',
-    translation: '雄辩的',
-    definition: 'Fluent or persuasive in speaking or writing.',
-    example: 'She gave an eloquent speech.',
-    tags: ['Academic', 'Daily Life']
-  }
-]);
+const words = ref([]);
+
+// 分页状态
+const bookId = ref('');
+const page = ref(1);
+const pageSize = ref(20);
+const total = ref(0);
+const hasMore = ref(true);
+const isLoading = ref(false);
 
 // 过滤后的单词列表
 const filteredWords = computed(() => {
   let result = words.value;
+    
+  // // 按分类过滤  
+  // if (activeCategory.value !== 'All') {
+  //   result = result.filter(word => 
+  //     word.tags && word.tags.includes(activeCategory.value)
+  //   );
+  // }
   
-  // 按分类过滤
-  if (activeCategory.value !== 'All') {
-    result = result.filter(word => word.tags.includes(activeCategory.value));
-  }
-  
-  // 按搜索文本过滤
-  if (searchText.value.trim()) {
-    const search = searchText.value.toLowerCase().trim();
-    result = result.filter(word => 
-      word.word.toLowerCase().includes(search) ||
-      word.translation.includes(search) ||
-      word.definition.toLowerCase().includes(search)
-    );
-  }
+  // // 按搜索文本过滤
+  // if (searchText.value.trim()) {
+  //   const search = searchText.value.toLowerCase().trim();
+  //   result = result.filter(word => 
+  //     word.headword.toLowerCase().includes(search) ||
+  //     word.cn.includes(search) ||
+  //     word.en.toLowerCase().includes(search)
+  //   );
+  // }
   
   return result;
 });
 
-// 选择分类
-const selectCategory = (category) => {
-  activeCategory.value = category;
-};
+// TODO 选择分类
+// const selectCategory = (category) => {
+//   activeCategory.value = category;
+// };
 
 // 播放音频
 const playAudio = (word) => {
@@ -218,25 +167,64 @@ const playAudio = (word) => {
   });
 };
 
+// 加载单词数据
+const loadWords = async () => {
+  if (isLoading.value || !hasMore.value) return;
+
+  isLoading.value = true;
+
+  try {
+    const res = await WordBookListAPI(bookId.value, page.value, pageSize.value);
+
+    if (res.code === 200) {
+      const { list, total: totalCount, hasMore: hasMoreData } = res.data;
+
+      if (page.value === 1) {
+        words.value = list;
+      } else {
+        words.value = [...words.value, ...list];
+      }
+
+      total.value = totalCount;
+      hasMore.value = hasMoreData;
+
+      console.log('单词书数据:', res);
+    }
+  } catch (err) {
+    console.error('加载单词书失败:', err);
+    uni.showToast({
+      title: '加载失败',
+      icon: 'none'
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 加载更多
+const loadMore = () => {
+  if (!isLoading.value && hasMore.value) {
+    page.value++;
+    loadWords();
+  }
+};
+
 // 页面加载
 onLoad((options) => {
   if (options && options.bookId) {
-    // 加载单词书数据
-    WordBookListAPI(options.bookId).then(res => {
-      console.log('单词书数据:', res);
-    })
-    .catch(err => {
-      console.error('加载单词书失败:', err);
-    });
+    bookId.value = options.bookId;
+    page.value = 1;
+    loadWords();
   }
 });
 </script>
-
 <style scoped>
 /* 容器 */
 .container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f7f8fa;
 }
 
@@ -257,7 +245,7 @@ onLoad((options) => {
 
 /* ========== 搜索栏区域 ========== */
 .search-section {
-  padding: 10rpx 12rpx 8rpx 12rpx;
+  padding: 10rpx 12rpx 6rpx 12rpx;
   background-color: #ffffff;
 }
 
@@ -305,7 +293,10 @@ onLoad((options) => {
 
 /* ========== 单词列表区域 ========== */
 .word-list-container {
-  padding: 24rpx 32rpx 40rpx;
+  flex: 1;
+  height: 0;
+  padding: 24rpx 30rpx 40rpx;
+  box-sizing: border-box;
 }
 
 /* 单词卡片 */
@@ -315,6 +306,8 @@ onLoad((options) => {
   padding: 24rpx 28rpx;
   margin-bottom: 18rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 单词标题行 */
@@ -323,6 +316,7 @@ onLoad((options) => {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 8rpx;
+  width: 100%;
 }
 
 .word-name {
@@ -331,6 +325,8 @@ onLoad((options) => {
   color: #1a1a1a;
   line-height: 1.3;
   flex: 1;
+  min-width: 0;
+  padding-right: 16rpx;
 }
 
 .audio-btn {
@@ -341,7 +337,7 @@ onLoad((options) => {
   height: 64rpx;
   margin-left: 16rpx;
   flex-shrink: 0;
-  background-color: #fffffb;
+  background-color: #f5f5f5;
   border-radius: 50%;
 }
 
@@ -355,10 +351,9 @@ onLoad((options) => {
 
 .word-phonetic {
   font-size: 30rpx;
-  font-weight: 680;
   color: #666666;
   margin-right: 16rpx;
-  font-family: 'Courier New', monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .word-type-badge {
@@ -457,5 +452,31 @@ onLoad((options) => {
 .empty-text {
   font-size: 28rpx;
   color: #999999;
+}
+
+/* ========== 加载中 ========== */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* ========== 没有更多 ========== */
+.no-more-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+
+.no-more-text {
+  font-size: 24rpx;
+  color: #cccccc;
 }
 </style>

@@ -90,8 +90,8 @@ const VocabularyController = {
                     message: '您未登录'
                 });
             }
-            const { bookId } = req.body;
-            const data = await VocabularyService.getWordBookList({ bookId });
+            const { bookId, page, pageSize } = req.body;
+            const data = await VocabularyService.getWordBookList({ bookId, page, pageSize });
             if (!data) {
                 return res.send({
                     code: 400,
