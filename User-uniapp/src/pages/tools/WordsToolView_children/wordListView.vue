@@ -39,7 +39,7 @@
       >
         <!-- 单词标题行 -->
         <view class="word-title-row">
-          <text class="word-name">{{ word.headWord }}</text>
+          <text class="word-name" :user-select="true">{{ word.headWord }}</text>
           <view 
             class="audio-btn" 
             @click="playAudio(word)">
@@ -52,25 +52,34 @@
 
         <!-- 音标和词性行 -->
         <view class="word-info-row">
-          <text class="word-phonetic">{{ word.phonetic }}</text>
+          <text class="word-phonetic" :user-select="true">{{ word.phonetic }}</text>
           <view class="word-type-badge">
-            <text class="word-type-text">{{ word.pos }}</text>
+            <text class="word-type-text" :user-select="true"      >{{ word.pos + '.'}}</text>
           </view>
         </view>
 
         <!-- 中文翻译 -->
         <view class="word-translation-row">
-          <text class="word-translation">{{ word.cn }}</text>
+          <text class="word-translation" :user-select="true">{{ word.cn }}</text>
         </view>
 
         <!-- 英文释义 -->
         <view class="word-definition-row">
-          <text class="word-definition">{{ word.en }}</text>
+          <text class="word-definition" :user-select="true">{{ word.en }}</text>
         </view>
 
         <!-- 例句 -->
         <view class="word-example-row">
-          <text class="word-example">"{{ word.sentence }}"</text>
+          <text class="word-example">"</text>
+          <text
+            :user-select="true"
+            v-for="(part, partIndex) in highlightWord.formatExampleSentence(word.sentence, word.headWord)" 
+            :key="partIndex"
+            :class="['word-example', { 'word-highlight': part.highlight }]"
+          >
+            {{ part.text }}
+          </text>
+          <text class="word-example">"</text>
         </view>
 
         <!-- 标签组 -->
@@ -110,6 +119,7 @@ import { ref, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import uniSearch from '../../../components/core/uniSearch.vue';
 import { WordBookListAPI } from '../../../API/Vocabulary/WordBooksAPI';
+import highlightWord from '../../../util/highlightWord.js';
 
 // 搜索文本
 const searchText = ref('');
@@ -406,6 +416,11 @@ onLoad((options) => {
   color: #888888;
   font-style: italic;
   line-height: 1.6;
+}
+
+.word-highlight {
+  color: #ff9800;
+  font-weight: 600;
 }
 
 /* 标签行 */
