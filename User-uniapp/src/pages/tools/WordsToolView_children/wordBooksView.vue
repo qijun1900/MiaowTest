@@ -85,10 +85,12 @@
             </view>
         </view>
         <dragButton
+            butColor="#ffffff"
             :show=" isShowdragButton"
             :isDock="true"
             :existTabBar="true" 
             iconType="folder-add-filled"
+            iconColor="#ff9800"
             :bottomOffset="100"
             :popMenu="false"
             @btnClick="handleBtnClick"

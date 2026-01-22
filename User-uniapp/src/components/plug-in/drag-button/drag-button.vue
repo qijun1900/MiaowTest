@@ -3,7 +3,7 @@
 			<view
 				id="_drag_button"
 				class="drag"
-				:style="'left: ' + left + 'px; top:' + top + 'px;'"
+				:style="'left: ' + left + 'px; top:' + top + 'px; background-color: ' + butColor"
 				@touchstart="touchstart"
 				@touchmove.stop.prevent="touchmove"
 				@touchend="touchend"
@@ -15,7 +15,8 @@
 			<uni-icons 
 				v-else-if="iconType" 
 				:type="iconType" 
-				:size="iconSize || 30" color="#fff">
+				:size="iconSize || 30" 
+				:color="iconColor">
 			</uni-icons>
 			<image 
 				v-else-if="icon" 
@@ -43,7 +44,7 @@
 					v-else-if="item.iconType" 
 					:type="item.iconType" 
 					:size="item.iconSize || 27" 
-					:color="item.iconType==='star-filled' ? '#f7ba2a':'#fff'">
+					:color="item.iconType==='star-filled' ? '#f7ba2a' : (item.color || '#fff')">
 				</uni-icons>
 				<image 
 					v-else-if="item.icon" 
@@ -70,6 +71,10 @@
 			show: { // 是否显示按钮
 				type: Boolean,
 				default: true
+			},
+			butColor: { // 按钮背景颜色
+				type: String,
+				default: '#1586FFB9'
 			},
 			isDock:{ // 是否固定
 				type: Boolean,
@@ -119,6 +124,10 @@
 			iconSize: { // 拖拽按钮图标大小，可选
 				type: Number,
 				default: 30
+			},
+			iconColor: { // 拖拽按钮图标颜色，可选
+				type: String,
+				default: '#ffffff'
 			},
 		},
 		data() {
@@ -250,7 +259,6 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		background-color: rgba(21, 134, 255, 0.725);
 		box-shadow: 0 0 6upx rgba(0, 0, 0, 0.4);
 		color: $uni-text-color-inverse;
 		width: 100upx;
