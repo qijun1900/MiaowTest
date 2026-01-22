@@ -245,7 +245,6 @@ const loadWords = async () => {
       total.value = totalCount;
       hasMore.value = hasMoreData;
 
-      console.log('单词书数据:', res);
     }
   } catch (err) {
     console.error('加载单词书失败:', err);
@@ -448,6 +447,8 @@ onLoad((options) => {
   background-color: #ffffff;
   border-radius: 4rpx;
   border-left: 6rpx solid #e0e0e0;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .word-example {
@@ -456,11 +457,13 @@ onLoad((options) => {
   color: #888888;
   font-style: italic;
   line-height: 1.6;
+  display: inline;
 }
 
 .word-highlight {
   color: #ff9800;
   font-weight: 600;
+  padding: 0 5rpx;
 }
 
 /* 标签行 */
