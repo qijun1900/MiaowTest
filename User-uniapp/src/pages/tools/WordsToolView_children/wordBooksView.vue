@@ -44,6 +44,7 @@
                 :key="index" 
                 v-else
                 >
+                <view v-if="book._id === wordBook_id" class="reciting-mark">正在背诵</view>
                 <image 
                 :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
                 <view class="book-content">
@@ -116,6 +117,7 @@ import escconfig from '../../../config/esc.config';
 import navBarHeightUtil from '../../../util/navBarHeight';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 import uviewPopup from '../../../components/core/uviewPopup.vue';
+import { checkWordRember } from '../../../API/Vocabulary/WordRemberAPI';
 
 const defaultBooks = ref([]);
 const currentType = ref('user'); // 'default' 或 'user'
@@ -123,6 +125,7 @@ const loading = ref(false);
 const UserWordBooks = ref([]);
 const navBarInfo = ref({});
 const popupShow = ref(false);
+const wordBook_id = ref('');
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
@@ -152,6 +155,20 @@ const fetchWordBooks = async () => {
         loading.value = false;
     }
 };
+
+//检查当前选择的词书
+const checkCurrentWordBook = async () => {
+    try {
+        const response = await checkWordRember();
+        if (response.code === 200) {
+           const {currentBook_id} = response.data;
+           wordBook_id.value = currentBook_id;
+        }
+    } catch (error) {
+        console.error("Error checking current word book:", error);
+    }
+  
+}
 
 //切换词书类型 
 const switchBookType = (type) => {
@@ -203,6 +220,11 @@ onMounted(() => {
     
     // 获取默认词书
     fetchWordBooks();
+
+    //检查当前选择的词书
+    checkCurrentWordBook();
+    
+    
 });
 </script>
 <style scoped>
@@ -332,6 +354,21 @@ onMounted(() => {
     gap: 32rpx;
     margin-bottom: 32rpx;
     position: relative;
+    overflow: hidden;
+}
+
+.reciting-mark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #f0be0a;
+    color: #ffffff;
+    font-size: 24rpx;
+    padding: 8rpx 16rpx;
+    border-bottom-left-radius: 20rpx;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: -2rpx 2rpx 4rpx rgba(0,0,0,0.1);
 }
 
 .book-image {
