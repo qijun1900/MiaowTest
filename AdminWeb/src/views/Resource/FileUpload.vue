@@ -183,10 +183,13 @@ import {
   autoDetectCategory 
 } from '@/util/resourceUtils'
 import { uploadFile } from '@/API/Resource/FileAPI'
+import { useAppStore } from '@/stores';
+
 
 const uploadRef = ref()
 const uploadFormRef = ref()
 const uploading = ref(false)
+const appStore = useAppStore()
 
 // 计算属性：文件信息用来显示元数据
 const fileInfo = computed(() => {
@@ -207,6 +210,7 @@ const form = reactive({
   ext: '', // 预留扩展字段
   size: 0, // 文件大小
   mimeType: '', // 文件类型
+  creator:appStore.userInfo.username,// 上传人
 })
 
 // 标签选项
@@ -298,10 +302,9 @@ const submitUpload = async () => {
       uploading.value = true
       try { 
         const response =  await uploadFile(form)
-
-        console.log('上传成功', response)
-        
-        ElMessage.success('上传成功')
+        if(response ===200){
+          ElMessage.success('上传成功')
+        }
         resetForm()
       } catch (error) {
         console.error(error)

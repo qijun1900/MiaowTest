@@ -9,8 +9,8 @@ const FileResourceSchema = new mongoose.Schema({
     size: { type: Number, default: 0 }, // 文件大小，单位字节
     
     // 存储信息
-    url: { type: String, default: '' }, // 访问URL
-    path: { type: String, default: '' }, // 本地存储路径或对象存储的key
+    url: { type: String, default: '' }, // 访问URL HTTP地址
+    path: { type: String, default: '' }, // 本地存储路径或对象存储的key  
     storage: { type: String, default: 'local' }, // 存储位置: local(本地), oss(阿里), cos(腾讯), kodo(七牛)
     hash: { type: String, default: '' }, // 文件指纹(MD5)，用于秒传和去重
     
@@ -22,7 +22,7 @@ const FileResourceSchema = new mongoose.Schema({
     // 分类管理
     category: { type: Number, default: 0 }, // 资源分类ID: 1图片, 2文档, 3视频, 4音频, 5其他
     description: { type: String, default: '' }, // 资源描述/备注
-    tags: { type: [String], default: [] }, // 业务标签数组
+    tag: { type: String, default: '' }, // 业务标签数组
     
     // 状态与权限
     status: { type: Number, default: 1 }, // 状态: 0禁用, 1正常,3删除

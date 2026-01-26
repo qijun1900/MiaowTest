@@ -20,6 +20,7 @@ const UniUserRouter = require('./routes/user/UserRouter'); // 引入用户端用
 const AdminConsumerRouter = require('./routes/admin/ConsumerRouter'); // 引入Admin用户端用户路由模块
 const WordBooksRouter = require('./routes/admin/WordBooksRouter'); // 引入Admin词书路由模块
 const VocabularyRouter = require('./routes/user/VocabularyRouter'); // 引入用户端词汇相关路由模块
+const AdminFileRouter = require('./routes/admin/FileRouter'); // 引入Admin资源路由模块
 
 var app = express();
 
@@ -109,6 +110,7 @@ app.use(AdminLLMRouter)//llm路由(admin)
 app.use(FunctionRouter)//功能路由(admin)
 app.use(AdminConsumerRouter)//用户路由(admin)
 app.use(WordBooksRouter)//词书路由(admin)
+app.use(AdminFileRouter)//资源路由(admin)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

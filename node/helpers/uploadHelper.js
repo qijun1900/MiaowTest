@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const ossHelper = require('./ossHelper');
+require('dotenv').config()
 
 // 生成唯一文件名
 function generateUniqueFilename(originalName) {
@@ -42,8 +43,13 @@ function uploadToOSS(ossDir) {
                 const fileUrl = await ossHelper.uploadFile(req.file.path, ossFilePath);  
                 
                 // 将文件 URL 保存到 req.file
-                req.file.ossUrl = fileUrl;
-                req.file.ossPath = ossFilePath;
+                req.file.ossUrl = fileUrl;  // 保存完整OSS URL: https://...
+                req.file.ossPath = ossFilePath; // 保存 OSS 路径 :fileresource/1769440794371-38il27har.png
+
+                //storage 存储位置: local(本地), oss(阿里), cos(腾讯), kodo(七牛)
+                if (process.env.STORAGE_TYPE === 'oss') {
+                    req.file.storage = 'oss';
+                }
                 
                 // 删除临时文件
                 fs.unlinkSync(req.file.path); // 删除临时文件

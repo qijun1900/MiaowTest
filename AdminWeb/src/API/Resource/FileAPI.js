@@ -11,11 +11,11 @@ import upload from "@/util/upload";
  * @param {ext} ext - 文件扩展名
  * @param {size} size - 文件大小，单位字节
  * @param {mimeType} mimeType - 文件MIME类型
+ * @param {creator} creator - 创建者username
  * @returns {Promise} 上传结果
  */
 export async function uploadFile(formdata) {
     try {
-        console.log("Uploading file with data:", formdata);
         const response = await upload("/adminapi/admin/file/upload", formdata);
         return response;
     }catch (error) {
