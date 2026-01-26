@@ -14,6 +14,9 @@ import consumerMessage from "../views/Consumer/ConsumerMessage.vue"
 import ConsumerManage from "@/views/Users/Consumer.vue"
 import ExamFileManage from "@/views/Exam/ExamFileManage.vue"
 import BooksManage from "@/views/WordBooks/BooksManage.vue"
+import FileList from "@/views/Resource/FileList.vue"
+import FileUpload from "@/views/Resource/FileUpload.vue"
+
 
 const routes= [
     {
@@ -95,6 +98,17 @@ const routes= [
         path: '/learn/wordbooks',
         name: 'BooksManage',
         component: BooksManage,
+    },
+    {
+        path: '/resource/filelist',
+        name: 'FileList',
+        component: FileList,
+            
+    },
+    {
+        path: '/resource/fileupload',
+        name: 'FileUpload',
+        component: FileUpload,
     }
 
 ]

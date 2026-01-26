@@ -29,7 +29,6 @@ const WordBooksController = {
             // 使用 uploadToOSS 中间件处理后的相对路径，如果没有文件则为 ""
             const cover = req.file ? req.file.relativePath : "";
             const { _id, title, tags, words, reciteCount } = req.body;
-            console.log('Received:', cover, _id, title, tags, words, reciteCount);
             if (!_id) {
                 return res.status(400).send({
                     code: 400,

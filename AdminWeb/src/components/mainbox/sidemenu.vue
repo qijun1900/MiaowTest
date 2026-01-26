@@ -60,6 +60,17 @@
         </template>
         <el-menu-item index="/consumer/message">用户意见</el-menu-item>
       </el-sub-menu>
+
+      <el-sub-menu index="/resource-manage">
+        <template #title>
+          <el-icon>
+            <FolderOpened />
+          </el-icon>
+          <span>资源管理</span>
+        </template>
+        <el-menu-item index="/resource/fileupload">资源上传</el-menu-item>
+        <el-menu-item index="/resource/filelist">资源列表</el-menu-item>
+      </el-sub-menu>
       
       <el-sub-menu index="/Model-manage">
         <template #title>
@@ -90,7 +101,8 @@ import {
   DocumentCopy,
   Cpu ,
   ChatLineRound,
-  ChatDotSquare} 
+  ChatDotSquare,
+  FolderOpened} 
   from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router';
 
