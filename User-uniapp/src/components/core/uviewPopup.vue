@@ -82,6 +82,9 @@ const handleClose = () => {
   padding: 20rpx;
   min-height: 200rpx;
   max-height: 70vh; /* 限制弹窗最大高度为视口高度的70% */
+  width: 100vw;
+  max-width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   background-color: #f3f3f3;

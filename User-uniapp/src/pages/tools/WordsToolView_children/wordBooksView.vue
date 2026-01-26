@@ -104,14 +104,58 @@
         :closeable="false">
         <template #popupcontent>
             <view class="popup-content">
+                <view class="form-item">
+                    <view class="form-item-header">
+                        <uni-icons type="compose" size="22" color="#0984e3"></uni-icons>
+                        <text class="form-label">词书名称</text>
+                    </view>
+                    <input
+                        v-model="createForm.title"
+                        class="form-input"
+                        placeholder="例如：高频3500词~"
+                        placeholder-class="placeholder-style"
+                        :maxlength="20"
+                    />
+                    <view class="input-counter">
+                        <text class="counter-text">{{ createForm.title.length }}/20</text>
+                    </view>
+                </view>
 
+                <view class="form-item">
+                    <view class="form-item-header">
+                        <uni-icons type="image" size="22" color="#0984e3"></uni-icons>
+                        <text class="form-label">选择封面</text>
+                    </view>
+                    <scroll-view class="cover-scroll" scroll-x="true" :show-scrollbar="false">
+                        <view class="cover-list">
+                            <view
+                                v-for="item in coverOptions"
+                                :key="item.id"
+                                class="cover-item"
+                                :class="{ active: createForm.coverId === item.id }"
+                                @click="selectCover(item.id)"
+                            >
+                                <image
+                                    class="cover-image"
+                                    :src="resolveCoverSrc(item)"
+                                    mode="aspectFill"
+                                />
+                            </view>
+                        </view>
+                    </scroll-view>
+                </view>
+
+                <view class="action-buttons">
+                    <view class="action-btn cancel-btn" @click="handleCreateCancel">取消</view>
+                    <view class="action-btn save-btn" @click="handleCreateSave">创建词书</view>
+                </view>
             </view>
         </template>
     </uviewPopup>
 </template>
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
+ import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../../components/core/ThemeLoading.vue';
 import escconfig from '../../../config/esc.config';
 import navBarHeightUtil from '../../../util/navBarHeight';
@@ -126,6 +170,19 @@ const UserWordBooks = ref([]);
 const navBarInfo = ref({});
 const popupShow = ref(false);
 const wordBook_id = ref('');
+const createForm = ref({
+    title: '',
+    coverId: 'fixed-cover-1'
+});
+const fixedCoverUrl = 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067';
+const coverOptions = ref([
+    { id: 'fixed-cover-1', cover: fixedCoverUrl },
+    { id: 'fixed-cover-2', cover: fixedCoverUrl },
+    { id: 'fixed-cover-3', cover: fixedCoverUrl },
+    { id: 'fixed-cover-4', cover: fixedCoverUrl },
+    { id: 'fixed-cover-5', cover: fixedCoverUrl },
+    { id: 'fixed-cover-6', cover: fixedCoverUrl }
+]);
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
@@ -135,6 +192,13 @@ const currentBooks = computed(() => {
 const baseImageUrl = computed(() => {
     return escconfig.ossDomain 
 })
+
+const resolveCoverSrc = (item) => {
+    const cover = item?.cover || item?.url || item?.path || item?.img;
+    if (!cover) return fixedCoverUrl;
+    if (/^https?:\/\//i.test(cover)) return cover;
+    return baseImageUrl.value + cover;
+}
 
 // 是否显示拖拽按钮
 const isShowdragButton = computed(() => {
@@ -156,6 +220,10 @@ const fetchWordBooks = async () => {
     }
 };
 
+if (!createForm.value.coverId && coverOptions.value.length > 0) {
+    createForm.value.coverId = coverOptions.value[0].id;
+}
+
 //检查当前选择的词书
 const checkCurrentWordBook = async () => {
     try {
@@ -167,7 +235,6 @@ const checkCurrentWordBook = async () => {
     } catch (error) {
         console.error("Error checking current word book:", error);
     }
-  
 }
 
 //切换词书类型 
@@ -186,6 +253,30 @@ const switchBookType = (type) => {
 
 const handleBtnClick = () => {
   popupShow.value = true;
+}
+
+const selectCover = (coverId) => {
+    createForm.value.coverId = coverId;
+}
+
+const handleCreateCancel = () => {
+    popupShow.value = false;
+}
+
+const handleCreateSave = () => {
+    const title = createForm.value.title.trim();
+    if (!title) {
+        uni.showToast({
+            title: '请输入词书名称',
+            icon: 'none'
+        });
+        return;
+    }
+    uni.showToast({
+        title: '已保存创建信息',
+        icon: 'success'
+    });
+    popupShow.value = false;
 }
 
 // 查看所有单词
@@ -220,6 +311,7 @@ onMounted(() => {
     
     // 获取默认词书
     fetchWordBooks();
+
 
     //检查当前选择的词书
     checkCurrentWordBook();
@@ -484,5 +576,122 @@ onMounted(() => {
 .empty-hint {
     font-size: 26rpx;
     color: #b2bec3;
+}
+
+/* 创建词书弹窗 */
+.popup-content {
+    padding: 8rpx 8rpx 20rpx;
+}
+
+.form-item {
+    background-color: #ffffff;
+    border-radius: 20rpx;
+    padding: 24rpx;
+    border: 2rpx solid #dfe6e9;
+    margin-bottom: 20rpx;
+    box-shadow: 0 4rpx 0 #dfe6e9;
+    overflow: hidden;
+}
+
+.cover-scroll {
+    width: 100%;
+    overflow: hidden;
+}
+
+.form-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    margin-bottom: 16rpx;
+}
+
+.form-label {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: #2d3436;
+}
+
+.form-input {
+    background-color: #f7fbff;
+    border-radius: 16rpx;
+    padding: 18rpx 20rpx;
+    font-size: 28rpx;
+    color: #2d3436;
+    border: 2rpx solid #dfe6e9;
+}
+
+.placeholder-style {
+    color: #b2bec3;
+}
+
+.input-counter {
+    text-align: right;
+    margin-top: 10rpx;
+}
+
+.counter-text {
+    font-size: 24rpx;
+    color: #b2bec3;
+}
+
+
+.cover-list {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 16rpx;
+    width: auto;
+    padding: 6rpx 4rpx 10rpx;
+}
+
+.cover-item {
+    flex: 0 0 auto;
+    width: 180rpx;
+    background-color: #f7fbff;
+    border-radius: 18rpx;
+    padding: 10rpx;
+    border: 2rpx solid #dfe6e9;
+    transition: all 0.2s ease;
+}
+
+.cover-item.active {
+    border-color: #0984e3;
+    box-shadow: 0 6rpx 0 #74b9ff;
+    transform: translateY(-2rpx);
+}
+
+.cover-image {
+    width: 100%;
+    height: 240rpx;
+    border-radius: 12rpx;
+    object-fit: cover;
+    display: block;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 16rpx;
+    margin-top: 12rpx;
+}
+
+.action-btn {
+    flex: 1;
+    text-align: center;
+    padding: 20rpx 0;
+    border-radius: 18rpx;
+    font-size: 28rpx;
+    font-weight: 700;
+}
+
+.cancel-btn {
+    background-color: #ffffff;
+    color: #636e72;
+    border: 2rpx solid #dfe6e9;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+    color: #ffffff;
+    border: 2rpx solid #0652DD;
+    box-shadow: 0 6rpx 0 #0652DD;
 }
 </style>

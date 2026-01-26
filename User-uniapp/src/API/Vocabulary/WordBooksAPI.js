@@ -23,6 +23,28 @@ export async function getWordBooksAPI() {
     }
 }
 
+/**
+ * @description 获取词书封面列表接口
+ * @URL /uniappAPI/tools/vocabulary/getWordBookCovers
+ * @method GET
+ * @returns {
+ *   code: number,
+ *   data: {
+ *     covers: Array
+ *   }
+ * }
+ */
+export async function getWordBookCoversAPI() {
+    try {
+        return await http({
+            url: '/uniappAPI/tools/vocabulary/getWordBookCovers',
+            method: 'GET',
+        })
+    } catch (error) {
+        console.error("getWordBookCovers 失败", error);
+    }
+}
+
  /**
   * @description 根据_id获取单词书列表
   * @URL /uniappAPI/tools/vocabulary/getWordBookList
