@@ -182,23 +182,13 @@ import {
   getCategoryTagType, 
   autoDetectCategory 
 } from '@/util/resourceUtils'
-import { uploadFile } from '@/API/Resource/FileAPI'
+import { uploadFile, getTags } from '@/API/Resource/FileAPI'
 import { useAppStore } from '@/stores';
-
 
 const uploadRef = ref()
 const uploadFormRef = ref()
 const uploading = ref(false)
 const appStore = useAppStore()
-
-// 计算属性：文件信息用来显示元数据
-const fileInfo = computed(() => {
-  if (!form.file) return null
-  return {
-    size: form.file.size,
-    mimeType: form.file.type,
-  }
-})
 
 // 表单数据
 const form = reactive({
@@ -214,30 +204,7 @@ const form = reactive({
 })
 
 // 标签选项
-const tagOptions = ref([
-  { value: '英语', label: '英语' },
-  { value: '数学', label: '数学' },
-  { value: '语文', label: '语文' },
-  { value: '物理', label: '物理' },
-  { value: '化学', label: '化学' }
-])
-
-// 模拟从后端获取标签数据
-const fetchTags = async () => {
-  try {
-    // const res = await request.get('/adminapi/resource/tags')
-    // tagOptions.value = res.data.map(tag => ({ value: tag, label: tag }))
-    
-    // 模拟延迟
-    // await new Promise(resolve => setTimeout(resolve, 500))
-  } catch (error) {
-    console.error('获取标签失败', error)
-  }
-}
-
-onMounted(() => {
-  fetchTags()
-})
+const tagOptions = ref([])
 
 // 表单校验规则
 const rules = {
@@ -251,6 +218,34 @@ const rules = {
     { required: true, message: '请选择或输入标签', trigger: 'change' }
   ],
 }
+
+// 计算属性：文件信息用来显示元数据
+const fileInfo = computed(() => {
+  if (!form.file) return null
+  return {
+    size: form.file.size,
+    mimeType: form.file.type,
+  }
+})
+
+// 从后端获取业务标签数组
+const fetchTags = async () => {
+  try {
+    const response = await getTags()
+    if( response.code === 200){
+      tagOptions.value = response.data.map(tag => ({
+        label: tag,
+        value: tag
+      }))
+    }
+  } catch (error) {
+    console.error('获取标签失败', error)
+  }
+}
+
+onMounted(() => {
+  fetchTags()
+})
 
 // 文件变动处理（自动填充信息）
 const handleFileChange = (uploadFile) => {
@@ -278,6 +273,7 @@ const handleExceed = (files) => {
   const file = files[0]
   uploadRef.value.handleStart(file)
 }
+
 //  移除文件处理
 const handleRemove = () => {
   form.file = null
@@ -302,8 +298,9 @@ const submitUpload = async () => {
       uploading.value = true
       try { 
         const response =  await uploadFile(form)
-        if(response ===200){
+        if(response.code === 200){
           ElMessage.success('上传成功')
+          tagOptions.value.push({ label: form.tag, value: form.tag })
         }
         resetForm()
       } catch (error) {
@@ -316,6 +313,7 @@ const submitUpload = async () => {
   })
 }
 
+// 重置表单
 const resetForm = () => {
   uploadRef.value.clearFiles()
   uploadFormRef.value.resetFields()

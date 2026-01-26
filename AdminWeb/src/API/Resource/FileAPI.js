@@ -1,4 +1,4 @@
-// import axios from "axios";
+import axios from "axios";
 import upload from "@/util/upload";
 
 /**
@@ -22,4 +22,19 @@ export async function uploadFile(formdata) {
         console.error("Error during file upload:", error);
         throw error;
     }
+}
+
+/**
+ * @description 获取业务标签数组
+ * @returns {Promise} 标签数组
+ */
+export async function getTags() {
+    try {
+        const response = await axios.get("/adminapi/admin/file/tags");
+        return response.data;
+    }catch (error) {
+        console.error("Error during get tags:", error);
+        throw error;
+    }
+    
 }

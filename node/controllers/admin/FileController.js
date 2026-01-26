@@ -39,6 +39,30 @@ const FileController = {
                 message: '文件上传失败'
             })
         }
+    },
+    getTags: async (req, res) => {
+        try {
+            const result = await FileService.getTags();
+            if (!result) {
+                return res.status(500).send({
+                    code: 500,
+                    ActionType: 'ERROR',
+                });
+            }
+            res.send({
+                code: 200,
+                ActionType: 'OK',
+                data: result,
+            });
+        }catch (error) {
+            console.error('获取业务标签数组失败:', error);
+            res.status(500).send({
+                code: 500,
+                ActionType: 'ERROR',
+                message: '获取业务标签数组失败'
+            })
+        }
+        
     }
 
 }

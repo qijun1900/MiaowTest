@@ -25,11 +25,21 @@ const FileService = {
             await fileResource.save();
             return fileResource;
         }catch (error) {
-            console.error('ERRor:database Type: FileService 上传文件失败:', error);
+            console.error('ERROR:database Type: FileService 上传文件失败:', error);
+            throw error;
+        }
+    },
+    getTags: async () => {
+        try {
+            const tags = await FileResourceModel.distinct('tag', 
+                { tag: { $ne: '' } }
+            );
+            return tags;
+        }catch (error) {
+            console.error('ERROR:database Type: FileService 获取业务标签数组失败:', error);
             throw error;
         }
     }
-
 }
 module.exports = FileService;
     
