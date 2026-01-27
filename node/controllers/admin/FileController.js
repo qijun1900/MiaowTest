@@ -63,6 +63,33 @@ const FileController = {
             })
         }
         
+    },
+    getFileList: async (req, res) => {
+        try {
+            const {page,size} = req.query
+            const result = await FileService.getFileList({
+                page: Number(page), size: Number(size)}
+            );
+            if (!result) {
+                return res.status(500).send({
+                    code: 500,
+                    ActionType: 'ERROR',
+                });
+            }
+            res.send({
+                code: 200,
+                data: result,
+            });
+        }catch (error) {
+            console.error('获取资源列表失败:', error);
+            res.status(500).send({
+                code: 500,
+                ActionType: 'ERROR',
+                message: '获取资源列表失败'
+            })
+        }
+        
+
     }
 
 }

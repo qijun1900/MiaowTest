@@ -1,8 +1,8 @@
 const FileResourceModel = require('../../models/FileResourceModel');
 const FileService = {
     uploadFile: async ({
-        url, storage, name, category, description, 
-        tag, ext, size, mimeType, creator, path,status,
+        url, storage, name, category, description,
+        tag, ext, size, mimeType, creator, path, status,
     }) => {
         try {
             const fileResource = new FileResourceModel({
@@ -11,7 +11,7 @@ const FileService = {
                 name,
                 originalName: name,
                 category,
-                description,    
+                description,
                 tag,
                 ext,
                 size,
@@ -24,22 +24,57 @@ const FileService = {
             });
             await fileResource.save();
             return fileResource;
-        }catch (error) {
+        } catch (error) {
             console.error('ERROR:database Type: FileService 上传文件失败:', error);
             throw error;
         }
     },
     getTags: async () => {
         try {
-            const tags = await FileResourceModel.distinct('tag', 
+            const tags = await FileResourceModel.distinct('tag',
                 { tag: { $ne: '' } }
             );
             return tags;
-        }catch (error) {
+        } catch (error) {
             console.error('ERROR:database Type: FileService 获取业务标签数组失败:', error);
+            throw error;
+        }
+    },
+    getFileList: async ({ page, size }) => {
+        try {
+            const skip = (page - 1) * size;
+            // 获取总数
+            const total = await FileResourceModel.countDocuments();
+            // 获取分页数据
+            const fileList = await FileResourceModel.find({},{
+                _id:1,
+                name:1,
+                originalName:1,
+                ext:1,
+                mimeType:1,
+                size:1,
+                url:1,
+                storage:1,
+                category:1,
+                description:1,
+                tag:1,
+                status:1,
+                creator:1,
+                createTime:1,
+                editTime:1,
+            }).sort({ createTime: -1 })
+                .skip(skip)
+                .limit(size)
+                .lean(); // 转换为普通对象
+                
+            return {
+                list: fileList,
+                total,
+            };
+        } catch (error) {
+            console.error('ERROR:database Type: FileService 获取资源列表失败:', error);
             throw error;
         }
     }
 }
 module.exports = FileService;
-    

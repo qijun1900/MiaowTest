@@ -234,69 +234,11 @@ const total = ref(0);
 const tableData = ref([]); // 模拟数据库
 const selectedFile = ref(null);
 
-// 模拟数据
-const mockData = [
-    {
-        _id: '1',
-        name: 'banner_design_v2.png',
-        originalName: 'banner_design_v2.png',
-        ext: '.png',
-        mimeType: 'image/png',
-        size: 2450000,
-        url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        storage: 'oss',
-        width: 1920,
-        height: 1080,
-        tag: 'banner',
-        createTime: new Date('2023-10-01T10:00:00')
-    },
-    {
-        _id: '2',
-        name: 'intro_video.mp4',
-        originalName: 'intro_final.mp4',
-        ext: '.mp4',
-        mimeType: 'video/mp4',
-        size: 15600000,
-        url: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
-        storage: 'local',
-        duration: 120,
-        tag: 'video',
-        createTime: new Date('2023-10-02T14:30:00')
-    },
-    {
-        _id: '3',
-        name: 'project_specs.pdf',
-        originalName: 'specs_2023.pdf',
-        ext: '.pdf',
-        mimeType: 'application/pdf',
-        size: 450000,
-        url: '#',
-        storage: 'local',
-        tag: 'document',
-        createTime: new Date('2023-10-05T09:15:00')
-    }
-];
-
-// 生成更多数据
-for (let i = 4; i < 40; i++) {
-    mockData.push({
-        _id: `${i}`,
-        name: `file_resource_${i}.jpg`,
-        originalName: `IMG_${i + 1000}.jpg`,
-        ext: '.jpg',
-        mimeType: 'image/jpeg',
-        size: Math.floor(Math.random() * 5000000),
-        url: 'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
-        storage: 'oss',
-        tag: i % 2 === 0 ? 'test' : '',
-        createTime: new Date()
-    });
-}
 
 const handlePageChange = ({page, size}) => {
     currentPage.value = page
     pageSize.value = size
-    fetchData();
+    fetchData();    
 };
 const fetchData = async () => {
     loading.value = true;
@@ -307,7 +249,10 @@ const fetchData = async () => {
             size: pageSize.value
         });
         console.log(res);
-
+        if(res.code === 200){
+            tableData.value = res.data.list;
+            total.value = res.data.total;
+        }
     }catch(err){
         console.error(err);
         ElMessage.error('获取文件列表失败');
