@@ -40,13 +40,32 @@ const FileService = {
             throw error;
         }
     },
-    getFileList: async ({ page, size }) => {
+    getFileList: async ({ page, size, search, tag }) => {
         try {
             const skip = (page - 1) * size;
+            // 构建查询条件
+            const query = {};
+            const conditions = [];
+            
+            // 添加搜索条件
+            if (search) {
+                conditions.push({ name: { $regex: search, $options: 'i' } }); // 模糊匹配名称，忽略大小写
+            }
+            
+            // 添加标签筛选
+            if (tag) {
+                conditions.push({ tag: tag });
+            }
+            
+            // 应用查询条件
+            if (conditions.length > 0) {
+                query.$and = conditions;
+            }
+            
             // 获取总数
-            const total = await FileResourceModel.countDocuments();
+            const total = await FileResourceModel.countDocuments(query);
             // 获取分页数据
-            const fileList = await FileResourceModel.find({},{
+            const fileList = await FileResourceModel.find(query,{
                 _id:1,
                 name:1,
                 originalName:1,
@@ -65,8 +84,7 @@ const FileService = {
             }).sort({ createTime: -1 })
                 .skip(skip)
                 .limit(size)
-                .lean(); // 转换为普通对象
-                
+                .lean();
             return {
                 list: fileList,
                 total,

@@ -12,31 +12,57 @@
                             <FolderOpened />
                         </el-icon>
                         <span>文件列表</span>
-                        <!-- <el-tag 
-                            v-if="tag" 
-                            size="small" 
-                            effect="plain" 
-                            class="ml-2">{{ tag }}
-                        </el-tag> -->
                     </div>
                     <div class="header-actions">
-                        <el-input v-model="searchQuery" placeholder="搜索文件名..." :prefix-icon="Search" clearable
-                            class="search-input" @input="handleSearch" />
-                        <el-button type="primary" :icon="Upload" @click="handleUpload">
+                        <el-input 
+                            v-model="searchQuery" 
+                            placeholder="搜索文件名..." 
+                            :prefix-icon="Search" 
+                            clearable
+                            class="search-input" 
+                            @input="handleSearch" />
+                        <el-select
+                            v-model="selectedTag"
+                            placeholder="按标签筛选"
+                            clearable
+                            filterable
+                            default-first-option
+                            class="tag-select"
+                            @change="handleTagChange"
+                        >
+                            <el-option
+                                v-for="item in tagOptions"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            />
+                        </el-select>
+                        <el-button type="primary" 
+                            :icon="Upload" 
+                            @click="handleUpload">
                             上传文件
                         </el-button>
-                        <el-button :icon="Refresh" circle @click="refreshData" />
+                        <el-button 
+                            :icon="Refresh" 
+                            circle 
+                            @click="refreshData" 
+                        />
                     </div>
                 </div>
 
                 <div class="pane-content">
-                    <el-table :data="tableData" style="width: 100%; height: 100%" height="100%" highlight-current-row
-                        @current-change="handleCurrentChange" v-loading="loading" class="custom-table">
+                    <el-table 
+                        :data="tableData" 
+                        style="width: 100%; 
+                        height: 100%" height="100%" 
+                        highlight-current-row
+                        @current-change="handleCurrentChange" 
+                        v-loading="loading" >
                         <el-table-column prop="name" label="文件名" min-width="180">
                             <template #default="{ row }">
                                 <div class="file-name-cell">
                                     <el-icon class="file-icon" :size="20">
-                                        <component :is="getFileIcon(row)" />
+                                        <component :is="getFileIcon(row, { Picture, VideoPlay, Headset, Document })" />
                                     </el-icon>
                                     <span class="text-truncate">{{ row.name }}</span>
                                 </div>
@@ -44,19 +70,29 @@
                         </el-table-column>
                         <el-table-column prop="size" label="大小" width="100">
                             <template #default="{ row }">
-                                {{ formatSize(row.size) }}
+                                {{ formatFileSize(row.size) }}
                             </template>
                         </el-table-column>
                         <el-table-column prop="mimeType" label="类型" width="120" show-overflow-tooltip />
                         <el-table-column prop="createTime" label="上传时间" width="160">
                             <template #default="{ row }">
-                                {{ formatDate(row.createTime) }}
+                                {{ formatTime.formatDate(row.createTime) }}
                             </template>
                         </el-table-column>
                         <el-table-column label="操作" width="100" fixed="right">
                             <template #default="{ row }">
-                                <el-button link type="danger" size="small"
-                                    @click.stop="handleDelete(row)">删除</el-button>
+                                <el-button 
+                                    link 
+                                    type="danger" 
+                                    size="small"
+                                    @click.stop="handleDelete(row)">删除
+                                </el-button>
+                                <el-button
+                                    link 
+                                    type="primary" 
+                                    size="small"
+                                    @click.stop="HnadleEditFile(row)">编辑
+                                </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -135,7 +171,7 @@
                         </div>
                         <div class="info-item">
                             <span class="label">大小</span>
-                            <span class="value">{{ formatSize(selectedFile.size) }}</span>
+                            <span class="value">{{ formatFileSize(selectedFile.size) }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">分辨率</span>
@@ -164,7 +200,7 @@
                         </div>
                         <div class="info-item">
                             <span class="label">创建时间</span>
-                            <span class="value">{{ formatDate(selectedFile.createTime) }}</span>
+                            <span class="value">{{ formatTime.formatDate(selectedFile.createTime) }}</span>
                         </div>
                         <div class="info-item block">
                             <span class="label">URL</span>
@@ -188,9 +224,11 @@ import {
     CopyDocument, Download
 } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import moment from 'moment';
 import Pagination from '@/components/ReuseComponents/Pagination.vue';
-import { getFileList } from '@/API/Resource/FileAPI';
+import { getFileList, getTags } from '@/API/Resource/FileAPI';
+import RouterPush from '@/util/RouterPush';
+import { formatFileSize, isImage, isVideo, isAudio, getFileIcon } from '@/util/resourceUtils';
+import formatTime from '@/util/formatTime';
 
 // 布局调整逻辑
 const leftPaneWidth = ref(65); // 百分比
@@ -234,19 +272,40 @@ const total = ref(0);
 const tableData = ref([]); // 模拟数据库
 const selectedFile = ref(null);
 
+// 标签筛选
+const tagOptions = ref([]);
+const selectedTag = ref('');
+
+// 获取标签列表
+const fetchTags = async () => {
+    try {
+        const response = await getTags();
+        if (response.code === 200) {
+            tagOptions.value = response.data.map(tag => ({
+                label: tag,
+                value: tag
+            }));
+        }
+    } catch (error) {
+        console.error('获取标签失败', error);
+    }
+};
+
 
 const handlePageChange = ({page, size}) => {
     currentPage.value = page
     pageSize.value = size
     fetchData();    
 };
+
 const fetchData = async () => {
     loading.value = true;
     try{
         const res = await getFileList({
             search: searchQuery.value,
+            tag: selectedTag.value,
             page: currentPage.value,
-            size: pageSize.value
+            size: pageSize.value,
         });
         console.log(res);
         if(res.code === 200){
@@ -262,16 +321,18 @@ const fetchData = async () => {
 };
 
 onMounted(() => {
+    fetchTags();
     fetchData();
 });
 
-const handleSearch = () => {
+// 处理标签筛选
+const handleTagChange = () => {
     currentPage.value = 1;
     fetchData();
 };
 
 const handleUpload = () => {
-    ElMessage.info('上传功能暂未实现 (Waiting for Backend)');
+    RouterPush( '/resource/fileupload',);
 };
 
 const refreshData = () => {
@@ -283,49 +344,30 @@ const handleCurrentChange = (val) => {
     selectedFile.value = val;
 };
 
-
+const handleSearch = () => {
+    currentPage.value = 1;
+    fetchData();
+};
 
 const handleDelete = (row) => {
     console.log(row)
 };
-
-// 工具函数
-const formatSize = (bytes) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-const formatDate = (date) => {
-    if (!date) return '-';
-    return moment(date).format('YYYY-MM-DD HH:mm:ss');
-};
-
-const getFileIcon = (file) => {
-    if (file.mimeType.startsWith('image/')) return Picture;
-    if (file.mimeType.startsWith('video/')) return VideoPlay;
-    if (file.mimeType.startsWith('audio/')) return Headset;
-    return Document;
-};
-
-const isImage = (file) => file.mimeType.startsWith('image/');
-const isVideo = (file) => file.mimeType.startsWith('video/');
-const isAudio = (file) => file.mimeType.startsWith('audio/');
 
 const copyLink = (url) => {
     navigator.clipboard.writeText(url).then(() => {
         ElMessage.success('链接已复制');
     });
 };
+const HnadleEditFile = (file) => {
+    ElMessage.info(`编辑文件: ${file.name}`);
+};
 
+// TODO 下载
 const downloadFile = (file) => {
     ElMessage.info(`开始下载: ${file.name}`);
 };
 
 </script>
-
 <style scoped>
 .file-manager-container {
     width: 100%;
@@ -377,6 +419,10 @@ const downloadFile = (file) => {
 
 .search-input {
     width: 200px;
+}
+
+.tag-select {
+    width: 180px;
 }
 
 .pane-content {

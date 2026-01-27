@@ -48,3 +48,16 @@ export const autoDetectCategory = (mimeType, fileName) => {
     return 5
   }
 }
+
+export const isImage = (file) => file.mimeType.startsWith('image/')
+
+export const isVideo = (file) => file.mimeType.startsWith('video/')
+
+export const isAudio = (file) => file.mimeType.startsWith('audio/')
+
+export const getFileIcon = (file, iconMap) => {
+  if (isImage(file)) return iconMap?.Picture || 'Picture'
+  if (isVideo(file)) return iconMap?.VideoPlay || 'VideoPlay'
+  if (isAudio(file)) return iconMap?.Headset || 'Headset'
+  return iconMap?.Document || 'Document'
+}

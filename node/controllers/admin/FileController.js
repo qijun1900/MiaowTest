@@ -66,11 +66,15 @@ const FileController = {
     },
     getFileList: async (req, res) => {
         try {
-            const {page,size} = req.query
+            const {page,size,search,tag} = req.query
+            console.log("Received getFileList request with params:", req.query);
             const result = await FileService.getFileList({
-                page: Number(page), size: Number(size)}
-            );
-            if (!result) {
+                page: Number(page), 
+                size: Number(size), 
+                search: search || "",
+                tag: tag || ""
+            });
+            if (!result) {  
                 return res.status(500).send({
                     code: 500,
                     ActionType: 'ERROR',

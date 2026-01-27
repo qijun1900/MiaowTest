@@ -43,7 +43,9 @@ export async function getTags() {
  * @param {Object} params - 查询参数，包括分页信息和其他筛选条件
  * @param {number} params.page - 当前页码，默认为1
  * @param {number} params.size - 每页显示的消息数量，默认为10
- * @returns {Promise<Array>} 用户消息列表
+ * @param {string} params.search - 搜索关键词
+ * @param {string} params.tag - 资源标签
+ * @returns {Promise<Array>} 用户文件列表
  */
 export async function getFileList(params) {
     try {
