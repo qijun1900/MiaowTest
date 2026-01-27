@@ -36,5 +36,29 @@ export async function getTags() {
         console.error("Error during get tags:", error);
         throw error;
     }
-    
+}
+
+/**
+ * @description 获取资源
+ * @param {Object} params - 查询参数，包括分页信息和其他筛选条件
+ * @param {number} params.page - 当前页码，默认为1
+ * @param {number} params.size - 每页显示的消息数量，默认为10
+ * @returns {Promise<Array>} 用户消息列表
+ */
+export async function getFileList(params) {
+    try {
+        const response = await axios.get("/adminapi/admin/file/list",{
+             params:{
+                page: params?.page || 1,
+                size: params?.size || 10,
+               ...params
+            }
+        });
+        return response.data;
+        
+    }
+    catch (error) {
+        console.error("Error fetching file list:", error);
+        throw error;
+    }
 }

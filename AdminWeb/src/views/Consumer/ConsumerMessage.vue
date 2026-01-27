@@ -336,8 +336,7 @@ const handleRefreshMessageList = async () => {
         if (res.code === 200) {
             feedbackList.value = res.data.data// 数据列表
             total.value = res.data.total// 总条数
-        }
-        
+        } 
     }catch (error) {
         console.error('获取用户信息列表失败:', error)
     }finally {

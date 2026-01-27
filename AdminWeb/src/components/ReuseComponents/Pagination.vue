@@ -8,6 +8,7 @@
     :page-sizes="[10,20,30, 50, 100, 200, 500, 1000]"
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
+    :size="props.size"
     />
 </template>
 <script setup>
@@ -25,6 +26,10 @@ const props = defineProps({
     type: Number,
     default: 1
   },
+  size: {// 大小
+    type: String,
+    default: 'default'// medium small mini
+  }
 })
 const currentPage = ref(props.currentPage)
 const pageSize = ref(props.pageSize)
