@@ -106,19 +106,17 @@
 #### Uniapp 用户端
 ```
 框架核心：Uniapp + Vue3 + Vite
-状态管理：Pinia + Pinia持久化插件
-UI组件：uView Plus + Element Plus
-图表展示：Chart.js
-样式预处理：Sass/SCSS
+状态管理：Pinia 持久化插件
+UI组件：uView Plus + uni-ui
 代码规范：ESLint
 ```
 
 #### Vue3 管理端
 ```
 框架核心：Vue3 + Vite
-状态管理：Vuex + Vuex持久化插件
+状态管理:Pinia持久化插件
 UI组件：Element Plus
-图表展示：Chart.js + vue-chartjs
+图表展示: vue-chartjs
 富文本编辑器：wangEditor
 代码规范：ESLint
 ```
