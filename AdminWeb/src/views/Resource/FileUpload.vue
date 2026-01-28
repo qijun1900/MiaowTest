@@ -301,6 +301,10 @@ const submitUpload = async () => {
         if(response.code === 200){
           ElMessage.success('上传成功')
           tagOptions.value.push({ label: form.tag, value: form.tag })
+          // 刷新标签选项，避免重复
+          tagOptions.value = tagOptions.value.filter((item, index, self) =>
+            index === self.findIndex((t) => t.value === item.value)
+          )
         }
         resetForm()
       } catch (error) {
