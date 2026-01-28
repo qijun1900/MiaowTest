@@ -250,24 +250,215 @@
             </div>
         </div>
     </div>
+
+    <!-- 编辑对话框 -->
+    <Dialog
+        :DilogTitle="'编辑文件资源'"
+        :DilogButContent="isUpdating ? '更新中...' : '确认更新'"
+        DilogWidth="800px"
+        :draggable="true"
+        top="5vh"
+        v-model="dialogVisible"
+        @dialog-confirm="handleConfirmEdit">
+        <template #dialogcontent>
+            <el-form
+                ref="editFormRef"
+                :model="editForm"
+                label-position="top"
+                class="edit-form">
+                
+                <!-- 文件上传区域 -->
+                <el-form-item label="替换文件（可选）">
+                    <el-alert
+                        v-if="!editForm.file"
+                        title="当前保持原文件不变"
+                        type="info"
+                        :closable="false"
+                        show-icon
+                        style="margin-bottom: 12px;">
+                        <template #default>
+                            <span style="font-size: 13px;">如需替换文件，请上传新文件；否则仅更新文件信息</span>
+                        </template>
+                    </el-alert>
+                    <el-alert
+                        v-else
+                        title="将替换为新文件"
+                        type="warning"
+                        :closable="false"
+                        show-icon
+                        style="margin-bottom: 12px;">
+                        <template #default>
+                            <span style="font-size: 13px;">确认后将使用新文件替换原文件，原文件将被删除</span>
+                        </template>
+                    </el-alert>
+                    
+                    <div class="upload-wrapper-edit" :class="{ 'has-file': !!editForm.file }">
+                        <el-upload
+                            ref="uploadRef"
+                            class="upload-dragger-edit"
+                            drag
+                            action="#"
+                            :auto-upload="false"
+                            :limit="1"
+                            :on-change="handleFileChange"
+                            :on-exceed="handleExceed"
+                            :on-remove="handleRemove"
+                            :show-file-list="false">
+                            <div class="upload-inner-edit">
+                                <div v-if="!editForm.file" class="upload-empty-edit">
+                                    <div class="icon-box-edit">
+                                        <el-icon><UploadFilled /></el-icon>
+                                    </div>
+                                    <div class="upload-text-edit">
+                                        <h4>点击或拖拽文件到此处替换</h4>
+                                        <p>不上传则保持原文件不变</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 选中文件后的预览 -->
+                                <div v-else class="file-selected-edit">
+                                    <div class="file-icon-wrapper-edit">
+                                        <div class="file-icon-edit">
+                                            <el-icon v-if="editForm.category === 1"><Picture /></el-icon>
+                                            <el-icon v-else-if="editForm.category === 2"><Document /></el-icon>
+                                            <el-icon v-else-if="editForm.category === 3"><VideoPlay /></el-icon>
+                                            <el-icon v-else-if="editForm.category === 4"><Headset /></el-icon>
+                                            <el-icon v-else><Files /></el-icon>
+                                        </div>
+                                    </div>
+                                    <div class="file-name-edit" :title="editForm.file.name">{{ editForm.file.name }}</div>
+                                    <div class="file-actions-edit">
+                                        <el-button type="primary" text bg @click.stop="handleRemove">
+                                            <el-icon style="margin-right: 4px;"><RefreshLeft /></el-icon>
+                                            取消替换
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-upload>
+                    </div>
+                    
+                    <!-- 文件元数据 -->
+                    <transition name="el-fade-in">
+                        <div v-if="editFileInfo" class="file-meta-card-edit">
+                            <div class="meta-header-edit">
+                                <el-icon><InfoFilled /></el-icon>
+                                <span>新文件元数据</span>
+                            </div>
+                            <div class="meta-grid-edit">
+                                <div class="meta-item-edit">
+                                    <span class="label">文件大小</span>
+                                    <span class="value">{{ formatSize(editFileInfo.size) }}</span>
+                                </div>
+                                <div class="meta-item-edit">
+                                    <span class="label">文件类型</span>
+                                    <span class="value">{{ editFileInfo.mimeType || '未知' }}</span>
+                                </div>
+                                <div class="meta-item-edit full">
+                                    <span class="label">智能分类</span>
+                                    <span class="value">
+                                        <el-tag :type="getCategoryTagType(editForm.category)" effect="plain" round size="small">
+                                            {{ getCategoryLabel(editForm.category) }}
+                                        </el-tag>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </transition>
+                </el-form-item>
+
+                <!-- 文件名 -->
+                <el-form-item label="文件名" required>
+                    <el-input
+                        v-model="editForm.name"
+                        placeholder="请输入文件名"
+                        prefix-icon="Edit"
+                        clearable
+                        size="large" />
+                </el-form-item>
+
+                <!-- 资源分类 -->
+                <el-form-item label="资源分类" required>
+                    <el-radio-group v-model="editForm.category" class="category-radio-group-edit">
+                        <el-radio-button :value="1">
+                            <div class="radio-content-edit"><el-icon><Picture /></el-icon> 图片</div>
+                        </el-radio-button>
+                        <el-radio-button :value="2">
+                            <div class="radio-content-edit"><el-icon><Document /></el-icon> 文档</div>
+                        </el-radio-button>
+                        <el-radio-button :value="3">
+                            <div class="radio-content-edit"><el-icon><VideoPlay /></el-icon> 视频</div>
+                        </el-radio-button>
+                        <el-radio-button :value="4">
+                            <div class="radio-content-edit"><el-icon><Headset /></el-icon> 音频</div>
+                        </el-radio-button>
+                        <el-radio-button :value="5">
+                            <div class="radio-content-edit"><el-icon><More /></el-icon> 其他</div>
+                        </el-radio-button>
+                    </el-radio-group>
+                </el-form-item>
+
+                <!-- 业务标签 -->
+                <el-form-item label="业务标签" required>
+                    <el-select
+                        v-model="editForm.tag"
+                        placeholder="请选择或输入标签"
+                        allow-create
+                        filterable
+                        clearable
+                        default-first-option
+                        size="large"
+                        style="width: 100%">
+                        <el-option
+                            v-for="item in tagOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                    <div class="form-tip-edit">
+                        <el-icon><InfoFilled /></el-icon>
+                        支持选择已有标签或直接输入新标签
+                    </div>
+                </el-form-item>
+
+                <!-- 资源描述 -->
+                <el-form-item label="资源描述">
+                    <el-input
+                        v-model="editForm.description"
+                        type="textarea"
+                        :rows="3"
+                        placeholder="请输入资源描述或备注信息..."
+                        resize="none"
+                        maxlength="200"
+                        show-word-limit />
+                </el-form-item>
+            </el-form>
+        </template>
+    </Dialog>
 </template>
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import {
     Search, Upload, Refresh, FolderOpened,
     Picture, Document, VideoPlay, Headset,
-    CopyDocument, Download
+    CopyDocument, Download, UploadFilled, RefreshLeft,
+    InfoFilled, Files, More
 } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import Pagination from '@/components/ReuseComponents/Pagination.vue';
-import { getFileList, getTags, deleteFile } from '@/API/Resource/FileAPI';
+import Dialog from '@/components/ReuseComponents/Dialog .vue';
+import { getFileList, getTags, deleteFile, updateFile } from '@/API/Resource/FileAPI';
 import RouterPush from '@/util/RouterPush';
 import { 
     isImage,
     isVideo, 
     isAudio, 
-    getFileIcon } 
-from '@/util/resourceUtils';
+    getFileIcon,
+    formatFileSize as formatSize,
+    getCategoryLabel,
+    getCategoryTagType,
+    autoDetectCategory
+} from '@/util/resourceUtils';
 import { 
     getFileIconClass, 
     getFileTypeTagType, 
@@ -276,7 +467,9 @@ import {
     formatFileSize } 
 from '@/util/fileListUtils';
 import formatTime from '@/util/formatTime';
+import { useAppStore } from '@/stores';
 
+const appStore = useAppStore()
 // 布局调整逻辑
 const leftPaneWidth = ref(65); // 百分比
 const isResizing = ref(false);
@@ -301,6 +494,26 @@ const isUploadHover = ref(false);
 const isRefreshing = ref(false);
 const hoveredAction = ref('');
 const hoveredPreviewAction = ref('');
+
+// 编辑对话框状态
+const dialogVisible = ref(false);
+const uploadRef = ref();
+const isUpdating = ref(false);
+
+// 编辑表单数据
+const editForm = reactive({
+    _id: '',
+    file: null,
+    name: '',
+    category: 5,
+    description: '',
+    tag: '',
+    ext: '',
+    size: 0,
+    mimeType: '',
+    originalUrl: '', // 保存原始URL
+    creator:appStore.userInfo.username,// 上传人
+});
 
 // 开始调整大小
 const startResize = () => {
@@ -446,8 +659,137 @@ const copyLink = (url) => {
         ElMessage.success('链接已复制');
     });
 };
+
+// 编辑文件处理
 const HnadleEditFile = (file) => {
-    ElMessage.info(`编辑文件: ${file.name}`);
+    // 填充表单数据
+    Object.assign(editForm, {
+        _id: file._id,
+        file: null,
+        name: file.name,
+        category: file.category || 5,
+        description: file.description || '',
+        tag: file.tag || '',
+        ext: file.ext || '',
+        size: file.size || 0,
+        mimeType: file.mimeType || '',
+        originalUrl: file.url
+    });
+    dialogVisible.value = true;
+};
+
+// 文件变动处理（编辑时上传新文件）
+const handleFileChange = (uploadFile) => {
+    const rawFile = uploadFile.raw;
+    if (!rawFile) return;
+
+    editForm.file = rawFile;
+    editForm.name = rawFile.name;
+    
+    // 提取文件扩展名
+    const fileName = rawFile.name;
+    const lastDotIndex = fileName.lastIndexOf('.');
+    editForm.ext = lastDotIndex > -1 ? fileName.substring(lastDotIndex + 1).toLowerCase() : '';
+    
+    // 填充文件大小和类型
+    editForm.size = rawFile.size;
+    editForm.mimeType = rawFile.type;
+
+    // 自动识别分类
+    editForm.category = autoDetectCategory(rawFile.type, rawFile.name);
+    
+    ElMessage.success('文件已选择，将替换原文件');
+};
+
+// 超出文件数限制处理
+const handleExceed = (files) => {
+    if (uploadRef.value) {
+        uploadRef.value.clearFiles();
+        const file = files[0];
+        uploadRef.value.handleStart(file);
+    }
+};
+
+// 移除文件处理
+const handleRemove = () => {
+    editForm.file = null;
+    // 清除upload组件内部文件列表
+    if (uploadRef.value) uploadRef.value.clearFiles();
+    ElMessage.info('已取消文件替换');
+};
+
+// 确认编辑
+const handleConfirmEdit = async () => {
+    // 表单验证
+    if (!editForm.name) {
+        ElMessage.warning('请输入文件名');
+        return;
+    }
+    if (!editForm.tag) {
+        ElMessage.warning('请选择或输入业务标签');
+        return;
+    }
+
+    isUpdating.value = true;
+    try {
+        // 准备提交数据
+        // 如果 editForm.file 为 null，后端会知道不需要替换文件
+        // 如果 editForm.file 有值，后端会处理新文件上传并替换
+        const submitData = {
+            _id: editForm._id,
+            name: editForm.name,
+            category: editForm.category,
+            tag: editForm.tag,
+            description: editForm.description,
+            // 只有当用户选择了新文件时，才包含文件相关信息
+            ...(editForm.file && {
+                file: editForm.file,
+                ext: editForm.ext,
+                size: editForm.size,
+                mimeType: editForm.mimeType
+            })
+        };
+
+        const response = await updateFile(submitData);
+        if (response.code === 200) {
+            ElMessage.success(editForm.file ? '文件替换成功' : '文件信息更新成功');
+            dialogVisible.value = false;
+            // 刷新列表
+            await fetchData();
+            // 如果更新的是当前选中的文件，更新选中状态
+            if (selectedFile.value && selectedFile.value._id === editForm._id) {
+                const updatedFile = tableData.value.find(f => f._id === editForm._id);
+                if (updatedFile) {
+                    selectedFile.value = updatedFile;
+                }
+            }
+            resetEditForm();
+        } else {
+            ElMessage.error(`文件更新失败: ${response.message}`);
+        }
+    } catch (error) {
+        console.error(error);
+        ElMessage.error('文件更新失败');
+    } finally {
+        isUpdating.value = false;
+    }
+};
+
+// 重置编辑表单
+const resetEditForm = () => {
+    Object.assign(editForm, {
+        _id: '',
+        file: null,
+        name: '',
+        category: 5,
+        description: '',
+        tag: '',
+        ext: '',
+        size: 0,
+        mimeType: '',
+        originalUrl: ''
+    });
+    if (uploadRef.value) uploadRef.value.clearFiles();
 };
 
 // TODO 下载
@@ -458,6 +800,15 @@ const downloadFile = (file) => {
 // 文件信息列表
 const fileInfoList = computed(() => {
     return generateFileInfoList(selectedFile.value);
+});
+
+// 计算属性：编辑表单的文件信息
+const editFileInfo = computed(() => {
+    if (!editForm.file) return null;
+    return {
+        size: editForm.file.size,
+        mimeType: editForm.file.type,
+    };
 });
 
 </script>
@@ -1054,5 +1405,290 @@ const fileInfoList = computed(() => {
     .tag-select {
         width: 100%;
     }
+}
+
+/* ==================== 编辑对话框样式 ==================== */
+.edit-form {
+    padding: 0 10px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.edit-form::-webkit-scrollbar {
+    width: 6px;
+}
+
+.edit-form::-webkit-scrollbar-thumb {
+    background: #dcdfe6;
+    border-radius: 3px;
+}
+
+.edit-form::-webkit-scrollbar-thumb:hover {
+    background: #c0c4cc;
+}
+
+.edit-form :deep(.el-form-item) {
+    margin-bottom: 20px;
+}
+
+.edit-form :deep(.el-form-item__label) {
+    font-weight: 500;
+    color: #606266;
+    margin-bottom: 8px;
+}
+
+/* 上传区域样式 */
+.upload-wrapper-edit {
+    width: 100%;
+    min-height: 180px;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 12px;
+}
+
+.upload-dragger-edit {
+    width: 100%;
+    height: 100%;
+}
+
+.upload-dragger-edit :deep(.el-upload) {
+    width: 100%;
+    height: 100%;
+}
+
+.upload-dragger-edit :deep(.el-upload-dragger) {
+    width: 100%;
+    height: 100%;
+    min-height: 180px;
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upload-dragger-edit :deep(.el-upload-dragger:hover) {
+    border-color: #409eff;
+    background: linear-gradient(135deg, #ecf5ff 0%, #ffffff 100%);
+    box-shadow: 0 2px 12px rgba(64, 158, 255, 0.1);
+}
+
+.upload-inner-edit {
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.upload-empty-edit {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.icon-box-edit {
+    font-size: 48px;
+    color: #c0c4cc;
+    margin-bottom: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
+
+.upload-dragger-edit :deep(.el-upload-dragger:hover) .icon-box-edit {
+    color: #409eff;
+    transform: translateY(-4px) scale(1.05);
+}
+
+.upload-text-edit h4 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    color: #606266;
+    font-weight: 500;
+}
+
+.upload-text-edit p {
+    margin: 0;
+    font-size: 12px;
+    color: #909399;
+}
+
+/* 文件选中后状态 */
+.file-selected-edit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    animation: slideIn 0.4s ease-out;
+}
+
+.file-icon-wrapper-edit {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 16px rgba(64, 158, 255, 0.3);
+}
+
+.file-icon-edit {
+    font-size: 32px;
+    color: #ffffff;
+}
+
+.file-name-edit {
+    font-size: 14px;
+    font-weight: 500;
+    color: #303133;
+    margin-bottom: 12px;
+    max-width: 85%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-actions-edit {
+    margin-top: 6px;
+}
+
+/* 元数据卡片 */
+.file-meta-card-edit {
+    background: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid #e4e7ed;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-top: 12px;
+    width: 100%;
+}
+
+.meta-header-edit {
+    font-size: 13px;
+    font-weight: 600;
+    color: #303133;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meta-header-edit .el-icon {
+    color: #409eff;
+    font-size: 14px;
+}
+
+.meta-grid-edit {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.meta-item-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #f0f2f5;
+    transition: all 0.2s;
+}
+
+.meta-item-edit:hover {
+    border-color: #409eff;
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
+}
+
+.meta-item-edit.full {
+    grid-column: span 2;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.meta-item-edit .label {
+    font-size: 12px;
+    color: #909399;
+    font-weight: 500;
+}
+
+.meta-item-edit .value {
+    font-size: 13px;
+    color: #606266;
+    font-weight: 500;
+}
+
+/* 分类单选按钮组 */
+.category-radio-group-edit {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+}
+
+.category-radio-group-edit :deep(.el-radio-button) {
+    flex: 1;
+}
+
+.category-radio-group-edit :deep(.el-radio-button__inner) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid #dcdfe6;
+    background: #ffffff;
+    transition: all 0.2s;
+    padding: 8px 10px;
+}
+
+.category-radio-group-edit :deep(.el-radio-button__inner:hover) {
+    border-color: #409eff;
+    background: #ecf5ff;
+}
+
+.category-radio-group-edit :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+    background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+    border-color: #409eff;
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+}
+
+.radio-content-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+/* 提示文本 */
+.form-tip-edit {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #909399;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.form-tip-edit .el-icon {
+    font-size: 14px;
+    color: #409eff;
+}
+
+/* 动画 */
+.el-fade-in-enter-active,
+.el-fade-in-leave-active {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.el-fade-in-enter-from {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.el-fade-in-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
 }
 </style>    

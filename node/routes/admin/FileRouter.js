@@ -11,5 +11,6 @@ FileRouter.get("/adminapi/admin/file/tags", FileController.getTags);
 FileRouter.get("/adminapi/admin/file/list", FileController.getFileList);
 //删除文件资源
 FileRouter.post("/adminapi/admin/file/deleteone", FileController.deleteFile);
-
+//更新（替换）文件资源信息
+FileRouter.post("/adminapi/admin/file/update",upload.single('file'),uploadToOSS('fileresource'), FileController.updateFile);
 module.exports = FileRouter;

@@ -83,3 +83,25 @@ export async function deleteFile(fileId) {
     }
     
 }
+
+/**
+ * @description 更新文件资源
+ * @param {Object} formdata - 更新数据
+ * @param {string} formdata._id - 文件资源ID
+ * @param {string} formdata.name - 文件名
+ * @param {number} formdata.category - 资源分类ID
+ * @param {string} formdata.tag - 业务标签
+ * @param {string} formdata.description - 资源描述
+ * @param {File} formdata.file - 新文件（可选）
+ * @returns {Promise} 更新结果
+ */
+export async function updateFile(formdata) {
+    try {
+        console.log("Updating file with data:", formdata);
+        const response = await upload("/adminapi/admin/file/update", formdata);
+        return response;
+    }catch (error) {
+        console.error("Error during file update:", error);
+        throw error;
+    }
+}

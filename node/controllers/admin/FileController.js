@@ -16,10 +16,10 @@ const FileController = {
                 creator,
             } = req.body;
 
-
             const result = await FileService.uploadFile({
                 url, storage, name, category, description, 
-                tag, ext, size, mimeType, creator, path,status: 1, createTime: Date.now(), editTime: Date.now()
+                tag, ext, size, mimeType, creator, path,status: 1, 
+                createTime: Date.now(), editTime: Date.now()
             });
             if (!result) {
                 return res.status(500).send({
@@ -116,7 +116,64 @@ const FileController = {
                 message: '删除文件资源失败'
             })
         }
-    }
+    },
+    updateFile:async (req,res)=>{
+        try{
+            if(req.file){
+                // 如果上传了新文件，更新 URL 和路径
+                req.body.url = req.file.ossUrl;
+                req.body.path = req.file.ossPath;
+                req.body.storage = req.file.storage;
+                req.body.isUpdatedFile = true;
+            }
+            const { 
+                _id, 
+                name, 
+                category, 
+                tag, 
+                ext,
+                description, 
+                url, 
+                mimeType,
+                size,
+                path, 
+                storage ,
+                isUpdatedFile
+            } = req.body;
 
+            let fileData = {
+                name,   
+                category,
+                tag,
+                ext,
+                description,
+                url, 
+                path, 
+                mimeType,
+                size,
+                storage ,
+                originalName: name,
+                editTime : new Date()
+            };
+            const result = await FileService.updateFile(_id, fileData, isUpdatedFile);
+            if (!result) {
+                return res.status(500).send({
+                    code: 500,
+                    ActionType: 'ERROR',
+                });
+            }
+            res.send({
+                code: 200,
+                ActionType: 'OK',
+            });
+        }catch(error){
+            console.error('更新文件资源失败:', error);
+            res.status(500).send({
+                code: 500,
+                ActionType: 'ERROR',
+                message: '更新文件资源失败'
+            })
+        }
+    }
 }
 module.exports = FileController;

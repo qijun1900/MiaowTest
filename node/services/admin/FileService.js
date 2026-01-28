@@ -109,6 +109,26 @@ const FileService = {
             console.error('ERROR:database Type: FileService 删除文件资源失败:', error);
             throw error;
         }
-    }
+    },
+    updateFile: async (fileId, updateData,isUpdatedFile) => {
+        try {
+            //如果是更新了文件，则需要删除旧文件
+            if(isUpdatedFile){
+                const fileRecord = await FileResourceModel.findById(fileId);
+                if (fileRecord && fileRecord.storage !== 'local' && fileRecord.path) {
+                    await deleteFile(fileRecord.path);
+                }
+            }
+            const result = await FileResourceModel.updateOne(
+                { _id: fileId },
+                { $set: updateData }
+            );
+            return result;
+        }
+        catch (error) {
+            console.error('ERROR:database Type: FileService 更新文件资源失败:', error);
+            throw error;
+        }
+    },
 }
 module.exports = FileService;
