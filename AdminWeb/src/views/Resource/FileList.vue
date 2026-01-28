@@ -258,9 +258,9 @@ import {
     Picture, Document, VideoPlay, Headset,
     CopyDocument, Download
 } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import Pagination from '@/components/ReuseComponents/Pagination.vue';
-import { getFileList, getTags } from '@/API/Resource/FileAPI';
+import { getFileList, getTags, deleteFile } from '@/API/Resource/FileAPI';
 import RouterPush from '@/util/RouterPush';
 import { 
     isImage,
@@ -361,7 +361,6 @@ const fetchData = async () => {
             page: currentPage.value,
             size: pageSize.value,
         });
-        console.log(res);
         if(res.code === 200){
             tableData.value = res.data.list;
             total.value = res.data.total;
@@ -407,7 +406,39 @@ const handleSearch = () => {
 };
 
 const handleDelete = (row) => {
-    console.log(row)
+    ElMessageBox.confirm(
+        `确定要删除文件 "${row.name}" 吗？\n\n删除操作不可逆，该文件将被永久移除，相关引用也会失效。`,
+        '删除确认',
+        {
+            confirmButtonText: '确定删除',
+            cancelButtonText: '取消',
+            type: 'danger',
+            center: true,
+            showClose: true,
+            closeOnClickModal: false,
+            closeOnPressEscape: true
+        }
+    ).then( () => {
+        deleteFile(row._id).then( res => {
+            console.log(res);
+            if(res.code === 200){
+                ElMessage.success('文件删除成功');
+                // 如果删除的文件是当前选中的文件，清空选中状态
+                if(selectedFile.value && selectedFile.value._id === row._id){
+                    selectedFile.value = null;
+                }
+                fetchData();
+            }else{
+                ElMessage.error(`文件删除失败: ${res.message}`);
+            }
+        }).catch( err => {
+            console.error(err);
+            ElMessage.error('文件删除失败');
+        });
+    }).catch(() => {
+        // 取消删除
+        ElMessage.info('已取消删除操作');
+    });
 };
 
 const copyLink = (url) => {

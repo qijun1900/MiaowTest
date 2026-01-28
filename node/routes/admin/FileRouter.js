@@ -9,6 +9,7 @@ FileRouter.post("/adminapi/admin/file/upload",upload.single('file'),uploadToOSS(
 FileRouter.get("/adminapi/admin/file/tags", FileController.getTags);
 //获取资源列表
 FileRouter.get("/adminapi/admin/file/list", FileController.getFileList);
-
+//删除文件资源
+FileRouter.post("/adminapi/admin/file/deleteone", FileController.deleteFile);
 
 module.exports = FileRouter;

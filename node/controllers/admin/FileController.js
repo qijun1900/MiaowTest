@@ -92,8 +92,30 @@ const FileController = {
                 message: '获取资源列表失败'
             })
         }
-        
-
+    },
+    deleteFile: async (req,res)=>{
+        try {
+            const {fileId} = req.body;
+            const result = await FileService.deleteFile(fileId);
+            if (!result) {
+                return res.status(500).send({
+                    code: 500,
+                    ActionType: 'ERROR',
+                });
+            }
+            res.send({
+                code: 200,
+                ActionType: 'OK',
+            });
+            
+        }catch (error) {
+            console.error('删除文件资源失败:', error);
+            res.status(500).send({
+                code: 500,
+                ActionType: 'ERROR',
+                message: '删除文件资源失败'
+            })
+        }
     }
 
 }

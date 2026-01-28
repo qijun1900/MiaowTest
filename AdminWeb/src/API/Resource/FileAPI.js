@@ -57,10 +57,29 @@ export async function getFileList(params) {
             }
         });
         return response.data;
-        
     }
     catch (error) {
         console.error("Error fetching file list:", error);
         throw error;
     }
+}
+
+/**
+ * @description 删除文件资源
+ * @param {string} fileId - 文件资源ID
+ * @returns {Promise} 删除结果
+ */
+export async function deleteFile(fileId) {
+    try {
+        const response = await axios.post("/adminapi/admin/file/deleteone", 
+            {
+                fileId: fileId
+            }
+        )
+        return response.data;
+    }catch (error) {
+        console.error("Error during delete file:", error);
+        throw error;
+    }
+    
 }

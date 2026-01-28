@@ -1,3 +1,4 @@
+const {deleteFile} = require('../../helpers/ossHelper');
 const FileResourceModel = require('../../models/FileResourceModel');
 const FileService = {
     uploadFile: async ({
@@ -91,6 +92,21 @@ const FileService = {
             };
         } catch (error) {
             console.error('ERROR:database Type: FileService 获取资源列表失败:', error);
+            throw error;
+        }
+    },
+    deleteFile: async (fileId) => {
+        try {
+            //删除OSS文件
+            const fileRecord = await FileResourceModel.findById(fileId);
+            if (fileRecord && fileRecord.storage !== 'local' && fileRecord.path) {
+                await deleteFile(fileRecord.path);
+            }
+            // 删除数据库记录
+            const result = await FileResourceModel.deleteOne({ _id: fileId });
+            return result;
+        } catch (error) {
+            console.error('ERROR:database Type: FileService 删除文件资源失败:', error);
             throw error;
         }
     }
