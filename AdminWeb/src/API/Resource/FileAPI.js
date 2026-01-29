@@ -25,6 +25,35 @@ export async function uploadFile(formdata) {
 }
 
 /**
+ * @description 批量上传文件资源
+ * @param {Array} files - 文件数组，每个元素包含文件信息
+ * @returns {Promise} 批量上传结果
+ */
+export async function batchUploadFiles(files) {
+    try {
+        const uploadPromises = files.map(fileData => uploadFile(fileData));
+        const results = await Promise.allSettled(uploadPromises);
+        
+        const successCount = results.filter(r => r.status === 'fulfilled' && r.value.code === 200).length;
+        const failCount = results.length - successCount;
+        
+        return {
+            code: 200,
+            message: `批量上传完成：成功 ${successCount} 个，失败 ${failCount} 个`,
+            data: {
+                total: results.length,
+                success: successCount,
+                fail: failCount,
+                results: results
+            }
+        };
+    } catch (error) {
+        console.error("Error during batch file upload:", error);
+        throw error;
+    }
+}
+
+/**
  * @description 获取业务标签数组
  * @returns {Promise} 标签数组
  */

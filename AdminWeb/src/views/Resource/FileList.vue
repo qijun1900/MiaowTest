@@ -633,7 +633,6 @@ const handleDelete = (row) => {
         }
     ).then( () => {
         deleteFile(row._id).then( res => {
-            console.log(res);
             if(res.code === 200){
                 ElMessage.success('文件删除成功');
                 // 如果删除的文件是当前选中的文件，清空选中状态
