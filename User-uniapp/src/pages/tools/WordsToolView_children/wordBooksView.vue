@@ -126,18 +126,21 @@
                         <uni-icons type="image" size="22" color="#0984e3"></uni-icons>
                         <text class="form-label">选择封面</text>
                     </view>
-                    <scroll-view class="cover-scroll" scroll-x="true" :show-scrollbar="false">
+                    <scroll-view 
+                        class="cover-scroll" 
+                        scroll-x="true" 
+                        :show-scrollbar="false">
                         <view class="cover-list">
                             <view
                                 v-for="item in coverOptions"
-                                :key="item.id"
+                                :key="item._id"
                                 class="cover-item"
-                                :class="{ active: createForm.coverId === item.id }"
-                                @click="selectCover(item.id)"
+                                :class="{ active: createForm.coverId === item._id }"
+                                @click="selectCover(item._id)"
                             >
                                 <image
-                                    class="cover-image"
-                                    :src="resolveCoverSrc(item)"
+                                    class="cover-image" 
+                                    :src="item.url"
                                     mode="aspectFill"
                                 />
                             </view>
@@ -157,11 +160,11 @@
 import { onMounted, ref, computed } from 'vue';
  import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../../components/core/ThemeLoading.vue';
-import escconfig from '../../../config/esc.config';
 import navBarHeightUtil from '../../../util/navBarHeight';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 import uviewPopup from '../../../components/core/uviewPopup.vue';
 import { checkWordRember } from '../../../API/Vocabulary/WordRemberAPI';
+import { getResourceList } from '../../../API/Resource/FetchAPI';
 
 const defaultBooks = ref([]);
 const currentType = ref('user'); // 'default' 或 'user'
@@ -172,33 +175,16 @@ const popupShow = ref(false);
 const wordBook_id = ref('');
 const createForm = ref({
     title: '',
-    coverId: 'fixed-cover-1'
+    coverId: ''
 });
-const fixedCoverUrl = 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067';
-const coverOptions = ref([
-    { id: 'fixed-cover-1', cover: fixedCoverUrl },
-    { id: 'fixed-cover-2', cover: fixedCoverUrl },
-    { id: 'fixed-cover-3', cover: fixedCoverUrl },
-    { id: 'fixed-cover-4', cover: fixedCoverUrl },
-    { id: 'fixed-cover-5', cover: fixedCoverUrl },
-    { id: 'fixed-cover-6', cover: fixedCoverUrl }
-]);
+const coverOptions = ref([]);
+
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
     return currentType.value === 'user' ? UserWordBooks.value: defaultBooks.value ;
 });
 
-const baseImageUrl = computed(() => {
-    return escconfig.ossDomain 
-})
-
-const resolveCoverSrc = (item) => {
-    const cover = item?.cover || item?.url || item?.path || item?.img;
-    if (!cover) return fixedCoverUrl;
-    if (/^https?:\/\//i.test(cover)) return cover;
-    return baseImageUrl.value + cover;
-}
 
 // 是否显示拖拽按钮
 const isShowdragButton = computed(() => {
@@ -219,10 +205,6 @@ const fetchWordBooks = async () => {
         loading.value = false;
     }
 };
-
-if (!createForm.value.coverId && coverOptions.value.length > 0) {
-    createForm.value.coverId = coverOptions.value[0].id;
-}
 
 //检查当前选择的词书
 const checkCurrentWordBook = async () => {
@@ -253,6 +235,14 @@ const switchBookType = (type) => {
 
 const handleBtnClick = () => {
   popupShow.value = true;
+    //获取图片资源
+    getResourceList({ tag: 'bookcover' }).then(res => {
+        if (res.code === 200) {
+            coverOptions.value = res.data;
+        }
+    }).catch(err => {
+        console.error("Error fetching resource list:", err);
+    });
 }
 
 const selectCover = (coverId) => {
@@ -315,8 +305,6 @@ onMounted(() => {
 
     //检查当前选择的词书
     checkCurrentWordBook();
-    
-    
 });
 </script>
 <style scoped>
