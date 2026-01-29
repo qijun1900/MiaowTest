@@ -110,7 +110,6 @@ export async function deleteFile(fileId) {
         console.error("Error during delete file:", error);
         throw error;
     }
-    
 }
 
 /**
@@ -126,7 +125,6 @@ export async function deleteFile(fileId) {
  */
 export async function updateFile(formdata) {
     try {
-        console.log("Updating file with data:", formdata);
         const response = await upload("/adminapi/admin/file/update", formdata);
         return response;
     }catch (error) {

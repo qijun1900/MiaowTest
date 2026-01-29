@@ -54,10 +54,6 @@ export const generateFileInfoList = (selectedFile) => {
     },
     { label: '大小', value: formatFileSize(selectedFile.size) },
     { 
-      label: '分辨率', 
-      value: selectedFile.width ? `${selectedFile.width} x ${selectedFile.height}` : '-' 
-    },
-    { 
       label: '存储位置', 
       value: selectedFile.storage, 
       isTag: true, 
