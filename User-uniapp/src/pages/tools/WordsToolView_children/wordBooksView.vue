@@ -135,8 +135,8 @@
                                 v-for="item in coverOptions"
                                 :key="item._id"
                                 class="cover-item"
-                                :class="{ active: createForm.coverId === item._id }"
-                                @click="selectCover(item._id)"
+                                :class="{ active: createForm.cover_id === item._id }"
+                                @click="selectCover(item)"
                             >
                                 <image
                                     class="cover-image" 
@@ -158,7 +158,7 @@
 </template>
 <script setup>
 import { onMounted, ref, computed } from 'vue';
- import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
+ import { getWordBooksAPI, createWordBookAPI } from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../../components/core/ThemeLoading.vue';
 import navBarHeightUtil from '../../../util/navBarHeight';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
@@ -175,10 +175,10 @@ const popupShow = ref(false);
 const wordBook_id = ref('');
 const createForm = ref({
     title: '',
-    coverId: ''
+    cover_id: '',
+    cover_url: ''
 });
 const coverOptions = ref([]);
-
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
@@ -245,8 +245,9 @@ const handleBtnClick = () => {
     });
 }
 
-const selectCover = (coverId) => {
-    createForm.value.coverId = coverId;
+const selectCover = (val) => {
+    createForm.value.cover_id = val._id;
+    createForm.value.cover_url = val.url;
 }
 
 const handleCreateCancel = () => {
@@ -262,10 +263,36 @@ const handleCreateSave = () => {
         });
         return;
     }
-    uni.showToast({
-        title: '已保存创建信息',
-        icon: 'success'
-    });
+    // 调用创建词书API
+    createWordBookAPI({
+        title: title,
+        cover_id: createForm.value.cover_id,
+        cover_url:createForm.value.cover_url
+    }).then(res => {
+        if (res.code === 200) {
+            uni.showToast({
+                title: '词书创建成功',
+                icon: 'success'
+            });
+            //reset表单
+            createForm.value.title = '';
+            createForm.value.cover_id = '';
+            createForm.value.cover_url = '';
+            // 重新获取词书列表
+            
+        } else {
+            uni.showToast({
+                title: res.message || '词书创建失败',
+                icon: 'none'
+            });
+        }
+    }).catch(err => {
+        console.error("Error creating word book:", err);
+        uni.showToast({
+            title: '词书创建失败',
+            icon: 'none'
+        });
+    })
     popupShow.value = false;
 }
 
@@ -301,7 +328,6 @@ onMounted(() => {
     
     // 获取默认词书
     fetchWordBooks();
-
 
     //检查当前选择的词书
     checkCurrentWordBook();

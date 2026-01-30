@@ -11,5 +11,8 @@ VocabularyRouter.post("/uniappAPI/tools/vocabulary/setting/setWordRember", JWT.v
 VocabularyRouter.get("/uniappAPI/tools/vocabulary/check/getWordRember", JWT.verifyTokenMiddleware(),VocabularyController.checkWordRember)
 //获取单词书列表
 VocabularyRouter.post("/uniappAPI/tools/vocabulary/getWordBookList", JWT.verifyTokenMiddleware(),VocabularyController.getWordBookList)
+//创建用户单词书
+VocabularyRouter.post("/uniappAPI/tools/vocabulary/self/createWordBook", JWT.verifyTokenMiddleware(),VocabularyController.createWordBook)
+
 
 module.exports = VocabularyRouter;

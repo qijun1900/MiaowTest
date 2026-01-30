@@ -111,6 +111,40 @@ const VocabularyController = {
             });
         }
         
+    },
+    createWordBook: async (req, res) => {
+        try {
+            const { uid } = req.user
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    message: '您未登录'
+                });
+            }
+            const { title, cover_id, cover_url } = req.body;
+            const result = await VocabularyService.createWordBook({ 
+                uid, 
+                title, 
+                cover_id, 
+                cover_url 
+            });
+            if (!result.success) {
+                return res.send({
+                    code: 400,
+                    message: '创建单词书失败'
+                });
+            }
+            res.send({
+                code: 200,
+                message: '创建单词书成功',
+            });
+        } catch (error) {
+            console.error("创建单词书失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "创建单词书失败"
+            });
+        }
     }
 };
 

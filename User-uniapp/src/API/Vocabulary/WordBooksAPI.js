@@ -45,7 +45,7 @@ export async function getWordBookCoversAPI() {
     }
 }
 
- /**
+/**
   * @description 根据_id获取单词书列表
   * @URL /uniappAPI/tools/vocabulary/getWordBookList
   * @method POST
@@ -62,19 +62,45 @@ export async function getWordBookCoversAPI() {
   *     hasMore: boolean
   *   }
   * }
-  */
- export async function WordBookListAPI(bookId, page = 1, pageSize = 20) {
-     try {
-         return  await http({
-             url: '/uniappAPI/tools/vocabulary/getWordBookList',
-             method: 'POST',
-             data: {
-                 bookId: bookId,
-                 page,
-                 pageSize
-             }
-         })
-     }catch (error) {
-         console.error("getWordBookList 失败", error);
-     }
- }
+*/
+export async function WordBookListAPI(bookId, page = 1, pageSize = 20) {
+    try {
+        return await http({
+            url: '/uniappAPI/tools/vocabulary/getWordBookList',
+            method: 'POST',
+            data: {
+                bookId: bookId,
+                page,
+                pageSize
+            }
+        })
+    } catch (error) {
+        console.error("getWordBookList 失败", error);
+    }
+}
+
+/**
+ * @description 用户创建单词书接口
+ * @URL /uniappAPI/tools/vocabulary/createWordBook
+ * @method POST
+ * @param {string} title - 词书名称
+ * @param {string} cover_id - 词书封面ID
+ * @param {string} cover_url - 词书封面URL
+ */
+export async function createWordBookAPI({title, cover_id, cover_url}) {
+    try {
+        return await http({
+            url: '/uniappAPI/tools/vocabulary/self/createWordBook',
+            method: 'POST',
+            data: {
+                title: title,
+                cover_id: cover_id,
+                cover_url: cover_url,
+            }
+        })
+    } catch (error) {
+        console.error("createWordBook 失败", error);
+    }
+}
+
+

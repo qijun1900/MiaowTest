@@ -1,6 +1,7 @@
 const { WordBooksModel } = require('../../models/WordBooksModel');
 const ConsumerWordModel = require('../../models/ConsumerWordModel');
 const WordModel = require('../../models/WordModel');
+const UserWordBookModel = require('../../models/UserWordBookModel');
 
 const VocabularyService = {
     /**
@@ -123,6 +124,21 @@ const VocabularyService = {
             };
         } catch (error) {
             console.error("获取单词书列表失败", error);
+            throw error;
+        }
+    },
+    createWordBook: async ({ uid, title, cover_id, cover_url }) => {
+        try {
+            const newWordBook = new UserWordBookModel({
+                Uid:uid,
+                title,
+                cover_id,
+                cover_url
+            });
+            await newWordBook.save();
+            return { success: true, wordBookId: newWordBook._id };
+        } catch (error) {
+            console.error("创建用户单词书失败", error);
             throw error;
         }
     }
