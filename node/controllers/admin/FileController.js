@@ -174,6 +174,28 @@ const FileController = {
                 message: '更新文件资源失败'
             })
         }
+    },
+    changeFileStatus: async (req, res) => {
+        try {
+            const { fileId } = req.body;
+            const fileRecord = await FileService.changeFileStatus(fileId);
+            if (!fileRecord) {
+                return res.status(500).send({
+                    code: 500,
+                    ActionType: 'ERROR',
+                });
+            }
+            res.send({
+                code: 200,
+            });
+        } catch (error) {
+            console.error('更新文件资源失败:', error);
+            res.status(500).send({
+                code: 500,
+                ActionType: 'ERROR',
+                message: '更新文件资源失败'
+            })
+        }
     }
 }
 module.exports = FileController;

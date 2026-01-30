@@ -38,14 +38,14 @@ app.use(helmet());
 // 2. 响应压缩
 app.use(compression());
 
-// 3. 速率限制 (Rate Limiting) - 全局限制，每15分钟100次请求
+// 3. 速率限制 (Rate Limiting) - 全局限制，每10分钟500次请求
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 300, // 限制每个IP每窗口最多300个请求
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 500, // 限制每个IP每窗口最多500个请求
   standardHeaders: true, // 返回 `RateLimit-*` 头部
   legacyHeaders: false, // 禁用 `X-RateLimit-*` 头部
 });
-app.use(limiter);
+app.use(limiter); 
 
 app.use(logger('dev'));
 app.use(express.json());

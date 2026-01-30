@@ -132,3 +132,22 @@ export async function updateFile(formdata) {
         throw error;
     }
 }
+
+/**
+ * @description 改变文件资源状态
+ * @param {string} fileId - 文件资源ID
+ * @returns {Promise} 状态改变结果
+ */
+export async function changeFileStatus(fileId) {
+    try {
+        const response = await axios.post("/adminapi/admin/file/change-status",
+            {
+                fileId: fileId
+            }
+        )
+        return response.data;
+    }catch (error) {
+        console.error("Error during change file status:", error);
+        throw error;
+    }
+}

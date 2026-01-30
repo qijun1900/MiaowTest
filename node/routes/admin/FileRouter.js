@@ -13,4 +13,8 @@ FileRouter.get("/adminapi/admin/file/list", FileController.getFileList);
 FileRouter.post("/adminapi/admin/file/deleteone", FileController.deleteFile);
 //更新（替换）文件资源信息
 FileRouter.post("/adminapi/admin/file/update",upload.single('file'),uploadToOSS('fileresource'), FileController.updateFile);
+//更改文件资源状态
+FileRouter.post("/adminapi/admin/file/change-status", FileController.changeFileStatus);
+
+
 module.exports = FileRouter;

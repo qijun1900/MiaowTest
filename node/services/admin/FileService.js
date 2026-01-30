@@ -130,5 +130,23 @@ const FileService = {
             throw error;
         }
     },
+    changeFileStatus: async (fileId) => {
+        try {
+            const fileRecord = await FileResourceModel.findById(fileId);
+            if (!fileRecord) {
+                throw new Error('文件资源未找到');
+            }
+            const newStatus = fileRecord.status === 1 ? 0 : 1;
+            const result = await FileResourceModel.updateOne(
+                { _id: fileId },
+                { $set: { status: newStatus, editTime: new Date() } }
+            );
+            return result;
+        } catch (error) {
+            console.error('ERROR:database Type: FileService 更改文件资源状态失败:', error);
+            throw error;
+        }
+    }
 }
 module.exports = FileService;
+    

@@ -1,6 +1,12 @@
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getFileList, getTags, deleteFile, updateFile } from '@/API/Resource/FileAPI'
+import { 
+  getFileList, 
+  getTags, 
+  deleteFile, 
+  updateFile,
+  changeFileStatus
+ } from '@/API/Resource/FileAPI'
 
 /**
  * 文件列表管理组合式函数
@@ -13,7 +19,7 @@ export function useFileList() {
   const searchQuery = ref('')          // 搜索关键词
   const selectedTag = ref('')          // 选中的标签
   const currentPage = ref(1)           // 当前页码
-  const pageSize = ref(20)             // 每页数量
+  const pageSize = ref(10)             // 每页数量
   const total = ref(0)                 // 总数据量
   const tableData = ref([])            // 表格数据
   const selectedFile = ref(null)       // 当前选中的文件
@@ -182,6 +188,15 @@ export function useFileList() {
   }
 
   /**
+   * 改变文件状态
+   * @param {string} fileId - 文件ID
+   */
+  const handleStateChange = async (fileId) => {
+    const res = await changeFileStatus(fileId)
+    console.log('Change status response:', res)
+  }
+
+  /**
    * 复制链接
    * @param {string} url - 要复制的URL
    */
@@ -224,6 +239,7 @@ export function useFileList() {
     handleDelete,
     handleUpdate,
     copyLink,
-    downloadFile
+    downloadFile,
+    handleStateChange,
   }
 }

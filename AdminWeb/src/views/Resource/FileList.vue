@@ -23,6 +23,7 @@
           @refresh="refreshData"
           @delete="handleDelete"
           @edit="handleEdit"
+          @change-status="handleStateChange"
         />
       </div>
 
@@ -88,7 +89,8 @@ const {
   handleDelete,
   handleUpdate,
   copyLink,
-  downloadFile
+  downloadFile,
+  handleStateChange,
 } = useFileList()
 
 // ========== 布局调整逻辑 ==========

@@ -95,6 +95,20 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="状态" width="150">
+          <template #default="scope">
+            <el-switch
+              size="large"
+              v-model="scope.row.status"
+              inline-prompt
+              :active-value="1"
+              :inactive-value="0" 
+              active-text="已发布"
+              inactive-text="未发布"
+              @change="handleChangeStatus(scope.row._id)">
+            </el-switch>
+          </template>
+        </el-table-column>
         <el-table-column prop="createTime" label="上传时间" width="160">
           <template #default="{ row }">
             <span class="file-time">{{ formatTime.formatDate(row.createTime) }}</span>
@@ -210,7 +224,9 @@ const emit = defineEmits([
   'upload',          // 上传文件
   'refresh',         // 刷新数据
   'delete',          // 删除文件
-  'edit'             // 编辑文件
+  'edit' ,            // 编辑文件
+  'change-status'     // 状态变化
+
 ])
 
 // ========== 本地状态 ==========
@@ -233,6 +249,9 @@ const handleTagChange = () => {
 
 const handlePageChange = ({ page, size }) => {
   emit('page-change', { page, size })
+}
+const handleChangeStatus = (fileId) => {
+  emit('change-status', fileId)
 }
 
 // ========== 监听外部变化 ==========
