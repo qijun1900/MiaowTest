@@ -141,6 +141,17 @@ const VocabularyService = {
             console.error("创建用户单词书失败", error);
             throw error;
         }
+    },
+    fetchUserWordBooks: async ({ uid }) => {
+        try {
+            const userWordBooks = await UserWordBookModel.find({ Uid: uid },)
+            return {
+                wordBooks: userWordBooks
+            };
+        } catch (error) {
+            console.error("获取用户单词书失败", error);
+            throw error;
+        }
     }
 }
 module.exports = VocabularyService;

@@ -46,13 +46,15 @@
                 >
                 <view v-if="book._id === wordBook_id" class="reciting-mark">正在背诵</view>
                 <image 
-                :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" class="book-image"></image>
+                    :src="book.cover ? baseImageUrl + book.cover : book.cover_url" 
+                    class="book-image">
+                </image>
                 <view class="book-content">
                     <view class="book-info">
                         <text class="book-title">{{ book.title }}</text>
                         <view class="book-words">
                             <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
-                            <text>{{ book.words }}词</text>
+                            <text>{{ book.words || book.wordCount }}词</text>
                         </view>
                         <view class="book-tags">
                             <up-tag 
@@ -66,7 +68,9 @@
                         </view>
                     </view>
                     <view class="book-action">
-                        <view class="view-words-btn" @click="viewAllWords(book)">
+                        <view 
+                            class="view-words-btn" 
+                            @click="viewAllWords(book)">
                             <up-icon name="eye" size="32rpx" color="#ffffff"></up-icon>
                             <text class="btn-text">查看单词</text>
                         </view>
@@ -158,13 +162,18 @@
 </template>
 <script setup>
 import { onMounted, ref, computed } from 'vue';
- import { getWordBooksAPI, createWordBookAPI } from '../../../API/Vocabulary/WordBooksAPI';
+ import { 
+    getWordBooksAPI, 
+    createWordBookAPI,
+    getUserWordBooksAPI
+} from '../../../API/Vocabulary/WordBooksAPI';
 import ThemeLoading from '../../../components/core/ThemeLoading.vue';
 import navBarHeightUtil from '../../../util/navBarHeight';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 import uviewPopup from '../../../components/core/uviewPopup.vue';
 import { checkWordRember } from '../../../API/Vocabulary/WordRemberAPI';
 import { getResourceList } from '../../../API/Resource/FetchAPI';
+import escconfig from '../../../config/esc.config';
 
 const defaultBooks = ref([]);
 const currentType = ref('user'); // 'default' 或 'user'
@@ -180,11 +189,14 @@ const createForm = ref({
 });
 const coverOptions = ref([]);
 
+const baseImageUrl = computed(() => {
+    return escconfig.ossDomain 
+});
+
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
     return currentType.value === 'user' ? UserWordBooks.value: defaultBooks.value ;
 });
-
 
 // 是否显示拖拽按钮
 const isShowdragButton = computed(() => {
@@ -195,13 +207,17 @@ const isShowdragButton = computed(() => {
 const fetchWordBooks = async () => {
     loading.value = true;
     try {
-        const response = await getWordBooksAPI();
+        const isDefault = currentType.value === 'default';
+        const api = isDefault ? getWordBooksAPI : getUserWordBooksAPI;
+        const targetBooks = isDefault ? defaultBooks : UserWordBooks;
+
+        const response = await api();
         if (response.code == 200) {
-            defaultBooks.value = response.data.wordBooks;
-            loading.value = false;
+            targetBooks.value = response.data.wordBooks;
         }
     } catch (error) {
         console.error("Error fetching word books:", error);
+    } finally {
         loading.value = false;
     }
 };
@@ -231,6 +247,12 @@ const switchBookType = (type) => {
     uni.vibrateShort({
         type: 'medium'
     });
+
+    if (type === 'default' && defaultBooks.value.length === 0) {
+        fetchWordBooks();
+    } else if (type === 'user' && UserWordBooks.value.length === 0) {
+        fetchWordBooks();
+    }
 };
 
 const handleBtnClick = () => {
@@ -256,13 +278,14 @@ const handleCreateCancel = () => {
 
 const handleCreateSave = () => {
     const title = createForm.value.title.trim();
-    if (!title) {
+    if (title === '' || createForm.value.cover_id === '') {
         uni.showToast({
-            title: '请输入词书名称',
+            title: '请输入词书名称并选择封面',
             icon: 'none'
         });
         return;
     }
+   
     // 调用创建词书API
     createWordBookAPI({
         title: title,
@@ -278,20 +301,14 @@ const handleCreateSave = () => {
             createForm.value.title = '';
             createForm.value.cover_id = '';
             createForm.value.cover_url = '';
-            // 重新获取词书列表
-            
+            //获取用户词书列表
+            fetchWordBooks();
         } else {
             uni.showToast({
                 title: res.message || '词书创建失败',
                 icon: 'none'
             });
         }
-    }).catch(err => {
-        console.error("Error creating word book:", err);
-        uni.showToast({
-            title: '词书创建失败',
-            icon: 'none'
-        });
     })
     popupShow.value = false;
 }
@@ -311,9 +328,10 @@ const viewAllWords = (book) => {
 // 加载用户偏好
 const loadUserPreference = () => {
     try {
-        // 将本地存储的 wordBookType 设置为 ' default' 或 'user'
-        uni.setStorageSync('wordBookType', 'user');
-        currentType.value = 'user';
+        const value = uni.getStorageSync('wordBookType');
+        if (value) {
+            currentType.value = value;
+        }
     } catch (error) {
         console.error("Error loading user preference:", error);
     }

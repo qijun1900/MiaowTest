@@ -81,7 +81,7 @@ export async function WordBookListAPI(bookId, page = 1, pageSize = 20) {
 
 /**
  * @description 用户创建单词书接口
- * @URL /uniappAPI/tools/vocabulary/createWordBook
+ * @URL /uniappAPI/tools/vocabulary/self/createWordBook
  * @method POST
  * @param {string} title - 词书名称
  * @param {string} cover_id - 词书封面ID
@@ -103,4 +103,24 @@ export async function createWordBookAPI({title, cover_id, cover_url}) {
     }
 }
 
-
+/**
+ * @description 获取用户词书
+ * @URl /uniappAPI/tools/vocabulary/self/fetchWordBook
+ * @method GET
+ * @return {
+ *   code: number,
+ *  data: {
+ *    wordbooks: Array
+ *  }
+ * }
+ */
+export async function getUserWordBooksAPI() {
+    try {
+        return await http({
+            url: '/uniappAPI/tools/vocabulary/self/fetchWordBook',
+            method: 'GET',
+        })
+    } catch (error) {
+        console.error("fetchUserWordBooks 失败", error);
+    }
+}

@@ -145,6 +145,28 @@ const VocabularyController = {
                 message: "创建单词书失败"
             });
         }
+    },
+    fetchUserWordBooks: async (req, res) => {
+        try {
+            const { uid } = req.user
+            if (!uid) {
+                return res.send({
+                    code: 401,
+                    message: '您未登录'
+                });
+            }
+            const wordBooks = await VocabularyService.fetchUserWordBooks({ uid });
+            res.send({
+                code: 200,
+                data: wordBooks 
+            });
+        } catch (error) {
+            console.error("获取用户单词书失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "获取用户单词书失败"
+            });
+        }
     }
 };
 
