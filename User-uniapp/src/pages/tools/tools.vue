@@ -11,49 +11,19 @@
     <view 
       class="tools-container" 
       :style="{ paddingTop: pageHeadRef?.contentPaddingTop + 10 +'px' }">
-      <!-- 计时器工具卡片 -->
+      <!-- 循环渲染工具卡片 -->
       <view 
+        v-for="(tool, index) in toolsList"
+        :key="index"
         class="tool-card" 
-        @tap="navigateToTimer">
+        @tap="handleToolClick(tool)">
         <view class="tool-info">
-          <view class="tool-title">计时器</view>
-          <view class="tool-desc">精确计时，支持倒计时和正计时模式</view>
+          <view class="tool-title">{{ tool.title }}</view>
+          <view class="tool-desc">{{ tool.desc }}</view>
         </view>
         <view class="tool-icon">
           <image
-            src="/static/tools/tools-timer.png"
-            mode="aspectFit"
-          />
-        </view>
-      </view>
-      <!-- 计划日程表 -->
-      <view 
-        class="tool-card" 
-        @click="navigateToTodo">
-        <view class="tool-info">
-          <view class="tool-title">TODO</view>
-          <view class="tool-desc">记录待办事项，管理学习任务，制定学习计划</view>
-        </view>
-        <view class="tool-icon">
-          <image
-            src="/static/tools/tools-todo.png"
-            mode="aspectFit"
-          />
-        </view>
-      </view>
-      <!-- 喵喵单词 -->
-      <view 
-        class="tool-card" 
-        @click="navigateToWords">
-        <view class="tool-info">
-          <view class="tool-title">喵喵单词</view>
-          <view class="tool-desc">
-            单词记忆工具，帮助你快速学习单词
-          </view>
-        </view>
-        <view class="tool-icon">
-          <image
-            src="/static/tools/tools-words.png"
+            :src="tool.icon"
             mode="aspectFit"
           />
         </view>
@@ -70,29 +40,50 @@ import checkLogin from '../../util/checkLogin.js';
 
 const pageHeadRef = ref();
 
-// 导航到计时器页面
-const navigateToTimer = () => {
-  uni.navigateTo({
-    url: '/pages/tools/TimerToolView'
-  });
-};
-// 导航到TODO页面
-const navigateToTodo = async () => {
-  const isLoggedIn = await checkLogin("请登录后再操作");
-  if (!isLoggedIn) return;
-  
-  uni.navigateTo({
-    url: '/pages/tools/TodoToolView'
-  });
-};
-// 导航到喵喵单词页面
-const navigateToWords = async () => {
-  const isLoggedIn = await checkLogin("请登录后再操作");
-  if (!isLoggedIn) return;
+// 工具列表配置
+const toolsList = [
+  {
+    title: '计时器',
+    desc: '精确计时，支持倒计时和正计时模式',
+    icon: '/static/tools/tools-timer.png',
+    path: '/pages/tools/TimerToolView',
+    needLogin: false
+  },
+  {
+    title: 'TODO',
+    desc: '记录待办事项，管理学习任务，制定学习计划',
+    icon: '/static/tools/tools-todo.png',
+    path: '/pages/tools/TodoToolView',
+    needLogin: true
+  },
+  {
+    title: '喵喵单词',
+    desc: '单词记忆工具，帮助你快速学习单词',
+    icon: '/static/tools/tools-words.png',
+    path: '/pages/tools/WordsToolView',
+    needLogin: true
+  },
+  {
+    title: '喵喵笔记',
+    desc: '笔记工具，帮助你快速记录和管理笔记',
+    icon: '/static/tools/tools-notes.png',
+    path: '/pages/tools/NotesToolView',
+    needLogin: true
+  } 
+];
 
-  uni.navigateTo({
-    url: '/pages/tools/WordsToolView'
-  });
+// 统一的工具点击处理函数
+const handleToolClick = async (tool) => {
+  if (tool.needLogin) {
+    const isLoggedIn = await checkLogin("请登录后再操作");
+    if (!isLoggedIn) return;
+  }
+  
+  if (tool.path) {
+    uni.navigateTo({
+      url: tool.path
+    });
+  }
 };
 
 // 页面加载时执行
