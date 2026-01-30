@@ -1,7 +1,7 @@
 <!-- 项目标题 -->
 <div align="center">
   <h1>🐈️ 题喵喵</h1>
-  <p><strong>基于 Uniapp 的跨平台刷题程序</strong></p>
+  <p><strong>基于 Vue3/Uniapp/Express 的跨平台刷题程序</strong></p>
   
   <!-- 二维码预览区域 -->
   <div style="margin-bottom: 20px;">

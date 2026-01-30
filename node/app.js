@@ -3,10 +3,16 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+// 安全与优化中间件
+const helmet = require('helmet');
+const compression = require('compression');
+const mongoSanitize = require('express-mongo-sanitize');
+const rateLimit = require('express-rate-limit');
 
 
 const JWT = require('./MiddleWares/jwt');
 const clientDetector = require('./MiddleWares/clientDetector');// 引入客户端检测中间件
+const adminAuth = require('./MiddleWares/adminAuth');// 引入Admin认证中间件
 var indexRouter = require('./routes/index'); // 引入路由模块
 const UserRouter = require('./routes/admin/UserRouter'); // 引入Admin用户路由模块
 const NewsRouter = require('./routes/admin/NewsRouter'); // 引入Admin新闻路由模块
@@ -26,10 +32,29 @@ const UserResourceRouter = require('./routes/user/ResourceRouter') //用户资�
 
 var app = express();
 
+// 1. 基础安全头 (Helmet)
+app.use(helmet());
+
+// 2. 响应压缩
+app.use(compression());
+
+// 3. 速率限制 (Rate Limiting) - 全局限制，每15分钟100次请求
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // 限制每个IP每窗口最多300个请求
+  standardHeaders: true, // 返回 `RateLimit-*` 头部
+  legacyHeaders: false, // 禁用 `X-RateLimit-*` 头部
+});
+app.use(limiter);
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// 4. 防止 NoSQL 注入
+app.use(mongoSanitize());
+
 // 静态文件重定向到阿里云 OSS
 const ossStaticRedirect = require('./MiddleWares/ossStaticRedirect');
 app.use(ossStaticRedirect);
@@ -82,30 +107,8 @@ app.use(UserResourceRouter) //注册资源相关路由(用户端)
 /*
 adminapi===后台管理接口
 */
-app.use((req,res,next)=>{
-  //token有效，next()
-  //token过期返回401
-  if(req.url === "/adminapi/user/login"){//登录接口不验证token
-    next()
-    return;
-  }
-  const token = req.headers["authorization"].split(" ")[1]
-  if(token){
-    var payload = JWT.verify(token)
-    if(payload){
-      const newToken = JWT.generate({//生成新的token，有效期3d
-        _id:payload._id, 
-        username:payload.username 
-      },"3d")   
-      res.header('Authorization',newToken)//将新的token返回给客户端
-      next()
-    }else{
-      res.status(401).send({errCode:"-1",errInfo:"token过期"})
-    }
-  } else {
-    res.status(401).send({errCode:"-1",errInfo:"token为空"});
-  }
-})
+app.use(adminAuth); // 使用提取后的 Admin 认证中间件
+
 app.use(UserRouter);//用户路由(admin)
 app.use(NewsRouter)//信息路由(admin)
 app.use(AdminExamRouter)//考试路由(admin)
