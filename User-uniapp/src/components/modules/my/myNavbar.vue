@@ -5,8 +5,10 @@
         v-for="(item, index) in navItems" 
         :key="index" 
         class="nav-item"
+        hover-class="nav-item-hover"
+        :hover-stay-time="100"
         @click="handleNavClick(item)">
-        <view class="nav-icon-wrapper">
+        <view class="nav-icon-wrapper" :class="'icon-bg-' + index">
           <image 
             class="nav-icon" 
             :src="item.icon" 
@@ -23,7 +25,7 @@
 import { ref } from 'vue'
 import checkLogin from '../../../util/checkLogin'
 
-// 导航项数据 - 使用不同的图标
+// 导航项数据
 const navItems = ref([
   {
     title: '我的收藏',
@@ -64,154 +66,101 @@ const handleNavClick = async (item) => {
   }
 }
 </script>
+
 <style scoped lang="scss">
 .navigation-container {
-  padding: 30rpx 5rpx;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
-  border-radius: 20rpx;
-  margin: 0 5rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
-  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  margin: 20rpx 10rpx;
+  padding: 30rpx 0;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .nav-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10rpx;
 }
 
 .nav-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20rpx 10rpx;
-  border-radius: 16rpx;
-  background: rgba(255, 255, 255, 0.9);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3rpx;
-    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
-  
-  &:hover {
-    transform: translateY(-4rpx);
-    box-shadow: 0 8rpx 25rpx rgba(79, 172, 254, 0.15);
-    
-    &::before {
-      transform: scaleX(1);
-    }
-    
-    .nav-icon-wrapper {
-      transform: scale(1.1);
-    }
-  }
-  
-  &:active {
-    transform: translateY(-2rpx);
-    transition: transform 0.1s ease;
-  }
+  transition: all 0.2s ease-in-out;
+}
+
+/* 交互反馈：点击时的微小缩放 */
+.nav-item-hover {
+  transform: scale(0.95);
+  opacity: 0.9;
 }
 
 .nav-icon-wrapper {
-  width: 80rpx;
-  height: 80rpx;
+  width: 96rpx;
+  height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20rpx;
-  margin-bottom: 15rpx;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.1);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  &:hover::after {
-    opacity: 1;
-  }
+  border-radius: 32rpx; /* 圆润的方形（超椭圆视觉） */
+  margin-bottom: 16rpx;
+  transition: box-shadow 0.3s ease;
 }
 
 .nav-icon {
-  width: 40rpx;
-  height: 40rpx;
-  filter: brightness(0) invert(1);
+  width: 48rpx;
+  height: 48rpx;
+  filter: brightness(0) invert(1); /* 确保图标为纯白色 */
 }
 
 .nav-title {
-  font-size: 24rpx;
-  color: #333;
-  font-weight: 600;
-  text-align: center;
+  font-size: 26rpx;
+  color: #333333;
+  font-weight: 500;
   line-height: 1.4;
-  transition: color 0.3s ease;
+  letter-spacing: 0.5rpx;
 }
 
-.nav-item:hover .nav-title {
-  color: #4facfe;
+/* 
+  色彩方案：清晰的纯色搭配
+  分别为：紫色(收藏)、红色(错题)、蓝色(笔记)、青色(题库)
+*/
+.icon-bg-0 {
+  background-color: #7b61ff; /* 鲜明的紫色 */
+  box-shadow: 0 8rpx 20rpx rgba(123, 97, 255, 0.2);
 }
 
-/* 响应式设计 */
-@media (max-width: 750rpx) {
-  .nav-grid {
-    gap: 15rpx;
-  }
-  
-  .nav-item {
-    padding: 15rpx 8rpx;
-  }
-  
+.icon-bg-1 {
+  background-color: #ff5252; /* 活力的红色 */
+  box-shadow: 0 8rpx 20rpx rgba(255, 82, 82, 0.2);
+}
+
+.icon-bg-2 {
+  background-color: #448aff; /* 清晰的蓝色 */
+  box-shadow: 0 8rpx 20rpx rgba(68, 138, 255, 0.2);
+}
+
+.icon-bg-3 {
+  background-color: #00bfa5; /* 清新的青色 */
+  box-shadow: 0 8rpx 20rpx rgba(0, 191, 165, 0.2);
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 320px) {
   .nav-icon-wrapper {
-    width: 70rpx;
-    height: 70rpx;
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 28rpx;
   }
   
   .nav-icon {
-    width: 35rpx;
-    height: 35rpx;
+    width: 40rpx;
+    height: 40rpx;
   }
   
   .nav-title {
-    font-size: 22rpx;
+    font-size: 24rpx;
   }
-}
-
-/* 针对不同导航项的特殊样式 */
-.nav-item:nth-child(1) .nav-icon-wrapper {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.nav-item:nth-child(2) .nav-icon-wrapper {
-  background: linear-gradient(135deg, #f6a2ff 0%, #ff6277 100%);
-}
-
-.nav-item:nth-child(3) .nav-icon-wrapper {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.nav-item:nth-child(4) .nav-icon-wrapper {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 </style>
