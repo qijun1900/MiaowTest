@@ -6,29 +6,13 @@
       <!-- 仅保留状态栏占位，不显示标题 -->
     </view>
     
-    <!-- 用户信息区域 -->
-    <view class="user-info" :style="{ marginTop: (navBarInfo.totalHeight - 5) + 'px' }">
-      <view class="avatar-wrapper">
-        <userAvatar
-          :showOnline="false"
-          />
-      </view>
-      <view class="user-detail" @click="handleUserinfo">
-        <view class="user-info-content">
-          <view class="login-btn" v-if="!userInfoStore.isLoggedIn">点击登录</view>
-          <view class="username" v-else>{{ userInfoStore.userInfo?.nickname ||  `第${userInfoStore.userInfo.userCount}位哈基米` }}</view>
-          <view class="user-desc" v-if="!userInfoStore.isLoggedIn">登录后可享受更多服务</view>
-          <view class="user-openid" v-else><text class="openid-data">{{ userInfoStore.userInfo?.uid || '欢迎回来' }}</text></view>
-        </view>
-        <view class="arrow-right" v-if="userInfoStore.isLoggedIn"><up-icon name="arrow-right" size="14px"></up-icon></view>
-      </view>
-    </view>
-    
-    <!-- vip -->
-    <!-- <view>
-      <VipCard/>
-    </view> -->
-    
+    <!-- 用户信息区域 - 美化版 -->
+    <UserInfoCard 
+      :marginTop="(navBarInfo.totalHeight - 5) + 'px'"
+      :showVip="false"
+      :showStatusBar="true"
+      @click="handleUserinfo" />
+
     <!-- Core Nav -->
      <view>
       <myNavbar/>
@@ -90,7 +74,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import uviewOverlay from '../../components/core/uviewOverlay.vue';
-import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
 import myNavbar from '../../components/modules/my/myNavbar.vue';
 import ThemeDivider from '../../components/core/ThemeDivider.vue';
@@ -99,11 +82,10 @@ import CustomNavbar from '../../components/core/CustomNavbar.vue';
 import { clearExamCache } from '../../util/cacheCleaner.js';
 import showShareMenu from '../../util/wechatShare.js';
 import UserAgreementTips from '../../components/modules/my/UserAgreementTips.vue';
-import userAvatar from '../../components/core/userAvatar.vue';
+import UserInfoCard from '../../components/modules/my/UserInfoCard.vue';
 
 const LoginOverlayShow = ref(false);
 const AuthorOverlayShow = ref(false);
-const userInfoStore = UserInfoStore();
 const navBarInfo = ref({});
 const CustomNavbarList = ref([
   {
@@ -161,10 +143,10 @@ const handleClick = (item) => {
 }
 
 //用户信息
-const handleUserinfo = () => {
-  if (!userInfoStore.isLoggedIn) {
+const handleUserinfo = ({ isLoggedIn }) => {
+  if (!isLoggedIn) {
     LoginOverlayShow.value = true;
-  }else{
+  } else {
     uni.navigateTo({
       url: '/pages/my/UserInfoView'
     });
@@ -259,86 +241,6 @@ onMounted(() => {
   backdrop-filter: blur(10px); /* 毛玻璃效果 */
   -webkit-backdrop-filter: blur(10px);
   pointer-events: none; /* 让导航栏不阻挡点击事件 */
-}
-
-
-.user-info {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.95) 0%, 
-    rgba(245, 250, 255, 0.9) 50%,
-    rgba(240, 248, 255, 0.95) 100%
-  ); /* 优雅的白色到淡蓝色渐变 */
-  border-radius: 20rpx;
-  padding: 35rpx;
-  margin: 0 0 25rpx 0;
-  box-shadow: 
-    0 8rpx 24rpx rgba(198, 226, 255, 0.15),
-    0 2rpx 8rpx rgba(198, 226, 255, 0.1); /* 柔和的蓝色阴影 */
-  position: relative;
-  overflow: hidden;
-  z-index: 9999; /* 确保卡片在导航栏上方显示 */
-  border: 1px solid rgba(255, 255, 255, 0.8); /* 细腻边框 */
-  backdrop-filter: blur(5px); /* 轻微模糊效果 */
-  -webkit-backdrop-filter: blur(5px);
-  transition: all 0.3s ease; /* 动画过渡 */
-}
-
-.avatar-wrapper {
-  margin-right: 30rpx;
-}
-
-.avatar {
-  width: 110rpx;
-  height: 110rpx;
-  border-radius: 60rpx;
-  background-color: #f0f8ff;
-  box-shadow: 0 4rpx 12rpx rgba(198, 226, 255, 0.25); /* 柔和的蓝色阴影 */
-  border: 2px solid rgba(255, 255, 255, 0.9); /* 明亮的白色边框 */
-}
-
-.user-detail {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.user-info-content {
-  flex: 1;
-}
-
-.arrow-right {
-  margin-left: 10rpx;
-  flex-shrink: 0;
-}
-
-.login-btn {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333333;
-  margin-bottom: 10rpx;
-}
-
-.username {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333333;
-  margin-bottom: 10rpx;
-}
-
-.user-desc {
-  font-size: 26rpx;
-  color: #999999;
-}
-.user-openid {
-  font-size: 25rpx;
-  color: #333333;
-}
-.openid-data{
-  font-size: 23rpx;
-  color: #929292;
 }
 
 .logout-btn {
