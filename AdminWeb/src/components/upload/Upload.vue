@@ -140,6 +140,77 @@ const uploadAvatar = computed(() =>
   background-color: #ecf5ff;
 }
 
+.avatar-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover; /* 默认 cover，填充 */
+}
+
+.edit-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.avatar-preview-wrapper:hover .edit-mask {
+  opacity: 1;
+}
+
+.edit-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.edit-text {
+  font-size: 12px;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #8c939d;
+  transition: color 0.3s;
+}
+
+.avatar-uploader :deep(.el-upload:hover) .upload-placeholder {
+  color: var(--el-color-primary);
+}
+
+.upload-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  font-size: 12px;
+  color: inherit;
+}
+
 .resource-select-bar {
   display: flex;
   align-items: center;
@@ -151,7 +222,7 @@ const uploadAvatar = computed(() =>
   border-top: none;
   border-radius: 0 0 8px 8px;
   font-size: 12px;
-  color: #606466;
+  color: #606266;
   cursor: pointer;
   transition: all 0.3s;
 }
