@@ -16,7 +16,7 @@
 <script setup>
 import { defineEmits, defineProps, computed } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
-import escconfig from '@/config/esc.config';
+import formatImageUrl from '@/util/formatImageUrl';
 
 const props = defineProps({
   avatar: String,
@@ -39,7 +39,7 @@ const handleChange = (file) => {
 const uploadAvatar = computed(() =>
   props.avatar.includes('blob')
     ? props.avatar
-    : `http://${escconfig.serverHost}:${escconfig.serverPort}` + props.avatar
+    : formatImageUrl(props.avatar)
 );
 </script>
 

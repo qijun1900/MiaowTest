@@ -22,8 +22,6 @@ const formatImageUrl = (url) => {
     // 否则使用服务器地址和端口访问
     return `http://${escconfig.serverHost}:${escconfig.serverPort}${url.startsWith('/')? '' : '/'}${url}`;
   }
-  
- 
 };
 
 export default formatImageUrl;

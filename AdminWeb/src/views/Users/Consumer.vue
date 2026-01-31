@@ -95,7 +95,7 @@
         <el-table-column prop="nickname" label="昵称" width="150">
           <template #default="scope">
             <div class="nickname-cell">
-              <el-avatar :src="scope.row.avatar ? formatImageUrl(scope.row.avatar) : defaultAvatar" size="small" />
+              <el-avatar :src="scope.row.avatar ? scope.row.avatar : defaultAvatar" size="small" />
               <span class="nickname-text">{{ scope.row.nickname }}</span>
             </div>
           </template>

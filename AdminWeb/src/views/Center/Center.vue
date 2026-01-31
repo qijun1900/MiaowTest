@@ -73,12 +73,12 @@
 import { computed, ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 import Upload from '@/components/upload/Upload.vue';
-import escconfig from '@/config/esc.config';
 import formatImageUrl from '@/util/formatImageUrl';
 import { useAppStore } from '@/stores';
 import { postUploadInfo } from '@/API/Users/postUploadInfo';
 import { List } from '@element-plus/icons-vue'
 import TodoList from '@/components/FunComponents/TodoList.vue';
+
 const appStore = useAppStore()
 
 const avatarUrl = computed(() => {

@@ -115,7 +115,8 @@
                             <template #default="scope">
                                 <div v-if="scope.row.avatar">
                                     <el-avatar :size="50"
-                                        :src="`http://${escconfig.serverHost}:${escconfig.serverPort}` + scope.row.avatar"></el-avatar>
+                                        :src="formatImageUrl(scope.row.avatar)">
+                                    </el-avatar>
                                 </div>
                                 <div v-else>
                                     <el-avatar :size="50"
@@ -253,13 +254,13 @@ import Tooltip from '@/components/ReuseComponents/Tooltip.vue'
 import Pagination from '@/components/ReuseComponents/Pagination.vue'
 import { useTableState } from '@/composables/State/useTableState'
 import { useTableActions } from '@/composables/Action/useTableActions'
-import escconfig from '../../config/esc.config';
 import { postAddUser, postEditUser } from '@/API/Users/userAPI'//API
 import { ElMessage } from 'element-plus'
 import formatTime from '@/util/formatTime'
 import Popconfirm from '@/components/ReuseComponents/Popconfirm.vue'
 import SearchFilter from '@/components/FunComponents/SearchFilter.vue'
 import {getUserList,PostDeleteOneUser,PostDeleteManyUser} from '@/API/Users/userAPI'//API
+import formatImageUrl from '@/util/formatImageUrl'
 
 
 // 动态导入较大的组件
