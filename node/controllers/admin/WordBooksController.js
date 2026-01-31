@@ -12,7 +12,6 @@ const WordBooksController = {
                 data: result
             });
 
-
         } catch (error) {
             console.error('获取词书列表失败:', error);
             res.status(500).send({

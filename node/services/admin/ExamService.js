@@ -5,6 +5,7 @@ const ExamJudgeModel = require('../../models/JudgeModel')
 const ExamShortModel = require('../../models/ShortModel')
 const UserExamModel = require('../../models/UserExamModel')
 const AianalysisModel = require('../../models/AianalysisModel')
+const {deleteFile} = require('../../helpers/ossHelper');
 
 const ExamService = {
     ExamAdd: async ({
@@ -44,6 +45,11 @@ const ExamService = {
     },
     updateInfo: async ({ name, code, category, year, isPublish, cover, creator, day, createdTime, _id }) => {
         if (cover) {
+            // 删除旧封面文件
+            const exam = await ExamModel.findById(_id);
+            if (exam && exam.cover) {
+                await deleteFile(exam.cover);
+            }
             return ExamModel.updateOne({ _id }, {
                 name,
                 code,
@@ -635,6 +641,5 @@ const ExamService = {
             console.error("删除单个网盘资料信息失败",error);
         }
     }
-
 }
 module.exports = ExamService

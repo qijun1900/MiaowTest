@@ -1,4 +1,6 @@
 const UserModel = require('../../models/UserModel')
+const { deleteFile } = require('../../helpers/ossHelper');
+
 const UserService = {
   login: async ({ username, password }) => {
     return UserModel.find({
@@ -8,6 +10,11 @@ const UserService = {
   },
   upload: async ({ _id, username, introduction, gender, avatar }) => {
     if (avatar) {
+      // 删除旧头像
+      const user = await UserModel.findById(_id);
+      if (user && user.avatar) {
+        await deleteFile(user.avatar);
+      }
       return UserModel.updateOne({ _id }, {
         username, introduction, gender, avatar
       })
@@ -64,6 +71,11 @@ const UserService = {
     avatar
   }) => {
     if (avatar) {
+      // 删除旧头像
+      const user = await UserModel.findById(_id);
+      if (user && user.avatar) {
+        await deleteFile(user.avatar);
+      }
       return UserModel.updateOne(
         { _id },
         {

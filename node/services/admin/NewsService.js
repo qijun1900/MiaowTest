@@ -1,4 +1,5 @@
 const NewsModel = require('../../models/NewsModel')
+const {deleteFile} = require('../../helpers/ossHelper');
 const NewsService ={
     addAnnouncement: async ({title,content,category,isPublish,cover,creator,editTime})=>{
         return NewsModel.create({
@@ -32,7 +33,16 @@ const NewsService ={
         return NewsModel.updateOne({_id},{isPublish:state})
     },
     editAnnouncement: async ({_id,title,content,category,isPublish,cover,creator})=>{
-        return NewsModel.updateOne({_id},{title,content,category,isPublish,cover,creator})
+        if (cover) {
+            // 删除旧封面文件
+            const news = await NewsModel.findById(_id);
+            if (news && news.cover) {
+                await deleteFile(news.cover);
+            }
+            return NewsModel.updateOne({_id},{title,content,category,isPublish,cover,creator})
+        } else {
+            return NewsModel.updateOne({_id},{title,content,category,isPublish,creator})
+        }
     }
 }
 
