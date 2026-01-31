@@ -144,7 +144,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import { Search, Picture, Check } from '@element-plus/icons-vue';
+import { Picture, Check } from '@element-plus/icons-vue';
 import { getTags, getFileList } from '@/API/Resource/FileAPI';
 
 const props = defineProps({

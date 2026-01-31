@@ -155,7 +155,6 @@ const handleChange = file => {
 const submitForm = async () => {
     try {
         const res = await postUploadInfo(userForm)
-        console.log(res)
         if (res.ActionType === "OK") {
             appStore.userInfo = res.data
             ElMessage.success("更新成功")
@@ -163,7 +162,6 @@ const submitForm = async () => {
     } catch {
         ElMessage.error("更新失败")
     }
-
 }
 </script>
 <style scoped lang="scss">

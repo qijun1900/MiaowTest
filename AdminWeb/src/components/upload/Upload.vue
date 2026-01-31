@@ -1,33 +1,36 @@
 <template>
   <div class="upload-wrapper">
-    <el-upload
-      class="avatar-uploader"
-      action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-      :show-file-list="false"
-      :auto-upload="false"
-      :on-change="handleChange"
-    >
-      <img 
-        v-if="props.avatar" 
-        :src="uploadAvatar" 
-        class="avatar" 
-      />
-      <el-icon 
-        v-else 
-        class="avatar-uploader-icon">
-        <Plus/>
-      </el-icon>
-    </el-upload>
-    <el-button 
-      size="small" 
-      type="primary" 
-      class="resource-btn" 
-      @click="showResourceSelector = true" 
-      style="margin-top: 10px;"
-      v-if="props.isShowResourceSelector"
+    <div class="upload-container">
+      <el-upload
+        class="avatar-uploader"
+        action="#"
+        :show-file-list="false"
+        :auto-upload="false"
+        :on-change="handleChange"
       >
-      从资源中心库选择
-    </el-button>
+        <div v-if="props.avatar" class="avatar-preview-wrapper">
+          <img :src="uploadAvatar" class="avatar" />
+          <div class="edit-mask">
+            <el-icon class="edit-icon"><Edit /></el-icon>
+            <span class="edit-text">更换图片</span>
+          </div>
+        </div>
+        <div v-else class="upload-placeholder">
+          <el-icon class="upload-icon"><Plus /></el-icon>
+          <span class="upload-text">点击上传</span>
+        </div>
+      </el-upload>
+      
+      <div 
+        v-if="props.isShowResourceSelector"
+        class="resource-select-bar"
+        @click="showResourceSelector = true"
+      >
+        <el-icon><Picture /></el-icon>
+        <span>从资源库选择</span>
+      </div>
+    </div>
+
     <ResourceSelector   
       v-model="showResourceSelector" 
       @select="handleResourceSelect"
@@ -37,7 +40,7 @@
 
 <script setup>
 import { defineEmits, defineProps, computed, ref } from 'vue';
-import { Plus } from '@element-plus/icons-vue';
+import { Plus, Edit, Picture } from '@element-plus/icons-vue';
 import formatImageUrl from '@/util/formatImageUrl';
 import ResourceSelector from './ResourceSelector.vue';
 import axios from 'axios';
@@ -106,35 +109,60 @@ const uploadAvatar = computed(() =>
 );
 </script>
 
-<style>
+<style scoped>
 .upload-wrapper {
+  display: inline-block;
+}
+
+.upload-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  gap: 0;
+  width: v-bind('typeof props.width === "number" ? `${props.width}px` : props.width');
 }
 
-.avatar-uploader .avatar {
-  width: v-bind('typeof props.width === "number" ? `${props.width}px` : props.width');
-  height: v-bind('typeof props.height === "number" ? `${props.height}px` : props.height');
-  display: block;
-}
-
-.avatar-uploader .el-upload {
-  width: v-bind('typeof props.width === "number" ? `${props.width}px` : props.width');
-  height: v-bind('typeof props.height === "number" ? `${props.height}px` : props.height');
+.avatar-uploader :deep(.el-upload) {
   border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
+  border-radius: 8px 8px 0 0;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   transition: var(--el-transition-duration-fast);
+  background-color: #fafafa;
+  width: 100%;
+  height: v-bind('typeof props.height === "number" ? `${props.height}px` : props.height');
 }
 
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: v-bind('typeof props.width === "number" ? `${props.width}px` : props.width');
-  height: v-bind('typeof props.height === "number" ? `${props.height}px` : props.height');
-  text-align: center;
+/* 调整底部圆角，因为下面接了按钮 */
+.avatar-uploader :deep(.el-upload:hover) {
+  border-color: var(--el-color-primary);
+  background-color: #ecf5ff;
+}
+
+.resource-select-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  background-color: #f5f7fa;
+  border: 1px dashed var(--el-border-color);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  font-size: 12px;
+  color: #606466;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.resource-select-bar:hover {
+  background-color: #ecf5ff;
+  color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
+}
+
+.resource-select-bar .el-icon {
+  font-size: 14px;
 }
 </style>
