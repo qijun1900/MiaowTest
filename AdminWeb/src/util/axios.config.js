@@ -20,10 +20,12 @@ axios.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
     // 对响应错误做点什么
-    const { status } = error.response;
-    if (status === 401) {
-        localStorage.removeItem('token')// 防止冲突而删除token
-        window.location.href = '#/login';// 定向到登录界面
+    if (error.response) {
+        const { status } = error.response;
+        if (status === 401) {
+            localStorage.removeItem('token')// 防止冲突而删除token
+            window.location.href = '#/login';// 定向到登录界面
+        }
     }
     return Promise.reject(error);
 });

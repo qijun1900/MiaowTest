@@ -15,6 +15,11 @@ const formatImageUrl = (url) => {
     return url;
   }
   
+  // 如果已经是完整的 HTTP/HTTPS URL，直接返回
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
   // 如果启用了 OSS 且配置了域名，使用 OSS 域名访问
   if (escconfig.oss.enabled && escconfig.oss.domain) {
     return `${escconfig.oss.domain}${url.startsWith('/') ? '' : '/'}${url}`;

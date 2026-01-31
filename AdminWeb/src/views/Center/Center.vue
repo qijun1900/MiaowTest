@@ -56,7 +56,11 @@
                             <el-input v-model="userForm.introduction" type="textarea" />
                         </el-form-item>
                         <el-form-item label="个人头像" prop="avatar">
-                            <Upload :avatar='userForm.avatar' @AvatarChange="handleChange" />
+                            <Upload 
+                                :avatar='userForm.avatar' 
+                                @AvatarChange="handleChange"
+                                 :is-show-resource-selector="true"
+                                />
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="submitForm" class="login-button">
