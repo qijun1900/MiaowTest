@@ -31,6 +31,20 @@
           </view>
         </view>
       </view>
+
+      <!-- 新建错题本卡片 -->
+      <view 
+        class="book-card create-card" 
+        @click="handleCreateBook">
+        <view class="create-content">
+          <view class="create-icon-wrapper">
+            <view class="create-icon">
+              <uni-icons type="plus" size="40" color="#999"></uni-icons>
+            </view>
+          </view>
+          <view class="create-text">新建错题本</view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -42,7 +56,6 @@ import { ref } from 'vue'
 const wrongBooks = ref([
   {
     id: 1,
-    icon: 'EN',
     name: '英语语法专项',
     year: '2023年',
     count: 89,
@@ -51,7 +64,6 @@ const wrongBooks = ref([
   },
   {
     id: 2,
-    icon: 'PH',
     name: '物理力学整理',
     year: '2023年',
     count: 56,
@@ -60,7 +72,6 @@ const wrongBooks = ref([
   },
   {
     id: 3,
-    icon: 'CH',
     name: '化学方程式默写',
     year: '2024年',
     count: 230,
@@ -69,7 +80,6 @@ const wrongBooks = ref([
   },
   {
     id: 4,
-    icon: 'PO',
     name: '政治核心考点',
     year: '2024年',
     count: 45,
@@ -78,7 +88,6 @@ const wrongBooks = ref([
   },
   {
     id: 5,
-    icon: 'MA',
     name: '数学函数专题',
     year: '2024年',
     count: 128,
@@ -87,7 +96,6 @@ const wrongBooks = ref([
   },
   {
     id: 6,
-    icon: 'HI',
     name: '历史重点事件',
     year: '2023年',
     count: 67,
@@ -95,16 +103,25 @@ const wrongBooks = ref([
     iconBg: '#FFFFFF40'
   }
 ])
+
+// 创建新错题本
+const handleCreateBook = () => {
+  uni.showToast({
+    title: '创建新错题本',
+    icon: 'none'
+  })
+  // TODO: 打开创建错题本的弹窗或页面
+}
 </script>
 
 <style scoped>
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+  background: #fff9f2;
   padding: 30rpx 20rpx;
 }
 
-.book-list {
+.book-list {  
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24rpx;
@@ -123,7 +140,6 @@ const wrongBooks = ref([
 }
 
 .book-card::before {
-  content: '';
   position: absolute;
   top: 0;
   right: 0;
@@ -222,6 +238,64 @@ const wrongBooks = ref([
 
 .stats-text {
   color: rgba(255, 255, 255, 0.95);
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+/* 新建错题本卡片 */
+.create-card {
+  background:#fff9f2 !important;
+  border: 4rpx dashed #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-card::before {
+  display: none;
+}
+
+.create-card:active {
+  border-color: #999;
+  background: #f9f9f9 !important;
+}
+
+.create-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+}
+
+.create-icon-wrapper {
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-icon {
+  width: 100rpx;
+  height: 100rpx;
+  background: #efe9d7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.create-card:active .create-icon {
+  background: #e0e0e0;
+  transform: scale(0.95);
+}
+
+.create-text {
+  color: #999;
   font-size: 28rpx;
   font-weight: 500;
 }
