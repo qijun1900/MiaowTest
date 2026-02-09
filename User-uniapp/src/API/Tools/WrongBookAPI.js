@@ -11,14 +11,30 @@ export async  function createWrongBookAPI({
     color
 }){
     try {
-        console.log("createWrongBookAPI data:", { title, color });
         return await http({
-            url: '/uniappAPI/WrongBook/createWrongBook',
+            url: '/uniappAPI/tools/WrongBook/createWrongBook',
             method: 'POST',
             data: { title, color },
         });
     }catch (error) {
         console.error("createWrongBook 失败", error);
+        throw error;
+    }
+}
+
+/**
+ * @description 获取错题本列表接口
+ * @URL /uniappAPI/tools/wrongbook/getWrongBooks
+ * @method GET
+ */
+export async function getWrongBooksAPI() {
+    try {
+        return await http({
+            url: '/uniappAPI/tools/wrongbook/getWrongBooks',
+            method: 'GET',
+        });
+    } catch (error) {
+        console.error("getWrongBooks 失败", error);
         throw error;
     }
 }

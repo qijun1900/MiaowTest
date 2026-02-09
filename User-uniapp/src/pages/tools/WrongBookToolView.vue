@@ -126,9 +126,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
 import uviewPopup from '../../components/core/uviewPopup.vue';
-import { createWrongBookAPI } from '../../API/Tools/WrongBookAPI';
+import { createWrongBookAPI ,getWrongBooksAPI } from '../../API/Tools/WrongBookAPI';
 
 const popupShow = ref(false);
 
@@ -141,7 +141,6 @@ const formData = ref({
 const validationErrors = ref({
   title: ''
 });
-
 
 // 颜色选项
 const colorOptions = [
@@ -163,51 +162,7 @@ const colorOptions = [
   '#CDDC39', // 柠檬绿
 ];
 
-// 假数据
-const wrongBooks = ref([
-  {
-    id: 1,
-    title: '英语语法专项',
-    year: '2023年',
-    count: 89,
-    color: '#4CAF50',
-  },
-  {
-    id: 2,
-    title: '物理力学整理',
-    year: '2023年',
-    count: 56,
-    color: '#2196F3',
-  },
-  {
-    id: 3,
-    title: '化学方程式默写',
-    year: '2024年',
-    count: 230,
-    color: '#00BCD4',
-  },
-  {
-    id: 4,
-    title: '政治核心考点',
-    year: '2024年',
-    count: 45,
-    color: '#E91E63',
-  },
-  {
-    id: 5,
-    title: '数学函数专题',
-    year: '2024年',
-    count: 128,
-    color: '#FF9800',
-  },
-  {
-    id: 6,
-    title: '历史重点事件',
-    year: '2023年',
-    count: 67,
-    color: '#9C27B0',
-  }
-])
+const wrongBooks = ref([])
 
 // 创建新错题本
 const handleCreateBook = () => {
@@ -263,13 +218,26 @@ const handleSubmit = () => {
     });
   });
 
-  uni.showToast({
-    title: '创建成功',
-    icon: 'success'
-  });
-
   handleClosePopup();
 }
+
+// 获取错题本列表
+const fetchWrongBooks = async () => {
+  try {
+    const res = await getWrongBooksAPI();
+    console.log('获取错题本列表成功:', res);
+    wrongBooks.value = res.data.wrongBooks;
+  } catch (error) {
+    uni.showToast({
+      title: '获取错题本失败',
+      icon: 'error'
+    });
+    console.error('获取错题本失败:', error);
+  }
+}
+onMounted(() => {
+  fetchWrongBooks();
+})
 </script>
 
 <style scoped>

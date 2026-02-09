@@ -28,6 +28,7 @@ const WordBooksRouter = require('./routes/admin/WordBooksRouter'); // 引入Admi
 const VocabularyRouter = require('./routes/user/VocabularyRouter'); // 引入用户端词汇相关路由模块
 const AdminFileRouter = require('./routes/admin/FileRouter'); // 引入Admin资源路由模块
 const UserResourceRouter = require('./routes/user/ResourceRouter') //用户资源相关路由模块
+const UserWrongBookRouter = require('./routes/user/WrongBookRouter') //用户错题本相关路由模块
 
 
 var app = express();
@@ -103,7 +104,7 @@ app.use(ConsumerExamRouter)// 注册考试路由(用户端)
 app.use(ConsumerLLMRouter)// 注册llm路由(用户端)
 app.use(VocabularyRouter)// 注册词汇相关路由(用户端)
 app.use(UserResourceRouter) //注册资源相关路由(用户端)
-
+app.use(UserWrongBookRouter) //注册错题本相关路由(用户端)
 /*
 adminapi===后台管理接口
 */
