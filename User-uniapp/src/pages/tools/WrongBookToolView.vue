@@ -15,7 +15,7 @@
         </view>
 
         <!-- 科目名称 -->
-        <view class="subject-name">{{ book.name }}</view>
+        <view class="subject-name">{{ book.title }}</view>
 
         <!-- 年份 -->
         <view class="year">
@@ -60,25 +60,25 @@
               错题本名称
               <text class="required">*</text>
             </view>
-            <view class="input-wrapper" :class="{ 'has-error': validationErrors.name }">
+            <view class="input-wrapper" :class="{ 'has-error': validationErrors.title }">
               <uni-icons 
                 type="compose" 
                 size="18" 
-                :color="validationErrors.name ? '#f44336' : '#999'"
+                :color="validationErrors.title ? '#f44336' : '#999'"
               ></uni-icons>
               <input 
                 class="form-input" 
-                :class="{ 'is-error': validationErrors.name }"
-                v-model="formData.name" 
+                :class="{ 'is-error': validationErrors.title }"
+                v-model="formData.title" 
                 placeholder="请输入错题本名称（最多20个字）"
                 maxlength="20"
-                @input="handleNameInput"
+                @input="handleTitleInput"
               />
-              <text class="char-count">{{ formData.name.length }}/20</text>
+              <text class="char-count">{{ formData.title.length }}/20</text>
             </view>
-            <view v-if="validationErrors.name" class="form-error">
+            <view v-if="validationErrors.title" class="form-error">
               <uni-icons type="info-filled" size="14" color="#f44336"></uni-icons>
-              <text>{{ validationErrors.name }}</text>
+              <text>{{ validationErrors.title }}</text>
             </view>
           </view>
 
@@ -128,17 +128,18 @@
 <script setup>
 import { ref } from 'vue'
 import uviewPopup from '../../components/core/uviewPopup.vue';
+import { createWrongBookAPI } from '../../API/Tools/WrongBookAPI';
 
 const popupShow = ref(false);
 
 // 表单数据
 const formData = ref({
-  name: '',
+  title: '',
   color: '#4CAF50'
 });
 
 const validationErrors = ref({
-  name: ''
+  title: ''
 });
 
 
@@ -166,51 +167,45 @@ const colorOptions = [
 const wrongBooks = ref([
   {
     id: 1,
-    name: '英语语法专项',
+    title: '英语语法专项',
     year: '2023年',
     count: 89,
     color: '#4CAF50',
-    iconBg: '#FFFFFF10'
   },
   {
     id: 2,
-    name: '物理力学整理',
+    title: '物理力学整理',
     year: '2023年',
     count: 56,
     color: '#2196F3',
-    iconBg: '#FFFFFF40'
   },
   {
     id: 3,
-    name: '化学方程式默写',
+    title: '化学方程式默写',
     year: '2024年',
     count: 230,
     color: '#00BCD4',
-    iconBg: '#FFFFFF40'
   },
   {
     id: 4,
-    name: '政治核心考点',
+    title: '政治核心考点',
     year: '2024年',
     count: 45,
     color: '#E91E63',
-    iconBg: '#FFFFFF40'
   },
   {
     id: 5,
-    name: '数学函数专题',
+    title: '数学函数专题',
     year: '2024年',
     count: 128,
     color: '#FF9800',
-    iconBg: '#FFFFFF40'
   },
   {
     id: 6,
-    name: '历史重点事件',
+    title: '历史重点事件',
     year: '2023年',
     count: 67,
     color: '#9C27B0',
-    iconBg: '#FFFFFF40'
   }
 ])
 
@@ -224,9 +219,9 @@ const selectColor = (color) => {
   formData.value.color = color;
 }
 
-const handleNameInput = () => {
-  if (validationErrors.value.name) {
-    validationErrors.value.name = '';
+const handleTitleInput = () => {
+  if (validationErrors.value.title) {
+    validationErrors.value.title = '';
   }
 }
 
@@ -235,32 +230,38 @@ const handleClosePopup = () => {
   popupShow.value = false;
   // 重置表单
   formData.value = {
-    name: '',
+    title: '',
     color: '#4CAF50'
   };
   validationErrors.value = {
-    name: ''
+    title: ''
   };
 }
 
 // 提交表单
 const handleSubmit = () => {
   // 验证表单
-  if (!formData.value.name.trim()) {
-    validationErrors.value.name = '请输入错题本名称';
+  if (!formData.value.title.trim()) {
+    validationErrors.value.title = '请输入错题本名称';
     return;
   }
 
   // 创建新错题本
-  const newBook = {
-    id: wrongBooks.value.length + 1,
-    name: formData.value.name,
-    count: 0,
-    color: formData.value.color,
-    iconBg: '#FFFFFF40'
-  };
-
-  wrongBooks.value.push(newBook);
+  createWrongBookAPI({
+    title: formData.value.title,
+    color: formData.value.color
+  }).then(() => {
+    uni.showToast({
+      title: '创建成功',
+      icon: 'success'
+    });
+    handleClosePopup();
+  }).catch(() => {
+    uni.showToast({
+      title: '创建失败，请重试',
+      icon: 'error'
+    });
+  });
 
   uni.showToast({
     title: '创建成功',

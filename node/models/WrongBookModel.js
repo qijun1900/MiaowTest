@@ -16,9 +16,9 @@ const WrongBookSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },                          
-    iconBg: { // 图标背景颜色
+    color: { // 图标背景颜色
         type: String,
-        default: '#FFFFFF40'
+        default: '#FFFFFF'
     },                          
     questions: [{
         questionId: {
