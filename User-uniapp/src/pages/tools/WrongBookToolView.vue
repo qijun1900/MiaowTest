@@ -46,11 +46,121 @@
         </view>
       </view>
     </view>
+    <!-- 弹窗 -->
+    <uviewPopup
+      v-model:show="popupShow"
+      title="创建错题本"  
+      :closeable="true"
+      @close="handleClosePopup">
+      <template #popupcontent>
+        <view class="form-container">
+          <!-- 错题本名称 -->
+          <view class="form-item">
+            <view class="form-label">
+              错题本名称
+              <text class="required">*</text>
+            </view>
+            <view class="input-wrapper" :class="{ 'has-error': validationErrors.name }">
+              <uni-icons 
+                type="compose" 
+                size="18" 
+                :color="validationErrors.name ? '#f44336' : '#999'"
+              ></uni-icons>
+              <input 
+                class="form-input" 
+                :class="{ 'is-error': validationErrors.name }"
+                v-model="formData.name" 
+                placeholder="请输入错题本名称（最多20个字）"
+                maxlength="20"
+                @input="handleNameInput"
+              />
+              <text class="char-count">{{ formData.name.length }}/20</text>
+            </view>
+            <view v-if="validationErrors.name" class="form-error">
+              <uni-icons type="info-filled" size="14" color="#f44336"></uni-icons>
+              <text>{{ validationErrors.name }}</text>
+            </view>
+          </view>
+
+          <!-- 颜色选择 -->
+          <view class="form-item">
+            <view class="form-label">
+              选择颜色
+              <text class="required">*</text>
+            </view>
+            <view class="color-picker-wrapper">
+              <scroll-view class="color-scroll" scroll-x>
+                <view class="color-list">
+                  <view 
+                    class="color-item" 
+                    v-for="color in colorOptions" 
+                    :key="color"
+                    :style="{ backgroundColor: color }"
+                    :class="{ active: formData.color === color }"
+                    @click="selectColor(color)"
+                  >
+                    <view class="color-check" v-if="formData.color === color">
+                      <uni-icons type="checkmarkempty" size="16" color="#fff"></uni-icons>
+                    </view>
+                  </view>
+                </view>
+              </scroll-view>
+            </view>
+          </view>
+
+          <!-- 按钮组 -->
+          <view class="form-actions">
+            <button class="btn btn-cancel" @click="handleClosePopup">
+              <uni-icons type="closeempty" size="16" color="#666"></uni-icons>
+              取消
+            </button>
+            <button class="btn btn-submit" @click="handleSubmit">
+              <uni-icons type="checkmarkempty" size="16" color="#fff"></uni-icons>
+              创建
+            </button>
+          </view>
+        </view>
+      </template>
+    </uviewPopup>
   </view>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import uviewPopup from '../../components/core/uviewPopup.vue';
+
+const popupShow = ref(false);
+
+// 表单数据
+const formData = ref({
+  name: '',
+  color: '#4CAF50'
+});
+
+const validationErrors = ref({
+  name: ''
+});
+
+
+// 颜色选项
+const colorOptions = [
+  '#4CAF50', // 绿色
+  '#2196F3', // 蓝色
+  '#00BCD4', // 青色
+  '#E91E63', // 粉色
+  '#FF9800', // 橙色
+  '#9C27B0', // 紫色
+  '#F44336', // 红色
+  '#FF5722', // 深橙色
+  '#3F51B5', // 靛蓝色
+  '#009688', // 蓝绿色
+  '#8BC34A', // 浅绿色
+  '#FFC107', // 琥珀色
+  '#795548', // 棕色
+  '#607D8B', // 蓝灰色
+  '#673AB7', // 深紫色
+  '#CDDC39', // 柠檬绿
+];
 
 // 假数据
 const wrongBooks = ref([
@@ -60,7 +170,7 @@ const wrongBooks = ref([
     year: '2023年',
     count: 89,
     color: '#4CAF50',
-    iconBg: '#FFFFFF40'
+    iconBg: '#FFFFFF10'
   },
   {
     id: 2,
@@ -106,11 +216,58 @@ const wrongBooks = ref([
 
 // 创建新错题本
 const handleCreateBook = () => {
+  popupShow.value = true;
+}
+
+// 选择颜色
+const selectColor = (color) => {
+  formData.value.color = color;
+}
+
+const handleNameInput = () => {
+  if (validationErrors.value.name) {
+    validationErrors.value.name = '';
+  }
+}
+
+// 关闭弹窗
+const handleClosePopup = () => {
+  popupShow.value = false;
+  // 重置表单
+  formData.value = {
+    name: '',
+    color: '#4CAF50'
+  };
+  validationErrors.value = {
+    name: ''
+  };
+}
+
+// 提交表单
+const handleSubmit = () => {
+  // 验证表单
+  if (!formData.value.name.trim()) {
+    validationErrors.value.name = '请输入错题本名称';
+    return;
+  }
+
+  // 创建新错题本
+  const newBook = {
+    id: wrongBooks.value.length + 1,
+    name: formData.value.name,
+    count: 0,
+    color: formData.value.color,
+    iconBg: '#FFFFFF40'
+  };
+
+  wrongBooks.value.push(newBook);
+
   uni.showToast({
-    title: '创建新错题本',
-    icon: 'none'
-  })
-  // TODO: 打开创建错题本的弹窗或页面
+    title: '创建成功',
+    icon: 'success'
+  });
+
+  handleClosePopup();
 }
 </script>
 
@@ -298,5 +455,188 @@ const handleCreateBook = () => {
   color: #999;
   font-size: 28rpx;
   font-weight: 500;
+}
+
+/* 表单样式 */
+.form-container {
+  padding: 50rpx 40rpx;
+}
+
+.form-item {
+  margin-bottom: 50rpx;
+}
+
+.form-label {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 20rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.required {
+  color: #f44336;
+  margin-left: 8rpx;
+  font-weight: normal;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  border-radius: 16rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+  background: #fff;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 4rpx rgba(76, 175, 80, 0.1);
+}
+
+.input-wrapper.has-error {
+  background: #fff;
+  border-color: #f44336;
+  box-shadow: 0 0 0 4rpx rgba(244, 67, 54, 0.1);
+}
+
+.form-input {
+  flex: 1;
+  height: 88rpx;
+  padding: 0 16rpx;
+  font-size: 30rpx;
+  color: #333;
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+}
+
+.form-input.is-error {
+  color: #f44336;
+}
+
+.char-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #f44336;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 颜色选择 */
+.color-picker-wrapper {
+  background: #f8f8f8;
+  border-radius: 16rpx;
+  padding: 10rpx;
+}
+
+.color-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.color-list {
+  display: inline-flex;
+  gap: 20rpx;
+  padding: 10rpx 10rpx;
+}
+
+.color-item {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+  border: 4rpx solid transparent;
+}
+
+.color-item.active {
+  transform: scale(1.1);
+  border-color: #fff;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.25);
+}
+
+.color-check {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 按钮组 */
+.form-actions {
+  display: flex;
+  gap: 30rpx;
+  margin-top: 60rpx;
+  padding-top: 40rpx;
+  border-top: 2rpx solid #f0f0f0;
+}
+
+.btn {
+  flex: 1;
+  height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.btn-cancel {
+  background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
+  color: #666;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.btn-cancel:active {
+  background: linear-gradient(135deg, #e8e8e8 0%, #ddd 100%);
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(76, 175, 80, 0.35);
+}
+
+.btn-submit:active {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 16rpx rgba(76, 175, 80, 0.25);
 }
 </style>
