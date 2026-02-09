@@ -23,7 +23,7 @@ const WrongBookService = {
     createWrongBook: async ({ uid, title, color }) => {
         try {
             const newWrongBook = new WrongBookModel({
-                uid: uid,
+                Uid: uid,
                 title,
                 color,
                 createdAt: new Date(),

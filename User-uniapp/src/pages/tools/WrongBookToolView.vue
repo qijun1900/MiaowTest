@@ -20,7 +20,7 @@
         <!-- 年份 -->
         <view class="year">
           <uni-icons type="calendar" size="16" color="rgba(255, 255, 255, 0.9)"></uni-icons>
-          <text>{{ book.year }}</text>
+          <text>{{ formatTime.getTime2(book.updatedAt) }}</text>
         </view>
 
         <!-- 底部统计信息 -->
@@ -93,7 +93,7 @@
                 <view class="color-list">
                   <view 
                     class="color-item" 
-                    v-for="color in colorOptions" 
+                    v-for="color in displayColorOptions" 
                     :key="color"
                     :style="{ backgroundColor: color }"
                     :class="{ active: formData.color === color }"
@@ -129,6 +129,8 @@
 import { ref,onMounted } from 'vue'
 import uviewPopup from '../../components/core/uviewPopup.vue';
 import { createWrongBookAPI ,getWrongBooksAPI } from '../../API/Tools/WrongBookAPI';
+import formatTime from '../../util/formatTime';
+import { wrongBookColors, generateDisplayColorList } from '../../util/wrongBookColors';
 
 const popupShow = ref(false);
 
@@ -142,30 +144,18 @@ const validationErrors = ref({
   title: ''
 });
 
-// 颜色选项
-const colorOptions = [
-  '#4CAF50', // 绿色
-  '#2196F3', // 蓝色
-  '#00BCD4', // 青色
-  '#E91E63', // 粉色
-  '#FF9800', // 橙色
-  '#9C27B0', // 紫色
-  '#F44336', // 红色
-  '#FF5722', // 深橙色
-  '#3F51B5', // 靛蓝色
-  '#009688', // 蓝绿色
-  '#8BC34A', // 浅绿色
-  '#FFC107', // 琥珀色
-  '#795548', // 棕色
-  '#607D8B', // 蓝灰色
-  '#673AB7', // 深紫色
-  '#CDDC39', // 柠檬绿
-];
-
 const wrongBooks = ref([])
+
+// 显示的颜色选项（会在第一个位置放随机颜色）
+const displayColorOptions = ref([...wrongBookColors])
 
 // 创建新错题本
 const handleCreateBook = () => {
+  const { randomColor, displayColors } = generateDisplayColorList()
+  // 设置显示的颜色列表（随机颜色在最前面）
+  displayColorOptions.value = displayColors
+  // 设置表单默认颜色为随机颜色
+  formData.value.color = randomColor
   popupShow.value = true;
 }
 
@@ -188,6 +178,8 @@ const handleClosePopup = () => {
     title: '',
     color: '#4CAF50'
   };
+  // 重置颜色选项
+  displayColorOptions.value = [...wrongBookColors]
   validationErrors.value = {
     title: ''
   };
@@ -210,6 +202,7 @@ const handleSubmit = () => {
       title: '创建成功',
       icon: 'success'
     });
+    fetchWrongBooks(); // 刷新错题本列表
     handleClosePopup();
   }).catch(() => {
     uni.showToast({
@@ -225,8 +218,7 @@ const handleSubmit = () => {
 const fetchWrongBooks = async () => {
   try {
     const res = await getWrongBooksAPI();
-    console.log('获取错题本列表成功:', res);
-    wrongBooks.value = res.data.wrongBooks;
+    wrongBooks.value = res.data;
   } catch (error) {
     uni.showToast({
       title: '获取错题本失败',
