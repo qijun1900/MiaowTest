@@ -1,6 +1,15 @@
 <template>
   <view class="container">
-    <view class="book-list">
+    <!-- 加载中状态 -->
+    <view v-if="loading" class="loading-container">
+      <view class="loading-spinner">
+        <view class="spinner-circle"></view>
+      </view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <!-- 错题本列表 -->
+    <view class="book-list" v-else>
       <view 
         class="book-card" 
         v-for="book in wrongBooks" 
@@ -110,13 +119,16 @@
 
           <!-- 按钮组 -->
           <view class="form-actions">
-            <button class="btn btn-cancel" @click="handleClosePopup">
+            <button class="btn btn-cancel" :disabled="submitting" @click="handleClosePopup">
               <uni-icons type="closeempty" size="16" color="#666"></uni-icons>
               取消
             </button>
-            <button class="btn btn-submit" @click="handleSubmit">
-              <uni-icons type="checkmarkempty" size="16" color="#fff"></uni-icons>
-              创建
+            <button class="btn btn-submit" :disabled="submitting" :class="{ 'btn-loading': submitting }" @click="handleSubmit">
+              <view v-if="submitting" class="btn-spinner">
+                <view class="spinner-circle-small"></view>
+              </view>
+              <uni-icons v-else type="checkmarkempty" size="16" color="#fff"></uni-icons>
+              {{ submitting ? '创建中...' : '创建' }}
             </button>
           </view>
         </view>
@@ -145,6 +157,10 @@ const validationErrors = ref({
 });
 
 const wrongBooks = ref([])
+
+// loading 状态
+const loading = ref(false)
+const submitting = ref(false)
 
 // 显示的颜色选项（会在第一个位置放随机颜色）
 const displayColorOptions = ref([...wrongBookColors])
@@ -186,36 +202,39 @@ const handleClosePopup = () => {
 }
 
 // 提交表单
-const handleSubmit = () => {
+const handleSubmit = async () => {
   // 验证表单
   if (!formData.value.title.trim()) {
     validationErrors.value.title = '请输入错题本名称';
     return;
   }
 
-  // 创建新错题本
-  createWrongBookAPI({
-    title: formData.value.title,
-    color: formData.value.color
-  }).then(() => {
+  submitting.value = true
+  try {
+    await createWrongBookAPI({
+      title: formData.value.title,
+      color: formData.value.color
+    })
     uni.showToast({
       title: '创建成功',
       icon: 'success'
     });
-    fetchWrongBooks(); // 刷新错题本列表
+    await fetchWrongBooks(); // 刷新错题本列表
     handleClosePopup();
-  }).catch(() => {
+  } catch (error) {
     uni.showToast({
       title: '创建失败，请重试',
       icon: 'error'
     });
-  });
-
-  handleClosePopup();
+    console.error('创建错题本失败:', error);
+  } finally {
+    submitting.value = false
+  }
 }
 
 // 获取错题本列表
 const fetchWrongBooks = async () => {
+  loading.value = true
   try {
     const res = await getWrongBooksAPI();
     wrongBooks.value = res.data;
@@ -225,6 +244,8 @@ const fetchWrongBooks = async () => {
       icon: 'error'
     });
     console.error('获取错题本失败:', error);
+  } finally {
+    loading.value = false
   }
 }
 onMounted(() => {
@@ -599,5 +620,70 @@ onMounted(() => {
   background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
   transform: scale(0.98);
   box-shadow: 0 4rpx 16rpx rgba(76, 175, 80, 0.25);
+}
+
+.btn-submit:disabled,
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-loading {
+  background: linear-gradient(135deg, #81C784 0%, #66BB6A 100%) !important;
+}
+
+/* Loading 样式 */
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff9f2;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  position: relative;
+}
+
+.spinner-circle {
+  width: 100%;
+  height: 100%;
+  border: 6rpx solid #e0e0e0;
+  border-top-color: #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.btn-spinner {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 8rpx;
+}
+
+.spinner-circle-small {
+  width: 100%;
+  height: 100%;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #666;
 }
 </style>
