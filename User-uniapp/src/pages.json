@@ -247,6 +247,18 @@
 			"style": {
 				"navigationBarTitleText": "单词列表"
 			}
+		},
+		{
+			"path": "pages/tools/NotesToolView",
+			"style": {
+				"navigationBarTitleText": "喵喵笔记"
+			}
+		},
+		{
+			"path": "pages/tools/WrongBookToolView",
+			"style": {
+				"navigationBarTitleText": "喵喵错题本"
+			}
 		}
 	],
 	"globalStyle": {
