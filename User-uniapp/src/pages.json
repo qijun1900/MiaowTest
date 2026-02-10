@@ -265,6 +265,14 @@
 			"style": {
 				"navigationBarTitleText": "编辑错题本"
 			}
+		},
+		{
+			"path": "pages/tools/WrongBookToolView_children/WrongQuestionListView",
+			"style": {
+				"navigationBarTitleText": "错题列表",
+				"navigationStyle": "custom" //自定义导航栏
+			}
+			
 		}
 	],
 	"globalStyle": {

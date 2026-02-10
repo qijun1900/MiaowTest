@@ -15,6 +15,7 @@
         v-for="book in wrongBooks" 
         :key="book.id"
         :style="{ backgroundColor: book.color }"
+        @click="handleOpenQuestionList(book)"
       >
         <!-- 顶部菜单 -->
         <view class="card-header" >
@@ -256,6 +257,14 @@ const handleOpenEdit = (book) => {
     url: `/pages/tools/WrongBookToolView_children/WrongBookEditView?id=${book._id}`
   });
 }
+
+// 跳转到错题列表页面
+const handleOpenQuestionList = (book) => {
+  uni.navigateTo({
+    url: `/pages/tools/WrongBookToolView_children/WrongQuestionListView?id=${book._id}`
+  });
+}
+
 onShow(() => {
   fetchWrongBooks();
 })

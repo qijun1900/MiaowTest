@@ -503,7 +503,12 @@ onLoad((options) => {
   justify-content: center;
   padding: 120rpx 0;
 }
+.empty-image{
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 20rpx;
 
+}
 .empty-text {
   font-size: 28rpx;
   color: #999999;
