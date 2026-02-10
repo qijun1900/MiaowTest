@@ -5,12 +5,6 @@ const WrongBookController = {
     getWrongBooks: async (req, res) => {
         try {
             const { uid } = req.user;
-            if (!uid) {
-                return res.send({
-                    code: 401,
-                    message: '您未登录'
-                });
-            }
             const data = await WrongBookService.getWrongBooks({ uid });
             res.send({
                 code: 200,
@@ -28,12 +22,6 @@ const WrongBookController = {
     createWrongBook: async (req, res) => {
         try {
             const { uid } = req.user;
-            if (!uid) {
-                return res.send({
-                    code: 401,
-                    message: '您未登录'
-                });
-            }
             const { title, color } = req.body;
             const result = await WrongBookService.createWrongBook({ uid, title, color });
             if (!result.success) {
@@ -54,16 +42,85 @@ const WrongBookController = {
             });
         }
     },
+    // 获取错题本详情 (Book)
+    getWrongBookDetail: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { id } = req.query;
+            const data = await WrongBookService.getWrongBookDetail({ uid, id });
+            if (!data) {
+                return res.send({
+                    code: 404,
+                    message: '错题本不存在'
+                });
+            }
+            res.send({
+                code: 200,
+                data
+            });
+        } catch (error) {
+            console.error("获取错题本详情失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "获取错题本详情失败"
+            });
+        }
+    },
+
+    // 更新错题本 (Book)
+    updateWrongBook: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { id, title, color } = req.body;
+            const result = await WrongBookService.updateWrongBook({ uid, id, title, color });
+            if (!result.success) {
+                return res.send({
+                    code: 400,
+                    message: '更新错题本失败'
+                });
+            }
+            res.send({
+                code: 200,
+                message: '更新错题本成功'
+            });
+        } catch (error) {
+            console.error("更新错题本失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "更新错题本失败"
+            });
+        }
+    },
+
+    // 删除错题本 (Book)
+    deleteWrongBook: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { id } = req.body;
+            const result = await WrongBookService.deleteWrongBook({ uid, id });
+            if (!result.success) {
+                return res.send({
+                    code: 400,
+                    message: '删除错题本失败'
+                });
+            }
+            res.send({
+                code: 200,
+                message: '删除错题本成功'
+            });
+        } catch (error) {
+            console.error("删除错题本失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "删除错题本失败"
+            });
+        }
+    },
+
     // 添加错题
     addWrongQuestion: async (req, res) => {
         try {
             const { uid } = req.user;
-            if (!uid) {
-                return res.send({
-                    code: 401,
-                    message: '您未登录'
-                });
-            }
             const { question, answer, category, note } = req.body;
             const result = await WrongBookService.addWrongQuestion({
                 uid,
@@ -96,12 +153,6 @@ const WrongBookController = {
     deleteWrongQuestion: async (req, res) => {
         try {
             const { uid } = req.user;
-            if (!uid) {
-                return res.send({
-                    code: 401,
-                    message: '您未登录'
-                });
-            }
             const { id } = req.body;
             const result = await WrongBookService.deleteWrongQuestion({ uid, id });
             if (!result.success) {
@@ -127,12 +178,6 @@ const WrongBookController = {
     getWrongQuestionDetail: async (req, res) => {
         try {
             const { uid } = req.user;
-            if (!uid) {
-                return res.send({
-                    code: 401,
-                    message: '您未登录'
-                });
-            }
             const { id } = req.params;
             const data = await WrongBookService.getWrongQuestionDetail({ uid, id });
             if (!data) {
@@ -158,12 +203,6 @@ const WrongBookController = {
     updateWrongQuestion: async (req, res) => {
         try {
             const { uid } = req.user;
-            if (!uid) {
-                return res.send({
-                    code: 401,
-                    message: '您未登录'
-                });
-            }
             const { id, question, answer, category, note } = req.body;
             const result = await WrongBookService.updateWrongQuestion({
                 uid,
@@ -196,12 +235,6 @@ const WrongBookController = {
     getWrongBookStatistics: async (req, res) => {
         try {
             const { uid } = req.user;
-            if (!uid) {
-                return res.send({
-                    code: 401,
-                    message: '您未登录'
-                });
-            }
             const data = await WrongBookService.getWrongBookStatistics({ uid });
             res.send({
                 code: 200,

@@ -1,21 +1,29 @@
 var express = require('express');
 const WrongBookController = require('../../controllers/user/WrongBookController');
 const JWT = require('../../MiddleWares/jwt');
+const requireUid = require('../../MiddleWares/requireUid');
 var WrongBookRouter = express.Router();
 
 // 获取错题本列表
-WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBooks", JWT.verifyTokenMiddleware(), WrongBookController.getWrongBooks)
-//创建错题本
-WrongBookRouter.post("/uniappAPI/tools/wrongbook/createWrongBook", JWT.verifyTokenMiddleware(), WrongBookController.createWrongBook)
+WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBooks", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongBooks)
+// 获取错题本详情
+WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBookDetail", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongBookDetail)
+// 创建错题本
+WrongBookRouter.post("/uniappAPI/tools/wrongbook/createWrongBook", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.createWrongBook)
+// 更新错题本
+WrongBookRouter.post("/uniappAPI/tools/wrongbook/updateWrongBook", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.updateWrongBook)
+// 删除错题本
+WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongBook", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.deleteWrongBook)
 // 添加错题
-WrongBookRouter.post("/uniappAPI/tools/wrongbook/addWrongQuestion", JWT.verifyTokenMiddleware(), WrongBookController.addWrongQuestion)
+WrongBookRouter.post("/uniappAPI/tools/wrongbook/addWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.addWrongQuestion)
 // 删除错题
-WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongQuestion", JWT.verifyTokenMiddleware(), WrongBookController.deleteWrongQuestion)
+WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.deleteWrongQuestion)
 // 获取错题详情
-WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongQuestionDetail/:id", JWT.verifyTokenMiddleware(), WrongBookController.getWrongQuestionDetail)
+WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongQuestionDetail/:id", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongQuestionDetail)
 // 更新错题
-WrongBookRouter.post("/uniappAPI/tools/wrongbook/updateWrongQuestion", JWT.verifyTokenMiddleware(), WrongBookController.updateWrongQuestion)
+WrongBookRouter.post("/uniappAPI/tools/wrongbook/updateWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.updateWrongQuestion)
 // 获取错题统计
-WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBookStatistics", JWT.verifyTokenMiddleware(), WrongBookController.getWrongBookStatistics)
+WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBookStatistics", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongBookStatistics)
+
 
 module.exports = WrongBookRouter;

@@ -66,7 +66,7 @@ export async function getWrongBookDetailAPI(id) {
 export async function updateWrongBookAPI({ id, title, color }) {
     try {
         return await http({
-            url: '/uniappAPI/tools/WrongBook/updateWrongBook',
+            url: '/uniappAPI/tools/wrongbook/updateWrongBook',
             method: 'POST',
             data: { id, title, color }
         });
@@ -83,7 +83,7 @@ export async function updateWrongBookAPI({ id, title, color }) {
 export async function deleteWrongBookAPI(id) {
     try {
         return await http({
-            url: '/uniappAPI/tools/WrongBook/deleteWrongBook',
+            url: '/uniappAPI/tools/wrongbook/deleteWrongBook',
             method: 'POST',
             data: { id }
         });

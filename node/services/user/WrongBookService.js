@@ -80,7 +80,64 @@ const WrongBookService = {
     },
 
     /**
-     * 获取错题详情
+     * 获取错题本详情 (Book)
+     */
+    getWrongBookDetail: async ({ uid, id }) => {
+        try {
+            const detail = await WrongBookModel.findOne({ _id: id, Uid: uid }, {
+                title: 1,
+                color: 1,
+                count: 1,
+                updatedAt: 1
+            }).lean();
+            return detail;
+        } catch (error) {
+            console.error("DATABASE:获取错题本详情失败", error);
+            throw error;
+        }
+    },
+
+    /**
+     * 更新错题本 (Book)
+     */
+    updateWrongBook: async ({ uid, id, title, color }) => {
+        try {
+            const result = await WrongBookModel.updateOne(
+                { _id: id, Uid: uid },
+                { 
+                    $set: { 
+                        title, 
+                        color,
+                        updatedAt: new Date()
+                    } 
+                }
+            );
+            return {
+                success: result.modifiedCount > 0
+            };
+        } catch (error) {
+            console.error("DATABASE:更新错题本失败", error);
+            throw error;
+        }
+    },
+
+    /**
+     * 删除错题本 (Book)
+     */
+    deleteWrongBook: async ({ uid, id }) => {
+        try {
+            const result = await WrongBookModel.deleteOne({ _id: id, Uid: uid });
+            return {
+                success: result.deletedCount > 0
+            };
+        } catch (error) {
+            console.error("DATABASE:删除错题本失败", error);
+            throw error;
+        }
+    },
+
+    /**
+     * 获取错题详情 (Question - Keep existing implementation even if suspicious, just in case)
      */
     getWrongQuestionDetail: async ({ uid, id }) => {
         try {
