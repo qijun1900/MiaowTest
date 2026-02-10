@@ -17,8 +17,8 @@
         :style="{ backgroundColor: book.color }"
       >
         <!-- 顶部菜单 -->
-        <view class="card-header">
-          <view class="menu-icon">
+        <view class="card-header" >
+          <view class="menu-icon" @click.stop="handleOpenEdit(book)">
             <uni-icons type="more-filled" size="20" color="#fff"></uni-icons>
           </view>
         </view>
@@ -138,7 +138,8 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue'
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import uviewPopup from '../../components/core/uviewPopup.vue';
 import { createWrongBookAPI ,getWrongBooksAPI } from '../../API/Tools/WrongBookAPI';
 import formatTime from '../../util/formatTime';
@@ -248,7 +249,14 @@ const fetchWrongBooks = async () => {
     loading.value = false
   }
 }
-onMounted(() => {
+
+// 打开编辑页面
+const handleOpenEdit = (book) => {
+  uni.navigateTo({
+    url: `/pages/tools/WrongBookToolView_children/WrongBookEditView?id=${book._id}`
+  });
+}
+onShow(() => {
   fetchWrongBooks();
 })
 </script>

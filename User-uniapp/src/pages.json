@@ -259,6 +259,12 @@
 			"style": {
 				"navigationBarTitleText": "喵喵错题本"
 			}
+		},
+		{
+			"path": "pages/tools/WrongBookToolView_children/WrongBookEditView",
+			"style": {
+				"navigationBarTitleText": "编辑错题本"
+			}
 		}
 	],
 	"globalStyle": {
