@@ -50,21 +50,25 @@
         :key="index"
         class="question-card"
       >
+        <!-- 状态标签 - 卡片右上角 -->
+        <view class="status-badge" :class="`status-${item.status}`">
+          {{ item.statusText }}
+        </view>
+
         <!-- 卡片头部 -->
         <view class="card-header">
-          <view class="tags-row">
-            <view 
-              v-for="(tag, tagIndex) in item.tags" 
-              :key="tagIndex"
-              class="tag"
-              :class="`tag-${tag.type}`"
-            >
-              {{ tag.text }}
+          <scroll-view class="tags-scroll-view" scroll-x :show-scrollbar="false">
+            <view class="tags-row">
+              <view 
+                v-for="(tag, tagIndex) in item.tags" 
+                :key="tagIndex"
+                class="tag"
+                :class="`tag-${tag.type}`"
+              >
+                {{ tag.text }}
+              </view>
             </view>
-            <view class="status-tag" :class="`status-${item.status}`">
-              {{ item.statusText }}
-            </view>
-          </view>
+          </scroll-view>
         </view>
 
         <!-- 题目内容 -->
@@ -88,24 +92,38 @@
         </view>
 
         <!-- 答案区域（可展开） -->
-        <view v-if="item.showAnswer" class="answer-section">
-          <!-- 我的错误答案 -->
-          <view class="answer-title">我的错解</view>
-          <view class="answer-block wrong-answer">
-            <text class="answer-text">{{ item.wrongAnswer }}</text>
-          </view>
+        <view class="answer-wrapper" :class="{ 'answer-expanded': item.showAnswer }">
+          <view class="answer-section">
+            <!-- 我的错误答案 -->
+            <view class="answer-title">我的错解</view>
+            <view class="answer-block wrong-answer">
+              <text class="answer-text">{{ item.wrongAnswer }}</text>
+            </view>
 
-          <!-- 正确答案 -->
-          <view class="answer-title">正确答案</view>
-          <view class="answer-block correct-answer">
-            <text class="answer-text">{{ item.correctAnswer }}</text>
-          </view>
+            <!-- 正确答案 -->
+            <view class="answer-title">正确答案</view>
+            <view class="answer-block correct-answer">
+              <text class="answer-text">{{ item.correctAnswer }}</text>
+            </view>
 
-          <!-- 解析/笔记 -->
-          <view v-if="item.note" class="note-wrapper">
-            <view class="answer-title">解析 / 笔记</view>
-            <view class="note-block">
-              <text class="note-text">{{ item.note }}</text>
+            <!-- 解析/笔记 -->
+            <view v-if="item.note" class="note-wrapper">
+              <view class="answer-title">解析 / 笔记</view>
+              <view class="note-block">
+                <text class="note-text">{{ item.note }}</text>
+              </view>
+            </view>
+
+            <!-- 答案区域底部操作按钮 -->
+            <view class="answer-actions">
+              <view class="answer-btn" @click="editQuestion(item)">
+                <uni-icons type="compose" size="16" color="#ff9555"></uni-icons>
+                <text class="answer-btn-text">修改题目</text>
+              </view>
+              <view class="answer-btn" @click="markNeedReview(item)">
+                <uni-icons type="loop" size="16" color="#2196f3"></uni-icons>
+                <text class="answer-btn-text">需要复习</text>
+              </view>
             </view>
           </view>
         </view>
@@ -155,10 +173,10 @@ const questionList = ref([
   {
     id: 1,
     tags: [
-      { text: '数学', type: 'blue' },
+      { text: '选择题', type: 'blue' },
       { text: '简单', type: 'green' },
       { text: '#代数', type: 'gray' },
-      { text: '#一元二次', type: 'gray' }
+      { text: '#一元二次方程福娃发发我', type: 'gray' }
     ],
     status: 'reviewing',
     statusText: '已复习',
@@ -173,7 +191,7 @@ const questionList = ref([
   {
     id: 2,
     tags: [
-      { text: '数学', type: 'blue' },
+      { text: '填空题', type: 'purple' },
       { text: '中等', type: 'yellow' },
       { text: '#微积分', type: 'gray' },
       { text: '#导数', type: 'gray' }
@@ -191,7 +209,7 @@ const questionList = ref([
   {
     id: 3,
     tags: [
-      { text: '英语', type: 'red' },
+      { text: '判断题', type: 'red' },
       { text: '简单', type: 'green' },
       { text: '#语法', type: 'gray' },
       { text: '#一般一致', type: 'gray' }
@@ -209,7 +227,7 @@ const questionList = ref([
   {
     id: 4,
     tags: [
-      { text: '物理', type: 'purple' },
+      { text: '简答题', type: 'orange' },
       { text: '中等', type: 'yellow' },
       { text: '#力学', type: 'gray' },
       { text: '#牛顿定律', type: 'gray' }
@@ -259,6 +277,25 @@ const markAsMastered = (item) => {
   item.statusText = '已掌握';
   uni.showToast({
     title: '已标记为掌握',
+    icon: 'success'
+  });
+};
+
+const editQuestion = (item) => {
+  console.log('修改题目:', item.id);
+  uni.showToast({
+    title: '修改题目',
+    icon: 'none'
+  });
+  // TODO: 跳转到编辑页面或打开编辑弹窗
+};
+
+const markNeedReview = (item) => {
+  console.log('标记需要复习:', item.id);
+  item.status = 'reviewing';
+  item.statusText = '复习中';
+  uni.showToast({
+    title: '已标记为需要复习',
     icon: 'success'
   });
 };
@@ -401,19 +438,57 @@ onLoad(async (options) => {
   background: #ffffff;
   border-radius: 24rpx;
   padding: 32rpx;
+  padding-top: 56rpx;
   margin-bottom: 24rpx;
   box-shadow: 0 4rpx 16rpx rgba(255, 149, 85, 0.06);
   border: 2rpx solid #ffe8d6;
+  position: relative;
+}
+
+/* 状态标签 - 卡片右上角贴纸样式 */
+.status-badge {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.status-badge.status-new {
+  background: #fff3e0;
+  color: #ff9800;
+  border: 2rpx solid #ffe8d6;
+}
+
+.status-badge.status-reviewing {
+  background: #e3f2fd;
+  color: #2196f3;
+  border: 2rpx solid #bbdefb;
+}
+
+.status-badge.status-mastered {
+  background: #e8f5e9;
+  color: #4caf50;
+  border: 2rpx solid #c8e6c9;
 }
 
 /* 卡片头部 */
 .card-header {
   margin-bottom: 20rpx;
+  padding-right: 120rpx;
+}
+
+.tags-scroll-view {
+  white-space: nowrap;
+  width: 100%;
 }
 
 .tags-row {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-flex;
   gap: 12rpx;
   align-items: center;
 }
@@ -423,6 +498,8 @@ onLoad(async (options) => {
   border-radius: 24rpx;
   font-size: 24rpx;
   font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tag-blue {
@@ -450,32 +527,14 @@ onLoad(async (options) => {
   color: #9c27b0;
 }
 
-.tag-gray {
-  background: #f5f5f5;
-  color: #757575;
-}
-
-.status-tag {
-  padding: 8rpx 20rpx;
-  border-radius: 24rpx;
-  font-size: 24rpx;
-  font-weight: 500;
-  margin-left: auto;
-}
-
-.status-new {
+.tag-orange {
   background: #fff3e0;
   color: #ff9800;
 }
 
-.status-reviewing {
-  background: #e3f2fd;
-  color: #2196f3;
-}
-
-.status-mastered {
-  background: #e8f5e9;
-  color: #4caf50;
+.tag-gray {
+  background: #f5f5f5;
+  color: #757575;
 }
 
 /* 题目内容 */
@@ -512,6 +571,12 @@ onLoad(async (options) => {
   border-radius: 20rpx;
   background: #f5f5f5;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.answer-status:active {
+  transform: scale(0.95);
+  background: #eeeeee;
 }
 
 .status-show {
@@ -524,9 +589,24 @@ onLoad(async (options) => {
   color: #909399;
 }
 
+/* 答案区域包装器 - 使用高度过渡 */
+.answer-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  opacity: 0;
+}
+
+.answer-wrapper.answer-expanded {
+  max-height: 2000rpx;
+  opacity: 1;
+}
+
 /* 答案区域 */
 .answer-section {
   margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #f5f5f5;
 }
 
 .answer-title {
@@ -563,17 +643,11 @@ onLoad(async (options) => {
   background: #fef0f0;
 }
 
-.wrong-answer::before {
-  background: #f56c6c;
-}
 
 .correct-answer {
   background: #f0f9ff;
 }
 
-.correct-answer::before {
-  background: #67c23a;
-}
 
 .answer-text {
   font-size: 28rpx;
@@ -597,6 +671,65 @@ onLoad(async (options) => {
   font-size: 28rpx;
   color: #666666;
   line-height: 1.8;
+}
+
+/* 答案区域底部操作按钮 */
+.answer-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 32rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #f5f5f5;
+}
+
+.answer-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 20rpx;
+  background: #f5f5f5;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.answer-btn:active {
+  transform: scale(0.95);
+  background: #eeeeee;
+}
+
+.answer-btn:first-child {
+  background: #fff8f0;
+  border: 2rpx solid #ffe8d6;
+}
+
+.answer-btn:first-child:active {
+  background: #ffedd9;
+}
+
+.answer-btn:last-child {
+  background: #f0f7ff;
+  border: 2rpx solid #d6ebff;
+}
+
+.answer-btn:last-child:active {
+  background: #e3f2fd;
+}
+
+.answer-btn-text {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.answer-btn:first-child .answer-btn-text {
+  color: #ff9555;
+}
+
+.answer-btn:last-child .answer-btn-text {
+  color: #2196f3;
 }
 
 /* 卡片底部 */
