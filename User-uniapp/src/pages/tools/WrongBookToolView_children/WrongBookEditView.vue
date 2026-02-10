@@ -7,74 +7,99 @@
       <text class="loading-text">加载中...</text>
     </view>
 
-    <view v-else class="form-container">
-      <!-- 错题本名称 -->
-      <view class="form-item">
-        <view class="form-label">
-          错题本名称
-          <text class="required">*</text>
-        </view>
-        <view class="input-wrapper" :class="{ 'has-error': validationErrors.title }">
-          <uni-icons 
-            type="compose" 
-            size="18" 
-            :color="validationErrors.title ? '#f44336' : '#999'"
-          ></uni-icons>
-          <input 
-            class="form-input" 
-            :class="{ 'is-error': validationErrors.title }"
-            v-model="formData.title" 
-            placeholder="请输入错题本名称（最多20个字）"
-            maxlength="20"
-            @input="handleTitleInput"
-          />
-          <text class="char-count">{{ formData.title.length }}/20</text>
-        </view>
-        <view v-if="validationErrors.title" class="form-error">
-          <uni-icons type="info-filled" size="14" color="#f44336"></uni-icons>
-          <text>{{ validationErrors.title }}</text>
+    <view v-else class="content-wrapper">
+      <!-- 预览卡片 -->
+      <view class="preview-section">
+        <view class="preview-title">效果预览</view>
+        <view class="preview-card" :style="{ backgroundColor: formData.color || '#ddd' }">
+          <view class="preview-card-bg"></view>
+          <view class="preview-icon">
+            <uni-icons type="star-filled" size="32" color="#fff"></uni-icons>
+          </view>
+          <view class="preview-book-title">{{ formData.title || '错题本名称' }}</view>
+          <view class="preview-footer">
+            <view class="preview-tag">
+              <uni-icons type="calendar" size="14" color="rgba(255,255,255,0.9)"></uni-icons>
+              <text>刚刚</text>
+            </view>
+            <view class="preview-tag">
+              <uni-icons type="list" size="14" color="rgba(255,255,255,0.9)"></uni-icons>
+              <text>0 题</text>
+            </view>
+          </view>
         </view>
       </view>
 
-      <!-- 颜色选择 -->
-      <view class="form-item">
-        <view class="form-label">
-          选择颜色
-          <text class="required">*</text>
+      <view class="form-container">
+        <!-- 错题本名称 -->
+        <view class="form-item">
+          <view class="form-label">
+            <uni-icons type="compose" size="20" color="#333" class="label-icon"></uni-icons>
+            错题本名称
+            <text class="required">*</text>
+          </view>
+          <view class="input-wrapper" :class="{ 'has-error': validationErrors.title }">
+            <input 
+              class="form-input" 
+              :class="{ 'is-error': validationErrors.title }"
+              v-model="formData.title" 
+              placeholder="请输入错题本名称"
+              placeholder-class="input-placeholder"
+              maxlength="20"
+              @input="handleTitleInput"
+            />
+            <text class="char-count">{{ formData.title.length }}/20</text>
+          </view>
+          <view v-if="validationErrors.title" class="form-error">
+            <uni-icons type="info-filled" size="14" color="#f44336"></uni-icons>
+            <text>{{ validationErrors.title }}</text>
+          </view>
         </view>
-        <view class="color-picker-wrapper">
-          <scroll-view class="color-scroll" scroll-x>
-            <view class="color-list">
-              <view 
-                class="color-item" 
-                v-for="color in displayColorOptions" 
-                :key="color"
-                :style="{ backgroundColor: color }"
-                :class="{ active: formData.color === color }"
-                @click="selectColor(color)"
-              >
-                <view class="color-check" v-if="formData.color === color">
-                  <uni-icons type="checkmarkempty" size="16" color="#fff"></uni-icons>
+
+        <!-- 颜色选择 -->
+        <view class="form-item">
+          <view class="form-label">
+            <uni-icons type="color" size="20" color="#333" class="label-icon"></uni-icons>
+            选择封面颜色
+            <text class="required">*</text>
+          </view>
+          <view class="color-picker-wrapper">
+            <scroll-view class="color-scroll" scroll-x :show-scrollbar="false">
+              <view class="color-list">
+                <view 
+                  class="color-item" 
+                  v-for="color in displayColorOptions" 
+                  :key="color"
+                  :style="{ backgroundColor: color }"
+                  :class="{ active: formData.color === color }"
+                  @click="selectColor(color)"
+                >
+                  <view class="color-check" v-if="formData.color === color">
+                    <uni-icons type="checkmarkempty" size="18" color="#fff"></uni-icons>
+                  </view>
                 </view>
               </view>
-            </view>
-          </scroll-view>
-        </view>
-      </view>
-
-      <!-- 按钮组 -->
-      <view class="form-actions">
-        <button class="btn btn-delete" :disabled="submitting" @click="handleDelete">
-          <uni-icons type="trash" size="18" color="#f44336"></uni-icons>
-          删除错题本
-        </button>
-        <button class="btn btn-submit" :disabled="submitting" :class="{ 'btn-loading': submitting }" @click="handleSubmit">
-          <view v-if="submitting" class="btn-spinner">
-            <view class="spinner-circle-small"></view>
+            </scroll-view>
           </view>
-          <uni-icons v-else type="checkmarkempty" size="18" color="#fff"></uni-icons>
-          {{ submitting ? '保存中...' : '保存修改' }}
-        </button>
+        </view>
+
+        <!-- 按钮组 -->
+        <view class="form-actions">
+          <button class="btn btn-submit" :disabled="submitting" :class="{ 'btn-loading': submitting }" @click="handleSubmit">
+            <view v-if="submitting" class="btn-spinner">
+              <view class="spinner-circle-small"></view>
+            </view>
+            <block v-else>
+              <uni-icons type="checkmarkempty" size="20" color="#fff"></uni-icons>
+              <text>保存修改</text>
+            </block>
+          </button>
+          
+          <button class="btn btn-delete" :disabled="submitting" @click="handleDelete">
+            <uni-icons type="trash" size="20" color="#f44336"></uni-icons>
+            <text>删除错题本</text>
+          </button>
+        </view>
       </view>
     </view>
   </view>
@@ -214,41 +239,137 @@ const handleDelete = () => {
 .container {
   min-height: 100vh;
   background: #fff9f2;
-  padding: 30rpx 20rpx;
+  padding: 30rpx 24rpx;
+  box-sizing: border-box;
 }
 
+.content-wrapper {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* 预览区域 */
+.preview-section {
+  margin-bottom: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-title {
+  font-size: 28rpx;
+  color: #888;
+  margin-bottom: 24rpx;
+  font-weight: 500;
+}
+
+.preview-card {
+  width: 100%;
+  height: 360rpx;
+  border-radius: 32rpx;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40rpx;
+  box-sizing: border-box;
+  box-shadow: 0 16rpx 40rpx rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease;
+  overflow: hidden;
+}
+
+.preview-card-bg {
+  position: absolute;
+  top: -40rpx;
+  right: -40rpx;
+  width: 240rpx;
+  height: 240rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.preview-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.preview-book-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-top: auto;
+  margin-bottom: 20rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.preview-footer {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.2);
+  padding-top: 24rpx;
+}
+
+.preview-tag {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 6rpx 16rpx;
+  border-radius: 100rpx;
+}
+
+/* 表单区域 */
 .form-container {
   background: #fff;
-  border-radius: 28rpx;
-  padding: 40rpx 30rpx;
-  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
+  border-radius: 32rpx;
+  padding: 48rpx 32rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
 .form-item {
-  margin-bottom: 50rpx;
+  margin-bottom: 48rpx;
 }
 
 .form-label {
   font-size: 30rpx;
   color: #333;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
   font-weight: 600;
   display: flex;
   align-items: center;
+  gap: 12rpx;
+}
+
+.label-icon {
+  margin-top: -2rpx;
 }
 
 .required {
   color: #f44336;
-  margin-left: 8rpx;
+  margin-left: 4rpx;
   font-weight: normal;
 }
 
 .input-wrapper {
   display: flex;
   align-items: center;
-  background: #f8f8f8;
-  border-radius: 16rpx;
-  padding: 0 20rpx;
+  background: #f5f7fa;
+  border-radius: 20rpx;
+  padding: 0 24rpx;
+  height: 100rpx;
   border: 2rpx solid transparent;
   transition: all 0.3s ease;
 }
@@ -256,30 +377,30 @@ const handleDelete = () => {
 .input-wrapper:focus-within {
   background: #fff;
   border-color: #4CAF50;
-  box-shadow: 0 0 0 4rpx rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 0 6rpx rgba(76, 175, 80, 0.1);
 }
 
 .input-wrapper.has-error {
   background: #fff;
   border-color: #f44336;
-  box-shadow: 0 0 0 4rpx rgba(244, 67, 54, 0.1);
+  box-shadow: 0 0 0 6rpx rgba(244, 67, 54, 0.1);
 }
 
 .form-input {
   flex: 1;
-  height: 88rpx;
-  padding: 0 16rpx;
-  font-size: 30rpx;
+  height: 100%;
+  font-size: 32rpx;
   color: #333;
 }
 
-.form-input.is-error {
-  color: #f44336;
+.input-placeholder {
+  color: #bbb;
 }
 
 .char-count {
   font-size: 24rpx;
   color: #999;
+  margin-left: 16rpx;
 }
 
 .form-error {
@@ -289,14 +410,15 @@ const handleDelete = () => {
   margin-top: 16rpx;
   font-size: 26rpx;
   color: #f44336;
+  padding-left: 8rpx;
   animation: slideDown 0.3s ease;
 }
 
 /* 颜色选择 */
 .color-picker-wrapper {
-  background: #f8f8f8;
-  border-radius: 16rpx;
-  padding: 10rpx;
+  background: #f5f7fa;
+  border-radius: 24rpx;
+  padding: 24rpx 20rpx;
 }
 
 .color-scroll {
@@ -306,53 +428,54 @@ const handleDelete = () => {
 
 .color-list {
   display: inline-flex;
-  gap: 20rpx;
-  padding: 10rpx;
+  gap: 24rpx;
+  padding: 4rpx;
 }
 
 .color-item {
-  width: 80rpx;
-  height: 80rpx;
+  width: 88rpx;
+  height: 88rpx;
   border-radius: 50%;
   position: relative;
-  transition: all 0.3s ease;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
   border: 4rpx solid transparent;
+  transform-origin: center;
 }
 
 .color-item.active {
-  transform: scale(1.1);
+  transform: scale(1.15);
   border-color: #fff;
-  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.2);
 }
 
 .color-check {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 36rpx;
-  height: 36rpx;
-  background: rgba(0, 0, 0, 0.35);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.2s ease;
 }
 
 /* 按钮组 */
 .form-actions {
   display: flex;
   flex-direction: column;
-  gap: 30rpx;
-  margin-top: 80rpx;
+  gap: 24rpx;
+  margin-top: 64rpx;
 }
 
 .btn {
   width: 100%;
-  height: 96rpx;
-  border-radius: 48rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
   font-size: 32rpx;
   font-weight: 600;
   border: none;
@@ -360,44 +483,43 @@ const handleDelete = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12rpx;
+  gap: 16rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  border: none;
 }
 
 .btn-delete {
   background: #fff;
   color: #f44336;
-  border: 2rpx solid #f44336;
-  background: #fff;
+  border: 2rpx solid #ffebee;
 }
 
 .btn-delete:active {
-  background: #ffebee;
+  background: #fff5f5;
+  border-color: #ffcdd2;
   transform: scale(0.98);
-}
-.btn-delete uni-icons {
-    color: #f44336 !important;
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  background: linear-gradient(135deg, #4CAF50 0%, #43a047 100%);
   color: #fff;
-  box-shadow: 0 8rpx 24rpx rgba(76, 175, 80, 0.35);
+  box-shadow: 0 8rpx 24rpx rgba(76, 175, 80, 0.3);
 }
 
 .btn-submit:active {
-  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
   transform: scale(0.98);
-  box-shadow: 0 4rpx 16rpx rgba(76, 175, 80, 0.25);
+  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.2);
 }
 
 .btn-submit:disabled,
 .btn-delete:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.btn-loading {
-  background: linear-gradient(135deg, #81C784 0%, #66BB6A 100%) !important;
+  transform: none;
 }
 
 /* Loading 样式 */
@@ -413,6 +535,7 @@ const handleDelete = () => {
   width: 80rpx;
   height: 80rpx;
   position: relative;
+  margin-bottom: 30rpx;
 }
 
 .spinner-circle {
@@ -425,9 +548,8 @@ const handleDelete = () => {
 }
 
 .btn-spinner {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
 }
 
 .spinner-circle-small {
@@ -439,19 +561,10 @@ const handleDelete = () => {
   animation: spin 1s linear infinite;
 }
 
+/* 动画 */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-text {
-  margin-top: 24rpx;
-  font-size: 28rpx;
-  color: #666;
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes slideDown {
@@ -463,5 +576,21 @@ const handleDelete = () => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>

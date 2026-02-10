@@ -80,7 +80,7 @@ const WrongBookService = {
     },
 
     /**
-     * 获取错题本详情 (Book)
+     * 获取错题本详情
      */
     getWrongBookDetail: async ({ uid, id }) => {
         try {
@@ -98,7 +98,7 @@ const WrongBookService = {
     },
 
     /**
-     * 更新错题本 (Book)
+     * 更新错题本
      */
     updateWrongBook: async ({ uid, id, title, color }) => {
         try {
@@ -122,7 +122,7 @@ const WrongBookService = {
     },
 
     /**
-     * 删除错题本 (Book)
+     * 删除错题本
      */
     deleteWrongBook: async ({ uid, id }) => {
         try {
@@ -137,7 +137,7 @@ const WrongBookService = {
     },
 
     /**
-     * 获取错题详情 (Question - Keep existing implementation even if suspicious, just in case)
+     * 获取错题详情 
      */
     getWrongQuestionDetail: async ({ uid, id }) => {
         try {
