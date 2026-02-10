@@ -139,8 +139,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { ref ,onMounted} from 'vue'
 import uviewPopup from '../../components/core/uviewPopup.vue';
 import { createWrongBookAPI ,getWrongBooksAPI } from '../../API/Tools/WrongBookAPI';
 import formatTime from '../../util/formatTime';
@@ -265,7 +264,7 @@ const handleOpenQuestionList = (book) => {
   });
 }
 
-onShow(() => {
+onMounted(() => {
   fetchWrongBooks();
 })
 </script>

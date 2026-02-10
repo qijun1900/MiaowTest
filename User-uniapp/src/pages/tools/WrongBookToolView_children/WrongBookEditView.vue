@@ -134,7 +134,7 @@ onLoad(async (options) => {
       title: '参数错误',
       icon: 'error'
     });
-    setTimeout(() => uni.navigateBack(), 1500);
+    setTimeout(() => uni.navigateBack(), 1000);
   }
 });
 
