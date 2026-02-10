@@ -278,7 +278,7 @@ onShow(() => {
   border-radius: 28rpx;
   padding: 32rpx 28rpx;
   position: relative;
-  height: 380rpx;
+  height: 390rpx;
   display: flex;
   flex-direction: column;
   box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.08);
