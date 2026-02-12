@@ -1,5 +1,5 @@
 # ===========================================
-# 答题系统后端服务 Dockerfile
+# 题喵喵后端服务 Dockerfile
 # 基于 Node.js 18 Alpine 构建轻量级生产镜像
 # ===========================================
 
@@ -8,8 +8,8 @@
 FROM node:18-alpine
 
 # 设置镜像元数据
-LABEL maintainer="答题系统"
-LABEL description="答题系统后端API服务"
+LABEL maintainer="题喵喵"
+LABEL description="题喵喵后端API服务"
 LABEL version="1.0.0"
 
 # 设置工作目录
