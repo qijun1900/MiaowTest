@@ -8,7 +8,7 @@
 				@touchmove.stop.prevent="touchmove"
 				@touchend="touchend"
 				@click.stop.prevent="click"
-				:class="{transition: isDock && !isMove }"
+				:class="{transition: isDock && !isMove, 'drag-delete-mode': isDeleteMode }"
 				v-if="show">
 			
 			<text v-if="!icon && !iconType" class="drag-text">{{ text }}</text>
@@ -60,6 +60,16 @@
 			v-if="popMenu && showMenu" 
 			class="menu-mask" 
 			@click.stop="closeMenu">
+		</view>
+		
+		<!-- 删除区域 -->
+		<view 
+			v-if="isDeleteMode" 
+			class="delete-zone"
+			:class="{ 'delete-zone-active': isOverDeleteZone }"
+			:style="{ height: deleteZoneHeight + 'px' }">
+			<uni-icons type="trash" :size="28" :color="isOverDeleteZone ? '#fff' : 'rgba(255,255,255,0.8)'"></uni-icons>
+			<text class="delete-zone-text">{{ isOverDeleteZone ? '松手即可删除' : '拖拽到此处删除' }}</text>
 		</view>
 	</view>
 </template>
@@ -129,6 +139,14 @@
 				type: String,
 				default: '#ffffff'
 			},
+			enableLongPressDelete: { // 是否启用长按删除功能
+				type: Boolean,
+				default: true
+			},
+			longPressDuration: { // 长按触发删除的时间（毫秒）
+				type: Number,
+				default: 2000
+			},
 		},
 		data() {
 			return {
@@ -143,7 +161,14 @@
 				isMove: true,
 				edge: 10,
 				text: '按钮',
-				showMenu: false // 控制菜单显示/隐藏
+				showMenu: false, // 控制菜单显示/隐藏
+				// 删除模式相关
+				longPressTimer: null, // 长按计时器
+				isDeleteMode: false, // 是否进入删除模式
+				isOverDeleteZone: false, // 是否拖拽到删除区域上方
+				deleteZoneHeight: 120, // 删除区域高度(px)
+				startX: 0, // 触摸起始X
+				startY: 0 // 触摸起始Y
 			}
 		},
 		mounted() {
@@ -169,16 +194,67 @@
 				this.top = this.windowHeight - this.height - this.bottomOffset;
 			}).exec();
 		},
+		beforeDestroy() {
+			this.clearLongPressTimer();
+		},
 		methods: {
 			click() {
+				// 删除模式下不响应点击
+				if (this.isDeleteMode) return;
 				// 如果启用了弹出菜单，则切换菜单显示状态
 				if (this.popMenu && this.content && this.content.length > 0) {
 					this.showMenu = !this.showMenu;
 				}
 				this.$emit('btnClick');
 			},
-			touchstart() {
+			touchstart(e) {
 				this.$emit('btnTouchstart');
+				// 如果未启用长按删除，直接返回
+				if (!this.enableLongPressDelete) return;
+				// 记录起始位置
+				if (e.touches.length === 1) {
+					this.startX = e.touches[0].clientX;
+					this.startY = e.touches[0].clientY;
+				}
+				// 启动长按计时器 - 只要按住指定时间就触发，不管是否移动
+				this.clearLongPressTimer();
+				this.longPressTimer = setTimeout(() => {
+					if (!this.isDeleteMode) {
+						this.enterDeleteMode();
+					}
+				}, this.longPressDuration);
+			},
+			// 进入删除模式
+			enterDeleteMode() {
+				this.isDeleteMode = true;
+				this.isOverDeleteZone = false;
+				// 触发震动反馈
+				// #ifdef APP-PLUS
+				uni.vibrateShort({ success: () => {} });
+				// #endif
+				// #ifdef MP-WEIXIN
+				uni.vibrateShort({ success: () => {} });
+				// #endif
+				// #ifdef H5
+				if (navigator && navigator.vibrate) {
+					navigator.vibrate(50);
+				}
+				// #endif
+			},
+			// 清除长按计时器
+			clearLongPressTimer() {
+				if (this.longPressTimer) {
+					clearTimeout(this.longPressTimer);
+					this.longPressTimer = null;
+				}
+			},
+			// 检查当前位置是否在删除区域内
+			checkDeleteZone(clientY) {
+				if (!this.isDeleteMode) return;
+				// 删除区域在屏幕底部
+				const deleteZoneTop = this.windowHeight - this.deleteZoneHeight;
+				const buttonBottom = clientY + this.offsetHeight;
+				this.isOverDeleteZone = buttonBottom >= deleteZoneTop;
 			},
 			// 获取菜单样式
 			getMenuStyle() {
@@ -209,7 +285,7 @@
 			closeMenu() {
 				this.showMenu = false;
 			},
-			touchmove(e) {
+				touchmove(e) {
 				// 单指触摸
 				if (e.touches.length !== 1) {
 					return false;
@@ -234,8 +310,41 @@
 					this.top = clientY
 				}
 				
+				// 删除模式下检测是否进入删除区域
+				if (this.isDeleteMode) {
+					this.checkDeleteZone(e.touches[0].clientY);
+				}
 			},
 			touchend() {
+				this.clearLongPressTimer();
+				
+				// 删除模式下的处理
+				if (this.isDeleteMode) {
+					if (this.isOverDeleteZone) {
+						// 拖到删除区域 → 移除按钮，自动隐藏
+						this.isDeleteMode = false;
+						this.isOverDeleteZone = false;
+						this.$emit('update:show', false);
+						this.$emit('btnRemove');
+					} else {
+						// 松手不在删除区域 → 取消删除模式，恢复位置
+						this.isDeleteMode = false;
+						this.isOverDeleteZone = false;
+						// 恢复停靠
+						if (this.isDock) {
+							let edgeRigth = this.windowWidth - this.width - this.edge;
+							if (this.left < this.windowWidth / 2 - this.offsetWidth) {
+								this.left = this.edge;
+							} else {
+								this.left = edgeRigth;
+							}
+						}
+					}
+					this.isMove = false;
+					this.$emit('btnTouchend');
+					return;
+				}
+				
 				if (this.isDock) {
 					let edgeRigth = this.windowWidth - this.width - this.edge;
 					
@@ -267,6 +376,10 @@
 		font-size: $uni-font-size-sm;
 		position: fixed;
 		z-index: 999999;
+		user-select: none;
+		-webkit-user-select: none;
+		-webkit-touch-callout: none;
+		-webkit-tap-highlight-color: transparent;
 		
 		.drag-text {
 			font-size: $uni-font-size-sm;
@@ -278,6 +391,12 @@
 		
 		&.transition {
 			transition: left .3s ease,top .3s ease;
+		}
+		
+		&.drag-delete-mode {
+			opacity: 0.8;
+			box-shadow: 0 0 12upx rgba(255, 59, 48, 0.6);
+			border: 2px dashed rgba(255, 59, 48, 0.8);
 		}
 	}
 	
@@ -359,5 +478,46 @@
 		right: 0;
 		bottom: 0;
 		z-index: 999997;
+	}
+	
+	// 删除区域样式
+	.delete-zone {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(to bottom, rgba(255, 59, 48, 0.7), rgba(255, 59, 48, 0.95));
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		z-index: 999998;
+		animation: slideUp 0.3s ease-out;
+		
+		.delete-zone-text {
+			color: rgba(255, 255, 255, 0.85);
+			font-size: 24upx;
+			margin-top: 10upx;
+		}
+		
+		&.delete-zone-active {
+			background: linear-gradient(to bottom, rgba(255, 30, 20, 0.9), rgba(200, 0, 0, 1));
+			
+			.delete-zone-text {
+				color: #fff;
+				font-weight: bold;
+			}
+		}
+	}
+	
+	@keyframes slideUp {
+		from {
+			transform: translateY(100%);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0);
+			opacity: 1;
+		}
 	}
 </style>

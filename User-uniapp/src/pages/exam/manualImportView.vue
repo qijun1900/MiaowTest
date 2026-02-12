@@ -10,10 +10,10 @@
            :range="questionTypeLabels" 
            :value="pickerValue"
            @change="onTypeChange">
-           <view class="picker-display">
-             <text class="selected-type">{{ selectedQuestionTypeLabel || '选择题' }}</text>
-             <text class="picker-arrow">▼</text>
-           </view>
+            <view class="picker-display">
+              <text class="selected-type">{{ selectedQuestionTypeLabel || '选择题' }}</text>
+              <uni-icons type="down" size="16" color="#666"></uni-icons>
+            </view>
          </picker>
        </view>
      </view>
@@ -162,14 +162,6 @@ onLoad((option) => {
   font-size: 28rpx;
   color: #333;
   flex: 1;
-}
-
-.picker-arrow {
-  font-size: 20rpx;
-  color: #666;
-  margin-left: 10rpx;
-  /* 确保箭头在最右侧 */
-  margin-left: auto;
 }
 
 .question-type-component{

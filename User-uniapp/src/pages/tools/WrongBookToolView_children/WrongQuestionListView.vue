@@ -149,16 +149,30 @@
         </view>
       </view>
     </view>
+    <!--悬浮按钮 -->
+    <dragButton
+      butColor="#ffffff"
+      v-model:show="isShowdragButton"
+      :isDock="true"
+      :existTabBar="true" 
+      iconType="folder-add-filled"
+      iconColor="#ff9800"
+      :bottomOffset="100"
+      :popMenu="false"
+      @btnClick="handleAddQuestion"
+    />
   </view>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
+import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 
-const bookId = ref('');
+const WrongbookId = ref('');
 const searchKeyword = ref('');
 const activeTab = ref('all');
+const isShowdragButton = ref(true);
 
 const tabs = ref([
   { label: '全部', value: 'all', count: 5 },
@@ -299,10 +313,16 @@ const markNeedReview = (item) => {
     icon: 'success'
   });
 };
-
+//跳转到添加题目页面
+const handleAddQuestion = () => {
+  console.log('添加题目');
+  uni.navigateTo({  
+    url: `/pages/tools/WrongBookToolView_children/WrongQuestionDetailView?id=${WrongbookId.value}`
+  });
+};
 onLoad(async (options) => {
   if (options.id) {
-    bookId.value = options.id;
+    WrongbookId.value = options.id;
   } else {
     uni.showToast({
       title: '参数错误',

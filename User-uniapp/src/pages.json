@@ -271,7 +271,12 @@
 			"style": {
 				"navigationBarTitleText": "错题列表"
 			}
-			
+		},
+		{
+			"path": "pages/tools/WrongBookToolView_children/WrongQuestionDetailView",
+			"style": {
+				"navigationBarTitleText": "WrongQuestionDetailView"
+			}
 		}
 	],
 	"globalStyle": {
