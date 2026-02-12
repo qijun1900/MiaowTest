@@ -275,7 +275,7 @@
 		{
 			"path": "pages/tools/WrongBookToolView_children/WrongQuestionDetailView",
 			"style": {
-				"navigationBarTitleText": "WrongQuestionDetailView"
+				"navigationBarTitleText": ""
 			}
 		}
 	],

@@ -35,7 +35,7 @@ const WrongQuestionSchema = new mongoose.Schema({
     questionSource: { // 题目来源：system-系统题库 user-用户自建
         type: String,
         enum: ['system', 'user'],
-        default: 'system'
+        default: 'user'
     },
     
     // 题目内容（冗余存储，避免原题被删除）
