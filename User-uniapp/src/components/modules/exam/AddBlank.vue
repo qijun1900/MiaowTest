@@ -1,6 +1,10 @@
 <template>
   <view>
-    <ThemeDivider text="题目题干" />
+    <!-- 题目题干/描述标题 -->
+    <QuestionStemHeader 
+      :is-wrong-book-mode="isAddWrongBookQuestion"
+      stem-text="题目描述"
+    />
     <!-- 题干编辑器 -->
     <view class="editor-section">
       <uniEditor 
@@ -31,11 +35,24 @@
         <text>添加答案</text>
       </view>
     </view>
-    <ThemeDivider text="题目解析(可选)" />
+    
+    <!-- 我的错解部分 (仅在错题本添加模式显示) -->
+    <MyWrongAnswerEditor 
+      :show="props.isAddWrongBookQuestion"
+      v-model="formData.myWrongAnswer"
+      editor-id="wrongAnswerEditorBlank"
+      @update:images="handleWrongAnswerImages"
+    />
+    
+    <!-- 题目解析/备注标题 -->
+    <QuestionAnalysisHeader 
+      :is-wrong-book-mode="isAddWrongBookQuestion"
+      analysis-text="解析 / 备注 / 笔记"
+    />
     <!-- 解析编辑器 -->
     <view class="editor-section">
       <uniEditor 
-        placeholder="请在此处输入解析内容" 
+        :placeholder="isAddWrongBookQuestion ? '记录解题思路或知识点...' : '请在此处输入解析内容'" 
         v-model="formData.analysis" 
         height="200rpx" 
         id="analysisEditor2"/>
@@ -49,34 +66,49 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, computed } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemeDivider from '../../core/ThemeDivider.vue';
+import QuestionStemHeader from './QuestionStemHeader.vue';
+import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
+import MyWrongAnswerEditor from './MyWrongAnswerEditor.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
-const butLoading = ref(false) // 按钮加载中
+const butLoading = ref(false)
 const props = defineProps({
-  currentBankId: { // 接收题库ID
+  currentBankId: { 
     default: null
   },
-  isEdit: { // 接收是否编辑模式
+  isEdit: { 
     default: false
   },
-  editData: { // 接收编辑数据
+  editData: { 
     default: null
+  },
+  isAddWrongBookQuestion: { 
+    default: false
   }
 })
+
+const isAddWrongBookQuestion = computed(() => props.isAddWrongBookQuestion)
 
 // 使用 reactive 集合所有数据
 const formData = reactive({
   Type: 2, // 题目类型，默认为2（填空题）
   stem: '', // 题干
   analysis: '', // 解析
+  myWrongAnswer: '', // 我的错解
+  myWrongAnswerImages: [], // 我的错解图片
   // 答案数据
   options: [
     { content: '' }
   ]
 })
+
+// 处理错解图片
+const handleWrongAnswerImages = (images) => {
+  formData.myWrongAnswerImages = images;
+}
 
 // 添加答案
 const addAnswer = () => {
@@ -166,6 +198,8 @@ const handleSend = async () => {
 const resetForm = () => {
   formData.stem = '';
   formData.analysis = '';
+  formData.myWrongAnswer = '';
+  formData.myWrongAnswerImages = [];
   formData.options = [
     { content: '' }
   ];
@@ -196,8 +230,8 @@ onMounted(() => {
 .options-container {
   margin-top: 20rpx;
   background: white;
-  padding: 20rpx;
-  border-radius: 15rpx;
+  padding: 24rpx;
+  border-radius: 16rpx;
   border: 1rpx solid #e0e0e0;
 }
 
@@ -240,20 +274,34 @@ onMounted(() => {
   flex: 1;
   height: 80rpx;
   border: 1rpx solid #d9d9d9;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
   margin-right: 20rpx;
+  background: #fafafa;
+  transition: all 0.3s ease;
+}
+
+.option-input:focus {
+  border-color: #1890ff;
+  background: #fff;
+  box-shadow: 0 0 0 4rpx rgba(24, 144, 255, 0.1);
 }
 
 .add-option-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20rpx;
+  padding: 24rpx;
   border: 1rpx dashed #d9d9d9;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   margin-top: 20rpx;
   background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.add-option-btn:active {
+  background-color: #f0f0f0;
+  border-color: #1890ff;
 }
 
 .add-icon {

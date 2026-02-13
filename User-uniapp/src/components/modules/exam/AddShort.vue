@@ -1,6 +1,10 @@
 <template>
   <view>
-    <ThemeDivider text="题目题干" />
+    <!-- 题目题干/描述标题 -->
+    <QuestionStemHeader 
+      :is-wrong-book-mode="isAddWrongBookQuestion"
+      stem-text="题目描述"
+    />
     <!-- 题干编辑器 -->
     <view class="editor-section">
       <uniEditor 
@@ -19,14 +23,28 @@
       <uniEditor 
         placeholder="请在此处输入参考答案" 
         v-model="formData.content" 
-        height="300rpx" 
+        height="220rpx" 
         id="answerEditor4"/>
     </view>
-    <ThemeDivider text="题目解析(可选)" />
+    
+    <!-- 我的错解部分 (仅在错题本添加模式显示) -->
+    <MyWrongAnswerEditor 
+      :show="props.isAddWrongBookQuestion"
+      v-model="formData.myWrongAnswer"
+      editor-id="wrongAnswerEditorShort"
+      @update:images="handleWrongAnswerImages"
+      height="200rpx"
+    />
+    
+    <!-- 题目解析/备注标题 -->
+    <QuestionAnalysisHeader 
+      :is-wrong-book-mode="isAddWrongBookQuestion"
+      analysis-text="解析 / 备注 / 笔记"
+    />
     <!-- 解析编辑器 -->
     <view class="editor-section">
       <uniEditor 
-        placeholder="请在此处输入解析内容"
+        :placeholder="isAddWrongBookQuestion ? '记录解题思路或知识点...' : '请在此处输入解析内容'"
          v-model="formData.analysis" 
          height="200rpx" 
          id="analysisEditor4"/>
@@ -40,31 +58,45 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, computed } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
-import ThemeDivider from '../../core/ThemeDivider.vue';
+import QuestionStemHeader from './QuestionStemHeader.vue';
+import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
+import MyWrongAnswerEditor from './MyWrongAnswerEditor.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
-const butLoading = ref(false) // 按钮加载中
+const butLoading = ref(false)
 const props = defineProps({
-  currentBankId: { // 接收题库ID
+  currentBankId: { 
     default: null
   },
-  isEdit: { // 接收是否编辑模式
+  isEdit: { 
     default: false
   },
-  editData: { // 接收编辑数据
+  editData: { 
     default: null
+  },
+  isAddWrongBookQuestion: { 
+    default: false
   }
 })
+
+const isAddWrongBookQuestion = computed(() => props.isAddWrongBookQuestion)
 
 // 使用 reactive 集合所有数据
 const formData = reactive({
   Type: 4, // 题目类型
   stem: '', // 题干
   content: '', // 答案
-  analysis: '' // 解析
+  analysis: '', // 解析
+  myWrongAnswer: '', // 我的错解
+  myWrongAnswerImages: [] // 我的错解图片
 })
+
+// 处理错解图片
+const handleWrongAnswerImages = (images) => {
+  formData.myWrongAnswerImages = images;
+}
 
 // 提交表单
 const handleSend = async () => {
@@ -138,6 +170,8 @@ const resetForm = () => {
   formData.stem = '';
   formData.content = '';
   formData.analysis = '';
+  formData.myWrongAnswer = '';
+  formData.myWrongAnswerImages = [];
 }
 
 // 编辑模式下的数据初始化
@@ -159,9 +193,10 @@ onMounted(() => {
 .answer-container {
   margin-top: 20rpx;
   background: white;
-  padding: 20rpx;
-  border-radius: 15rpx;
+  padding: 24rpx;
+  border-radius: 16rpx;
   border: 1rpx solid #e0e0e0;
+  overflow: hidden;
 }
 
 .answer-header {

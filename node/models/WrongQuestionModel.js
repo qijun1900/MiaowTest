@@ -27,9 +27,9 @@ const WrongQuestionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    questionType: { // 题目类型：select-选择题 judge-判断题 blank-填空题 short-简答题
-        type: String,
-        enum: ['select', 'judge', 'blank', 'short'],
+    questionType: { //// 1-选择题 2-填空题 3-判断题 4-简答题
+        type: Number,
+        enum: [1,2,3,4], 
         required: true
     },
     questionSource: { // 题目来源：system-系统题库 user-用户自建

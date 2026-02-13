@@ -170,6 +170,7 @@ import { onLoad } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 
 const WrongbookId = ref('');
+const WrongbookTitle = ref('');
 const searchKeyword = ref('');
 const activeTab = ref('all');
 const isShowdragButton = ref(true);
@@ -317,7 +318,7 @@ const markNeedReview = (item) => {
 const handleAddQuestion = () => {
   console.log('添加题目');
   uni.navigateTo({  
-    url: `/pages/tools/WrongBookToolView_children/WrongQuestionDetailView?id=${WrongbookId.value}`
+    url: `/pages/tools/WrongBookToolView_children/WrongQuestionDetailView?id=${WrongbookId.value}&title=${encodeURIComponent(WrongbookTitle.value)}`
   });
 };
 onLoad(async (options) => {
@@ -329,6 +330,9 @@ onLoad(async (options) => {
       icon: 'error'
     });
     setTimeout(() => uni.navigateBack(), 1000);
+  }
+  if (options.title) {
+    WrongbookTitle.value = decodeURIComponent(options.title);
   }
 });
 </script>

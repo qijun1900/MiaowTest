@@ -1,6 +1,10 @@
 <template>
     <view>
-        <ThemeDivider text="题目题干" />
+        <!-- 题目题干/描述标题 -->
+        <QuestionStemHeader 
+            :is-wrong-book-mode="isAddWrongBookQuestion"
+            stem-text="题目描述"
+        />
         <!-- 题干编辑器 -->
         <view class="editor-section">
             <uniEditor 
@@ -33,12 +37,39 @@
                 </view>
             </view>
         </view>
+    
+    <!-- 我的错解部分 (仅在错题本添加模式显示) -->
+    <view v-if="props.isAddWrongBookQuestion" class="my-wrong-answer-section">
+      <view class="wrong-answer-title">我的错解 (选填)</view>
+      
+      <!-- 判断题类型的错解 -->
+      <view class="wrong-answer-judge">
+        <view 
+          class="judge-btn"
+          :class="{ 'selected': formData.myWrongAnswer === '正确' }"
+          @click="selectWrongAnswer('正确')"
+        >
+          正确
+        </view>
+        <view 
+          class="judge-btn"
+          :class="{ 'selected': formData.myWrongAnswer === '错误' }"
+          @click="selectWrongAnswer('错误')"
+        >
+          错误
+        </view>
+      </view>
+    </view>
 
-        <ThemeDivider text="题目解析(可选)" />
+    <!-- 题目解析/备注标题 -->
+        <QuestionAnalysisHeader 
+            :is-wrong-book-mode="isAddWrongBookQuestion"
+            analysis-text="解析 / 备注 / 笔记"
+        />
         <!-- 解析编辑器 -->
         <view class="editor-section">
             <uniEditor 
-                placeholder="请在此处输入解析内容" 
+                :placeholder="isAddWrongBookQuestion ? '记录解题思路或知识点...' : '请在此处输入解析内容'" 
                 v-model="formData.analysis" 
                 height="200rpx" 
                 id="analysisEditor3"/>
@@ -54,23 +85,30 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted} from 'vue';
+import { reactive, ref, onMounted, computed} from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemeDivider from '../../core/ThemeDivider.vue';
+import QuestionStemHeader from './QuestionStemHeader.vue';
+import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
-const butLoading = ref(false) // 按钮加载中
+const butLoading = ref(false)
 const props = defineProps({
-  currentBankId: { // 接收题库ID
+  currentBankId: { 
     default: null
   },
-  isEdit: { // 接收是否编辑模式
+  isEdit: { 
     default: false
   },
-  editData: { // 接收编辑数据
+  editData: { 
     default: null
+  },
+  isAddWrongBookQuestion: { 
+    default: false
   }
 })
+
+const isAddWrongBookQuestion = computed(() => props.isAddWrongBookQuestion)
 
 // 使用 reactive 集合所有数据
 const formData = reactive({
@@ -78,6 +116,7 @@ const formData = reactive({
     stem: '', // 题干
     analysis: '', // 解析
     answer: null,//0:错误，1：正确
+    myWrongAnswer: '', // 我的错解
     // 选项数据
     options: [
         { text: '正确', value: 1},
@@ -88,6 +127,15 @@ const formData = reactive({
 // 设置答案
 const setAnswer = (value) => {
     formData.answer = value
+}
+
+// 选择错误答案
+const selectWrongAnswer = (answer) => {
+  if (formData.myWrongAnswer === answer) {
+    formData.myWrongAnswer = '' // 取消选择
+  } else {
+    formData.myWrongAnswer = answer
+  }
 }
 
 // 提交表单
@@ -162,6 +210,7 @@ const resetForm = () => {
     formData.stem = '';
     formData.analysis = '';
     formData.answer = null;
+    formData.myWrongAnswer = '';
 }
 
 // 编辑模式下的数据初始化
@@ -198,8 +247,8 @@ onMounted(() => {
 .judge-option {
     display: flex;
     align-items: center;
-    padding: 24rpx 30rpx;
-    border-radius: 12rpx;
+    padding: 28rpx 32rpx;
+    border-radius: 16rpx;
     background-color: #f9f9f9;
     border: 2rpx solid #e8e8e8;
     transition: all 0.3s ease;
@@ -284,5 +333,41 @@ onMounted(() => {
     height: 16rpx;
     border-radius: 50%;
     background-color: #ffffff;
+}
+
+.my-wrong-answer-section {
+  margin: 30rpx 0;
+}
+
+.wrong-answer-title {
+  font-size: 28rpx;
+  color: #ff4d4f;
+  margin-bottom: 20rpx;
+  font-weight: 500;
+}
+
+.wrong-answer-judge {
+  display: flex;
+  gap: 20rpx;
+}
+
+.judge-btn {
+  flex: 1;
+  height: 80rpx;
+  border: 2rpx solid #d9d9d9;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #999;
+  background-color: #ffffff;
+  transition: all 0.3s;
+}
+
+.judge-btn.selected {
+  border-color: #ff4d4f;
+  background-color: #fff1f0;
+  color: #ff4d4f;
 }
 </style>

@@ -260,7 +260,7 @@ const handleOpenEdit = (book) => {
 // 跳转到错题列表页面
 const handleOpenQuestionList = (book) => {
   uni.navigateTo({
-    url: `/pages/tools/WrongBookToolView_children/WrongQuestionListView?id=${book._id}`
+    url: `/pages/tools/WrongBookToolView_children/WrongQuestionListView?id=${book._id}&title=${encodeURIComponent(book.title)}`
   });
 }
 

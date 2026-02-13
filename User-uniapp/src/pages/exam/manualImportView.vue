@@ -10,20 +10,30 @@
       <!-- 不同组件 -->
       <view class="question-type-component">
          <!-- 根据 selectedQuestionTypeValue 的值来决定显示哪个组件 -->
-        <transition name="fade-slide" mode="out-in">
-          <view v-if="selectedQuestionTypeValue === 1" key="select" class="component-wrapper">
+          <view 
+            v-show="selectedQuestionTypeValue === 1" 
+            class="component-wrapper" 
+            :class="{ 'fade-slide-in': selectedQuestionTypeValue === 1 }">
             <AddSelect :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />
           </view>
-          <view v-else-if="selectedQuestionTypeValue === 2" key="blank" class="component-wrapper">
+          <view 
+            v-show="selectedQuestionTypeValue === 2" 
+            class="component-wrapper" 
+            :class="{ 'fade-slide-in': selectedQuestionTypeValue === 2 }">
             <AddBlank :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />
           </view>
-          <view v-else-if="selectedQuestionTypeValue === 3" key="judge" class="component-wrapper">
+          <view 
+            v-show="selectedQuestionTypeValue === 3" 
+            class="component-wrapper" 
+            :class="{ 'fade-slide-in': selectedQuestionTypeValue === 3 }">
             <AddJudge :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />
           </view>
-          <view v-else-if="selectedQuestionTypeValue === 4" key="short" class="component-wrapper">
+          <view 
+            v-show="selectedQuestionTypeValue === 4" 
+            class="component-wrapper" 
+            :class="{ 'fade-slide-in': selectedQuestionTypeValue === 4 }">
             <AddShort :currentBankId="questionbankId" :isEdit="isEditMode" :editData="editQuestionData" />  
           </view>
-        </transition>
       </view>
    </view>
  </view>
@@ -106,28 +116,24 @@ onLoad((option) => {
   width: 100%;
 }
 
-/* 淡入淡出 + 滑动动画 */
-.fade-slide-enter-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* 淡入淡出 + 滑动动画 - 微信小程序兼容版本 */
+.component-wrapper {
+  display: none;
 }
 
-.fade-slide-leave-active {
-  transition: all 0.25s cubic-bezier(0.4, 0, 1, 1);
+.component-wrapper.fade-slide-in {
+  display: block;
+  animation: fadeSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateX(30rpx);
-}
-
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateX(-30rpx);
-}
-
-.fade-slide-enter-to,
-.fade-slide-leave-from {
-  opacity: 1;
-  transform: translateX(0);
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 </style>

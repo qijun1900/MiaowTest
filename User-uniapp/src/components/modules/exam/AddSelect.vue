@@ -1,6 +1,12 @@
 <template>
   <view>
-    <ThemeDivider text="题目题干" />
+    <!-- 题目题干/描述标题 -->
+    <QuestionStemHeader 
+      :is-wrong-book-mode="props.isAddWrongBookQuestion"
+      stem-text="题目描述"
+      @add-image="handleAddImage"
+    />
+    
     <!-- 题干编辑器 -->
     <view class="editor-section">
       <uniEditor 
@@ -10,7 +16,7 @@
         id="stemEditorId1"
         />
     </view>
-    <ThemeDivider text="题目选项" />
+    <ThemeDivider text="题目选项" v-show="!isAddWrongBookQuestion"/>
     <view class="options-container">
       <!-- 选项列表 -->
       <view class="option-item" v-for="(option, index) in formData.options" :key="index">
@@ -37,11 +43,64 @@
         <text>添加选项</text>
       </view>
     </view>
-    <ThemeDivider text="题目解析(可选)" />
+    
+    <!-- 我的错解部分 (仅在错题本添加模式显示) -->
+    <view v-if="props.isAddWrongBookQuestion" class="my-wrong-answer-section">
+      <view class="wrong-answer-title">我的错解 (选填)</view>
+      
+      <!-- 选择题类型的错解 -->
+      <view v-if="formData.Type === 1" class="wrong-answer-options">
+        <view 
+          v-for="(option, index) in formData.options" 
+          :key="index"
+          class="wrong-answer-option-btn"
+          :class="{ 'selected': formData.myWrongAnswer === String.fromCharCode(65 + index) }"
+          @click="selectWrongAnswer(String.fromCharCode(65 + index))"
+        >
+          {{ String.fromCharCode(65 + index) }}
+        </view>
+      </view>
+      
+      <!-- 判断题类型的错解 -->
+      <view v-else-if="formData.Type === 3" class="wrong-answer-judge">
+        <view 
+          class="judge-btn"
+          :class="{ 'selected': formData.myWrongAnswer === '正确' }"
+          @click="selectWrongAnswer('正确')"
+        >
+          正确
+        </view>
+        <view 
+          class="judge-btn"
+          :class="{ 'selected': formData.myWrongAnswer === '错误' }"
+          @click="selectWrongAnswer('错误')"
+        >
+          错误
+        </view>
+      </view>
+      
+      <!-- 其他题型的错解输入框 -->
+      <view v-else class="wrong-answer-input-wrapper">
+        <uniEditor 
+          placeholder="记录当时做错的答案..." 
+          v-model="formData.myWrongAnswer" 
+          height="150rpx" 
+          id="wrongAnswerEditorSelect"
+        />
+      </view>
+    </view>
+    
+    <!-- 题目解析/备注标题 -->
+    <QuestionAnalysisHeader 
+      :is-wrong-book-mode="props.isAddWrongBookQuestion"
+      analysis-text="解析 / 备注 / 笔记"
+      @add-image="handleAddAnalysisImage"
+    />
+    
     <!-- 解析编辑器 -->
     <view class="editor-section">
       <uniEditor 
-        placeholder="请在此处输入解析内容" 
+        :placeholder="props.isAddWrongBookQuestion ? '记录解题思路或知识点...' : '请在此处输入解析内容'" 
         v-model="formData.analysis" 
         height="200rpx" 
         id="analysisEditorId2"/>
@@ -55,9 +114,11 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, computed } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 import ThemeDivider from '../../core/ThemeDivider.vue';
+import QuestionStemHeader from './QuestionStemHeader.vue';
+import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
 const props = defineProps({
@@ -69,8 +130,13 @@ const props = defineProps({
   },
   editData: { // 接收编辑数据
     default: null
+  },
+  isAddWrongBookQuestion: { // 是否来自错题本添加
+    default: false
   }
 })
+
+const isAddWrongBookQuestion = computed(() => props.isAddWrongBookQuestion)
 
 
 const butLoading = ref(false) // 按钮加载中
@@ -80,6 +146,7 @@ const formData = reactive({
   stem: '', // 题干
   analysis: '', // 解析
   isMultiple: null, // 是否多选
+  myWrongAnswer: '', // 我的错解
   // 选项数据
   options: [
     { content: '', isCorrect: false },
@@ -114,6 +181,49 @@ const setCorrectAnswer = (index) => {
 
   // 根据选择的答案数量设置是否多选
   formData.isMultiple = correctCount > 1 ? 1 : 0
+}
+
+// 添加图片处理
+const handleAddImage = () => {
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: (res) => {
+      console.log('选择的图片:', res.tempFilePaths[0])
+      // 这里可以添加图片上传逻辑
+      uni.showToast({
+        title: '图片选择成功',
+        icon: 'success'
+      })
+    }
+  })
+}
+
+// 添加解析图片处理
+const handleAddAnalysisImage = () => {
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: (res) => {
+      console.log('选择的解析图片:', res.tempFilePaths[0])
+      // 这里可以添加图片上传逻辑
+      uni.showToast({
+        title: '图片选择成功',
+        icon: 'success'
+      })
+    }
+  })
+}
+
+// 选择错误答案
+const selectWrongAnswer = (answer) => {
+  if (formData.myWrongAnswer === answer) {
+    formData.myWrongAnswer = '' // 取消选择
+  } else {
+    formData.myWrongAnswer = answer
+  }
 }
 
 
@@ -201,6 +311,7 @@ const resetForm = () => {
   formData.stem = '';
   formData.analysis = '';
   formData.isMultiple = null;
+  formData.myWrongAnswer = '';
   formData.options = [
     { content: '', isCorrect: false },
     { content: '', isCorrect: false },
@@ -226,6 +337,29 @@ onMounted(() => {
 })
 </script>
 <style scoped>
+.custom-divider {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20rpx 0;
+}
+
+.divider-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.add-image-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.add-image-text {
+  font-size: 28rpx;
+  color: #07c160;
+}
+
 .editor-section {
   margin-bottom: 20rpx;
 }
@@ -233,8 +367,8 @@ onMounted(() => {
 .options-container {
   margin-top: 20rpx;
   background: white;
-  padding: 20rpx;
-  border-radius: 15rpx;
+  padding: 24rpx;
+  border-radius: 16rpx;
   border: 1rpx solid #e0e0e0;
 }
 
@@ -277,9 +411,17 @@ onMounted(() => {
   flex: 1;
   height: 80rpx;
   border: 1rpx solid #d9d9d9;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
   margin-right: 20rpx;
+  background: #fafafa;
+  transition: all 0.3s ease;
+}
+
+.option-input:focus {
+  border-color: #1890ff;
+  background: #fff;
+  box-shadow: 0 0 0 4rpx rgba(24, 144, 255, 0.1);
 }
 
 .radio-btn {
@@ -319,11 +461,17 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20rpx;
+  padding: 24rpx;
   border: 1rpx dashed #d9d9d9;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   margin-top: 20rpx;
   background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.add-option-btn:active {
+  background-color: #f0f0f0;
+  border-color: #1890ff;
 }
 
 .add-icon {
@@ -340,5 +488,75 @@ onMounted(() => {
   border-radius: 8rpx;
   font-size: 24rpx;
   color: #666;
+}
+
+.my-wrong-answer-section {
+  margin: 30rpx 0;
+}
+
+.wrong-answer-title {
+  font-size: 28rpx;
+  color: #ff4d4f;
+  margin-bottom: 20rpx;
+  font-weight: 500;
+}
+
+.wrong-answer-options {
+  display: flex;
+  gap: 20rpx;
+  flex-wrap: wrap;
+}
+
+.wrong-answer-option-btn {
+  width: 160rpx;
+  height: 80rpx;
+  border: 2rpx solid #d9d9d9;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #999;
+  background-color: #ffffff;
+  transition: all 0.3s;
+}
+
+.wrong-answer-option-btn.selected {
+  border-color: #ff4d4f;
+  background-color: #fff1f0;
+  color: #ff4d4f;
+}
+
+.wrong-answer-judge {
+  display: flex;
+  gap: 20rpx;
+}
+
+.judge-btn {
+  flex: 1;
+  height: 80rpx;
+  border: 2rpx solid #d9d9d9;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #999;
+  background-color: #ffffff;
+  transition: all 0.3s;
+}
+
+.judge-btn.selected {
+  border-color: #ff4d4f;
+  background-color: #fff1f0;
+  color: #ff4d4f;
+}
+
+.wrong-answer-input-wrapper {
+  width: 100%;
+  background-color: #fff9f9;
+  border-radius: 12rpx;
+  border: 2rpx solid #d9d9d9;
+  overflow: hidden;
 }
 </style>

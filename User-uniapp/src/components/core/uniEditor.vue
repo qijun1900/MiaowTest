@@ -642,7 +642,7 @@ onUnmounted(() => {
 .editor-section {
     margin-bottom: 20rpx;
     border: 1rpx solid #e5e5e5;
-    border-radius: 8rpx;
+    border-radius: 15rpx;
     overflow: hidden;
     position: relative;
 }
