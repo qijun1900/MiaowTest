@@ -51,7 +51,7 @@ defineEmits(['addImage'])
 }
 
 .add-image-text {
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: #07c160;
 }
 </style>

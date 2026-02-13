@@ -15,16 +15,36 @@
     </view>
     <view class="answer-container">
       <view class="answer-header">
-        <view class="answer-icon">
-          <uni-icons type="compose" size="20" color="#1890ff"></uni-icons>
+        <view class="answer-header-left">
+          <view class="answer-icon">
+            <uni-icons type="compose" size="20" color="#1890ff"></uni-icons>
+          </view>
+          <text class="answer-title">题目答案</text>
         </view>
-        <text class="answer-title">题目答案</text>
+        <view v-if="props.isAddWrongBookQuestion" class="add-image-btn" @click="handleAddAnswerImage">
+          <uni-icons type="image" size="18" color="#07c160"></uni-icons>
+          <text class="add-image-text">添加图片</text>
+        </view>
       </view>
       <uniEditor 
         placeholder="请在此处输入参考答案" 
         v-model="formData.content" 
         height="220rpx" 
         id="answerEditor4"/>
+      
+      <!-- 已上传的答案图片列表 -->
+      <view v-if="answerImageList.length > 0" class="image-list">
+        <view 
+          v-for="(img, index) in answerImageList" 
+          :key="index"
+          class="image-item"
+        >
+          <image :src="img" mode="aspectFill" class="preview-image" />
+          <view class="delete-image-btn" @click="removeAnswerImage(index)">
+            <uni-icons type="close" size="14" color="#ffffff"></uni-icons>
+          </view>
+        </view>
+      </view>
     </view>
     
     <!-- 我的错解部分 (仅在错题本添加模式显示) -->
@@ -66,6 +86,8 @@ import MyWrongAnswerEditor from './MyWrongAnswerEditor.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
 const butLoading = ref(false)
+const answerImageList = ref([])
+
 const props = defineProps({
   currentBankId: { 
     default: null
@@ -96,6 +118,36 @@ const formData = reactive({
 // 处理错解图片
 const handleWrongAnswerImages = (images) => {
   formData.myWrongAnswerImages = images;
+}
+
+// 添加答案图片
+const handleAddAnswerImage = () => {
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: (res) => {
+      const tempFilePath = res.tempFilePaths[0];
+      answerImageList.value.push(tempFilePath);
+      
+      uni.showToast({
+        title: '图片添加成功',
+        icon: 'success'
+      });
+    },
+    fail: (err) => {
+      console.error('选择图片失败:', err);
+      uni.showToast({
+        title: '图片选择失败',
+        icon: 'none'
+      });
+    }
+  });
+}
+
+// 删除答案图片
+const removeAnswerImage = (index) => {
+  answerImageList.value.splice(index, 1);
 }
 
 // 提交表单
@@ -172,6 +224,7 @@ const resetForm = () => {
   formData.analysis = '';
   formData.myWrongAnswer = '';
   formData.myWrongAnswerImages = [];
+  answerImageList.value = [];
 }
 
 // 编辑模式下的数据初始化
@@ -202,9 +255,15 @@ onMounted(() => {
 .answer-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 20rpx;
   padding-bottom: 15rpx;
   border-bottom: 1rpx solid #f0f0f0;
+}
+
+.answer-header-left {
+  display: flex;
+  align-items: center;
 }
 
 .answer-icon {
@@ -222,5 +281,50 @@ onMounted(() => {
   font-size: 32rpx;
   font-weight: 600;
   color: #333;
+}
+
+.add-image-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  cursor: pointer;
+}
+
+.add-image-text {
+  font-size: 28rpx;
+  color: #07c160;
+}
+
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.image-item {
+  position: relative;
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+}
+
+.delete-image-btn {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
