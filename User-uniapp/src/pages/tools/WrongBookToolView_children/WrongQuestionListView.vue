@@ -316,7 +316,6 @@ const markNeedReview = (item) => {
 };
 //跳转到添加题目页面
 const handleAddQuestion = () => {
-  console.log('添加题目');
   uni.navigateTo({  
     url: `/pages/tools/WrongBookToolView_children/WrongQuestionDetailView?id=${WrongbookId.value}&title=${encodeURIComponent(WrongbookTitle.value)}`
   });

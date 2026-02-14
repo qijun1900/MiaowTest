@@ -57,6 +57,13 @@
         height="200rpx" 
         id="analysisEditor2"/>
     </view>
+    
+    <!-- 标签组件 -->
+    <QuestionTags 
+      :show="props.isAddWrongBookQuestion"
+      v-model="formData.tags"
+    />
+    
     <view class="submit-btn">
       <button type="primary" :loading="butLoading" @click="handleSend">
         {{ props.isEdit ? '更新题目' : '添加题目' }}
@@ -72,6 +79,7 @@ import ThemeDivider from '../../core/ThemeDivider.vue';
 import QuestionStemHeader from './QuestionStemHeader.vue';
 import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
 import MyWrongAnswerEditor from './MyWrongAnswerEditor.vue';
+import QuestionTags from './QuestionTags.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
 const butLoading = ref(false)
@@ -99,6 +107,7 @@ const formData = reactive({
   analysis: '', // 解析
   myWrongAnswer: '', // 我的错解
   myWrongAnswerImages: [], // 我的错解图片
+  tags: [], // 标签
   // 答案数据
   options: [
     { content: '' }
@@ -200,6 +209,7 @@ const resetForm = () => {
   formData.analysis = '';
   formData.myWrongAnswer = '';
   formData.myWrongAnswerImages = [];
+  formData.tags = [];
   formData.options = [
     { content: '' }
   ];

@@ -69,6 +69,13 @@
          height="200rpx" 
          id="analysisEditor4"/>
     </view>
+    
+    <!-- 标签组件 -->
+    <QuestionTags 
+      :show="props.isAddWrongBookQuestion"
+      v-model="formData.tags"
+    />
+    
     <view class="submit-btn">
       <button type="primary" :loading="butLoading" @click="handleSend">
         {{ props.isEdit ? '更新题目' : '添加题目' }}
@@ -83,6 +90,7 @@ import uniEditor from '../../core/uniEditor.vue';
 import QuestionStemHeader from './QuestionStemHeader.vue';
 import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
 import MyWrongAnswerEditor from './MyWrongAnswerEditor.vue';
+import QuestionTags from './QuestionTags.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
 const butLoading = ref(false)
@@ -112,7 +120,8 @@ const formData = reactive({
   content: '', // 答案
   analysis: '', // 解析
   myWrongAnswer: '', // 我的错解
-  myWrongAnswerImages: [] // 我的错解图片
+  myWrongAnswerImages: [], // 我的错解图片
+  tags: [] // 标签
 })
 
 // 处理错解图片
@@ -224,6 +233,7 @@ const resetForm = () => {
   formData.analysis = '';
   formData.myWrongAnswer = '';
   formData.myWrongAnswerImages = [];
+  formData.tags = [];
   answerImageList.value = [];
 }
 

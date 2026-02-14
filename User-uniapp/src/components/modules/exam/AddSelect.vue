@@ -47,46 +47,17 @@
     <!-- 我的错解部分 (仅在错题本添加模式显示) -->
     <view v-if="props.isAddWrongBookQuestion" class="my-wrong-answer-section">
       <view class="wrong-answer-title">我的错解 (选填)</view>
-      
       <!-- 选择题类型的错解 -->
       <view v-if="formData.Type === 1" class="wrong-answer-options">
         <view 
           v-for="(option, index) in formData.options" 
           :key="index"
           class="wrong-answer-option-btn"
-          :class="{ 'selected': formData.myWrongAnswer === String.fromCharCode(65 + index) }"
+          :class="{ 'selected': formData.myWrongAnswer.includes(String.fromCharCode(65 + index)) }"
           @click="selectWrongAnswer(String.fromCharCode(65 + index))"
         >
           {{ String.fromCharCode(65 + index) }}
         </view>
-      </view>
-      
-      <!-- 判断题类型的错解 -->
-      <view v-else-if="formData.Type === 3" class="wrong-answer-judge">
-        <view 
-          class="judge-btn"
-          :class="{ 'selected': formData.myWrongAnswer === '正确' }"
-          @click="selectWrongAnswer('正确')"
-        >
-          正确
-        </view>
-        <view 
-          class="judge-btn"
-          :class="{ 'selected': formData.myWrongAnswer === '错误' }"
-          @click="selectWrongAnswer('错误')"
-        >
-          错误
-        </view>
-      </view>
-      
-      <!-- 其他题型的错解输入框 -->
-      <view v-else class="wrong-answer-input-wrapper">
-        <uniEditor 
-          placeholder="记录当时做错的答案..." 
-          v-model="formData.myWrongAnswer" 
-          height="150rpx" 
-          id="wrongAnswerEditorSelect"
-        />
       </view>
     </view>
     
@@ -105,6 +76,13 @@
         height="200rpx" 
         id="analysisEditorId2"/>
     </view>
+    
+    <!-- 标签组件 -->
+    <QuestionTags 
+      :show="props.isAddWrongBookQuestion"
+      v-model="formData.tags"
+    />
+    
     <view class="submit-btn">
       <button type="primary" :loading="butLoading" @click="handleSend">
         {{ props.isEdit ? '更新题目' : '添加题目' }}
@@ -119,6 +97,7 @@ import uniEditor from '../../core/uniEditor.vue';
 import ThemeDivider from '../../core/ThemeDivider.vue';
 import QuestionStemHeader from './QuestionStemHeader.vue';
 import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
+import QuestionTags from './QuestionTags.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 
 const props = defineProps({
@@ -146,7 +125,8 @@ const formData = reactive({
   stem: '', // 题干
   analysis: '', // 解析
   isMultiple: null, // 是否多选
-  myWrongAnswer: '', // 我的错解
+  myWrongAnswer: [], // 我的错解（改为数组支持多选）
+  tags: [], // 标签
   // 选项数据
   options: [
     { content: '', isCorrect: false },
@@ -217,12 +197,15 @@ const handleAddAnalysisImage = () => {
   })
 }
 
-// 选择错误答案
+// 选择错误答案（支持多选）
 const selectWrongAnswer = (answer) => {
-  if (formData.myWrongAnswer === answer) {
-    formData.myWrongAnswer = '' // 取消选择
+  const index = formData.myWrongAnswer.indexOf(answer);
+  if (index > -1) {
+    // 如果已选中，则取消选择
+    formData.myWrongAnswer.splice(index, 1);
   } else {
-    formData.myWrongAnswer = answer
+    // 如果未选中，则添加
+    formData.myWrongAnswer.push(answer);
   }
 }
 
@@ -311,7 +294,8 @@ const resetForm = () => {
   formData.stem = '';
   formData.analysis = '';
   formData.isMultiple = null;
-  formData.myWrongAnswer = '';
+  formData.myWrongAnswer = [];
+  formData.tags = [];
   formData.options = [
     { content: '', isCorrect: false },
     { content: '', isCorrect: false },
