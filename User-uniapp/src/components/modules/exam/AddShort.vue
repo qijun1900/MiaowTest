@@ -21,7 +21,10 @@
           </view>
           <text class="answer-title">题目答案</text>
         </view>
-        <view v-if="props.isAddWrongBookQuestion" class="add-image-btn" @click="handleAddAnswerImage">
+        <view 
+          v-if="props.isAddWrongBookQuestion" 
+          class="add-image-btn" 
+          @click="handleAddAnswerImage">
           <uni-icons type="image" size="18" color="#07c160"></uni-icons>
           <text class="add-image-text">添加图片</text>
         </view>
@@ -65,9 +68,9 @@
     <view class="editor-section">
       <uniEditor 
         :placeholder="isAddWrongBookQuestion ? '记录解题思路或知识点...' : '请在此处输入解析内容'"
-         v-model="formData.analysis" 
-         height="200rpx" 
-         id="analysisEditor4"/>
+        v-model="formData.analysis" 
+        height="200rpx" 
+        id="analysisEditor4"/>
     </view>
     
     <!-- 标签组件 -->

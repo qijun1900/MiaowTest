@@ -4,7 +4,7 @@
     <QuestionStemHeader 
       :is-wrong-book-mode="props.isAddWrongBookQuestion"
       stem-text="题目描述"
-      @add-image="handleAddImage"
+      @add-image="stemImages.addImage"
     />
     
     <!-- 题干编辑器 -->
@@ -15,6 +15,11 @@
         height="200rpx" 
         id="stemEditorId1"
         />
+      <!-- 题干图片列表 -->
+      <ImageList 
+        :images="stemImages.imageList.value"
+        @remove="stemImages.removeImage"
+      />
     </view>
     <ThemeDivider text="题目选项" v-show="!isAddWrongBookQuestion"/>
     <view class="options-container">
@@ -65,7 +70,7 @@
     <QuestionAnalysisHeader 
       :is-wrong-book-mode="props.isAddWrongBookQuestion"
       analysis-text="解析 / 备注 / 笔记"
-      @add-image="handleAddAnalysisImage"
+      @add-image="analysisImages.addImage"
     />
     
     <!-- 解析编辑器 -->
@@ -75,6 +80,11 @@
         v-model="formData.analysis" 
         height="200rpx" 
         id="analysisEditorId2"/>
+      <!-- 解析图片列表 -->
+      <ImageList 
+        :images="analysisImages.imageList.value"
+        @remove="analysisImages.removeImage"
+      />
     </view>
     
     <!-- 标签组件 -->
@@ -98,7 +108,9 @@ import ThemeDivider from '../../core/ThemeDivider.vue';
 import QuestionStemHeader from './QuestionStemHeader.vue';
 import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
 import QuestionTags from './QuestionTags.vue';
+import ImageList from '../../common/ImageList.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
+import { useImageUpload } from '../../../composables/useImageUpload.js';
 
 const props = defineProps({
   currentBankId: { // 接收题库ID
@@ -136,6 +148,10 @@ const formData = reactive({
   ]
 })
 
+//图片实列
+const stemImages = useImageUpload()
+const analysisImages = useImageUpload()
+
 // 添加选项
 const addOption = () => {
   formData.options.push({
@@ -163,40 +179,6 @@ const setCorrectAnswer = (index) => {
   formData.isMultiple = correctCount > 1 ? 1 : 0
 }
 
-// 添加图片处理
-const handleAddImage = () => {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'],
-    sourceType: ['album', 'camera'],
-    success: (res) => {
-      console.log('选择的图片:', res.tempFilePaths[0])
-      // 这里可以添加图片上传逻辑
-      uni.showToast({
-        title: '图片选择成功',
-        icon: 'success'
-      })
-    }
-  })
-}
-
-// 添加解析图片处理
-const handleAddAnalysisImage = () => {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'],
-    sourceType: ['album', 'camera'],
-    success: (res) => {
-      console.log('选择的解析图片:', res.tempFilePaths[0])
-      // 这里可以添加图片上传逻辑
-      uni.showToast({
-        title: '图片选择成功',
-        icon: 'success'
-      })
-    }
-  })
-}
-
 // 选择错误答案（支持多选）
 const selectWrongAnswer = (answer) => {
   const index = formData.myWrongAnswer.indexOf(answer);
@@ -208,7 +190,6 @@ const selectWrongAnswer = (answer) => {
     formData.myWrongAnswer.push(answer);
   }
 }
-
 
 // 提交表单
 const handleSend = async () => {
@@ -302,6 +283,8 @@ const resetForm = () => {
     { content: '', isCorrect: false },
     { content: '', isCorrect: false }
   ];
+  stemImages.clearImages();
+  analysisImages.clearImages();
 }
 onMounted(() => {
   if (props.isEdit && props.editData) {
@@ -321,29 +304,6 @@ onMounted(() => {
 })
 </script>
 <style scoped>
-.custom-divider {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 20rpx 0;
-}
-
-.divider-text {
-  font-size: 28rpx;
-  color: #999;
-}
-
-.add-image-btn {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-}
-
-.add-image-text {
-  font-size: 28rpx;
-  color: #07c160;
-}
-
 .editor-section {
   margin-bottom: 20rpx;
 }
