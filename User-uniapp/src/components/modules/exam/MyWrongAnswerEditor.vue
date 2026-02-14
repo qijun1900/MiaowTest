@@ -18,25 +18,10 @@
         :id="editorId"
       />
     </view>
-    
-    <!-- 已上传的图片列表 -->
-    <view v-if="imageList.length > 0" class="image-list">
-      <view 
-        v-for="(img, index) in imageList" 
-        :key="index"
-        class="image-item"
-      >
-        <image :src="img" mode="aspectFill" class="preview-image" />
-        <view class="delete-image-btn" @click="removeImage(index)">
-          <uni-icons type="close" size="14" color="#ffffff"></uni-icons>
-        </view>
-      </view>
-    </view>
   </view>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import uniEditor from '../../core/uniEditor.vue';
 
 const props = defineProps({
@@ -62,45 +47,16 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:modelValue', 'update:images']);
-
-const imageList = ref([]);
+const emit = defineEmits(['update:modelValue', 'add-image']);
 
 // 处理输入
 const handleInput = (value) => {
   emit('update:modelValue', value);
 };
 
-// 添加图片
+// 触发添加图片事件
 const handleAddImage = () => {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'],
-    sourceType: ['album', 'camera'],
-    success: (res) => {
-      const tempFilePath = res.tempFilePaths[0];
-      imageList.value.push(tempFilePath);
-      emit('update:images', imageList.value);
-      
-      uni.showToast({
-        title: '图片添加成功',
-        icon: 'success'
-      });
-    },
-    fail: (err) => {
-      console.error('选择图片失败:', err);
-      uni.showToast({
-        title: '图片选择失败',
-        icon: 'none'
-      });
-    }
-  });
-};
-
-// 删除图片
-const removeImage = (index) => {
-  imageList.value.splice(index, 1);
-  emit('update:images', imageList.value);
+  emit('add-image');
 };
 </script>
 
@@ -140,38 +96,5 @@ const removeImage = (index) => {
   border-radius: 12rpx;
   border: 2rpx solid #d9d9d9;
   overflow: hidden;
-}
-
-.image-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20rpx;
-  margin-top: 20rpx;
-}
-
-.image-item {
-  position: relative;
-  width: 150rpx;
-  height: 150rpx;
-  border-radius: 12rpx;
-  overflow: hidden;
-}
-
-.preview-image {
-  width: 100%;
-  height: 100%;
-}
-
-.delete-image-btn {
-  position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>

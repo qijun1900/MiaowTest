@@ -4,6 +4,7 @@
     <QuestionStemHeader 
       :is-wrong-book-mode="isAddWrongBookQuestion"
       stem-text="题目描述"
+      @add-image="stemImages.addImage"
     />
     <!-- 题干编辑器 -->
     <view class="editor-section">
@@ -12,6 +13,11 @@
         v-model="formData.stem" 
         height="200rpx" 
         id="stemEditor4"/>
+      <!-- 题干图片列表 -->
+      <ImageList 
+        :images="stemImages.imageList.value"
+        @remove="stemImages.removeImage"
+      />
     </view>
     <view class="answer-container">
       <view class="answer-header">
@@ -24,7 +30,7 @@
         <view 
           v-if="props.isAddWrongBookQuestion" 
           class="add-image-btn" 
-          @click="handleAddAnswerImage">
+          @click="answerImages.addImage">
           <uni-icons type="image" size="18" color="#07c160"></uni-icons>
           <text class="add-image-text">添加图片</text>
         </view>
@@ -36,18 +42,10 @@
         id="answerEditor4"/>
       
       <!-- 已上传的答案图片列表 -->
-      <view v-if="answerImageList.length > 0" class="image-list">
-        <view 
-          v-for="(img, index) in answerImageList" 
-          :key="index"
-          class="image-item"
-        >
-          <image :src="img" mode="aspectFill" class="preview-image" />
-          <view class="delete-image-btn" @click="removeAnswerImage(index)">
-            <uni-icons type="close" size="14" color="#ffffff"></uni-icons>
-          </view>
-        </view>
-      </view>
+      <ImageList 
+        :images="answerImages.imageList.value"
+        @remove="answerImages.removeImage"
+      />
     </view>
     
     <!-- 我的错解部分 (仅在错题本添加模式显示) -->
@@ -55,14 +53,22 @@
       :show="props.isAddWrongBookQuestion"
       v-model="formData.myWrongAnswer"
       editor-id="wrongAnswerEditorShort"
-      @update:images="handleWrongAnswerImages"
+      @add-image="wrongAnswerImages.addImage"
       height="200rpx"
     />
+    <!-- 错解图片列表 -->
+    <view v-if="props.isAddWrongBookQuestion" class="wrong-answer-images">
+      <ImageList 
+        :images="wrongAnswerImages.imageList.value"
+        @remove="wrongAnswerImages.removeImage"
+      />
+    </view>
     
     <!-- 题目解析/备注标题 -->
     <QuestionAnalysisHeader 
       :is-wrong-book-mode="isAddWrongBookQuestion"
       analysis-text="解析 / 备注 / 笔记"
+      @add-image="analysisImages.addImage"
     />
     <!-- 解析编辑器 -->
     <view class="editor-section">
@@ -71,6 +77,11 @@
         v-model="formData.analysis" 
         height="200rpx" 
         id="analysisEditor4"/>
+      <!-- 解析图片列表 -->
+      <ImageList 
+        :images="analysisImages.imageList.value"
+        @remove="analysisImages.removeImage"
+      />
     </view>
     
     <!-- 标签组件 -->
@@ -94,10 +105,17 @@ import QuestionStemHeader from './QuestionStemHeader.vue';
 import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
 import MyWrongAnswerEditor from './MyWrongAnswerEditor.vue';
 import QuestionTags from './QuestionTags.vue';
+import ImageList from '../../common/ImageList.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
+import { useImageUpload } from '../../../composables/useImageUpload.js';
 
 const butLoading = ref(false)
-const answerImageList = ref([])
+
+// 使用图片上传 composable
+const stemImages = useImageUpload(); // 题干图片
+const analysisImages = useImageUpload(); // 解析图片
+const answerImages = useImageUpload(); // 答案图片
+const wrongAnswerImages = useImageUpload(); // 错解图片
 
 const props = defineProps({
   currentBankId: { 
@@ -126,41 +144,6 @@ const formData = reactive({
   myWrongAnswerImages: [], // 我的错解图片
   tags: [] // 标签
 })
-
-// 处理错解图片
-const handleWrongAnswerImages = (images) => {
-  formData.myWrongAnswerImages = images;
-}
-
-// 添加答案图片
-const handleAddAnswerImage = () => {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'],
-    sourceType: ['album', 'camera'],
-    success: (res) => {
-      const tempFilePath = res.tempFilePaths[0];
-      answerImageList.value.push(tempFilePath);
-      
-      uni.showToast({
-        title: '图片添加成功',
-        icon: 'success'
-      });
-    },
-    fail: (err) => {
-      console.error('选择图片失败:', err);
-      uni.showToast({
-        title: '图片选择失败',
-        icon: 'none'
-      });
-    }
-  });
-}
-
-// 删除答案图片
-const removeAnswerImage = (index) => {
-  answerImageList.value.splice(index, 1);
-}
 
 // 提交表单
 const handleSend = async () => {
@@ -237,7 +220,10 @@ const resetForm = () => {
   formData.myWrongAnswer = '';
   formData.myWrongAnswerImages = [];
   formData.tags = [];
-  answerImageList.value = [];
+  stemImages.clearImages();
+  analysisImages.clearImages();
+  answerImages.clearImages();
+  wrongAnswerImages.clearImages();
 }
 
 // 编辑模式下的数据初始化
@@ -308,36 +294,7 @@ onMounted(() => {
   color: #07c160;
 }
 
-.image-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20rpx;
+.wrong-answer-images {
   margin-top: 20rpx;
-}
-
-.image-item {
-  position: relative;
-  width: 150rpx;
-  height: 150rpx;
-  border-radius: 12rpx;
-  overflow: hidden;
-}
-
-.preview-image {
-  width: 100%;
-  height: 100%;
-}
-
-.delete-image-btn {
-  position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>
