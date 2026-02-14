@@ -27,7 +27,7 @@ const WrongQuestionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    questionType: { //// 1-选择题 2-填空题 3-判断题 4-简答题
+    Type: { //// 1-选择题 2-填空题 3-判断题 4-简答题
         type: Number,
         enum: [1,2,3,4], 
         required: true
@@ -39,9 +39,14 @@ const WrongQuestionSchema = new mongoose.Schema({
     },
     
     // 题目内容（冗余存储，避免原题被删除）
-    stem: { // 题干
-        type: String,
-        required: true
+    stem: { // 题干（支持富文本和图片）
+        text: { // 文本内容
+            type: String,
+            default: ''
+        },
+        images: [{ // 图片列表
+            url: String, // 图片URL
+        }]
     },
     options: { // 选项（选择题/填空题）
         type: Array,
@@ -49,17 +54,32 @@ const WrongQuestionSchema = new mongoose.Schema({
     },
     
     // 答案信息
-    wrongAnswer: { // 用户的错误答案
-        type: mongoose.Schema.Types.Mixed, // 可以是字符串、数字、数组等
-        required: true
+    wrongAnswer: { // 用户的错误答案（支持富文本和图片）
+        text: { // 文本内容
+            type: String,
+            default: ''
+        },
+        images: [{ // 图片列表
+            url: String,
+        }]
     },
-    correctAnswer: { // 正确答案
-        type: mongoose.Schema.Types.Mixed,
-        required: true
+    correctAnswer: { // 正确答案（支持富文本和图片）
+        text: { // 文本内容
+            type: String,
+            default: ''
+        },
+        images: [{ // 图片列表
+            url: String,
+        }]
     },
-    analysis: { // 题目解析
-        type: String,
-        default: ''
+    analysis: { // 题目解析（支持富文本和图片）
+        text: { // 文本内容
+            type: String,
+            default: ''
+        },
+        images: [{ // 图片列表
+            url: String,
+        }]
     },
     
     // 标签和分类
@@ -67,6 +87,7 @@ const WrongQuestionSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+
     difficulty: { // 难度：easy-简单 medium-中等 hard-困难
         type: String,
         enum: ['easy', 'medium', 'hard'],
@@ -79,19 +100,26 @@ const WrongQuestionSchema = new mongoose.Schema({
         enum: [0, 1, 2],
         default: 0
     },
+
     reviewCount: { // 复习次数
         type: Number,
         default: 0
     },
+
     wrongCount: { // 错误次数
         type: Number,
         default: 1
     },
     
     // 笔记内容
-    note: { // 用户笔记/心得
-        type: String,
-        default: ''
+    note: { // 用户笔记/心得（支持富文本和图片）
+        text: { // 文本内容
+            type: String,
+            default: ''
+        },
+        images: [{ // 图片列表
+            url: String,
+        }]
     },
     noteUpdatedAt: { // 笔记更新时间
         type: Date,
@@ -154,7 +182,7 @@ WrongQuestionSchema.pre('save', function(next) {
 // 创建复合索引以提高查询性能
 WrongQuestionSchema.index({ Uid: 1, wrongBookId: 1 }); // 用户+错题本查询
 WrongQuestionSchema.index({ Uid: 1, status: 1 }); // 用户+状态查询
-WrongQuestionSchema.index({ Uid: 1, questionType: 1 }); // 用户+题目类型查询
+WrongQuestionSchema.index({ Uid: 1, Type: 1 }); // 用户+题目类型查询
 WrongQuestionSchema.index({ nextReviewAt: 1 }); // 复习提醒查询
 WrongQuestionSchema.index({ createdAt: -1 }); // 时间排序
 
