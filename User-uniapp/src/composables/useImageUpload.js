@@ -21,6 +21,7 @@ export function useImageUpload() {
         console.error('选择图片失败:', err);
         uni.showToast({
           title: '图片选择失败',
+          position: 'top',
           icon: 'none'
         });
       }
@@ -49,7 +50,8 @@ export function useImageUpload() {
         
         uni.showToast({
           title: '图片已添加',
-          icon: 'success'
+          position:'top',
+          none: 'none'
         });
       },
       fail: (err) => {
@@ -59,7 +61,8 @@ export function useImageUpload() {
         
         uni.showToast({
           title: '图片已添加',
-          icon: 'success'
+          position:'top',
+          none: 'none'
         });
       }
     });
