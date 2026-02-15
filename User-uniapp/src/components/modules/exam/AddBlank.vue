@@ -125,6 +125,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['submit'])
+
 const isAddWrongBookQuestion = computed(() => props.isAddWrongBookQuestion)
 
 // 使用 reactive 集合所有数据
@@ -158,10 +160,10 @@ const removeAnswer = (index) => {
 // 提交表单
 const handleSend = async () => {
   try {
-    // 验证题目是否为空
-    if (!formData.stem.trim()) {
+    // 验证题目是否为空（题干文本或图片至少有一个）
+    if (!formData.stem.trim() && stemImages.imageList.value.length === 0) {
       uni.showToast({
-        title: '请输入题目内容',
+        title: '请输入题目内容或上传题干图片',
         icon: 'none'
       });
       return;
@@ -180,7 +182,59 @@ const handleSend = async () => {
     // 设置按钮加载状态
     butLoading.value = true;
 
-    // 准备提交的数据
+    // 如果是错题本模式，emit 数据给父组件
+    if (props.isAddWrongBookQuestion) {
+      // 上传所有图片到服务器
+      const [stemImageUrls, analysisImageUrls, wrongAnswerImageUrls] = await Promise.all([
+        stemImages.uploadAllImages(),
+        analysisImages.uploadAllImages(),
+        wrongAnswerImages.uploadAllImages()
+      ]);
+
+      // 构建符合 WrongQuestionModel 的数据结构
+      const wrongQuestionData = {
+        Type: formData.Type,
+        questionSource: 'user',
+        
+        // 题干（支持富文本和图片）
+        stem: {
+          text: formData.stem,
+          images: (stemImageUrls || []).map(url => ({ url }))
+        },
+        
+        // 选项（填空题的答案列表）
+        options: formData.options,
+        
+        // 正确答案
+        correctAnswer: {
+          text: formData.options.map(opt => opt.content).join('; '),
+          images: []
+        },
+        
+        // 用户的错误答案
+        wrongAnswer: {
+          text: formData.myWrongAnswer,
+          images: (wrongAnswerImageUrls || []).map(url => ({ url }))
+        },
+        
+        // 解析/备注
+        analysis: {
+          text: formData.analysis,
+          images: (analysisImageUrls || []).map(url => ({ url }))
+        },
+        
+        // 标签
+        tags: formData.tags,
+        
+        // 其他字段由父组件补充（wrongBookId, difficulty 等）
+      };
+
+      emit('submit', wrongQuestionData);
+      butLoading.value = false;
+      return;
+    }
+
+    // 原有的题库模式提交逻辑
     const submitData = {
       Type: formData.Type,
       stem: formData.stem,

@@ -1,4 +1,16 @@
 const WrongBookService = require('../../services/user/WrongBookService');
+const multer = require('multer');
+const OSS = require('ali-oss');
+const ossConfig = require('../../config/oss.config');
+const path = require('path');
+// 使用内存存储，方便后续上传到OSS
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage: storage, 
+  limits: { fileSize: 10 * 1024 * 1024 } // 限制10MB
+});
+// 创建OSS客户端
+const client = new OSS(ossConfig);
 
 const WrongBookController = {
     // 获取错题本列表
@@ -116,7 +128,49 @@ const WrongBookController = {
             });
         }
     },
+    //上传图片
+    uploadImage: [
+        upload.single('file'),
+        async (req, res) => {
+            try {
+                // 检查是否有文件上传
+                if (!req.file) {
+                    return res.send({
+                        code: 400,
+                        ActionType: "ERROR",
+                        message: '请选择要上传的图片'
+                    });
+                }
+                const { uid } = req.user;
+                console.log('上传图片的用户UID:', uid);
+                console.log('上传的文件信息:', req.file);
+                // 生成唯一的文件名
+                const fileExtension = path.extname(req.file.originalname);
+                const fileName = `user/wrong_question/${uid}/${Date.now()}${fileExtension}`;
 
+                // 上传文件到OSS
+                const result = await client.put(fileName, req.file.buffer);
+
+                console.log('OSS上传结果:', result);
+                
+                // 获取上传后的URL
+                const url = result.url;
+                res.send({
+                    code: 200,
+                    message: '上传图片成功',
+                    data: {
+                        url
+                    }
+                });
+            } catch (error) {
+                console.error("上传图片失败", error);
+                res.status(500).send({
+                    code: 500,
+                    message: "上传图片失败"
+                });
+            }
+        },
+    ],
     // 添加错题
     addWrongQuestion: async (req, res) => {
         try {

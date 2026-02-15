@@ -30,29 +30,42 @@
     <!-- 题型组件 -->
     <view class="question-form">
       <view v-if="selectedQuestionTypeValue === 1" :key="1" class="form-item fade-slide">
-        <AddSelect :isAddWrongBookQuestion="true" />
+        <AddSelect 
+          :isAddWrongBookQuestion="true" 
+          @submit="handleQuestionSubmit"
+        />
       </view>
       <view v-if="selectedQuestionTypeValue === 2" :key="2" class="form-item fade-slide">
-        <AddBlank :isAddWrongBookQuestion="true" />
+        <AddBlank 
+          :isAddWrongBookQuestion="true" 
+          @submit="handleQuestionSubmit"
+        />
       </view>
       <view v-if="selectedQuestionTypeValue === 3" :key="3" class="form-item fade-slide">
-        <AddJudge :isAddWrongBookQuestion="true" />
+        <AddJudge 
+          :isAddWrongBookQuestion="true" 
+          @submit="handleQuestionSubmit"
+        />
       </view>
       <view v-if="selectedQuestionTypeValue === 4" :key="4" class="form-item fade-slide">
-        <AddShort :isAddWrongBookQuestion="true" />
+        <AddShort 
+          :isAddWrongBookQuestion="true" 
+          @submit="handleQuestionSubmit"
+        />
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 import SliderSelector from '../../../components/core/SliderSelector.vue';
 import AddSelect from '../../../components/modules/exam/AddSelect.vue';//1
 import AddBlank from '../../../components/modules/exam/AddBlank.vue';//2
 import AddJudge from '../../../components/modules/exam/AddJudge.vue';//3
 import AddShort from '../../../components/modules/exam/AddShort.vue';//4
-import { ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { addWrongQuestionAPI } from '../../../API/Tools/wrongQuestionAPI';
 
 const selectedQuestionTypeValue = ref(1)
 const WrongbookTitle = ref('')
@@ -82,6 +95,42 @@ const handleTypeChange = ({ value }) => {
 const handleDifficultyChange = (e) => {
   const index = e.detail.value
   selectedDifficulty.value = difficulties.value[index]
+}
+
+// 处理题目提交
+const handleQuestionSubmit = async (questionData) => {
+  try {
+    // 补充错题本相关信息
+    const wrongQuestionData = {
+      ...questionData,
+      wrongBookId: WrongbookId.value,
+      difficulty: selectedDifficulty.value.value,
+    };
+
+    console.log('提交错题数据:', wrongQuestionData);
+
+    // 调用 API 提交到后端
+    const res = await addWrongQuestionAPI(wrongQuestionData);
+    
+    if (res.code === 200) {
+      uni.showToast({
+        title: '添加成功',
+        icon: 'success'
+      });
+    } else {
+      uni.showToast({
+        title: res.message || '添加失败',
+        icon: 'none'
+      });
+    }
+
+  } catch (error) {
+    console.error('提交错题失败:', error);
+    uni.showToast({
+      title: '提交失败，请重试',
+      icon: 'none'
+    });
+  }
 }
 
 onLoad((options) => {

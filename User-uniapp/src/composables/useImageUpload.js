@@ -13,7 +13,6 @@ export function useImageUpload() {
       sourceType: ['album', 'camera'],
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0];
-        
         // 保存到本地永久路径（避免临时文件失效）
         saveToLocalFile(tempFilePath);
       },
@@ -45,13 +44,10 @@ export function useImageUpload() {
         const savedPath = res.savedFilePath;
         imageList.value.push(savedPath);
         
-        console.log('图片已保存:', savedPath);
-        console.log('当前图片列表:', imageList.value);
-        
         uni.showToast({
           title: '图片已添加',
           position:'top',
-          none: 'none'
+          icon: 'none'
         });
       },
       fail: (err) => {
@@ -62,7 +58,7 @@ export function useImageUpload() {
         uni.showToast({
           title: '图片已添加',
           position:'top',
-          none: 'none'
+          icon: 'none'
         });
       }
     });
@@ -71,23 +67,18 @@ export function useImageUpload() {
   /**
    * 批量上传所有图片到服务器
    */
-  const uploadAllImages = async (uploadUrl = '/api/upload/image') => {
+  const uploadAllImages = async (uploadUrl = '/uniappAPI/upload/image') => {
     if (imageList.value.length === 0) {
       return [];
     }
 
-    imageList.value.map((filePath) => {
+    const uploadPromises = imageList.value.map((filePath) => {
       return new Promise((resolve, reject) => {
         uni.uploadFile({
           url: uploadUrl,
           filePath: filePath,
           name: 'file',
-          header: {
-            'Authorization': uni.getStorageSync('token') || ''
-          },
-          formData: {
-            type: 'question_image'
-          },
+          fileType: 'image',
           success: (uploadRes) => {
             try {
               const data = JSON.parse(uploadRes.data);
@@ -107,6 +98,8 @@ export function useImageUpload() {
         });
       });
     });
+
+    return Promise.all(uploadPromises);
   };
 
   /**
