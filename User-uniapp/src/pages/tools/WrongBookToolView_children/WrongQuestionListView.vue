@@ -11,6 +11,7 @@
             v-model="searchKeyword"
             placeholder="搜索题目内容..."
             placeholder-class="search-placeholder"
+            :hold-fast="true"
             @input="handleSearch"
           />
           <uni-icons 
@@ -19,6 +20,7 @@
             size="18" 
             color="#999999" 
             class="clear-icon" 
+            hover-class="none"
             @click="clearSearch"
           ></uni-icons>
         </view>
@@ -33,6 +35,7 @@
               :key="index"
               class="tab-item"
               :class="{ 'tab-active': activeTab === tab.value }"
+              hover-class="none"
               @click="switchTab(tab.value)"
             >
               <text class="tab-text">{{ tab.label }}</text>
@@ -84,7 +87,7 @@
         <!-- 日期和复习次数 -->
         <view class="question-meta">
           <text class="meta-text">{{formatTime.getTime2(item._raw.updatedAt) }} · 复习 {{ item.reviewCount }} 次</text>
-          <view class="answer-status" @click="toggleAnswer(index)">
+          <view class="answer-status" hover-class="none" @click="toggleAnswer(index)">
             <text :class="item.showAnswer ? 'status-show' : 'status-hide'">
               {{ item.showAnswer ? '收起答案' : '查看答案' }}
             </text>
@@ -123,11 +126,14 @@
 
             <!-- 答案区域底部操作按钮 -->
             <view class="answer-actions">
-              <view class="answer-btn" @click="editQuestion(item)">
+              <view 
+                class="answer-btn"
+                hover-class="none" 
+                @click="editQuestion(item)">
                 <uni-icons type="compose" size="16" color="#ff9555"></uni-icons>
                 <text class="answer-btn-text">修改题目</text>
               </view>
-              <view class="answer-btn" @click="markNeedReview(item)">
+              <view class="answer-btn" hover-class="none" @click="markNeedReview(item)">
                 <uni-icons type="loop" size="16" color="#2196f3"></uni-icons>
                 <text class="answer-btn-text">需要复习</text>
               </view>
@@ -137,17 +143,18 @@
 
         <!-- 底部操作栏 -->
         <view class="card-footer">
-          <view class="footer-left">
+          <view class="footer-left" hover-class="none">
             <uni-icons type="trash" size="18" color="#909399"></uni-icons>
             <text class="footer-text">删除</text>
           </view>
           <view class="footer-right">
-            <view class="footer-btn" @click="reviewQuestion(item)">
+            <view class="footer-btn" hover-class="none" @click="reviewQuestion(item)">
               <text class="btn-text">查看习题</text>
             </view>
             <view 
               class="footer-btn primary" 
               :class="{ 'disabled': item.status === 'mastered' }"
+              hover-class="none"
               @click="markAsMastered(item)"
             >
               <text class="btn-text">{{ item.status === 'mastered' ? '已掌握' : '标记为掌握' }}</text>
