@@ -31,24 +31,28 @@
     <view class="question-form">
       <view v-if="selectedQuestionTypeValue === 1" :key="1" class="form-item fade-slide">
         <AddSelect 
+          ref="addSelectRef"
           :isAddWrongBookQuestion="true" 
           @submit="handleQuestionSubmit"
         />
       </view>
       <view v-if="selectedQuestionTypeValue === 2" :key="2" class="form-item fade-slide">
         <AddBlank 
+          ref="addBlankRef"
           :isAddWrongBookQuestion="true" 
           @submit="handleQuestionSubmit"
         />
       </view>
       <view v-if="selectedQuestionTypeValue === 3" :key="3" class="form-item fade-slide">
         <AddJudge 
+          ref="addJudgeRef"
           :isAddWrongBookQuestion="true" 
           @submit="handleQuestionSubmit"
         />
       </view>
       <view v-if="selectedQuestionTypeValue === 4" :key="4" class="form-item fade-slide">
         <AddShort 
+          ref="addShortRef"
           :isAddWrongBookQuestion="true" 
           @submit="handleQuestionSubmit"
         />
@@ -70,6 +74,12 @@ import { addWrongQuestionAPI } from '../../../API/Tools/wrongQuestionAPI';
 const selectedQuestionTypeValue = ref(1)
 const WrongbookTitle = ref('')
 const WrongbookId  = ref('')
+
+// 子组件 ref
+const addSelectRef = ref(null)
+const addBlankRef = ref(null)
+const addJudgeRef = ref(null)
+const addShortRef = ref(null)
 
 const questionTypes = ref([
   { label: '选择题', value: 1 },
@@ -117,6 +127,9 @@ const handleQuestionSubmit = async (questionData) => {
         title: '添加成功',
         icon: 'success'
       });
+      
+      // 提交成功后重置对应的子组件表单
+      resetCurrentForm();
     } else {
       uni.showToast({
         title: res.message || '添加失败',
@@ -130,6 +143,24 @@ const handleQuestionSubmit = async (questionData) => {
       title: '提交失败，请重试',
       icon: 'none'
     });
+  }
+}
+
+// 重置当前激活的表单
+const resetCurrentForm = () => {
+  switch (selectedQuestionTypeValue.value) {
+    case 1:
+      addSelectRef.value?.resetForm();
+      break;
+    case 2:
+      addBlankRef.value?.resetForm();
+      break;
+    case 3:
+      addJudgeRef.value?.resetForm();
+      break;
+    case 4:
+      addShortRef.value?.resetForm();
+      break;
   }
 }
 
