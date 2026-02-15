@@ -215,6 +215,27 @@ const WrongBookController = {
             });
         }
     },
+    // 获取错题列表
+    getWrongQuestions: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { wrongBookId} = req.query;
+            const data = await WrongBookService.getWrongQuestions({ 
+                uid, 
+                wrongBookId,
+            });
+            res.send({
+                code: 200,
+                data
+            });
+        } catch (error) {
+            console.error("获取错题列表失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "获取错题列表失败"
+            });
+        }
+    },
 
     // 删除错题
     deleteWrongQuestion: async (req, res) => {

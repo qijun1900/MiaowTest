@@ -194,7 +194,7 @@
 				this.top = this.windowHeight - this.height - this.bottomOffset;
 			}).exec();
 		},
-		beforeDestroy() {
+		beforeUnmount() {
 			this.clearLongPressTimer();
 		},
 		methods: {

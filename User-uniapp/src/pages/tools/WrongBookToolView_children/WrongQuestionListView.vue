@@ -57,7 +57,10 @@
 
         <!-- 卡片头部 -->
         <view class="card-header">
-          <scroll-view class="tags-scroll-view" scroll-x :show-scrollbar="false">
+          <scroll-view 
+            class="tags-scroll-view" 
+            scroll-x 
+            :show-scrollbar="false">
             <view class="tags-row">
               <view 
                 v-for="(tag, tagIndex) in item.tags" 
@@ -73,12 +76,14 @@
 
         <!-- 题目内容 -->
         <view class="question-content">
-          <text class="question-text">{{ item.question }}</text>
+          <view class="question-text">
+            <rich-text :nodes="item._raw.stem.text"></rich-text>
+          </view>
         </view>
 
         <!-- 日期和复习次数 -->
         <view class="question-meta">
-          <text class="meta-text">{{ item.date }} · 复习 {{ item.reviewCount }} 次</text>
+          <text class="meta-text">{{formatTime.getTime2(item._raw.updatedAt) }} · 复习 {{ item.reviewCount }} 次</text>
           <view class="answer-status" @click="toggleAnswer(index)">
             <text :class="item.showAnswer ? 'status-show' : 'status-hide'">
               {{ item.showAnswer ? '收起答案' : '查看答案' }}
@@ -97,7 +102,7 @@
             <!-- 我的错误答案 -->
             <view class="answer-title">我的错解</view>
             <view class="answer-block wrong-answer">
-              <text class="answer-text">{{ item.wrongAnswer }}</text>
+              <rich-text :nodes="item._raw.wrongAnswer.text"></rich-text>
             </view>
 
             <!-- 正确答案 -->
@@ -108,9 +113,11 @@
 
             <!-- 解析/笔记 -->
             <view v-if="item.note" class="note-wrapper">
-              <view class="answer-title">解析 / 笔记</view>
+              <view class="answer-title">解析 / 笔记 /备注</view>
               <view class="note-block">
-                <text class="note-text">{{ item.note }}</text>
+                <view class="note-text">
+                  <rich-text :nodes="item._raw.analysis.text"></rich-text>
+                </view>
               </view>
             </view>
 
@@ -143,12 +150,13 @@
               :class="{ 'disabled': item.status === 'mastered' }"
               @click="markAsMastered(item)"
             >
-              <text class="btn-text">{{ item.status === 'mastered' ? '已掌握' : '已掌握' }}</text>
+              <text class="btn-text">{{ item.status === 'mastered' ? '已掌握' : '标记为掌握' }}</text>
             </view>
           </view>
         </view>
       </view>
     </view>
+
     <!--悬浮按钮 -->
     <dragButton
       butColor="#ffffff"
@@ -165,9 +173,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
+import { getWrongQuestionsAPI } from '../../../API/Tools/wrongQuestionAPI';
+import formatTime from '../../../util/formatTime';
 
 const WrongbookId = ref('');
 const WrongbookTitle = ref('');
@@ -175,116 +185,74 @@ const searchKeyword = ref('');
 const activeTab = ref('all');
 const isShowdragButton = ref(true);
 
-const tabs = ref([
-  { label: '全部', value: 'all', count: 5 },
-  { label: '选择题', value: 'select', count: 2 },
-  { label: '判断题', value: 'judge', count: 0 },
-  { label: '填空题', value: 'blank', count: 1 },
-  { label: '简答题', value: 'short', count: 2 }
-]);
+// 原始完整数据列表
+const allQuestions = ref([]);
+// 错题列表数据（筛选后）
+const questionList = ref([]);
 
-// 假数据
-const questionList = ref([
-  {
-    id: 1,
-    tags: [
-      { text: '选择题', type: 'blue' },
-      { text: '简单', type: 'green' },
-      { text: '#代数', type: 'gray' },
-      { text: '#一元二次方程福娃发发我', type: 'gray' }
-    ],
-    status: 'reviewing',
-    statusText: '已复习',
-    question: '解方程: 2x + 5 = 15',
-    date: '2023/10/01',
-    reviewCount: 3,
-    showAnswer: false,
-    wrongAnswer: 'x = 10',
-    correctAnswer: 'x = 5',
-    note: '两边同时减去5得到 2x = 10，然后除以2。'
-  },
-  {
-    id: 2,
-    tags: [
-      { text: '填空题', type: 'purple' },
-      { text: '中等', type: 'yellow' },
-      { text: '#微积分', type: 'gray' },
-      { text: '#导数', type: 'gray' }
-    ],
-    status: 'reviewing',
-    statusText: '复习中',
-    question: 'f(x) = x^2 的导数是多少？',
-    date: '2023/10/05',
-    reviewCount: 1,
-    showAnswer: false,
-    wrongAnswer: 'f\'(x) = x',
-    correctAnswer: 'f\'(x) = 2x',
-    note: '幂函数求导公式：x^n 的导数是 n·x^(n-1)'
-  },
-  {
-    id: 3,
-    tags: [
-      { text: '判断题', type: 'red' },
-      { text: '简单', type: 'green' },
-      { text: '#语法', type: 'gray' },
-      { text: '#一般一致', type: 'gray' }
-    ],
-    status: 'new',
-    statusText: '新题',
-    question: '找出错误: "She don\'t like apples."',
-    date: '2023/10/10',
-    reviewCount: 0,
-    showAnswer: false,
-    wrongAnswer: 'apples 应该是 apple',
-    correctAnswer: 'don\'t 应该改为 doesn\'t',
-    note: '第三人称单数用 doesn\'t，不用 don\'t。'
-  },
-  {
-    id: 4,
-    tags: [
-      { text: '简答题', type: 'orange' },
-      { text: '中等', type: 'yellow' },
-      { text: '#力学', type: 'gray' },
-      { text: '#牛顿定律', type: 'gray' }
-    ],
-    status: 'reviewing',
-    statusText: '复习中',
-    question: '牛顿第二定律是什么？',
-    date: '2023/10/12',
-    reviewCount: 0,
-    showAnswer: false,
-    wrongAnswer: 'F = ma^2',
-    correctAnswer: 'F = ma',
-    note: '力等于质量乘以加速度，这是牛顿第二定律的基本表达式。'
-  }
+// 动态标签列表（从用户数据中提取）
+const tabs = ref([
+  { label: '全部', value: 'all', count: 0 }
 ]);
 
 const handleSearch = () => {
-  console.log('搜索:', searchKeyword.value);
+  filterQuestions();
 };
 
 const clearSearch = () => {
   searchKeyword.value = '';
-  handleSearch();
+  filterQuestions();
 };
 
 const switchTab = (value) => {
   activeTab.value = value;
-  console.log('切换到:', value);
+  filterQuestions();
+};
+
+// 筛选问题列表
+const filterQuestions = () => {
+  let filtered = [...allQuestions.value];
+  
+  // 按标签筛选
+  if (activeTab.value !== 'all') {
+    filtered = filtered.filter(q => {
+      // 检查原始数据中的 tags 数组
+      return q._raw?.tags && q._raw.tags.includes(activeTab.value);
+    });
+  }
+  
+  // 按关键词搜索
+  if (searchKeyword.value.trim()) {
+    const keyword = searchKeyword.value.trim().toLowerCase();
+    filtered = filtered.filter(q => {
+      // 安全地检查每个字段是否存在
+      const questionMatch = q.question ? q.question.toLowerCase().includes(keyword) : false;
+      const wrongAnswerMatch = q.wrongAnswer ? q.wrongAnswer.toLowerCase().includes(keyword) : false;
+      const correctAnswerMatch = q.correctAnswer ? q.correctAnswer.toLowerCase().includes(keyword) : false;
+      const noteMatch = q.note ? q.note.toLowerCase().includes(keyword) : false;
+      const tagsMatch = q.tags ? q.tags.some(tag => tag.text && tag.text.toLowerCase().includes(keyword)) : false;
+      
+      return questionMatch || wrongAnswerMatch || correctAnswerMatch || noteMatch || tagsMatch;
+    });
+  }
+  
+  questionList.value = filtered;
 };
 
 const toggleAnswer = (index) => {
   questionList.value[index].showAnswer = !questionList.value[index].showAnswer;
 };
 
+//TODO 查看习题详情
 const reviewQuestion = (item) => {
-  console.log('查看习题:', item.id);
   uni.showToast({
     title: '查看习题',
     icon: 'none'
   });
+  console.log('查看习题:', item);
 };
 
+//TODO 标记需要复习
 const markAsMastered = (item) => {
   if (item.status === 'mastered') return;
   
@@ -295,18 +263,17 @@ const markAsMastered = (item) => {
     icon: 'success'
   });
 };
-
+// TODO: 跳转到编辑页面或打开编辑弹窗
 const editQuestion = (item) => {
-  console.log('修改题目:', item.id);
   uni.showToast({
     title: '修改题目',
     icon: 'none'
   });
-  // TODO: 跳转到编辑页面或打开编辑弹窗
-};
+  console.log('编辑题目:', item);
 
+};
+//TODO 标记需要复习
 const markNeedReview = (item) => {
-  console.log('标记需要复习:', item.id);
   item.status = 'reviewing';
   item.statusText = '复习中';
   uni.showToast({
@@ -320,6 +287,114 @@ const handleAddQuestion = () => {
     url: `/pages/tools/WrongBookToolView_children/WrongQuestionDetailView?id=${WrongbookId.value}&title=${encodeURIComponent(WrongbookTitle.value)}`
   });
 };
+
+// 获取错题列表数据
+const fetchWrongQuestions = async () => {
+  try {
+    const res = await getWrongQuestionsAPI(WrongbookId.value);
+    if (res.code === 200) {
+      // 将后端数据转换为前端需要的格式
+      allQuestions.value = (res.data || []).map(q => {
+        // 题型映射
+        const typeMap = {
+          1: { text: '选择题', color: 'blue' },
+          2: { text: '填空题', color: 'purple' },
+          3: { text: '判断题', color: 'red' },
+          4: { text: '简答题', color: 'orange' }
+        };
+        
+        // 难度映射
+        const difficultyMap = {
+          'easy': { text: '简单', color: 'green' },
+          'medium': { text: '中等', color: 'yellow' },
+          'hard': { text: '困难', color: 'red' }
+        };
+        
+        // 状态映射
+        const statusMap = {
+          0: { status: 'new', text: '新题' },
+          1: { status: 'reviewing', text: '复习中' },
+          2: { status: 'mastered', text: '已掌握' }
+        };
+        
+        
+        // 构建标签数组
+        const tags = [
+          { text: typeMap[q.Type]?.text || '未知', type: typeMap[q.Type]?.color || 'gray' },
+          { text: difficultyMap[q.difficulty]?.text || '中等', type: difficultyMap[q.difficulty]?.color || 'yellow' }
+        ];
+        
+        // 添加用户自定义标签
+        if (q.tags && Array.isArray(q.tags)) {
+          q.tags.forEach(tag => {
+            tags.push({ text: `#${tag}`, type: 'gray' });
+          });
+        }
+        
+        return {
+          id: q._id,
+          tags: tags,
+          status: statusMap[q.status]?.status || 'new',
+          statusText: statusMap[q.status]?.text || '新题',
+          reviewCount: q.reviewCount || 0,
+          showAnswer: false,
+          // 保留原始数据以便后续使用
+          _raw: q
+        };
+      });
+      
+      // 更新标签栏
+      updateTabCounts();
+      
+      // 应用筛选
+      filterQuestions();
+      
+    } else {
+      uni.showToast({
+        title: res.message || '获取数据失败',
+        icon: 'none'
+      });
+    }
+  } catch (error) {
+    console.error('获取错题列表失败:', error);
+    uni.showToast({
+      title: '网络错误，请稍后重试',
+      icon: 'none'
+    });
+  }
+}
+
+// 更新标签栏（从用户数据中提取所有标签）
+const updateTabCounts = () => {
+  // 统计所有标签及其出现次数
+  const tagCounts = {};
+  
+  allQuestions.value.forEach(q => {
+    if (q._raw?.tags && Array.isArray(q._raw.tags)) {
+      q._raw.tags.forEach(tag => {
+        if (tag) {
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        }
+      });
+    }
+  });
+  
+  // 构建标签列表（按出现次数降序排序）
+  const tagList = Object.entries(tagCounts)
+    .map(([tag, count]) => ({
+      label: tag,
+      value: tag,
+      count: count
+    }))
+    .sort((a, b) => b.count - a.count); // 按数量降序排序
+  
+  // 更新 tabs，保留"全部"标签在最前面
+  tabs.value = [
+    { label: '全部', value: 'all', count: allQuestions.value.length },
+    ...tagList
+  ];
+}
+
 onLoad(async (options) => {
   if (options.id) {
     WrongbookId.value = options.id;
@@ -334,6 +409,9 @@ onLoad(async (options) => {
     WrongbookTitle.value = decodeURIComponent(options.title);
   }
 });
+onMounted(() => {
+  fetchWrongQuestions();
+})
 </script>
 <style scoped>
 .container {

@@ -104,13 +104,36 @@ const WrongBookService = {
             throw error;
         }
     },
+    /**
+     * 获取错题列表
+     */
+    getWrongQuestions: async ({ uid, wrongBookId }) => {
+        try {
+            const questions = await WrongQuestionModel.find({ Uid: uid, wrongBookId: wrongBookId },{
+                questionSource :0,
+                note: 0,
+                noteUpdatedAt: 0,
+                createdAt: 0,
+                __v: 0,
+                masteredAt: 0,
+                nextReviewAt:0,
+                lastReviewAt:0,
+                addedAt:0,
+                reviewHistory:0
 
+            }).lean();
+            return questions;
+        } catch (error) {
+            console.error("DATABASE:获取错题列表失败", error);
+            throw error;
+        }
+    },
     /**
      * 删除错题
      */
     deleteWrongQuestion: async ({ uid, id }) => {
         try {
-            const result = await WrongBookModel.deleteOne({ _id: id, uid });
+            const result = await WrongQuestionModel.deleteOne({ _id: id, Uid: uid });
             return {
                 success: result.deletedCount > 0
             };
@@ -182,7 +205,7 @@ const WrongBookService = {
      */
     getWrongQuestionDetail: async ({ uid, id }) => {
         try {
-            const detail = await WrongBookModel.findOne({ _id: id, uid }).lean();
+            const detail = await WrongQuestionModel.findOne({ _id: id, Uid: uid }).lean();
             return detail;
         } catch (error) {
             console.error("DATABASE:获取错题详情失败", error);

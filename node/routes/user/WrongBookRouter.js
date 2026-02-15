@@ -18,6 +18,8 @@ WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongBook", JWT.verifyTok
 WrongBookRouter.post("/uniappAPI/upload/image", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.uploadImage)
 // 添加错题
 WrongBookRouter.post("/uniappAPI/tools/wrongQuestion/addWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.addWrongQuestion)
+// 获取错题列表
+WrongBookRouter.get("/uniappAPI/tools/wrongQuestion/getWrongQuestions", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongQuestions)
 // 删除错题
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.deleteWrongQuestion)
 // 获取错题详情

@@ -42,20 +42,22 @@ export async function addWrongQuestionAPI(data) {
  * @returns {Promise} 返回错题列表
  */
 export async function getWrongQuestionsAPI(wrongBookId, params = {}) {
-    try {
-        const queryParams = new URLSearchParams({
-            wrongBookId,
-            ...params
-        }).toString();
-        
-        return await http({
-            url: `/uniappAPI/tools/wrongQuestion/getWrongQuestions?${queryParams}`,
-            method: 'GET'
-        });
-    } catch (error) {
-        console.error("getWrongQuestions 失败", error);
-        throw error;
+  try {
+    let queryString = 'wrongBookId=' + wrongBookId;
+    for (const key in params) {
+      if (params[key] !== undefined && params[key] !== null) {
+        queryString += '&' + key + '=' + params[key];
+      }
     }
+
+    return await http({
+      url: `/uniappAPI/tools/wrongQuestion/getWrongQuestions?${queryString}`,
+      method: 'GET'
+    });
+  } catch (error) {
+    console.error("getWrongQuestions 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -239,5 +241,5 @@ export async function getWrongQuestionStatsAPI(wrongBookId) {
     } catch (error) {
         console.error("getWrongQuestionStats 失败", error);
         throw error;
-    }
+  }
 }

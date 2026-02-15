@@ -315,7 +315,7 @@ const handleSend = async () => {
       })
     }
   } catch (error) {
-    console.log(error)
+    console.error('提交失败:', error);
     uni.showToast({
       title: '提交失败',
       icon: 'none'
