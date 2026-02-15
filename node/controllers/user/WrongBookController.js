@@ -142,8 +142,6 @@ const WrongBookController = {
                     });
                 }
                 const { uid } = req.user;
-                console.log('上传图片的用户UID:', uid);
-                console.log('上传的文件信息:', req.file);
                 // 生成唯一的文件名
                 const fileExtension = path.extname(req.file.originalname);
                 const fileName = `user/wrong_question/${uid}/${Date.now()}${fileExtension}`;
@@ -151,7 +149,6 @@ const WrongBookController = {
                 // 上传文件到OSS
                 const result = await client.put(fileName, req.file.buffer);
 
-                console.log('OSS上传结果:', result);
                 
                 // 获取上传后的URL
                 const url = result.url;
@@ -175,20 +172,36 @@ const WrongBookController = {
     addWrongQuestion: async (req, res) => {
         try {
             const { uid } = req.user;
-            const { question, answer, category, note } = req.body;
-            const result = await WrongBookService.addWrongQuestion({
-                uid,
-                question,
-                answer,
-                category,
-                note
+            const questionData = req.body;
+            
+            // 验证必填字段
+            if (!questionData.wrongBookId) {
+                return res.send({
+                    code: 400,
+                    message: '缺少错题本ID'
+                });
+            }
+            
+            if (!questionData.Type) {
+                return res.send({
+                    code: 400,
+                    message: '缺少题目类型'
+                });
+            }
+            
+            // 调用 Service 层添加错题
+            const result = await WrongBookService.addWrongQuestion({ 
+                uid, 
+                questionData 
             });
+            
             if (!result.success) {
                 return res.send({
                     code: 400,
-                    message: '添加错题失败'
+                    message: result.message || '添加错题失败'
                 });
             }
+            
             res.send({
                 code: 200,
                 message: '添加错题成功',

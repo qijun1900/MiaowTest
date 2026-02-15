@@ -1,4 +1,5 @@
 const WrongBookModel = require('../../models/WrongBookModel');
+const WrongQuestionModel = require('../../models/WrongQuestionModel');
 
 const WrongBookService = {
     /**
@@ -42,21 +43,61 @@ const WrongBookService = {
     /**
      * 添加错题
      */
-    addWrongQuestion: async ({ uid, question, answer, category, note }) => {
+    addWrongQuestion: async ({ uid, questionData }) => {
         try {
-            const newWrongQuestion = new WrongBookModel({
-                uid,
-                question,
-                answer,
-                category,
-                note,
+            const { wrongBookId, Type, questionSource, stem, options, correctAnswer, wrongAnswer, analysis, tags, difficulty } = questionData;
+            
+            // 验证错题本是否存在且属于该用户
+            const wrongBook = await WrongBookModel.findOne({ _id: wrongBookId, Uid: uid });
+            if (!wrongBook) {
+                return {
+                    success: false,
+                    message: '错题本不存在或无权限'
+                };
+            }
+            
+            // 生成题目ID（用户自建题目）
+            const mongoose = require('mongoose');
+            const questionId = new mongoose.Types.ObjectId();
+            
+            // 创建错题记录
+            const newWrongQuestion = new WrongQuestionModel({
+                Uid: uid,
+                wrongBookId: wrongBookId,
+                questionId: questionId,
+                Type: Type,
+                questionSource: questionSource || 'user',
+                stem: stem || { text: '', images: [] },
+                options: options || [],
+                correctAnswer: correctAnswer || { text: '', images: [] },
+                wrongAnswer: wrongAnswer || { text: '', images: [] },
+                analysis: analysis || { text: '', images: [] },
+                tags: tags || [],
+                difficulty: difficulty || 'medium',
+                status: 0,
+                reviewCount: 0,
+                wrongCount: 1,
+                addedAt: new Date(),
+                lastWrongAt: new Date(),
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
-            const saved = await newWrongQuestion.save();
+            
+            // 保存错题
+            const savedQuestion = await newWrongQuestion.save();
+            
+            // 更新错题本的题目数量和更新时间
+            await WrongBookModel.updateOne(
+                { _id: wrongBookId },
+                { 
+                    $inc: { count: 1 },
+                    $set: { updatedAt: new Date() }
+                }
+            );
+            
             return {
                 success: true,
-                data: saved
+                data: savedQuestion
             };
         } catch (error) {
             console.error("DATABASE:添加错题失败", error);

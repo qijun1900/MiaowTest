@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
   show: {
@@ -61,35 +61,30 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-const selectedTags = ref([...props.modelValue]);
 const customTagInput = ref('');
 const recommendedTags = ref([
   '公式',
   '概念',
   '计算错误',
   '审题不清',
-  '语法',
-  '单词',
-  '实验'
+  '粗心',
+  '解题方法',
+  '其他'
 ]);
 
-// 监听外部变化
-watch(() => props.modelValue, (newVal) => {
-  selectedTags.value = [...newVal];
-});
-
-// 监听内部变化并同步到外部
-watch(selectedTags, (newVal) => {
-  emit('update:modelValue', [...newVal]);
+const selectedTags = computed({
+  get: () => [...props.modelValue],
+  set: (val) => emit('update:modelValue', [...val])
 });
 
 // 添加自定义标签
 const addCustomTag = () => {
   const tag = customTagInput.value.trim();
-  if (tag && !selectedTags.value.includes(tag)) {
-    selectedTags.value.push(tag);
+  const currentTags = [...props.modelValue];
+  if (tag && !currentTags.includes(tag)) {
+    emit('update:modelValue', [...currentTags, tag]);
     customTagInput.value = '';
-  } else if (selectedTags.value.includes(tag)) {
+  } else if (currentTags.includes(tag)) {
     uni.showToast({
       title: '标签已存在',
       icon: 'none'
@@ -99,8 +94,9 @@ const addCustomTag = () => {
 
 // 添加推荐标签
 const addRecommendedTag = (tag) => {
-  if (!selectedTags.value.includes(tag)) {
-    selectedTags.value.push(tag);
+  const currentTags = [...props.modelValue];
+  if (!currentTags.includes(tag)) {
+    emit('update:modelValue', [...currentTags, tag]);
   } else {
     uni.showToast({
       title: '标签已存在',
@@ -111,7 +107,9 @@ const addRecommendedTag = (tag) => {
 
 // 移除标签
 const removeTag = (index) => {
-  selectedTags.value.splice(index, 1);
+  const currentTags = [...props.modelValue];
+  currentTags.splice(index, 1);
+  emit('update:modelValue', currentTags);
 };
 </script>
 

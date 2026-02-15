@@ -4,7 +4,7 @@ const JWT = require('../../MiddleWares/jwt');
 const requireUid = require('../../MiddleWares/requireUid');
 var WrongBookRouter = express.Router();
 
-// 获取错题本列表
+// 获取错题本列表 
 WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBooks", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongBooks)
 // 获取错题本详情
 WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBookDetail", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongBookDetail)
@@ -17,7 +17,7 @@ WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongBook", JWT.verifyTok
 //添加图片
 WrongBookRouter.post("/uniappAPI/upload/image", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.uploadImage)
 // 添加错题
-// WrongBookRouter.post("/uniappAPI/tools/wrongbook/addWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.addWrongQuestion)
+WrongBookRouter.post("/uniappAPI/tools/wrongQuestion/addWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.addWrongQuestion)
 // 删除错题
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.deleteWrongQuestion)
 // 获取错题详情
