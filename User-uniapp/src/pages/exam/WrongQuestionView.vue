@@ -90,21 +90,11 @@
               <uni-icons type="list" color="#007aff" size="18"></uni-icons>
               <text class="title-text">{{ question.isMultiple === 1 ? '多选题' : '单选题' }}</text>
             </view>
-            <view 
-              v-for="(option, optionIndex) in question.options" 
-              :key="optionIndex" class="option-item" 
-              :class="{
-                'correct-option': option.isCorrect,
-                }">
-              <view class="option-wrapper">
-                <text class="option-tag">{{ String.fromCharCode(65 + optionIndex) }}.</text>
-                <text class="option-content">{{ option.content }}</text>
-                <view class="option-status">
-                  <uni-icons v-if="option.isCorrect" type="checkmarkempty" color="#4caf50" size="18">
-                  </uni-icons>
-                </view>
-              </view>
-            </view>
+            <SelectOptionsPreview 
+              :options="question.options"
+              :userWrongAnswer="getUserObjectiveAnswerText(question._id)"
+              :showTitle="false"
+            />
           </view>
 
           <!-- 判断题选项显示 -->
@@ -240,6 +230,7 @@ import { useObjectiveAnswerStore } from '../../stores/modules/ObjectiveAnswerSto
 import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerStore'
 import uviewSubsection from '../../components/core/uviewSubsection.vue'
 import BackToTop from '../../components/core/BackToTop.vue'
+import SelectOptionsPreview from '../../components/modules/exam/SelectOptionsPreview.vue'
 import { 
   addWrongQuestionAPI,
   deleteWrongQuestionAPI ,
@@ -640,44 +631,6 @@ onPageScroll((e) => {
   font-size: 28rpx;
   font-weight: bold;
   color: #333333;
-}
-
-/* 选择题选项样式 */
-.option-item {
-  margin-bottom: 20rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  border: 2rpx solid transparent;
-  
-  &.correct-option {
-    background-color: #e8f5e9;
-    border: 2rpx solid #4caf50;
-    box-shadow: 0 2rpx 8rpx rgba(76, 175, 80, 0.2);
-  }
-  
-  
-}
-
-.option-wrapper {
-  display: flex;
-  align-items: center;
-  padding: 25rpx 30rpx;
-  gap: 15rpx;
-}
-
-.option-tag {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #007aff;
-  min-width: 40rpx;
-}
-
-.option-content {
-  flex: 1;
-  font-size: 30rpx;
-  color: #333333;
-  line-height: 1.5;
 }
 
 

@@ -121,8 +121,8 @@ const WrongBookService = {
                 nextReviewAt:0,
                 lastReviewAt:0,
                 addedAt:0,
-                reviewHistory:0
-
+                reviewHistory:0,
+                Uid:0,
             }).lean();
             return questions;
         } catch (error) {

@@ -126,20 +126,27 @@
         <!-- 答案区域（可展开） -->
         <view class="answer-wrapper" :class="{ 'answer-expanded': item.showAnswer }">
           <view class="answer-section">
+            <!-- 选择题选项预览 -->
+            <SelectOptionsPreview 
+              v-if="item._raw.Type === 1 && item._raw.options && item._raw.options.length > 0"
+              :options="item._raw.options"
+              :userWrongAnswer="item._raw.wrongAnswer?.text || ''"
+            />
+
             <!-- 我的错误答案 -->
             <view class="answer-title">我的错解</view>
             <view class="answer-block wrong-answer">
-              <rich-text :nodes="item._raw.wrongAnswer.text"></rich-text>
+              <rich-text :nodes="item._raw.wrongAnswer?.text || ''"></rich-text>
             </view>
 
             <!-- 正确答案 -->
             <view class="answer-title">正确答案</view>
             <view class="answer-block correct-answer">
-              <text class="answer-text">{{ item._raw.correctAnswer.text}}</text>
+              <text class="answer-text">{{ item._raw.correctAnswer?.text || '' }}</text>
             </view>
 
             <!-- 解析/笔记 -->
-            <view v-if="item.note" class="note-wrapper">
+            <view v-if="item._raw.analysis?.text" class="note-wrapper">
               <view class="answer-title">解析 / 笔记 /备注</view>
               <view class="note-block">
                 <view class="note-text">
@@ -208,6 +215,7 @@
 import { ref } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
+import SelectOptionsPreview from '../../../components/modules/exam/SelectOptionsPreview.vue';
 import { 
   getWrongQuestionsAPI ,
   deleteWrongQuestionAPI,
@@ -328,7 +336,6 @@ const reviewQuestion = (item) => {
     title: '查看习题',
     icon: 'none'
   });
-  console.log('查看习题:', item);
 };
 
 //标记为已掌握
@@ -360,8 +367,6 @@ const editQuestion = (item) => {
     title: '修改题目',
     icon: 'none'
   });
-  console.log('编辑题目:', item);
-
 };
 
 //TODO 标记需要复习
@@ -1100,4 +1105,5 @@ onShow(() => {
 .footer-btn.primary.disabled .btn-text {
   color: #4caf50;
 }
+
 </style>
