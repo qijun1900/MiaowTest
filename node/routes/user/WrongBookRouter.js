@@ -24,6 +24,8 @@ WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongQuestions", JWT.verifyTo
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.deleteWrongQuestion)
 //标记为已掌握
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/markAsMastered", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.markAsMastered)
+//标记为需要复习
+WrongBookRouter.post("/uniappAPI/tools/wrongbook/markAsNeedReview", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.markAsNeedReview)
 // 获取错题详情
 WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongQuestionDetail/:id", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongQuestionDetail)
 // 更新错题

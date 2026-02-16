@@ -186,7 +186,8 @@ import dragButton from '../../../components/plug-in/drag-button/drag-button.vue'
 import { 
   getWrongQuestionsAPI ,
   deleteWrongQuestionAPI,
-  markAsMasteredAPI
+  markAsMasteredAPI,
+  markAsNeedReviewAPI
 
 } from '../../../API/Tools/wrongQuestionAPI';
 import formatTime from '../../../util/formatTime';
@@ -338,15 +339,25 @@ const editQuestion = (item) => {
 };
 
 //TODO 标记需要复习
-const markNeedReview = (item) => {
-  item.status = 'reviewing';
-  item.statusText = '复习中';
-  uni.showToast({
-    title: '已标记为需要复习',
-    icon: 'success'
-  });
-};
-
+const markNeedReview = async (item) => {
+  try {
+    const res = await markAsNeedReviewAPI(item.id);
+    if (res.code === 200) {
+      item.status = 'reviewing';
+      item.statusText = '复习中';
+    } else {
+      uni.showToast({
+        title: res.message || '标记失败',
+        icon: 'none'
+      });
+    }
+  } catch (error) {
+    console.error('标记为需要复习失败:', error);
+    uni.showToast({
+      title: '网络错误，请稍后重试',
+      icon: 'none'
+    });
+}};
 //跳转到添加题目页面
 const handleAddQuestion = () => {
   uni.navigateTo({  

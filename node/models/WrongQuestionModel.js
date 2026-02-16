@@ -194,6 +194,14 @@ WrongQuestionSchema.methods.markAsMastered = function() {
     return this.save();
 };
 
+// 实例方法：标记为需要复习
+WrongQuestionSchema.methods.markAsNeedReview = function() {
+    this.status = 1;
+    this.wrongCount += 1;
+    this.nextReviewAt = this.calculateNextReviewTime();
+    return this.save();
+}
+
 // 实例方法：添加复习记录
 WrongQuestionSchema.methods.addReviewRecord = function(isCorrect, timeSpent = 0) {
     this.reviewCount += 1;

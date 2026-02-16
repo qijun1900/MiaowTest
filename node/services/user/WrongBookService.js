@@ -161,6 +161,23 @@ const WrongBookService = {
     },
 
     /**
+     * 标记为需要复习
+     */
+    markAsNeedReview: async ({ uid, id }) => {
+        try {
+            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+            if (!question) {
+                return { success: false };
+            }
+            await question.markAsNeedReview();
+            return { success: true };
+        } catch (error) {
+            console.error("DATABASE:标记为需要复习失败", error);
+            throw error;
+        }
+    },
+
+    /**
      * 获取错题本详情
      */
     getWrongBookDetail: async ({ uid, id }) => {

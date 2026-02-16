@@ -165,6 +165,25 @@ export async function markAsMasteredAPI(questionId) {
 }
 
 /**
+ * @description 标记为需要复习
+ * @method POST
+ * @param {String} questionId - 错题ID，必填
+ * @returns {Promise} 返回标记结果
+ */
+export async function markAsNeedReviewAPI(questionId) {
+    try {
+        return await http({
+            url: '/uniappAPI/tools/wrongbook/markAsNeedReview',
+            method: 'POST',
+            data: { id: questionId }
+        });
+    } catch (error) {
+        console.error("markAsNeedReview 失败", error);
+        throw error;
+    }
+}
+
+/**
  * @description 获取需要复习的错题列表
  * @method GET
  * @returns {Promise} 返回需要复习的错题列表

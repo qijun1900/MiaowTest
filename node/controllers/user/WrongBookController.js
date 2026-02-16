@@ -287,6 +287,31 @@ const WrongBookController = {
         }
     },
 
+    //将错题标记为需要复习
+    markAsNeedReview: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { id } = req.body;
+            const result = await WrongBookService.markAsNeedReview({ uid, id });
+            if (!result.success) {
+                return res.send({
+                    code: 400,
+                    message: '标记为需要复习失败'
+                });
+            }
+            res.send({
+                code: 200,
+                message: '标记为需要复习成功'
+            });
+        } catch (error) {
+            console.error("标记为需要复习失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "标记为需要复习失败"
+            });
+        }
+    },
+
     // 获取错题详情
     getWrongQuestionDetail: async (req, res) => {
         try {
