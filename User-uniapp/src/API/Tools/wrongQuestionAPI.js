@@ -19,7 +19,7 @@ import { http } from "../../util/http";
 export async function addWrongQuestionAPI(data) {
     try {
         return await http({
-            url: '/uniappAPI/tools/wrongQuestion/addWrongQuestion',
+            url: '/uniappAPI/tools/wrongbook/addWrongQuestion',
             method: 'POST',
             data: data
         });
@@ -51,13 +51,31 @@ export async function getWrongQuestionsAPI(wrongBookId, params = {}) {
     }
 
     return await http({
-      url: `/uniappAPI/tools/wrongQuestion/getWrongQuestions?${queryString}`,
+      url: `/uniappAPI/tools/wrongbook/getWrongQuestions?${queryString}`,
       method: 'GET'
     });
   } catch (error) {
     console.error("getWrongQuestions 失败", error);
     throw error;
   }
+}
+/**
+ * @description 删除错题
+ * @method POST
+ * @param {String} questionId - 错题ID，必填
+ * @returns {Promise} 返回删除结果
+ */
+export async function deleteWrongQuestionAPI(questionId) {
+    try {
+        return await http({
+            url: '/uniappAPI/tools/wrongbook/deleteWrongQuestion',
+            method: 'POST',
+            data: { id: questionId }
+        });
+    } catch (error) {
+        console.error("deleteWrongQuestion 失败", error);
+        throw error;
+    }
 }
 
 /**
@@ -101,26 +119,6 @@ export async function updateWrongQuestionAPI(data) {
         throw error;
     }
 }
-
-/**
- * @description 删除错题
- * @method POST
- * @param {String} questionId - 错题ID，必填
- * @returns {Promise} 返回删除结果
- */
-export async function deleteWrongQuestionAPI(questionId) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongQuestion/deleteWrongQuestion',
-            method: 'POST',
-            data: { id: questionId }
-        });
-    } catch (error) {
-        console.error("deleteWrongQuestion 失败", error);
-        throw error;
-    }
-}
-
 /**
  * @description 添加复习记录
  * @method POST

@@ -143,7 +143,7 @@
 
         <!-- 底部操作栏 -->
         <view class="card-footer">
-          <view class="footer-left" hover-class="none">
+          <view class="footer-left" hover-class="none" @click="handleDelete(item)">
             <uni-icons type="trash" size="18" color="#909399"></uni-icons>
             <text class="footer-text">删除</text>
           </view>
@@ -183,7 +183,11 @@
 import { ref,onMounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
-import { getWrongQuestionsAPI } from '../../../API/Tools/wrongQuestionAPI';
+import { 
+  getWrongQuestionsAPI ,
+  deleteWrongQuestionAPI,
+
+} from '../../../API/Tools/wrongQuestionAPI';
 import formatTime from '../../../util/formatTime';
 
 const WrongbookId = ref('');
@@ -246,8 +250,49 @@ const filterQuestions = () => {
   questionList.value = filtered;
 };
 
+// 切换答案显示状态
 const toggleAnswer = (index) => {
   questionList.value[index].showAnswer = !questionList.value[index].showAnswer;
+};
+
+// 删除错题
+const handleDelete = async (item) => {
+  const confirm = await uni.showModal({
+    title: '删除确认',
+    content: '确定要删除这道错题吗？',
+    confirmText: '删除',
+    cancelText: '取消',
+    confirmColor: '#ff4d4f',
+    cancelColor: '#909399'
+  });
+  if (confirm.confirm) {
+    try {
+      const res = await deleteWrongQuestionAPI(item.id);
+      if (res.code === 200) {
+        uni.showToast({
+          title: '删除成功',
+          icon: 'success'
+        });
+        // 从 allQuestions 中移除被删除的题目
+        allQuestions.value = allQuestions.value.filter(q => q.id !== item.id);
+        // 更新标签栏
+        updateTabCounts();
+        // 重新应用筛选
+        filterQuestions();
+      } else {
+        uni.showToast({
+          title: res.message || '删除失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('删除错题失败:', error);
+      uni.showToast({ 
+        title: '网络错误，请稍后重试',
+        icon: 'none'
+      });
+    }
+  }
 };
 
 //TODO 查看习题详情
@@ -270,6 +315,7 @@ const markAsMastered = (item) => {
     icon: 'success'
   });
 };
+
 // TODO: 跳转到编辑页面或打开编辑弹窗
 const editQuestion = (item) => {
   uni.showToast({
@@ -279,6 +325,7 @@ const editQuestion = (item) => {
   console.log('编辑题目:', item);
 
 };
+
 //TODO 标记需要复习
 const markNeedReview = (item) => {
   item.status = 'reviewing';
@@ -288,6 +335,7 @@ const markNeedReview = (item) => {
     icon: 'success'
   });
 };
+
 //跳转到添加题目页面
 const handleAddQuestion = () => {
   uni.navigateTo({  
