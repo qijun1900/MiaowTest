@@ -20,7 +20,9 @@ const WrongBookService = {
             throw error;
         }
     },
-
+    /**
+     * 创建错题本
+     */
     createWrongBook: async ({ uid, title, color }) => {
         try {
             const newWrongBook = new WrongBookModel({
@@ -129,14 +131,26 @@ const WrongBookService = {
         }
     },
     /**
-     * 删除错题
+     * 删除错题(先查找后删除 以更新错题本数量)
      */
     deleteWrongQuestion: async ({ uid, id }) => {
         try {
+            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+            if (!question) {
+                return { success: false };
+            }
+            const wrongBookId = question.wrongBookId;
             const result = await WrongQuestionModel.deleteOne({ _id: id, Uid: uid });
-            return {
-                success: result.deletedCount > 0
-            };
+            if (result.deletedCount > 0) {
+                await WrongBookModel.updateOne(
+                    { _id: wrongBookId },
+                    { 
+                        $inc: { count: -1 },
+                        $set: { updatedAt: new Date() }
+                    }
+                );
+            }
+            return { success: result.deletedCount > 0 };
         } catch (error) {
             console.error("DATABASE:删除错题失败", error);
             throw error;

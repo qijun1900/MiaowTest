@@ -48,8 +48,14 @@
 
     <!-- 错题列表 -->
     <view class="question-list">
+      <!-- Loading 加载状态 -->
+      <view v-if="loading" class="loading-container">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载中...</text>
+      </view>
+
       <!-- 空状态提示 -->
-      <view v-if="questionList.length === 0" class="empty-state">
+      <view v-else-if="questionList.length === 0" class="empty-state">
         <view class="empty-icon">
           <uni-icons type="folder-add" size="120" color="#ffd4a3"></uni-icons>
         </view>
@@ -199,8 +205,8 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 import { 
   getWrongQuestionsAPI ,
@@ -216,6 +222,7 @@ const WrongbookTitle = ref('');
 const searchKeyword = ref('');
 const activeTab = ref('all');
 const isShowdragButton = ref(true);
+const loading = ref(false); // 加载状态
 
 // 原始完整数据列表
 const allQuestions = ref([]);
@@ -397,7 +404,10 @@ const getEmptyMessage = () => {
 
 // 获取错题列表数据
 const fetchWrongQuestions = async () => {
+  if (loading.value) return; // 防止重复请求
+  
   try {
+    loading.value = true;
     const res = await getWrongQuestionsAPI(WrongbookId.value);
     if (res.code === 200) {
       // 将后端数据转换为前端需要的格式
@@ -468,6 +478,8 @@ const fetchWrongQuestions = async () => {
       title: '网络错误，请稍后重试',
       icon: 'none'
     });
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -516,9 +528,13 @@ onLoad(async (options) => {
     WrongbookTitle.value = decodeURIComponent(options.title);
   }
 });
-onMounted(() => {
-  fetchWrongQuestions();
-})
+
+onShow(() => {
+  // 页面显示时刷新列表（从添加页面返回时会触发）
+  if (WrongbookId.value) {
+    fetchWrongQuestions();
+  }
+});
 </script>
 <style scoped>
 .container {
@@ -641,6 +657,40 @@ onMounted(() => {
 .question-list {
   padding: 24rpx 32rpx;
   min-height: 60vh;
+}
+
+/* Loading 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 60rpx;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #ffe8d6;
+  border-top-color: #ff9555;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 32rpx;
+  font-size: 28rpx;
+  color: #ff9555;
+  font-weight: 500;
 }
 
 /* 空状态样式 */
