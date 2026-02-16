@@ -135,7 +135,7 @@
             <!-- 正确答案 -->
             <view class="answer-title">正确答案</view>
             <view class="answer-block correct-answer">
-              <text class="answer-text">{{ item.correctAnswer }}</text>
+              <text class="answer-text">{{ item._raw.correctAnswer.text}}</text>
             </view>
 
             <!-- 解析/笔记 -->

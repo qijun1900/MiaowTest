@@ -117,8 +117,6 @@ const handleQuestionSubmit = async (questionData) => {
       difficulty: selectedDifficulty.value.value,
     };
 
-    console.log('提交错题数据:', wrongQuestionData);
-
     // 调用 API 提交到后端
     const res = await addWrongQuestionAPI(wrongQuestionData);
     
