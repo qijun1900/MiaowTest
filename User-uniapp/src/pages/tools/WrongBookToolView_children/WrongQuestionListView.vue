@@ -48,6 +48,24 @@
 
     <!-- 错题列表 -->
     <view class="question-list">
+      <!-- 空状态提示 -->
+      <view v-if="questionList.length === 0" class="empty-state">
+        <view class="empty-icon">
+          <uni-icons type="folder-add" size="120" color="#ffd4a3"></uni-icons>
+        </view>
+        <view class="empty-title">暂无错题</view>
+        <view class="empty-desc">{{ getEmptyMessage() }}</view>
+        <view 
+          v-if="activeTab === 'all' && searchKeyword === ''" 
+          class="empty-action" 
+          @click="handleAddQuestion" 
+          hover-class="none">
+          <uni-icons type="plus" size="18" color="#ffffff"></uni-icons>
+          <text class="empty-action-text">添加第一道错题</text>
+        </view>
+      </view>
+
+      <!-- 错题卡片列表 -->
       <view 
         v-for="(item, index) in questionList" 
         :key="index"
@@ -166,8 +184,9 @@
 
     <!--悬浮按钮 -->
     <dragButton
+      v-if="questionList.length > 0"
       butColor="#ffffff"
-      v-model:show="isShowdragButton"
+      v-model:show="isShowdragButton "
       :isDock="true"
       :existTabBar="true" 
       iconType="folder-add-filled"
@@ -363,6 +382,17 @@ const handleAddQuestion = () => {
   uni.navigateTo({  
     url: `/pages/tools/WrongBookToolView_children/WrongQuestionDetailView?id=${WrongbookId.value}&title=${encodeURIComponent(WrongbookTitle.value)}`
   });
+};
+
+// 获取空状态提示消息
+const getEmptyMessage = () => {
+  if (searchKeyword.value.trim()) {
+    return `没有找到包含"${searchKeyword.value}"的错题`;
+  }
+  if (activeTab.value !== 'all') {
+    return `暂无"${activeTab.value}"标签的错题`;
+  }
+  return '点击右下角按钮开始添加错题吧';
 };
 
 // 获取错题列表数据
@@ -610,6 +640,59 @@ onMounted(() => {
 /* 错题列表样式 */
 .question-list {
   padding: 24rpx 32rpx;
+  min-height: 60vh;
+}
+
+/* 空状态样式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 60rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  margin-bottom: 40rpx;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 36rpx;
+  color: #ff9555;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: #999999;
+  line-height: 1.6;
+  margin-bottom: 48rpx;
+  max-width: 500rpx;
+}
+
+.empty-action {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 24rpx 48rpx;
+  background: linear-gradient(135deg, #ff9555 0%, #ffb380 100%);
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 149, 85, 0.3);
+  transition: all 0.3s ease;
+}
+
+.empty-action:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(255, 149, 85, 0.2);
+}
+
+.empty-action-text {
+  font-size: 30rpx;
+  color: #ffffff;
+  font-weight: 500;
 }
 
 .question-card {
