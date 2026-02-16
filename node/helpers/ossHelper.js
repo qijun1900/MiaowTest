@@ -88,6 +88,44 @@ async function deleteFile(ossFilePath) {
 }
 
 /**
+ * 通过 URL 删除 OSS 文件
+ * @param {string} fileUrl - 文件完整 URL
+ * @returns {Promise<void>}
+ */
+async function deleteFileByUrl(fileUrl) {
+    try {
+        // 移除 CDN 域名或 OSS 域名前缀，提取路径
+        let ossPath = fileUrl;
+        
+        // 如果是 CDN 域名
+        if (ossConfig.cdnDomain) {
+            const cdnHost = `https://${ossConfig.cdnDomain}/`;
+            if (ossPath.startsWith(cdnHost)) {
+                ossPath = ossPath.replace(cdnHost, '');
+            }
+        }
+        
+        // 如果是 OSS 原始域名
+        if (!ossPath.includes(ossConfig.prefix)) {
+            const ossHost = `https://${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com/`;
+            if (ossPath.startsWith(ossHost)) {
+                ossPath = ossPath.replace(ossHost, '');
+            }
+        }
+        
+        // 移除存储前缀
+        if (ossConfig.prefix && ossPath.startsWith(ossConfig.prefix)) {
+            ossPath = ossPath.replace(ossConfig.prefix, '');
+        }
+        
+        await deleteFile(ossPath);
+    } catch (error) {
+        console.error('OSS 通过 URL 删除文件失败:', error);
+        throw error;
+    }
+}
+
+/**
  * 获取 OSS 文件的访问 URL
  * @param {string} ossFilePath - OSS 文件路径（相对于存储桶）
  * @returns {string} - 文件访问 URL
@@ -172,6 +210,7 @@ module.exports = {
     uploadFile,
     uploadStream,
     deleteFile,
+    deleteFileByUrl,
     getFileUrl,
     migrateDirToOSS
 };
