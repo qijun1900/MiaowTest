@@ -98,24 +98,12 @@
           </view>
 
           <!-- 判断题选项显示 -->
-          <view v-if="question.Type === 3" class="judge-options-section">
-            <view 
-              v-for="(option, index) in judgeOptions" 
-              :key="index" class="judge-option-item" 
-              :class="{
-                'correct-option': (question.answer === 1 && index === 0) || (question.answer === 0 && index === 1),
-              }">
-              <view class="judge-option-wrapper">
-                <text class="option-tag">{{ String.fromCharCode(65 + index) }}.</text>
-                <text class="option-content">{{ option }}</text>
-                <view class="option-status">
-                  <uni-icons v-if="(question.answer === 1 && index === 0) || (question.answer === 0 && index === 1)"
-                    type="checkmarkempty" color="#4caf50" size="18">
-                  </uni-icons>
-                </view>
-              </view>
-            </view>
-          </view>
+          <JudgeOptionsPreview 
+            v-if="question.Type === 3"
+            :correctAnswer="question.answer === 1 ? 'A' : 'B'"
+            :userWrongAnswer="getUserObjectiveAnswerText(question._id)"
+            :showTitle="true"
+          />
 
           <!-- 填空题用户答案 -->
           <view v-if="question.Type === 2" class="blank-answers-section">
@@ -231,6 +219,7 @@ import { useSubjectiveAnswerStore } from '../../stores/modules/SubjectiveAnswerS
 import uviewSubsection from '../../components/core/uviewSubsection.vue'
 import BackToTop from '../../components/core/BackToTop.vue'
 import SelectOptionsPreview from '../../components/modules/exam/SelectOptionsPreview.vue'
+import JudgeOptionsPreview from '../../components/modules/exam/JudgeOptionsPreview.vue'
 import { 
   addWrongQuestionAPI,
   deleteWrongQuestionAPI ,
@@ -262,7 +251,6 @@ const questionTypeList = ref([
   { name: '判断题' },
   { name: '简答题' }
 ])
-const judgeOptions = ['正确', '错误'];// 判断题选项，A代表正确，B代表错误
 
 // 计算属性, 过滤后的错题列表
 const filteredQuestions = computed(() => { // 过滤后的错题列表
@@ -613,7 +601,6 @@ onPageScroll((e) => {
 
 /* 选项区域 */
 .select-options-section,
-.judge-options-section,
 .blank-answers-section,
 .essay-answers-section {
   margin-bottom: 30rpx;
@@ -631,64 +618,6 @@ onPageScroll((e) => {
   font-size: 28rpx;
   font-weight: bold;
   color: #333333;
-}
-
-
-
-/* 判断题特殊样式 */
-.judge-option-item {
-  margin-bottom: 15rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  border: 2rpx solid transparent;
-  background-color: #f8f9fa;
-  
-  &.correct-option {
-    background-color: #e8f5e9;
-    border: 2rpx solid #4caf50;
-    box-shadow: 0 2rpx 8rpx rgba(76, 175, 80, 0.2);
-  }
-  
-  &.user-wrong-option {
-    background-color: #ffeaea;
-    border: 2rpx solid #ff4d4f;
-    box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.2);
-  }
-}
-
-.judge-option-wrapper {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 30rpx;
-  gap: 15rpx;
-  justify-content: space-between;
-}
-
-.judge-option-text {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 15rpx;
-}
-
-.option-tag {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #007aff;
-  min-width: 40rpx;
-}
-
-.option-content {
-  font-size: 30rpx;
-  color: #333333;
-  line-height: 1.5;
-}
-
-.option-status {
-  display: flex;
-  align-items: center;
-  gap: 5rpx;
 }
 
 /* 填空题答案样式 */

@@ -133,6 +133,13 @@
               :userWrongAnswer="item._raw.wrongAnswer?.text || ''"
             />
 
+            <!-- 判断题选项预览 -->
+            <JudgeOptionsPreview 
+              v-if="item._raw.Type === 3"
+              :correctAnswer="item._raw.correctAnswer?.text || 'A'"
+              :userWrongAnswer="item._raw.wrongAnswer?.text || ''"
+            />
+
             <!-- 我的错误答案 -->
             <view class="answer-title">我的错解</view>
             <view class="answer-block wrong-answer">
@@ -142,7 +149,9 @@
             <!-- 正确答案 -->
             <view class="answer-title">正确答案</view>
             <view class="answer-block correct-answer">
-              <text class="answer-text">{{ item._raw.correctAnswer?.text || '' }}</text>
+              <view class="answer-text">
+                <rich-text :nodes="item._raw.correctAnswer?.text || ''"></rich-text>
+              </view>
             </view>
 
             <!-- 解析/笔记 -->
@@ -216,6 +225,7 @@ import { ref } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 import SelectOptionsPreview from '../../../components/modules/exam/SelectOptionsPreview.vue';
+import JudgeOptionsPreview from '../../../components/modules/exam/JudgeOptionsPreview.vue';
 import { 
   getWrongQuestionsAPI ,
   deleteWrongQuestionAPI,

@@ -198,7 +198,6 @@ WrongQuestionSchema.methods.markAsMastered = function() {
 WrongQuestionSchema.methods.markAsNeedReview = function() {
     this.status = 1;
     this.wrongCount += 1;
-    this.nextReviewAt = this.calculateNextReviewTime();
     return this.save();
 }
 
