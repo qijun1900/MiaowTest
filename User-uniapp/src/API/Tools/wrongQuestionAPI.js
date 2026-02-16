@@ -154,7 +154,7 @@ export async function addReviewRecordAPI({ questionId, isCorrect, timeSpent = 0 
 export async function markAsMasteredAPI(questionId) {
     try {
         return await http({
-            url: '/uniappAPI/tools/wrongQuestion/markAsMastered',
+            url: '/uniappAPI/tools/wrongbook/markAsMastered',
             method: 'POST',
             data: { id: questionId }
         });

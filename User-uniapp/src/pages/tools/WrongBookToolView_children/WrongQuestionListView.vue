@@ -186,6 +186,7 @@ import dragButton from '../../../components/plug-in/drag-button/drag-button.vue'
 import { 
   getWrongQuestionsAPI ,
   deleteWrongQuestionAPI,
+  markAsMasteredAPI
 
 } from '../../../API/Tools/wrongQuestionAPI';
 import formatTime from '../../../util/formatTime';
@@ -200,7 +201,6 @@ const isShowdragButton = ref(true);
 const allQuestions = ref([]);
 // 错题列表数据（筛选后）
 const questionList = ref([]);
-
 // 动态标签列表（从用户数据中提取）
 const tabs = ref([
   { label: '全部', value: 'all', count: 0 }
@@ -304,16 +304,27 @@ const reviewQuestion = (item) => {
   console.log('查看习题:', item);
 };
 
-//TODO 标记需要复习
-const markAsMastered = (item) => {
+//标记为已掌握
+const markAsMastered = async (item) => {
   if (item.status === 'mastered') return;
-  
-  item.status = 'mastered';
-  item.statusText = '已掌握';
-  uni.showToast({
-    title: '已标记为掌握',
-    icon: 'success'
-  });
+  try {
+    const res = await markAsMasteredAPI(item.id);
+    if (res.code === 200) {
+      item.status = 'mastered';
+      item.statusText = '已掌握';
+    } else {
+      uni.showToast({
+        title: res.message || '标记失败',
+        icon: 'none'
+      });
+    }
+  } catch (error) {
+    console.error('标记为已掌握失败:', error);
+    uni.showToast({
+      title: '网络错误，请稍后重试',
+      icon: 'none'
+    });
+  }
 };
 
 // TODO: 跳转到编辑页面或打开编辑弹窗

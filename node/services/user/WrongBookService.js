@@ -144,6 +144,23 @@ const WrongBookService = {
     },
 
     /**
+     * 标记为已掌握
+     */
+    markAsMastered: async ({ uid, id }) => {
+        try {
+            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+            if (!question) {
+                return { success: false };
+            }
+            await question.markAsMastered();
+            return { success: true };
+        } catch (error) {
+            console.error("DATABASE:标记为已掌握失败", error);
+            throw error;
+        }
+    },
+
+    /**
      * 获取错题本详情
      */
     getWrongBookDetail: async ({ uid, id }) => {
@@ -226,8 +243,8 @@ const WrongBookService = {
             if (category !== undefined) updateData.category = category;
             if (note !== undefined) updateData.note = note;
 
-            const result = await WrongBookModel.updateOne(
-                { _id: id, uid },
+            const result = await WrongQuestionModel.updateOne(
+                { _id: id, Uid: uid },
                 { $set: updateData }
             );
             return {
