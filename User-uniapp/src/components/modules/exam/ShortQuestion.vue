@@ -2,56 +2,40 @@
     <view class="question-container">
         <view class="question-header">
             <view class="question-top-row">
-                <text class="question-index">{{props.questionIndex}}.</text>
+                <text class="question-index">{{ props.questionIndex }}.</text>
                 <text class="question-lable">简答题</text>
             </view>
             <view class="question-stem">
-            <text v-if="!enableWordQuery || !processedStem" @longpress="handleLongPress">{{question.stem}}</text>
-            <view v-else class="word-container" @longpress="handleLongPress">
-                <text 
-                    v-for="(word, index) in processedStem" 
-                    :key="index"
-                    class="word-item"
-                    @tap="handleWordClick(word)"
-                    :class="{ 'word-highlight': selectedWord === word }"
-                >{{word}}</text>
+                <!-- <text v-if="!enableWordQuery || !processedStem" @longpress="handleLongPress">{{ question.stem }}</text>
+                <view v-else class="word-container" @longpress="handleLongPress">
+                    <text v-for="(word, index) in processedStem" :key="index" class="word-item"
+                        @tap="handleWordClick(word)"
+                        :class="{ 'word-highlight': selectedWord === word }">{{ word }}</text>
+                </view> -->
+                <rich-text :nodes="question.stem"></rich-text>
             </view>
-        </view>
         </view>
         <view class="input-container" v-show="props.currentMode === 0">
             <view class="input-label">
-                <uni-icons
-                    color="#3797ff" 
-                    type="compose" 
-                    size="20">
+                <uni-icons color="#3797ff" type="compose" size="20">
                 </uni-icons>
             </view>
             <view class="input-textarea">
-            <up-textarea 
-                v-model="userinput" 
-                placeholder="请在此处输入答案~"
-                autoHeight 
-                :height="75"
-                count
-                :maxlength="-1">
-            </up-textarea>
+                <up-textarea v-model="userinput" placeholder="请在此处输入答案~" autoHeight :height="75" count :maxlength="-1">
+                </up-textarea>
             </view>
         </view>
         <!-- 查看答案 -->
         <view class="check-container">
-            <up-button 
-                v-if="props.currentMode === 0"
-                @click="isShowAnswer = !isShowAnswer"
-                type="primary" 
-                :text= "showAnswerComputed ? '隐藏答案' : '显示答案'"
-                shape="circle" 
-                :icon="showAnswerComputed? 'eye-off':'eye-fill'">
+            <up-button v-if="props.currentMode === 0" @click="isShowAnswer = !isShowAnswer" type="primary"
+                :text="showAnswerComputed ? '隐藏答案' : '显示答案'" shape="circle"
+                :icon="showAnswerComputed ? 'eye-off' : 'eye-fill'">
             </up-button>
         </view>
         <!-- 答案 -->
         <uni-transition name="fade" mode="out-in" :show="showAnswerComputed">
             <view class="question-answer-container" key="answer">
-                <view  class="answer-label">答案：</view>
+                <view class="answer-label">答案：</view>
                 <view class="answer-content">
                     <rich-text :nodes="question.content"></rich-text>
                 </view>
@@ -60,34 +44,22 @@
         <!-- 用户判断 -->
         <uni-transition name="fade" mode="out-in" :show="showAnswerComputed && props.currentMode === 0">
             <view class="user-judgment-container" key="judgment">
-                <up-button 
-                    icon="close-circle-fill"
-                    type="primary" 
-                    :plain="true" 
-                    text="答错了" 
-                    shape="circle" 
-                    class="user-judgment-but"
-                    @click="handleSelfEvaluation(false)"></up-button>
-                <up-button 
-                    icon="checkmark-circle-fill"
-                    type="primary" 
-                    :plain="true" 
-                    text="答对了" 
-                    shape="circle" 
-                    class="user-judgment-but"
-                    @click="handleSelfEvaluation(true)"></up-button>
+                <up-button icon="close-circle-fill" type="primary" :plain="true" text="答错了" shape="circle"
+                    class="user-judgment-but" @click="handleSelfEvaluation(false)"></up-button>
+                <up-button icon="checkmark-circle-fill" type="primary" :plain="true" text="答对了" shape="circle"
+                    class="user-judgment-but" @click="handleSelfEvaluation(true)"></up-button>
             </view>
         </uni-transition>
         <!-- 解析 -->
-        <AnalysisCom 
-            :analysis="question.analysis" 
-            :showAnalysis="showAnswerComputed" 
-            :isAIanswer="question.isAIanswer=== 1 ? true:false"/>
+        <AnalysisCom :analysis="question.analysis" :showAnalysis="showAnswerComputed"
+            :isAIanswer="question.isAIanswer === 1 ? true : false" />
     </view>
 </template>
 
 <script setup>
-import { ref ,computed,onMounted,watch} from 'vue';
+//TODO 1. 长按题干触发单词选择模式，选中单词后显示单词信息（音标、翻译、例句等）
+//TODO 2. 显示单词信息的弹窗可以集成真实的词典API
+import { ref, computed, onMounted, watch } from 'vue';
 import { useSubjectiveAnswerStore } from '@/stores/modules/SubjectiveAnswerStore';
 import AnalysisCom from '@/components/modules/exam/Analysiscom.vue';
 
@@ -107,7 +79,7 @@ const props = defineProps({
     },
     enableWordQuery: {
         type: Boolean,
-        default: true // 默认启用单词查询功能
+        default: false // 默认禁用单词查询功能
         // 使用说明：
         // 1. 双击题干中的单词（500ms内）可以查看单词信息
         // 2. 显示内容包括：音标、翻译、例句
@@ -124,7 +96,7 @@ const lastTapWord = ref('');
 const enableWordQuery = ref(true); // 是否启用单词查询功能
 
 const showAnswerComputed = computed(() => {
-    if(props.currentMode === 1){
+    if (props.currentMode === 1) {
         //学习模式直接显示
         return true;
     }
@@ -151,7 +123,7 @@ const handleLongPress = (e) => {
 const handleWordClick = (word) => {
     const currentTime = Date.now();
     const timeDiff = currentTime - lastTapTime.value;
-    
+
     // 检测双击（500ms内点击同一个单词）
     if (timeDiff < 500 && lastTapWord.value === word) {
         // 双击事件触发
@@ -159,11 +131,11 @@ const handleWordClick = (word) => {
         // 清理单词，去除标点符号
         const cleanWord = word.replace(/[，。！？；：""（）【】《》〈〉「」『』〔〕［］｛｝\s]/g, '');
         if (!cleanWord) return;
-        
+
         // 显示单词信息弹窗
         showWordInfo(cleanWord);
     }
-    
+
     // 更新最后点击信息
     lastTapTime.value = currentTime;
     lastTapWord.value = word;
@@ -174,7 +146,7 @@ const showWordInfo = async (word) => {
     try {
         // 这里可以调用词典API，现在先用模拟数据
         const wordInfo = await getWordInfo(word);
-        
+
         uni.showModal({
             title: '单词信息',
             content: `单词: ${word}\n音标: [${wordInfo.phonetic || '暂无'}]\n翻译: ${wordInfo.translation || '暂无'}\n例句: ${wordInfo.example || '暂无'}`,
@@ -199,11 +171,11 @@ const getWordInfo = async (word) => {
             title: '查询中...',
             mask: true
         });
-        
+
         // 这里可以配置真实的词典API
         // 例如：有道词典API、百度翻译API等
         const API_KEY = ''; // 如果需要API密钥
-        
+
         // 模拟API调用，实际使用时替换为真实API
         // const response = await uni.request({
         //     url: `https://api.example.com/dictionary/${word}`,
@@ -212,19 +184,19 @@ const getWordInfo = async (word) => {
         //         'Authorization': `Bearer ${API_KEY}`
         //     }
         // });
-        
+
         // 模拟数据 - 实际使用时删除这部分
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         uni.hideLoading();
-        
+
         // 返回模拟数据
         return {
             phonetic: getPhonetic(word),
             translation: getTranslation(word),
             example: getExample(word)
         };
-        
+
     } catch (error) {
         uni.hideLoading();
         console.error('获取单词信息失败:', error);
@@ -274,7 +246,7 @@ const processQuestionStem = () => {
         // 智能分割：保留单词和标点符号，但将空格作为分隔符
         const words = props.question.stem.split(/(\s+)/);
         const result = [];
-        
+
         words.forEach(segment => {
             if (segment.trim() === '') {
                 // 如果是纯空格，添加一个空格元素
@@ -291,25 +263,25 @@ const processQuestionStem = () => {
                 });
             }
         });
-        
+
         processedStem.value = result;
     }
 };
 
 
-onMounted(()=>{
+onMounted(() => {
     // 组件挂载时，从 store 获取已保存的答案（如果有）
     const savedAnswer = subjectiveAnswerStore.getUserAnswer(props.question._id);
-    if(savedAnswer){
+    if (savedAnswer) {
         userinput.value = savedAnswer;
     }
 
     //挂载时候 保存参考答案到 store
-    subjectiveAnswerStore.saveReferenceAnswer(props.question._id,props.question.content);
-    
+    subjectiveAnswerStore.saveReferenceAnswer(props.question._id, props.question.content);
+
     // 处理题干文本
     processQuestionStem();
-    
+
     // 显示使用提示
     if (props.enableWordQuery) {
         setTimeout(() => {
@@ -329,12 +301,13 @@ onMounted(()=>{
 }
 
 
-.question-index{
-   font-size: 28rpx;
+.question-index {
+    font-size: 28rpx;
     font-weight: bold;
     color: #333;
 }
-.question-lable{
+
+.question-lable {
     margin-left: 12rpx;
     margin-right: 12rpx;
     background-color: #0d82ff;
@@ -344,18 +317,22 @@ onMounted(()=>{
     font-size: 20rpx;
     display: inline-block;
 }
-.question-top-row{
+
+.question-top-row {
     float: inline-start;
 }
-.question-stem{
+
+.question-stem {
     font-size: 34rpx;
     color: #000000;
     font-weight: 572;
 }
+
 .word-container {
     display: inline;
     line-height: 1.6;
 }
+
 .word-item {
     display: inline;
     padding: 2rpx 4rpx;
@@ -363,29 +340,34 @@ onMounted(()=>{
     border-radius: 4rpx;
     transition: all 0.2s ease;
 }
+
 .word-item:active {
     background-color: #e6f7ff;
 }
+
 .word-highlight {
     background-color: #bae7ff;
     color: #0050b3;
 }
+
 .input-container {
     margin-top: 30rpx;
     background-color: rgb(248, 248, 248);
     border-radius: 13rpx;
 }
-.input-label{
+
+.input-label {
     font-size: 28rpx;
-    color:#3797ff;
+    color: #3797ff;
     font-weight: 572;
     margin-left: 13rpx;
     margin-top: 10rpx
-
 }
-.input-textarea{
+
+.input-textarea {
     padding: 15rpx 15rpx 25rpx 15rpx;
 }
+
 /* 答案容器样式 */
 .question-answer-container {
     margin-top: 50rpx;
@@ -393,13 +375,15 @@ onMounted(()=>{
     background-color: #f5f5f5;
     border-radius: 12rpx;
 }
+
 .answer-label {
     font-size: 28rpx;
     font-weight: bold;
     color: #333;
     margin-right: 10rpx;
 }
-.user-judgment-container{
+
+.user-judgment-container {
     margin-top: 20rpx;
     display: flex;
     justify-content: space-between;
@@ -407,12 +391,15 @@ onMounted(()=>{
     padding: 0 8rpx;
     gap: 10rpx;
 }
-.user-judgment-but{
-    flex: 1; /* 让按钮占据相同的宽度 */
-    margin: 0 10rpx; /* 调整按钮之间的间距 */
+
+.user-judgment-but {
+    flex: 1;
+    /* 让按钮占据相同的宽度 */
+    margin: 0 10rpx;
+    /* 调整按钮之间的间距 */
 }
 
-.check-container{
+.check-container {
     margin-top: 20rpx;
     padding: 0 28rpx;
 }
