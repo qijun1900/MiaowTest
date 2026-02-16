@@ -188,7 +188,8 @@ WrongQuestionSchema.index({ createdAt: -1 }); // 时间排序
 
 // 实例方法：标记为已掌握
 WrongQuestionSchema.methods.markAsMastered = function() {
-    this.status = 2;
+    this.status = 2; 
+    this.reviewCount += 1; 
     this.masteredAt = Date.now();
     return this.save();
 };
