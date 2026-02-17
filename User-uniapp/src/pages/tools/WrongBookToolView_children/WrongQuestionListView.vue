@@ -141,13 +141,23 @@
             <!-- 我的错误答案 -->
             <view class="answer-title">我的错解</view>
             <view class="answer-block wrong-answer">
-              <QuestionContentDisplay :content="item._raw.wrongAnswer" />
+              <!-- 选择题/判断题：纯文本简洁显示 -->
+              <view v-if="(item._raw.Type === 1 || item._raw.Type === 3) && !item._raw.wrongAnswer?.images?.length" class="simple-answer">
+                <text class="answer-text">{{ item._raw.wrongAnswer?.text || '' }}</text>
+              </view>
+              <!-- 其他题型：使用完整组件 -->
+              <QuestionContentDisplay v-else :content="item._raw.wrongAnswer" />
             </view>
 
             <!-- 正确答案 -->
             <view class="answer-title">正确答案</view>
             <view class="answer-block correct-answer">
-              <QuestionContentDisplay :content="item._raw.correctAnswer" />
+              <!-- 选择题/判断题：纯文本简洁显示 -->
+              <view v-if="(item._raw.Type === 1 || item._raw.Type === 3) && !item._raw.correctAnswer?.images?.length" class="simple-answer">
+                <text class="answer-text">{{ item._raw.correctAnswer?.text || '' }}</text>
+              </view>
+              <!-- 其他题型：使用完整组件 -->
+              <QuestionContentDisplay v-else :content="item._raw.correctAnswer" />
             </view>
 
             <!-- 解析/笔记 -->
@@ -961,6 +971,18 @@ onShow(() => {
 
 .correct-answer {
   background: #f0f9ff;
+}
+
+/* 简洁答案样式（用于选择题/判断题） */
+.simple-answer {
+  padding: 0;
+}
+
+.answer-text {
+  font-size: 32rpx;
+  line-height: 1.5;
+  color: #333333;
+  font-weight: 500;
 }
 
 /* 笔记区域 */
