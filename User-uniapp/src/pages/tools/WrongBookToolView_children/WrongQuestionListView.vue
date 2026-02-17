@@ -103,9 +103,7 @@
 
         <!-- 题目内容 -->
         <view class="question-content">
-          <view class="question-text">
-            <rich-text :nodes="item._raw.stem.text"></rich-text>
-          </view>
+          <QuestionContentDisplay :content="item._raw.stem" />
         </view>
 
         <!-- 日期和复习次数 -->
@@ -143,24 +141,20 @@
             <!-- 我的错误答案 -->
             <view class="answer-title">我的错解</view>
             <view class="answer-block wrong-answer">
-              <rich-text :nodes="item._raw.wrongAnswer?.text || ''"></rich-text>
+              <QuestionContentDisplay :content="item._raw.wrongAnswer" />
             </view>
 
             <!-- 正确答案 -->
             <view class="answer-title">正确答案</view>
             <view class="answer-block correct-answer">
-              <view class="answer-text">
-                <rich-text :nodes="item._raw.correctAnswer?.text || ''"></rich-text>
-              </view>
+              <QuestionContentDisplay :content="item._raw.correctAnswer" />
             </view>
 
             <!-- 解析/笔记 -->
-            <view v-if="item._raw.analysis?.text" class="note-wrapper">
+            <view v-if="item._raw.analysis?.text || (item._raw.analysis?.images && item._raw.analysis.images.length > 0)" class="note-wrapper">
               <view class="answer-title">解析 / 笔记 /备注</view>
               <view class="note-block">
-                <view class="note-text">
-                  <rich-text :nodes="item._raw.analysis.text"></rich-text>
-                </view>
+                <QuestionContentDisplay :content="item._raw.analysis" />
               </view>
             </view>
 
@@ -226,6 +220,7 @@ import { onLoad, onShow } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 import SelectOptionsPreview from '../../../components/modules/exam/SelectOptionsPreview.vue';
 import JudgeOptionsPreview from '../../../components/modules/exam/JudgeOptionsPreview.vue';
+import QuestionContentDisplay from '../../../components/modules/exam/QuestionContentDisplay.vue';
 import { 
   getWrongQuestionsAPI ,
   deleteWrongQuestionAPI,
@@ -868,12 +863,6 @@ onShow(() => {
   margin-bottom: 20rpx;
 }
 
-.question-text {
-  font-size: 30rpx;
-  color: #333333;
-  line-height: 1.6;
-}
-
 /* 元信息 */
 .question-meta {
   display: flex;
@@ -974,13 +963,6 @@ onShow(() => {
   background: #f0f9ff;
 }
 
-
-.answer-text {
-  font-size: 28rpx;
-  line-height: 1.8;
-  color: #333333;
-}
-
 /* 笔记区域 */
 .note-wrapper {
   margin-top: 28rpx;
@@ -990,13 +972,6 @@ onShow(() => {
   padding: 20rpx 28rpx;
   background: #fafafa;
   border-radius: 12rpx;
-  border-left: 4rpx solid #e0e0e0;
-}
-
-.note-text {
-  font-size: 28rpx;
-  color: #666666;
-  line-height: 1.8;
 }
 
 /* 答案区域底部操作按钮 */
