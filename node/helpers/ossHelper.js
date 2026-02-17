@@ -72,7 +72,7 @@ async function uploadStream(stream, ossFilePath) {
 /**
  * 删除 OSS 上的文件
  * @param {string} ossFilePath - OSS 文件路径（相对于存储桶）
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>}
  */
 async function deleteFile(ossFilePath) {
     try {
@@ -81,6 +81,7 @@ async function deleteFile(ossFilePath) {
         
         // 删除文件
         await client.delete(fullOssPath);
+        return true;
     } catch (error) {
         console.error('OSS 删除文件失败:', error);
         throw error;
@@ -90,7 +91,7 @@ async function deleteFile(ossFilePath) {
 /**
  * 通过 URL 删除 OSS 文件
  * @param {string} fileUrl - 文件完整 URL
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>}
  */
 async function deleteFileByUrl(fileUrl) {
     try {
@@ -117,8 +118,10 @@ async function deleteFileByUrl(fileUrl) {
         if (ossConfig.prefix && ossPath.startsWith(ossConfig.prefix)) {
             ossPath = ossPath.replace(ossConfig.prefix, '');
         }
+
+        const result = await deleteFile(ossPath);
         
-        await deleteFile(ossPath);
+        return result;
     } catch (error) {
         console.error('OSS 通过 URL 删除文件失败:', error);
         throw error;

@@ -2,11 +2,11 @@
   <view v-if="images.length > 0" class="image-list">
     <view 
       v-for="(img, index) in images" 
-      :key="img + index"
+      :key="getImageUrl(img) + index"
       class="image-item"
     >
       <image 
-        :src="img" 
+        :src="getImageUrl(img)" 
         mode="aspectFill" 
         class="preview-image" 
         @click="previewImage(index)"
@@ -29,8 +29,29 @@ const props = defineProps({
 
 const emit = defineEmits(['remove', 'error']);
 
+/**
+ * 获取图片URL（支持字符串或对象格式）
+ */
+const getImageUrl = (img) => {
+  if (!img) return '';
+  // 如果是对象格式 { _id, url }，返回 url
+  if (typeof img === 'object' && img.url) {
+    return img.url;
+  }
+  // 如果是字符串，直接返回
+  return img;
+};
+
 const handleRemove = (index) => {
-  emit('remove', index);
+  uni.showModal({
+    title: '提示',
+    content: '确定要删除这张图片吗？',
+    success: (res) => {
+      if (res.confirm) {
+        emit('remove', index);
+      }
+    }
+  });
 };
 
 const handleImageError = (index) => {
@@ -39,8 +60,10 @@ const handleImageError = (index) => {
 };
 
 const previewImage = (index) => {
-  // 过滤掉无效的图片路径
-  const validImages = props.images.filter(img => img && img.trim());
+  // 提取所有有效的图片URL
+  const validImages = props.images
+    .map(img => getImageUrl(img))
+    .filter(url => url && url.trim());
   
   if (validImages.length === 0) {
     uni.showToast({
@@ -52,7 +75,7 @@ const previewImage = (index) => {
   
   uni.previewImage({
     urls: validImages,
-    current: props.images[index],
+    current: getImageUrl(props.images[index]),
     fail: (err) => {
       console.error('预览失败:', err);
       uni.showToast({

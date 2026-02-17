@@ -67,12 +67,16 @@ export function useImageUpload() {
   /**
    * 检查是否为已上传到OSS的远程URL
    */
-  const isRemoteUrl = (path) => {
-    if (!path) return false;
+  const isRemoteUrl = (item) => {
+    if (!item) return false;
+    
+    // 支持字符串或对象格式
+    const url = typeof item === 'string' ? item : item.url;
+    if (!url) return false;
     
     // 检查是否以 OSS 域名开头
     const ossDomain = import.meta.env.VITE_OSS_DOMAIN;
-    return ossDomain && path.startsWith(ossDomain);
+    return ossDomain && url.startsWith(ossDomain);
   };
 
   /**
@@ -85,20 +89,20 @@ export function useImageUpload() {
 
     const results = [];
 
-    for (const path of imageList.value) {
-      // 如果是已上传到OSS的远程URL，直接使用
-      if (isRemoteUrl(path)) {
-        results.push(path);
+    for (const item of imageList.value) {
+      // 如果是已上传到OSS的远程URL（带_id的对象），直接使用
+      if (isRemoteUrl(item)) {
+        results.push(item);
         continue;
       }
 
-      // 本地文件：尝试上传，如果失败说明文件已失效，跳过
+      // 本地文件路径：尝试上传
+      const localPath = typeof item === 'string' ? item : item.url;
       try {
-        const url = await uploadSingleImage(path, uploadUrl);
-        results.push(url);
+        const uploadResult = await uploadSingleImage(localPath, uploadUrl);
+        results.push(uploadResult); // { _id, url }
       } catch (error) {
-        console.warn('图片上传失败或文件不存在，跳过:', path, error.message);
-        // 文件不存在则跳过，不添加
+        console.warn('图片上传失败或文件不存在，跳过:', localPath, error.message);
       }
     }
 
@@ -119,7 +123,11 @@ export function useImageUpload() {
           try {
             const data = JSON.parse(uploadRes.data);
             if (data.code === 200) {
-              resolve(data.data.url);
+              // 返回包含 _id 和 url 的对象
+              resolve({
+                _id: data.data._id,
+                url: data.data.url
+              });
             } else {
               reject(new Error(data.message || '上传失败'));
             }
@@ -136,26 +144,73 @@ export function useImageUpload() {
   };
 
   /**
-   * 删除指定索引的图片
+   * 删除服务器上的图片
    */
-  const removeImage = (index) => {
-    if (index >= 0 && index < imageList.value.length) {
-      const filePath = imageList.value[index];
+  const deleteRemoteImage = async (imageItem) => {
+    return new Promise((resolve, reject) => {
+      const requestData = {};
       
-      // 尝试删除本地文件
-      const fs = uni.getFileSystemManager();
-      if (filePath.includes(wx.env.USER_DATA_PATH)) {
-        fs.unlink({
-          filePath: filePath,
-          success: () => {
-            console.log('本地文件已删除:', filePath);
-          },
-          fail: (err) => {
-            console.warn('删除本地文件失败:', err);
-          }
-        });
+      // 支持对象格式 { _id, url } 或字符串格式
+      if (typeof imageItem === 'object' && imageItem._id) {
+        requestData._id = imageItem._id;
+        requestData.path = imageItem.url;
+      } else {
+        requestData.path = typeof imageItem === 'string' ? imageItem : imageItem.url;
       }
       
+      uni.request({
+        url: '/uniappAPI/delete/image',
+        method: 'POST',
+        data: requestData,
+        success: (res) => {
+          if (res.data.code === 200) {
+            uni.showToast({
+              title: '图片已删除',
+              position:'top',
+              icon: 'none'
+            });
+            resolve(true);
+          } else {
+            reject(new Error(res.data.message || '删除失败'));
+          }
+        },
+        fail: (err) => {
+          reject(err);
+        }
+      });
+    });
+  };
+
+  /**
+   * 删除指定索引的图片
+   */
+  const removeImage = async (index) => {
+    if (index >= 0 && index < imageList.value.length) {
+      const item = imageList.value[index];
+
+      if (isRemoteUrl(item)) {
+        try {
+          await deleteRemoteImage(item);
+        } catch (error) {
+          console.warn('远程图片删除失败:', error);
+        }
+      } else {
+        // 本地文件路径
+        const filePath = typeof item === 'string' ? item : item.url;
+        if (filePath && filePath.includes(wx.env.USER_DATA_PATH)) {
+          const fs = uni.getFileSystemManager();
+          fs.unlink({
+            filePath: filePath,
+            success: () => {
+              console.log('本地文件已删除:', filePath);
+            },
+            fail: (err) => {
+              console.warn('删除本地文件失败:', err);
+            }
+          });
+        }
+      }
+
       imageList.value.splice(index, 1);
     }
   };
@@ -165,8 +220,9 @@ export function useImageUpload() {
    */
   const clearImages = () => {
     // 清理本地文件
-    imageList.value.forEach(filePath => {
-      if (filePath.includes(wx.env.USER_DATA_PATH)) {
+    imageList.value.forEach(item => {
+      const filePath = typeof item === 'string' ? item : item.url;
+      if (filePath && filePath.includes(wx.env.USER_DATA_PATH)) {
         const fs = uni.getFileSystemManager();
         fs.unlink({
           filePath: filePath,
@@ -183,15 +239,22 @@ export function useImageUpload() {
 
   /**
    * 设置已有图片（从API加载）
-   * @param {Array} images - 图片数组，每项可为 string 或 { url } 对象
+   * @param {Array} images - 图片数组，每项可为 string、{ url } 或 { _id, url } 对象
    */
   const setImages = (images) => {
     if (!images || !Array.isArray(images)) return;
     
     imageList.value = images.map(img => {
-      // 支持两种格式：string 或 { url: '...' }
-      return typeof img === 'string' ? img : (img.url || '');
-    }).filter(url => url);
+      // 支持三种格式：string、{ url } 或 { _id, url }
+      if (typeof img === 'string') {
+        return img;
+      } else if (img._id && img.url) {
+        return { _id: img._id, url: img.url };
+      } else if (img.url) {
+        return img.url;
+      }
+      return null;
+    }).filter(item => item);
   };
 
   return {

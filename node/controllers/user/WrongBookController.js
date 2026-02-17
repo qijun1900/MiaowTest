@@ -3,6 +3,8 @@ const multer = require('multer');
 const OSS = require('ali-oss');
 const ossConfig = require('../../config/oss.config');
 const path = require('path');
+const {deleteFileByUrl} = require('../../helpers/ossHelper')
+
 // 使用内存存储，方便后续上传到OSS
 const storage = multer.memoryStorage();
 const upload = multer({ 
@@ -141,24 +143,44 @@ const WrongBookController = {
                         message: '请选择要上传的图片'
                     });
                 }
+                
                 const { uid } = req.user;
+                
                 // 生成唯一的文件名
                 const fileExtension = path.extname(req.file.originalname);
                 const fileName = `user/wrong_question/${uid}/${Date.now()}${fileExtension}`;
 
                 // 上传文件到OSS
-                const result = await client.put(fileName, req.file.buffer);
+                const ossResult = await client.put(fileName, req.file.buffer);
 
-                
-                // 获取上传后的URL
-                const url = result.url;
-                res.send({
-                    code: 200,
-                    message: '上传图片成功',
-                    data: {
-                        url
+                if (ossResult && ossResult.url) {
+                    // 保存图片记录到数据库
+                    const dbResult = await WrongBookService.uploadImage({
+                        uid,
+                        url: ossResult.url
+                    });
+                    
+                    if (dbResult.success) {
+                        res.send({
+                            code: 200,
+                            message: '上传图片成功',
+                            data: {
+                                _id: dbResult.data._id,
+                                url: dbResult.data.url
+                            }
+                        });
+                    } else {
+                        res.send({
+                            code: 500,
+                            message: '图片上传成功但保存记录失败'
+                        });
                     }
-                });
+                } else {
+                    res.status(500).send({
+                        code: 500,
+                        message: "上传图片失败"
+                    });
+                }
             } catch (error) {
                 console.error("上传图片失败", error);
                 res.status(500).send({
@@ -168,6 +190,51 @@ const WrongBookController = {
             }
         },
     ],
+    
+    //删除图片
+    deleteImage: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { path, _id } = req.body;
+            
+            // 删除OSS文件
+            const ossResult = await deleteFileByUrl(path);
+            
+            if (ossResult && _id) {
+                // 从数据库中移除图片记录（通过_id）
+                const dbResult = await WrongBookService.removeImageById({ 
+                    uid, 
+                    imageId: _id,
+                    imageUrl: path
+                });
+                
+                res.send({
+                    code: 200,
+                    message: '删除图片成功',
+                    data: {
+                        modifiedCount: dbResult.modifiedCount
+                    }
+                });
+            } else if (ossResult) {
+                res.send({
+                    code: 200,
+                    message: '删除图片成功',
+                });
+            } else {
+                res.send({
+                    code: 400,
+                    message: '删除图片失败'
+                });
+            }
+        } catch (error) {
+            console.error("删除图片失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "删除图片失败"
+            });
+        }
+    },
+
     // 添加错题
     addWrongQuestion: async (req, res) => {
         try {

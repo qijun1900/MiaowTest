@@ -1,5 +1,6 @@
 const WrongBookModel = require('../../models/WrongBookModel');
 const WrongQuestionModel = require('../../models/WrongQuestionModel');
+const mongoose = require('mongoose');
 
 const WrongBookService = {
     /**
@@ -59,7 +60,6 @@ const WrongBookService = {
             }
             
             // 生成题目ID（用户自建题目）
-            const mongoose = require('mongoose');
             const questionId = new mongoose.Types.ObjectId();
             
             // 创建错题记录
@@ -337,7 +337,91 @@ const WrongBookService = {
             console.error("获取错题统计失败", error);
             throw error;
         }
-    }
-};
+    },
+
+    /**
+     * 上传图片并保存记录
+     */
+    uploadImage: async ({ uid, url }) => {
+        try {
+            const imageId = new mongoose.Types.ObjectId();
+            
+            // 创建临时图片记录（未关联到具体题目）
+            const imageRecord = {
+                _id: imageId,
+                url: url,
+                uploadedAt: new Date()
+            };
+            
+            return {
+                success: true,
+                data: {
+                    _id: imageId.toString(),
+                    url: url
+                }
+            };
+        } catch (error) {
+            console.error("DATABASE:保存图片记录失败", error);
+            throw error;
+        }
+    },
+
+    /**
+     * 通过图片ID删除图片记录
+     */
+    removeImageById: async ({ uid, imageId, imageUrl }) => {
+        try {
+            // 先查找包含该图片的题目（仅限当前用户）
+            const questions = await WrongQuestionModel.find({
+                Uid: uid,
+                $or: [
+                    { 'stem.images._id': imageId },
+                    { 'wrongAnswer.images._id': imageId },
+                    { 'correctAnswer.images._id': imageId },
+                    { 'analysis.images._id': imageId },
+                    { 'note.images._id': imageId }
+                ]
+            });
+
+            if (questions.length === 0) {
+                return {
+                    success: true,
+                    modifiedCount: 0,
+                    message: '未找到包含该图片的题目'
+                };
+            }
+
+            // 从找到的题目中移除该图片
+            const updateOperations = {
+                $pull: {
+                    'stem.images': { _id: imageId },
+                    'wrongAnswer.images': { _id: imageId },
+                    'correctAnswer.images': { _id: imageId },
+                    'analysis.images': { _id: imageId },
+                    'note.images': { _id: imageId }
+                },
+                $set: {
+                    updatedAt: new Date()
+                }
+            };
+
+            const result = await WrongQuestionModel.updateMany(
+                { 
+                    Uid: uid,
+                    _id: { $in: questions.map(q => q._id) }
+                },
+                updateOperations
+            );
+
+            return {
+                success: true,
+                modifiedCount: result.modifiedCount
+            };
+        } catch (error) {
+            console.error("DATABASE:删除图片记录失败", error);
+            throw error;
+        }
+    },
+}
 
 module.exports = WrongBookService;

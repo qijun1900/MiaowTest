@@ -207,7 +207,7 @@ const handleSend = async () => {
                 // 题干（支持富文本和图片）
                 stem: {
                     text: formData.stem,
-                    images: (stemImageUrls || []).map(url => ({ url }))
+                    images: stemImageUrls || []
                 },
                 
                 // 选项（判断题的选项）
@@ -228,7 +228,7 @@ const handleSend = async () => {
                 // 解析/备注
                 analysis: {
                     text: formData.analysis,
-                    images: (analysisImageUrls || []).map(url => ({ url }))
+                    images: analysisImageUrls || []
                 },
                 
                 // 标签

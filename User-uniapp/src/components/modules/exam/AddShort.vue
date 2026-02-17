@@ -189,7 +189,7 @@ const handleSend = async () => {
         // 题干（支持富文本和图片）
         stem: {
           text: formData.stem,
-          images: (stemImageUrls || []).map(url => ({ url }))
+          images: stemImageUrls || []
         },
         
         // 选项（简答题没有选项）
@@ -198,19 +198,19 @@ const handleSend = async () => {
         // 正确答案
         correctAnswer: {
           text: formData.content,
-          images: (answerImageUrls || []).map(url => ({ url }))
+          images: answerImageUrls || []
         },
         
         // 用户的错误答案
         wrongAnswer: {
           text: formData.myWrongAnswer,
-          images: (wrongAnswerImageUrls || []).map(url => ({ url }))
+          images: wrongAnswerImageUrls || []
         },
         
         // 解析/备注
         analysis: {
           text: formData.analysis,
-          images: (analysisImageUrls || []).map(url => ({ url }))
+          images: analysisImageUrls || []
         },
         
         // 标签
