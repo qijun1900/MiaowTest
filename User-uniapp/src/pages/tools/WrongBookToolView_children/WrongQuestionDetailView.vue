@@ -1,5 +1,12 @@
 <template>
   <view class="container">
+    <!-- 加载状态 -->
+    <view v-if="loading" class="loading-container">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载题目数据...</text>
+    </view>
+    
+    <template v-else>
     <!-- 题型选择器 -->
     <SliderSelector 
       v-model="selectedQuestionTypeValue"
@@ -33,6 +40,8 @@
         <AddSelect 
           ref="addSelectRef"
           :isAddWrongBookQuestion="true" 
+          :isEdit="isEditMode"
+          :editData="editQuestionData"
           @submit="handleQuestionSubmit"
         />
       </view>
@@ -40,6 +49,8 @@
         <AddBlank 
           ref="addBlankRef"
           :isAddWrongBookQuestion="true" 
+          :isEdit="isEditMode"
+          :editData="editQuestionData"
           @submit="handleQuestionSubmit"
         />
       </view>
@@ -47,6 +58,8 @@
         <AddJudge 
           ref="addJudgeRef"
           :isAddWrongBookQuestion="true" 
+          :isEdit="isEditMode"
+          :editData="editQuestionData"
           @submit="handleQuestionSubmit"
         />
       </view>
@@ -54,10 +67,13 @@
         <AddShort 
           ref="addShortRef"
           :isAddWrongBookQuestion="true" 
+          :isEdit="isEditMode"
+          :editData="editQuestionData"
           @submit="handleQuestionSubmit"
         />
       </view>
     </view>
+    </template>
   </view>
 </template>
 
@@ -69,11 +85,15 @@ import AddSelect from '../../../components/modules/exam/AddSelect.vue';//1
 import AddBlank from '../../../components/modules/exam/AddBlank.vue';//2
 import AddJudge from '../../../components/modules/exam/AddJudge.vue';//3
 import AddShort from '../../../components/modules/exam/AddShort.vue';//4
-import { addWrongQuestionAPI } from '../../../API/Tools/wrongQuestionAPI';
+import { addWrongQuestionAPI, getWrongQuestionDetailAPI, updateWrongQuestionAPI } from '../../../API/Tools/wrongQuestionAPI';
 
 const selectedQuestionTypeValue = ref(1)
 const WrongbookTitle = ref('')
 const WrongbookId  = ref('')
+const questionId = ref('')
+const isEditMode = ref(false)
+const editQuestionData = ref(null)
+const loading = ref(false)
 
 // 子组件 ref
 const addSelectRef = ref(null)
@@ -107,6 +127,42 @@ const handleDifficultyChange = (e) => {
   selectedDifficulty.value = difficulties.value[index]
 }
 
+// 加载题目数据（编辑模式）
+const loadQuestionData = async () => {
+  try {
+    loading.value = true;
+    const res = await getWrongQuestionDetailAPI(questionId.value);
+    if (res.code === 200 && res.data) {
+      const data = res.data;
+      editQuestionData.value = data;
+      
+      // 设置题型
+      selectedQuestionTypeValue.value = data.Type || 1;
+      
+      // 设置难度
+      const difficultyMap = {
+        'easy': { label: '简单', value: 'easy' },
+        'medium': { label: '中等', value: 'medium' },
+        'hard': { label: '困难', value: 'hard' }
+      };
+      selectedDifficulty.value = difficultyMap[data.difficulty] || difficultyMap.medium;
+    } else {
+      uni.showToast({
+        title: res.message || '获取题目失败',
+        icon: 'none'
+      });
+    }
+  } catch (error) {
+    console.error('获取题目详情失败:', error);
+    uni.showToast({
+      title: '加载失败，请重试',
+      icon: 'none'
+    });
+  } finally {
+    loading.value = false;
+  }
+}
+
 // 处理题目提交
 const handleQuestionSubmit = async (questionData) => {
   try {
@@ -117,26 +173,34 @@ const handleQuestionSubmit = async (questionData) => {
       difficulty: selectedDifficulty.value.value,
     };
 
-    // 调用 API 提交到后端
-    const res = await addWrongQuestionAPI(wrongQuestionData);
+    let res;
+    if (isEditMode.value) {
+      // 编辑模式：调用更新API
+      res = await updateWrongQuestionAPI({
+        id: questionId.value,
+        ...wrongQuestionData
+      });
+    } else {
+      // 添加模式：调用添加API
+      res = await addWrongQuestionAPI(wrongQuestionData);
+    }
     
     if (res.code === 200) {
       uni.showToast({
-        title: '添加成功',
+        title: isEditMode.value ? '更新成功' : '添加成功',
         icon: 'success'
       });
-      
-      // 提交成功后重置对应的子组件表单
       resetCurrentForm();
+      
     } else {
       uni.showToast({
-        title: res.message || '添加失败',
+        title: res.message || (isEditMode.value ? '更新失败' : '添加失败'),
         icon: 'none'
       });
     }
 
   } catch (error) {
-    console.error('提交错题失败:', error);
+    console.error(isEditMode.value ? '更新错题失败:' : '提交错题失败:', error);
     uni.showToast({
       title: '提交失败，请重试',
       icon: 'none'
@@ -162,7 +226,7 @@ const resetCurrentForm = () => {
   }
 }
 
-onLoad((options) => {
+onLoad(async (options) => {
   if (options.id) {
     WrongbookId.value = options.id;
   } else {
@@ -178,6 +242,13 @@ onLoad((options) => {
   } else {
     console.warn('未接收到错题本名称')
   }
+  
+  // 编辑模式：加载题目数据
+  if (options.questionId) {
+    questionId.value = options.questionId;
+    isEditMode.value = true;
+    await loadQuestionData();
+  }
 })
 </script>
 
@@ -186,6 +257,39 @@ onLoad((options) => {
   min-height: 100vh;
   background: #fff9f2;
   padding: 15rpx 15rpx;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 60rpx;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #ffe8d6;
+  border-top-color: #ff9555;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 32rpx;
+  font-size: 28rpx;
+  color: #ff9555;
+  font-weight: 500;
 }
 
 .selector-row {

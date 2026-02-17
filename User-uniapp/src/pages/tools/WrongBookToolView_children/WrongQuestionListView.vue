@@ -192,9 +192,9 @@
             <text class="footer-text">删除</text>
           </view>
           <view class="footer-right">
-            <view class="footer-btn" hover-class="none" @click="reviewQuestion(item)">
+            <!-- <view class="footer-btn" hover-class="none" @click="reviewQuestion(item)">
               <text class="btn-text">查看习题</text>
-            </view>
+            </view> -->
             <view 
               class="footer-btn primary" 
               :class="{ 'disabled': item.status === 'mastered' }"
@@ -345,14 +345,6 @@ const handleDelete = async (item) => {
   }
 };
 
-//TODO 查看习题详情
-const reviewQuestion = (item) => {
-  uni.showToast({
-    title: '查看习题',
-    icon: 'none'
-  });
-};
-
 //标记为已掌握
 const markAsMastered = async (item) => {
   if (item.status === 'mastered') return;
@@ -378,9 +370,8 @@ const markAsMastered = async (item) => {
 
 // TODO: 跳转到编辑页面或打开编辑弹窗
 const editQuestion = (item) => {
-  uni.showToast({
-    title: '修改题目',
-    icon: 'none'
+  uni.navigateTo({
+    url: `/pages/tools/WrongBookToolView_children/WrongQuestionDetailView?id=${WrongbookId.value}&title=${encodeURIComponent(WrongbookTitle.value)}&questionId=${item.id}`
   });
 };
 

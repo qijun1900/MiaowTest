@@ -65,6 +65,17 @@ export function useImageUpload() {
   };
 
   /**
+   * 检查是否为已上传到OSS的远程URL
+   */
+  const isRemoteUrl = (path) => {
+    if (!path) return false;
+    
+    // 检查是否以 OSS 域名开头
+    const ossDomain = import.meta.env.VITE_OSS_DOMAIN;
+    return ossDomain && path.startsWith(ossDomain);
+  };
+
+  /**
    * 批量上传所有图片到服务器
    */
   const uploadAllImages = async (uploadUrl = '/uniappAPI/upload/image') => {
@@ -72,34 +83,56 @@ export function useImageUpload() {
       return [];
     }
 
-    const uploadPromises = imageList.value.map((filePath) => {
-      return new Promise((resolve, reject) => {
-        uni.uploadFile({
-          url: uploadUrl,
-          filePath: filePath,
-          name: 'file',
-          fileType: 'image',
-          success: (uploadRes) => {
-            try {
-              const data = JSON.parse(uploadRes.data);
-              if (data.code === 200) {
-                resolve(data.data.url);
-              } else {
-                reject(new Error(data.message || '上传失败'));
-              }
-            } catch (e) {
-              reject(new Error('解析响应失败'));
-              console.error('上传响应解析失败:', e);
+    const results = [];
+
+    for (const path of imageList.value) {
+      // 如果是已上传到OSS的远程URL，直接使用
+      if (isRemoteUrl(path)) {
+        results.push(path);
+        continue;
+      }
+
+      // 本地文件：尝试上传，如果失败说明文件已失效，跳过
+      try {
+        const url = await uploadSingleImage(path, uploadUrl);
+        results.push(url);
+      } catch (error) {
+        console.warn('图片上传失败或文件不存在，跳过:', path, error.message);
+        // 文件不存在则跳过，不添加
+      }
+    }
+
+    return results;
+  };
+
+  /**
+   * 上传单张图片
+   */
+  const uploadSingleImage = (filePath, uploadUrl) => {
+    return new Promise((resolve, reject) => {
+      uni.uploadFile({
+        url: uploadUrl,
+        filePath: filePath,
+        name: 'file',
+        fileType: 'image',
+        success: (uploadRes) => {
+          try {
+            const data = JSON.parse(uploadRes.data);
+            if (data.code === 200) {
+              resolve(data.data.url);
+            } else {
+              reject(new Error(data.message || '上传失败'));
             }
-          },
-          fail: (err) => {
-            reject(err);
+          } catch (e) {
+            reject(new Error('解析响应失败'));
+            console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
           }
-        });
+        },
+        fail: (err) => {
+          reject(err);
+        }
       });
     });
-
-    return Promise.all(uploadPromises);
   };
 
   /**
@@ -148,11 +181,25 @@ export function useImageUpload() {
     imageList.value = [];
   };
 
+  /**
+   * 设置已有图片（从API加载）
+   * @param {Array} images - 图片数组，每项可为 string 或 { url } 对象
+   */
+  const setImages = (images) => {
+    if (!images || !Array.isArray(images)) return;
+    
+    imageList.value = images.map(img => {
+      // 支持两种格式：string 或 { url: '...' }
+      return typeof img === 'string' ? img : (img.url || '');
+    }).filter(url => url);
+  };
+
   return {
     imageList,
     addImage,
     uploadAllImages,
     removeImage,
-    clearImages
+    clearImages,
+    setImages
   };
 }

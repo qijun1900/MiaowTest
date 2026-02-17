@@ -341,19 +341,25 @@ const WrongBookController = {
     updateWrongQuestion: async (req, res) => {
         try {
             const { uid } = req.user;
-            const { id, question, answer, category, note } = req.body;
+            const { id, wrongBookId, Type, questionSource, stem, options, correctAnswer, wrongAnswer, analysis, tags, difficulty } = req.body;
             const result = await WrongBookService.updateWrongQuestion({
                 uid,
                 id,
-                question,
-                answer,
-                category,
-                note
+                wrongBookId,
+                Type,
+                questionSource,
+                stem,
+                options,
+                correctAnswer,
+                wrongAnswer,
+                analysis,
+                tags,
+                difficulty
             });
             if (!result.success) {
                 return res.send({
                     code: 400,
-                    message: '更新错题失败'
+                    message: result.message || '更新错题失败'
                 });
             }
             res.send({

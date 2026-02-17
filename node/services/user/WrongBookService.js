@@ -264,15 +264,32 @@ const WrongBookService = {
     /**
      * 更新错题
      */
-    updateWrongQuestion: async ({ uid, id, question, answer, category, note }) => {
+    updateWrongQuestion: async ({ uid, id, wrongBookId, Type, questionSource, stem, options, correctAnswer, wrongAnswer, analysis, tags, difficulty }) => {
         try {
+            // 验证错题是否存在且属于该用户
+            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+            if (!question) {
+                return {
+                    success: false,
+                    message: '错题不存在或无权限'
+                };
+            }
+
             const updateData = {
                 updatedAt: new Date()
             };
-            if (question !== undefined) updateData.question = question;
-            if (answer !== undefined) updateData.answer = answer;
-            if (category !== undefined) updateData.category = category;
-            if (note !== undefined) updateData.note = note;
+
+            // 只更新传入的字段
+            if (wrongBookId !== undefined) updateData.wrongBookId = wrongBookId;
+            if (Type !== undefined) updateData.Type = Type;
+            if (questionSource !== undefined) updateData.questionSource = questionSource;
+            if (stem !== undefined) updateData.stem = stem;
+            if (options !== undefined) updateData.options = options;
+            if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
+            if (wrongAnswer !== undefined) updateData.wrongAnswer = wrongAnswer;
+            if (analysis !== undefined) updateData.analysis = analysis;
+            if (tags !== undefined) updateData.tags = tags;
+            if (difficulty !== undefined) updateData.difficulty = difficulty;
 
             const result = await WrongQuestionModel.updateOne(
                 { _id: id, Uid: uid },

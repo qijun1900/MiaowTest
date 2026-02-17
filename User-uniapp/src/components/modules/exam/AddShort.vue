@@ -284,10 +284,37 @@ const resetForm = () => {
 // 编辑模式下的数据初始化
 onMounted(() => {
   if (props.isEdit && props.editData) {
-    // 编辑模式下初始化表单数据
-    formData.stem = props.editData.stem || '';
-    formData.content = props.editData.content || '';
-    formData.analysis = props.editData.analysis || '';
+    // stem 可能是对象 { text, images } 或字符串
+    const stemData = props.editData.stem;
+    formData.stem = stemData?.text || stemData || '';
+    if (stemData?.images && stemData.images.length > 0) {
+      stemImages.setImages(stemData.images);
+    }
+    
+    // 答案
+    const answerData = props.editData.correctAnswer;
+    formData.content = answerData?.text || answerData || '';
+    if (answerData?.images && answerData.images.length > 0) {
+      answerImages.setImages(answerData.images);
+    }
+    
+    // analysis 可能是对象 { text, images } 或字符串
+    const analysisData = props.editData.analysis;
+    formData.analysis = analysisData?.text || analysisData || '';
+    if (analysisData?.images && analysisData.images.length > 0) {
+      analysisImages.setImages(analysisData.images);
+    }
+    
+    // 错解
+    const wrongAnswerData = props.editData.wrongAnswer;
+    if (wrongAnswerData?.images && wrongAnswerData.images.length > 0) {
+      wrongAnswerImages.setImages(wrongAnswerData.images);
+    }
+    
+    // 初始化标签
+    if (props.editData.tags && Array.isArray(props.editData.tags)) {
+      formData.tags = props.editData.tags;
+    }
   }
 })
 

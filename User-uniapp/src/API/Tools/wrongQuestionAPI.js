@@ -87,7 +87,7 @@ export async function deleteWrongQuestionAPI(questionId) {
 export async function getWrongQuestionDetailAPI(questionId) {
     try {
         return await http({
-            url: `/uniappAPI/tools/wrongQuestion/getWrongQuestionDetail?id=${questionId}`,
+            url: `/uniappAPI/tools/wrongbook/getWrongQuestionDetail/${questionId}`,
             method: 'GET'
         });
     } catch (error) {
@@ -110,7 +110,7 @@ export async function getWrongQuestionDetailAPI(questionId) {
 export async function updateWrongQuestionAPI(data) {
     try {
         return await http({
-            url: '/uniappAPI/tools/wrongQuestion/updateWrongQuestion',
+            url: '/uniappAPI/tools/wrongbook/updateWrongQuestion',
             method: 'POST',
             data: data
         });
