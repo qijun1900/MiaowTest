@@ -85,7 +85,11 @@ import AddSelect from '../../../components/modules/exam/AddSelect.vue';//1
 import AddBlank from '../../../components/modules/exam/AddBlank.vue';//2
 import AddJudge from '../../../components/modules/exam/AddJudge.vue';//3
 import AddShort from '../../../components/modules/exam/AddShort.vue';//4
-import { addWrongQuestionAPI, getWrongQuestionDetailAPI, updateWrongQuestionAPI } from '../../../API/Tools/wrongQuestionAPI';
+import { 
+  addWrongQuestionAPI, 
+  getWrongQuestionDetailAPI, 
+  updateWrongQuestionAPI 
+} from '../../../API/Tools/wrongQuestionAPI';
 
 const selectedQuestionTypeValue = ref(1)
 const WrongbookTitle = ref('')

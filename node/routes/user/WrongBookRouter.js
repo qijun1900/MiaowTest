@@ -14,7 +14,7 @@ WrongBookRouter.post("/uniappAPI/tools/wrongbook/createWrongBook", JWT.verifyTok
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/updateWrongBook", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.updateWrongBook)
 // 删除错题本
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongBook", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.deleteWrongBook)
-//添加图片
+// 添加图片
 WrongBookRouter.post("/uniappAPI/upload/image", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.uploadImage)
 // 添加错题
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/addWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.addWrongQuestion)
@@ -22,7 +22,7 @@ WrongBookRouter.post("/uniappAPI/tools/wrongbook/addWrongQuestion", JWT.verifyTo
 WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongQuestions", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongQuestions)
 // 删除错题
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/deleteWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.deleteWrongQuestion)
-//标记为已掌握
+// 标记为已掌握
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/markAsMastered", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.markAsMastered)
 //标记为需要复习
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/markAsNeedReview", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.markAsNeedReview)

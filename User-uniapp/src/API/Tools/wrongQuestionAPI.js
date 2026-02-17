@@ -200,29 +200,6 @@ export async function getNeedReviewQuestionsAPI() {
     }
 }
 
-/**
- * @description 更新错题笔记
- * @method POST
- * @param {Object} data - 笔记数据
- * @param {String} data.questionId - 错题ID，必填
- * @param {Object} data.note - 笔记对象 { text, images }，必填
- * @returns {Promise} 返回更新结果
- */
-export async function updateWrongQuestionNoteAPI({ questionId, note }) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongQuestion/updateNote',
-            method: 'POST',
-            data: {
-                id: questionId,
-                note
-            }
-        });
-    } catch (error) {
-        console.error("updateWrongQuestionNote 失败", error);
-        throw error;
-    }
-}
 
 /**
  * @description 批量删除错题
