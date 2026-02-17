@@ -191,7 +191,15 @@ const handleQuestionSubmit = async (questionData) => {
         icon: 'success'
       });
       resetCurrentForm();
-      
+      // 编辑模式下返回上一页并刷新列表 
+      setTimeout(() => {
+        if (isEditMode.value) {
+          uni.navigateBack({
+            delta: 1,
+          });
+        }
+      }, 1000);
+
     } else {
       uni.showToast({
         title: res.message || (isEditMode.value ? '更新失败' : '添加失败'),
