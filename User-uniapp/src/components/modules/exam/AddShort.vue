@@ -307,6 +307,7 @@ onMounted(() => {
     
     // 错解
     const wrongAnswerData = props.editData.wrongAnswer;
+    formData.myWrongAnswer = wrongAnswerData?.text || '';
     if (wrongAnswerData?.images && wrongAnswerData.images.length > 0) {
       wrongAnswerImages.setImages(wrongAnswerData.images);
     }

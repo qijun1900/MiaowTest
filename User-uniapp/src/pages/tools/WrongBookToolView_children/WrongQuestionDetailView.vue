@@ -239,6 +239,8 @@ const resetCurrentForm = () => {
 }
 
 onLoad(async (options) => {
+  uni.pageScrollTo({ scrollTop: 0 });
+  
   if (options.id) {
     WrongbookId.value = options.id;
   } else {
