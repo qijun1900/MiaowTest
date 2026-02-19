@@ -105,10 +105,10 @@ import { useImageUpload } from '../../../composables/useImageUpload.js';
 
 const butLoading = ref(false)
 
-// 使用图片上传 composable
-const stemImages = useImageUpload(); // 题干图片
-const analysisImages = useImageUpload(); // 解析图片
-const wrongAnswerImages = useImageUpload(); // 错解图片
+// 使用图片上传 composable（限制 5MB）
+const stemImages = useImageUpload({ maxSize: 5 * 1024 * 1024 }); // 题干图片
+const analysisImages = useImageUpload({ maxSize: 5 * 1024 * 1024 }); // 解析图片
+const wrongAnswerImages = useImageUpload({ maxSize: 5 * 1024 * 1024 }); // 错解图片
 
 const props = defineProps({
   currentBankId: { 

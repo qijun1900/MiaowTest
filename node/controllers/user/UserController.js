@@ -7,7 +7,7 @@ const { uploadBuffer } = require('../../helpers/ossHelper');
 const storage = multer.memoryStorage();
 const upload = multer({ 
   storage: storage, 
-  limits: { fileSize: 5 * 1024 * 1024 } // 限制5MB
+  limits: { fileSize: 10 * 1024 * 1024 } // 限制10MB
 });
 
 const UserController = {

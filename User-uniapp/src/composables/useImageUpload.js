@@ -1,7 +1,10 @@
 import { ref } from 'vue';
 
-export function useImageUpload() {
+export function useImageUpload(options = {}) {
   const imageList = ref([]);
+  
+  // 默认配置：最大 10MB
+  const maxSize = options.maxSize || 10 * 1024 * 1024;
   
   /**
    * 选择图片（不上传）
@@ -13,8 +16,8 @@ export function useImageUpload() {
       sourceType: ['album', 'camera'],
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0];
-        // 保存到本地永久路径（避免临时文件失效）
-        saveToLocalFile(tempFilePath);
+        // 检查文件大小
+        checkFileSize(tempFilePath);
       },
       fail: (err) => {
         console.error('选择图片失败:', err);
@@ -23,6 +26,39 @@ export function useImageUpload() {
           position: 'top',
           icon: 'none'
         });
+      }
+    });
+  };
+
+  /**
+   * 检查文件大小
+   */
+  const checkFileSize = (filePath) => {
+    uni.getFileInfo({
+      filePath: filePath,
+      success: (res) => {
+        const fileSize = res.size; // 字节
+        
+        if (fileSize > maxSize) {
+          const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(1);
+          const currentSizeMB = (fileSize / (1024 * 1024)).toFixed(1);
+          
+          uni.showToast({
+            title: `图片过大(${currentSizeMB}MB)，限制${maxSizeMB}MB`,
+            position: 'top',
+            icon: 'none',
+            duration: 2500
+          });
+          return;
+        }
+        
+        // 大小符合要求，保存文件
+        saveToLocalFile(filePath);
+      },
+      fail: (err) => {
+        console.error('获取文件信息失败:', err);
+        // 如果获取失败，仍然允许保存（降级处理）
+        saveToLocalFile(filePath);
       }
     });
   };
@@ -98,6 +134,7 @@ export function useImageUpload() {
 
       // 本地文件路径：尝试上传
       const localPath = typeof item === 'string' ? item : item.url;
+      
       try {
         const uploadResult = await uploadSingleImage(localPath, uploadUrl);
         results.push(uploadResult); // { _id, url }
@@ -114,30 +151,86 @@ export function useImageUpload() {
    */
   const uploadSingleImage = (filePath, uploadUrl) => {
     return new Promise((resolve, reject) => {
-      uni.uploadFile({
-        url: uploadUrl,
+      // 上传前再次检查文件大小
+      uni.getFileInfo({
         filePath: filePath,
-        name: 'file',
-        fileType: 'image',
-        success: (uploadRes) => {
-          try {
-            const data = JSON.parse(uploadRes.data);
-            if (data.code === 200) {
-              // 返回包含 _id 和 url 的对象
-              resolve({
-                _id: data.data._id,
-                url: data.data.url
-              });
-            } else {
-              reject(new Error(data.message || '上传失败'));
-            }
-          } catch (e) {
-            reject(new Error('解析响应失败'));
-            console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
+        success: (fileInfo) => {
+          const fileSize = fileInfo.size;
+          
+          // 检查文件大小
+          if (fileSize > maxSize) {
+            const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(1);
+            const currentSizeMB = (fileSize / (1024 * 1024)).toFixed(1);
+            const errorMsg = `图片过大(${currentSizeMB}MB)，限制${maxSizeMB}MB`;
+            
+            reject(new Error(errorMsg));
+            
+            uni.showToast({
+              title: errorMsg,
+              position: 'top',
+              icon: 'none',
+              duration: 2500
+            });
+            return;
           }
+          
+          // 大小符合要求，开始上传
+          uni.uploadFile({
+            url: uploadUrl,
+            filePath: filePath,
+            name: 'file',
+            fileType: 'image',
+            success: (uploadRes) => {
+              try {
+                const data = JSON.parse(uploadRes.data);
+                if (data.code === 200) {
+                  // 返回包含 _id 和 url 的对象
+                  resolve({
+                    _id: data.data._id,
+                    url: data.data.url
+                  });
+                } else {
+                  reject(new Error(data.message || '上传失败'));
+                }
+              } catch (e) {
+                reject(new Error('解析响应失败'));
+                console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
+              }
+            },
+            fail: (err) => {
+              reject(err);
+            }
+          });
         },
         fail: (err) => {
-          reject(err);
+          console.warn('获取文件信息失败，跳过大小检查，直接上传:', err);
+          
+          // 如果获取文件信息失败，仍然尝试上传（降级处理）
+          uni.uploadFile({
+            url: uploadUrl,
+            filePath: filePath,
+            name: 'file',
+            fileType: 'image',
+            success: (uploadRes) => {
+              try {
+                const data = JSON.parse(uploadRes.data);
+                if (data.code === 200) {
+                  resolve({
+                    _id: data.data._id,
+                    url: data.data.url
+                  });
+                } else {
+                  reject(new Error(data.message || '上传失败'));
+                }
+              } catch (e) {
+                reject(new Error('解析响应失败'));
+                console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
+              }
+            },
+            fail: (err) => {
+              reject(err);
+            }
+          });
         }
       });
     });

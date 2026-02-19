@@ -150,9 +150,9 @@ const formData = reactive({
   ]
 })
 
-//图片实列
-const stemImages = useImageUpload()
-const analysisImages = useImageUpload()
+//图片实列（限制 5MB）
+const stemImages = useImageUpload({ maxSize: 5 * 1024 * 1024 })
+const analysisImages = useImageUpload({ maxSize: 5 * 1024 * 1024 })
 
 // 添加选项
 const addOption = () => {

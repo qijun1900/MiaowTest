@@ -353,6 +353,10 @@ const markAsMastered = async (item) => {
     if (res.code === 200) {
       item.status = 'mastered';
       item.statusText = '已掌握';
+      uni.showToast({
+        title: '修改成功',
+        icon: 'none'
+      });
     } else {
       uni.showToast({
         title: res.message || '标记失败',
@@ -382,6 +386,10 @@ const markNeedReview = async (item) => {
     if (res.code === 200) {
       item.status = 'reviewing';
       item.statusText = '复习中';
+      uni.showToast({
+        title: '修改成功',
+        icon: 'none'
+      });
     } else {
       uni.showToast({
         title: res.message || '标记失败',
