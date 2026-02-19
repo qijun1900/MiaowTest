@@ -8,7 +8,7 @@ const ossConfig = require('../config/oss.config');
 const client = new OSS(ossConfig);
 
 /**
- * 上传文件到 OSS
+ * 本地磁盘文件到 OSS上传文件到 OSS
  * @param {string} localFilePath - 本地文件路径
  * @param {string} ossFilePath - OSS 文件路径（相对于存储桶）
  * @returns {Promise<string>} - 文件访问 URL
@@ -65,6 +65,37 @@ async function uploadStream(stream, ossFilePath) {
         return fileUrl;
     } catch (error) {
         console.error('OSS 流式上传文件失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 上传 Buffer 到 OSS（用户上传的文件（multer），无需写入磁盘）
+ * @param {Buffer} buffer - 文件 Buffer
+ * @param {string} ossFilePath - OSS 文件路径（相对于存储桶）
+ * @returns {Promise<string>} - 文件访问 URL
+ */
+async function uploadBuffer(buffer, ossFilePath) {
+    try {
+        // 添加存储前缀
+        const fullOssPath = ossConfig.prefix + ossFilePath;
+        
+        // 上传 Buffer
+        const result = await client.put(fullOssPath, buffer);
+        
+        // 生成文件访问 URL
+        let fileUrl;
+        if (ossConfig.cdnDomain) {
+            // 使用 CDN 域名
+            fileUrl = `https://${ossConfig.cdnDomain}/${fullOssPath}`;
+        } else {
+            // 使用 OSS 原始域名
+            fileUrl = `https://${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com/${fullOssPath}`;
+        }
+        
+        return fileUrl;
+    } catch (error) {
+        console.error('OSS 上传 Buffer 失败:', error);
         throw error;
     }
 }
@@ -212,6 +243,7 @@ async function migrateDirToOSS(localDir, ossDir) {
 module.exports = {
     uploadFile,
     uploadStream,
+    uploadBuffer,
     deleteFile,
     deleteFileByUrl,
     getFileUrl,

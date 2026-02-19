@@ -1,8 +1,7 @@
 const UserService = require("../../services/user/UserService");
 const multer = require('multer');
-const OSS = require('ali-oss');
-const ossConfig = require('../../config/oss.config');
 const path = require('path');
+const { uploadBuffer } = require('../../helpers/ossHelper');
 
 // 使用内存存储，方便后续上传到OSS
 const storage = multer.memoryStorage();
@@ -10,9 +9,6 @@ const upload = multer({
   storage: storage, 
   limits: { fileSize: 5 * 1024 * 1024 } // 限制5MB
 });
-
-// 创建OSS客户端
-const client = new OSS(ossConfig);
 
 const UserController = {
     Userlogin: async (req, res) => {
@@ -121,11 +117,8 @@ const UserController = {
                 const fileExtension = path.extname(req.file.originalname);
                 const fileName = `user/avatar/${uid}/${Date.now()}${fileExtension}`;
 
-                // 上传文件到OSS
-                const result = await client.put(fileName, req.file.buffer);
-                
-                // 获取上传后的URL
-                const avatarUrl = result.url;
+                // 使用 ossHelper 的 Buffer 上传
+                const avatarUrl = await uploadBuffer(req.file.buffer, fileName);
 
                 const databaseResult = await UserService.updateUserAvatar({ 
                     uid, 

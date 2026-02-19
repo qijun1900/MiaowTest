@@ -1,9 +1,7 @@
 const WrongBookService = require('../../services/user/WrongBookService');
 const multer = require('multer');
-const OSS = require('ali-oss');
-const ossConfig = require('../../config/oss.config');
 const path = require('path');
-const {deleteFileByUrl} = require('../../helpers/ossHelper')
+const { deleteFileByUrl, uploadBuffer } = require('../../helpers/ossHelper')
 
 // 使用内存存储，方便后续上传到OSS
 const storage = multer.memoryStorage();
@@ -11,9 +9,6 @@ const upload = multer({
   storage: storage, 
   limits: { fileSize: 10 * 1024 * 1024 } // 限制10MB
 });
-
-// 创建OSS客户端
-const client = new OSS(ossConfig);
 
 const WrongBookController = {
     // 获取错题本列表
@@ -151,14 +146,14 @@ const WrongBookController = {
                 const fileExtension = path.extname(req.file.originalname);
                 const fileName = `user/wrong_question/${uid}/${Date.now()}${fileExtension}`;
 
-                // 上传文件到OSS
-                const ossResult = await client.put(fileName, req.file.buffer);
+                // 使用 ossHelper 的 Buffer 上传
+                const fileUrl = await uploadBuffer(req.file.buffer, fileName);
 
-                if (ossResult && ossResult.url) {
+                if (fileUrl) {
                     // 保存图片记录到数据库
                     const dbResult = await WrongBookService.uploadImage({
                         uid,
-                        url: ossResult.url
+                        url: fileUrl
                     });
                     
                     if (dbResult.success) {
