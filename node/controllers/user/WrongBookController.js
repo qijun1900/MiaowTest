@@ -35,18 +35,18 @@ const WrongBookController = {
             const { title, color } = req.body;
             const result = await WrongBookService.createWrongBook({ uid, title, color });
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '创建错题本失败'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: '创建错题本成功',
             });
         } catch (error) {
             console.error("创建错题本失败", error);
-            res.status(500).send({
+            res.status(200).send({
                 code: 500,
                 message: "创建错题本失败"
             });
@@ -59,18 +59,18 @@ const WrongBookController = {
             const { id } = req.query;
             const data = await WrongBookService.getWrongBookDetail({ uid, id });
             if (!data) {
-                return res.send({
+                return res.status(200).send({
                     code: 404,
                     message: '错题本不存在'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data
             });
         } catch (error) {
             console.error("获取错题本详情失败", error);
-            res.status(500).send({
+            res.status(200).send({
                 code: 500,
                 message: "获取错题本详情失败"
             });
@@ -84,18 +84,18 @@ const WrongBookController = {
             const { id, title, color } = req.body;
             const result = await WrongBookService.updateWrongBook({ uid, id, title, color });
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '更新错题本失败'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: '更新错题本成功'
             });
         } catch (error) {
             console.error("更新错题本失败", error);
-            res.status(500).send({
+            res.status(200).send({
                 code: 500,
                 message: "更新错题本失败"
             });
@@ -108,19 +108,25 @@ const WrongBookController = {
             const { uid } = req.user;
             const { id } = req.body;
             const result = await WrongBookService.deleteWrongBook({ uid, id });
+            
+            // 统一返回 200 状态码，通过 code 字段区分成功/失败
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
-                    message: '删除错题本失败'
+                    message: result.message || '删除错题本失败',
+                    data: {
+                        questionCount: result.questionCount
+                    }
                 });
             }
-            res.send({
+            
+            res.status(200).send({
                 code: 200,
                 message: '删除错题本成功'
             });
         } catch (error) {
             console.error("删除错题本失败", error);
-            res.status(500).send({
+            res.status(200).send({
                 code: 500,
                 message: "删除错题本失败"
             });
@@ -133,7 +139,7 @@ const WrongBookController = {
             try {
                 // 检查是否有文件上传
                 if (!req.file) {
-                    return res.send({
+                    return res.status(200).send({
                         code: 400,
                         ActionType: "ERROR",
                         message: '请选择要上传的图片'
@@ -157,7 +163,7 @@ const WrongBookController = {
                     });
                     
                     if (dbResult.success) {
-                        res.send({
+                        res.status(200).send({
                             code: 200,
                             message: '上传图片成功',
                             data: {
@@ -166,13 +172,13 @@ const WrongBookController = {
                             }
                         });
                     } else {
-                        res.send({
+                        res.status(200).send({
                             code: 500,
                             message: '图片上传成功但保存记录失败'
                         });
                     }
                 } else {
-                    res.status(500).send({
+                    res.status(200).send({
                         code: 500,
                         message: "上传图片失败"
                     });
@@ -204,7 +210,7 @@ const WrongBookController = {
                     imageUrl: path
                 });
                 
-                res.send({
+                res.status(200).send({
                     code: 200,
                     message: '删除图片成功',
                     data: {
@@ -212,12 +218,12 @@ const WrongBookController = {
                     }
                 });
             } else if (ossResult) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     message: '删除图片成功',
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: 400,
                     message: '删除图片失败'
                 });
@@ -239,14 +245,14 @@ const WrongBookController = {
             
             // 验证必填字段
             if (!questionData.wrongBookId) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '缺少错题本ID'
                 });
             }
             
             if (!questionData.Type) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '缺少题目类型'
                 });
@@ -259,13 +265,13 @@ const WrongBookController = {
             });
             
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: result.message || '添加错题失败'
                 });
             }
             
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: '添加错题成功',
                 data: result.data
@@ -307,17 +313,17 @@ const WrongBookController = {
             const { id } = req.body;
             const result = await WrongBookService.deleteWrongQuestion({ uid, id });
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: result.message || '删除错题失败'
                 });
             }
             // 删除错题相关图片(如果有的话) images[{url:...,_id:...}...]
-            if (result.data && result.data.images && result.data.images.length > 0) {
-                for (const url of result.data.images.map(img => img.url)) {
-                    await deleteFileByUrl(url);
-                }
-            }
+            // 并行删除
+            await Promise.all(
+                result.data.images.map(img => deleteFileByUrl(img.url))
+            );
+
             res.send({
                 code: 200,
                 message: '删除错题成功'
@@ -338,12 +344,12 @@ const WrongBookController = {
             const { id } = req.body;
             const result = await WrongBookService.markAsMastered({ uid, id });
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '标记为已掌握失败'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: '标记为已掌握成功'
             });
@@ -363,12 +369,12 @@ const WrongBookController = {
             const { id } = req.body;
             const result = await WrongBookService.markAsNeedReview({ uid, id });
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '标记为需要复习失败'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: '标记为需要复习成功'
             });
@@ -388,12 +394,12 @@ const WrongBookController = {
             const { id } = req.params;
             const data = await WrongBookService.getWrongQuestionDetail({ uid, id });
             if (!data) {
-                return res.send({
+                return res.status(200).send({
                     code: 404,
                     message: '错题不存在'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data
             });
@@ -426,12 +432,12 @@ const WrongBookController = {
                 difficulty
             });
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: result.message || '更新错题失败'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: '更新错题成功'
             });

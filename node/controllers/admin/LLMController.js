@@ -1,4 +1,4 @@
-const LLMService = require("../../services/admin/LLMService");
+﻿const LLMService = require("../../services/admin/LLMService");
 
 const LLMController = {
     addmodel: async (req, res) => {
@@ -11,7 +11,7 @@ const LLMController = {
             description,
             createdTime:new Date()
          })
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK", 
         })
@@ -23,7 +23,7 @@ const LLMController = {
             page: Number(page),
             size: Number(size)
         })
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
             data: result
@@ -39,7 +39,7 @@ const LLMController = {
             description,
             editTime:new Date()
         })
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
         })
@@ -47,7 +47,7 @@ const LLMController = {
     deleteOnemodel: async (req, res) => {
         const {_id} = req.body
         await LLMService.deleteOnemodel({_id})
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK", 
         })
@@ -55,7 +55,7 @@ const LLMController = {
     deleteManymodel: async (req, res) => {
         const {_ids} = req.body;
         await LLMService.deleteManymodel({_ids})
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
         })
@@ -63,7 +63,7 @@ const LLMController = {
     changestatus: async (req, res) => {
         const {_id,state} = req.body;
         await LLMService.changestatus({_id,state})
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
         })
@@ -72,7 +72,7 @@ const LLMController = {
         const {message,model} = req.body;
         console.log(message,model)
         const result = await LLMService.useLLMChat(message,model)
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
             data: result
@@ -80,7 +80,7 @@ const LLMController = {
     },
     getChatModels: async (req, res) => {
         const result = await LLMService.getChatModels()
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
             data: result
@@ -89,7 +89,7 @@ const LLMController = {
     BatchaddQuestion: async (req, res) => {
         const {message,examId,category} = req.body;
         const result = await LLMService.BatchaddQuestion(message,examId,category)
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
             data: result
@@ -99,7 +99,7 @@ const LLMController = {
         const {message,questionType,_id} = req.body;
         const result = await LLMService.getQuestionAnalysis(message,questionType,_id)
         console.log(result)
-        res.send({
+        res.status(200).send({
             code: 200,
             ActionType: "OK",
             data: result

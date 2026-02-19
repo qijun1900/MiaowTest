@@ -252,9 +252,35 @@ const WrongBookService = {
      */
     deleteWrongBook: async ({ uid, id }) => {
         try {
+            // 1. 检查错题本是否存在且属于该用户
+            const wrongBook = await WrongBookModel.findOne({ _id: id, Uid: uid });
+            if (!wrongBook) {
+                return {
+                    success: false,
+                    message: '错题本不存在或无权限'
+                };
+            }
+            
+            // 2. 检查错题本中是否有题目
+            const questionCount = await WrongQuestionModel.countDocuments({ 
+                wrongBookId: id, 
+                Uid: uid 
+            });
+            
+            if (questionCount > 0) {
+                return {
+                    success: false,
+                    message: `错题本中还有 ${questionCount} 道题目，请先删除所有题目后再删除错题本`,
+                    questionCount: questionCount
+                };
+            }
+            
+            // 3. 如果没有题目，则可以删除
             const result = await WrongBookModel.deleteOne({ _id: id, Uid: uid });
+            
             return {
-                success: result.deletedCount > 0
+                success: result.deletedCount > 0,
+                message: result.deletedCount > 0 ? '删除成功' : '删除失败'
             };
         } catch (error) {
             console.error("DATABASE:删除错题本失败", error);

@@ -1,10 +1,10 @@
-const ConumerService = require('../../services/admin/ConsumerService');
+﻿const ConumerService = require('../../services/admin/ConsumerService');
 
 const ConsumerController ={
     GetMessageCount:async(req,res)=>{
         const result = await ConumerService.GetMessageCount();
         if(result) {
-            res.send({
+            res.status(200).send({
                 code:200,
                 data:result,
             })
@@ -17,7 +17,7 @@ const ConsumerController ={
             size: Number(size),
         });
         if(result) {
-            res.send({
+            res.status(200).send({
                 code:200,
                 data:result,
             })
@@ -27,7 +27,7 @@ const ConsumerController ={
         const {_id,status,adminReply} = req.body;
         const result = await ConumerService.HandleFeedback({_id,status,adminReply});
         if(result) {
-            res.send({
+            res.status(200).send({
                 code:200,
             })
         }
@@ -36,7 +36,7 @@ const ConsumerController ={
         const {_id} = req.body;
         const result = await ConumerService.DeleteFeedback({_id});
         if(result) {
-            res.send({
+            res.status(200).send({
                 code:200,
             })
         }
@@ -48,7 +48,7 @@ const ConsumerController ={
             size: Number(size),
         });
         if(result) {
-            res.send({
+            res.status(200).send({
                 code:200,
                 data:result,
             })
@@ -58,7 +58,7 @@ const ConsumerController ={
         const {uid } = req.body;
         console.log(uid);
         const result = await ConumerService.GetAuthExamList({uid});    
-        res.send({
+        res.status(200).send({
             code:200,
             data:result,
         })    
@@ -67,7 +67,7 @@ const ConsumerController ={
         const {uid,examId} = req.body;
         const result = await ConumerService.updateExamAuthStatus({uid,examId});
         if(result) {
-            res.send({
+            res.status(200).send({
                 code:200,
             })
         }

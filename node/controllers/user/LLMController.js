@@ -1,4 +1,4 @@
-const LLMService = require("../../services/user/LLMService");
+﻿const LLMService = require("../../services/user/LLMService");
 
 const LLMController ={
     sendExamAIanalyse:async (req,res)=>{
@@ -8,7 +8,7 @@ const LLMController ={
             const newmessage = prompt+":"+map; // 拼接提示词和映射后的问题
 
             const result = await LLMService.sendExamAIanalyse(newmessage, QuestionID,Type,model); // 调用服务层的sendExamAIanalyse方法
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: "OK",
                 data: result ,// 返回服务层的响应结果
@@ -23,7 +23,7 @@ const LLMController ={
             const {message,model} = req.body; 
             console.log("用户输入的问题:", message, "模型:", model);
             const result = await LLMService.UserChat(message,model) 
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: "OK",
                 data: result // 返回服务层的响应结果 
@@ -35,7 +35,7 @@ const LLMController ={
     getLLMList:async (req,res)=>{
         try {
             const result = await LLMService.getLLMList() // 调用服务层的getLLMList方法 
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: "OK",
                 data: result // 返回服务层的响应结果
@@ -50,7 +50,7 @@ const LLMController ={
             const {word} = req.body; 
             console.log("要翻译的单词:", word);
             const result = await LLMService.postTranslateWorld(word) // 调用服务层的postTranslateWorld方法
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: "OK",
                 data: result // 返回服务层的响应结果

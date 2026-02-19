@@ -1,4 +1,4 @@
-const ExamService = require("../../services/admin/ExamService");
+﻿const ExamService = require("../../services/admin/ExamService");
 
 const ExamController ={
     ExamAdd:async (req,res) => {
@@ -16,7 +16,7 @@ const ExamController ={
             day,
             createdTime:new Date()
         })
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
         }) 
     },
@@ -26,7 +26,7 @@ const ExamController ={
             page: Number(page),
             size: Number(size)
         })
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             data: result,
             code:200,
@@ -48,7 +48,7 @@ const ExamController ={
             createdTime:new Date(),
             _id
         })
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -56,7 +56,7 @@ const ExamController ={
     updateExamStatus:async(req,res)=>{
         const {_id,state} = req.body
         await ExamService.updateExamStatus({_id,state:Number(state)})
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -64,7 +64,7 @@ const ExamController ={
     deleteOneExamInfo:async(req,res)=>{
         const {_id} = req.body
         await ExamService.deleteOneExamInfo({_id})
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -72,7 +72,7 @@ const ExamController ={
     deleteManyExamInfo:async(req,res)=>{
         const {_ids} = req.body
         await ExamService.deleteManyExamInfo({_ids})
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -91,7 +91,7 @@ const ExamController ={
             isMultiple:Number(isMultiple),
             createdTime:new Date()
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -104,7 +104,7 @@ const ExamController ={
             examId,
             questionType:Number(questionType)
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType: "OK",
             data: result,
@@ -123,7 +123,7 @@ const ExamController ={
             Type:Number(Type),
             createdTime:new Date()
         }) 
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK", 
         })
@@ -141,7 +141,7 @@ const ExamController ={
             Type:Number(Type),
             createdTime:new Date()
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK", 
         })
@@ -159,7 +159,7 @@ const ExamController ={
             Type:Number(Type),
             createdTime:new Date()
         }) 
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK", 
         })
@@ -171,7 +171,7 @@ const ExamController ={
             isPublish:Number(isPublish),
             questionType
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -179,7 +179,7 @@ const ExamController ={
     UpdateBatchQuestion:async(req,res)=>{
         const {Ids,questionType} = req.body;
         await ExamService.UpdateBatchQuestion({Ids,questionType})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -187,7 +187,7 @@ const ExamController ={
     DeleteOneQuestion:async(req,res)=>{
         const {_id,questionType} = req.body
         await ExamService.DeleteOneQuestion({_id,questionType})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -195,7 +195,7 @@ const ExamController ={
     DeleteManyQuestion:async(req,res)=>{
         const {Ids,questionType} = req.body
         await ExamService.DeleteManyQuestion({Ids,questionType})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -205,7 +205,7 @@ const ExamController ={
         const result = await ExamService.getQuestionInfo({
             _id:req.params.id,
             questionType}) 
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
             data:result, 
@@ -224,7 +224,7 @@ const ExamController ={
            isMultiple:Number(isMultiple),
            createdTime:new Date()
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK", 
         })
@@ -241,7 +241,7 @@ const ExamController ={
             isAIanswer:Number(isAIanswer),
             createdTime:new Date(),
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK", 
         })
@@ -258,7 +258,7 @@ const ExamController ={
             isAIanswer:Number(isAIanswer),
             createdTime:new Date(),  
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK", 
         })
@@ -275,7 +275,7 @@ const ExamController ={
             isAIanswer:Number(isAIanswer),
             createdTime:new Date(),
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK", 
         })
@@ -286,7 +286,7 @@ const ExamController ={
             examId,
             isPublish:Number(isPublish),
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -297,7 +297,7 @@ const ExamController ={
             examId,
             state:Number(state),
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -311,7 +311,7 @@ const ExamController ={
             isPublish:Number(isPublish),
             examId
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -323,7 +323,7 @@ const ExamController ={
             size: Number(size),
             examId,
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
             data: result,
@@ -337,7 +337,7 @@ const ExamController ={
             examId,
             _id,
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -345,7 +345,7 @@ const ExamController ={
     CheckQuestionTitle:async(req,res)=>{
         const {_id,examId} = req.body
         const result = await ExamService.CheckQuestionTitle({_id,examId})
-        res.send({
+        res.status(200).send({
             code:200,
             data:result,
         })
@@ -353,7 +353,7 @@ const ExamController ={
     DeleteOneQuestionTitle:async(req,res)=>{
         const {_id,examId} = req.body
         await ExamService.DeleteOneQuestionTitle({_id,examId})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -361,7 +361,7 @@ const ExamController ={
     DeleteManyQuestionTitle:async(req,res)=>{
         const {_ids,examId} = req.body
         await ExamService.DeleteManyQuestionTitle({_ids,examId})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -369,7 +369,7 @@ const ExamController ={
     UpdateOneQuestionTitleState:async(req,res)=>{
         const {_id, examId, state} = req.body
         await ExamService.UpdateOneQuestionTitleState({_id,examId,isPublish:Number(state)})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -380,7 +380,7 @@ const ExamController ={
             category:Number(category),
             examId,
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
             data:result,
@@ -389,7 +389,7 @@ const ExamController ={
     AddOneQuestion:async(req,res)=>{
         const {_id, examId,category,QuestionTitleId} = req.body
         await ExamService.AddOneQuestion({_id,examId,category,QuestionTitleId})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -397,7 +397,7 @@ const ExamController ={
     AddManyQuestion:async(req,res)=>{
         const {_ids,examId,category,QuestionTitleId} = req.body
         await ExamService.AddManyQuestion({_ids,examId,category,QuestionTitleId})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -405,7 +405,7 @@ const ExamController ={
     getCheckQusetionList:async(req,res)=>{
         const {examId,QuestionTitleId} = req.query
         const result = await ExamService.getCheckQusetionList({examId,QuestionTitleId})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
             data:result,
@@ -414,7 +414,7 @@ const ExamController ={
     MatchQusetionList:async(req,res)=>{
         const {extractedData} = req.body
         const result = await ExamService.MatchQusetionList({extractedData})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
             data:result,
@@ -423,7 +423,7 @@ const ExamController ={
     RemoveUserQuestionList:async(req,res)=>{
         const {chooseInfo,examId,QuestionTitleId} = req.body
         await ExamService.RemoveUserQuestionList({chooseInfo,examId,QuestionTitleId})
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -437,7 +437,7 @@ const ExamController ={
             questionId,//用于题库的更新，二次匹配
             questionIdS,
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
         })
@@ -449,7 +449,7 @@ const ExamController ={
                 titleId: req.query.titleId,  // 从查询参数获取titleId
             }
         )
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
             data:result,
@@ -462,7 +462,7 @@ const ExamController ={
             questionType,
             isAddUserList,
         })
-        res.send({
+        res.status(200).send({
             code:200,
             ActionType:"OK",
             data:result, 
@@ -478,7 +478,7 @@ const ExamController ={
             isPublish,
             examId 
         })
-        res.send({
+        res.status(200).send({
             code:200,
         })
     },
@@ -489,7 +489,7 @@ const ExamController ={
             size: Number(size),
             examId,
         })
-        res.send({
+        res.status(200).send({
             code:200,
             data:result,
         })
@@ -505,21 +505,21 @@ const ExamController ={
             isPublish,
             examId,
         })
-        res.send({
+        res.status(200).send({
             code:200,
         })
     },
     UpdateNetDiskState:async(req,res)=>{
         const {_id,examId,state} = req.body;
         await ExamService.UpdateNetDiskState({_id,examId,state})
-        res.send({
+        res.status(200).send({
             code:200,
         })
     },
     DeleteOneNetDisk:async(req,res)=>{
         const {_id,examId,state} = req.body;
         await ExamService.DeleteOneNetDisk({_id,examId,state})
-        res.send({
+        res.status(200).send({
             code:200,
         })
     }

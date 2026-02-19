@@ -1,4 +1,4 @@
-const UserService = require("../../services/user/UserService");
+﻿const UserService = require("../../services/user/UserService");
 const multer = require('multer');
 const path = require('path');
 const { uploadBuffer } = require('../../helpers/ossHelper');
@@ -16,7 +16,7 @@ const UserController = {
             const { message, code } = req.body;
             console.log("接收到的 message:", message, "code:", code);
             const result = await UserService.Userlogin(message, code);
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: "OK",
                 data: result.data,
@@ -31,7 +31,7 @@ const UserController = {
             const { account, verifyCode, password } = req.body;
             const result = await UserService.UserRegister(account, verifyCode, password);
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
@@ -48,7 +48,7 @@ const UserController = {
         try {
             const { account, password } = req.body;
             const result = await UserService.UserAccountLogin(account, password);
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 success: result.success,
                 message: result.message,
@@ -67,14 +67,14 @@ const UserController = {
             const result = await UserService.updateUserInfo({ uid, nickname, avatar, gender });
 
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
                     data: result.data
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message
@@ -82,7 +82,7 @@ const UserController = {
             }
         } catch (error) {
             console.error("updateUserInfo 失败", error);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -96,7 +96,7 @@ const UserController = {
             try {
                 // 检查是否有文件上传
                 if (!req.file) {
-                    return res.send({
+                    return res.status(200).send({
                         code: 400,
                         ActionType: "ERROR",
                         message: '请选择要上传的图片'
@@ -106,7 +106,7 @@ const UserController = {
                 // 获取用户信息
                 const { uid } = req.user;
                 if (!uid) {
-                    return res.send({
+                    return res.status(200).send({
                         code: 401,
                         ActionType: "ERROR",
                         message: '用户未登录'
@@ -126,20 +126,20 @@ const UserController = {
                 });
                 if(databaseResult.success){
                     // 返回成功响应
-                    res.send({
+                    res.status(200).send({
                         code: databaseResult.code,
                         message:databaseResult.message,
                         data: { avatar: avatarUrl }
                     });
                 }else{
-                    res.send({
+                    res.status(200).send({
                         code: databaseResult.code,
                         message: databaseResult.message,
                     });
                 }
             } catch (e) {
                 console.error("uploadUserAvatar失败", e);
-                res.send({
+                res.status(200).send({
                     code: 500,
                     ActionType: "ERROR",
                     message: '服务器错误'
@@ -154,13 +154,13 @@ const UserController = {
             const { uid } = req.user//获取用户openid
             const result = await UserService.addExamFavorite(examId, uid);
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
                 })
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message
@@ -168,7 +168,7 @@ const UserController = {
             }
         } catch (error) {
             console.error("addExamFavorite 失败", error);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -184,20 +184,20 @@ const UserController = {
 
             const result = await UserService.getExamFavorites(examId, uid);
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     data: result.data
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                 });
             }
         } catch (error) {
             console.error("getExamFavorites 失败", error);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -211,7 +211,7 @@ const UserController = {
             const { uid } = req.user;
             const result = await UserService.removeExamFavorite(examId, uid);
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
@@ -219,7 +219,7 @@ const UserController = {
             }
         } catch (error) {
             console.error("removeExamFavorite 失败", error);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -231,7 +231,7 @@ const UserController = {
             const { uid } = req.user;
             const result = await UserService.getUserFavoritesExam(uid);  // 调用服务层方法获取用户收藏的考试
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     data: result.data,
@@ -239,7 +239,7 @@ const UserController = {
             }
         } catch (error) {
             console.error("getUserFavoritesExam 失败", error);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -252,13 +252,13 @@ const UserController = {
             const { uid } = req.user;
             const result = await UserService.BindAccount({ uid, account, password, verifyCode });
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message
@@ -266,7 +266,7 @@ const UserController = {
             }
         } catch (error) {
             console.error("BindAccount 失败", error);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -278,7 +278,7 @@ const UserController = {
             const { uid } = req.user;
             const result = await UserService.checkUserBind(uid);
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     data: result.data,
@@ -297,13 +297,13 @@ const UserController = {
             
             const result = await UserService.userFeedback({ uid, type, content, contactInfo, relatedId }); // 调用服务层方法处理反馈
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message, // 返回成功消息
                 })
             }else{
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message:"反馈失败"
@@ -311,7 +311,7 @@ const UserController = {
             }
         }catch(e){
             console.error("userFeedback 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: "服务器错误"
@@ -322,7 +322,7 @@ const UserController = {
         try {
             const { uid } = req.user; // 获取用户uid
             if (!uid) {
-                return res.send({ 
+                return res.status(200).send({ 
                     code: 401, 
                     message: '您未登录' 
                 }); // 如果用户未登录，返回错误信息
@@ -333,13 +333,13 @@ const UserController = {
             });
             
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message
@@ -347,7 +347,7 @@ const UserController = {
             }
         }catch(e) {
             console.error("savePracticeNote 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -358,7 +358,7 @@ const UserController = {
         try {
             const { uid } = req.user; // 获取用户uid
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     ActionType: "ERROR",
                     message: '您未登录'
@@ -368,7 +368,7 @@ const UserController = {
             
             // 验证questionId是否存在
             if (!questionId) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     ActionType: "ERROR",
                     message: '缺少题目ID'
@@ -378,13 +378,13 @@ const UserController = {
             const result = await UserService.getPracticeNote({ uid, questionId });
             
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     data: result.data
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message
@@ -392,7 +392,7 @@ const UserController = {
             }
         }catch(e) {
             console.error("getPracticeNote 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -403,7 +403,7 @@ const UserController = {
         try {
             const { uid } = req.user; // 获取用户uid
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     ActionType: "ERROR",
                     message: '您未登录'
@@ -412,13 +412,13 @@ const UserController = {
             const result = await UserService.getNoteExamList({uid}); // 调用服务层方法获取用户笔记的考试列表
             
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     data: result.data,
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message,
@@ -426,7 +426,7 @@ const UserController = {
             }
         } catch(e) {
             console.error("getNoteExamList 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -437,7 +437,7 @@ const UserController = {
         try {
             const { uid } = req.user; // 获取用户uid
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     ActionType: "ERROR",
                     message: '您未登录'
@@ -445,7 +445,7 @@ const UserController = {
             }
             const { examId } = req.body; // 从请求体中获取考试ID
             if (!examId) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     ActionType: "ERROR",
                     message: '缺少考试ID'
@@ -454,20 +454,20 @@ const UserController = {
             const result = await UserService.getNoteListByExamId({uid, examId}); // 调用服务层方法获取指定考试ID的笔记列表   
             
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     data: result.data
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                 });
             }
         }catch(e) {
             console.error("getNoteListByExamId 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -479,7 +479,7 @@ const UserController = {
         try {
             const { uid } = req.user; // 获取用户uid
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     ActionType: "ERROR",
                     message: '您未登录'
@@ -495,13 +495,13 @@ const UserController = {
             }); // 调用服务层方法保存用户笔记
             
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message
@@ -509,7 +509,7 @@ const UserController = {
             }
         }catch(e) {
             console.error("saveUserBankPracticeNote 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -521,7 +521,7 @@ const UserController = {
         try {
             const { uid } = req.user; // 获取用户uid
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     ActionType: "ERROR",
                     message: '您未登录'
@@ -530,13 +530,13 @@ const UserController = {
             const { questionId } = req.body; // 从请求体中获取笔记信息
             const result = await UserService.getUserBankPracticeNote({ uid, questionId }); // 调用服务层方法获取用户笔记
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     data: result.data,
                 });
             }else{
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     ActionType: "ERROR",
                     message: result.message
@@ -553,7 +553,7 @@ const UserController = {
             const {message,model} = req.body;
             console.log(message,model);
             const result = await UserService.useLLMChat({message,model});
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: "OK",
                 data: result
@@ -569,19 +569,19 @@ const UserController = {
             const { fulldate, todos_content } = req.body; // 从请求体中获取待办事项信息
             const result = await UserService.setTodayTodos({ uid, fulldate, todos_content });
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     message: result.message,
                 });
             } else {
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     message: result.message
                 });
             }
         } catch (e) {
             console.error("setTodayTodos 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -593,12 +593,12 @@ const UserController = {
             const { uid } = req.user; // 获取用户uid，前端阻拦了未登录的情况
             const result = await UserService.getDotDates({ uid });
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     data: result.data,
                 })
             }else{
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     message: result.message
                 })
@@ -606,7 +606,7 @@ const UserController = {
             
         }catch(e) {
             console.error("getDotDates 失败", e);
-            res.send({
+            res.status(200).send({
                 code: 500,
                 ActionType: "ERROR",
                 message: '服务器错误'
@@ -620,7 +620,7 @@ const UserController = {
             const { fulldate } = req.body; // 从请求体中获取日期信息
             const result = await UserService.getTodayTodos({ uid, fulldate });
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     data: result.data,
                 })
@@ -636,12 +636,12 @@ const UserController = {
             const { fulldate, todoId } = req.body; // 从请求体中获取日期和待办事项ID信息
             const result = await UserService.toggleTodoStatus({ uid, fulldate, todoId });
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     message: result.message,
                 });
             }else{
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     message: result.message,
                 })
@@ -656,12 +656,12 @@ const UserController = {
             const { fulldate, todoId } = req.body; // 从请求体中获取日期和待办事项ID信息
             const result = await UserService.deleteTodo({ uid, fulldate, todoId });
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     message: result.message,
                 });
             }else{
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     message: result.message,
                 })
@@ -681,13 +681,13 @@ const UserController = {
                 todoForm 
             });
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     message: result.message,
                 });
                 
             }else{
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     message: result.message,
                 })

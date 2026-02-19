@@ -1,4 +1,4 @@
-const NewsService = require("../../services/admin/NewsService");
+﻿const NewsService = require("../../services/admin/NewsService");
 
 const NewsController ={
      addAnnouncement:async (req,res)=>{
@@ -13,7 +13,7 @@ const NewsController ={
             creator,
             editTime:new Date()
         })
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -24,7 +24,7 @@ const NewsController ={
             page: Number(page),
             size: Number(size)
         })
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             data: result,
             code:200,
@@ -33,7 +33,7 @@ const NewsController ={
     DeleteOneAnnouncement:async (req,res)=>{
         const {_id} = req.body
         await NewsService.DeleteOneAnnouncement({_id})
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -41,7 +41,7 @@ const NewsController ={
     DeleteManyAnnouncement:async (req,res)=>{
         const {_ids} = req.body
         await NewsService.DeleteManyAnnouncement({_ids})
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -49,7 +49,7 @@ const NewsController ={
     updateStatus:async (req,res)=>{
         const {_id,state} = req.body
         await NewsService.updateStatus({_id,state})
-        res.send({
+        res.status(200).send({
             ActionType: "OK",
             code:200,
         })
@@ -68,7 +68,7 @@ const NewsController ={
         creator,
         editTime:new Date()
     })
-    res.send({
+    res.status(200).send({
         ActionType: "OK",
         code:200,
     })

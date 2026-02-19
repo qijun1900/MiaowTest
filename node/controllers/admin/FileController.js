@@ -1,4 +1,4 @@
-const FileService = require('../../services/admin/FileService');
+﻿const FileService = require('../../services/admin/FileService');
 const FileController = {
     uploadFile: async (req, res) => {
         try {
@@ -27,7 +27,7 @@ const FileController = {
                     ActionType: 'ERROR',
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
             });
@@ -49,7 +49,7 @@ const FileController = {
                     ActionType: 'ERROR',
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
                 data: result,
@@ -80,7 +80,7 @@ const FileController = {
                     ActionType: 'ERROR',
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data: result,
             });
@@ -103,7 +103,7 @@ const FileController = {
                     ActionType: 'ERROR',
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
             });
@@ -162,7 +162,7 @@ const FileController = {
                     ActionType: 'ERROR',
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
             });
@@ -185,7 +185,7 @@ const FileController = {
                     ActionType: 'ERROR',
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
             });
         } catch (error) {

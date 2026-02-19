@@ -1,4 +1,4 @@
-const WordBooksService = require('../../services/admin/WordBooksService');
+﻿const WordBooksService = require('../../services/admin/WordBooksService');
 
 const WordBooksController = {
     getWordBooksList: async (req, res) => {
@@ -6,7 +6,7 @@ const WordBooksController = {
             const { page = 1, size = 10 } = req.query;
             const result = await WordBooksService.getWordBooksList(page, size);
 
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
                 data: result
@@ -47,7 +47,7 @@ const WordBooksController = {
                     message: '词书不存在'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
                 data: result,
@@ -80,7 +80,7 @@ const WordBooksController = {
                     message: '词书不存在'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
                 message: '词书删除成功'
@@ -107,7 +107,7 @@ const WordBooksController = {
 
             }
             const result = await WordBooksService.deleteManyWordBooks(_ids);
-            res.send({
+            res.status(200).send({
                 code: 200,
                 ActionType: 'OK',
                 data: {

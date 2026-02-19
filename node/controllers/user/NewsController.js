@@ -1,10 +1,10 @@
-const NewsService = require("../../services/user/NewsService");
+﻿const NewsService = require("../../services/user/NewsService");
 
 const NewsController ={
     getNoticeInfo:async(req,res)=>{
         try {
             const result = await NewsService.getNoticeInfo(); // 调用服务层的方法获取数据
-            res.send({
+            res.status(200).send({
                 code: 200, 
                 data: result, 
             })
@@ -15,7 +15,7 @@ const NewsController ={
     getIndexBanner:async(req,res)=>{
         try {
             const result = await NewsService.getIndexBanner(); 
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data: result,
             })

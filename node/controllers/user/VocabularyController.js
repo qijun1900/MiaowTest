@@ -1,10 +1,10 @@
-const VocabularyService = require('../../services/user/VocabularyService');
+﻿const VocabularyService = require('../../services/user/VocabularyService');
 
 const VocabularyController = {
     getWordBooks: async (req, res) => {
         try {
             const wordBooks = await VocabularyService.getWordBooks();    
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data: wordBooks
             });
@@ -20,7 +20,7 @@ const VocabularyController = {
         try {
             const { uid } = req.user
             if (!uid) {
-                return res.send({ 
+                return res.status(200).send({ 
                     code: 401, 
                     message: '您未登录' 
                 }); 
@@ -33,12 +33,12 @@ const VocabularyController = {
                 currentBookTitle,
             });
             if (!result.success) {
-                return res.send({ 
+                return res.status(200).send({ 
                     code: 400, 
                     message: '设置失败' 
                 }); 
             }else{
-                res.send({
+                res.status(200).send({
                     code: 200,
                     message: "设置成功"
                 });
@@ -55,19 +55,19 @@ const VocabularyController = {
         try {
             const { uid } = req.user
             if (!uid) {
-                return res.send({ 
+                return res.status(200).send({ 
                     code: 401, 
                     message: '您未登录' 
                 }); 
             }
             const data = await VocabularyService.checkWordRember({ uid });
             if (!data.currentBook_id && !data.dailyGoal) {
-                return res.send({ 
+                return res.status(200).send({ 
                     code: 400, 
                     isInit: false
                 }); 
             }else{
-                res.send({
+                res.status(200).send({
                     code: 200,
                     data,
                     isInit: true
@@ -85,7 +85,7 @@ const VocabularyController = {
         try {
             const { uid } = req.user
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     message: '您未登录'
                 });
@@ -93,12 +93,12 @@ const VocabularyController = {
             const { bookId, page, pageSize } = req.body;
             const data = await VocabularyService.getWordBookList({ bookId, page, pageSize });
             if (!data) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '获取单词书列表失败'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data,
             })
@@ -116,7 +116,7 @@ const VocabularyController = {
         try {
             const { uid } = req.user
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     message: '您未登录'
                 });
@@ -129,12 +129,12 @@ const VocabularyController = {
                 cover_url 
             });
             if (!result.success) {
-                return res.send({
+                return res.status(200).send({
                     code: 400,
                     message: '创建单词书失败'
                 });
             }
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: '创建单词书成功',
             });
@@ -150,13 +150,13 @@ const VocabularyController = {
         try {
             const { uid } = req.user
             if (!uid) {
-                return res.send({
+                return res.status(200).send({
                     code: 401,
                     message: '您未登录'
                 });
             }
             const wordBooks = await VocabularyService.fetchUserWordBooks({ uid });
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data: wordBooks 
             });

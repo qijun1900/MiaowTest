@@ -1,11 +1,11 @@
-const ExamService = require("../../services/user/ExamService");
+﻿const ExamService = require("../../services/user/ExamService");
 
 const ExamController ={
     //uniappAPI
     getHotExamList:async (req,res)=>{
         try {
             const result = await ExamService.getHotExamList()
-            res.send({
+            res.status(200).send({
                 code:200,
                 data: result 
             })
@@ -17,7 +17,7 @@ const ExamController ={
     getExamSubjects:async (req,res)=>{
         try {
             const result = await ExamService.getExamSubjects()
-            res.send({
+            res.status(200).send({
                 code:200,
                 data: result 
             })
@@ -29,7 +29,7 @@ const ExamController ={
         try {
             const ExamSubjectId = req.params.id; // 从请求参数中获取ExamSubjectId
             const result = await ExamService.getExamSubjectTypes(ExamSubjectId) 
-            res.send({
+            res.status(200).send({
                 code:200,
                 data: result
             })
@@ -41,7 +41,7 @@ const ExamController ={
         try {
             const extractedData = req.body; 
             const result = await ExamService.FetchMatchQuestionList(extractedData) 
-            res.send({
+            res.status(200).send({
                 code: 200,
                 data: result
             });
@@ -58,13 +58,13 @@ const ExamController ={
                 questionData, // 问题数据对象
             )
            if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
                 });
             }else{
-                res.send({
+                res.status(200).send({
                     code: result.code,
                     message: result.message,
                 });
@@ -82,7 +82,7 @@ const ExamController ={
             const result = await ExamService.AddUserBank(uid, bankName);
             
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     ActionType: "OK",
                     message: result.message,
@@ -107,12 +107,12 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const result = await ExamService.getUserBankList(uid)
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     data: result.data
                 });
             }else{
-                res.send({
+                res.status(200).send({
                     code: 401
                 });
             }
@@ -126,7 +126,7 @@ const ExamController ={
             const bankId = req.params.id;//获取题库id
             console.log("uid",uid,"bankId",bankId);
             const result = await ExamService.getUserBankQuestionList(uid,bankId)
-            res.send({
+            res.status(200).send({
                 code:200,
                 data: result.data
             })  
@@ -140,21 +140,21 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { questionData } = req.body; // 从请求体中获取questionData
             if(!uid){
-                res.send({
+                res.status(200).send({
                     code: 401,
                     message: "您未登录",
                 })
                 return;
             }
             if(!questionData._id){
-                res.send({
+                res.status(200).send({
                     code: 400,
                     message: "更新错误",
                 })
                 return;
             }
             const result = await ExamService.userUpdateQuestion(questionData)
-            res.send({
+            res.status(200).send({
                 code: 200,
                 message: result.message,
             });
@@ -167,14 +167,14 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { questionId , bankId} = req.body; // 从请求体中获取questionId,bankId
             if(!uid&&!questionId&&!bankId){
-                res.send({
+                res.status(200).send({
                     code: 401,
                     message: "删除错误",
                 })
                 return;
             }
             const result = await ExamService.userDeleteQuestion({uid,questionId,bankId})
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 message: result.message
             });
@@ -187,14 +187,14 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { bankId } = req.body; // 从请求体中获取bankId
             if(!uid&&!bankId){
-                res.send({
+                res.status(200).send({
                     code: 401,
                     message: "删除错误",
                 })
                 return;
             }
             const result = await ExamService.userDeleteBank({uid,bankId})
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 message: result.message
             })
@@ -207,7 +207,7 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { questionId, examId,Type } = req.body; // 从请求体中获取questionId,examId,Type
             const result = await ExamService.useraddwrongquestion({uid,questionId,examId,Type})
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 message: result.message
             })
@@ -221,7 +221,7 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { questionId } = req.body; 
             const result = await ExamService.userDeleteWrongQuestion({uid,questionId})
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 message: result.message
             })
@@ -236,7 +236,7 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { questionId, examId,Type } = req.body; // 从请求体中获取questionId,examId,Type
             const result = await ExamService.useraddfavoritequestion({uid,questionId,examId,Type})
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 message: result.message
             })
@@ -250,7 +250,7 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { questionId } = req.body; // 从请求体中获取questionId
             const result = await ExamService.userDeleteFavoriteQuestion({uid,questionId})  
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 message: result.message
             })     
@@ -262,7 +262,7 @@ const ExamController ={
         try {
             const { uid } = req.user;//获取用户openid
             const result = await ExamService.getUserFavoriteQuestionList(uid)
-            res.send({
+            res.status(200).send({
                 code:result.code,
                 data: result.data
             })
@@ -276,7 +276,7 @@ const ExamController ={
             const { uid } = req.user;//获取用户openid
             const { questionId } = req.body; // 从请求体中获取questionId
             const result = await ExamService.checkFavoriteQuestion({uid,questionId})
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 isFavorited: result.isFavorited
             })
@@ -295,7 +295,7 @@ const ExamController ={
                 Type,
                 questionId
             })
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 data: result.data, // 返回的数据
             })
@@ -308,7 +308,7 @@ const ExamController ={
         try {
             const { uid } = req.user;//获取用户openid
             const result = await ExamService.getUserWrongQuestionList(uid)
-            res.send({
+            res.status(200).send({
                 code:result.code,
                 data: result.data
             })
@@ -321,7 +321,7 @@ const ExamController ={
         try {
             const {examId} = req.body;
             const result = await ExamService.getExamSubjectMaterials(examId)
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 data: result.data, // 返回的数据
             })
@@ -335,7 +335,7 @@ const ExamController ={
         try {
             const { uid } = req.user;//获取用户openid
             if(!uid){
-                res.send({
+                res.status(200).send({
                     code: 401,
                     message: "您未登录",
                 })
@@ -343,7 +343,7 @@ const ExamController ={
             }
             const {examId,titleid} = req.body;
             const result = await ExamService.getExamSubjectTitleUrl({examId,titleid})
-            res.send({
+            res.status(200).send({
                 code: result.code,
                 data: result.data, // 返回的url数据
             })
@@ -357,7 +357,7 @@ const ExamController ={
             const { examId } = req.body;
             const result = await ExamService.checkExamVerify({ uid, examId })
             if (result.success) {
-                res.send({
+                res.status(200).send({
                     code: 200,
                     data: result.data
                 })

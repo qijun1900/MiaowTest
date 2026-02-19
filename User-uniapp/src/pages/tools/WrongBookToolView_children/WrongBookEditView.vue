@@ -209,22 +209,57 @@ const handleDelete = () => {
     title: '确认删除',
     content: '删除后无法恢复，确定要删除这个错题本吗？',
     confirmColor: '#f44336',
-    success: async (res) => {
-      if (res.confirm) {
+    success: async (confirm) => {
+      if (confirm.confirm) {
         submitting.value = true;
         try {
-          await deleteWrongBookAPI(bookId.value);
-          uni.showToast({
-            title: '删除成功',
-            icon: 'success'
-          });
-          setTimeout(() => {
-            uni.navigateBack();
-          }, 1500);
+          const res = await deleteWrongBookAPI(bookId.value);
+          
+          if (res.code === 200) {
+            uni.showToast({
+              title: '删除成功',
+              icon: 'success'
+            });
+            setTimeout(() => {
+              uni.navigateBack();
+            }, 1500);
+          } else {
+            // 处理删除失败的情况（如：错题本中还有题目）
+            const questionCount = res.data?.questionCount;
+            
+            if (questionCount > 0) {
+              // 错题本中有题目，提示用户
+              setTimeout(() => {
+                uni.showModal({
+                  title: '无法删除',
+                  content: res.message || '删除失败',
+                  showCancel: true,
+                  cancelText: '取消',
+                  confirmText: '去删除',
+                  confirmColor: '#1890ff',
+                  success: (modalRes) => {
+                    if (modalRes.confirm) {
+                      // 跳转到题目列表页面
+                      uni.navigateTo({
+                        url: `/pages/tools/WrongBookToolView_children/WrongQuestionListView?id=${bookId.value}&title=${encodeURIComponent(formData.value.title)}`
+                      });
+                    }
+                  }
+                });
+              }, 300);
+            } else {
+              // 其他错误
+              uni.showToast({
+                title: res.message || '删除失败',
+                icon: 'none'
+              });
+            }
+            submitting.value = false;
+          }
         } catch (error) {
           uni.showToast({
             title: '删除失败',
-            icon: 'error'
+            icon: 'none'
           });
           console.error(error);
           submitting.value = false;

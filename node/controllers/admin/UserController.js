@@ -1,11 +1,11 @@
-const UserService = require("../../services/admin/UserService");
+﻿const UserService = require("../../services/admin/UserService");
 const JWT = require("../../MiddleWares/jwt")
 
 const UserController = {
     login: async (req, res) => {
         const result = await UserService.login(req.body);
         if (result.length === 0) {
-            res.send({
+            res.status(200).send({
                 code: "-1",
                 error: "用户名或密码不匹配"
             });
@@ -16,7 +16,7 @@ const UserController = {
                 username:result[0].username
             },"1d")
             res.header("authorization", token)
-            res.send({
+            res.status(200).send({
                 ActionType: "OK",
                 data:{
                     username:result[0].username,
@@ -41,7 +41,7 @@ const UserController = {
             avatar
         })
         if(avatar){
-            res.send({
+            res.status(200).send({
                 ActionType:"OK",
                 data:{
                     username,
@@ -51,7 +51,7 @@ const UserController = {
                 }
             })
         }else{
-            res.send({
+            res.status(200).send({
                 ActionType:"OK",
                 data:{
                     username,
@@ -74,7 +74,7 @@ const UserController = {
             state:Number(state),
             createTime:Date.now()
         })
-        res.send({
+        res.status(200).send({
             ActionType:"OK"
         })
     },
@@ -85,7 +85,7 @@ const UserController = {
             page: Number(page),
             size: Number(size)
         })
-        res.send({
+        res.status(200).send({
             ActionType:"OK",  
             data:result,
             total: result.total
@@ -94,14 +94,14 @@ const UserController = {
     delListOneUser:async (req,res)=>{
         const {_id} = req.body
         const result = await UserService.dellist({_id})
-        res.send({
+        res.status(200).send({
             ActionType:"OK",  
         })
 
     },
     putList:async (req,res)=>{
         const result = await UserService.putlist(req.body)
-        res.send({
+        res.status(200).send({
             ActionType:"OK",  
         })
 
@@ -110,7 +110,7 @@ const UserController = {
         const {_ids} = req.body
         console.log(_ids)
         const result = await UserService.delManylist({_ids})
-        res.send({
+        res.status(200).send({
             ActionType:"OK",
         })
     },
@@ -126,7 +126,7 @@ const UserController = {
             state,
             avatar
         })
-        res.send({
+        res.status(200).send({
             ActionType:"OK",
         })
     }
