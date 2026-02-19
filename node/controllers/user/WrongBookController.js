@@ -11,6 +11,7 @@ const upload = multer({
   storage: storage, 
   limits: { fileSize: 10 * 1024 * 1024 } // 限制10MB
 });
+
 // 创建OSS客户端
 const client = new OSS(ossConfig);
 
@@ -313,8 +314,14 @@ const WrongBookController = {
             if (!result.success) {
                 return res.send({
                     code: 400,
-                    message: '删除错题失败'
+                    message: result.message || '删除错题失败'
                 });
+            }
+            // 删除错题相关图片(如果有的话) images[{url:...,_id:...}...]
+            if (result.data && result.data.images && result.data.images.length > 0) {
+                for (const url of result.data.images.map(img => img.url)) {
+                    await deleteFileByUrl(url);
+                }
             }
             res.send({
                 code: 200,

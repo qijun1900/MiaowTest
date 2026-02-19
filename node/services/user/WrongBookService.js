@@ -131,13 +131,16 @@ const WrongBookService = {
         }
     },
     /**
-     * 删除错题(先查找后删除 以更新错题本数量)
+     * 删除错题(先查找后删除 以更新错题本数量，同时带出url 以删除图片)
      */
     deleteWrongQuestion: async ({ uid, id }) => {
         try {
             const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
             if (!question) {
-                return { success: false };
+                return { 
+                    success: false ,
+                    message: '错题不存在或无权限'
+                };
             }
             const wrongBookId = question.wrongBookId;
             const result = await WrongQuestionModel.deleteOne({ _id: id, Uid: uid });
@@ -150,7 +153,18 @@ const WrongBookService = {
                     }
                 );
             }
-            return { success: result.deletedCount > 0 };
+            return { 
+                success: result.deletedCount > 0 ,
+                    data: {
+                        images: [
+                            ...question.stem.images,
+                            ...question.correctAnswer.images,
+                            ...question.wrongAnswer.images,
+                            ...question.analysis.images,
+                            ...question.note.images
+                        ]
+                    }
+            };
         } catch (error) {
             console.error("DATABASE:删除错题失败", error);
             throw error;
