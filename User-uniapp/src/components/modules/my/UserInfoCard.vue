@@ -14,8 +14,6 @@
       <!-- 头像区域 -->
       <view class="avatar-section">
         <view class="avatar-container">
-          <!-- 头像装饰边框 -->
-          <view class="avatar-ring"></view>
           <!-- 头像 -->
           <userAvatar :showOnline="false" :width="110" :height="110" />
         </view>
@@ -230,35 +228,6 @@ const handleClick = () => {
   position: relative;
   width: 110rpx;
   height: 110rpx;
-}
-
-/* 头像装饰环*/
-.avatar-ring {
-  position: absolute;
-  top: -6rpx;
-  left: -8rpx;
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 50%;
-  border: 2rpx solid transparent;
-  background: linear-gradient(white, white) padding-box,
-              linear-gradient(135deg, #4285F4, #34A853, #FBBC04, #EA4335) border-box;
-  animation: rotate 3s linear infinite;
-  z-index: 0;
-}
-
-.avatar-container :deep(.avatar-container) {
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* 用户信息区域 */

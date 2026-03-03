@@ -6,7 +6,7 @@
         <userAvatar
           :width="160"
           :height="160"
-          :showOnline="true"
+          :showOnline="false"
           />
       </view>
       <view class="edit-avatar-btn" >
