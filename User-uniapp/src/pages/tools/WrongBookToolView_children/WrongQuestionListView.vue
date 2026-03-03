@@ -379,7 +379,7 @@ const editQuestion = (item) => {
   });
 };
 
-//TODO 标记需要复习
+//标记需要复习
 const markNeedReview = async (item) => {
   try {
     const res = await markAsNeedReviewAPI(item.id);
@@ -429,7 +429,6 @@ const fetchWrongQuestions = async () => {
     loading.value = true;
     const res = await getWrongQuestionsAPI(WrongbookId.value);
     if (res.code === 200) {
-      console.log('获取错题列表成功:', res.data);
       // 将后端数据转换为前端需要的格式
       allQuestions.value = (res.data || []).map(q => {
         // 题型映射
