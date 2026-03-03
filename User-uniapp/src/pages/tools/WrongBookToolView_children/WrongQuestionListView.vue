@@ -287,13 +287,13 @@ const filterQuestions = () => {
     const keyword = searchKeyword.value.trim().toLowerCase();
     filtered = filtered.filter(q => {
       // 安全地检查每个字段是否存在
-      const questionMatch = q.question ? q.question.toLowerCase().includes(keyword) : false;
-      const wrongAnswerMatch = q.wrongAnswer ? q.wrongAnswer.toLowerCase().includes(keyword) : false;
-      const correctAnswerMatch = q.correctAnswer ? q.correctAnswer.toLowerCase().includes(keyword) : false;
-      const noteMatch = q.note ? q.note.toLowerCase().includes(keyword) : false;
-      const tagsMatch = q.tags ? q.tags.some(tag => tag.text && tag.text.toLowerCase().includes(keyword)) : false;
+      const stemMatch = q._raw?.stem?.text ? q._raw.stem.text.toLowerCase().includes(keyword) : false;
+      const wrongAnswerMatch = q._raw?.wrongAnswer?.text ? q._raw.wrongAnswer.text.toLowerCase().includes(keyword) : false;
+      const correctAnswerMatch = q._raw?.correctAnswer?.text ? q._raw.correctAnswer.text.toLowerCase().includes(keyword) : false;
+      const analysisMatch = q._raw?.analysis?.text ? q._raw.analysis.text.toLowerCase().includes(keyword) : false;
+      const tagsMatch = q._raw?.tags && Array.isArray(q._raw.tags) ? q._raw.tags.some(tag => tag.toLowerCase().includes(keyword)) : false;
       
-      return questionMatch || wrongAnswerMatch || correctAnswerMatch || noteMatch || tagsMatch;
+      return stemMatch || wrongAnswerMatch || correctAnswerMatch || analysisMatch || tagsMatch;
     });
   }
   
@@ -429,6 +429,7 @@ const fetchWrongQuestions = async () => {
     loading.value = true;
     const res = await getWrongQuestionsAPI(WrongbookId.value);
     if (res.code === 200) {
+      console.log('获取错题列表成功:', res.data);
       // 将后端数据转换为前端需要的格式
       allQuestions.value = (res.data || []).map(q => {
         // 题型映射
