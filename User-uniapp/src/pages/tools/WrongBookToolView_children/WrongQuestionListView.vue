@@ -162,7 +162,7 @@
 
             <!-- 解析/笔记 -->
             <view v-if="item._raw.analysis?.text || (item._raw.analysis?.images && item._raw.analysis.images.length > 0)" class="note-wrapper">
-              <view class="answer-title">解析 / 笔记 /备注</view>
+              <view class="answer-title">解析 / 笔记 / 备注</view>
               <view class="note-block">
                 <QuestionContentDisplay :content="item._raw.analysis" />
               </view>
