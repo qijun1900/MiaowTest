@@ -462,6 +462,22 @@ const WrongBookService = {
             throw error;
         }
     },
+
+    /**
+     * 获取用户所有已使用的标签（去重）
+     */
+    getUserTags: async ({ uid, wrongBookId }) => {
+        try {
+            const tags = await WrongQuestionModel.distinct('tags', {
+                Uid: uid,
+                wrongBookId
+            });
+            return tags.filter(tag => tag); // 过滤空值
+        } catch (error) {
+            console.error("DATABASE:获取用户标签失败", error);
+            throw error;
+        }
+    },
 }
 
 module.exports = WrongBookService;

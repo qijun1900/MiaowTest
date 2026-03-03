@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
   show: {
@@ -56,21 +56,32 @@ const props = defineProps({
   modelValue: {
     type: Array,
     default: () => []
+  },
+  extraTags: {
+    type: Array,
+    default: () => []
   }
 });
 
 const emit = defineEmits(['update:modelValue']);
 
 const customTagInput = ref('');
-const recommendedTags = ref([
-  '公式',
-  '概念',
-  '计算错误',
-  '审题不清',
-  '粗心',
-  '解题方法',
-  '其他'
-]);
+const defaultTags = ['公式', '概念', '计算错误', '审题不清', '粗心', '解题方法', '其他'];
+
+// 合并默认标签和用户历史标签（去重），使用 watch 确保 uni-app 下响应性
+const recommendedTags = ref([...defaultTags]);
+
+watch(() => props.extraTags, (newTags) => {
+  const merged = [...defaultTags];
+  if (newTags && newTags.length > 0) {
+    for (const tag of newTags) {
+      if (tag && !merged.includes(tag)) {
+        merged.push(tag);
+      }
+    }
+  }
+  recommendedTags.value = merged;
+}, { immediate: true, deep: true });
 
 const selectedTags = computed({
   get: () => [...props.modelValue],

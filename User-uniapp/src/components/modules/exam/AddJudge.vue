@@ -91,6 +91,7 @@
         <QuestionTags 
           :show="props.isAddWrongBookQuestion"
           v-model="formData.tags"
+          :extra-tags="props.extraTags"
         />
         
         <view class="submit-btn">
@@ -131,6 +132,10 @@ const props = defineProps({
   },
   isAddWrongBookQuestion: { 
     default: false
+  },
+  extraTags: {
+    type: Array,
+    default: () => []
   }
 })
 

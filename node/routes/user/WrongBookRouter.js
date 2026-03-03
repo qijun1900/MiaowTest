@@ -35,6 +35,8 @@ WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongQuestionDetail/:id", JWT
 WrongBookRouter.post("/uniappAPI/tools/wrongbook/updateWrongQuestion", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.updateWrongQuestion)
 // 获取错题统计
 WrongBookRouter.get("/uniappAPI/tools/wrongbook/getWrongBookStatistics", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getWrongBookStatistics)
+// 获取用户所有已使用的标签
+WrongBookRouter.get("/uniappAPI/tools/wrongbook/getUserTags", JWT.verifyTokenMiddleware(), requireUid, WrongBookController.getUserTags)
 
 
 module.exports = WrongBookRouter;

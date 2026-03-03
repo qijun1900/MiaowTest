@@ -466,6 +466,31 @@ const WrongBookController = {
                 message: "获取错题统计失败"
             });
         }
+    },
+
+    // 获取用户所有已使用的标签
+    getUserTags: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { wrongBookId } = req.query;
+            if (!wrongBookId) {
+                return res.status(200).send({
+                    code: 400,
+                    message: 'wrongBookId不能为空'
+                });
+            }
+            const tags = await WrongBookService.getUserTags({ uid, wrongBookId });
+            res.send({
+                code: 200,
+                data: tags
+            });
+        } catch (error) {
+            console.error("获取用户标签失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "获取用户标签失败"
+            });
+        }
     }
 };
 

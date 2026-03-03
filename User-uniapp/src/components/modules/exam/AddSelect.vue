@@ -91,6 +91,7 @@
     <QuestionTags 
       :show="props.isAddWrongBookQuestion"
       v-model="formData.tags"
+      :extra-tags="props.extraTags"
     />
     
     <view class="submit-btn">
@@ -124,6 +125,10 @@ const props = defineProps({
   },
   isAddWrongBookQuestion: { // 是否来自错题本添加
     default: false
+  },
+  extraTags: { // 用户历史标签
+    type: Array,
+    default: () => []
   }
 })
 

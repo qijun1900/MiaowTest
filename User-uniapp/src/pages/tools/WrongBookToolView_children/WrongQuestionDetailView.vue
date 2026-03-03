@@ -42,6 +42,7 @@
           :isAddWrongBookQuestion="true" 
           :isEdit="isEditMode"
           :editData="editQuestionData"
+          :extra-tags="userTags"
           @submit="handleQuestionSubmit"
         />
       </view>
@@ -51,6 +52,7 @@
           :isAddWrongBookQuestion="true" 
           :isEdit="isEditMode"
           :editData="editQuestionData"
+          :extra-tags="userTags"
           @submit="handleQuestionSubmit"
         />
       </view>
@@ -60,6 +62,7 @@
           :isAddWrongBookQuestion="true" 
           :isEdit="isEditMode"
           :editData="editQuestionData"
+          :extra-tags="userTags"
           @submit="handleQuestionSubmit"
         />
       </view>
@@ -69,6 +72,7 @@
           :isAddWrongBookQuestion="true" 
           :isEdit="isEditMode"
           :editData="editQuestionData"
+          :extra-tags="userTags"
           @submit="handleQuestionSubmit"
         />
       </view>
@@ -88,7 +92,8 @@ import AddShort from '../../../components/modules/exam/AddShort.vue';//4
 import { 
   addWrongQuestionAPI, 
   getWrongQuestionDetailAPI, 
-  updateWrongQuestionAPI 
+  updateWrongQuestionAPI,
+  getUserTagsAPI 
 } from '../../../API/Tools/wrongQuestionAPI';
 
 const selectedQuestionTypeValue = ref(1)
@@ -98,6 +103,7 @@ const questionId = ref('')
 const isEditMode = ref(false)
 const editQuestionData = ref(null)
 const loading = ref(false)
+const userTags = ref([])
 
 // 子组件 ref
 const addSelectRef = ref(null)
@@ -129,6 +135,19 @@ const handleTypeChange = ({ value }) => {
 const handleDifficultyChange = (e) => {
   const index = e.detail.value
   selectedDifficulty.value = difficulties.value[index]
+}
+
+// 加载用户历史标签
+const loadUserTags = async () => {
+  try {
+    const res = await getUserTagsAPI(WrongbookId.value);
+    if (res.code === 200 && Array.isArray(res.data)) {
+      console.log(res.data)
+      userTags.value = res.data;
+    }
+  } catch (error) {
+    console.error('获取用户标签失败:', error);
+  }
 }
 
 // 加载题目数据（编辑模式）
@@ -239,6 +258,7 @@ const resetCurrentForm = () => {
 }
 
 onLoad(async (options) => {
+  loading.value = true;
   uni.pageScrollTo({ scrollTop: 0 });
   
   if (options.id) {
@@ -257,12 +277,17 @@ onLoad(async (options) => {
     console.warn('未接收到错题本名称')
   }
   
+  // 先加载用户历史标签，确保组件渲染时标签数据已就绪
+  await loadUserTags();
+  
   // 编辑模式：加载题目数据
   if (options.questionId) {
     questionId.value = options.questionId;
     isEditMode.value = true;
     await loadQuestionData();
   }
+
+  loading.value = false;
 })
 </script>
 

@@ -119,7 +119,7 @@ export async function updateWrongQuestionAPI(data) {
         throw error;
     }
 }
-/**
+/**  TODO
  * @description 添加复习记录
  * @method POST
  * @param {Object} data - 复习记录数据
@@ -183,7 +183,7 @@ export async function markAsNeedReviewAPI(questionId) {
     }
 }
 
-/**
+/**TODO
  * @description 获取需要复习的错题列表
  * @method GET
  * @returns {Promise} 返回需要复习的错题列表
@@ -201,7 +201,7 @@ export async function getNeedReviewQuestionsAPI() {
 }
 
 
-/**
+/** TODO
  * @description 批量删除错题
  * @method POST
  * @param {Array} questionIds - 错题ID数组，必填
@@ -220,7 +220,7 @@ export async function batchDeleteWrongQuestionsAPI(questionIds) {
     }
 }
 
-/**
+/** TODO
  * @description 获取错题统计信息
  * @method GET
  * @param {String} wrongBookId - 错题本ID，必填
@@ -236,4 +236,25 @@ export async function getWrongQuestionStatsAPI(wrongBookId) {
         console.error("getWrongQuestionStats 失败", error);
         throw error;
   }
+}
+
+/**
+ * @description 获取用户所有已使用的标签（去重）
+ * @method GET
+ * @param {String} wrongBookId - 错题本ID，必填
+ * @returns {Promise} 返回标签数组
+ */
+export async function getUserTagsAPI(wrongBookId) {
+    try {
+        if (!wrongBookId) {
+            throw new Error('wrongBookId is required');
+        }
+        return await http({
+            url: `/uniappAPI/tools/wrongbook/getUserTags?wrongBookId=${wrongBookId}`,
+            method: 'GET'
+        });
+    } catch (error) {
+        console.error("getUserTags 失败", error);
+        throw error;
+    }
 }
