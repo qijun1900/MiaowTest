@@ -306,14 +306,14 @@ onMounted(() => {
     if (props.isEdit && props.editData) {
         // stem 可能是对象 { text, images } 或字符串
         const stemData = props.editData.stem;
-        formData.stem = stemData?.text || stemData || '';
+        formData.stem = typeof stemData === 'object' ? (stemData?.text ?? '') : (stemData || '');
         if (stemData?.images && stemData.images.length > 0) {
             stemImages.setImages(stemData.images);
         }
         
         // analysis 可能是对象 { text, images } 或字符串
         const analysisData = props.editData.analysis;
-        formData.analysis = analysisData?.text || analysisData || '';
+        formData.analysis = typeof analysisData === 'object' ? (analysisData?.text ?? '') : (analysisData || '');
         if (analysisData?.images && analysisData.images.length > 0) {
             analysisImages.setImages(analysisData.images);
         }

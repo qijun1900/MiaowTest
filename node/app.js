@@ -33,6 +33,9 @@ const UserWrongBookRouter = require('./routes/user/WrongBookRouter') //用户错
 
 var app = express();
 
+// 信任反向代理（Nginx/1Panel），使 req.ip 正确获取客户端真实 IP
+app.set('trust proxy', 1);
+
 // 1. 基础安全头 (Helmet)
 app.use(helmet());
 

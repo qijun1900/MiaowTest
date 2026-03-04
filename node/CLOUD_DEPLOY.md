@@ -34,11 +34,21 @@ WECHAT_APPID=wx4f6ba6075c1d2a31
 WECHAT_SECRET=dfcb1748945aad840b5bae683fe75017
 
 # JWT和Session密钥（生产环境请使用随机密钥）
-JWT_SECRET=your_jwt_secret_key_here
-SESSION_SECRET=your_session_secret_key_here
+TOKEN_SECRET=your_token_secret_here
 
 # API密钥
 DASHSCOPE_API_KEY=your_dashscope_api_key_here
+
+# 阿里云 OSS 配置（生产环境）
+OSS_REGION=oss-cn-beijing
+OSS_ACCESS_KEY_ID=your_access_key_id
+OSS_ACCESS_KEY_SECRET=your_access_key_secret
+OSS_BUCKET=miaowtest-production
+OSS_INTERNAL=false
+OSS_SECURE=true
+OSS_PREFIX=
+OSS_CDN_DOMAIN=miaowtest-production.oss-cn-beijing.aliyuncs.com
+STORAGE_TYPE=oss
 ```
 
 ### 2. 确保外部数据库可访问

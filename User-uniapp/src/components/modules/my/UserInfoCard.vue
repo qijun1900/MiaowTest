@@ -64,7 +64,7 @@
     </view>
     
     <!-- 底部状态栏（可选） -->
-    <view class="user-status-bar" v-if="isLoggedIn && showStatusBar">
+    <!-- <view class="user-status-bar" v-if="isLoggedIn && showStatusBar">
       <view class="status-item">
         <text class="status-value">{{ userInfo?.examCount || 0 }}</text>
         <text class="status-label">考试</text>
@@ -79,7 +79,7 @@
         <text class="status-value">{{ userInfo?.noteCount || 0 }}</text>
         <text class="status-label">笔记</text>
       </view>
-    </view>
+    </view> -->
   </view>
 </template>
 

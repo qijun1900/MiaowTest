@@ -48,6 +48,14 @@ async function startApplication() {
       console.log(`   MONGO_CLOUD_PASSWORD: ${process.env.MONGO_CLOUD_PASSWORD ? '✅' : '❌'}`);
       console.log(`   MONGO_CLOUD_DATABASE: ${process.env.MONGO_CLOUD_DATABASE || 'examinationsystem'}`);
     }
+
+    // OSS 配置检查
+    console.log('\n🔍 OSS 配置检查:');
+    console.log(`   OSS_BUCKET: ${process.env.OSS_BUCKET || '❌ 未设置'}`);
+    console.log(`   OSS_REGION: ${process.env.OSS_REGION || '❌ 未设置'}`);
+    console.log(`   OSS_CDN_DOMAIN: ${process.env.OSS_CDN_DOMAIN || '❌ 未设置'}`);
+    console.log(`   OSS_ACCESS_KEY_ID: ${process.env.OSS_ACCESS_KEY_ID ? '✅' : '❌ 未设置'}`);
+    console.log(`   TOKEN_SECRET: ${process.env.TOKEN_SECRET ? '✅' : '❌ 未设置'}`);
     
     // 连接数据库
     console.log('\n💾 正在连接数据库...');
