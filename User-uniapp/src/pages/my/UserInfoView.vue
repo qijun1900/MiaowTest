@@ -105,7 +105,7 @@ const getGenderText = (genderValue) => {
   return genderMap[genderValue] || '未设置';
 };
 
-// TODO 编辑头像
+//编辑头像
 const handleEditAvatar = () => {
   uni.chooseMedia({
     count: 1,// 最多选择一张图片

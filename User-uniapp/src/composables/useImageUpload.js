@@ -67,6 +67,17 @@ export function useImageUpload(options = {}) {
    * 将临时文件保存到本地永久路径
    */
   const saveToLocalFile = (tempFilePath) => {
+    // #ifdef APP-PLUS
+    // APP端直接使用临时路径，wx对象不存在于APP平台
+    imageList.value.push(tempFilePath);
+    uni.showToast({
+      title: '图片已添加',
+      position: 'top',
+      icon: 'none'
+    });
+    // #endif
+
+    // #ifdef MP-WEIXIN
     const fs = uni.getFileSystemManager();
     const timestamp = Date.now();
     const random = Math.random().toString(36).slice(2);
@@ -79,25 +90,23 @@ export function useImageUpload(options = {}) {
       success: (res) => {
         const savedPath = res.savedFilePath;
         imageList.value.push(savedPath);
-        
         uni.showToast({
           title: '图片已添加',
-          position:'top',
+          position: 'top',
           icon: 'none'
         });
       },
       fail: (err) => {
         console.error('保存图片失败:', err);
-        // 如果保存失败，直接使用临时路径
         imageList.value.push(tempFilePath);
-        
         uni.showToast({
           title: '图片已添加',
-          position:'top',
+          position: 'top',
           icon: 'none'
         });
       }
     });
+    // #endif
   };
 
   /**
@@ -290,7 +299,8 @@ export function useImageUpload(options = {}) {
       } else {
         // 本地文件路径
         const filePath = typeof item === 'string' ? item : item.url;
-        if (filePath && filePath.includes(wx.env.USER_DATA_PATH)) {
+        // #ifdef MP-WEIXIN
+        if (filePath && wx.env && filePath.includes(wx.env.USER_DATA_PATH)) {
           const fs = uni.getFileSystemManager();
           fs.unlink({
             filePath: filePath,
@@ -302,6 +312,7 @@ export function useImageUpload(options = {}) {
             }
           });
         }
+        // #endif
       }
 
       imageList.value.splice(index, 1);
@@ -313,9 +324,10 @@ export function useImageUpload(options = {}) {
    */
   const clearImages = () => {
     // 清理本地文件
+    // #ifdef MP-WEIXIN
     imageList.value.forEach(item => {
       const filePath = typeof item === 'string' ? item : item.url;
-      if (filePath && filePath.includes(wx.env.USER_DATA_PATH)) {
+      if (filePath && wx.env && filePath.includes(wx.env.USER_DATA_PATH)) {
         const fs = uni.getFileSystemManager();
         fs.unlink({
           filePath: filePath,
@@ -326,6 +338,7 @@ export function useImageUpload(options = {}) {
         });
       }
     });
+    // #endif
     
     imageList.value = [];
   };
