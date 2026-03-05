@@ -100,10 +100,6 @@ const CustomNavbarList = ref([
     icon: '/static/navMy/c-my-feedback.png',
     path: '/pages/my/MyWrongView'
   },
-  // {
-  //   title: '开发作者',
-  //   icon: '/static/navMy/c-my-author.png',
-  // },
   {
     title: '我的设置',
     icon: '/static/navMy/c-my-setting.png',
