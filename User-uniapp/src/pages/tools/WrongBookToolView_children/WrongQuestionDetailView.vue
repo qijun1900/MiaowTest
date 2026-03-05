@@ -142,7 +142,6 @@ const loadUserTags = async () => {
   try {
     const res = await getUserTagsAPI(WrongbookId.value);
     if (res.code === 200 && Array.isArray(res.data)) {
-      console.log(res.data)
       userTags.value = res.data;
     }
   } catch (error) {
