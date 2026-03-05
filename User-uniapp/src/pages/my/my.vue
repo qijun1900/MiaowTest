@@ -49,6 +49,7 @@
           </view>
           <view class="tips-container">
              <UserAgreementTips 
+              v-model="agreed"
               @showUserAgreement="showUserAgreement" 
               @showPrivacyPolicy="showPrivacyPolicy"/> 
           </view>
@@ -86,6 +87,7 @@ import UserInfoCard from '../../components/modules/my/UserInfoCard.vue';
 
 const LoginOverlayShow = ref(false);
 const AuthorOverlayShow = ref(false);
+const agreed = ref(false);
 const navBarInfo = ref({});
 const CustomNavbarList = ref([
   {
@@ -155,10 +157,15 @@ const handleUserinfo = ({ isLoggedIn }) => {
 
 const handleCancelLogin = () => {
   LoginOverlayShow.value = false;
+  agreed.value = false;
 };
 
 // 微信程序端登录 - 使用工具函数
 const handleUseWXLogin = async () => {
+  if (!agreed.value) {
+    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    return;
+  }
   LoginOverlayShow.value = false;
   try {
     await wechatLogin({
@@ -178,6 +185,10 @@ const handleUseWXLogin = async () => {
 
 // 处理账号登录 h5端和小程序端
 const handleUseAccountLogin = () => {
+  if (!agreed.value) {
+    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    return;
+  }
   LoginOverlayShow.value = false;
   uni.navigateTo({
     url: '/pages/my/UserLoginView'

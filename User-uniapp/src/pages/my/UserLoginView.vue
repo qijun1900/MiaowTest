@@ -83,6 +83,7 @@
     
     <!-- 底部提示 - 使用通用组件 -->
     <UserAgreementTips 
+      v-model="agreed"
       @showUserAgreement="showUserAgreement" 
       @showPrivacyPolicy="showPrivacyPolicy" /> 
   </view>
@@ -98,6 +99,7 @@ import UserAgreementTips from '../../components/modules/my/UserAgreementTips.vue
 
 const showPassword = ref(true);
 const rememberMe = ref([]);
+const agreed = ref(false);
 const userInfoStore = UserInfoStore();
 const navBarInfo = ref(0);// 导航栏高度信息
 
@@ -120,6 +122,10 @@ const goBack = () => {
 };
 
 const handleLogin = async () => {
+  if (!agreed.value) {
+    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    return;
+  }
   try {
     const response = await UserAccountLogin({
       account: formData.email,
@@ -187,6 +193,10 @@ const handleLogin = async () => {
 
 // 微信登录方法 - 使用工具函数
 const handleUseWXLogin = async () => {
+  if (!agreed.value) {
+    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    return;
+  }
   try {
     await wechatLogin();
   } catch (error) {
