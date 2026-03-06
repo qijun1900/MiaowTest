@@ -209,13 +209,17 @@ const handleUseWXLogin = async () => {
 };
 
 const goToRegister = () => {
+  // #ifdef MP-WEIXIN
   uni.showToast({
     title: '请使用微信登录',
     icon: 'error'
   });
-  // uni.navigateTo({
-  //   url: '/pages/my/UserRegisterView'
-  // });
+  // #endif
+  // #ifndef MP-WEIXIN
+  uni.navigateTo({
+    url: '/pages/my/UserRegisterView'
+  });
+  // #endif
 };
 
 // 用户服务协议

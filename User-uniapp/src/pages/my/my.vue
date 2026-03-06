@@ -36,14 +36,10 @@
             <text class="login-tips">请选择下面任意一种方式登录</text>
           </view>
           <view class="login-but">
-            <!-- #ifdef H5 -->
+            <!-- #ifndef MP-WEIXIN -->
             <up-button type="primary" icon="fingerprint" @click="handleUseAccountLogin">账号登录</up-button>
             <!-- #endif -->
             <!-- #ifdef MP-WEIXIN -->
-            <up-button color="#09B83E" type="success" icon="weixin-fill" @click="handleUseWXLogin">微信登录</up-button>
-            <!-- #endif -->
-            <!-- #ifndef H5 || MP-WEIXIN --> 
-            <up-button type="primary" icon="fingerprint" @click="handleUseAccountLogin">账号登录</up-button>
             <up-button color="#09B83E" type="success" icon="weixin-fill" @click="handleUseWXLogin">微信登录</up-button>
             <!-- #endif -->
           </view>
@@ -159,7 +155,12 @@ const handleCancelLogin = () => {
 // 微信程序端登录 - 使用工具函数
 const handleUseWXLogin = async () => {
   if (!agreed.value) {
-    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    uni.showToast({ 
+      title: '请先阅读并同意用户协议和隐私政策', 
+      icon: 'none', 
+      duration: 500,
+      position: 'top'
+    });
     return;
   }
   LoginOverlayShow.value = false;
