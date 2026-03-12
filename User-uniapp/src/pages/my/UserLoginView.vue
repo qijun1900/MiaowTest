@@ -65,6 +65,12 @@
         </view>
       </u-form>
     </view>
+
+     <!-- 底部提示 - 使用通用组件 -->
+    <UserAgreementTips 
+      v-model="agreed"
+      @showUserAgreement="showUserAgreement" 
+      @showPrivacyPolicy="showPrivacyPolicy" /> 
     
     <!-- 添加微信登录按钮 -->
     <!-- #ifdef MP-WEIXIN -->
@@ -80,12 +86,6 @@
       </view>
     </view>
     <!-- #endif -->
-    
-    <!-- 底部提示 - 使用通用组件 -->
-    <UserAgreementTips 
-      v-model="agreed"
-      @showUserAgreement="showUserAgreement" 
-      @showPrivacyPolicy="showPrivacyPolicy" /> 
   </view>
 </template>
 

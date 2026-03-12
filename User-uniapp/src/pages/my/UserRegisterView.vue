@@ -1,120 +1,123 @@
 <template>
   <view class="login-container">
-    <!-- 顶部背景装饰 -->
-    <view class="header-decoration">
-      <view class="decoration-circle"></view>
-      <view class="decoration-wave"></view>
+    
+    <!-- 装饰性背景元素 -->
+    <view class="bg-decoration top-left"></view>
+    <view class="bg-decoration top-right"></view>
+    <view class="bg-decoration bottom-left"></view>
+    
+    <view class="login-header">
+      <view class="logo-container">
+        <image class="logo" src="/static/other/login-cat.png" mode="aspectFit"></image>
+        <view class="logo-bg">
+          <u-icon name="account-fill" color="#ffffff" size="40"></u-icon>
+        </view>
+      </view>
+      <text class="title">{{ bindMode ? '绑定账号' : '注册账户' }}</text>
+      <text class="subtitle">{{ bindMode ? '请输入您的账号完成绑定' : '请输入您的邮箱完成注册' }}</text>
     </view>
     
-    <!-- 登录表单区域 -->
-    <view class="login-content">
-      <!-- 标题区域 -->
-      <view class="title-section">
-        <view class="login-icon">
-          <up-icon name="account" size="48" color="#5DADE2"></up-icon>
-        </view>
-        <text class="login-title">{{ bindMode ? '绑定账号' : '注册账户' }}</text>
-        <text class="login-subtitle">{{ bindMode ? '请输入您的账号完成绑定' : '请输入您的邮箱完成注册' }}</text>
-      </view>
-      
-      <!-- 表单区域 -->
-      <view class="form-section">
+    <view class="login-form">
+      <u-form :model="formData" ref="uForm">
         <!-- 邮箱输入 -->
-        <view class="form-item">
-          <view class="input-wrapper">
-            <up-icon name="email" size="20" color="#AED6F1" class="input-icon"></up-icon>
-            <input 
-              class="form-input"
-              type="text"
-              v-model="email"
-              placeholder="请输入邮箱地址"
-              placeholder-style="color: #AED6F1; font-size: 28rpx;"
-              @input="onEmailInput"
-            />
-          </view>
-        </view>
+        <u-form-item prop="email">
+          <u-input
+            v-model="formData.email"
+            placeholder="请输入邮箱地址"
+            prefixIcon="email"
+            prefixIconStyle="font-size: 22px;color: #909399"
+            clearable
+          ></u-input>
+        </u-form-item>
         
         <!-- 验证码输入 -->
-        <view class="form-item">
-          <view class="input-wrapper verify-wrapper">
-            <up-icon name="attach" size="20" color="#AED6F1" class="input-icon"></up-icon>
-            <input 
-              class="form-input verify-input"
-              type="text"
-              v-model="verifyCode"
-              placeholder="请输入验证码"
-              placeholder-style="color: #AED6F1; font-size: 28rpx;"
-              maxlength="6"
-            />
-            <up-button 
+        <u-form-item prop="verifyCode">
+          <view class="verify-wrapper">
+            <view class="verify-input-wrap">
+              <u-input
+                v-model="formData.verifyCode"
+                placeholder="请输入验证码"
+                prefixIcon="attach"
+                prefixIconStyle="font-size: 22px;color: #909399"
+                maxlength="6"
+              ></u-input>
+            </view>
+            <u-button 
               :text="verifyBtnText" 
               size="small"
-              :color="verifyBtnColor"
+              type="primary"
               class="verify-btn"
               :disabled="isCountingDown || !isEmailValid"
               @click="sendVerifyCode"
-            ></up-button>
+            ></u-button>
           </view>
-        </view>
+        </u-form-item>
         
         <!-- 密码输入 -->
-        <view class="form-item">
-          <view class="input-wrapper">
-            <up-icon name="lock-open" size="20" color="#AED6F1" class="input-icon"></up-icon>
-            <up-input 
-              placeholder="请设置登录密码" 
-              type="password"
-              v-model="password"
-              placeholder-style="color: #AED6F1; font-size: 28rpx;"
-              :show-password="false"
-            ></up-input>
-          </view>
-        </view>
+        <u-form-item prop="password">
+          <u-input
+            v-model="formData.password"
+            placeholder="请设置登录密码"
+            prefixIcon="lock-open"
+            prefixIconStyle="font-size: 22px;color: #909399"
+            :password="showPassword"
+          ></u-input>
+        </u-form-item>
         
         <!-- 确认密码输入 -->
-        <view class="form-item">
-          <view class="input-wrapper">
-            <up-icon name="lock" size="20" color="#AED6F1" class="input-icon"></up-icon>
-            <up-input 
-              placeholder="请再次确认密码" 
-              type="password"
-              v-model="confirmPassword"
-              placeholder-style="color: #AED6F1; font-size: 28rpx;"
-              :show-password="false"
-            ></up-input>
-          </view>
+        <u-form-item prop="confirmPassword">
+          <u-input
+            v-model="formData.confirmPassword"
+            placeholder="请再次确认密码"
+            prefixIcon="lock"
+            prefixIconStyle="font-size: 22px;color: #909399"
+            :password="showConfirmPassword"
+          ></u-input>
+        </u-form-item>
+        
+        <u-button type="primary" class="login-btn" :disabled="!canSubmit" @click="handleLogin">
+          <u-icon name="arrow-rightward" color="#ffffff" size="18"></u-icon>
+          <text class="btn-text">{{ bindMode ? '立即绑定' : '立即注册' }}</text>
+        </u-button>
+        
+        <view class="register-link">
+          <text>已有账号？</text>
+          <text class="link-text" @click="goToLogin">去登录</text>
+          <u-icon name="arrow-rightward" color="#3c9cff" size="14"></u-icon>
         </view>
-      </view>
-
-      <!-- 登录按钮 -->
-      <view class="button-section">
-        <up-button 
-          :text="bindMode ? '立即绑定' : '立即注册'" 
-          color="#5DADE2"
-          size="large"
-          class="login-btn"
-          shape="circle"
-          :disabled="!canSubmit"
-          @click="handleLogin"
-        ></up-button>
-      </view>
+      </u-form>
     </view>
+    
+    <!-- 底部提示 - 使用通用组件 -->
+    <UserAgreementTips 
+      v-model="agreed"
+      @showUserAgreement="showUserAgreement" 
+      @showPrivacyPolicy="showPrivacyPolicy" />
   </view>
 </template>
+
 <script setup>
-import { ref, computed, onUnmounted } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { UserRegister, BindAccount } from '../../API/My/UserLoginAPI';
+import navBarHeightUtil from '../../util/navBarHeight';
+import UserAgreementTips from '../../components/modules/my/UserAgreementTips.vue';
 
-// 添加绑定模式状态
+// 绑定模式状态
 const bindMode = ref(false);
+const showPassword = ref(true);
+const showConfirmPassword = ref(true);
+const agreed = ref(false);
+const navBarInfo = ref(0);
 
 
 // 表单数据
-const email = ref('');
-const verifyCode = ref('');
-const password = ref('');
-const confirmPassword = ref('');
+const formData = reactive({
+  email: '',
+  verifyCode: '',
+  password: '',
+  confirmPassword: ''
+});
 
 // 验证码相关状态
 const isCountingDown = ref(false);
@@ -124,53 +127,46 @@ const countdownTimer = ref(null);
 // 邮箱验证
 const isEmailValid = computed(() => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email.value);
+  return emailRegex.test(formData.email);
 });
 
 // 验证码按钮文本
 const verifyBtnText = computed(() => {
   if (isCountingDown.value) {
-    return `${countdown.value}秒后重试`;
+    return `${countdown.value}s`;
   }
   return '获取验证码';
 });
 
-// 验证码按钮颜色
-const verifyBtnColor = computed(() => {
-  if (isCountingDown.value) {
-    return '#95A5A6';
-  }
-  return '#5DADE2';
-});
-
 // 是否可以提交表单
 const canSubmit = computed(() => {
-  return email.value && 
-         verifyCode.value && 
-         password.value
+  return formData.email && 
+         formData.verifyCode && 
+         formData.password &&
+         formData.confirmPassword
 });
 
-// 邮箱输入处理
-const onEmailInput = (e) => {
-  email.value = e.detail.value;
+// 跳转登录页
+const goToLogin = () => {
+  uni.navigateTo({
+    url: '/pages/my/UserLoginView'
+  });
 };
 
 // 发送验证码
 const sendVerifyCode = async () => {
-
   if (isCountingDown.value) {
     return;
   }
 
   try {
-    // 发送验证码请求
     uni.showLoading({
       title: '发送中...',
       mask: true
     });
 
     // 这里应该调用实际的API发送验证码
-    // 例如: await api.sendVerifyCode(email.value);
+    // 例如: await api.sendVerifyCode(formData.email);
     
     uni.hideLoading();
     
@@ -180,7 +176,6 @@ const sendVerifyCode = async () => {
       duration: 2000
     });
     
-    // 开始倒计时
     startCountdown();
     
   } catch (error) {
@@ -194,11 +189,14 @@ const sendVerifyCode = async () => {
   }
 };
 
-// 处理登录
-// 简化后的 handleLogin 函数
+// 处理注册/绑定
 const handleLogin = async () => {
+  if (!agreed.value) {
+    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    return;
+  }
+
   try {
-    // 检查表单是否可提交
     if (!canSubmit.value) {
       uni.showToast({
         title: '请填写完整信息',
@@ -208,16 +206,15 @@ const handleLogin = async () => {
       throw new Error('表单填写不完整');
     }
 
-    // 检查密码是否一致
-    if (password.value !== confirmPassword.value) {
+    if (formData.password !== formData.confirmPassword) {
       await new Promise((resolve) => {
         uni.showModal({
           title: '密码不一致',
           content: '两次输入的密码不一致，请重新输入',
           showCancel: false,
           success: () => {
-            password.value = '';
-            confirmPassword.value = '';
+            formData.password = '';
+            formData.confirmPassword = '';
             resolve();
           }
         });
@@ -226,20 +223,17 @@ const handleLogin = async () => {
     }
 
     let result;
-    // 根据模式调用不同的API
     if (bindMode.value) {
-      // 绑定账号模式
       result = await BindAccount({
-        account: email.value,
-        verifyCode: verifyCode.value,
-        password: password.value,
+        account: formData.email,
+        verifyCode: formData.verifyCode,
+        password: formData.password,
       });
     } else {
-      // 普通注册模式
       result = await UserRegister({
-        account: email.value,
-        verifyCode: verifyCode.value,
-        password: password.value,
+        account: formData.email,
+        verifyCode: formData.verifyCode,
+        password: formData.password,
       });
     }
     
@@ -255,7 +249,6 @@ const handleLogin = async () => {
           uni.navigateBack();
         }, 1500);
       } else {
-        // 注册成功后跳转到登录页
         setTimeout(() => {
           uni.navigateTo({ url: '/pages/my/UserLoginView' });
         }, 1500);
@@ -295,171 +288,198 @@ const stopCountdown = () => {
   }
 };
 
+// 用户服务协议
+const showUserAgreement = () => {
+  uni.navigateTo({
+    url: '/pages/public/UserAgreementView'
+  });
+};
+
+// 隐私政策
+const showPrivacyPolicy = () => {
+  uni.navigateTo({
+    url: '/pages/public/PrivacyPolicyView'
+  });
+};
+
 onLoad((options) => {
-  if(options.isBind === "true" ){
+  if(options.isBind === "true"){
     bindMode.value = true;
   }
 });
 
-// 组件卸载时清理定时器
+onMounted(() => {
+  const info = navBarHeightUtil.getNavBarInfo();
+  navBarInfo.value = info.totalHeight;
+});
+
 onUnmounted(() => {
   stopCountdown();
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #E8F6F3 0%, #D6EAF8 100%);
+  background-color: #f5f9ff;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
+  
+  .back-btn {
+    position: absolute;
+    left: 20rpx;
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+    z-index: 10;
+    padding: 10rpx 20rpx;
+    border-radius: 20rpx;
+    background-color: rgba(255, 255, 255, 0.8);
+    
+    .back-text {
+      font-size: 28rpx;
+      color: #3c9cff;
+    }
+  }
+  
+  .bg-decoration {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 0;
+    
+    &.top-left {
+      width: 200rpx;
+      height: 200rpx;
+      background: linear-gradient(135deg, rgba(60, 156, 255, 0.1), rgba(60, 156, 255, 0.05));
+      top: -50rpx;
+      left: -50rpx;
+    }
+    
+    &.top-right {
+      width: 150rpx;
+      height: 150rpx;
+      background: linear-gradient(135deg, rgba(60, 156, 255, 0.08), rgba(60, 156, 255, 0.03));
+      top: 100rpx;
+      right: -30rpx;
+    }
+    
+    &.bottom-left {
+      width: 180rpx;
+      height: 180rpx;
+      background: linear-gradient(135deg, rgba(60, 156, 255, 0.06), rgba(60, 156, 255, 0.02));
+      bottom: 100rpx;
+      left: -40rpx;
+    }
+  }
 }
 
-/* 顶部装饰 */
-.header-decoration {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 200rpx;
-  z-index: 1;
-}
-
-.decoration-circle {
-  position: absolute;
-  top: -100rpx;
-  right: -100rpx;
-  width: 300rpx;
-  height: 300rpx;
-  background: rgba(93, 173, 226, 0.1);
-  border-radius: 50%;
-}
-
-.decoration-wave {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100rpx;
-  background: linear-gradient(45deg, transparent 30%, rgba(93, 173, 226, 0.05) 70%);
-  border-radius: 0 0 50% 50%;
-}
-
-/* 登录内容区域 */
-.login-content {
-  position: relative;
-  z-index: 2;
-  padding: 80rpx 60rpx 40rpx;
-}
-
-/* 标题区域 */
-.title-section {
-  text-align: center;
-  margin-bottom: 80rpx;
-}
-
-.login-icon {
-  margin-bottom: 30rpx;
-}
-
-.login-title {
-  display: block;
-  font-size: 48rpx;
-  font-weight: bold;
-  color: #2C3E50;
-  margin-bottom: 16rpx;
-}
-
-.login-subtitle {
-  display: block;
-  font-size: 28rpx;
-  color: #7F8C8D;
-}
-
-/* 表单区域 */
-.form-section {
+.login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60rpx;
   margin-bottom: 60rpx;
+  position: relative;
+  z-index: 1;
+  
+  .logo-container {
+    position: relative;
+    margin-bottom: 30rpx;
+    
+    .logo {
+      width: 160rpx;
+      height: 160rpx;
+      border-radius: 30rpx;
+      box-shadow: 0 10rpx 30rpx rgba(60, 156, 255, 0.2);
+    }
+    
+    .logo-bg {
+      position: absolute;
+      bottom: -10rpx;
+      right: -10rpx;
+      width: 60rpx;
+      height: 60rpx;
+      background-color: #3c9cff;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4rpx 10rpx rgba(60, 156, 255, 0.3);
+    }
+  }
+  
+  .title {
+    font-size: 44rpx;
+    font-weight: bold;
+    color: #3c9cff;
+    margin-bottom: 10rpx;
+  }
+  
+  .subtitle {
+    font-size: 28rpx;
+    color: #909193;
+  }
 }
 
-.form-item {
-  margin-bottom: 40rpx;
+.login-form {
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-shadow: 0 8rpx 30rpx rgba(60, 156, 255, 0.1);
+  position: relative;
+  z-index: 1;
+  
+  .verify-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    
+    .verify-input-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .verify-btn {
+      margin-left: 20rpx;
+      flex-shrink: 0;
+      width: 200rpx;
+    }
+  }
+  
+  .login-btn {
+    width: 100%;
+    height: 90rpx;
+    margin-top: 30rpx;
+    background-color: #3c9cff;
+    border-radius: 45rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10rpx;
+    
+    .btn-text {
+      color: #ffffff;
+      font-size: 32rpx;
+      font-weight: bold;
+    }
+  }
+  
+  .register-link {
+    text-align: center;
+    margin-top: 40rpx;
+    font-size: 28rpx;
+    color: #909193;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6rpx;
+    
+    .link-text {
+      color: #3c9cff;
+    }
+  }
 }
-
-.input-wrapper {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16rpx;
-  padding: 30rpx;
-  box-shadow: 0 4rpx 20rpx rgba(93, 173, 226, 0.1);
-  border: 2rpx solid rgba(93, 173, 226, 0.2);
-}
-
-/* 验证码输入区域样式优化 */
-.verify-wrapper {
-  padding-right: 15rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.verify-input {
-  flex: 1;
-  margin-right: 10rpx;
-  min-width: 0; /* 允许flex项目收缩 */
-}
-
-.verify-btn {
-  margin-left: 0;
-  min-width: 180rpx;
-  max-width: 220rpx; /* 限制按钮最大宽度 */
-  height: 70rpx;
-  font-size: 24rpx; /* 减小字体大小以适应更小的按钮 */
-  font-weight: 500;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 10rpx rgba(93, 173, 226, 0.2);
-  transition: all 0.3s ease;
-  flex-shrink: 0; /* 防止按钮被压缩 */
-}
-
-/* 按钮禁用状态 */
-.verify-btn[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* 按钮点击效果 */
-.verify-btn:active:not([disabled]) {
-  transform: scale(0.98);
-}
-
-.input-icon {
-  margin-right: 20rpx;
-  flex-shrink: 0; /* 防止图标被压缩 */
-}
-
-.form-input {
-  flex: 1;
-  font-size: 30rpx;
-  color: #2C3E50;
-  height: 40rpx;
-  line-height: 40rpx;
-}
-
-
-
-/* 按钮区域 */
-.button-section {
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 100%;
-  height: 88rpx;
-  font-size: 32rpx;
-  font-weight: 500;
-  box-shadow: 0 4rpx 20rpx rgba(93, 173, 226, 0.3);
-  transition: all 0.3s ease;
-}
-
 </style>
