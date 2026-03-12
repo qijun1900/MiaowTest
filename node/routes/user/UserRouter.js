@@ -8,6 +8,7 @@ UserRouter.post("/uniappAPI/User/UserRegister", UserController.UserRegister)//�
 UserRouter.post("/uniappAPI/User/UserAccountLogin", UserController.UserAccountLogin)//用户账号登录接口
 UserRouter.post("/uniappAPI/User/updateUserInfo", JWT.verifyTokenMiddleware(), UserController.updateUserInfo)//用户更新信息接口
 UserRouter.post("/uniappAPI/uploadFile/useravatar", JWT.verifyTokenMiddleware(), UserController.uploadUserAvatar)//用户上传头像接口
+UserRouter.post("/uniappAPI/uploadFile/cloudAvatar", JWT.verifyTokenMiddleware(), UserController.uploadCloudAvatar)//云托管上传头像接口
 UserRouter.post("/uniappAPI/UserFavorite/addExamFavorite", JWT.verifyTokenMiddleware(),UserController.addExamFavorite)//添加用户收藏考试接口
 UserRouter.post("/uniappAPI/UserFavorite/getExamFavorites", JWT.verifyTokenMiddleware(),UserController.getExamFavorites)//检测是否收藏考试接口
 UserRouter.post("/uniappAPI/UserFavorite/removeExamFavorite", JWT.verifyTokenMiddleware(),UserController.removeExamFavorite)//用户取消收藏考试接口

@@ -7,7 +7,8 @@ const escconfig = {
   //#ifdef MP-WEIXIN
     useCloudContainer: import.meta.env.VITE_USE_CLOUD_CONTAINER === 'true', // 是否启用微信云托管
     cloudEnv: import.meta.env.VITE_CLOUD_ENV , // 云托管环境ID
-    cloudService: import.meta.env.VITE_CLOUD_SERVICE // 云托管服务名
+    cloudService: import.meta.env.VITE_CLOUD_SERVICE, // 云托管服务名
+    useCloudStorage: import.meta.env.VITE_USE_CLOUD_STORAGE === 'true', // 云托管文件上传方式：true=云对象存储，false=base64中转OSS
   //#endif
 };
 // 使用 ES6 标准导出语法

@@ -147,6 +147,57 @@ const UserController = {
             }
         }
     ],
+    // 云托管模式上传头像（支持两种方式：云对象存储fileID / base64中转OSS）
+    uploadCloudAvatar: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { fileID, base64Data, fileExt } = req.body;
+
+            let avatarUrl;
+
+            if (base64Data) {
+                // 方式2：base64 中转 OSS
+                const buffer = Buffer.from(base64Data, 'base64');
+                const ext = fileExt || 'jpg';
+                const fileName = `user/avatar/${uid}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+                avatarUrl = await uploadBuffer(buffer, fileName);
+            } else if (fileID) {
+                // 方式1：云对象存储，直接使用 fileID
+                avatarUrl = fileID;
+            } else {
+                return res.status(200).send({
+                    code: 400,
+                    ActionType: "ERROR",
+                    message: '缺少文件信息'
+                });
+            }
+
+            const databaseResult = await UserService.updateUserAvatar({ 
+                uid, 
+                avatarUrl: avatarUrl 
+            });
+
+            if (databaseResult.success) {
+                res.status(200).send({
+                    code: databaseResult.code,
+                    message: databaseResult.message,
+                    data: { avatar: avatarUrl }
+                });
+            } else {
+                res.status(200).send({
+                    code: databaseResult.code,
+                    message: databaseResult.message,
+                });
+            }
+        } catch (e) {
+            console.error("云托管上传头像失败", e);
+            res.status(200).send({
+                code: 500,
+                ActionType: "ERROR",
+                message: '服务器错误'
+            });
+        }
+    },
     //收藏考试
     addExamFavorite: async (req, res) => {
         try {

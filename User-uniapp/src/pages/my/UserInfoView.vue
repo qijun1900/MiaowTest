@@ -78,6 +78,8 @@ import handleCopy from '../../util/copy';
 import { updateUserInfo } from '../../API/My/UserInfoUpdateAPI';//checkUserBind
 import { onMounted,ref } from 'vue';
 import userAvatar from '../../components/core/userAvatar.vue';
+import { httpUpload } from '../../util/http';
+import escconfig from '../../config/esc.config';
 
 const  accountBindStatus = ref(false);// 账号绑定状态
 const userInfoStore = UserInfoStore();
@@ -111,24 +113,42 @@ const handleEditAvatar = () => {
     count: 1,// 最多选择一张图片
     mediaType: ['image'],// 只允许选择图片
     sourceType: ['album', 'camera'],
-    success:  (res) => {
-      uni.uploadFile({
-        url: '/uniappAPI/uploadFile/useravatar',
-        fileType: 'image',
-        filePath: res.tempFiles[0].tempFilePath,
-        name: 'file',
-        success: ({ data }) => {
-          const parsedData = JSON.parse(data);
-          if(parsedData.code===200){
-            uni.showToast({
-              title:parsedData.message,
-              icon:'success'
-            })
-            // 更新用户信息
-            updateUserData({ avatar: parsedData.data.url }, '头像');
+    success: async (res) => {
+      const filePath = res.tempFiles[0].tempFilePath;
+      try {
+        if (escconfig.useCloudContainer) {
+          // 云托管模式：通过 httpUpload 统一处理（内部自动区分云对象存储 / base64中转OSS）
+          const ext = filePath.split('.').pop() || 'jpg';
+          const cloudPath = `user/avatar/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+          const data = await httpUpload({
+            filePath: filePath,
+            url: '/uniappAPI/uploadFile/cloudAvatar',
+            cloudPath: cloudPath
+          });
+          if (data.code === 200) {
+            uni.showToast({ title: data.message, icon: 'success' });
+            updateUserData({ avatar: data.data.avatar }, '头像');
           }
-        },
-      })
+        } else {
+          // 普通模式：直接上传到后端
+          uni.uploadFile({
+            url: '/uniappAPI/uploadFile/useravatar',
+            fileType: 'image',
+            filePath: filePath,
+            name: 'file',
+            success: ({ data }) => {
+              const parsedData = JSON.parse(data);
+              if (parsedData.code === 200) {
+                uni.showToast({ title: parsedData.message, icon: 'success' });
+                updateUserData({ avatar: parsedData.data.url }, '头像');
+              }
+            },
+          });
+        }
+      } catch (err) {
+        console.error('头像上传失败:', err);
+        uni.showToast({ title: '头像上传失败', icon: 'none' });
+      }
     } 
   })
 };

@@ -193,6 +193,61 @@ const WrongBookController = {
         },
     ],
     
+    // 云托管模式上传图片（支持两种方式：云对象存储fileID / base64中转OSS）
+    uploadCloudImage: async (req, res) => {
+        try {
+            const { uid } = req.user;
+            const { fileID, base64Data, fileExt } = req.body;
+
+            let fileUrl;
+
+            if (base64Data) {
+                // 方式2：base64 中转 OSS
+                const buffer = Buffer.from(base64Data, 'base64');
+                const ext = fileExt || 'jpg';
+                const fileName = `user/wrong_question/${uid}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+                fileUrl = await uploadBuffer(buffer, fileName);
+            } else if (fileID) {
+                // 方式1：云对象存储，直接使用 fileID
+                fileUrl = fileID;
+            } else {
+                return res.status(200).send({
+                    code: 400,
+                    ActionType: "ERROR",
+                    message: '缺少文件信息'
+                });
+            }
+
+            // 保存图片记录到数据库
+            const dbResult = await WrongBookService.uploadImage({
+                uid,
+                url: fileUrl
+            });
+
+            if (dbResult.success) {
+                res.status(200).send({
+                    code: 200,
+                    message: '上传图片成功',
+                    data: {
+                        _id: dbResult.data._id,
+                        url: dbResult.data.url
+                    }
+                });
+            } else {
+                res.status(200).send({
+                    code: 500,
+                    message: '保存图片记录失败'
+                });
+            }
+        } catch (error) {
+            console.error("云托管上传图片失败", error);
+            res.status(500).send({
+                code: 500,
+                message: "上传图片失败"
+            });
+        }
+    },
+
     //删除图片
     deleteImage: async (req, res) => {
         try {

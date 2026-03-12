@@ -1,4 +1,6 @@
 import { ref } from 'vue';
+import { httpUpload } from '../util/http';
+import escconfig from '../config/esc.config';
 
 export function useImageUpload(options = {}) {
   const imageList = ref([]);
@@ -156,6 +158,16 @@ export function useImageUpload(options = {}) {
   };
 
   /**
+   * 生成云存储路径
+   */
+  const generateCloudPath = (filePath) => {
+    const ext = filePath.split('.').pop() || 'jpg';
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).slice(2, 8);
+    return `user/wrong_question/${timestamp}_${random}.${ext}`;
+  };
+
+  /**
    * 上传单张图片
    */
   const uploadSingleImage = (filePath, uploadUrl) => {
@@ -184,62 +196,59 @@ export function useImageUpload(options = {}) {
           }
           
           // 大小符合要求，开始上传
-          uni.uploadFile({
-            url: uploadUrl,
-            filePath: filePath,
-            name: 'file',
-            fileType: 'image',
-            success: (uploadRes) => {
-              try {
-                const data = JSON.parse(uploadRes.data);
-                if (data.code === 200) {
-                  // 返回包含 _id 和 url 的对象
-                  resolve({
-                    _id: data.data._id,
-                    url: data.data.url
-                  });
-                } else {
-                  reject(new Error(data.message || '上传失败'));
-                }
-              } catch (e) {
-                reject(new Error('解析响应失败'));
-                console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
-              }
-            },
-            fail: (err) => {
-              reject(err);
-            }
-          });
+          doUpload(filePath, uploadUrl).then(resolve).catch(reject);
         },
         fail: (err) => {
           console.warn('获取文件信息失败，跳过大小检查，直接上传:', err);
-          
           // 如果获取文件信息失败，仍然尝试上传（降级处理）
-          uni.uploadFile({
-            url: uploadUrl,
-            filePath: filePath,
-            name: 'file',
-            fileType: 'image',
-            success: (uploadRes) => {
-              try {
-                const data = JSON.parse(uploadRes.data);
-                if (data.code === 200) {
-                  resolve({
-                    _id: data.data._id,
-                    url: data.data.url
-                  });
-                } else {
-                  reject(new Error(data.message || '上传失败'));
-                }
-              } catch (e) {
-                reject(new Error('解析响应失败'));
-                console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
-              }
-            },
-            fail: (err) => {
-              reject(err);
+          doUpload(filePath, uploadUrl).then(resolve).catch(reject);
+        }
+      });
+    });
+  };
+
+  /**
+   * 实际执行上传
+   */
+  const doUpload = (filePath, uploadUrl) => {
+    // 云托管模式：通过 httpUpload 统一处理（内部自动区分云对象存储 / base64中转OSS）
+    if (escconfig.useCloudContainer) {
+      const cloudPath = generateCloudPath(filePath);
+      return httpUpload({
+        filePath: filePath,
+        url: '/uniappAPI/upload/cloudImage',
+        cloudPath: cloudPath
+      }).then(data => {
+        if (data.code === 200) {
+          return { _id: data.data._id, url: data.data.url };
+        } else {
+          throw new Error(data.message || '上传失败');
+        }
+      });
+    }
+
+    // 普通模式：使用 uni.uploadFile
+    return new Promise((resolve, reject) => {
+      uni.uploadFile({
+        url: uploadUrl,
+        filePath: filePath,
+        name: 'file',
+        fileType: 'image',
+        success: (uploadRes) => {
+          try {
+            const data = JSON.parse(uploadRes.data);
+            if (data.code === 200) {
+              resolve({ _id: data.data._id, url: data.data.url });
+            } else {
+              reject(new Error(data.message || '上传失败'));
             }
-          });
+          } catch (e) {
+            reject(new Error('解析响应失败'));
+            console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
+          }
+        },
+        fail: (err) => {
+          reject(err);
         }
       });
     });
