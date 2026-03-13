@@ -240,7 +240,7 @@ function cloudUploadFile(filePath, cloudPath, onProgress) {
  * 统一的文件上传方法 
  * 云托管模式下支持两种上传方式（由 useCloudStorage 配置控制）：
  *   1. 云托管云对象存储（useCloudStorage=true）：wx.cloud.uploadFile 上传到云存储，再 callContainer 通知后端记录 fileID
- *   2. base64 中转 OSS（useCloudStorage=false）：读取文件为 base64，通过 callContainer 发给后端，后端上传到 OSS
+ *   2. base64 中转 OSS（useCloudStorage=false）：读取文件为 base64，通过 callContainer 发给后端，后端上传到 OSS（大小不能超过 100KB）
  * 普通模式：使用 uni.uploadFile 直接上传到后端
  * @param {object} options - 上传选项
  * @param {string} options.filePath - 本地文件路径
@@ -311,4 +311,28 @@ export const httpUpload = (options) => {
             });
         });
     }
+}
+
+/**
+ * 云托管 - 删除云对象存储文件
+ * @param {string[]} fileList - 需要删除的 fileID 列表
+ * @returns {Promise<object>} 微信云返回结果
+ */
+export function deleteCloudFiles(fileList = []) {
+    return new Promise((resolve, reject) => {
+        if (!Array.isArray(fileList) || fileList.length === 0) {
+            resolve({ fileList: [] });
+            return;
+        }
+        if (!wx.cloud) {
+            reject(new Error('请在微信小程序环境下使用云托管删除'));
+            return;
+        }
+        wx.cloud.deleteFile({
+            fileList,
+            config: { env: escconfig.cloudEnv },
+            success: (res) => resolve(res),
+            fail: (err) => reject(err)
+        });
+    });
 }

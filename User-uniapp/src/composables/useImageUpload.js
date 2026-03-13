@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { httpUpload } from '../util/http';
+import { deleteCloudFiles, httpUpload } from '../util/http';
 import escconfig from '../config/esc.config';
 
 export function useImageUpload(options = {}) {
@@ -124,6 +124,15 @@ export function useImageUpload(options = {}) {
     // 检查是否以 OSS 域名开头
     const ossDomain = import.meta.env.VITE_OSS_DOMAIN;
     return ossDomain && url.startsWith(ossDomain);
+  };
+
+  /**
+   * 检查是否为云存储 fileID
+   */
+  const isCloudFileId = (item) => {
+    if (!item) return false;
+    const url = typeof item === 'string' ? item : item.url;
+    return typeof url === 'string' && url.startsWith('cloud://');
   };
 
   /**
@@ -260,34 +269,46 @@ export function useImageUpload(options = {}) {
   const deleteRemoteImage = async (imageItem) => {
     return new Promise((resolve, reject) => {
       const requestData = {};
+
+      const imagePath = typeof imageItem === 'string' ? imageItem : imageItem.url;
+
+      // 云存储文件先在小程序端删除，再通知后端清理数据库记录
+      const preDeletePromise = (escconfig.useCloudContainer && escconfig.useCloudStorage && isCloudFileId(imageItem))
+        ? deleteCloudFiles([imagePath]).catch((err) => {
+            console.warn('删除云存储文件失败，将继续删除数据库记录:', err);
+            return null;
+          })
+        : Promise.resolve(null);
       
       // 支持对象格式 { _id, url } 或字符串格式
       if (typeof imageItem === 'object' && imageItem._id) {
         requestData._id = imageItem._id;
         requestData.path = imageItem.url;
       } else {
-        requestData.path = typeof imageItem === 'string' ? imageItem : imageItem.url;
+        requestData.path = imagePath;
       }
-      
-      uni.request({
-        url: '/uniappAPI/delete/image',
-        method: 'POST',
-        data: requestData,
-        success: (res) => {
-          if (res.data.code === 200) {
-            uni.showToast({
-              title: '图片已删除',
-              position:'top',
-              icon: 'none'
-            });
-            resolve(true);
-          } else {
-            reject(new Error(res.data.message || '删除失败'));
+
+      preDeletePromise.then(() => {
+        uni.request({
+          url: '/uniappAPI/delete/image',
+          method: 'POST',
+          data: requestData,
+          success: (res) => {
+            if (res.data.code === 200) {
+              uni.showToast({
+                title: '图片已删除',
+                position:'top',
+                icon: 'none'
+              });
+              resolve(true);
+            } else {
+              reject(new Error(res.data.message || '删除失败'));
+            }
+          },
+          fail: (err) => {
+            reject(err);
           }
-        },
-        fail: (err) => {
-          reject(err);
-        }
+        });
       });
     });
   };
@@ -299,7 +320,7 @@ export function useImageUpload(options = {}) {
     if (index >= 0 && index < imageList.value.length) {
       const item = imageList.value[index];
 
-      if (isRemoteUrl(item)) {
+      if (isRemoteUrl(item) || isCloudFileId(item)) {
         try {
           await deleteRemoteImage(item);
         } catch (error) {

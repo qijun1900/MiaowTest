@@ -253,18 +253,22 @@ const WrongBookController = {
         try {
             const { uid } = req.user;
             const { path, _id } = req.body;
-            
-            // 删除OSS文件
-            const ossResult = await deleteFileByUrl(path);
-            
-            if (ossResult && _id) {
+
+            const isCloudFile = typeof path === 'string' && path.startsWith('cloud://');
+
+            // 非 cloud:// 路径按 OSS 删除；cloud:// 文件由小程序端调用 wx.cloud.deleteFile 删除
+            if (!isCloudFile && path) {
+                await deleteFileByUrl(path);
+            }
+
+            if (_id) {
                 // 从数据库中移除图片记录（通过_id）
-                const dbResult = await WrongBookService.removeImageById({ 
-                    uid, 
+                const dbResult = await WrongBookService.removeImageById({
+                    uid,
                     imageId: _id,
                     imageUrl: path
                 });
-                
+
                 res.status(200).send({
                     code: 200,
                     message: '删除图片成功',
@@ -272,15 +276,11 @@ const WrongBookController = {
                         modifiedCount: dbResult.modifiedCount
                     }
                 });
-            } else if (ossResult) {
+            } else {
+                // 兼容老调用：无 _id 仅删除文件
                 res.status(200).send({
                     code: 200,
-                    message: '删除图片成功',
-                });
-            } else {
-                res.status(200).send({
-                    code: 400,
-                    message: '删除图片失败'
+                    message: '删除图片成功'
                 });
             }
         } catch (error) {

@@ -1,7 +1,9 @@
 ﻿const UserService = require("../../services/user/UserService");
 const multer = require('multer');
 const path = require('path');
-const { uploadBuffer } = require('../../helpers/ossHelper');
+const ConsumerModel = require('../../models/ConsumerModel');
+const ossConfig = require('../../config/oss.config');
+const { uploadBuffer, deleteFileByUrl } = require('../../helpers/ossHelper');
 
 // 使用内存存储，方便后续上传到OSS
 const storage = multer.memoryStorage();
@@ -9,6 +11,18 @@ const upload = multer({
   storage: storage, 
   limits: { fileSize: 10 * 1024 * 1024 } // 限制10MB
 });
+
+function isOssUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+        if (url.startsWith('cloud://')) return false;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
+
+        if (ossConfig.cdnDomain && url.includes(ossConfig.cdnDomain)) {
+                return true;
+        }
+
+        return !!(ossConfig.bucket && ossConfig.region && url.includes(`${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com`));
+}
 
 const UserController = {
     Userlogin: async (req, res) => {
@@ -113,6 +127,9 @@ const UserController = {
                     });
                 }
 
+                const currentUser = await ConsumerModel.findById(uid).select('avatar');
+                const oldAvatar = currentUser?.avatar || '';
+
                 // 生成唯一的文件名
                 const fileExtension = path.extname(req.file.originalname);
                 const fileName = `user/avatar/${uid}/${Date.now()}${fileExtension}`;
@@ -125,6 +142,11 @@ const UserController = {
                     avatarUrl: avatarUrl 
                 });
                 if(databaseResult.success){
+                    if (oldAvatar && oldAvatar !== avatarUrl && isOssUrl(oldAvatar)) {
+                        deleteFileByUrl(oldAvatar).catch((err) => {
+                            console.warn('删除旧OSS头像失败:', err.message || err);
+                        });
+                    }
                     // 返回成功响应
                     res.status(200).send({
                         code: databaseResult.code,
@@ -153,6 +175,9 @@ const UserController = {
             const { uid } = req.user;
             const { fileID, base64Data, fileExt } = req.body;
 
+            const currentUser = await ConsumerModel.findById(uid).select('avatar');
+            const oldAvatar = currentUser?.avatar || '';
+
             let avatarUrl;
 
             if (base64Data) {
@@ -178,6 +203,11 @@ const UserController = {
             });
 
             if (databaseResult.success) {
+                if (oldAvatar && oldAvatar !== avatarUrl && isOssUrl(oldAvatar)) {
+                    deleteFileByUrl(oldAvatar).catch((err) => {
+                        console.warn('删除旧OSS头像失败:', err.message || err);
+                    });
+                }
                 res.status(200).send({
                     code: databaseResult.code,
                     message: databaseResult.message,

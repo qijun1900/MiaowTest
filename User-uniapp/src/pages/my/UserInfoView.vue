@@ -78,7 +78,7 @@ import handleCopy from '../../util/copy';
 import { updateUserInfo } from '../../API/My/UserInfoUpdateAPI';//checkUserBind
 import { onMounted,ref } from 'vue';
 import userAvatar from '../../components/core/userAvatar.vue';
-import { httpUpload } from '../../util/http';
+import { deleteCloudFiles, httpUpload } from '../../util/http';
 import escconfig from '../../config/esc.config';
 
 const  accountBindStatus = ref(false);// 账号绑定状态
@@ -120,12 +120,23 @@ const handleEditAvatar = () => {
           // 云托管模式：通过 httpUpload 统一处理（内部自动区分云对象存储 / base64中转OSS）
           const ext = filePath.split('.').pop() || 'jpg';
           const cloudPath = `user/avatar/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+          const oldAvatar = userInfoStore.userInfo?.avatar;
           const data = await httpUpload({
             filePath: filePath,
             url: '/uniappAPI/uploadFile/cloudAvatar',
             cloudPath: cloudPath
           });
           if (data.code === 200) {
+            if (
+              escconfig.useCloudStorage &&
+              oldAvatar &&
+              oldAvatar.startsWith('cloud://') &&
+              oldAvatar !== data.data.avatar
+            ) {
+              deleteCloudFiles([oldAvatar]).catch((err) => {
+                console.warn('删除旧头像云文件失败:', err);
+              });
+            }
             uni.showToast({ title: data.message, icon: 'success' });
             updateUserData({ avatar: data.data.avatar }, '头像');
           }
