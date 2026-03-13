@@ -297,6 +297,7 @@ export const httpUpload = (options) => {
                         resolve(data);
                     } catch (e) {
                         reject(new Error('解析响应失败'));
+                        console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
                     }
                 },
                 fail: (err) => {
