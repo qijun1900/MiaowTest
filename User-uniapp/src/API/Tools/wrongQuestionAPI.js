@@ -76,9 +76,7 @@ export async function deleteWrongQuestionAPI(questionId) {
         // 如果删除成功且返回了需要删除的云存储文件列表，则删除这些文件
         if (res.code === 200 && res.data?.cloudFilesToDelete?.length > 0) {
             try {
-                console.log('正在删除云存储文件:', res.data.cloudFilesToDelete);
                 await deleteCloudFiles(res.data.cloudFilesToDelete);
-                console.log('云存储文件删除成功:', res.data.cloudFilesToDelete);
             } catch (err) {
                 console.warn('云存储文件删除失败，但题目已删除:', err);
             }
