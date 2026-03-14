@@ -1,4 +1,4 @@
-import { http } from "../../util/http";
+import { http, deleteCloudFiles } from "../../util/http";
 
 /**
  * @description 添加错题到错题本
@@ -75,9 +75,8 @@ export async function deleteWrongQuestionAPI(questionId) {
         
         // 如果删除成功且返回了需要删除的云存储文件列表，则删除这些文件
         if (res.code === 200 && res.data?.cloudFilesToDelete?.length > 0) {
-            // 动态导入 deleteCloudFiles 避免循环依赖
-            const { deleteCloudFiles } = await import('../../util/http');
             try {
+                console.log('正在删除云存储文件:', res.data.cloudFilesToDelete);
                 await deleteCloudFiles(res.data.cloudFilesToDelete);
                 console.log('云存储文件删除成功:', res.data.cloudFilesToDelete);
             } catch (err) {
