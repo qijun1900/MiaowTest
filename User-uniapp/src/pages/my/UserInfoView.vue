@@ -119,7 +119,8 @@ const handleEditAvatar = () => {
         if (escconfig.useCloudContainer) {
           // 云托管模式：通过 httpUpload 统一处理（内部自动区分云对象存储 / base64中转OSS）
           const ext = filePath.split('.').pop() || 'jpg';
-          const cloudPath = `user/avatar/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+          const uid = userInfoStore.userInfo?.uid || 'anonymous';
+          const cloudPath = `user/avatar/${uid}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
           const oldAvatar = userInfoStore.userInfo?.avatar;
           const data = await httpUpload({
             filePath: filePath,

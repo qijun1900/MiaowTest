@@ -95,7 +95,10 @@
     />
     
     <view class="submit-btn">
-      <button type="primary" :loading="butLoading" @click="handleSend">
+      <button 
+      type="primary" 
+      :loading="butLoading" 
+      @click="handleSend">
         {{ props.isEdit ? '更新题目' : '添加题目' }}
       </button>
     </view>

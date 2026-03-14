@@ -315,8 +315,25 @@ export const httpUpload = (options) => {
 
 /**
  * 云托管 - 删除云对象存储文件
- * @param {string[]} fileList - 需要删除的 fileID 列表
+ * 
+ * 使用场景：
+ * 1. 删除题目时，自动删除题目中的所有云存储图片
+ * 2. 编辑题目时，删除被移除的图片
+ * 
+ * 工作流程：
+ * 1. 后端删除题目时，返回需要删除的云存储 fileID 列表
+ * 2. 前端收到响应后，调用此方法删除云存储文件
+ * 3. 云存储文件必须在小程序端删除（需要 wx.cloud API）
+ * 
+ * @param {string[]} fileList - 需要删除的 fileID 列表（cloud:// 格式）
  * @returns {Promise<object>} 微信云返回结果
+ * 
+ * @example
+ * // 删除单个文件
+ * deleteCloudFiles(['cloud://xxx.jpg'])
+ * 
+ * // 删除多个文件
+ * deleteCloudFiles(['cloud://xxx.jpg', 'cloud://yyy.png'])
  */
 export function deleteCloudFiles(fileList = []) {
     return new Promise((resolve, reject) => {
@@ -331,8 +348,14 @@ export function deleteCloudFiles(fileList = []) {
         wx.cloud.deleteFile({
             fileList,
             config: { env: escconfig.cloudEnv },
-            success: (res) => resolve(res),
-            fail: (err) => reject(err)
+            success: (res) => {
+                console.log('云存储文件删除成功:', res);
+                resolve(res);
+            },
+            fail: (err) => {
+                console.error('云存储文件删除失败:', err);
+                reject(err);
+            }
         });
     });
 }

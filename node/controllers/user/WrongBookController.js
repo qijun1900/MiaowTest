@@ -373,15 +373,45 @@ const WrongBookController = {
                     message: result.message || '删除错题失败'
                 });
             }
+            
             // 删除错题相关图片(如果有的话) images[{url:...,_id:...}...]
+            // 区分云存储文件和 OSS 文件
+            const cloudFiles = [];
+            const ossFiles = [];
+            
+            result.data.images.forEach(img => {
+                const url = img.url || img;
+                if (typeof url === 'string') {
+                    if (url.startsWith('cloud://')) {
+                        cloudFiles.push(url);
+                    } else {
+                        ossFiles.push(url);
+                    }
+                }
+            });
+            
             // 并行删除
-            await Promise.all(
-                result.data.images.map(img => deleteFileByUrl(img.url))
-            );
+            const deletePromises = [];
+            
+            // 删除 OSS 文件
+            if (ossFiles.length > 0) {
+                deletePromises.push(
+                    ...ossFiles.map(url => deleteFileByUrl(url).catch(err => {
+                        console.warn('删除 OSS 文件失败:', url, err);
+                    }))
+                );
+            }
+            
+            // 云存储文件由前端删除（因为需要 wx.cloud API）
+            // 后端只返回需要删除的 fileID 列表
+            await Promise.all(deletePromises);
 
             res.send({
                 code: 200,
-                message: '删除错题成功'
+                message: '删除错题成功',
+                data: {
+                    cloudFilesToDelete: cloudFiles // 返回给前端，让前端删除
+                }
             });
         } catch (error) {
             console.error("删除错题失败", error);

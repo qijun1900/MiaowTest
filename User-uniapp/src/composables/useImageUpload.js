@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { deleteCloudFiles, httpUpload } from '../util/http';
 import escconfig from '../config/esc.config';
+import { UserInfoStore } from '../stores/modules/UserinfoStore';
 
 export function useImageUpload(options = {}) {
   const imageList = ref([]);
@@ -136,6 +137,13 @@ export function useImageUpload(options = {}) {
   };
 
   /**
+   * 检查是否为已上传的远程资源（OSS或云存储）
+   */
+  const isUploadedResource = (item) => {
+    return isRemoteUrl(item) || isCloudFileId(item);
+  };
+
+  /**
    * 批量上传所有图片到服务器
    */
   const uploadAllImages = async (uploadUrl = '/uniappAPI/upload/image') => {
@@ -146,8 +154,8 @@ export function useImageUpload(options = {}) {
     const results = [];
 
     for (const item of imageList.value) {
-      // 如果是已上传到OSS的远程URL（带_id的对象），直接使用
-      if (isRemoteUrl(item)) {
+      // 如果是已上传的远程资源（OSS URL 或云存储 fileID），直接使用
+      if (isUploadedResource(item)) {
         results.push(item);
         continue;
       }
@@ -167,13 +175,18 @@ export function useImageUpload(options = {}) {
   };
 
   /**
-   * 生成云存储路径
+   * 生成云存储路径（包含用户 UID）
    */
   const generateCloudPath = (filePath) => {
     const ext = filePath.split('.').pop() || 'jpg';
     const timestamp = Date.now();
     const random = Math.random().toString(36).slice(2, 8);
-    return `user/wrong_question/${timestamp}_${random}.${ext}`;
+    
+    // 获取当前用户 UID
+    const userInfoStore = UserInfoStore();
+    const uid = userInfoStore.userInfo?.uid || 'anonymous';
+    
+    return `user/wrong_question/${uid}/${timestamp}_${random}.${ext}`;
   };
 
   /**

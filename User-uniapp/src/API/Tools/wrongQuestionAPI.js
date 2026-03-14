@@ -67,11 +67,25 @@ export async function getWrongQuestionsAPI(wrongBookId, params = {}) {
  */
 export async function deleteWrongQuestionAPI(questionId) {
     try {
-        return await http({
+        const res = await http({
             url: '/uniappAPI/tools/wrongbook/deleteWrongQuestion',
             method: 'POST',
             data: { id: questionId }
         });
+        
+        // 如果删除成功且返回了需要删除的云存储文件列表，则删除这些文件
+        if (res.code === 200 && res.data?.cloudFilesToDelete?.length > 0) {
+            // 动态导入 deleteCloudFiles 避免循环依赖
+            const { deleteCloudFiles } = await import('../../util/http');
+            try {
+                await deleteCloudFiles(res.data.cloudFilesToDelete);
+                console.log('云存储文件删除成功:', res.data.cloudFilesToDelete);
+            } catch (err) {
+                console.warn('云存储文件删除失败，但题目已删除:', err);
+            }
+        }
+        
+        return res;
     } catch (error) {
         console.error("deleteWrongQuestion 失败", error);
         throw error;
