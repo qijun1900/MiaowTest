@@ -103,7 +103,12 @@
 
         <!-- 题目内容 -->
         <view class="question-content">
-          <QuestionContentDisplay :content="item._raw.stem" />
+          <QuestionContentDisplay
+            :content="item._raw.stem"
+            :editable="true"
+            @fullscreen-change="handleFullscreenChange"
+            @image-cropped="(data) => handleImageCropped(item, 'stem', data)"
+          />
         </view>
 
         <!-- 日期和复习次数 -->
@@ -146,7 +151,7 @@
                 <text class="answer-text">{{ item._raw.wrongAnswer?.text || '' }}</text>
               </view>
               <!-- 其他题型：使用完整组件 -->
-              <QuestionContentDisplay v-else :content="item._raw.wrongAnswer" />
+              <QuestionContentDisplay v-else :content="item._raw.wrongAnswer" :editable="true" @fullscreen-change="handleFullscreenChange" @image-cropped="(data) => handleImageCropped(item, 'wrongAnswer', data)" />
             </view>
 
             <!-- 正确答案 -->
@@ -157,14 +162,14 @@
                 <text class="answer-text">{{ item._raw.correctAnswer?.text || '' }}</text>
               </view>
               <!-- 其他题型：使用完整组件 -->
-              <QuestionContentDisplay v-else :content="item._raw.correctAnswer" />
+              <QuestionContentDisplay v-else :content="item._raw.correctAnswer" :editable="true" @fullscreen-change="handleFullscreenChange" @image-cropped="(data) => handleImageCropped(item, 'correctAnswer', data)" />
             </view>
 
             <!-- 解析/笔记 -->
             <view v-if="item._raw.analysis?.text || (item._raw.analysis?.images && item._raw.analysis.images.length > 0)" class="note-wrapper">
               <view class="answer-title">解析 / 笔记 / 备注</view>
               <view class="note-block">
-                <QuestionContentDisplay :content="item._raw.analysis" />
+                <QuestionContentDisplay :content="item._raw.analysis" :editable="true" @fullscreen-change="handleFullscreenChange" @image-cropped="(data) => handleImageCropped(item, 'analysis', data)" />
               </view>
             </view>
 
@@ -210,7 +215,7 @@
 
     <!--悬浮按钮 -->
     <dragButton
-      v-if="questionList.length > 0"
+      v-if="questionList.length > 0 && !isFullscreen"
       butColor="#ffffff"
       v-model:show="isShowdragButton "
       :isDock="true"
@@ -231,13 +236,14 @@ import dragButton from '../../../components/plug-in/drag-button/drag-button.vue'
 import SelectOptionsPreview from '../../../components/modules/exam/SelectOptionsPreview.vue';
 import JudgeOptionsPreview from '../../../components/modules/exam/JudgeOptionsPreview.vue';
 import QuestionContentDisplay from '../../../components/modules/exam/QuestionContentDisplay.vue';
-import { 
+import {
   getWrongQuestionsAPI ,
   deleteWrongQuestionAPI,
   markAsMasteredAPI,
-  markAsNeedReviewAPI
-
+  markAsNeedReviewAPI,
+  updateWrongQuestionAPI
 } from '../../../API/Tools/wrongQuestionAPI';
+import { uploadSingleFile } from '../../../composables/useImageUpload.js';
 import formatTime from '../../../util/formatTime';
 
 const WrongbookId = ref('');
@@ -245,6 +251,7 @@ const WrongbookTitle = ref('');
 const searchKeyword = ref('');
 const activeTab = ref('all');
 const isShowdragButton = ref(true);
+const isFullscreen = ref(false); // 是否有图片在全屏查看
 const loading = ref(false); // 加载状态
 
 // 原始完整数据列表
@@ -403,6 +410,48 @@ const markNeedReview = async (item) => {
       icon: 'none'
     });
 }};
+
+// 图片全屏状态变化
+const handleFullscreenChange = (visible) => {
+  isFullscreen.value = visible;
+};
+
+// 全屏查看裁剪图片后，上传新图片并更新题目
+const handleImageCropped = async (item, sectionKey, { index, tempFilePath }) => {
+  try {
+    uni.showLoading({ title: '更新图片中...' });
+
+    // 1. 上传裁剪后的图片
+    const newImage = await uploadSingleFile(tempFilePath);
+
+    // 2. 替换本地数据中的图片
+    const section = item._raw[sectionKey];
+    if (section && section.images && index < section.images.length) {
+      section.images[index] = newImage;
+    }
+
+    // 3. 调用 API 更新题目
+    await updateWrongQuestionAPI({
+      id: item.id,
+      Type: item._raw.Type,
+      stem: item._raw.stem,
+      options: item._raw.options,
+      correctAnswer: item._raw.correctAnswer,
+      wrongAnswer: item._raw.wrongAnswer,
+      analysis: item._raw.analysis,
+      tags: item._raw.tags,
+      difficulty: item._raw.difficulty,
+    });
+
+    uni.hideLoading();
+    uni.showToast({ title: '图片已更新', icon: 'success' });
+  } catch (error) {
+    uni.hideLoading();
+    console.error('更新图片失败:', error);
+    uni.showToast({ title: '更新失败，请重试', icon: 'none' });
+  }
+};
+
 //跳转到添加题目页面
 const handleAddQuestion = () => {
   uni.navigateTo({  

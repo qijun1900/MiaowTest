@@ -3,6 +3,56 @@ import { deleteCloudFiles, httpUpload } from '../util/http';
 import escconfig from '../config/esc.config';
 import { UserInfoStore } from '../stores/modules/UserinfoStore';
 
+/**
+ * 上传单个图片文件（独立函数，不依赖 composable 实例）
+ * @param {string} filePath - 本地图片路径
+ * @returns {Promise<{_id: string, url: string}>}
+ */
+export function uploadSingleFile(filePath) {
+  const ext = filePath.split('.').pop() || 'jpg';
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).slice(2, 8);
+  const userInfoStore = UserInfoStore();
+  const uid = userInfoStore.userInfo?.uid || 'anonymous';
+  const cloudPath = `user/wrong_question/${uid}/${timestamp}_${random}.${ext}`;
+
+  if (escconfig.useCloudContainer) {
+    return httpUpload({
+      filePath,
+      url: '/uniappAPI/upload/cloudImage',
+      cloudPath
+    }).then(data => {
+      if (data.code === 200) {
+        return { _id: data.data._id, url: data.data.url };
+      }
+      throw new Error(data.message || '上传失败');
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    uni.uploadFile({
+      url: '/uniappAPI/upload/image',
+      filePath,
+      name: 'file',
+      fileType: 'image',
+      success: (uploadRes) => {
+        try {
+          const data = JSON.parse(uploadRes.data);
+          if (data.code === 200) {
+            resolve({ _id: data.data._id, url: data.data.url });
+          } else {
+            reject(new Error(data.message || '上传失败'));
+          }
+        } catch (e) {
+          reject(new Error('解析响应失败'));
+          console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
+        }
+      },
+      fail: reject
+    });
+  });
+}
+
 export function useImageUpload(options = {}) {
   const imageList = ref([]);
 

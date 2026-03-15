@@ -112,6 +112,9 @@ const canvasHeight = ref(10);
 // 裁剪中状态
 const cropping = ref(false);
 
+// 本地图片路径（用于 canvas 绘制，兼容远程URL）
+const localImagePath = ref('');
+
 // 当 show 变为 false 时重置状态
 watch(() => props.show, (val) => {
   if (!val) {
@@ -128,6 +131,8 @@ const onImageLoad = () => {
     success: (info) => {
       originalWidth.value = info.width;
       originalHeight.value = info.height;
+      // 保存本地路径，确保 canvas drawImage 兼容远程URL
+      localImagePath.value = info.path || props.imagePath;
 
       nextTick(() => {
         uni.createSelectorQuery().in(instance.proxy)
@@ -300,7 +305,7 @@ const handleConfirm = async () => {
     // 使用 canvas 绘制裁剪区域
     const ctx = uni.createCanvasContext('cropCanvas', instance.proxy);
     ctx.drawImage(
-      props.imagePath,
+      localImagePath.value,
       cropX, cropY, cropW, cropH,
       0, 0, canvasWidth.value, canvasHeight.value
     );
@@ -360,6 +365,7 @@ const resetState = () => {
   hasSelection.value = false;
   isSelecting.value = false;
   cropping.value = false;
+  localImagePath.value = '';
 };
 </script>
 

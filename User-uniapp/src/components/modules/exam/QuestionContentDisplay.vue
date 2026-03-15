@@ -63,29 +63,51 @@
     <!-- 全屏查看弹窗 -->
     <view v-if="fullscreenVisible" class="fullscreen-modal" @click="closeFullscreen">
       <view class="fullscreen-content">
-        <image 
-          :src="currentFullscreenImage" 
+        <image
+          :src="currentFullscreenImage"
           mode="aspectFit"
           class="fullscreen-image"
           @click.stop
         />
-        
+
         <!-- 关闭按钮 -->
         <view class="close-btn" hover-class="close-btn-hover" @click.stop="closeFullscreen">
           <uni-icons type="closeempty" size="28" color="#ffffff"></uni-icons>
         </view>
-        
+
+        <!-- 编辑截取按钮 - 仅在可编辑模式 -->
+        <view
+          v-if="editable"
+          class="edit-crop-btn"
+          hover-class="edit-crop-btn-hover"
+          @click.stop="startCrop"
+        >
+          <uni-icons type="compose" size="20" color="#ffffff"></uni-icons>
+          <text class="edit-crop-text">编辑截取</text>
+        </view>
+
         <!-- 图片序号指示器 -->
         <view v-if="content.images.length > 1" class="image-indicator">
           <text class="indicator-text">{{ currentFullscreenIndex + 1 }} / {{ content.images.length }}</text>
         </view>
       </view>
     </view>
+
+    <!-- 图片裁剪器 -->
+    <ImageCropper
+      v-if="editable"
+      :show="cropperVisible"
+      :image-path="currentFullscreenImage"
+      @confirm="onCropConfirm"
+      @cancel="onCropCancel"
+      @use-original="onCropCancel"
+    />
   </view>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue';
+import ImageCropper from '../../common/ImageCropper.vue';
 
 const props = defineProps({
   // 内容对象 { text: string, images: [{url: string}] }
@@ -96,8 +118,15 @@ const props = defineProps({
       text: '',
       images: []
     })
+  },
+  // 是否可编辑（显示编辑截取按钮）
+  editable: {
+    type: Boolean,
+    default: false
   }
 });
+
+const emit = defineEmits(['image-cropped', 'fullscreen-change']);
 
 // 图片加载状态
 const imageLoadingStates = reactive({});
@@ -141,11 +170,39 @@ const openFullscreen = (index) => {
   currentFullscreenImage.value = props.content.images[index].url;
   currentFullscreenIndex.value = index;
   fullscreenVisible.value = true;
+  emit('fullscreen-change', true);
 };
 
 // 关闭全屏查看
 const closeFullscreen = () => {
   fullscreenVisible.value = false;
+  emit('fullscreen-change', false);
+};
+
+// 裁剪器状态
+const cropperVisible = ref(false);
+
+// 点击编辑截取 → 关闭全屏 → 打开裁剪器
+const startCrop = () => {
+  fullscreenVisible.value = false;
+  cropperVisible.value = true;
+  // 裁剪时仍保持隐藏悬浮按钮，不触发 fullscreen-change
+};
+
+// 裁剪完成 → 通知父组件
+const onCropConfirm = (croppedPath) => {
+  cropperVisible.value = false;
+  emit('fullscreen-change', false);
+  emit('image-cropped', {
+    index: currentFullscreenIndex.value,
+    tempFilePath: croppedPath
+  });
+};
+
+// 裁剪取消 → 回到全屏查看
+const onCropCancel = () => {
+  cropperVisible.value = false;
+  fullscreenVisible.value = true;
 };
 </script>
 
@@ -385,6 +442,32 @@ const closeFullscreen = () => {
 
 .indicator-text {
   font-size: 28rpx;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* 编辑截取按钮 */
+.edit-crop-btn {
+  position: absolute;
+  bottom: 60rpx;
+  right: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 20rpx 32rpx;
+  background: rgba(255, 149, 85, 0.85);
+  border-radius: 48rpx;
+  z-index: 10000;
+  transition: all 0.3s ease;
+}
+
+.edit-crop-btn-hover {
+  background: rgba(255, 149, 85, 1);
+  transform: scale(0.95);
+}
+
+.edit-crop-text {
+  font-size: 26rpx;
   color: #ffffff;
   font-weight: 500;
 }
