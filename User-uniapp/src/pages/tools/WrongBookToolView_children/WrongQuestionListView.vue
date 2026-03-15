@@ -244,6 +244,8 @@ import {
   updateWrongQuestionAPI
 } from '../../../API/Tools/wrongQuestionAPI';
 import { uploadSingleFile } from '../../../composables/useImageUpload.js';
+import { deleteCloudFiles } from '../../../util/http';
+import escconfig from '../../../config/esc.config';
 import formatTime from '../../../util/formatTime';
 
 const WrongbookId = ref('');
@@ -416,21 +418,60 @@ const handleFullscreenChange = (visible) => {
   isFullscreen.value = visible;
 };
 
+// 删除旧的远程图片（云存储或OSS）
+const deleteOldImage = async (imageItem) => {
+  const imageUrl = typeof imageItem === 'string' ? imageItem : imageItem?.url;
+  if (!imageUrl) return;
+
+  // 云存储文件：前端直接删除
+  if (escconfig.useCloudContainer && escconfig.useCloudStorage && imageUrl.startsWith('cloud://')) {
+    await deleteCloudFiles([imageUrl]).catch((err) => {
+      console.warn('删除旧云存储图片失败:', err);
+    });
+  }
+
+  // 通知后端删除数据库记录及OSS文件
+  const requestData = {};
+  if (typeof imageItem === 'object' && imageItem._id) {
+    requestData._id = imageItem._id;
+    requestData.path = imageItem.url;
+  } else {
+    requestData.path = imageUrl;
+  }
+  await new Promise((resolve) => {
+    uni.request({
+      url: '/uniappAPI/delete/image',
+      method: 'POST',
+      data: requestData,
+      success: () => resolve(),
+      fail: (err) => {
+        console.warn('删除旧图片记录失败:', err);
+        resolve();
+      }
+    });
+  });
+};
+
 // 全屏查看裁剪图片后，上传新图片并更新题目
 const handleImageCropped = async (item, sectionKey, { index, tempFilePath }) => {
   try {
     uni.showLoading({ title: '更新图片中...' });
 
-    // 1. 上传裁剪后的图片
+    // 1. 保存旧图片引用
+    const section = item._raw[sectionKey];
+    const oldImage = (section && section.images && index < section.images.length)
+      ? section.images[index]
+      : null;
+
+    // 2. 上传裁剪后的图片
     const newImage = await uploadSingleFile(tempFilePath);
 
-    // 2. 替换本地数据中的图片
-    const section = item._raw[sectionKey];
+    // 3. 替换本地数据中的图片
     if (section && section.images && index < section.images.length) {
       section.images[index] = newImage;
     }
 
-    // 3. 调用 API 更新题目
+    // 4. 调用 API 更新题目
     await updateWrongQuestionAPI({
       id: item.id,
       Type: item._raw.Type,
@@ -442,6 +483,11 @@ const handleImageCropped = async (item, sectionKey, { index, tempFilePath }) => 
       tags: item._raw.tags,
       difficulty: item._raw.difficulty,
     });
+
+    // 5. 删除旧图片（更新成功后再删，避免失败时丢失图片）
+    if (oldImage) {
+      deleteOldImage(oldImage).catch(() => {});
+    }
 
     uni.hideLoading();
     uni.showToast({ title: '图片已更新', icon: 'success' });
