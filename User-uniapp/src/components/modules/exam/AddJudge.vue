@@ -100,6 +100,21 @@
             </button>
         </view>
 
+        <!-- 图片裁剪器 -->
+        <ImageCropper
+          :show="stemImages.cropperVisible.value"
+          :image-path="stemImages.pendingCropImage.value"
+          @confirm="stemImages.completeCrop"
+          @cancel="stemImages.cancelCrop"
+          @use-original="stemImages.skipCrop"
+        />
+        <ImageCropper
+          :show="analysisImages.cropperVisible.value"
+          :image-path="analysisImages.pendingCropImage.value"
+          @confirm="analysisImages.completeCrop"
+          @cancel="analysisImages.cancelCrop"
+          @use-original="analysisImages.skipCrop"
+        />
     </view>
 
 </template>
@@ -112,6 +127,7 @@ import QuestionStemHeader from './QuestionStemHeader.vue';
 import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
 import QuestionTags from './QuestionTags.vue';
 import ImageList from '../../common/ImageList.vue';
+import ImageCropper from '../../common/ImageCropper.vue';
 import { saveQuestion } from '../../../API/Exam/QuestionAPI';
 import { useImageUpload } from '../../../composables/useImageUpload.js';
 

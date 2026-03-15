@@ -5,12 +5,16 @@ import { UserInfoStore } from '../stores/modules/UserinfoStore';
 
 export function useImageUpload(options = {}) {
   const imageList = ref([]);
-  
+
   // 默认配置：最大 10MB
   const maxSize = options.maxSize || 10 * 1024 * 1024;
-  
+
+  // 裁剪器状态
+  const cropperVisible = ref(false);
+  const pendingCropImage = ref('');
+
   /**
-   * 选择图片（不上传）
+   * 选择图片 → 打开裁剪器
    */
   const addImage = () => {
     uni.chooseImage({
@@ -19,8 +23,9 @@ export function useImageUpload(options = {}) {
       sourceType: ['album', 'camera'],
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0];
-        // 检查文件大小
-        checkFileSize(tempFilePath);
+        // 先展示裁剪器，让用户选择截取区域或使用原图
+        pendingCropImage.value = tempFilePath;
+        cropperVisible.value = true;
       },
       fail: (err) => {
         console.error('选择图片失败:', err);
@@ -31,6 +36,33 @@ export function useImageUpload(options = {}) {
         });
       }
     });
+  };
+
+  /**
+   * 裁剪完成，保存裁剪后的图片
+   */
+  const completeCrop = (croppedPath) => {
+    cropperVisible.value = false;
+    pendingCropImage.value = '';
+    checkFileSize(croppedPath);
+  };
+
+  /**
+   * 跳过裁剪，使用原图
+   */
+  const skipCrop = () => {
+    const originalPath = pendingCropImage.value;
+    cropperVisible.value = false;
+    pendingCropImage.value = '';
+    checkFileSize(originalPath);
+  };
+
+  /**
+   * 取消裁剪
+   */
+  const cancelCrop = () => {
+    cropperVisible.value = false;
+    pendingCropImage.value = '';
   };
 
   /**
@@ -412,6 +444,12 @@ export function useImageUpload(options = {}) {
     uploadAllImages,
     removeImage,
     clearImages,
-    setImages
+    setImages,
+    // 裁剪器状态
+    cropperVisible,
+    pendingCropImage,
+    completeCrop,
+    skipCrop,
+    cancelCrop
   };
 }
