@@ -14,9 +14,10 @@
                 height="200rpx" 
                 id="stemEditorId3"/>
             <!-- 题干图片列表 -->
-            <ImageList 
+            <ImageList
                 :images="stemImages.imageList.value"
                 @remove="stemImages.removeImage"
+                @crop="(data) => stemImages.replaceImage(data.index, data.tempFilePath)"
             />
         </view>
         <ThemeDivider text="题目答案" />
@@ -81,9 +82,10 @@
                 height="200rpx" 
                 id="analysisEditor3"/>
             <!-- 解析图片列表 -->
-            <ImageList 
+            <ImageList
                 :images="analysisImages.imageList.value"
                 @remove="analysisImages.removeImage"
+                @crop="(data) => analysisImages.replaceImage(data.index, data.tempFilePath)"
             />
         </view>
         

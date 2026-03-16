@@ -1,25 +1,41 @@
 <template>
   <view v-if="images.length > 0" class="image-list">
-    <view 
-      v-for="(img, index) in images" 
+    <view
+      v-for="(img, index) in images"
       :key="getImageUrl(img) + index"
       class="image-item"
     >
-      <image 
-        :src="getImageUrl(img)" 
-        mode="aspectFill" 
-        class="preview-image" 
-        @click="previewImage(index)"
+      <image
+        :src="getImageUrl(img)"
+        mode="aspectFill"
+        class="preview-image"
+        @click="handleImageClick(index)"
         @error="handleImageError(index)"
       />
+      <!-- 裁剪小图标 -->
+      <view class="crop-image-btn" @click.stop="startCrop(index)">
+        <uni-icons type="compose" size="14" color="#ffffff"></uni-icons>
+      </view>
       <view class="delete-image-btn" @click="handleRemove(index)">
         <uni-icons type="close" size="14" color="#ffffff"></uni-icons>
       </view>
     </view>
   </view>
+
+  <!-- 图片裁剪器 -->
+  <ImageCropper
+    :show="cropperVisible"
+    :image-path="cropImagePath"
+    @confirm="onCropConfirm"
+    @cancel="onCropCancel"
+    @use-original="onCropCancel"
+  />
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import ImageCropper from './ImageCropper.vue';
+
 const props = defineProps({
   images: {
     type: Array,
@@ -27,18 +43,21 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['remove', 'error']);
+const emit = defineEmits(['remove', 'error', 'crop']);
+
+// 裁剪状态
+const cropperVisible = ref(false);
+const cropImagePath = ref('');
+const cropIndex = ref(-1);
 
 /**
  * 获取图片URL（支持字符串或对象格式）
  */
 const getImageUrl = (img) => {
   if (!img) return '';
-  // 如果是对象格式 { _id, url }，返回 url
   if (typeof img === 'object' && img.url) {
     return img.url;
   }
-  // 如果是字符串，直接返回
   return img;
 };
 
@@ -59,12 +78,53 @@ const handleImageError = (index) => {
   emit('error', index);
 };
 
+/**
+ * 点击图片 - 弹出操作菜单
+ */
+const handleImageClick = (index) => {
+  uni.showActionSheet({
+    itemList: ['预览图片', '裁剪图片'],
+    success: (res) => {
+      if (res.tapIndex === 0) {
+        previewImage(index);
+      } else if (res.tapIndex === 1) {
+        startCrop(index);
+      }
+    }
+  });
+};
+
+/**
+ * 开始裁剪
+ */
+const startCrop = (index) => {
+  const url = getImageUrl(props.images[index]);
+  if (!url) return;
+  cropIndex.value = index;
+  cropImagePath.value = url;
+  cropperVisible.value = true;
+};
+
+/**
+ * 裁剪完成
+ */
+const onCropConfirm = (croppedPath) => {
+  cropperVisible.value = false;
+  emit('crop', { index: cropIndex.value, tempFilePath: croppedPath });
+};
+
+/**
+ * 裁剪取消
+ */
+const onCropCancel = () => {
+  cropperVisible.value = false;
+};
+
 const previewImage = (index) => {
-  // 提取所有有效的图片URL
   const validImages = props.images
     .map(img => getImageUrl(img))
     .filter(url => url && url.trim());
-  
+
   if (validImages.length === 0) {
     uni.showToast({
       title: '图片加载失败',
@@ -72,7 +132,7 @@ const previewImage = (index) => {
     });
     return;
   }
-  
+
   uni.previewImage({
     urls: validImages,
     current: getImageUrl(props.images[index]),
@@ -108,6 +168,20 @@ const previewImage = (index) => {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+.crop-image-btn {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: rgba(255, 149, 85, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
 .delete-image-btn {

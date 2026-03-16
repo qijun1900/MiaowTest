@@ -16,9 +16,10 @@
         id="stemEditorId1"
         />
       <!-- 题干图片列表 -->
-      <ImageList 
+      <ImageList
         :images="stemImages.imageList.value"
         @remove="stemImages.removeImage"
+        @crop="(data) => stemImages.replaceImage(data.index, data.tempFilePath)"
       />
     </view>
     <ThemeDivider text="题目选项" v-show="!isAddWrongBookQuestion"/>
@@ -81,9 +82,10 @@
         height="200rpx" 
         id="analysisEditorId2"/>
       <!-- 解析图片列表 -->
-      <ImageList 
+      <ImageList
         :images="analysisImages.imageList.value"
         @remove="analysisImages.removeImage"
+        @crop="(data) => analysisImages.replaceImage(data.index, data.tempFilePath)"
       />
     </view>
     

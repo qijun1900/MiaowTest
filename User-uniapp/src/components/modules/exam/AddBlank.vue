@@ -14,9 +14,10 @@
         height="200rpx" 
         id="stemEditor2"/>
       <!-- 题干图片列表 -->
-      <ImageList 
+      <ImageList
         :images="stemImages.imageList.value"
         @remove="stemImages.removeImage"
+        @crop="(data) => stemImages.replaceImage(data.index, data.tempFilePath)"
       />
     </view>
     <ThemeDivider text="题目答案" />
@@ -51,9 +52,10 @@
     />
     <!-- 错解图片列表 -->
     <view v-if="props.isAddWrongBookQuestion" class="wrong-answer-images">
-      <ImageList 
+      <ImageList
         :images="wrongAnswerImages.imageList.value"
         @remove="wrongAnswerImages.removeImage"
+        @crop="(data) => wrongAnswerImages.replaceImage(data.index, data.tempFilePath)"
       />
     </view>
     
@@ -71,9 +73,10 @@
         height="200rpx" 
         id="analysisEditor2"/>
       <!-- 解析图片列表 -->
-      <ImageList 
+      <ImageList
         :images="analysisImages.imageList.value"
         @remove="analysisImages.removeImage"
+        @crop="(data) => analysisImages.replaceImage(data.index, data.tempFilePath)"
       />
     </view>
     

@@ -488,11 +488,32 @@ export function useImageUpload(options = {}) {
     }).filter(item => item);
   };
 
+  /**
+   * 替换指定索引的图片（裁剪后替换），如果旧图是远程资源则先删除
+   */
+  const replaceImage = async (index, newPath) => {
+    if (index >= 0 && index < imageList.value.length) {
+      const oldItem = imageList.value[index];
+
+      // 如果旧图是已上传的远程资源，先删除服务器上的旧图
+      if (isUploadedResource(oldItem)) {
+        try {
+          await deleteRemoteImage(oldItem);
+        } catch (error) {
+          console.warn('替换时删除旧远程图片失败:', error);
+        }
+      }
+
+      imageList.value.splice(index, 1, newPath);
+    }
+  };
+
   return {
     imageList,
     addImage,
     uploadAllImages,
     removeImage,
+    replaceImage,
     clearImages,
     setImages,
     // 裁剪器状态
