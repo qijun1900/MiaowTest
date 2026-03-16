@@ -3,7 +3,7 @@
     <!-- 顶部栏 -->
     <view class="cropper-header" :style="{ paddingTop: statusBarHeight + 'px' }">
       <text class="header-title">截取图片</text>
-      <text class="header-hint">拖动选择要截取的区域</text>
+      <text class="header-hint">{{ headerHint }}</text>
     </view>
 
     <!-- 图片区域 -->
@@ -29,10 +29,21 @@
         <view class="crop-mask" :style="rightMaskStyle" />
         <!-- 选区边框 -->
         <view class="selection-border" :style="selectionBorderStyle">
+          <!-- 三分线 -->
+          <view class="grid-line grid-h1" />
+          <view class="grid-line grid-h2" />
+          <view class="grid-line grid-v1" />
+          <view class="grid-line grid-v2" />
+          <!-- 四角手柄 -->
           <view class="corner tl" />
           <view class="corner tr" />
           <view class="corner bl" />
           <view class="corner br" />
+          <!-- 边缘手柄 -->
+          <view class="edge-handle edge-t" />
+          <view class="edge-handle edge-b" />
+          <view class="edge-handle edge-l" />
+          <view class="edge-handle edge-r" />
         </view>
       </template>
       <template v-else>
@@ -99,11 +110,25 @@ const containerRect = reactive({ left: 0, top: 0, width: 0, height: 0 });
 // 图片在容器内的实际显示区域（aspectFit模式下可能有留白）
 const imageDisplay = reactive({ left: 0, top: 0, width: 0, height: 0 });
 
-// 触摸状态
-const startPoint = reactive({ x: 0, y: 0 });
+// 常量
+const MIN_SIZE = 30;       // 最小选区尺寸 px
+const CORNER_SLOP = 20;    // 四角触摸热区半径 px
+const EDGE_SLOP = 14;      // 边缘触摸热区半径 px
+
+// 交互状态
+const interactionMode = ref('none'); // 'none'|'drawing'|'moving'|'resize-tl'|'resize-tr'|'resize-bl'|'resize-br'|'resize-t'|'resize-b'|'resize-l'|'resize-r'
+const dragStart = reactive({ x: 0, y: 0 });
+const dragStartRect = reactive({ left: 0, top: 0, width: 0, height: 0 });
 const selectionRect = reactive({ left: 0, top: 0, width: 0, height: 0 });
-const isSelecting = ref(false);
 const hasSelection = ref(false);
+
+// 动态提示文字
+const headerHint = computed(() => {
+  if (interactionMode.value === 'drawing') return '松手完成选区';
+  if (interactionMode.value === 'moving') return '移动选区中...';
+  if (interactionMode.value.startsWith('resize')) return '调整选区大小中...';
+  return hasSelection.value ? '拖动调整选区，点击外部重新选择' : '拖动选择要截取的区域';
+});
 
 // Canvas 尺寸
 const canvasWidth = ref(10);
@@ -169,6 +194,54 @@ const onImageLoad = () => {
 };
 
 /**
+ * 辅助函数：限制值在范围内
+ */
+const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+
+/**
+ * 快照当前选区
+ */
+const snapshotRect = () => {
+  dragStartRect.left = selectionRect.left;
+  dragStartRect.top = selectionRect.top;
+  dragStartRect.width = selectionRect.width;
+  dragStartRect.height = selectionRect.height;
+};
+
+/**
+ * 命中检测：判断触摸点落在选区的哪个区域
+ */
+const getHitZone = (x, y) => {
+  const left = selectionRect.left;
+  const top = selectionRect.top;
+  const right = left + selectionRect.width;
+  const bottom = top + selectionRect.height;
+
+  const nearX = (target) => Math.abs(x - target) <= CORNER_SLOP;
+  const nearY = (target) => Math.abs(y - target) <= CORNER_SLOP;
+
+  // 四角（优先级最高）
+  if (nearX(left) && nearY(top)) return 'resize-tl';
+  if (nearX(right) && nearY(top)) return 'resize-tr';
+  if (nearX(left) && nearY(bottom)) return 'resize-bl';
+  if (nearX(right) && nearY(bottom)) return 'resize-br';
+
+  // 四边
+  const inHorzSpan = x >= left - EDGE_SLOP && x <= right + EDGE_SLOP;
+  const inVertSpan = y >= top - EDGE_SLOP && y <= bottom + EDGE_SLOP;
+
+  if (inHorzSpan && Math.abs(y - top) <= EDGE_SLOP) return 'resize-t';
+  if (inHorzSpan && Math.abs(y - bottom) <= EDGE_SLOP) return 'resize-b';
+  if (inVertSpan && Math.abs(x - left) <= EDGE_SLOP) return 'resize-l';
+  if (inVertSpan && Math.abs(x - right) <= EDGE_SLOP) return 'resize-r';
+
+  // 选区内部
+  if (x > left && x < right && y > top && y < bottom) return 'move';
+
+  return 'outside';
+};
+
+/**
  * 触摸开始
  */
 const onTouchStart = (e) => {
@@ -177,44 +250,108 @@ const onTouchStart = (e) => {
   const x = touch.clientX - containerRect.left;
   const y = touch.clientY - containerRect.top;
 
-  startPoint.x = x;
-  startPoint.y = y;
-  selectionRect.left = x;
-  selectionRect.top = y;
-  selectionRect.width = 0;
-  selectionRect.height = 0;
-  isSelecting.value = true;
-  hasSelection.value = false;
+  dragStart.x = x;
+  dragStart.y = y;
+
+  if (hasSelection.value) {
+    const zone = getHitZone(x, y);
+    if (zone === 'outside') {
+      // 重新框选
+      selectionRect.left = x;
+      selectionRect.top = y;
+      selectionRect.width = 0;
+      selectionRect.height = 0;
+      hasSelection.value = false;
+      interactionMode.value = 'drawing';
+    } else if (zone === 'move') {
+      snapshotRect();
+      interactionMode.value = 'moving';
+    } else {
+      snapshotRect();
+      interactionMode.value = zone;
+    }
+  } else {
+    selectionRect.left = x;
+    selectionRect.top = y;
+    selectionRect.width = 0;
+    selectionRect.height = 0;
+    interactionMode.value = 'drawing';
+  }
+};
+
+/** 新建选区 */
+const handleDrawing = (x, y) => {
+  selectionRect.left = Math.min(dragStart.x, x);
+  selectionRect.top = Math.min(dragStart.y, y);
+  selectionRect.width = Math.abs(x - dragStart.x);
+  selectionRect.height = Math.abs(y - dragStart.y);
+  hasSelection.value = selectionRect.width > 10 && selectionRect.height > 10;
+};
+
+/** 移动选区 */
+const handleMoving = (dx, dy) => {
+  const maxLeft = containerRect.width - dragStartRect.width;
+  const maxTop = containerRect.height - dragStartRect.height;
+  selectionRect.left = clamp(dragStartRect.left + dx, 0, maxLeft);
+  selectionRect.top = clamp(dragStartRect.top + dy, 0, maxTop);
+};
+
+/** 调整选区大小 */
+const handleResizing = (mode, dx, dy) => {
+  const r = dragStartRect;
+  let newLeft = r.left;
+  let newTop = r.top;
+  let newRight = r.left + r.width;
+  let newBottom = r.top + r.height;
+
+  if (mode.includes('l')) newLeft = clamp(r.left + dx, 0, newRight - MIN_SIZE);
+  if (mode.includes('r')) newRight = clamp(r.left + r.width + dx, newLeft + MIN_SIZE, containerRect.width);
+  if (mode.includes('t')) newTop = clamp(r.top + dy, 0, newBottom - MIN_SIZE);
+  if (mode.includes('b')) newBottom = clamp(r.top + r.height + dy, newTop + MIN_SIZE, containerRect.height);
+
+  selectionRect.left = newLeft;
+  selectionRect.top = newTop;
+  selectionRect.width = newRight - newLeft;
+  selectionRect.height = newBottom - newTop;
 };
 
 /**
  * 触摸移动
  */
 const onTouchMove = (e) => {
-  if (!isSelecting.value) return;
+  if (interactionMode.value === 'none') return;
   const touch = e.touches[0];
-  const x = touch.clientX - containerRect.left;
-  const y = touch.clientY - containerRect.top;
+  const rawX = touch.clientX - containerRect.left;
+  const rawY = touch.clientY - containerRect.top;
+  const x = clamp(rawX, 0, containerRect.width);
+  const y = clamp(rawY, 0, containerRect.height);
+  const dx = x - dragStart.x;
+  const dy = y - dragStart.y;
 
-  // 限制在容器范围内
-  const clampedX = Math.max(0, Math.min(x, containerRect.width));
-  const clampedY = Math.max(0, Math.min(y, containerRect.height));
-
-  selectionRect.left = Math.min(startPoint.x, clampedX);
-  selectionRect.top = Math.min(startPoint.y, clampedY);
-  selectionRect.width = Math.abs(clampedX - startPoint.x);
-  selectionRect.height = Math.abs(clampedY - startPoint.y);
-
-  // 拖动超过10px才认为有效选区
-  hasSelection.value = selectionRect.width > 10 && selectionRect.height > 10;
+  const mode = interactionMode.value;
+  if (mode === 'drawing') {
+    handleDrawing(x, y);
+  } else if (mode === 'moving') {
+    handleMoving(dx, dy);
+  } else {
+    handleResizing(mode, dx, dy);
+  }
 };
 
 /**
  * 触摸结束
  */
 const onTouchEnd = () => {
-  isSelecting.value = false;
-  hasSelection.value = selectionRect.width > 10 && selectionRect.height > 10;
+  if (interactionMode.value === 'drawing') {
+    hasSelection.value = selectionRect.width > MIN_SIZE && selectionRect.height > MIN_SIZE;
+    if (!hasSelection.value) {
+      selectionRect.left = 0;
+      selectionRect.top = 0;
+      selectionRect.width = 0;
+      selectionRect.height = 0;
+    }
+  }
+  interactionMode.value = 'none';
 };
 
 /**
@@ -363,7 +500,7 @@ const resetState = () => {
   selectionRect.width = 0;
   selectionRect.height = 0;
   hasSelection.value = false;
-  isSelecting.value = false;
+  interactionMode.value = 'none';
   cropping.value = false;
   localImagePath.value = '';
 };
@@ -439,39 +576,118 @@ const resetState = () => {
 /* 四角标记 */
 .corner {
   position: absolute;
-  width: 30rpx;
-  height: 30rpx;
+  width: 40rpx;
+  height: 40rpx;
   border-color: #fff;
   border-style: solid;
   border-width: 0;
+  pointer-events: none;
 }
 
 .corner.tl {
-  top: -3rpx;
-  left: -3rpx;
-  border-top-width: 6rpx;
-  border-left-width: 6rpx;
+  top: -4rpx;
+  left: -4rpx;
+  border-top-width: 8rpx;
+  border-left-width: 8rpx;
 }
 
 .corner.tr {
-  top: -3rpx;
-  right: -3rpx;
-  border-top-width: 6rpx;
-  border-right-width: 6rpx;
+  top: -4rpx;
+  right: -4rpx;
+  border-top-width: 8rpx;
+  border-right-width: 8rpx;
 }
 
 .corner.bl {
-  bottom: -3rpx;
-  left: -3rpx;
-  border-bottom-width: 6rpx;
-  border-left-width: 6rpx;
+  bottom: -4rpx;
+  left: -4rpx;
+  border-bottom-width: 8rpx;
+  border-left-width: 8rpx;
 }
 
 .corner.br {
-  bottom: -3rpx;
-  right: -3rpx;
-  border-bottom-width: 6rpx;
-  border-right-width: 6rpx;
+  bottom: -4rpx;
+  right: -4rpx;
+  border-bottom-width: 8rpx;
+  border-right-width: 8rpx;
+}
+
+/* 边缘手柄 */
+.edge-handle {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 3rpx;
+  pointer-events: none;
+}
+
+.edge-handle.edge-t,
+.edge-handle.edge-b {
+  width: 48rpx;
+  height: 8rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.edge-handle.edge-t {
+  top: -4rpx;
+}
+
+.edge-handle.edge-b {
+  bottom: -4rpx;
+}
+
+.edge-handle.edge-l,
+.edge-handle.edge-r {
+  width: 8rpx;
+  height: 48rpx;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.edge-handle.edge-l {
+  left: -4rpx;
+}
+
+.edge-handle.edge-r {
+  right: -4rpx;
+}
+
+/* 三分线 */
+.grid-line {
+  position: absolute;
+  pointer-events: none;
+}
+
+.grid-line.grid-h1,
+.grid-line.grid-h2 {
+  left: 0;
+  right: 0;
+  height: 1rpx;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.grid-line.grid-h1 {
+  top: 33.33%;
+}
+
+.grid-line.grid-h2 {
+  top: 66.67%;
+}
+
+.grid-line.grid-v1,
+.grid-line.grid-v2 {
+  top: 0;
+  bottom: 0;
+  width: 1rpx;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.grid-line.grid-v1 {
+  left: 33.33%;
+}
+
+.grid-line.grid-v2 {
+  left: 66.67%;
 }
 
 /* 底部操作栏 */
