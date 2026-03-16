@@ -144,14 +144,16 @@
             />
 
             <!-- 我的错误答案 -->
-            <view class="answer-title">我的错解</view>
-            <view class="answer-block wrong-answer">
-              <!-- 选择题/判断题：纯文本简洁显示 -->
-              <view v-if="(item._raw.Type === 1 || item._raw.Type === 3) && !item._raw.wrongAnswer?.images?.length" class="simple-answer">
-                <text class="answer-text">{{ item._raw.wrongAnswer?.text || '' }}</text>
+            <view v-if="item._raw.wrongAnswer?.text || (item._raw.wrongAnswer?.images && item._raw.wrongAnswer.images.length > 0)">
+              <view class="answer-title">我的错解</view>
+              <view class="answer-block wrong-answer">
+                <!-- 选择题/判断题：纯文本简洁显示 -->
+                <view v-if="(item._raw.Type === 1 || item._raw.Type === 3) && !item._raw.wrongAnswer?.images?.length" class="simple-answer">
+                  <text class="answer-text">{{ item._raw.wrongAnswer?.text || '' }}</text>
+                </view>
+                <!-- 其他题型：使用完整组件 -->
+                <QuestionContentDisplay v-else :content="item._raw.wrongAnswer" :editable="true" @fullscreen-change="handleFullscreenChange" @image-cropped="(data) => handleImageCropped(item, 'wrongAnswer', data)" />
               </view>
-              <!-- 其他题型：使用完整组件 -->
-              <QuestionContentDisplay v-else :content="item._raw.wrongAnswer" :editable="true" @fullscreen-change="handleFullscreenChange" @image-cropped="(data) => handleImageCropped(item, 'wrongAnswer', data)" />
             </view>
 
             <!-- 正确答案 -->

@@ -195,10 +195,10 @@ const handleSend = async () => {
       return;
     }
 
-    // 验证答案是否为空
-    if (!formData.content.trim()) {
+    // 验证答案是否为空（文本或图片至少有一个）
+    if (!formData.content.trim() && answerImages.imageList.value.length === 0) {
       uni.showToast({
-        title: '请输入参考答案',
+        title: '请输入参考答案或上传答案图片',
         icon: 'none'
       });
       return;
