@@ -35,6 +35,7 @@
 <script setup>
 import { ref } from 'vue';
 import ImageCropper from './ImageCropper.vue';
+import { cloudFileToHttpUrl } from '../../util/cloudFileUrl';
 
 const props = defineProps({
   images: {
@@ -55,10 +56,8 @@ const cropIndex = ref(-1);
  */
 const getImageUrl = (img) => {
   if (!img) return '';
-  if (typeof img === 'object' && img.url) {
-    return img.url;
-  }
-  return img;
+  const url = typeof img === 'object' && img.url ? img.url : img;
+  return cloudFileToHttpUrl(url);
 };
 
 const handleRemove = (index) => {

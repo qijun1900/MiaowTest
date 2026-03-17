@@ -19,6 +19,7 @@
 <script setup>
 import { computed, defineProps, defineEmits } from 'vue';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
+import { cloudFileToHttpUrl } from '../../util/cloudFileUrl';
 
 const userInfoStore = UserInfoStore();
 
@@ -78,14 +79,15 @@ const props = defineProps({
 const avatarSrc = computed(() => {
     // 如果传入了自定义src，优先使用
     if (props.src) {
-        return props.src;
+        return cloudFileToHttpUrl(props.src);
     }
-    
+
     // 根据登录状态返回对应头像
     if (userInfoStore.isLoggedIn) {
-        return userInfoStore.userInfo?.avatar || '/static/other/default-avatar.png';
+        const avatar = userInfoStore.userInfo?.avatar || '/static/other/default-avatar.png';
+        return cloudFileToHttpUrl(avatar);
     }
-    
+
     return '/static/other/default-user.png';
 });
 

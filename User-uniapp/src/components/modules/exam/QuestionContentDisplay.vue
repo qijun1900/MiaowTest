@@ -17,8 +17,8 @@
           :class="{ 'expanded': expandedImages[index] }"
           @click="toggleImage(index)"
         >
-          <image 
-            :src="image.url" 
+          <image
+            :src="resolveImageUrl(image)"
             :mode="expandedImages[index] ? 'widthFix' : 'aspectFill'"
             class="content-image"
             :class="{ 'thumbnail': !expandedImages[index] }"
@@ -108,6 +108,7 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import ImageCropper from '../../common/ImageCropper.vue';
+import { cloudFileToHttpUrl } from '../../../util/cloudFileUrl';
 
 const props = defineProps({
   // 内容对象 { text: string, images: [{url: string}] }
@@ -127,6 +128,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['image-cropped', 'fullscreen-change']);
+
+// 解析图片 URL（cloud:// → HTTP）
+const resolveImageUrl = (image) => {
+  const url = typeof image === 'string' ? image : image?.url;
+  return cloudFileToHttpUrl(url);
+};
 
 // 图片加载状态
 const imageLoadingStates = reactive({});
@@ -167,7 +174,7 @@ const toggleImage = (index) => {
 
 // 打开全屏查看
 const openFullscreen = (index) => {
-  currentFullscreenImage.value = props.content.images[index].url;
+  currentFullscreenImage.value = resolveImageUrl(props.content.images[index]);
   currentFullscreenIndex.value = index;
   fullscreenVisible.value = true;
   emit('fullscreen-change', true);
