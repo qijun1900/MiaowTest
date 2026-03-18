@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { deleteCloudFiles, httpUpload } from '../util/http';
+import { deleteCloudFiles, httpUpload, http } from '../util/http';
 import escconfig from '../config/esc.config';
 import { UserInfoStore } from '../stores/modules/UserinfoStore';
 
@@ -360,52 +360,51 @@ export function useImageUpload(options = {}) {
 
   /**
    * 删除服务器上的图片
+   *
+   * 删除策略：
+   * - 统一通过后端接口删除（后端自动区分 OSS / cloud:// 并处理）
+   * - 小程序端对 cloud:// 文件额外做客户端快速删除（与后端双保险）
    */
   const deleteRemoteImage = async (imageItem) => {
-    return new Promise((resolve, reject) => {
-      const requestData = {};
+    const imagePath = typeof imageItem === 'string' ? imageItem : imageItem.url;
 
-      const imagePath = typeof imageItem === 'string' ? imageItem : imageItem.url;
-
-      // 云存储文件先在小程序端删除，再通知后端清理数据库记录
-      const preDeletePromise = (escconfig.useCloudContainer && escconfig.useCloudStorage && isCloudFileId(imageItem))
-        ? deleteCloudFiles([imagePath]).catch((err) => {
-            console.warn('删除云存储文件失败，将继续删除数据库记录:', err);
-            return null;
-          })
-        : Promise.resolve(null);
-      
-      // 支持对象格式 { _id, url } 或字符串格式
-      if (typeof imageItem === 'object' && imageItem._id) {
-        requestData._id = imageItem._id;
-        requestData.path = imageItem.url;
-      } else {
-        requestData.path = imagePath;
-      }
-
-      preDeletePromise.then(() => {
-        uni.request({
-          url: '/uniappAPI/delete/image',
-          method: 'POST',
-          data: requestData,
-          success: (res) => {
-            if (res.data.code === 200) {
-              uni.showToast({
-                title: '图片已删除',
-                position:'top',
-                icon: 'none'
-              });
-              resolve(true);
-            } else {
-              reject(new Error(res.data.message || '删除失败'));
-            }
-          },
-          fail: (err) => {
-            reject(err);
-          }
+    // 小程序端对 cloud:// 文件做客户端快速删除
+    if (isCloudFileId(imagePath)) {
+      // #ifdef MP-WEIXIN
+      if (escconfig.useCloudContainer && escconfig.useCloudStorage) {
+        deleteCloudFiles([imagePath]).catch((err) => {
+          console.warn('小程序端删除云存储文件失败，后端将兜底删除:', err);
         });
-      });
+      }
+      // #endif
+    }
+
+    // 构造请求数据
+    const requestData = {};
+    if (typeof imageItem === 'object' && imageItem._id) {
+      requestData._id = imageItem._id;
+      requestData.path = imageItem.url;
+    } else {
+      requestData.path = imagePath;
+    }
+
+    // 统一走后端接口：后端自动处理 OSS 和 cloud:// 两种类型的删除
+    const res = await http({
+      url: '/uniappAPI/delete/image',
+      method: 'POST',
+      data: requestData
     });
+
+    if (res.code === 200) {
+      uni.showToast({
+        title: '图片已删除',
+        position: 'top',
+        icon: 'none'
+      });
+      return true;
+    } else {
+      throw new Error(res.message || '删除失败');
+    }
   };
 
   /**

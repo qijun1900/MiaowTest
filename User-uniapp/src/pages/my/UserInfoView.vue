@@ -78,7 +78,7 @@ import handleCopy from '../../util/copy';
 import { updateUserInfo } from '../../API/My/UserInfoUpdateAPI';//checkUserBind
 import { onMounted,ref } from 'vue';
 import userAvatar from '../../components/core/userAvatar.vue';
-import { deleteCloudFiles, httpUpload } from '../../util/http';
+import { httpUpload } from '../../util/http';
 import escconfig from '../../config/esc.config';
 
 const  accountBindStatus = ref(false);// 账号绑定状态
@@ -128,16 +128,7 @@ const handleEditAvatar = () => {
             cloudPath: cloudPath
           });
           if (data.code === 200) {
-            if (
-              escconfig.useCloudStorage &&
-              oldAvatar &&
-              oldAvatar.startsWith('cloud://') &&
-              oldAvatar !== data.data.avatar
-            ) {
-              deleteCloudFiles([oldAvatar]).catch((err) => {
-                console.warn('删除旧头像云文件失败:', err);
-              });
-            }
+            // 旧云存储头像由后端 uploadCloudAvatar 统一删除（支持 OSS 和 cloud:// ）
             uni.showToast({ title: data.message, icon: 'success' });
             updateUserData({ avatar: data.data.avatar }, '头像');
           }

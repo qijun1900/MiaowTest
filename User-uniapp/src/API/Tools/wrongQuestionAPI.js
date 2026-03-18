@@ -1,4 +1,4 @@
-import { http, deleteCloudFiles } from "../../util/http";
+import { http } from "../../util/http";
 
 /**
  * @description 添加错题到错题本
@@ -67,22 +67,12 @@ export async function getWrongQuestionsAPI(wrongBookId, params = {}) {
  */
 export async function deleteWrongQuestionAPI(questionId) {
     try {
-        const res = await http({
+        // 后端已统一处理 OSS 文件和云存储文件的删除
+        return await http({
             url: '/uniappAPI/tools/wrongbook/deleteWrongQuestion',
             method: 'POST',
             data: { id: questionId }
         });
-        
-        // 如果删除成功且返回了需要删除的云存储文件列表，则删除这些文件
-        if (res.code === 200 && res.data?.cloudFilesToDelete?.length > 0) {
-            try {
-                await deleteCloudFiles(res.data.cloudFilesToDelete);
-            } catch (err) {
-                console.warn('云存储文件删除失败，但题目已删除:', err);
-            }
-        }
-        
-        return res;
     } catch (error) {
         console.error("deleteWrongQuestion 失败", error);
         throw error;

@@ -2,6 +2,7 @@ const WrongBookService = require('../../services/user/WrongBookService');
 const multer = require('multer');
 const path = require('path');
 const { deleteFileByUrl, uploadBuffer } = require('../../helpers/ossHelper')
+const { isCloudFileId, deleteCloudFiles } = require('../../helpers/cloudStorageHelper')
 
 // 使用内存存储，方便后续上传到OSS
 const storage = multer.memoryStorage();
@@ -254,10 +255,15 @@ const WrongBookController = {
             const { uid } = req.user;
             const { path, _id } = req.body;
 
-            const isCloudFile = typeof path === 'string' && path.startsWith('cloud://');
+            const isCloudFile = isCloudFileId(path);
 
-            // 非 cloud:// 路径按 OSS 删除；cloud:// 文件由小程序端调用 wx.cloud.deleteFile 删除
-            if (!isCloudFile && path) {
+            if (isCloudFile) {
+                // cloud:// 文件通过微信开放 API 在服务端删除
+                await deleteCloudFiles([path]).catch(err => {
+                    console.warn('服务端删除云存储文件失败:', path, err.message);
+                });
+            } else if (path) {
+                // OSS 文件直接删除
                 await deleteFileByUrl(path);
             }
 
@@ -401,17 +407,21 @@ const WrongBookController = {
                     }))
                 );
             }
-            
-            // 云存储文件由前端删除（因为需要 wx.cloud API）
-            // 后端只返回需要删除的 fileID 列表
+
+            // 服务端删除云存储文件（通过微信开放 API）
+            if (cloudFiles.length > 0) {
+                deletePromises.push(
+                    deleteCloudFiles(cloudFiles).catch(err => {
+                        console.warn('服务端删除云存储文件失败:', err.message);
+                    })
+                );
+            }
+
             await Promise.all(deletePromises);
 
             res.send({
                 code: 200,
-                message: '删除错题成功',
-                data: {
-                    cloudFilesToDelete: cloudFiles // 返回给前端，让前端删除
-                }
+                message: '删除错题成功'
             });
         } catch (error) {
             console.error("删除错题失败", error);

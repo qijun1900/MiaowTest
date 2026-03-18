@@ -4,6 +4,7 @@ const path = require('path');
 const ConsumerModel = require('../../models/ConsumerModel');
 const ossConfig = require('../../config/oss.config');
 const { uploadBuffer, deleteFileByUrl } = require('../../helpers/ossHelper');
+const { isCloudFileId, deleteCloudFiles } = require('../../helpers/cloudStorageHelper');
 
 // 使用内存存储，方便后续上传到OSS
 const storage = multer.memoryStorage();
@@ -142,10 +143,17 @@ const UserController = {
                     avatarUrl: avatarUrl 
                 });
                 if(databaseResult.success){
-                    if (oldAvatar && oldAvatar !== avatarUrl && isOssUrl(oldAvatar)) {
-                        deleteFileByUrl(oldAvatar).catch((err) => {
-                            console.warn('删除旧OSS头像失败:', err.message || err);
-                        });
+                    // 删除旧头像（支持 OSS 和云存储）
+                    if (oldAvatar && oldAvatar !== avatarUrl) {
+                        if (isOssUrl(oldAvatar)) {
+                            deleteFileByUrl(oldAvatar).catch((err) => {
+                                console.warn('删除旧OSS头像失败:', err.message || err);
+                            });
+                        } else if (isCloudFileId(oldAvatar)) {
+                            deleteCloudFiles([oldAvatar]).catch((err) => {
+                                console.warn('删除旧云存储头像失败:', err.message || err);
+                            });
+                        }
                     }
                     // 返回成功响应
                     res.status(200).send({
@@ -203,10 +211,17 @@ const UserController = {
             });
 
             if (databaseResult.success) {
-                if (oldAvatar && oldAvatar !== avatarUrl && isOssUrl(oldAvatar)) {
-                    deleteFileByUrl(oldAvatar).catch((err) => {
-                        console.warn('删除旧OSS头像失败:', err.message || err);
-                    });
+                // 删除旧头像（支持 OSS 和云存储）
+                if (oldAvatar && oldAvatar !== avatarUrl) {
+                    if (isOssUrl(oldAvatar)) {
+                        deleteFileByUrl(oldAvatar).catch((err) => {
+                            console.warn('删除旧OSS头像失败:', err.message || err);
+                        });
+                    } else if (isCloudFileId(oldAvatar)) {
+                        deleteCloudFiles([oldAvatar]).catch((err) => {
+                            console.warn('删除旧云存储头像失败:', err.message || err);
+                        });
+                    }
                 }
                 res.status(200).send({
                     code: databaseResult.code,
