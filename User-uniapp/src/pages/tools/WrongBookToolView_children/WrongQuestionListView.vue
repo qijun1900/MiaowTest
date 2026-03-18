@@ -247,9 +247,7 @@ import {
   markAsNeedReviewAPI,
   updateWrongQuestionAPI
 } from '../../../API/Tools/wrongQuestionAPI';
-import { uploadSingleFile } from '../../../composables/useImageUpload.js';
-import { deleteCloudFiles } from '../../../util/http';
-import escconfig from '../../../config/esc.config';
+import { uploadSingleFile, deleteRemoteImageFile } from '../../../composables/useImageUpload.js';
 import formatTime from '../../../util/formatTime';
 
 const WrongbookId = ref('');
@@ -318,6 +316,55 @@ const toggleAnswer = (index) => {
   questionList.value[index].showAnswer = !questionList.value[index].showAnswer;
 };
 
+// 提取题目中所有图片引用
+const getQuestionImages = (question) => {
+  if (!question) return [];
+
+  const images = [];
+  const pushImages = (list) => {
+    if (Array.isArray(list)) {
+      images.push(...list.filter(Boolean));
+    }
+  };
+
+  pushImages(question.stem?.images);
+  pushImages(question.correctAnswer?.images);
+  pushImages(question.wrongAnswer?.images);
+  pushImages(question.analysis?.images);
+
+  if (Array.isArray(question.options)) {
+    question.options.forEach((option) => {
+      pushImages(option?.images);
+      pushImages(option?.content?.images);
+    });
+  }
+
+  // 去重，避免同一张图重复请求删除
+  const imageMap = new Map();
+  images.forEach((img) => {
+    const key = typeof img === 'string' ? img : `${img?._id || ''}|${img?.url || ''}`;
+    if (key && !imageMap.has(key)) {
+      imageMap.set(key, img);
+    }
+  });
+
+  return Array.from(imageMap.values());
+};
+
+// 批量删除题目关联图片（不阻塞主流程）
+const removeQuestionImages = async (question) => {
+  const imageItems = getQuestionImages(question);
+  if (!imageItems.length) return;
+
+  await Promise.all(
+    imageItems.map((imageItem) =>
+      deleteRemoteImageFile(imageItem, { showToast: false }).catch((err) => {
+        console.warn('删除题目关联图片失败:', err);
+      })
+    )
+  );
+};
+
 // 删除错题
 const handleDelete = async (item) => {
   const confirm = await uni.showModal({
@@ -330,8 +377,11 @@ const handleDelete = async (item) => {
   });
   if (confirm.confirm) {
     try {
+      uni.showLoading({ title: '删除中...' });
       const res = await deleteWrongQuestionAPI(item.id);
       if (res.code === 200) {
+        removeQuestionImages(item._raw).catch(() => {});
+        uni.hideLoading();
         uni.showToast({
           title: '删除成功',
           icon: 'success'
@@ -343,12 +393,14 @@ const handleDelete = async (item) => {
         // 重新应用筛选
         filterQuestions();
       } else {
+        uni.hideLoading();
         uni.showToast({
           title: res.message || '删除失败',
           icon: 'none'
         });
       }
     } catch (error) {
+      uni.hideLoading();
       console.error('删除错题失败:', error);
       uni.showToast({ 
         title: '网络错误，请稍后重试',
@@ -422,40 +474,6 @@ const handleFullscreenChange = (visible) => {
   isFullscreen.value = visible;
 };
 
-// 删除旧的远程图片（云存储或OSS）
-const deleteOldImage = async (imageItem) => {
-  const imageUrl = typeof imageItem === 'string' ? imageItem : imageItem?.url;
-  if (!imageUrl) return;
-
-  // 云存储文件：前端直接删除
-  if (escconfig.useCloudContainer && escconfig.useCloudStorage && imageUrl.startsWith('cloud://')) {
-    await deleteCloudFiles([imageUrl]).catch((err) => {
-      console.warn('删除旧云存储图片失败:', err);
-    });
-  }
-
-  // 通知后端删除数据库记录及OSS文件
-  const requestData = {};
-  if (typeof imageItem === 'object' && imageItem._id) {
-    requestData._id = imageItem._id;
-    requestData.path = imageItem.url;
-  } else {
-    requestData.path = imageUrl;
-  }
-  await new Promise((resolve) => {
-    uni.request({
-      url: '/uniappAPI/delete/image',
-      method: 'POST',
-      data: requestData,
-      success: () => resolve(),
-      fail: (err) => {
-        console.warn('删除旧图片记录失败:', err);
-        resolve();
-      }
-    });
-  });
-};
-
 // 全屏查看裁剪图片后，上传新图片并更新题目
 const handleImageCropped = async (item, sectionKey, { index, tempFilePath }) => {
   try {
@@ -490,7 +508,9 @@ const handleImageCropped = async (item, sectionKey, { index, tempFilePath }) => 
 
     // 5. 删除旧图片（更新成功后再删，避免失败时丢失图片）
     if (oldImage) {
-      deleteOldImage(oldImage).catch(() => {});
+      deleteRemoteImageFile(oldImage, { showToast: false }).catch((err) => {
+        console.warn('删除旧图片失败:', err);
+      });
     }
 
     uni.hideLoading();

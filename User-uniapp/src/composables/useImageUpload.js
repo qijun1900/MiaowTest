@@ -4,6 +4,61 @@ import escconfig from '../config/esc.config';
 import { UserInfoStore } from '../stores/modules/UserinfoStore';
 
 /**
+ * 删除远程图片资源（OSS 或 cloud://），可在组件外直接复用。
+ * @param {string|{_id?: string, url: string}} imageItem
+ * @param {{ showToast?: boolean }} options
+ * @returns {Promise<boolean>}
+ */
+export async function deleteRemoteImageFile(imageItem, options = {}) {
+  const { showToast = true } = options;
+  const imagePath = typeof imageItem === 'string' ? imageItem : imageItem?.url;
+  if (!imagePath) return false;
+
+  // 小程序端对 cloud:// 文件做客户端快速删除
+  // #ifdef MP-WEIXIN
+  if (
+    escconfig.useCloudContainer &&
+    escconfig.useCloudStorage &&
+    typeof imagePath === 'string' &&
+    imagePath.startsWith('cloud://')
+  ) {
+    deleteCloudFiles([imagePath]).catch((err) => {
+      console.warn('小程序端删除云存储文件失败，后端将兜底删除:', err);
+    });
+  }
+  // #endif
+
+  // 构造请求数据
+  const requestData = {};
+  if (typeof imageItem === 'object' && imageItem?._id) {
+    requestData._id = imageItem._id;
+    requestData.path = imageItem.url;
+  } else {
+    requestData.path = imagePath;
+  }
+
+  // 统一走后端接口：后端自动处理 OSS 和 cloud:// 两种类型的删除
+  const res = await http({
+    url: '/uniappAPI/delete/image',
+    method: 'POST',
+    data: requestData
+  });
+
+  if (res.code === 200) {
+    if (showToast) {
+      uni.showToast({
+        title: '图片已删除',
+        position: 'top',
+        icon: 'none'
+      });
+    }
+    return true;
+  }
+
+  throw new Error(res.message || '删除失败');
+}
+
+/**
  * 上传单个图片文件（独立函数，不依赖 composable 实例）
  * @param {string} filePath - 本地图片路径
  * @returns {Promise<{_id: string, url: string}>}
@@ -366,45 +421,7 @@ export function useImageUpload(options = {}) {
    * - 小程序端对 cloud:// 文件额外做客户端快速删除（与后端双保险）
    */
   const deleteRemoteImage = async (imageItem) => {
-    const imagePath = typeof imageItem === 'string' ? imageItem : imageItem.url;
-
-    // 小程序端对 cloud:// 文件做客户端快速删除
-    if (isCloudFileId(imagePath)) {
-      // #ifdef MP-WEIXIN
-      if (escconfig.useCloudContainer && escconfig.useCloudStorage) {
-        deleteCloudFiles([imagePath]).catch((err) => {
-          console.warn('小程序端删除云存储文件失败，后端将兜底删除:', err);
-        });
-      }
-      // #endif
-    }
-
-    // 构造请求数据
-    const requestData = {};
-    if (typeof imageItem === 'object' && imageItem._id) {
-      requestData._id = imageItem._id;
-      requestData.path = imageItem.url;
-    } else {
-      requestData.path = imagePath;
-    }
-
-    // 统一走后端接口：后端自动处理 OSS 和 cloud:// 两种类型的删除
-    const res = await http({
-      url: '/uniappAPI/delete/image',
-      method: 'POST',
-      data: requestData
-    });
-
-    if (res.code === 200) {
-      uni.showToast({
-        title: '图片已删除',
-        position: 'top',
-        icon: 'none'
-      });
-      return true;
-    } else {
-      throw new Error(res.message || '删除失败');
-    }
+    return deleteRemoteImageFile(imageItem);
   };
 
   /**
