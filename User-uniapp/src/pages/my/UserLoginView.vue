@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { UserAccountLogin } from '../../API/My/UserLoginAPI';
 import { UserInfoStore } from '../../stores/modules/UserinfoStore';
 import { wechatLogin } from '../../util/wechatLogin';
@@ -102,6 +102,9 @@ const rememberMe = ref([]);
 const agreed = ref(false);
 const userInfoStore = UserInfoStore();
 const navBarInfo = ref(0);// 导航栏高度信息
+const REMEMBER_LOGIN_KEY = 'user_login_remember_info';
+
+const isRememberChecked = computed(() => rememberMe.value.includes(true));
 
 // 计算返回按钮的top位置
 const backBtnTop = computed(() => {
@@ -113,6 +116,32 @@ const formData = reactive({
   email: '',
   password: ''
 });
+
+// 读取记住的账号密码
+const loadRememberedLogin = () => {
+  const savedLogin = uni.getStorageSync(REMEMBER_LOGIN_KEY);
+  if (!savedLogin || typeof savedLogin !== 'object') return;
+
+  if (savedLogin.email) {
+    formData.email = savedLogin.email;
+  }
+  if (savedLogin.password) {
+    formData.password = savedLogin.password;
+  }
+  rememberMe.value = [true];
+};
+
+// 保存或清理记住我信息
+const persistRememberLogin = () => {
+  if (isRememberChecked.value) {
+    uni.setStorageSync(REMEMBER_LOGIN_KEY, {
+      email: formData.email || '',
+      password: formData.password || ''
+    });
+  } else {
+    uni.removeStorageSync(REMEMBER_LOGIN_KEY);
+  }
+};
 
 // 返回上一页的方法
 const goBack = () => {
@@ -141,6 +170,7 @@ const handleLogin = async () => {
       });
       uni.setStorageSync('token',response.data.token); // 存储 Token
       userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
+      persistRememberLogin();
       
       // 登录成功后返回上一页
       setTimeout(() => {
@@ -240,7 +270,15 @@ const showPrivacyPolicy = () => {
 onMounted(() => {
   const info = navBarHeightUtil.getNavBarInfo();
   navBarInfo.value = info.totalHeight;
+  loadRememberedLogin();
 });
+
+watch(
+  [() => formData.email, () => formData.password, isRememberChecked],
+  () => {
+    persistRememberLogin();
+  }
+);
 
 </script>
 
