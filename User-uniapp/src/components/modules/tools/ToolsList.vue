@@ -1,13 +1,19 @@
 <template>
   <view 
     class="tools-container" 
+    :class="{ 'sorting-mode': isDragging }"
     :style="{ paddingTop: paddingTop }">
     <!-- 循环渲染工具卡片 -->
     <view 
-      v-for="(tool, index) in toolsList"
-      :key="index"
+      v-for="(tool, index) in localToolsList"
+      :key="tool.path || index"
       class="tool-card" 
-      @tap="handleToolClick(tool)">
+      :class="{ 'tool-card-dragging': isDragging && draggingIndex === index }"
+      @tap="handleToolClick(tool)"
+      @longpress="startDrag(index, $event)"
+      @touchmove.stop.prevent="onDragMove($event)"
+      @touchend="endDrag"
+      @touchcancel="endDrag">
       <view class="tool-info">
         <view class="tool-title">{{ tool.title }}</view>
         <view class="tool-desc">{{ tool.desc }}</view>
@@ -23,7 +29,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, ref, watch, nextTick, getCurrentInstance } from 'vue';
 
 // 定义 props
 const props = defineProps({
@@ -40,10 +46,116 @@ const props = defineProps({
 });
 
 // 定义 emits
-const emit = defineEmits(['toolClick']);
+const emit = defineEmits(['toolClick', 'orderChange']);
+
+const localToolsList = ref([]);
+const isDragging = ref(false);
+const draggingIndex = ref(-1);
+const dragTouchY = ref(0);
+const ignoreTapOnce = ref(false);
+const itemRects = ref([]);
+const instance = getCurrentInstance();
+
+const syncLocalTools = (list) => {
+  localToolsList.value = Array.isArray(list) ? [...list] : [];
+};
+
+watch(
+  () => props.toolsList,
+  (newList) => {
+    if (!isDragging.value) {
+      syncLocalTools(newList);
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+const getTouchClientY = (event) => {
+  if (event?.changedTouches?.length) return event.changedTouches[0].clientY;
+  if (event?.touches?.length) return event.touches[0].clientY;
+  return 0;
+};
+
+const collectItemRects = async () => {
+  await nextTick();
+  return new Promise((resolve) => {
+    const query = uni.createSelectorQuery();
+    if (instance?.proxy) {
+      query.in(instance.proxy);
+    }
+    query
+      .selectAll('.tool-card')
+      .boundingClientRect((rects) => {
+        itemRects.value = Array.isArray(rects) ? rects : [];
+        resolve(itemRects.value);
+      })
+      .exec();
+  });
+};
+
+const findTargetIndexByY = (clientY) => {
+  if (!itemRects.value.length) return -1;
+
+  for (let i = 0; i < itemRects.value.length; i += 1) {
+    const rect = itemRects.value[i];
+    if (clientY >= rect.top && clientY <= rect.bottom) {
+      return i;
+    }
+  }
+
+  if (clientY < itemRects.value[0].top) return 0;
+  return itemRects.value.length - 1;
+};
+
+const moveTool = async (from, to) => {
+  if (from === to || from < 0 || to < 0) return;
+  const list = [...localToolsList.value];
+  const [moved] = list.splice(from, 1);
+  if (!moved) return;
+  list.splice(to, 0, moved);
+  localToolsList.value = list;
+  draggingIndex.value = to;
+  await collectItemRects();
+};
+
+const startDrag = async (index, event) => {
+  if (index < 0 || index >= localToolsList.value.length) return;
+  isDragging.value = true;
+  draggingIndex.value = index;
+  dragTouchY.value = getTouchClientY(event);
+  await collectItemRects();
+  if (typeof uni.vibrateShort === 'function') {
+    uni.vibrateShort({ type: 'light' });
+  }
+};
+
+const onDragMove = async (event) => {
+  if (!isDragging.value) return;
+  const currentY = getTouchClientY(event);
+  if (!currentY && currentY !== 0) return;
+  dragTouchY.value = currentY;
+
+  const targetIndex = findTargetIndexByY(currentY);
+  if (targetIndex !== -1 && targetIndex !== draggingIndex.value) {
+    await moveTool(draggingIndex.value, targetIndex);
+  }
+};
+
+const endDrag = () => {
+  if (!isDragging.value) return;
+  isDragging.value = false;
+  draggingIndex.value = -1;
+  itemRects.value = [];
+  ignoreTapOnce.value = true;
+  emit('orderChange', [...localToolsList.value]);
+  setTimeout(() => {
+    ignoreTapOnce.value = false;
+  }, 200);
+};
 
 // 工具点击处理
 const handleToolClick = (tool) => {
+  if (isDragging.value || ignoreTapOnce.value) return;
   emit('toolClick', tool);
 };
 </script>
@@ -56,6 +168,10 @@ const handleToolClick = (tool) => {
   padding: 0 30rpx 30rpx 30rpx;
   width: 100%;
   box-sizing: border-box;
+}
+
+.tools-container.sorting-mode {
+  user-select: none;
 }
 
 /* 工具卡片样式 */
@@ -74,6 +190,12 @@ const handleToolClick = (tool) => {
   box-sizing: border-box;
   min-height: 120rpx;
   border: 2px solid #ebeef5;
+}
+
+.tool-card-dragging {
+  opacity: 0.85;
+  border-color: #5c8dff;
+  box-shadow: 0 8rpx 22rpx rgba(92, 141, 255, 0.2);
 }
 
 .tool-card:active {

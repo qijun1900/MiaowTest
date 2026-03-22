@@ -4,14 +4,13 @@
     <PageHead 
       ref="pageHeadRef"
       title="所有工具" 
-    />
-    <!-- TODO 工具拖拽 -->
-     
+    /> 
     <!-- 工具列表区域 -->
     <ToolsList 
       :toolsList="toolsList"
       :paddingTop="pageHeadRef?.contentPaddingTop + 10 + 'px'"
       @toolClick="handleToolClick"
+      @orderChange="handleOrderChange"
     />
   </view>
 </template>
@@ -24,9 +23,10 @@ import showShareMenu from '../../util/wechatShare.js';
 import checkLogin from '../../util/checkLogin.js';
 
 const pageHeadRef = ref();
+const TOOLS_ORDER_STORAGE_KEY = 'tools:list:order';
 
 // 工具列表配置
-const toolsList = [
+const defaultToolsList = [
   {
     title: '计时器',
     desc: '精确计时，支持倒计时和正计时模式',
@@ -64,6 +64,61 @@ const toolsList = [
   }
 ];
 
+const toolsList = ref([...defaultToolsList]);
+
+const applySavedOrder = (savedPaths) => {
+  if (!Array.isArray(savedPaths) || !savedPaths.length) {
+    return [...defaultToolsList];
+  }
+
+  const pathToolMap = new Map();
+  defaultToolsList.forEach((tool) => {
+    pathToolMap.set(tool.path, tool);
+  });
+
+  const sortedTools = [];
+  savedPaths.forEach((path) => {
+    const tool = pathToolMap.get(path);
+    if (tool) {
+      sortedTools.push(tool);
+      pathToolMap.delete(path);
+    }
+  });
+
+  pathToolMap.forEach((tool) => {
+    sortedTools.push(tool);
+  });
+
+  return sortedTools;
+};
+
+const loadToolsOrder = () => {
+  try {
+    const savedPaths = uni.getStorageSync(TOOLS_ORDER_STORAGE_KEY);
+    toolsList.value = applySavedOrder(savedPaths);
+  } catch (error) {
+    console.warn('读取工具排序失败，使用默认顺序:', error);
+    toolsList.value = [...defaultToolsList];
+  }
+};
+
+const persistToolsOrder = (list) => {
+  try {
+    const pathOrder = list
+      .map((tool) => tool.path)
+      .filter(Boolean);
+    uni.setStorageSync(TOOLS_ORDER_STORAGE_KEY, pathOrder);
+  } catch (error) {
+    console.warn('保存工具排序失败:', error);
+  }
+};
+
+const handleOrderChange = (newList) => {
+  if (!Array.isArray(newList) || !newList.length) return;
+  toolsList.value = [...newList];
+  persistToolsOrder(toolsList.value);
+};
+
 // 统一的工具点击处理函数
 const handleToolClick = async (tool) => {
   if (tool.needLogin) {
@@ -80,6 +135,7 @@ const handleToolClick = async (tool) => {
 
 // 页面加载时执行
 onMounted(() => {
+  loadToolsOrder();
   //#ifdef MP-WEIXIN
   showShareMenu();
   //#endif
