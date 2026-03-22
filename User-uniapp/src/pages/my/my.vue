@@ -55,7 +55,7 @@
         </view>
       </template>
     </uviewOverlay>
-    <uviewOverlay v-model:show="AuthorOverlayShow">
+    <!-- <uviewOverlay v-model:show="AuthorOverlayShow">
       <template #overlaycontent>
         <view class="rect">
           <view class="overlay-header">
@@ -64,7 +64,7 @@
           </view>
           </view>
       </template>
-    </uviewOverlay>
+    </uviewOverlay> -->
   </view>
 </template>
 
@@ -183,7 +183,12 @@ const handleUseWXLogin = async () => {
 // 处理账号登录 h5端和小程序端
 const handleUseAccountLogin = () => {
   if (!agreed.value) {
-    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    uni.showToast({ 
+      title: '请先阅读并同意用户协议和隐私政策', 
+      icon: 'none', 
+      duration: 2000,
+      position: 'bottom'
+    });
     return;
   }
   LoginOverlayShow.value = false;

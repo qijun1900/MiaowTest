@@ -152,7 +152,12 @@ const goBack = () => {
 
 const handleLogin = async () => {
   if (!agreed.value) {
-    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    uni.showToast({ 
+      title: '请先阅读并同意用户协议和隐私政策', 
+      icon: 'none', 
+      duration: 2000,
+      position: 'bottom' 
+    });
     return;
   }
   try {
@@ -224,7 +229,11 @@ const handleLogin = async () => {
 // 微信登录方法 - 使用工具函数
 const handleUseWXLogin = async () => {
   if (!agreed.value) {
-    uni.showToast({ title: '请先阅读并同意用户协议和隐私政策', icon: 'none', duration: 2000 });
+    uni.showToast({ 
+      title: '请先阅读并同意用户协议和隐私政策', 
+      icon: 'none', 
+      duration: 2000 
+    });
     return;
   }
   try {
