@@ -4,7 +4,6 @@
         <u-navbar 
             bgColor="#F8F8F8" 
             :autoBack="true"
-            rightIcon="more-dot-fill"
             @leftClick="leftClick">
             <template #center>
                 <UviewSubsection 
