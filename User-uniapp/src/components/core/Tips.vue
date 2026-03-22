@@ -60,7 +60,7 @@ const props = defineProps({
 })
 
 // 定义emits
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'click'])
 
 // 响应式数据
 const visible = ref(true)

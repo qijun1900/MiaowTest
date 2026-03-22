@@ -144,7 +144,7 @@
             </uviewPopup>
         <!-- 答题助手 -->
         <dragButton
-            v-if="questionStore.UserShowSettings.showHelper"
+            v-if="questionStore.UserShowSettings.showHelper && !iSopenNotePopupShow"
             :isDock="true"
 			:existTabBar="true"
             :iconType="bankInfo.isUserBank ? 'compose':'plusempty'"
