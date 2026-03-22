@@ -43,15 +43,17 @@ export async function addWrongQuestionAPI(data) {
  */
 export async function getWrongQuestionsAPI(wrongBookId, params = {}) {
   try {
-    let queryString = 'wrongBookId=' + wrongBookId;
-    for (const key in params) {
-      if (params[key] !== undefined && params[key] !== null) {
-        queryString += '&' + key + '=' + params[key];
-      }
-    }
+        const queryPairs = [`wrongBookId=${encodeURIComponent(wrongBookId)}`];
+
+        Object.keys(params).forEach((key) => {
+            const value = params[key];
+            if (value !== undefined && value !== null && value !== '') {
+                queryPairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+            }
+        });
 
     return await http({
-      url: `/uniappAPI/tools/wrongbook/getWrongQuestions?${queryString}`,
+            url: `/uniappAPI/tools/wrongbook/getWrongQuestions?${queryPairs.join('&')}`,
       method: 'GET'
     });
   } catch (error) {

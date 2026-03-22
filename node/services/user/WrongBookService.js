@@ -2,6 +2,8 @@ const WrongBookModel = require('../../models/WrongBookModel');
 const WrongQuestionModel = require('../../models/WrongQuestionModel');
 const mongoose = require('mongoose');
 
+const escapeRegex = (keyword = '') => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const WrongBookService = {
     /**
      * 获取错题本列表
@@ -109,9 +111,37 @@ const WrongBookService = {
     /**
      * 获取错题列表
      */
-    getWrongQuestions: async ({ uid, wrongBookId }) => {
+    getWrongQuestions: async ({ uid, wrongBookId, page = 1, pageSize = 20, keyword = '', tag = '' }) => {
         try {
-            const questions = await WrongQuestionModel.find({ Uid: uid, wrongBookId: wrongBookId },{
+            const safePage = Math.max(1, Number(page) || 1);
+            const safePageSize = Math.min(50, Math.max(1, Number(pageSize) || 20));
+
+            const query = {
+                Uid: uid,
+                wrongBookId: wrongBookId
+            };
+
+            if (tag && tag !== 'all') {
+                query.tags = tag;
+            }
+
+            const trimmedKeyword = String(keyword || '').trim();
+            if (trimmedKeyword) {
+                const regex = new RegExp(escapeRegex(trimmedKeyword), 'i');
+                query.$or = [
+                    { 'stem.text': regex },
+                    { 'wrongAnswer.text': regex },
+                    { 'correctAnswer.text': regex },
+                    { 'analysis.text': regex },
+                    { tags: regex },
+                    { 'options.text': regex },
+                    { 'options.content.text': regex }
+                ];
+            }
+
+            const total = await WrongQuestionModel.countDocuments(query);
+
+            const questions = await WrongQuestionModel.find(query,{
                 questionSource :0,
                 note: 0,
                 noteUpdatedAt: 0,
@@ -123,8 +153,21 @@ const WrongBookService = {
                 addedAt:0,
                 reviewHistory:0,
                 Uid:0,
-            }).lean();
-            return questions;
+            })
+            .sort({ updatedAt: -1, _id: -1 })
+            .skip((safePage - 1) * safePageSize)
+            .limit(safePageSize)
+            .lean();
+
+            return {
+                list: questions,
+                pagination: {
+                    page: safePage,
+                    pageSize: safePageSize,
+                    total,
+                    hasMore: safePage * safePageSize < total
+                }
+            };
         } catch (error) {
             console.error("DATABASE:获取错题列表失败", error);
             throw error;

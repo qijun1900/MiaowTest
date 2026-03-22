@@ -349,10 +349,14 @@ const WrongBookController = {
     getWrongQuestions: async (req, res) => {
         try {
             const { uid } = req.user;
-            const { wrongBookId} = req.query;
+            const { wrongBookId, page = 1, pageSize = 20, keyword = '', tag = '' } = req.query;
             const data = await WrongBookService.getWrongQuestions({ 
                 uid, 
                 wrongBookId,
+                page: Number(page) || 1,
+                pageSize: Number(pageSize) || 20,
+                keyword,
+                tag,
             });
             res.send({
                 code: 200,

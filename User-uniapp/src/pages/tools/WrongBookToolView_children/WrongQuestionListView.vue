@@ -215,6 +215,14 @@
           </view>
         </view>
       </view>
+
+      <view v-if="questionList.length > 0" class="load-more-container">
+        <view v-if="loadingMore" class="load-more-loading">
+          <view class="load-more-spinner"></view>
+          <text class="load-more-text">加载更多...</text>
+        </view>
+        <text v-else class="load-more-text">{{ hasMore ? '上拉加载更多' : '没有更多了' }}</text>
+      </view>
     </view>
 
     <!--悬浮按钮 -->
@@ -235,7 +243,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { onLoad, onShow } from '@dcloudio/uni-app';
+import { onLoad, onShow, onReachBottom } from '@dcloudio/uni-app';
 import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
 import SelectOptionsPreview from '../../../components/modules/exam/SelectOptionsPreview.vue';
 import JudgeOptionsPreview from '../../../components/modules/exam/JudgeOptionsPreview.vue';
@@ -257,63 +265,130 @@ const activeTab = ref('all');
 const isShowdragButton = ref(true);
 const isFullscreen = ref(false); // 是否有图片在全屏查看
 const loading = ref(false); // 加载状态
+const loadingMore = ref(false); // 触底加载状态
+const hasMore = ref(true); // 是否还有更多
+const currentPage = ref(1);
+const totalQuestions = ref(0);
+const PAGE_SIZE = 20;
+let searchDebounceTimer = null;
 
-// 原始完整数据列表
-const allQuestions = ref([]);
-// 错题列表数据（筛选后）
+// 当前列表数据
 const questionList = ref([]);
-// 动态标签列表（从用户数据中提取）
+// 标签列表（通过接口加载全部标签）
 const tabs = ref([
   { label: '全部', value: 'all', count: 0 }
 ]);
 
 const handleSearch = () => {
-  filterQuestions();
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+  searchDebounceTimer = setTimeout(() => {
+    resetAndFetchQuestions();
+  }, 300);
 };
 
 const clearSearch = () => {
   searchKeyword.value = '';
-  filterQuestions();
+  resetAndFetchQuestions();
 };
 
 const switchTab = (value) => {
+  if (activeTab.value === value) return;
   activeTab.value = value;
-  filterQuestions();
-};
-
-// 筛选问题列表
-const filterQuestions = () => {
-  let filtered = [...allQuestions.value];
-  
-  // 按标签筛选
-  if (activeTab.value !== 'all') {
-    filtered = filtered.filter(q => {
-      // 检查原始数据中的 tags 数组
-      return q._raw?.tags && q._raw.tags.includes(activeTab.value);
-    });
-  }
-  
-  // 按关键词搜索
-  if (searchKeyword.value.trim()) {
-    const keyword = searchKeyword.value.trim().toLowerCase();
-    filtered = filtered.filter(q => {
-      // 安全地检查每个字段是否存在
-      const stemMatch = q._raw?.stem?.text ? q._raw.stem.text.toLowerCase().includes(keyword) : false;
-      const wrongAnswerMatch = q._raw?.wrongAnswer?.text ? q._raw.wrongAnswer.text.toLowerCase().includes(keyword) : false;
-      const correctAnswerMatch = q._raw?.correctAnswer?.text ? q._raw.correctAnswer.text.toLowerCase().includes(keyword) : false;
-      const analysisMatch = q._raw?.analysis?.text ? q._raw.analysis.text.toLowerCase().includes(keyword) : false;
-      const tagsMatch = q._raw?.tags && Array.isArray(q._raw.tags) ? q._raw.tags.some(tag => tag.toLowerCase().includes(keyword)) : false;
-      
-      return stemMatch || wrongAnswerMatch || correctAnswerMatch || analysisMatch || tagsMatch;
-    });
-  }
-  
-  questionList.value = filtered;
+  resetAndFetchQuestions();
 };
 
 // 切换答案显示状态
 const toggleAnswer = (index) => {
   questionList.value[index].showAnswer = !questionList.value[index].showAnswer;
+};
+
+const rebuildTabsFromLoadedQuestions = () => {
+  const tagSet = new Set();
+  questionList.value.forEach((item) => {
+    const rawTags = item?._raw?.tags;
+    if (Array.isArray(rawTags)) {
+      rawTags.forEach((tag) => {
+        if (tag) {
+          tagSet.add(tag);
+        }
+      });
+    }
+  });
+
+  const nextTabs = [
+    { label: '全部', value: 'all', count: totalQuestions.value },
+    ...Array.from(tagSet).map((tag) => ({ label: tag, value: tag }))
+  ];
+
+  tabs.value = nextTabs;
+
+  const activeExists = tabs.value.some(tab => tab.value === activeTab.value);
+  if (!activeExists) {
+    activeTab.value = 'all';
+  }
+};
+
+const mergeQuestionList = (oldList, newList) => {
+  const idMap = new Map();
+  [...oldList, ...newList].forEach((item) => {
+    idMap.set(item.id, item);
+  });
+  return Array.from(idMap.values());
+};
+
+const formatQuestionItem = (q) => {
+  // 题型映射
+  const typeMap = {
+    1: { text: '选择题', color: 'blue' },
+    2: { text: '填空题', color: 'purple' },
+    3: { text: '判断题', color: 'red' },
+    4: { text: '简答题', color: 'orange' }
+  };
+
+  // 难度映射
+  const difficultyMap = {
+    easy: { text: '简单', color: 'green' },
+    medium: { text: '中等', color: 'yellow' },
+    hard: { text: '困难', color: 'red' }
+  };
+
+  // 状态映射
+  const statusMap = {
+    0: { status: 'new', text: '新题' },
+    1: { status: 'reviewing', text: '复习中' },
+    2: { status: 'mastered', text: '已掌握' }
+  };
+
+  // 构建标签数组
+  const tags = [
+    { text: typeMap[q.Type]?.text || '未知', type: typeMap[q.Type]?.color || 'gray' },
+    { text: difficultyMap[q.difficulty]?.text || '中等', type: difficultyMap[q.difficulty]?.color || 'yellow' }
+  ];
+
+  // 添加用户自定义标签
+  if (q.tags && Array.isArray(q.tags)) {
+    q.tags.forEach((tag) => {
+      tags.push({ text: `#${tag}`, type: 'gray' });
+    });
+  }
+
+  return {
+    id: q._id,
+    tags,
+    status: statusMap[q.status]?.status || 'new',
+    statusText: statusMap[q.status]?.text || '新题',
+    reviewCount: q.reviewCount || 0,
+    showAnswer: false,
+    _raw: q
+  };
+};
+
+const resetAndFetchQuestions = () => {
+  hasMore.value = true;
+  currentPage.value = 1;
+  fetchWrongQuestions({ append: false });
 };
 
 // 提取题目中所有图片引用
@@ -386,12 +461,9 @@ const handleDelete = async (item) => {
           title: '删除成功',
           icon: 'success'
         });
-        // 从 allQuestions 中移除被删除的题目
-        allQuestions.value = allQuestions.value.filter(q => q.id !== item.id);
-        // 更新标签栏
-        updateTabCounts();
-        // 重新应用筛选
-        filterQuestions();
+        questionList.value = questionList.value.filter(q => q.id !== item.id);
+        totalQuestions.value = Math.max(0, totalQuestions.value - 1);
+        rebuildTabsFromLoadedQuestions();
       } else {
         uni.hideLoading();
         uni.showToast({
@@ -541,69 +613,60 @@ const getEmptyMessage = () => {
 };
 
 // 获取错题列表数据
-const fetchWrongQuestions = async () => {
-  if (loading.value) return; // 防止重复请求
-  
-  try {
+const fetchWrongQuestions = async ({ append = false } = {}) => {
+  if (!WrongbookId.value) return;
+
+  if (append) {
+    if (loading.value || loadingMore.value || !hasMore.value) return;
+    loadingMore.value = true;
+  } else {
+    if (loading.value) return;
     loading.value = true;
-    const res = await getWrongQuestionsAPI(WrongbookId.value);
+  }
+
+  const page = append ? currentPage.value : 1;
+
+  try {
+    const res = await getWrongQuestionsAPI(WrongbookId.value, {
+      page,
+      pageSize: PAGE_SIZE,
+      keyword: searchKeyword.value.trim(),
+      tag: activeTab.value === 'all' ? '' : activeTab.value
+    });
+
     if (res.code === 200) {
-      // 将后端数据转换为前端需要的格式
-      allQuestions.value = (res.data || []).map(q => {
-        // 题型映射
-        const typeMap = {
-          1: { text: '选择题', color: 'blue' },
-          2: { text: '填空题', color: 'purple' },
-          3: { text: '判断题', color: 'red' },
-          4: { text: '简答题', color: 'orange' }
-        };
-        
-        // 难度映射
-        const difficultyMap = {
-          'easy': { text: '简单', color: 'green' },
-          'medium': { text: '中等', color: 'yellow' },
-          'hard': { text: '困难', color: 'red' }
-        };
-        
-        // 状态映射
-        const statusMap = {
-          0: { status: 'new', text: '新题' },
-          1: { status: 'reviewing', text: '复习中' },
-          2: { status: 'mastered', text: '已掌握' }
-        };
-        
-        
-        // 构建标签数组
-        const tags = [
-          { text: typeMap[q.Type]?.text || '未知', type: typeMap[q.Type]?.color || 'gray' },
-          { text: difficultyMap[q.difficulty]?.text || '中等', type: difficultyMap[q.difficulty]?.color || 'yellow' }
-        ];
-        
-        // 添加用户自定义标签
-        if (q.tags && Array.isArray(q.tags)) {
-          q.tags.forEach(tag => {
-            tags.push({ text: `#${tag}`, type: 'gray' });
-          });
+      const payload = res.data || {};
+      const list = Array.isArray(payload) ? payload : (payload.list || []);
+      const pagination = Array.isArray(payload) ? null : payload.pagination;
+      const formattedList = list.map(formatQuestionItem);
+
+      if (append) {
+        questionList.value = mergeQuestionList(questionList.value, formattedList);
+      } else {
+        questionList.value = formattedList;
+      }
+
+      if (pagination && typeof pagination.total === 'number') {
+        totalQuestions.value = pagination.total;
+      } else if (!append) {
+        totalQuestions.value = formattedList.length;
+      }
+
+      if (pagination && typeof pagination.hasMore === 'boolean') {
+        hasMore.value = pagination.hasMore;
+      } else {
+        hasMore.value = formattedList.length >= PAGE_SIZE;
+      }
+
+      if (append) {
+        if (hasMore.value) {
+          currentPage.value = page + 1;
         }
-        
-        return {
-          id: q._id,
-          tags: tags,
-          status: statusMap[q.status]?.status || 'new',
-          statusText: statusMap[q.status]?.text || '新题',
-          reviewCount: q.reviewCount || 0,
-          showAnswer: false,
-          // 保留原始数据以便后续使用
-          _raw: q
-        };
-      });
-      
-      // 更新标签栏
-      updateTabCounts();
-      
-      // 应用筛选
-      filterQuestions();
-      
+      } else {
+        currentPage.value = hasMore.value ? 2 : 1;
+      }
+
+      rebuildTabsFromLoadedQuestions();
     } else {
       uni.showToast({
         title: res.message || '获取数据失败',
@@ -617,39 +680,12 @@ const fetchWrongQuestions = async () => {
       icon: 'none'
     });
   } finally {
-    loading.value = false;
-  }
-}
-
-// 更新标签栏（从用户数据中提取所有标签）
-const updateTabCounts = () => {
-  // 统计所有标签及其出现次数
-  const tagCounts = {};
-  
-  allQuestions.value.forEach(q => {
-    if (q._raw?.tags && Array.isArray(q._raw.tags)) {
-      q._raw.tags.forEach(tag => {
-        if (tag) {
-          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-        }
-      });
+    if (append) {
+      loadingMore.value = false;
+    } else {
+      loading.value = false;
     }
-  });
-  
-  // 构建标签列表（按出现次数降序排序）
-  const tagList = Object.entries(tagCounts)
-    .map(([tag, count]) => ({
-      label: tag,
-      value: tag,
-      count: count
-    }))
-    .sort((a, b) => b.count - a.count); // 按数量降序排序
-  
-  // 更新 tabs，保留"全部"标签在最前面
-  tabs.value = [
-    { label: '全部', value: 'all', count: allQuestions.value.length },
-    ...tagList
-  ];
+  }
 }
 
 onLoad(async (options) => {
@@ -670,8 +706,12 @@ onLoad(async (options) => {
 onShow(() => {
   // 页面显示时刷新列表（从添加页面返回时会触发）
   if (WrongbookId.value) {
-    fetchWrongQuestions();
+    resetAndFetchQuestions();
   }
+});
+
+onReachBottom(() => {
+  fetchWrongQuestions({ append: true });
 });
 </script>
 <style scoped>
@@ -795,6 +835,33 @@ onShow(() => {
 .question-list {
   padding: 24rpx 32rpx;
   min-height: 60vh;
+}
+
+.load-more-container {
+  padding: 16rpx 0 24rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.load-more-loading {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.load-more-spinner {
+  width: 24rpx;
+  height: 24rpx;
+  border: 3rpx solid #ffe8d6;
+  border-top-color: #ff9555;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.load-more-text {
+  font-size: 24rpx;
+  color: #b0b0b0;
 }
 
 /* Loading 加载状态 */

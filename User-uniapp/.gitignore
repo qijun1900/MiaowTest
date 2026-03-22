@@ -20,6 +20,8 @@ unpackage
 .env.development.local
 .env.test.local
 .env.production.local
+.env.development
+.env.production
 
 # Build analysis files
 stats.html
