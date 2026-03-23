@@ -17,16 +17,16 @@ import { http } from "../../util/http";
  * @returns {Promise} 返回添加错题的响应
  */
 export async function addWrongQuestionAPI(data) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/addWrongQuestion',
-            method: 'POST',
-            data: data
-        });
-    } catch (error) {
-        console.error("addWrongQuestion 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/addWrongQuestion",
+      method: "POST",
+      data: data,
+    });
+  } catch (error) {
+    console.error("addWrongQuestion 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -43,18 +43,20 @@ export async function addWrongQuestionAPI(data) {
  */
 export async function getWrongQuestionsAPI(wrongBookId, params = {}) {
   try {
-        const queryPairs = [`wrongBookId=${encodeURIComponent(wrongBookId)}`];
+    const queryPairs = [`wrongBookId=${encodeURIComponent(wrongBookId)}`];
 
-        Object.keys(params).forEach((key) => {
-            const value = params[key];
-            if (value !== undefined && value !== null && value !== '') {
-                queryPairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
-            }
-        });
+    Object.keys(params).forEach((key) => {
+      const value = params[key];
+      if (value !== undefined && value !== null && value !== "") {
+        queryPairs.push(
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+        );
+      }
+    });
 
     return await http({
-            url: `/uniappAPI/tools/wrongbook/getWrongQuestions?${queryPairs.join('&')}`,
-      method: 'GET'
+      url: `/uniappAPI/tools/wrongbook/getWrongQuestions?${queryPairs.join("&")}`,
+      method: "GET",
     });
   } catch (error) {
     console.error("getWrongQuestions 失败", error);
@@ -68,17 +70,17 @@ export async function getWrongQuestionsAPI(wrongBookId, params = {}) {
  * @returns {Promise} 返回删除结果
  */
 export async function deleteWrongQuestionAPI(questionId) {
-    try {
-        // 后端已统一处理 OSS 文件和云存储文件的删除
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/deleteWrongQuestion',
-            method: 'POST',
-            data: { id: questionId }
-        });
-    } catch (error) {
-        console.error("deleteWrongQuestion 失败", error);
-        throw error;
-    }
+  try {
+    // 后端已统一处理 OSS 文件和云存储文件的删除
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/deleteWrongQuestion",
+      method: "POST",
+      data: { id: questionId },
+    });
+  } catch (error) {
+    console.error("deleteWrongQuestion 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -88,15 +90,15 @@ export async function deleteWrongQuestionAPI(questionId) {
  * @returns {Promise} 返回错题详情
  */
 export async function getWrongQuestionDetailAPI(questionId) {
-    try {
-        return await http({
-            url: `/uniappAPI/tools/wrongbook/getWrongQuestionDetail/${questionId}`,
-            method: 'GET'
-        });
-    } catch (error) {
-        console.error("getWrongQuestionDetail 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: `/uniappAPI/tools/wrongbook/getWrongQuestionDetail/${questionId}`,
+      method: "GET",
+    });
+  } catch (error) {
+    console.error("getWrongQuestionDetail 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -111,16 +113,16 @@ export async function getWrongQuestionDetailAPI(questionId) {
  * @returns {Promise} 返回更新结果
  */
 export async function updateWrongQuestionAPI(data) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/updateWrongQuestion',
-            method: 'POST',
-            data: data
-        });
-    } catch (error) {
-        console.error("updateWrongQuestion 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/updateWrongQuestion",
+      method: "POST",
+      data: data,
+    });
+  } catch (error) {
+    console.error("updateWrongQuestion 失败", error);
+    throw error;
+  }
 }
 /**  TODO
  * @description 添加复习记录
@@ -131,21 +133,25 @@ export async function updateWrongQuestionAPI(data) {
  * @param {Number} data.timeSpent - 本次复习耗时（秒），可选
  * @returns {Promise} 返回添加复习记录的结果
  */
-export async function addReviewRecordAPI({ questionId, isCorrect, timeSpent = 0 }) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongQuestion/addReviewRecord',
-            method: 'POST',
-            data: {
-                questionId,
-                isCorrect,
-                timeSpent
-            }
-        });
-    } catch (error) {
-        console.error("addReviewRecord 失败", error);
-        throw error;
-    }
+export async function addReviewRecordAPI({
+  questionId,
+  isCorrect,
+  timeSpent = 0,
+}) {
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongQuestion/addReviewRecord",
+      method: "POST",
+      data: {
+        questionId,
+        isCorrect,
+        timeSpent,
+      },
+    });
+  } catch (error) {
+    console.error("addReviewRecord 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -155,16 +161,16 @@ export async function addReviewRecordAPI({ questionId, isCorrect, timeSpent = 0 
  * @returns {Promise} 返回标记结果
  */
 export async function markAsMasteredAPI(questionId) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/markAsMastered',
-            method: 'POST',
-            data: { id: questionId }
-        });
-    } catch (error) {
-        console.error("markAsMastered 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/markAsMastered",
+      method: "POST",
+      data: { id: questionId },
+    });
+  } catch (error) {
+    console.error("markAsMastered 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -174,16 +180,16 @@ export async function markAsMasteredAPI(questionId) {
  * @returns {Promise} 返回标记结果
  */
 export async function markAsNeedReviewAPI(questionId) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/markAsNeedReview',
-            method: 'POST',
-            data: { id: questionId }
-        });
-    } catch (error) {
-        console.error("markAsNeedReview 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/markAsNeedReview",
+      method: "POST",
+      data: { id: questionId },
+    });
+  } catch (error) {
+    console.error("markAsNeedReview 失败", error);
+    throw error;
+  }
 }
 
 /**TODO
@@ -192,17 +198,16 @@ export async function markAsNeedReviewAPI(questionId) {
  * @returns {Promise} 返回需要复习的错题列表
  */
 export async function getNeedReviewQuestionsAPI() {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongQuestion/getNeedReviewQuestions',
-            method: 'GET'
-        });
-    } catch (error) {
-        console.error("getNeedReviewQuestions 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongQuestion/getNeedReviewQuestions",
+      method: "GET",
+    });
+  } catch (error) {
+    console.error("getNeedReviewQuestions 失败", error);
+    throw error;
+  }
 }
-
 
 /** TODO
  * @description 批量删除错题
@@ -211,16 +216,16 @@ export async function getNeedReviewQuestionsAPI() {
  * @returns {Promise} 返回批量删除结果
  */
 export async function batchDeleteWrongQuestionsAPI(questionIds) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongQuestion/batchDelete',
-            method: 'POST',
-            data: { ids: questionIds }
-        });
-    } catch (error) {
-        console.error("batchDeleteWrongQuestions 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongQuestion/batchDelete",
+      method: "POST",
+      data: { ids: questionIds },
+    });
+  } catch (error) {
+    console.error("batchDeleteWrongQuestions 失败", error);
+    throw error;
+  }
 }
 
 /** TODO
@@ -230,14 +235,14 @@ export async function batchDeleteWrongQuestionsAPI(questionIds) {
  * @returns {Promise} 返回统计信息（总数、各状态数量、各题型数量等）
  */
 export async function getWrongQuestionStatsAPI(wrongBookId) {
-    try {
-        return await http({
-            url: `/uniappAPI/tools/wrongQuestion/getStats?wrongBookId=${wrongBookId}`,
-            method: 'GET'
-        });
-    } catch (error) {
-        console.error("getWrongQuestionStats 失败", error);
-        throw error;
+  try {
+    return await http({
+      url: `/uniappAPI/tools/wrongQuestion/getStats?wrongBookId=${wrongBookId}`,
+      method: "GET",
+    });
+  } catch (error) {
+    console.error("getWrongQuestionStats 失败", error);
+    throw error;
   }
 }
 
@@ -248,16 +253,16 @@ export async function getWrongQuestionStatsAPI(wrongBookId) {
  * @returns {Promise} 返回标签数组
  */
 export async function getUserTagsAPI(wrongBookId) {
-    try {
-        if (!wrongBookId) {
-            throw new Error('wrongBookId is required');
-        }
-        return await http({
-            url: `/uniappAPI/tools/wrongbook/getUserTags?wrongBookId=${wrongBookId}`,
-            method: 'GET'
-        });
-    } catch (error) {
-        console.error("getUserTags 失败", error);
-        throw error;
+  try {
+    if (!wrongBookId) {
+      throw new Error("wrongBookId is required");
     }
+    return await http({
+      url: `/uniappAPI/tools/wrongbook/getUserTags?wrongBookId=${wrongBookId}`,
+      method: "GET",
+    });
+  } catch (error) {
+    console.error("getUserTags 失败", error);
+    throw error;
+  }
 }

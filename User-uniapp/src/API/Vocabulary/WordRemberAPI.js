@@ -14,23 +14,23 @@ import { http } from "../../util/http";
  * }
  */
 export async function setWordRember({
-    currentBook_id,
-    dailyGoal,
-    currentBookTitle,
+  currentBook_id,
+  dailyGoal,
+  currentBookTitle,
 }) {
-    try{
-        return await http({
-            url: '/uniappAPI/tools/vocabulary/setting/setWordRember',
-            method: 'POST',
-            data: {
-                currentBook_id,
-                dailyGoal,
-                currentBookTitle,
-            },
-        })
-    }catch(err){
-        console.error('设置词书和每日词数失败:', err);
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/vocabulary/setting/setWordRember",
+      method: "POST",
+      data: {
+        currentBook_id,
+        dailyGoal,
+        currentBookTitle,
+      },
+    });
+  } catch (err) {
+    console.error("设置词书和每日词数失败:", err);
+  }
 }
 
 /**
@@ -42,18 +42,18 @@ export async function setWordRember({
  *   data: {
  *     currentBook_id: string, // 单词书ID
  *     dailyGoal: number, // 每日学习目标（单词数量）
- *      
+ *
  *   }
  *  isInit: boolean, // 是否初始化
  * }
  */
 export async function checkWordRember() {
-    try{
-        return await http({
-            url: '/uniappAPI/tools/vocabulary/check/getWordRember',
-            method: 'GET',
-        })
-    }catch(err){
-        console.error('检查词书和每日词数失败:', err);
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/vocabulary/check/getWordRember",
+      method: "GET",
+    });
+  } catch (err) {
+    console.error("检查词书和每日词数失败:", err);
+  }
 }

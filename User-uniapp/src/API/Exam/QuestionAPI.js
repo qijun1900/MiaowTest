@@ -1,4 +1,4 @@
-import { http } from '../../util/http.js';
+import { http } from "../../util/http.js";
 
 /**
  * 添加题目接口
@@ -16,9 +16,9 @@ import { http } from '../../util/http.js';
 export async function addQuestion(questionData) {
   try {
     return await http({
-      url: '/uniappAPI/exam/useradd/question',
-      method: 'POST',
-      data: {questionData}
+      url: "/uniappAPI/exam/useradd/question",
+      method: "POST",
+      data: { questionData },
     });
   } catch (error) {
     console.error("addQuestion 失败", error);
@@ -43,12 +43,12 @@ export async function addQuestion(questionData) {
 export async function updateQuestion(questionData) {
   try {
     if (!questionData._id) {
-      throw new Error('更新题目时必须提供题目ID');
+      throw new Error("更新题目时必须提供题目ID");
     }
     return await http({
-      url: '/uniappAPI/exam/userupdate/question',
-      method: 'POST',
-      data: {questionData}
+      url: "/uniappAPI/exam/userupdate/question",
+      method: "POST",
+      data: { questionData },
     });
   } catch (error) {
     console.error("updateQuestion 失败", error);
@@ -85,16 +85,16 @@ export async function saveQuestion(questionData) {
 }
 /**
  * 获取用户题库列表
- * @param {String} bankId - 题库ID 
+ * @param {String} bankId - 题库ID
  * @returns {Promise} 返回用户题库列表
  */
 export async function getUserBankQuestionList(bankId) {
   try {
     return await http({
       url: `/uniappAPI/exam/getUserBankQuestionList/${bankId}`,
-      method: 'GET'
+      method: "GET",
     });
-  }catch (error) {
+  } catch (error) {
     console.error("getUserBankList 失败", error);
     throw error;
   }
@@ -109,10 +109,10 @@ export async function deleteQuestionAPI(questionId, bankId) {
   try {
     return await http({
       url: `/uniappAPI/exam/userdelete/question`,
-      method: 'POST',
-      data:{questionId, bankId}
+      method: "POST",
+      data: { questionId, bankId },
     });
-  }catch (error) {
+  } catch (error) {
     console.error("deleteQuestion 失败", error);
     throw error;
   }
@@ -124,14 +124,14 @@ export async function deleteQuestionAPI(questionId, bankId) {
  * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @returns {Promise} 返回添加结果
  */
-export async function addWrongQuestionAPI(questionId, examId,Type) {
+export async function addWrongQuestionAPI(questionId, examId, Type) {
   try {
     return await http({
       url: `/uniappAPI/exam/useradd/wrongquestion`,
-      method: 'POST',
-      data:{questionId, examId,Type}
+      method: "POST",
+      data: { questionId, examId, Type },
     });
-  }catch (error) {
+  } catch (error) {
     console.error("addWrongQuestion 失败", error);
     throw error;
   }
@@ -145,10 +145,10 @@ export async function deleteWrongQuestionAPI(questionId) {
   try {
     return await http({
       url: `/uniappAPI/exam/userdelete/wrongquestion`,
-      method: 'POST',
-      data:{questionId,}
-    })
-  }catch (error) {
+      method: "POST",
+      data: { questionId },
+    });
+  } catch (error) {
     console.error("deleteWrongQuestion 失败", error);
     throw error;
   }
@@ -162,9 +162,9 @@ export async function getUserWrongQuestionListAPI() {
   try {
     return await http({
       url: `/uniappAPI/exam/getUserWrongQuestionList`,
-      method: 'GET'
-    })
-  }catch (error) {
+      method: "GET",
+    });
+  } catch (error) {
     console.error("getUserWrongQuestionList 失败", error);
   }
 }
@@ -181,14 +181,14 @@ export async function getUserWrongQuestionListAPI() {
  * @param {String} Type - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
  * @returns {Promise} 返回收藏结果
  */
-export async function addFavoriteQuestionAPI(questionId, examId,Type) {
+export async function addFavoriteQuestionAPI(questionId, examId, Type) {
   try {
     return await http({
       url: `/uniappAPI/exam/useradd/favoritequestion`,
-      method: 'POST',
-      data:{questionId, examId,Type}
-    })
-  }catch (error) {
+      method: "POST",
+      data: { questionId, examId, Type },
+    });
+  } catch (error) {
     console.error("addFavoriteQuestion 失败", error);
   }
 }
@@ -201,10 +201,10 @@ export async function deleteFavoriteQuestionAPI(questionId) {
   try {
     return await http({
       url: `/uniappAPI/exam/userdelete/favoritequestion`,
-      method: 'POST',
-      data:{questionId,}
-    })
-  }catch (error) {
+      method: "POST",
+      data: { questionId },
+    });
+  } catch (error) {
     console.error("deleteFavoriteQuestion 失败", error);
   }
 }
@@ -216,9 +216,9 @@ export async function getUserFavoriteQuestionListAPI() {
   try {
     return await http({
       url: `/uniappAPI/exam/getUserFavoriteQuestionList`,
-      method: 'GET'
-    })
-  }catch (error) {
+      method: "GET",
+    });
+  } catch (error) {
     console.error("getUserFavoriteQuestionList 失败", error);
   }
 }
@@ -226,19 +226,18 @@ export async function getUserFavoriteQuestionListAPI() {
  * @description 刷题时候检测当前题目是否收藏
  * @param {String} questionId - 题目ID
  * @returns {Promise} 返回收藏结果
-*/
+ */
 export async function checkFavoriteQuestionAPI(questionId) {
   try {
     return await http({
       url: `/uniappAPI/exam/checkFavoriteQuestion`,
-      method: 'POST',
-      data:{questionId,}
-    })
-  }catch (error) {
+      method: "POST",
+      data: { questionId },
+    });
+  } catch (error) {
     console.error("checkFavoriteQuestion 失败", error);
   }
 }
-
 
 /**
  * 用户点击题目进行练习
@@ -251,39 +250,40 @@ export async function practiceQuestionAPI(Type, questionId) {
   try {
     return await http({
       url: `/uniappAPI/exam/userpractice/question`,
-      method: 'POST',
-      data:{Type, questionId}
-    })
-  }catch (error) {
+      method: "POST",
+      data: { Type, questionId },
+    });
+  } catch (error) {
     console.error("practiceQuestion 失败", error);
-  } 
+  }
 }
 /**
  * @description 刷题时候保存用户记录的笔记内容
  * @param {*Boolean} isUserBank 是否是用户题库
  * @param {*String} questionId - 题目ID
  * @param {*Number} questionType - 题目类型 (1:选择题, 2:填空题, 3:判断题, 4:简答题)
- * @param {*String} examId - 考试ID 
+ * @param {*String} examId - 考试ID
  * @param {*String} content - 笔记内容
- * @returns {Promise} 返回保存结果-code -   message -  ActionType 
- * 
+ * @returns {Promise} 返回保存结果-code -   message -  ActionType
+ *
  */
 export async function savePracticeNoteAPI({
   isUserBank,
   questionId,
   questionType,
   examId,
-  content
+  content,
 }) {
   try {
     // 根据是否为用户题库选择不同的API URL
-    const url = isUserBank ? "/uniappAPI/exam/saveUserBankPracticeNote" : "/uniappAPI/exam/savePracticeNote";
+    const url = isUserBank
+      ? "/uniappAPI/exam/saveUserBankPracticeNote"
+      : "/uniappAPI/exam/savePracticeNote";
     return await http({
       url,
-      method: 'POST',
-      data: { questionId, questionType, examId, content }
-    })
-
+      method: "POST",
+      data: { questionId, questionType, examId, content },
+    });
   } catch (error) {
     console.error("savePracticeNote 失败", error);
   }
@@ -295,15 +295,17 @@ export async function savePracticeNoteAPI({
  * @param {*String} questionId - 题目ID
  * @returns {Promise} 返回笔记内容
  */
-export async function getPracticeNoteAPI(isUserBank,questionId) {
+export async function getPracticeNoteAPI(isUserBank, questionId) {
   try {
-    const url = isUserBank? "/uniappAPI/exam/getUserBankPracticeNote" : "/uniappAPI/exam/getPracticeNote";
+    const url = isUserBank
+      ? "/uniappAPI/exam/getUserBankPracticeNote"
+      : "/uniappAPI/exam/getPracticeNote";
     return await http({
       url: url,
-      method: 'POST',
-      data:{questionId}
-    })
-  }catch (error) {
+      method: "POST",
+      data: { questionId },
+    });
+  } catch (error) {
     console.error("getPracticeNote 失败", error);
   }
 }

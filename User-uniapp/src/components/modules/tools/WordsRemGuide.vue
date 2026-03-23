@@ -13,34 +13,48 @@
                 <scroll-view class="book-list" scroll-y>
                     <!-- 加载中提示 -->
                     <ThemeLoading v-if="loading" text="正在加载词书..." />
-                    <view 
-                        v-else 
-                        v-for="(book, index) in wordBooks" 
-                        :key="book._id" 
+                    <view
+                        v-else
+                        v-for="(book, index) in wordBooks"
+                        :key="book._id"
                         class="book-card"
-                        :class="{ 'selected': selectedBook?._id === book._id }"
-                        :style="{ animationDelay: `${index * 0.1}s` }" 
-                        @click="selectBook(book)">
+                        :class="{ selected: selectedBook?._id === book._id }"
+                        :style="{ animationDelay: `${index * 0.1}s` }"
+                        @click="selectBook(book)"
+                    >
                         <view class="card-content">
-                            <image class="book-cover" 
-                            :src="book.cover ? baseImageUrl + book.cover : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'" ></image>
+                            <image
+                                class="book-cover"
+                                :src="
+                                    book.cover
+                                        ? baseImageUrl + book.cover
+                                        : 'https://camo.githubusercontent.com/6aee9290f9f24d62fd55c02efbd8e5b36d0cdbce43bce50f6e281b42f41b208a/68747470733a2f2f6e6f732e6e6574656173652e636f6d2f79647363686f6f6c2d6f6e6c696e652f31343936363332373237323030434554346c75616e5f312e6a7067'
+                                "
+                            ></image>
                             <view class="book-info">
                                 <text class="book-name">{{ book.title }}</text>
-                                <view class="book-tags">                            
-                                    <up-tag 
-                                    v-for="(tag, tagIndex) in book.tags" 
-                                    :key="tagIndex" 
-                                    :text="tag" 
-                                    plain 
-                                    size="mini" 
-                                    type="warning" 
-                                    plainFill 
-                                    style="margin-right: 12rpx;">
+                                <view class="book-tags">
+                                    <up-tag
+                                        v-for="(tag, tagIndex) in book.tags"
+                                        :key="tagIndex"
+                                        :text="tag"
+                                        plain
+                                        size="mini"
+                                        type="warning"
+                                        plainFill
+                                        style="margin-right: 12rpx"
+                                    >
                                     </up-tag>
                                 </view>
                                 <view class="book-count">
-                                    <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
-                                    <text class="count-text">{{ book.words }} 单词</text>
+                                    <uni-icons
+                                        type="medal"
+                                        size="21"
+                                        color="#f0be0a"
+                                    ></uni-icons>
+                                    <text class="count-text"
+                                        >{{ book.words }} 单词</text
+                                    >
                                 </view>
                             </view>
                         </view>
@@ -62,13 +76,25 @@
                 <view class="goal-display">
                     <view class="circle-wrapper">
                         <view class="circle-bg"></view>
-                        <view class="circle-progress" :style="{ transform: `rotate(${progressRotation}deg)` }"></view>
+                        <view
+                            class="circle-progress"
+                            :style="{
+                                transform: `rotate(${progressRotation}deg)`,
+                            }"
+                        ></view>
                         <view class="circle-content">
                             <text class="goal-label">每日新词</text>
                             <text class="goal-number">{{ dailyGoal }}</text>
-                            <text class="estimate-text">预计 {{ estimatedDays }} 天完成</text>
-                            <view class="intensity-badge" :class="intensityLevel.class">
-                                <text class="badge-text">{{ intensityLevel.text }}</text>
+                            <text class="estimate-text"
+                                >预计 {{ estimatedDays }} 天完成</text
+                            >
+                            <view
+                                class="intensity-badge"
+                                :class="intensityLevel.class"
+                            >
+                                <text class="badge-text">{{
+                                    intensityLevel.text
+                                }}</text>
                             </view>
                         </view>
                     </view>
@@ -77,12 +103,20 @@
                 <!-- 学习统计卡片 -->
                 <view class="stats-cards">
                     <view class="stat-card">
-                        <uni-icons type="calendar" size="32" color="#2196F3"></uni-icons>
+                        <uni-icons
+                            type="calendar"
+                            size="32"
+                            color="#2196F3"
+                        ></uni-icons>
                         <text class="stat-value">{{ estimatedDays }}</text>
                         <text class="stat-label">完成天数</text>
                     </view>
                     <view class="stat-card">
-                        <uni-icons type="fire" size="32" color="#F44336"></uni-icons>
+                        <uni-icons
+                            type="fire"
+                            size="32"
+                            color="#F44336"
+                        ></uni-icons>
                         <text class="stat-value">{{ dailyProgress }}%</text>
                         <text class="stat-label">每日进度</text>
                     </view>
@@ -90,14 +124,17 @@
 
                 <!-- 预设目标选项 -->
                 <view class="preset-options">
-                    <view 
-                        v-for="option in presetOptions" 
-                        :key="option" 
+                    <view
+                        v-for="option in presetOptions"
+                        :key="option"
                         class="option-item"
-                        :class="{ 'active': dailyGoal === option }" 
-                        @click="selectGoal(option)">
+                        :class="{ active: dailyGoal === option }"
+                        @click="selectGoal(option)"
+                    >
                         <text class="option-text">{{ option }}词/天</text>
-                        <text class="option-subtitle">{{ getOptionLabel(option) }}</text>
+                        <text class="option-subtitle">{{
+                            getOptionLabel(option)
+                        }}</text>
                     </view>
                 </view>
 
@@ -107,15 +144,17 @@
                         <text class="label-text">轻松</text>
                         <text class="label-text">极限</text>
                     </view>
-                    <slider class="goal-slider" 
-                        :value="dailyGoal" 
-                        :min="10" 
-                        :max="200" 
-                        :step="5" 
+                    <slider
+                        class="goal-slider"
+                        :value="dailyGoal"
+                        :min="10"
+                        :max="200"
+                        :step="5"
                         activeColor="#2196F3"
-                        backgroundColor="#E0E0E0" 
-                        block-size="24" 
-                        @change="onSliderChange" />
+                        backgroundColor="#E0E0E0"
+                        block-size="24"
+                        @change="onSliderChange"
+                    />
                     <view class="slider-range">
                         <text class="range-text">10词/日</text>
                         <text class="range-text">200词/日</text>
@@ -124,23 +163,34 @@
 
                 <!-- 提示信息 -->
                 <view class="tip-box">
-                    <uni-icons type="info" size="20" color="#2196F3" style="margin-right: 12rpx;"></uni-icons>
+                    <uni-icons
+                        type="info"
+                        size="20"
+                        color="#2196F3"
+                        style="margin-right: 12rpx"
+                    ></uni-icons>
                     <text class="tip-text">{{ dynamicTipText }}</text>
                 </view>
             </view>
         </transition>
 
-        <view class='bottom'>
-            <up-button @click="goToStep2" v-if="currentStep === 1" type="primary" :disabled="selectedBook === null"
-                :plain="selectedBook === null ? true : false" :icon="selectedBook === null ? '' : 'checkmark'">
-                {{ '下一步' }}
+        <view class="bottom">
+            <up-button
+                @click="goToStep2"
+                v-if="currentStep === 1"
+                type="primary"
+                :disabled="selectedBook === null"
+                :plain="selectedBook === null ? true : false"
+                :icon="selectedBook === null ? '' : 'checkmark'"
+            >
+                {{ "下一步" }}
             </up-button>
             <view v-if="currentStep === 2" class="step2-buttons">
                 <up-button @click="goToStep1" type="primary">
-                    {{ ' 上一步' }}
+                    {{ " 上一步" }}
                 </up-button>
                 <up-button @click="confirmSettings" type="primary">
-                    {{ '确认设置' }}
+                    {{ "确认设置" }}
                 </up-button>
             </view>
         </view>
@@ -148,13 +198,13 @@
 </template>
 
 <script setup>
-import { ref, computed,onMounted } from 'vue';
-import { getWordBooksAPI } from '../../../API/Vocabulary/WordBooksAPI';
-import escconfig from '../../../config/esc.config';
-import ThemeLoading from '../../core/ThemeLoading.vue';
+import { ref, computed, onMounted } from "vue";
+import { getWordBooksAPI } from "../../../API/Vocabulary/WordBooksAPI";
+import escconfig from "../../../config/esc.config";
+import ThemeLoading from "../../core/ThemeLoading.vue";
 
 // 定义 emit
-const emit = defineEmits(['complete']);
+const emit = defineEmits(["complete"]);
 // 当前步骤
 const currentStep = ref(1);
 // 选中的词书
@@ -162,18 +212,18 @@ const selectedBook = ref(null);
 // 每日目标
 const dailyGoal = ref(30);
 // 预设选项
-const presetOptions = [20, 30, 50,100];
+const presetOptions = [20, 30, 50, 100];
 // 词书列表数据
 const wordBooks = ref([]);
 const loading = ref(false);
 
 const baseImageUrl = computed(() => {
-    return escconfig.ossDomain 
-})
+    return escconfig.ossDomain;
+});
 
 // 计算预计完成天数
 const estimatedDays = computed(() => {
-    if (!selectedBook.value ||  !dailyGoal.value) return 0;
+    if (!selectedBook.value || !dailyGoal.value) return 0;
     return Math.ceil(selectedBook.value.words / dailyGoal.value);
 });
 
@@ -185,13 +235,13 @@ const progressRotation = computed(() => {
 // 计算学习强度等级
 const intensityLevel = computed(() => {
     if (dailyGoal.value <= 30) {
-        return { text: '轻松', class: 'easy' };
+        return { text: "轻松", class: "easy" };
     } else if (dailyGoal.value <= 60) {
-        return { text: '适中', class: 'medium' };
+        return { text: "适中", class: "medium" };
     } else if (dailyGoal.value <= 100) {
-        return { text: '挑战', class: 'hard' };
+        return { text: "挑战", class: "hard" };
     } else {
-        return { text: '极限', class: 'extreme' };
+        return { text: "极限", class: "extreme" };
     }
 });
 
@@ -204,23 +254,23 @@ const dailyProgress = computed(() => {
 // 动态提示文案
 const dynamicTipText = computed(() => {
     if (dailyGoal.value <= 20) {
-        return '稳扎稳打的节奏！这个计划非常适合长期坚持，每天轻松完成目标，积少成多。';
+        return "稳扎稳打的节奏！这个计划非常适合长期坚持，每天轻松完成目标，积少成多。";
     } else if (dailyGoal.value <= 40) {
-        return '科学合理的选择！保持每天稳定的学习节奏比偶尔的高强度更有助于长期记忆。';
+        return "科学合理的选择！保持每天稳定的学习节奏比偶尔的高强度更有助于长期记忆。";
     } else if (dailyGoal.value <= 80) {
-        return '有挑战性的目标！需要每天投入更多时间，但能更快完成词书。记得劳逸结合哦。';
+        return "有挑战性的目标！需要每天投入更多时间，但能更快完成词书。记得劳逸结合哦。";
     } else if (dailyGoal.value <= 120) {
-        return '高强度学习计划！适合有充足时间和强大毅力的学习者。注意不要给自己太大压力。';
+        return "高强度学习计划！适合有充足时间和强大毅力的学习者。注意不要给自己太大压力。";
     } else {
-        return '极限挑战模式！这需要极强的自律和大量时间投入。建议根据实际情况适当调整。';
+        return "极限挑战模式！这需要极强的自律和大量时间投入。建议根据实际情况适当调整。";
     }
 });
 
 // 获取预设选项标签
 const getOptionLabel = (option) => {
-    if (option <= 30) return '轻松';
-    if (option <= 60) return '适中';
-    return '挑战';
+    if (option <= 30) return "轻松";
+    if (option <= 60) return "适中";
+    return "挑战";
 };
 
 // 获取词书
@@ -231,9 +281,9 @@ const fetchWordBooks = async () => {
         wordBooks.value = response.data.wordBooks;
         loading.value = false;
     } catch (error) {
-        console.error('获取词书失败:', error);
+        console.error("获取词书失败:", error);
         loading.value = false;
-    } 
+    }
 };
 
 // 选择词书
@@ -241,7 +291,7 @@ const selectBook = (book) => {
     selectedBook.value = book;
     // 添加触觉反馈
     uni.vibrateShort({
-        type: 'light'
+        type: "light",
     });
 };
 
@@ -251,7 +301,7 @@ const goToStep2 = () => {
         currentStep.value = 2;
         // 添加触觉反馈
         uni.vibrateShort({
-            type: 'medium'
+            type: "medium",
         });
     }
 };
@@ -266,7 +316,7 @@ const selectGoal = (goal) => {
     dailyGoal.value = goal;
     // 添加触觉反馈
     uni.vibrateShort({
-        type: 'light'
+        type: "light",
     });
 };
 
@@ -283,8 +333,7 @@ const confirmSettings = () => {
     };
 
     // 触发完成事件
-    emit('complete', settings);
-
+    emit("complete", settings);
 };
 onMounted(() => {
     fetchWordBooks();
@@ -347,7 +396,7 @@ onMounted(() => {
     display: block;
     font-size: 48rpx;
     font-weight: 700;
-    color: #1A202C;
+    color: #1a202c;
     margin-bottom: 20rpx;
     line-height: 1.3;
 }
@@ -366,7 +415,7 @@ onMounted(() => {
 }
 
 .book-card {
-    background: #FFFFFF;
+    background: #ffffff;
     border-radius: 24rpx;
     margin-bottom: 24rpx;
     padding: 30rpx;
@@ -379,7 +428,7 @@ onMounted(() => {
 }
 
 .book-card.selected {
-    border-color: #2196F3;
+    border-color: #2196f3;
     box-shadow: 0 8rpx 24rpx rgba(33, 150, 243, 0.25);
     transform: scale(1.02);
 }
@@ -398,7 +447,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #FFFFFF;
+    color: #ffffff;
     font-size: 48rpx;
     font-weight: bold;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
@@ -420,7 +469,7 @@ onMounted(() => {
 .book-name {
     font-size: 30rpx;
     font-weight: 600;
-    color: #1A202C;
+    color: #1a202c;
     margin-bottom: 12rpx;
 }
 
@@ -435,12 +484,9 @@ onMounted(() => {
 
 .count-text {
     font-size: 28rpx;
-    color: #2196F3;
+    color: #2196f3;
     font-weight: 600;
 }
-
-
-
 
 /* ========== 步骤二样式 ========== */
 .step-two {
@@ -472,9 +518,8 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: #F7FAFC;
-    box-shadow:
-        inset 0 0 0 20rpx #E2E8F0;
+    background: #f7fafc;
+    box-shadow: inset 0 0 0 20rpx #e2e8f0;
 }
 
 .circle-progress {
@@ -484,20 +529,26 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: conic-gradient(from 0deg at 50% 50%,
-            #2196F3 0deg,
-            #2196F3 135deg,
-            transparent 135deg);
-    mask: radial-gradient(circle at center,
-            transparent 160rpx,
-            black 160rpx,
-            black 180rpx,
-            transparent 180rpx);
-    -webkit-mask: radial-gradient(circle at center,
-            transparent 160rpx,
-            black 160rpx,
-            black 180rpx,
-            transparent 180rpx);
+    background: conic-gradient(
+        from 0deg at 50% 50%,
+        #2196f3 0deg,
+        #2196f3 135deg,
+        transparent 135deg
+    );
+    mask: radial-gradient(
+        circle at center,
+        transparent 160rpx,
+        black 160rpx,
+        black 180rpx,
+        transparent 180rpx
+    );
+    -webkit-mask: radial-gradient(
+        circle at center,
+        transparent 160rpx,
+        black 160rpx,
+        black 180rpx,
+        transparent 180rpx
+    );
     transition: transform 0.3s ease;
 }
 
@@ -515,7 +566,7 @@ onMounted(() => {
 
 .goal-label {
     font-size: 28rpx;
-    color: #2196F3;
+    color: #2196f3;
     margin-bottom: 16rpx;
     font-weight: 500;
 }
@@ -523,14 +574,14 @@ onMounted(() => {
 .goal-number {
     font-size: 120rpx;
     font-weight: 900;
-    color: #1A202C;
+    color: #1a202c;
     line-height: 1;
     margin-bottom: 16rpx;
 }
 
 .estimate-text {
     font-size: 26rpx;
-    color: #2196F3;
+    color: #2196f3;
     font-weight: 500;
 }
 
@@ -545,7 +596,8 @@ onMounted(() => {
 }
 
 @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
         transform: scale(1);
     }
     50% {
@@ -554,27 +606,27 @@ onMounted(() => {
 }
 
 .intensity-badge.easy {
-    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+    background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
     box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.3);
 }
 
 .intensity-badge.medium {
-    background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+    background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
     box-shadow: 0 4rpx 12rpx rgba(255, 152, 0, 0.3);
 }
 
 .intensity-badge.hard {
-    background: linear-gradient(135deg, #F44336 0%, #E91E63 100%);
+    background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
     box-shadow: 0 4rpx 12rpx rgba(244, 67, 54, 0.3);
 }
 
 .intensity-badge.extreme {
-    background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
+    background: linear-gradient(135deg, #9c27b0 0%, #673ab7 100%);
     box-shadow: 0 4rpx 12rpx rgba(156, 39, 176, 0.3);
 }
 
 .badge-text {
-    color: #FFFFFF;
+    color: #ffffff;
     font-size: 24rpx;
 }
 
@@ -589,14 +641,14 @@ onMounted(() => {
 
 .stat-card {
     flex: 1;
-    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border-radius: 20rpx;
     padding: 30rpx 20rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
-    border: 2rpx solid #E8EAF6;
+    border: 2rpx solid #e8eaf6;
     transition: all 0.3s ease;
     animation: fadeInUp 0.6s ease backwards;
 }
@@ -631,7 +683,7 @@ onMounted(() => {
 .stat-value {
     font-size: 30rpx;
     font-weight: 700;
-    color: #1A202C;
+    color: #1a202c;
     margin: 12rpx 0 8rpx;
     line-height: 1;
 }
@@ -654,38 +706,38 @@ onMounted(() => {
     flex: 1;
     margin: 0 8rpx;
     padding: 20rpx 0;
-    background: #FFFFFF;
+    background: #ffffff;
     border-radius: 40rpx;
     text-align: center;
-    border: 3rpx solid #E2E8F0;
+    border: 3rpx solid #e2e8f0;
     transition: all 0.3s ease;
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
 .option-item.active {
-    background: linear-gradient(135deg, #FF9800 0%, #FF6F00 100%);
-    border-color: #FF9800;
+    background: linear-gradient(135deg, #ff9800 0%, #ff6f00 100%);
+    border-color: #ff9800;
     box-shadow: 0 6rpx 20rpx rgba(255, 152, 0, 0.4);
     transform: scale(1.05);
 }
 
 .option-text {
     font-size: 28rpx;
-    color: #4A5568;
+    color: #4a5568;
     font-weight: 600;
     display: block;
 }
 
 .option-subtitle {
     font-size: 22rpx;
-    color: #A0AEC0;
+    color: #a0aec0;
     margin-top: 6rpx;
     display: block;
 }
 
 .option-item.active .option-text,
 .option-item.active .option-subtitle {
-    color: #FFFFFF;
+    color: #ffffff;
 }
 
 /* 滑块区域 */
@@ -717,7 +769,7 @@ onMounted(() => {
 
 .range-text {
     font-size: 24rpx;
-    color: #A0AEC0;
+    color: #a0aec0;
 }
 
 /* 提示框 */
@@ -733,7 +785,7 @@ onMounted(() => {
 .tip-text {
     flex: 1;
     font-size: 26rpx;
-    color: #4A5568;
+    color: #4a5568;
     line-height: 1.6;
 }
 

@@ -1,216 +1,230 @@
 <template>
-  <view class="answer-sheet-container">
-    <view class="answer-sheet-grid">
-      <view 
-        v-for="(question, index) in props.questions" 
-        :key="index"
-        class="answer-item"
-        @click="handleQuestionClick(index)">
-        <view 
-          class="answer-circle" 
-          :class="{
-            'correct': isAnsweredCorrectly(question._id) && isShowAnswer,
-            'incorrect': isAnsweredIncorrectly(question._id) && isShowAnswer,
-            'unanswered': !isAnswered(question._id),
-            'answered': isAnswered(question._id) && !isShowAnswer,
-            'current': currentIndex === index
-            }">
-          {{ (index + 1) }}
+    <view class="answer-sheet-container">
+        <view class="answer-sheet-grid">
+            <view
+                v-for="(question, index) in props.questions"
+                :key="index"
+                class="answer-item"
+                @click="handleQuestionClick(index)"
+            >
+                <view
+                    class="answer-circle"
+                    :class="{
+                        correct:
+                            isAnsweredCorrectly(question._id) && isShowAnswer,
+                        incorrect:
+                            isAnsweredIncorrectly(question._id) && isShowAnswer,
+                        unanswered: !isAnswered(question._id),
+                        answered: isAnswered(question._id) && !isShowAnswer,
+                        current: currentIndex === index,
+                    }"
+                >
+                    {{ index + 1 }}
+                </view>
+            </view>
         </view>
-      </view>
+        <up-divider
+            text="没有更多了"
+            :dashed="true"
+            textPosition="center"
+        ></up-divider>
     </view>
-    <up-divider text="没有更多了" :dashed="true" textPosition="center"></up-divider>
-  </view>
 </template>
 <script setup>
-import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
-import { useSubjectiveAnswerStore } from '../../../stores/modules/SubjectiveAnswerStore';
-import { computed } from 'vue';
+import { useObjectiveAnswerStore } from "../../../stores/modules/ObjectiveAnswerStore";
+import { useSubjectiveAnswerStore } from "../../../stores/modules/SubjectiveAnswerStore";
+import { computed } from "vue";
 // 定义组件属性
 const props = defineProps({
-  questions: {
-    type: Array,
-    required: true
-  },
-  currentIndex: {
-    type: Number,
-    default: -1
-  },
-  isShowAnswer: {
-    type: Boolean,
-    default: false
-  }
+    questions: {
+        type: Array,
+        required: true,
+    },
+    currentIndex: {
+        type: Number,
+        default: -1,
+    },
+    isShowAnswer: {
+        type: Boolean,
+        default: false,
+    },
 });
 
-
 // 定义事件
-const emit = defineEmits(['question-click']);
+const emit = defineEmits(["question-click"]);
 
 // 获取Store实例
 const ObjectiveAnswerStore = useObjectiveAnswerStore();
 const SubjectiveAnswerStore = useSubjectiveAnswerStore();
-const  isShowAnswer = computed(() => props.isShowAnswer);
-
+const isShowAnswer = computed(() => props.isShowAnswer);
 
 // 处理题目点击事件
 const handleQuestionClick = (index) => {
-  emit('question-click', index);
+    emit("question-click", index);
 };
 
 // 判断题目是否已回答
 const isAnswered = (questionId) => {
-  // 先检查客观题
-  const objectiveAnswer = ObjectiveAnswerStore.getUserAnswer(questionId);
-  if (objectiveAnswer !== undefined) {
-    return true;
-  }
-  
-  // 再检查主观题
-  const subjectiveAnswer = SubjectiveAnswerStore.getUserAnswer(questionId);
-  return subjectiveAnswer !== undefined;
+    // 先检查客观题
+    const objectiveAnswer = ObjectiveAnswerStore.getUserAnswer(questionId);
+    if (objectiveAnswer !== undefined) {
+        return true;
+    }
+
+    // 再检查主观题
+    const subjectiveAnswer = SubjectiveAnswerStore.getUserAnswer(questionId);
+    return subjectiveAnswer !== undefined;
 };
 
 // 判断客观题是否正确
 const isObjectiveCorrect = (questionId) => {
-  return ObjectiveAnswerStore.getIsAnswerCorrect(questionId) === true;
+    return ObjectiveAnswerStore.getIsAnswerCorrect(questionId) === true;
 };
 
 // 判断主观题是否正确（基于用户自评）
 const isSubjectiveCorrect = (questionId) => {
-  return SubjectiveAnswerStore.getUserSelfEvaluation(questionId) === true; 
+    return SubjectiveAnswerStore.getUserSelfEvaluation(questionId) === true;
 };
 
 // 判断题目是否回答正确
 const isAnsweredCorrectly = (questionId) => {
-  // 客观题正确
-  if (isObjectiveCorrect(questionId)) {
-    return true;
-  }
-  
-  // 主观题且用户自评正确
-  if (isSubjectiveCorrect(questionId)) {
-    return true;
-  }
-  
-  return false;
+    // 客观题正确
+    if (isObjectiveCorrect(questionId)) {
+        return true;
+    }
+
+    // 主观题且用户自评正确
+    if (isSubjectiveCorrect(questionId)) {
+        return true;
+    }
+
+    return false;
 };
 
 // 判断题目是否回答错误
 const isAnsweredIncorrectly = (questionId) => {
-  // 已回答但客观题错误
-  if (isAnswered(questionId) && ObjectiveAnswerStore.getIsAnswerCorrect(questionId) === false) {
-    return true;
-  }
-  
-  // 主观题已回答且用户自评错误
-  if (isAnswered(questionId) && SubjectiveAnswerStore.getUserSelfEvaluation(questionId) === false) {
-    return true;
-  }
-  
-  return false;
+    // 已回答但客观题错误
+    if (
+        isAnswered(questionId) &&
+        ObjectiveAnswerStore.getIsAnswerCorrect(questionId) === false
+    ) {
+        return true;
+    }
+
+    // 主观题已回答且用户自评错误
+    if (
+        isAnswered(questionId) &&
+        SubjectiveAnswerStore.getUserSelfEvaluation(questionId) === false
+    ) {
+        return true;
+    }
+
+    return false;
 };
 </script>
 
 <style scoped>
 .answer-sheet-container {
-  padding: 15rpx 15rpx 20rpx 48rpx;
-  max-height: calc(50vh - 120rpx); /* 限制最大高度，减去标题和按钮区域的高度 */
-  overflow-y: auto; /* 允许垂直滚动 */
+    padding: 15rpx 15rpx 20rpx 48rpx;
+    max-height: calc(
+        50vh - 120rpx
+    ); /* 限制最大高度，减去标题和按钮区域的高度 */
+    overflow-y: auto; /* 允许垂直滚动 */
 }
 
 /* 隐藏滚动条但保持滚动功能 */
 .answer-sheet-container::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-  color: transparent;
-  background: transparent;
+    display: none;
+    width: 0;
+    height: 0;
+    color: transparent;
+    background: transparent;
 }
 
 /* 兼容其他浏览器 */
 .answer-sheet-container {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 .answer-sheet-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 20rpx;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 20rpx;
 }
 
 .answer-item {
-  position: relative;
-  width: 100rpx;
-  height: 100rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20rpx;
+    position: relative;
+    width: 100rpx;
+    height: 100rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20rpx;
 }
 
 .answer-circle {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333333;
-  background-color: #f5f5f5; /* 未答题默认浅灰色 */
-  border: 2rpx solid #dcdfe6;
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333333;
+    background-color: #f5f5f5; /* 未答题默认浅灰色 */
+    border: 2rpx solid #dcdfe6;
 }
 
 .answer-circle.answered {
-  background-color: #fffacd; /* 已作答淡黄色背景 */
-  border-color: #ffd700;
-  color: #333333; /* 保持文字为深色 */
+    background-color: #fffacd; /* 已作答淡黄色背景 */
+    border-color: #ffd700;
+    color: #333333; /* 保持文字为深色 */
 }
 
 .answer-circle.correct {
-  background-color: #6bd46e; /* 答对绿色 */
-  border-color: #4caf50;
-  color: #ffffff; /* 答对时文字为白色 */
+    background-color: #6bd46e; /* 答对绿色 */
+    border-color: #4caf50;
+    color: #ffffff; /* 答对时文字为白色 */
 }
 
 .answer-circle.incorrect {
-  background-color: #ff7878; /* 答错红色 */
-  border-color: #f56c6c;
-  color: #ffffff; /* 答错时文字为白色 */
+    background-color: #ff7878; /* 答错红色 */
+    border-color: #f56c6c;
+    color: #ffffff; /* 答错时文字为白色 */
 }
 
 .answer-circle.unanswered {
-  background-color: #f5f5f5; /* 未答题浅灰色 */
-  border-color: #dcdfe6;
-  color: #333333; /* 未答题时文字为深色 */
+    background-color: #f5f5f5; /* 未答题浅灰色 */
+    border-color: #dcdfe6;
+    color: #333333; /* 未答题时文字为深色 */
 }
 
 .answer-circle.current {
-  background-color: #e6f7ff; /* 当前题目淡蓝色背景 */
-  border-color: #1890ff;
-  color: #1890ff; /* 当前题目文字为蓝色 */
+    background-color: #e6f7ff; /* 当前题目淡蓝色背景 */
+    border-color: #1890ff;
+    color: #1890ff; /* 当前题目文字为蓝色 */
 }
 
 /* 当题目既是当前又是已答对/答错时的样式优先级 */
 .answer-circle.current.correct {
-  background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
-  border-color: #1890ff;
-  color: #1890ff; /* 当前题目优先显示蓝色文字 */
+    background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
+    border-color: #1890ff;
+    color: #1890ff; /* 当前题目优先显示蓝色文字 */
 }
 
 .answer-circle.current.incorrect {
-  background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
-  border-color: #1890ff;
-  color: #1890ff; /* 当前题目优先显示蓝色文字 */
+    background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
+    border-color: #1890ff;
+    color: #1890ff; /* 当前题目优先显示蓝色文字 */
 }
 
 /* 当题目既是当前又是已作答时的样式优先级 */
 .answer-circle.current.answered {
-  background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
-  border-color: #1890ff;
-  color: #1890ff; /* 当前题目优先显示蓝色文字 */
+    background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
+    border-color: #1890ff;
+    color: #1890ff; /* 当前题目优先显示蓝色文字 */
 }
 </style>

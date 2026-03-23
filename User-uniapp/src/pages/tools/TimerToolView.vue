@@ -7,7 +7,13 @@
                 <view class="timer-text">
                     <text class="time-display">{{ formattedTime }}</text>
                     <text v-if="isTimeUp" class="time-up-text">时间到!</text>
-                    <text v-if="isTimeUp && overtimeSeconds > 0" class="overtime-text">已超时 {{ overtimeMinutes }}分{{ overtimeSeconds % 60 }}秒</text>
+                    <text
+                        v-if="isTimeUp && overtimeSeconds > 0"
+                        class="overtime-text"
+                        >已超时 {{ overtimeMinutes }}分{{
+                            overtimeSeconds % 60
+                        }}秒</text
+                    >
                 </view>
             </view>
         </view>
@@ -18,9 +24,18 @@
             <view class="preset-times-container" v-if="!isRunning">
                 <text class="section-title">快速选择</text>
                 <view class="preset-times">
-                    <view v-for="preset in presetTimes" :key="preset.label" @click="setPresetTime(preset)"
-                        :class="['preset-time-card', { active: currentPreset === preset.label }]">
-                        <text class="preset-time-value">{{ preset.minutes }}</text>
+                    <view
+                        v-for="preset in presetTimes"
+                        :key="preset.label"
+                        @click="setPresetTime(preset)"
+                        :class="[
+                            'preset-time-card',
+                            { active: currentPreset === preset.label },
+                        ]"
+                    >
+                        <text class="preset-time-value">{{
+                            preset.minutes
+                        }}</text>
                         <text class="preset-time-unit">分钟</text>
                     </view>
                 </view>
@@ -30,34 +45,58 @@
             <view class="custom-time-container" v-if="!isRunning">
                 <text class="section-title">自定义时间</text>
                 <view class="custom-time-input">
-                    <input v-model="customMinutes" type="number" placeholder="输入分钟数" min="1" max="180"
-                        @input="handleCustomTimeChange" class="custom-input" />
-                    <button @click="setCustomTime" class="custom-btn">设置</button>
+                    <input
+                        v-model="customMinutes"
+                        type="number"
+                        placeholder="输入分钟数"
+                        min="1"
+                        max="180"
+                        @input="handleCustomTimeChange"
+                        class="custom-input"
+                    />
+                    <button @click="setCustomTime" class="custom-btn">
+                        设置
+                    </button>
                 </view>
             </view>
 
             <!-- 控制按钮 -->
             <view class="control-buttons">
-                <view 
-                    class="control-btn start-btn" 
-                    @click="startTimer" 
+                <view
+                    class="control-btn start-btn"
+                    @click="startTimer"
                     :class="{ disabled: isRunning || totalSeconds <= 0 }"
-                    v-if="!isRunning">
-                     <uni-icons type="checkmarkempty" size="26" color="#ffffff"></uni-icons>
+                    v-if="!isRunning"
+                >
+                    <uni-icons
+                        type="checkmarkempty"
+                        size="26"
+                        color="#ffffff"
+                    ></uni-icons>
                     <text class="but-text">开始</text>
                 </view>
-                <view 
-                    class="control-btn pause-btn" 
-                    @click="pauseTimer" 
-                    :class="{ disabled: !isRunning }">
-                    <uni-icons type="circle-filled" size="25" color="#ffffff"></uni-icons>
+                <view
+                    class="control-btn pause-btn"
+                    @click="pauseTimer"
+                    :class="{ disabled: !isRunning }"
+                >
+                    <uni-icons
+                        type="circle-filled"
+                        size="25"
+                        color="#ffffff"
+                    ></uni-icons>
                     <text class="but-text">暂停</text>
                 </view>
-                <view 
-                    class="control-btn reset-btn" 
+                <view
+                    class="control-btn reset-btn"
                     @click="resetTimer"
-                    v-if="!isRunning">
-                    <uni-icons type="reload" size="25" color="#ffffff"></uni-icons>
+                    v-if="!isRunning"
+                >
+                    <uni-icons
+                        type="reload"
+                        size="25"
+                        color="#ffffff"
+                    ></uni-icons>
                     <text class="but-text">重置</text>
                 </view>
             </view>
@@ -66,130 +105,127 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from "vue";
 // 预设时间选项
 const presetTimes = [
-    { label: '25分钟', minutes: 25 },
-    { label: '45分钟', minutes: 45 },
-    { label: '1小时', minutes: 60 },
-    { label: '2小时', minutes: 120 }
-]
+    { label: "25分钟", minutes: 25 },
+    { label: "45分钟", minutes: 45 },
+    { label: "1小时", minutes: 60 },
+    { label: "2小时", minutes: 120 },
+];
 // 状态变量
-const totalSeconds = ref(0) // 总秒数
-const remainingSeconds = ref(0) // 剩余秒数
-const isRunning = ref(false) // 是否正在运行
-const isTimeUp = ref(false) // 是否时间到
-const currentPreset = ref('') // 当前选中的预设
-const customMinutes = ref('') // 自定义分钟数
-const overtimeSeconds = ref(0) // 超时秒数
-let timer = null // 定时器ID
-
+const totalSeconds = ref(0); // 总秒数
+const remainingSeconds = ref(0); // 剩余秒数
+const isRunning = ref(false); // 是否正在运行
+const isTimeUp = ref(false); // 是否时间到
+const currentPreset = ref(""); // 当前选中的预设
+const customMinutes = ref(""); // 自定义分钟数
+const overtimeSeconds = ref(0); // 超时秒数
+let timer = null; // 定时器ID
 
 // 格式化时间显示
 const formattedTime = computed(() => {
-    const minutes = Math.floor(remainingSeconds.value / 60)
-    const seconds = remainingSeconds.value % 60
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-})
+    const minutes = Math.floor(remainingSeconds.value / 60);
+    const seconds = remainingSeconds.value % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+});
 
 // 计算超时分钟数
 const overtimeMinutes = computed(() => {
-    return Math.floor(overtimeSeconds.value / 60)
-})
-
+    return Math.floor(overtimeSeconds.value / 60);
+});
 
 // 设置预设时间
 const setPresetTime = (preset) => {
-    if (isRunning.value) return
+    if (isRunning.value) return;
 
-    totalSeconds.value = preset.minutes * 60
-    remainingSeconds.value = totalSeconds.value
-    currentPreset.value = preset.label
-    customMinutes.value = ''
-    isTimeUp.value = false
-    overtimeSeconds.value = 0
-}
+    totalSeconds.value = preset.minutes * 60;
+    remainingSeconds.value = totalSeconds.value;
+    currentPreset.value = preset.label;
+    customMinutes.value = "";
+    isTimeUp.value = false;
+    overtimeSeconds.value = 0;
+};
 
 // 设置自定义时间
 const setCustomTime = () => {
-    if (isRunning.value) return
+    if (isRunning.value) return;
 
-    const minutes = parseInt(customMinutes.value)
+    const minutes = parseInt(customMinutes.value);
     if (isNaN(minutes) || minutes <= 0) {
         uni.showToast({
-            title: '请输入有效分钟数',
-            icon: 'none'
-        })
-        return
+            title: "请输入有效分钟数",
+            icon: "none",
+        });
+        return;
     }
 
-    totalSeconds.value = minutes * 60
-    remainingSeconds.value = totalSeconds.value
-    currentPreset.value = ''
-    isTimeUp.value = false
-    overtimeSeconds.value = 0
-}
+    totalSeconds.value = minutes * 60;
+    remainingSeconds.value = totalSeconds.value;
+    currentPreset.value = "";
+    isTimeUp.value = false;
+    overtimeSeconds.value = 0;
+};
 
 // 处理自定义时间输入变化
 const handleCustomTimeChange = () => {
-    currentPreset.value = ''
-}
+    currentPreset.value = "";
+};
 
 // 开始计时
 const startTimer = () => {
-    if (remainingSeconds.value <= 0 && !isTimeUp.value) return
+    if (remainingSeconds.value <= 0 && !isTimeUp.value) return;
 
-    isRunning.value = true
+    isRunning.value = true;
 
     timer = setInterval(() => {
         if (!isTimeUp.value) {
-            remainingSeconds.value--
+            remainingSeconds.value--;
 
             if (remainingSeconds.value <= 0) {
-                isTimeUp.value = true
+                isTimeUp.value = true;
                 // 播放提示音或震动
                 //   uni.vibrateShort()
                 uni.showToast({
-                    title: '计时结束',
-                    icon: 'success'
-                })
+                    title: "计时结束",
+                    icon: "success",
+                });
             }
         } else {
             // 超时后继续计时
-            overtimeSeconds.value++
+            overtimeSeconds.value++;
         }
-    }, 1000)
-}
+    }, 1000);
+};
 
 // 暂停计时
 const pauseTimer = () => {
-    isRunning.value = false
+    isRunning.value = false;
     if (timer) {
-        clearInterval(timer)
-        timer = null
+        clearInterval(timer);
+        timer = null;
     }
-}
+};
 
 // 重置计时器
 const resetTimer = () => {
-    pauseTimer()
-    remainingSeconds.value = totalSeconds.value
-    isTimeUp.value = false
-    overtimeSeconds.value = 0
-}
-
+    pauseTimer();
+    remainingSeconds.value = totalSeconds.value;
+    isTimeUp.value = false;
+    overtimeSeconds.value = 0;
+};
 
 // 组件挂载时设置默认时间和初始化Canvas
 onMounted(() => {
-    setPresetTime(presetTimes[0]) // 默认选择25分钟
-})
+    setPresetTime(presetTimes[0]); // 默认选择25分钟
+});
 
 // 组件卸载时清除定时器
 onUnmounted(() => {
     if (timer) {
-        clearInterval(timer)
+        clearInterval(timer);
     }
-})
+});
 </script>
 
 <style scoped>
@@ -416,7 +452,7 @@ onUnmounted(() => {
 .reset-btn {
     background-color: #e74c3c;
 }
-.but-text{
+.but-text {
     font-size: 31rpx;
     font-weight: 520;
     color: white;

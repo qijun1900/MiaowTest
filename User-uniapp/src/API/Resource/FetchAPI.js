@@ -1,4 +1,4 @@
-import { http } from '../../util/http.js';
+import { http } from "../../util/http.js";
 
 /**
  * @description  向服务器获取资源列表
@@ -9,8 +9,8 @@ export async function getResourceList({ tag }) {
   try {
     return await http({
       url: `/uniappAPI/resource/user/getResourceList`,
-      method: 'POST',
-      data: { tag }
+      method: "POST",
+      data: { tag },
     });
   } catch (error) {
     console.error("getResourceList 失败", error);

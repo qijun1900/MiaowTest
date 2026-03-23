@@ -1,4 +1,4 @@
-import { http } from '../../util/http.js';
+import { http } from "../../util/http.js";
 
 /**
  * 收藏考试
@@ -6,16 +6,16 @@ import { http } from '../../util/http.js';
  * @returns {Promise} 返回收藏操作结果
  */
 export async function addExamFavorite(examId) {
-    try {
-        return await http({
-            url: '/uniappAPI/UserFavorite/addExamFavorite',
-            method: 'POST',
-            data: { examId }
-        });
-    } catch (error) {
-        console.error("addExamFavorite 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/UserFavorite/addExamFavorite",
+      method: "POST",
+      data: { examId },
+    });
+  } catch (error) {
+    console.error("addExamFavorite 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -24,16 +24,16 @@ export async function addExamFavorite(examId) {
  * @returns {Promise} 返回取消收藏操作结果
  */
 export async function removeExamFavorite(examId) {
-    try {
-        return await http({
-            url: '/uniappAPI/UserFavorite/removeExamFavorite',
-            method: 'POST',
-            data: { examId }
-        });
-    } catch (error) {
-        console.error("removeExamFavorite 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/UserFavorite/removeExamFavorite",
+      method: "POST",
+      data: { examId },
+    });
+  } catch (error) {
+    console.error("removeExamFavorite 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -42,16 +42,16 @@ export async function removeExamFavorite(examId) {
  * @returns {Promise} 返回用户收藏的考试列表
  */
 export async function getExamFavorites(examId) {
-    try {
-        return await http({
-            url: '/uniappAPI/UserFavorite/getExamFavorites',
-            method: 'POST',
-           data: { examId }
-        });
-    } catch (error) {
-        console.error("getExamFavorites 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/UserFavorite/getExamFavorites",
+      method: "POST",
+      data: { examId },
+    });
+  } catch (error) {
+    console.error("getExamFavorites 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -59,14 +59,13 @@ export async function getExamFavorites(examId) {
  * @returns {Promise} 返回用户收藏的考试列表
  */
 export async function getUserFavorites() {
-    try {
-        return await http({
-            url: '/uniappAPI/UserFavorite/getUserFavoritesExams',
-            method: 'GET',
-        });
-    }catch (error) {
-        console.error("getUserFavorites 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/UserFavorite/getUserFavoritesExams",
+      method: "GET",
+    });
+  } catch (error) {
+    console.error("getUserFavorites 失败", error);
+    throw error;
+  }
 }
-

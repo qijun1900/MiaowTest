@@ -1,17 +1,18 @@
 <template>
-   <view class="container">
+    <view class="container">
         <view class="animation">
             <firework-effect ref="fireworkRef"></firework-effect>
         </view>
         <view class="accuracy">
             <view class="accuracy-circle">
-               <up-count-to
-                    color="#ffffff" 
-                    :startVal="0" 
-                    :endVal="accuracyRate" 
+                <up-count-to
+                    color="#ffffff"
+                    :startVal="0"
+                    :endVal="accuracyRate"
                     :fontSize="40"
                     :decimals="1"
-                    :bold="true"/>
+                    :bold="true"
+                />
                 <text class="accuracy-text">正确率</text>
             </view>
         </view>
@@ -44,18 +45,20 @@
             <view class="data-title">
                 <text class="data-label">答题情况</text>
             </view>
-            <AnswerSheet 
+            <AnswerSheet
                 :questions="QuestionStore.UserChooseQuestion"
-                :isShowAnswer="true">
+                :isShowAnswer="true"
+            >
             </AnswerSheet>
         </view>
         <view class="bottom-action-container">
             <up-button
-                :plain="true" 
-                :hairline="true" 
+                :plain="true"
+                :hairline="true"
                 type="primary"
                 shape="circle"
-                @click="exportToPDF">
+                @click="exportToPDF"
+            >
                 导出为PDF
             </up-button>
             <up-button
@@ -64,7 +67,8 @@
                 :hairline="true"
                 type="error"
                 shape="circle"
-                @click="viewWrongQuestions">
+                @click="viewWrongQuestions"
+            >
                 查看错题
             </up-button>
             <up-button
@@ -73,80 +77,82 @@
                 :hairline="true"
                 type="error"
                 shape="circle"
-                @click="handleBack">
+                @click="handleBack"
+            >
                 返回题库
             </up-button>
         </view>
-   </view>  
+    </view>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
-import { storeToRefs } from 'pinia'
-import FireworkEffect from '@/components/plug-in/firework-effect/firework-effect.vue'//特效
-import AnswerSheet from '../../components/modules/exam/AnswerSheet.vue'
-import { useQuestionStore } from '../../stores/modules/QuestionStore'
-import {useStatisticsStore} from '../../stores/modules/StatisticsStore'
+import { ref, onMounted, computed } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
+import { storeToRefs } from "pinia";
+import FireworkEffect from "@/components/plug-in/firework-effect/firework-effect.vue"; //特效
+import AnswerSheet from "../../components/modules/exam/AnswerSheet.vue";
+import { useQuestionStore } from "../../stores/modules/QuestionStore";
+import { useStatisticsStore } from "../../stores/modules/StatisticsStore";
 
-const fireworkRef = ref(null)
-const QuestionStore = useQuestionStore()
-const StatisticsStore = useStatisticsStore()
-const {correctCount,incorrectCount,unansweredCount,accuracyRate} = storeToRefs(StatisticsStore)
-const bankInfo = ref(null) // 题库信息
+const fireworkRef = ref(null);
+const QuestionStore = useQuestionStore();
+const StatisticsStore = useStatisticsStore();
+const { correctCount, incorrectCount, unansweredCount, accuracyRate } =
+    storeToRefs(StatisticsStore);
+const bankInfo = ref(null); // 题库信息
 
 // 计算是否为用户题库
 const isUserBank = computed(() => {
-  return bankInfo.value?.isUserBank || false
-})
+    return bankInfo.value?.isUserBank || false;
+});
 
 // 页面加载时接收参数
 onLoad((options) => {
-  if (options.bankInfo) {
-    try {
-      bankInfo.value = JSON.parse(decodeURIComponent(options.bankInfo));
-    } catch (error) {
-      console.error('解析题库信息失败:', error);
+    if (options.bankInfo) {
+        try {
+            bankInfo.value = JSON.parse(decodeURIComponent(options.bankInfo));
+        } catch (error) {
+            console.error("解析题库信息失败:", error);
+        }
     }
-  }
-})
+});
 
 onMounted(() => {
     // 页面加载完成后触发烟花效果
     if (fireworkRef.value) {
-        fireworkRef.value.handleShowEffect({ type: 'fireworks' })
+        fireworkRef.value.handleShowEffect({ type: "fireworks" });
     }
-})
- 
+});
+
 // TODO: 实现PDF导出功能
 const exportToPDF = () => {
     uni.showToast({
-        title: '导出功能开发中',
-        icon: 'none'
-    })
-}
+        title: "导出功能开发中",
+        icon: "none",
+    });
+};
 
 // 查看错题
 const viewWrongQuestions = () => {
-    uni.navigateTo({ 
-        url: '/pages/exam/WrongQuestionView' 
-    })
-}
+    uni.navigateTo({
+        url: "/pages/exam/WrongQuestionView",
+    });
+};
 //用户题库返回
 const handleBack = () => {
-    uni.navigateBack({ delta: 2 })
-}
+    uni.navigateBack({ delta: 2 });
+};
 </script>
 <style scoped>
-.container{
-    padding:10rpx 20rpx;
+.container {
+    padding: 10rpx 20rpx;
     background-color: #f8f8f8;
     height: 100vh;
     /* 为底部固定按钮留出空间 */
     padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
-.accuracy{
+.accuracy {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -169,7 +175,7 @@ const handleBack = () => {
 }
 
 .accuracy-circle::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -10rpx;
     left: -10rpx;
@@ -182,7 +188,7 @@ const handleBack = () => {
     filter: blur(15rpx);
 }
 
-.accuracy-text{
+.accuracy-text {
     font-size: 28rpx;
     color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
@@ -230,7 +236,7 @@ const handleBack = () => {
 }
 
 .data-info {
-    display: flex; 
+    display: flex;
     flex-direction: column;
     align-items: center;
 }
@@ -246,20 +252,24 @@ const handleBack = () => {
     font-size: 26rpx;
     color: #666666;
 }
-.answer-sheet-container{
+.answer-sheet-container {
     background-color: #ffffff;
     border-radius: 20rpx;
     padding: 30rpx;
 }
-.bottom-action-container{
+.bottom-action-container {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     height: 100rpx;
-    background: linear-gradient(to top, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
+    background: linear-gradient(
+        to top,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(255, 255, 255, 0.95) 100%
+    );
     backdrop-filter: blur(10rpx);
-    border-top: 1rpx solid rgba(0,0,0,0.05);
+    border-top: 1rpx solid rgba(0, 0, 0, 0.05);
     display: flex;
     justify-content: center;
     align-items: center;

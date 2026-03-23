@@ -1,99 +1,134 @@
 <template>
     <view class="container">
         <!-- 固定头部 -->
-        <view 
-        class="fixed-header" 
-        :style="{ top: navBarInfo.totalHeight + 'px' }">
+        <view
+            class="fixed-header"
+            :style="{ top: navBarInfo.totalHeight + 'px' }"
+        >
             <!-- 切换按钮 -->
             <view class="switch-container">
-                <view 
-                    class="switch-button" 
+                <view
+                    class="switch-button"
                     :class="{ active: currentType === 'default' }"
                     @click="switchBookType('default')"
                 >
                     <text class="switch-text">系统词书</text>
-                    <view v-if="currentType === 'default'" class="active-indicator"></view>
+                    <view
+                        v-if="currentType === 'default'"
+                        class="active-indicator"
+                    ></view>
                 </view>
-                <view 
-                    class="switch-button" 
+                <view
+                    class="switch-button"
                     :class="{ active: currentType === 'user' }"
                     @click="switchBookType('user')"
                 >
                     <text class="switch-text">我的词书</text>
-                    <view v-if="currentType === 'user'" class="active-indicator"></view>
+                    <view
+                        v-if="currentType === 'user'"
+                        class="active-indicator"
+                    ></view>
                 </view>
             </view>
 
             <!-- 词书头部信息 -->
             <view class="books-header">
-                <text class="books-title">{{ currentType === 'default' ? '默认词书' : '我的词书' }}</text>
+                <text class="books-title">{{
+                    currentType === "default" ? "默认词书" : "我的词书"
+                }}</text>
                 <text class="books-count">
-                    <text class="count-number">{{ currentBooks.length }}</text> 本
+                    <text class="count-number">{{ currentBooks.length }}</text>
+                    本
                 </text>
             </view>
         </view>
 
         <!-- 词书列表 -->
-        <view 
-        class="books-list" >
+        <view class="books-list">
             <!-- 加载中 -->
             <ThemeLoading v-if="loading" text="正在加载中..." />
-            <view 
-                class="book-item" 
-                v-for="(book, index) in currentBooks" 
-                :key="index" 
+            <view
+                class="book-item"
+                v-for="(book, index) in currentBooks"
+                :key="index"
                 v-else
+            >
+                <view v-if="book._id === wordBook_id" class="reciting-mark"
+                    >正在背诵</view
                 >
-                <view v-if="book._id === wordBook_id" class="reciting-mark">正在背诵</view>
-                <image 
-                    :src="book.cover ? baseImageUrl + book.cover : book.cover_url" 
-                    class="book-image">
+                <image
+                    :src="
+                        book.cover ? baseImageUrl + book.cover : book.cover_url
+                    "
+                    class="book-image"
+                >
                 </image>
                 <view class="book-content">
                     <view class="book-info">
                         <text class="book-title">{{ book.title }}</text>
                         <view class="book-words">
-                            <uni-icons type="medal" size="21" color="#f0be0a"></uni-icons>
+                            <uni-icons
+                                type="medal"
+                                size="21"
+                                color="#f0be0a"
+                            ></uni-icons>
                             <text>{{ book.words || book.wordCount }}词</text>
                         </view>
                         <view class="book-tags">
-                            <up-tag 
-                                v-for="(tag, tagIndex) in book.tags" 
-                                :key="tagIndex" 
-                                :text="tag" 
-                                plain size="mini" 
-                                type="warning" plainFill 
-                                style="margin-right: 12rpx;">
+                            <up-tag
+                                v-for="(tag, tagIndex) in book.tags"
+                                :key="tagIndex"
+                                :text="tag"
+                                plain
+                                size="mini"
+                                type="warning"
+                                plainFill
+                                style="margin-right: 12rpx"
+                            >
                             </up-tag>
                         </view>
                     </view>
                     <view class="book-action">
-                        <view 
-                            class="view-words-btn" 
-                            @click="viewAllWords(book)">
-                            <up-icon name="eye" size="32rpx" color="#ffffff"></up-icon>
+                        <view
+                            class="view-words-btn"
+                            @click="viewAllWords(book)"
+                        >
+                            <up-icon
+                                name="eye"
+                                size="32rpx"
+                                color="#ffffff"
+                            ></up-icon>
                             <text class="btn-text">查看单词</text>
                         </view>
                     </view>
                 </view>
             </view>
-            
+
             <!-- 空状态 -->
-            <view v-if="currentBooks.length === 0 && !loading" class="empty-state">
+            <view
+                v-if="currentBooks.length === 0 && !loading"
+                class="empty-state"
+            >
                 <image
                     class="empty-image"
                     src="/static/other/empty.png"
                     mode="aspectFit"
                 />
-                <text class="empty-text">{{ currentType === 'default' ? '暂无默认词书' : '暂无自定义词书' }}</text>
-                <text class="empty-hint">{{ currentType === 'user' ? '快去创建你的第一本词书吧~' : '' }}</text>
+                <text class="empty-text">{{
+                    currentType === "default"
+                        ? "暂无默认词书"
+                        : "暂无自定义词书"
+                }}</text>
+                <text class="empty-hint">{{
+                    currentType === "user" ? "快去创建你的第一本词书吧~" : ""
+                }}</text>
             </view>
         </view>
         <dragButton
             butColor="#ffffff"
-            :show=" isShowdragButton"
+            :show="isShowdragButton"
             :isDock="true"
-            :existTabBar="true" 
+            :existTabBar="true"
             iconType="folder-add-filled"
             iconColor="#ff9800"
             :bottomOffset="100"
@@ -102,15 +137,16 @@
         />
     </view>
     <!-- 底部弹出框 -->
-    <uviewPopup
-        v-model:show="popupShow"
-        title="创建新词书" 
-        :closeable="false">
+    <uviewPopup v-model:show="popupShow" title="创建新词书" :closeable="false">
         <template #popupcontent>
             <view class="popup-content">
                 <view class="form-item">
                     <view class="form-item-header">
-                        <uni-icons type="compose" size="22" color="#0984e3"></uni-icons>
+                        <uni-icons
+                            type="compose"
+                            size="22"
+                            color="#0984e3"
+                        ></uni-icons>
                         <text class="form-label">词书名称</text>
                     </view>
                     <input
@@ -121,29 +157,38 @@
                         :maxlength="20"
                     />
                     <view class="input-counter">
-                        <text class="counter-text">{{ createForm.title.length }}/20</text>
+                        <text class="counter-text"
+                            >{{ createForm.title.length }}/20</text
+                        >
                     </view>
                 </view>
 
                 <view class="form-item">
                     <view class="form-item-header">
-                        <uni-icons type="image" size="22" color="#0984e3"></uni-icons>
+                        <uni-icons
+                            type="image"
+                            size="22"
+                            color="#0984e3"
+                        ></uni-icons>
                         <text class="form-label">选择封面</text>
                     </view>
-                    <scroll-view 
-                        class="cover-scroll" 
-                        scroll-x="true" 
-                        :show-scrollbar="false">
+                    <scroll-view
+                        class="cover-scroll"
+                        scroll-x="true"
+                        :show-scrollbar="false"
+                    >
                         <view class="cover-list">
                             <view
                                 v-for="item in coverOptions"
                                 :key="item._id"
                                 class="cover-item"
-                                :class="{ active: createForm.cover_id === item._id }"
+                                :class="{
+                                    active: createForm.cover_id === item._id,
+                                }"
                                 @click="selectCover(item)"
                             >
                                 <image
-                                    class="cover-image" 
+                                    class="cover-image"
                                     :src="item.url"
                                     mode="aspectFill"
                                 />
@@ -153,61 +198,69 @@
                 </view>
 
                 <view class="action-buttons">
-                    <view class="action-btn cancel-btn" @click="handleCreateCancel">取消</view>
-                    <view class="action-btn save-btn" @click="handleCreateSave">创建词书</view>
+                    <view
+                        class="action-btn cancel-btn"
+                        @click="handleCreateCancel"
+                        >取消</view
+                    >
+                    <view class="action-btn save-btn" @click="handleCreateSave"
+                        >创建词书</view
+                    >
                 </view>
             </view>
         </template>
     </uviewPopup>
 </template>
 <script setup>
-import { onMounted, ref, computed } from 'vue';
- import { 
-    getWordBooksAPI, 
+import { onMounted, ref, computed } from "vue";
+import {
+    getWordBooksAPI,
     createWordBookAPI,
-    getUserWordBooksAPI
-} from '../../../API/Vocabulary/WordBooksAPI';
-import ThemeLoading from '../../../components/core/ThemeLoading.vue';
-import navBarHeightUtil from '../../../util/navBarHeight';
-import dragButton from '../../../components/plug-in/drag-button/drag-button.vue';
-import uviewPopup from '../../../components/core/uviewPopup.vue';
-import { checkWordRember } from '../../../API/Vocabulary/WordRemberAPI';
-import { getResourceList } from '../../../API/Resource/FetchAPI';
-import escconfig from '../../../config/esc.config';
+    getUserWordBooksAPI,
+} from "../../../API/Vocabulary/WordBooksAPI";
+import ThemeLoading from "../../../components/core/ThemeLoading.vue";
+import navBarHeightUtil from "../../../util/navBarHeight";
+import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
+import uviewPopup from "../../../components/core/uviewPopup.vue";
+import { checkWordRember } from "../../../API/Vocabulary/WordRemberAPI";
+import { getResourceList } from "../../../API/Resource/FetchAPI";
+import escconfig from "../../../config/esc.config";
 
 const defaultBooks = ref([]);
-const currentType = ref('user'); // 'default' 或 'user'
+const currentType = ref("user"); // 'default' 或 'user'
 const loading = ref(false);
 const UserWordBooks = ref([]);
 const navBarInfo = ref({});
 const popupShow = ref(false);
-const wordBook_id = ref('');
+const wordBook_id = ref("");
 const createForm = ref({
-    title: '',
-    cover_id: '',
-    cover_url: ''
+    title: "",
+    cover_id: "",
+    cover_url: "",
 });
 const coverOptions = ref([]);
 
 const baseImageUrl = computed(() => {
-    return escconfig.ossDomain 
+    return escconfig.ossDomain;
 });
 
 // 计算当前显示的词书列表
 const currentBooks = computed(() => {
-    return currentType.value === 'user' ? UserWordBooks.value: defaultBooks.value ;
+    return currentType.value === "user"
+        ? UserWordBooks.value
+        : defaultBooks.value;
 });
 
 // 是否显示拖拽按钮
 const isShowdragButton = computed(() => {
-    return currentType.value === 'user' && !loading.value && !popupShow.value;
+    return currentType.value === "user" && !loading.value && !popupShow.value;
 });
 
 // 获取词书
 const fetchWordBooks = async () => {
     loading.value = true;
     try {
-        const isDefault = currentType.value === 'default';
+        const isDefault = currentType.value === "default";
         const api = isDefault ? getWordBooksAPI : getUserWordBooksAPI;
         const targetBooks = isDefault ? defaultBooks : UserWordBooks;
 
@@ -227,108 +280,110 @@ const checkCurrentWordBook = async () => {
     try {
         const response = await checkWordRember();
         if (response.code === 200) {
-           const {currentBook_id} = response.data;
-           wordBook_id.value = currentBook_id;
+            const { currentBook_id } = response.data;
+            wordBook_id.value = currentBook_id;
         }
     } catch (error) {
         console.error("Error checking current word book:", error);
     }
-}
+};
 
-//切换词书类型 
+//切换词书类型
 const switchBookType = (type) => {
     if (currentType.value === type) return;
-    
+
     currentType.value = type;
     // 保存用户偏好到本地存储
-    uni.setStorageSync('wordBookType', type);
-    
+    uni.setStorageSync("wordBookType", type);
+
     // 触发反馈
     uni.vibrateShort({
-        type: 'medium'
+        type: "medium",
     });
 
-    if (type === 'default' && defaultBooks.value.length === 0) {
+    if (type === "default" && defaultBooks.value.length === 0) {
         fetchWordBooks();
-    } else if (type === 'user' && UserWordBooks.value.length === 0) {
+    } else if (type === "user" && UserWordBooks.value.length === 0) {
         fetchWordBooks();
     }
 };
 
 const handleBtnClick = () => {
-  popupShow.value = true;
+    popupShow.value = true;
     //获取图片资源
-    getResourceList({ tag: 'bookcover' }).then(res => {
-        if (res.code === 200) {
-            coverOptions.value = res.data;
-        }
-    }).catch(err => {
-        console.error("Error fetching resource list:", err);
-    });
-}
+    getResourceList({ tag: "bookcover" })
+        .then((res) => {
+            if (res.code === 200) {
+                coverOptions.value = res.data;
+            }
+        })
+        .catch((err) => {
+            console.error("Error fetching resource list:", err);
+        });
+};
 
 const selectCover = (val) => {
     createForm.value.cover_id = val._id;
     createForm.value.cover_url = val.url;
-}
+};
 
 const handleCreateCancel = () => {
     popupShow.value = false;
-}
+};
 
 const handleCreateSave = () => {
     const title = createForm.value.title.trim();
-    if (title === '' || createForm.value.cover_id === '') {
+    if (title === "" || createForm.value.cover_id === "") {
         uni.showToast({
-            title: '请输入词书名称并选择封面',
-            icon: 'none'
+            title: "请输入词书名称并选择封面",
+            icon: "none",
         });
         return;
     }
-   
+
     // 调用创建词书API
     createWordBookAPI({
         title: title,
         cover_id: createForm.value.cover_id,
-        cover_url:createForm.value.cover_url
-    }).then(res => {
+        cover_url: createForm.value.cover_url,
+    }).then((res) => {
         if (res.code === 200) {
             uni.showToast({
-                title: '词书创建成功',
-                icon: 'success'
+                title: "词书创建成功",
+                icon: "success",
             });
             //reset表单
-            createForm.value.title = '';
-            createForm.value.cover_id = '';
-            createForm.value.cover_url = '';
+            createForm.value.title = "";
+            createForm.value.cover_id = "";
+            createForm.value.cover_url = "";
             //获取用户词书列表
             fetchWordBooks();
         } else {
             uni.showToast({
-                title: res.message || '词书创建失败',
-                icon: 'none'
+                title: res.message || "词书创建失败",
+                icon: "none",
             });
         }
-    })
+    });
     popupShow.value = false;
-}
+};
 
 // 查看所有单词
 const viewAllWords = (book) => {
     // 触发触觉反馈
     uni.vibrateShort({
-        type: 'medium'
+        type: "medium",
     });
-    
+
     uni.navigateTo({
-        url: `/pages/tools/WordsToolView_children/wordListView?bookId=${book.bookId}`
+        url: `/pages/tools/WordsToolView_children/wordListView?bookId=${book.bookId}`,
     });
 };
 
 // 加载用户偏好
 const loadUserPreference = () => {
     try {
-        const value = uni.getStorageSync('wordBookType');
+        const value = uni.getStorageSync("wordBookType");
         if (value) {
             currentType.value = value;
         }
@@ -340,10 +395,10 @@ const loadUserPreference = () => {
 onMounted(() => {
     // 获取导航栏高度信息
     navBarInfo.value = navBarHeightUtil.getNavBarInfo();
-    
+
     // 加载用户偏好
     loadUserPreference();
-    
+
     // 获取默认词书
     fetchWordBooks();
 
@@ -359,12 +414,12 @@ onMounted(() => {
 }
 /* ========== 固定头部区域 ========== */
 .fixed-header {
-  position: sticky;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background-color: #f0f8ff;
-  padding: 24rpx 32rpx;
+    position: sticky;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: #f0f8ff;
+    padding: 24rpx 32rpx;
 }
 
 /* 切换按钮容器 */
@@ -430,7 +485,7 @@ onMounted(() => {
     font-size: 36rpx;
     font-weight: 900;
     color: #0984e3;
-    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     text-shadow: 2rpx 2rpx 0 #74b9ff;
 }
 
@@ -441,13 +496,13 @@ onMounted(() => {
     padding: 12rpx 28rpx;
     border-radius: 30rpx;
     font-weight: bold;
-    box-shadow: 0 4rpx 0 #0652DD;
+    box-shadow: 0 4rpx 0 #0652dd;
 }
 
 .count-number {
     color: #ffffff;
     font-weight: 900;
-    text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.2);
+    text-shadow: 1rpx 1rpx 0 rgba(0, 0, 0, 0.2);
 }
 
 /* 词书列表 */
@@ -492,7 +547,7 @@ onMounted(() => {
     border-bottom-left-radius: 20rpx;
     font-weight: bold;
     z-index: 10;
-    box-shadow: -2rpx 2rpx 4rpx rgba(0,0,0,0.1);
+    box-shadow: -2rpx 2rpx 4rpx rgba(0, 0, 0, 0.1);
 }
 
 .book-image {
@@ -514,8 +569,8 @@ onMounted(() => {
 }
 
 .book-info {
-    flex: 1; 
-    display: flex; 
+    flex: 1;
+    display: flex;
     flex-direction: column;
     gap: 16rpx;
 }
@@ -524,7 +579,7 @@ onMounted(() => {
     font-size: 30rpx;
     font-weight: 800;
     color: #2d3436;
-    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     letter-spacing: 1rpx;
 }
 
@@ -558,16 +613,15 @@ onMounted(() => {
     background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
     padding: 20rpx 32rpx;
     border-radius: 20rpx;
-    border: 4rpx solid #0652DD;
-    box-shadow: 0 6rpx 0 #0652DD;
+    border: 4rpx solid #0652dd;
+    box-shadow: 0 6rpx 0 #0652dd;
     transition: all 0.2s ease;
 }
 
 .view-words-btn:active {
     transform: translateY(4rpx);
-    box-shadow: 0 2rpx 0 #0652DD;
+    box-shadow: 0 2rpx 0 #0652dd;
 }
-
 
 .btn-text {
     font-size: 28rpx;
@@ -599,7 +653,7 @@ onMounted(() => {
     font-weight: 600;
     margin-bottom: 12rpx;
 }
-.empty-image{
+.empty-image {
     width: 200rpx;
     height: 200rpx;
     margin-bottom: 20rpx;
@@ -666,7 +720,6 @@ onMounted(() => {
     color: #b2bec3;
 }
 
-
 .cover-list {
     display: inline-flex;
     flex-direction: row;
@@ -723,7 +776,7 @@ onMounted(() => {
 .save-btn {
     background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
     color: #ffffff;
-    border: 2rpx solid #0652DD;
-    box-shadow: 0 6rpx 0 #0652DD;
+    border: 2rpx solid #0652dd;
+    box-shadow: 0 6rpx 0 #0652dd;
 }
 </style>

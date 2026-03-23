@@ -6,48 +6,72 @@
             <view class="exam-detail">
                 <!-- 左侧考试封面 -->
                 <view class="exam-cover">
-                    <image :src="examInfo.coverImage" mode="aspectFill" class="cover-image"></image>
+                    <image
+                        :src="examInfo.coverImage"
+                        mode="aspectFill"
+                        class="cover-image"
+                    ></image>
                 </view>
 
                 <!-- 右侧考试信息 -->
                 <view class="exam-info">
                     <view class="info-item">
                         <view class="info-icon-wrapper">
-                            <image src="/static/other/subject-name.png" class="info-icon"></image>
+                            <image
+                                src="/static/other/subject-name.png"
+                                class="info-icon"
+                            ></image>
                         </view>
                         <view class="info-content-wrapper">
                             <text class="info-title">考试名称</text>
-                            <text class="info-content">{{ examInfo.name }}</text>
+                            <text class="info-content">{{
+                                examInfo.name
+                            }}</text>
                         </view>
                     </view>
 
                     <view class="info-item">
                         <view class="info-icon-wrapper">
-                            <image src="/static/other/year.png" class="info-icon"></image>
+                            <image
+                                src="/static/other/year.png"
+                                class="info-icon"
+                            ></image>
                         </view>
                         <view class="info-content-wrapper">
                             <text class="info-title">考试年份</text>
-                            <text class="info-content">{{ examInfo.year }}</text>
-                        </view>
-                    </view>
-                    
-                    <view class="info-item">
-                        <view class="info-icon-wrapper">
-                            <image src="/static/other/time.png" class="info-icon"></image>
-                        </view>
-                        <view class="info-content-wrapper">
-                            <text class="info-title">更新时间</text>
-                            <text class="info-content">{{ examInfo.updateTime }}</text>
+                            <text class="info-content">{{
+                                examInfo.year
+                            }}</text>
                         </view>
                     </view>
 
                     <view class="info-item">
                         <view class="info-icon-wrapper">
-                            <image src="/static/other/open-time.png" class="info-icon"></image>
+                            <image
+                                src="/static/other/time.png"
+                                class="info-icon"
+                            ></image>
+                        </view>
+                        <view class="info-content-wrapper">
+                            <text class="info-title">更新时间</text>
+                            <text class="info-content">{{
+                                examInfo.updateTime
+                            }}</text>
+                        </view>
+                    </view>
+
+                    <view class="info-item">
+                        <view class="info-icon-wrapper">
+                            <image
+                                src="/static/other/open-time.png"
+                                class="info-icon"
+                            ></image>
                         </view>
                         <view class="info-content-wrapper">
                             <text class="info-title">开考时间</text>
-                            <text class="info-content">{{ examInfo.startTime }}</text>
+                            <text class="info-content">{{
+                                examInfo.startTime
+                            }}</text>
                         </view>
                     </view>
                 </view>
@@ -57,41 +81,55 @@
         <!-- 切换刷题/资料 -->
         <view class="divider-container">
             <uviewSubsection
-            :list="list" 
-            @updateCurrent="handleSendMode"
-            :current="currentMode"
+                :list="list"
+                @updateCurrent="handleSendMode"
+                :current="currentMode"
             />
         </view>
 
         <!-- 加载状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题型数据..." />
-        
+
         <!-- 题型列表 -->
-        <view 
-            class="subject-types-container" 
-            v-else-if="currentMode === 0 && subjectTypes && subjectTypes.length  > 0">
+        <view
+            class="subject-types-container"
+            v-else-if="
+                currentMode === 0 && subjectTypes && subjectTypes.length > 0
+            "
+        >
             <scroll-view scroll-y class="subject-types-scroll">
                 <view class="subject-types-list">
-                    <view 
-                        class="subject-type-item" 
-                        v-for="(item, index) in subjectTypes" 
+                    <view
+                        class="subject-type-item"
+                        v-for="(item, index) in subjectTypes"
                         :key="index"
-                        @click="isAuthAllowed && navigateToQuestions(item)">
+                        @click="isAuthAllowed && navigateToQuestions(item)"
+                    >
                         <view class="subject-type-info">
                             <view class="type-header">
-                                <text class="subject-type-name">{{ item.content }}</text>
-                                <view class="question-badge"
-                                    :class="{ 'no-questions': !item.questionIdS || item.questionIdS.length === 0 }">
+                                <text class="subject-type-name">{{
+                                    item.content
+                                }}</text>
+                                <view
+                                    class="question-badge"
+                                    :class="{
+                                        'no-questions':
+                                            !item.questionIdS ||
+                                            item.questionIdS.length === 0,
+                                    }"
+                                >
                                     <text class="question-count">
-                                        {{ item.questionIdS ? item.questionIdS.length : 0 }}题</text>
+                                        {{
+                                            item.questionIdS
+                                                ? item.questionIdS.length
+                                                : 0
+                                        }}题</text
+                                    >
                                 </view>
                             </view>
                         </view>
                         <view class="arrow-container">
-                            <uni-icons 
-                                type="forward" 
-                                size="16" 
-                                color="#409EFF">
+                            <uni-icons type="forward" size="16" color="#409EFF">
                             </uni-icons>
                         </view>
                     </view>
@@ -103,13 +141,16 @@
                     <text class="auth-title">该科目需要权限才能访问</text>
                     <text class="auth-desc">请联系管理员获取访问权限</text>
                     <text class="auth-note">科目说明：</text>
-                    <text class="auth-info"> 此科目为个人上传不具备查看权限 </text>
-                    
-                    <up-button 
-                        type="primary" 
-                        class="auth-button" 
+                    <text class="auth-info">
+                        此科目为个人上传不具备查看权限
+                    </text>
+
+                    <up-button
+                        type="primary"
+                        class="auth-button"
                         shape="circle"
-                        @click="handleAuth">
+                        @click="handleAuth"
+                    >
                         申请访问
                     </up-button>
                 </view>
@@ -117,31 +158,40 @@
         </view>
 
         <!-- 资料列表 -->
-        <view 
-            class="subject-types-container" 
-            v-else-if="currentMode === 1 && subjectnetDisks && subjectnetDisks.length > 0 ">
+        <view
+            class="subject-types-container"
+            v-else-if="
+                currentMode === 1 &&
+                subjectnetDisks &&
+                subjectnetDisks.length > 0
+            "
+        >
             <scroll-view scroll-y class="subject-types-scroll">
                 <view class="subject-types-list">
-                    <view 
-                    class="subject-type-item"
-                    v-for="(item,index) in subjectnetDisks"
-                    :key="index"
-                    @click="isAuthAllowed && navigateTonetDisksDetail(item)">
-                    <view class="subject-type-info">
+                    <view
+                        class="subject-type-item"
+                        v-for="(item, index) in subjectnetDisks"
+                        :key="index"
+                        @click="isAuthAllowed && navigateTonetDisksDetail(item)"
+                    >
+                        <view class="subject-type-info">
                             <view class="type-header">
-                                <text class="subject-type-name">{{ item.title }}</text>
+                                <text class="subject-type-name">{{
+                                    item.title
+                                }}</text>
                                 <view class="question-badge">
-                                    <text class="question-count">{{ item.content[0].type === 1 ? "夸克" : "百度"  }}</text>
+                                    <text class="question-count">{{
+                                        item.content[0].type === 1
+                                            ? "夸克"
+                                            : "百度"
+                                    }}</text>
                                 </view>
                             </view>
                         </view>
                         <view class="arrow-container">
-                        <uni-icons 
-                            type="forward" 
-                            size="16" 
-                            color="#409EFF">
-                        </uni-icons>
-                    </view>
+                            <uni-icons type="forward" size="16" color="#409EFF">
+                            </uni-icons>
+                        </view>
                     </view>
                 </view>
             </scroll-view>
@@ -151,15 +201,20 @@
                     <text class="auth-title">该科目需要权限才能访问</text>
                     <text class="auth-desc">请联系管理员获取访问权限</text>
                     <text class="auth-note">科目说明：</text>
-                    <text class="auth-info"> 此科目为个人上传不具备查看权限 </text>
+                    <text class="auth-info">
+                        此科目为个人上传不具备查看权限
+                    </text>
                 </view>
             </view>
         </view>
 
         <!-- 数据为空 -->
         <view v-else class="empty">
-            <Empty 
-                :description="currentMode === 0 ? '暂无题目数据' : '暂无资料数据'" />
+            <Empty
+                :description="
+                    currentMode === 0 ? '暂无题目数据' : '暂无资料数据'
+                "
+            />
             <view class="empty-tip">
                 <text v-if="currentMode === 0">
                     暂无题目数据，您可以尝试
@@ -170,62 +225,72 @@
                     <text class="empty-tip-action">查看题目</text>
                 </text>
             </view>
-            <button 
-                v-if="currentMode === 0" 
-                @click="currentMode = 1" 
-                class="switch-btn">查看资料</button>
-            <button 
-                v-else 
-                @click="currentMode = 0" 
-                class="switch-btn">查看题目</button>   
+            <button
+                v-if="currentMode === 0"
+                @click="currentMode = 1"
+                class="switch-btn"
+            >
+                查看资料
+            </button>
+            <button v-else @click="currentMode = 0" class="switch-btn">
+                查看题目
+            </button>
         </view>
 
         <!-- 自定义底部 -->
         <view class="bottom">
-            <up-button 
-                type="primary" 
-                class="bottom-button" 
+            <up-button
+                type="primary"
+                class="bottom-button"
                 :icon="isFavorited ? 'star-fill' : 'star'"
-                :plain="!isFavorited" 
-                @click="handleFavoriteExam" 
+                :plain="!isFavorited"
+                @click="handleFavoriteExam"
                 shape="circle"
-                :iconColor="isFavorited ? '#F7BA2A' : '#409EFF'">
-                {{ isFavorited ? '已收藏' : '收藏考试' }}
+                :iconColor="isFavorited ? '#F7BA2A' : '#409EFF'"
+            >
+                {{ isFavorited ? "已收藏" : "收藏考试" }}
             </up-button>
         </view>
     </view>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
-import formatTime from '../../util/formatTime';
-import { getExamSubjectTypes,getExamSubjectNetMaterialsAPI,checkExamVerifyAPI } from '../../API/Exam/ExamAPI';
-import Empty from '../../components/core/Empty.vue';
-import { useQuestionStore } from '../../stores/modules/QuestionStore';
-import { addExamFavorite, removeExamFavorite, getExamFavorites } from '../../API/My/FavoriteAPI';
-import ThemeLoading from '../../components/core/ThemeLoading.vue';
-import uviewSubsection from '../../components/core/uviewSubsection.vue';
-import checkLogin from '../../util/checkLogin';
+import { ref } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
+import formatTime from "../../util/formatTime";
+import {
+    getExamSubjectTypes,
+    getExamSubjectNetMaterialsAPI,
+    checkExamVerifyAPI,
+} from "../../API/Exam/ExamAPI";
+import Empty from "../../components/core/Empty.vue";
+import { useQuestionStore } from "../../stores/modules/QuestionStore";
+import {
+    addExamFavorite,
+    removeExamFavorite,
+    getExamFavorites,
+} from "../../API/My/FavoriteAPI";
+import ThemeLoading from "../../components/core/ThemeLoading.vue";
+import uviewSubsection from "../../components/core/uviewSubsection.vue";
+import checkLogin from "../../util/checkLogin";
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据
 const questionStore = useQuestionStore();
 const isFavorited = ref(false); // 添加收藏状态变量
 const isLoading = ref(false); // 加载状态
-const list = ref(['题目', '资料']);// 切换刷题/资料的选项 0-刷题 1-资料
-const currentMode = ref(0); 
+const list = ref(["题目", "资料"]); // 切换刷题/资料的选项 0-刷题 1-资料
+const currentMode = ref(0);
 const subjectnetDisks = ref([]); // 考试资料数据
 const isAuthAllowed = ref(true); // 认证结果，默认为允许访问
 
 // 切换模式
 const handleSendMode = (index) => {
     currentMode.value = index;
-}
+};
 
 // 页面加载时接收参数
 onLoad((options) => {
-
     if (options.data) {
         try {
             // 解析传递过来的科目数据
@@ -238,38 +303,38 @@ onLoad((options) => {
                 year: subjectData.year,
                 coverImage: subjectData.coverImage,
                 updateTime: formatTime.getTime2(subjectData.createdTime),
-                startTime: formatTime.getTime2(subjectData.day) || '待定'
+                startTime: formatTime.getTime2(subjectData.day) || "待定",
             };
             //检测是否登录
-            const isLoggedIn =  checkLogin("请登录后再获取");
+            const isLoggedIn = checkLogin("请登录后再获取");
             if (!isLoggedIn) {
                 return;
             }
             //检测改科目是否需要验证，检测是否为认证用户
-            checkExamVerifyAPI(subjectData.id).then(response => {
+            checkExamVerifyAPI(subjectData.id).then((response) => {
                 // 根据返回的result设置认证结果
                 isAuthAllowed.value = response.data.result === 1;
-            })
+            });
             //获取题型详细 在后台异步请求最新数据（不影响页面初始加载速度）
             fetchClickSubjectData(subjectData.id);
             // 检测收藏状态
             checkFavoriteStatus(subjectData.id);
             // 资料数据
-            getExamSubjectNetMaterialsAPI(subjectData.id).then(response => {
+            getExamSubjectNetMaterialsAPI(subjectData.id).then((response) => {
                 subjectnetDisks.value = response.data;
-            })
+            });
         } catch (error) {
-            console.error('解析科目数据失败:', error);
+            console.error("解析科目数据失败:", error);
             uni.showToast({
-                title: '数据解析失败',
-                icon: 'none'
+                title: "数据解析失败",
+                icon: "none",
             });
         }
     } else {
-        console.error('未接收到科目数据参数');
+        console.error("未接收到科目数据参数");
         uni.showToast({
-            title: '参数错误',
-            icon: 'none'
+            title: "参数错误",
+            icon: "none",
         });
     }
 });
@@ -281,15 +346,15 @@ const fetchClickSubjectData = async (examId) => {
         const response = await getExamSubjectTypes(examId);
         subjectTypes.value = response.data;
     } catch (error) {
-        console.error('获取点击的科目数据失败:', error);
+        console.error("获取点击的科目数据失败:", error);
         uni.showToast({
-            title: '获取数据失败',
-            icon: 'none'
+            title: "获取数据失败",
+            icon: "none",
         });
     } finally {
         isLoading.value = false;
     }
-}
+};
 
 // 检测收藏状态
 const checkFavoriteStatus = async (examId) => {
@@ -299,9 +364,9 @@ const checkFavoriteStatus = async (examId) => {
             isFavorited.value = response.data.isFavorited; // 根据返回数据判断是否已收藏
         }
     } catch (error) {
-        console.error('检测收藏状态失败:', error);
+        console.error("检测收藏状态失败:", error);
     }
-}
+};
 
 // 收藏/取消收藏考试
 const handleFavoriteExam = async () => {
@@ -311,10 +376,10 @@ const handleFavoriteExam = async () => {
             const showModal = () => {
                 return new Promise((resolve) => {
                     uni.showModal({
-                        title: '您确定要取消收藏吗？',
+                        title: "您确定要取消收藏吗？",
                         success: (res) => {
                             resolve(res.confirm);
-                        }
+                        },
                     });
                 });
             };
@@ -327,8 +392,8 @@ const handleFavoriteExam = async () => {
                 if (response.code === 200) {
                     isFavorited.value = false;
                     uni.showToast({
-                        title: response.message || '取消收藏成功',
-                        icon: 'success'
+                        title: response.message || "取消收藏成功",
+                        icon: "success",
                     });
                 }
             }
@@ -338,49 +403,53 @@ const handleFavoriteExam = async () => {
             if (response.code === 200) {
                 isFavorited.value = true;
                 uni.showToast({
-                    title: response.message || '收藏成功',
-                    icon: 'success'
+                    title: response.message || "收藏成功",
+                    icon: "success",
                 });
             }
         }
     } catch (error) {
-        console.error('收藏操作失败:', error);
+        console.error("收藏操作失败:", error);
         uni.showToast({
-            title: '操作失败',
-            icon: 'none'
+            title: "操作失败",
+            icon: "none",
         });
     }
-}
+};
 
 // 导航到题目列表页面
 const navigateToQuestions = (subjectType) => {
-    questionStore.setCurrentQuestionIds(subjectType.questionIdS || []);// 设置当前题目ID数组
-    questionStore.FetchQuestionData();// 数据请求获取题目详细信息
+    questionStore.setCurrentQuestionIds(subjectType.questionIdS || []); // 设置当前题目ID数组
+    questionStore.FetchQuestionData(); // 数据请求获取题目详细信息
     uni.navigateTo({
-        url: `/pages/exam/PracticeSettingView?data=${encodeURIComponent(JSON.stringify({
-            examId: examInfo.value.id,
-            subjectTypeName: subjectType.content, // 这个是考试题型
-            examName: examInfo.value.name, // 这个是考试名称
-            updateTime: examInfo.value.updateTime,
-            amount: subjectType.questionIdS ? subjectType.questionIdS.length : 0
-        }))}`
+        url: `/pages/exam/PracticeSettingView?data=${encodeURIComponent(
+            JSON.stringify({
+                examId: examInfo.value.id,
+                subjectTypeName: subjectType.content, // 这个是考试题型
+                examName: examInfo.value.name, // 这个是考试名称
+                updateTime: examInfo.value.updateTime,
+                amount: subjectType.questionIdS
+                    ? subjectType.questionIdS.length
+                    : 0,
+            }),
+        )}`,
     });
-}
+};
 // 导航到资料复制链接页面
 const navigateTonetDisksDetail = (item) => {
-   uni.navigateTo({
-    url:`/pages/exam/ExamDiskView?titleid=${item._id}&type=${item.content[0].type}&title=${item.title}&time=${item.time}&examId=${examInfo.value.id}`
-   })
-}
+    uni.navigateTo({
+        url: `/pages/exam/ExamDiskView?titleid=${item._id}&type=${item.content[0].type}&title=${item.title}&time=${item.time}&examId=${examInfo.value.id}`,
+    });
+};
 
 // 处理认证申请
 const handleAuth = () => {
     // 跳转到反馈页面
-    let content = '申请访问科目访问科目：' + examInfo.value.name 
+    let content = "申请访问科目访问科目：" + examInfo.value.name;
     uni.navigateTo({
-      url: `/pages/public/feedbackview?content=${content}&type=4`
-    })
-}
+        url: `/pages/public/feedbackview?content=${content}&type=4`,
+    });
+};
 </script>
 
 <style scoped>
@@ -454,7 +523,7 @@ const handleAuth = () => {
     flex: 1;
     word-break: break-all;
 }
-.divider-container{
+.divider-container {
     margin-top: 20rpx;
     margin-bottom: 21rpx;
     margin-left: auto;
@@ -487,20 +556,20 @@ const handleAuth = () => {
     margin-top: 10rpx;
     width: 260rpx;
     height: 72rpx;
-    background: linear-gradient(90deg, #409EFF 0%, #1b89ff 100%);
+    background: linear-gradient(90deg, #409eff 0%, #1b89ff 100%);
     color: #fff;
     border: none;
     border-radius: 36rpx;
     font-size: 28rpx;
     font-weight: 600;
-    box-shadow: 0 4rpx 16rpx rgba(64,158,255,0.12);
+    box-shadow: 0 4rpx 16rpx rgba(64, 158, 255, 0.12);
     transition: background 0.2s;
     outline: none;
     letter-spacing: 2rpx;
 }
 
 .switch-btn:active {
-    background: linear-gradient(90deg, #1b89ff 0%, #409EFF 100%);
+    background: linear-gradient(90deg, #1b89ff 0%, #409eff 100%);
     opacity: 0.92;
 }
 
@@ -543,13 +612,17 @@ const handleAuth = () => {
 }
 
 .subject-type-item::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at top right, rgba(0, 122, 255, 0.05), transparent 70%);
+    background: radial-gradient(
+        circle at top right,
+        rgba(0, 122, 255, 0.05),
+        transparent 70%
+    );
     z-index: 0;
 }
 

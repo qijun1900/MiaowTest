@@ -7,11 +7,7 @@
             <!-- 顶部用户信息栏 -->
             <view class="top-header">
                 <view class="user-info">
-                    <userAvatar
-                        :width="80"
-                        :height="80"
-                        :show-online="true"
-                        />
+                    <userAvatar :width="80" :height="80" :show-online="true" />
                     <text class="greeting">{{ getGreetingInfo().text }}</text>
                     <text class="username">同学</text>
                 </view>
@@ -20,8 +16,15 @@
                         <text class="fire-icon">🔥</text>
                         <text class="streak-days">12 天</text>
                     </view>
-                    <view class="notification-icon" @click="handleGoWordSetting">
-                        <uni-icons type="gear-filled" size="26" color="#FF9800"></uni-icons>
+                    <view
+                        class="notification-icon"
+                        @click="handleGoWordSetting"
+                    >
+                        <uni-icons
+                            type="gear-filled"
+                            size="26"
+                            color="#FF9800"
+                        ></uni-icons>
                     </view>
                 </view>
             </view>
@@ -47,16 +50,16 @@
                         <view class="circle-container">
                             <!-- 外层光晕效果 -->
                             <view class="circle-glow"></view>
-                            
+
                             <!-- 背景圆环 -->
                             <view class="circle-bg"></view>
-                            
+
                             <!-- 进度圆环 -->
                             <view class="circle-progress">
                                 <!-- 进度端点装饰 -->
                                 <view class="progress-dot"></view>
                             </view>
-                            
+
                             <!-- 中心内容 -->
                             <view class="circle-content">
                                 <view class="percentage-container">
@@ -66,7 +69,7 @@
                                 <!-- 完成度文字 -->
                                 <text class="completion-text">完成度</text>
                             </view>
-                            
+
                             <!-- 装饰性星星 -->
                             <view class="star-decoration star-1">⭐</view>
                             <view class="star-decoration star-2">✨</view>
@@ -82,11 +85,16 @@
                             <text class="unit">词</text>
                         </view>
                         <view class="progress-bar-mini">
-                            <view class="progress-bar-fill" style="width: 70%"></view>
+                            <view
+                                class="progress-bar-fill"
+                                style="width: 70%"
+                            ></view>
                         </view>
                         <view class="progress-label-wrapper">
                             <text class="progress-label">今日目标</text>
-                            <text class="progress-tip">还差 15 词就完成啦！</text>
+                            <text class="progress-tip"
+                                >还差 15 词就完成啦！</text
+                            >
                         </view>
                     </view>
                 </view>
@@ -115,7 +123,7 @@
                 <view class="stat-item">
                     <view class="stat-glow stat-glow-purple"></view>
                     <view class="stat-icon purple-icon">
-                         <image
+                        <image
                             class="stat-icon-image"
                             src="/static/tools/tools-view-review.png"
                             mode="aspectFit"
@@ -142,16 +150,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import WordsRemGuide from '../../../components/modules/tools/WordsRemGuide.vue';
-import { getGreetingInfo } from '../../../util/greet';
-import userAvatar from '../../../components/core/userAvatar.vue';
-import {setWordRember,checkWordRember} from '../../../API/Vocabulary/WordRemberAPI.js';
+import { ref, onMounted } from "vue";
+import WordsRemGuide from "../../../components/modules/tools/WordsRemGuide.vue";
+import { getGreetingInfo } from "../../../util/greet";
+import userAvatar from "../../../components/core/userAvatar.vue";
+import {
+    setWordRember,
+    checkWordRember,
+} from "../../../API/Vocabulary/WordRemberAPI.js";
 
 // 控制是否显示引导页
 const iSshowGuide = ref(false);
 const goal = ref(0);
-const wordBook_id = ref('');
+const wordBook_id = ref("");
 
 onMounted(async () => {
     try {
@@ -165,12 +176,12 @@ onMounted(async () => {
             iSshowGuide.value = true;
         }
     } catch (error) {
-        console.error('检查用户设置失败:', error);
+        console.error("检查用户设置失败:", error);
         iSshowGuide.value = true;
     }
-    uni.$on('updateWordRember', (newSettings) => {
+    uni.$on("updateWordRember", (newSettings) => {
         goal.value = newSettings.dailyGoal;
-        wordBook_id.value= newSettings.currentBook_id;
+        wordBook_id.value = newSettings.currentBook_id;
     });
 });
 
@@ -182,43 +193,45 @@ const handleGuideComplete = (settings) => {
         currentBook_id: settings.selectedBook._id,
         dailyGoal: settings.dailyGoal,
         currentBookTitle: settings.selectedBook.title,
-    }).then(res => {
-       if(res.code===200){
-        // 显示成功提示
-        goal.value = settings.dailyGoal;
-        wordBook_id.value = settings.selectedBook._id;
-        uni.showToast({
-            title: '设置成功',
-            icon: 'success',
-            duration: 1000
-        });
-        // 添加触觉反馈
-        uni.vibrateShort({
-            type: 'medium'
-        });
-       }else{
-        // 显示失败提示
-        uni.showToast({
-            title: '设置失败',
-            icon: 'none',
-            duration: 1200
-        });
-       }
+    }).then((res) => {
+        if (res.code === 200) {
+            // 显示成功提示
+            goal.value = settings.dailyGoal;
+            wordBook_id.value = settings.selectedBook._id;
+            uni.showToast({
+                title: "设置成功",
+                icon: "success",
+                duration: 1000,
+            });
+            // 添加触觉反馈
+            uni.vibrateShort({
+                type: "medium",
+            });
+        } else {
+            // 显示失败提示
+            uni.showToast({
+                title: "设置失败",
+                icon: "none",
+                duration: 1200,
+            });
+        }
     });
 };
 
 const handleGoWordSetting = () => {
     uni.navigateTo({
-        url: '/pages/tools/WordsToolView_children/wordSettingView'
-        + '?currentBook_id=' + wordBook_id.value
+        url:
+            "/pages/tools/WordsToolView_children/wordSettingView" +
+            "?currentBook_id=" +
+            wordBook_id.value,
     });
-}
+};
 </script>
 
 <style scoped>
 .word-remember-container {
     min-height: 100vh;
-    background: linear-gradient(180deg, #E3F2FD 0%, #F5F5F5 50%);
+    background: linear-gradient(180deg, #e3f2fd 0%, #f5f5f5 50%);
     padding: 0 20rpx;
     box-sizing: border-box;
 }
@@ -236,7 +249,6 @@ const handleGoWordSetting = () => {
     align-items: center;
     position: relative;
 }
-
 
 .greeting {
     font-size: 28rpx;
@@ -289,7 +301,7 @@ const handleGoWordSetting = () => {
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
 
-.header-setting-icon{
+.header-setting-icon {
     width: 46rpx;
     height: 46rpx;
 }
@@ -346,7 +358,7 @@ const handleGoWordSetting = () => {
 .decoration-1 {
     width: 200rpx;
     height: 200rpx;
-    background: linear-gradient(135deg, #2196F3, #1976D2);
+    background: linear-gradient(135deg, #2196f3, #1976d2);
     top: -50rpx;
     right: -50rpx;
     animation: float 6s ease-in-out infinite;
@@ -355,7 +367,7 @@ const handleGoWordSetting = () => {
 .decoration-2 {
     width: 150rpx;
     height: 150rpx;
-    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
     bottom: 50rpx;
     left: -30rpx;
     animation: float 8s ease-in-out infinite reverse;
@@ -364,14 +376,15 @@ const handleGoWordSetting = () => {
 .decoration-3 {
     width: 100rpx;
     height: 100rpx;
-    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    background: linear-gradient(135deg, #4caf50, #388e3c);
     top: 50%;
     right: 20rpx;
     animation: float 7s ease-in-out infinite;
 }
 
 @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateY(0) rotate(0deg);
     }
     50% {
@@ -407,12 +420,17 @@ const handleGoWordSetting = () => {
     width: calc(100% + 40rpx);
     height: calc(100% + 40rpx);
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(33, 150, 243, 0.2) 0%, transparent 70%);
+    background: radial-gradient(
+        circle,
+        rgba(33, 150, 243, 0.2) 0%,
+        transparent 70%
+    );
     animation: pulse 3s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
         transform: scale(1);
         opacity: 0.5;
     }
@@ -443,14 +461,28 @@ const handleGoWordSetting = () => {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: conic-gradient(from -90deg,
-            #2196F3 0deg,
-            #64B5F6 126deg,
-            #2196F3 252deg,
-            transparent 252deg,
-            transparent 360deg);
-    mask: radial-gradient(circle at center, transparent 110rpx, black 110rpx, black 140rpx, transparent 140rpx);
-    -webkit-mask: radial-gradient(circle at center, transparent 110rpx, black 110rpx, black 140rpx, transparent 140rpx);
+    background: conic-gradient(
+        from -90deg,
+        #2196f3 0deg,
+        #64b5f6 126deg,
+        #2196f3 252deg,
+        transparent 252deg,
+        transparent 360deg
+    );
+    mask: radial-gradient(
+        circle at center,
+        transparent 110rpx,
+        black 110rpx,
+        black 140rpx,
+        transparent 140rpx
+    );
+    -webkit-mask: radial-gradient(
+        circle at center,
+        transparent 110rpx,
+        black 110rpx,
+        black 140rpx,
+        transparent 140rpx
+    );
     animation: progressRotate 2s ease-out;
 }
 
@@ -473,21 +505,21 @@ const handleGoWordSetting = () => {
     transform: translateX(-50%);
     width: 24rpx;
     height: 24rpx;
-    background: linear-gradient(135deg, #2196F3, #1976D2);
+    background: linear-gradient(135deg, #2196f3, #1976d2);
     border-radius: 50%;
     box-shadow: 0 4rpx 12rpx rgba(33, 150, 243, 0.5);
     animation: dotPulse 2s ease-in-out infinite;
 }
 
 @keyframes dotPulse {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateX(-50%) scale(1);
     }
     50% {
         transform: translateX(-50%) scale(1.2);
     }
 }
-
 
 .circle-content {
     position: absolute;
@@ -498,7 +530,11 @@ const handleGoWordSetting = () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.9) 100%);
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(248, 249, 250, 0.9) 100%
+    );
     width: 200rpx;
     height: 200rpx;
     border-radius: 50%;
@@ -517,11 +553,11 @@ const handleGoWordSetting = () => {
 
 .percentage {
     font-size: 85rpx;
-    color: #1A202C;
+    color: #1a202c;
     font-weight: 900;
     line-height: 1;
     text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
-    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -573,7 +609,8 @@ const handleGoWordSetting = () => {
 }
 
 @keyframes starTwinkle {
-    0%, 100% {
+    0%,
+    100% {
         opacity: 0.3;
         transform: scale(1) rotate(0deg);
     }
@@ -582,7 +619,6 @@ const handleGoWordSetting = () => {
         transform: scale(1.2) rotate(180deg);
     }
 }
-
 
 /* 进度信息包装器 */
 .progress-info-wrapper {
@@ -600,7 +636,7 @@ const handleGoWordSetting = () => {
 
 .current {
     font-size: 40rpx;
-    color: #FF9800;
+    color: #ff9800;
     font-weight: 700;
     animation: numberSlide 1s ease-out;
 }
@@ -645,7 +681,7 @@ const handleGoWordSetting = () => {
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #2196F3, #64B5F6);
+    background: linear-gradient(90deg, #2196f3, #64b5f6);
     border-radius: 4rpx;
     transition: width 1s ease-out;
     position: relative;
@@ -653,13 +689,18 @@ const handleGoWordSetting = () => {
 }
 
 .progress-bar-fill::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.5),
+        transparent
+    );
     animation: shimmer 2s infinite;
 }
 
@@ -686,7 +727,7 @@ const handleGoWordSetting = () => {
 
 .progress-tip {
     font-size: 24rpx;
-    color: #2196F3;
+    color: #2196f3;
     font-weight: 500;
 }
 
@@ -698,7 +739,11 @@ const handleGoWordSetting = () => {
     gap: 40rpx;
     padding: 30rpx 0;
     margin-bottom: 30rpx;
-    background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(33, 150, 243, 0.02));
+    background: linear-gradient(
+        135deg,
+        rgba(33, 150, 243, 0.05),
+        rgba(33, 150, 243, 0.02)
+    );
     border-radius: 20rpx;
     position: relative;
     z-index: 1;
@@ -728,12 +773,17 @@ const handleGoWordSetting = () => {
 .time-divider {
     width: 2rpx;
     height: 40rpx;
-    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(0, 0, 0, 0.1),
+        transparent
+    );
 }
 
 .continue-btn {
     position: relative;
-    background: linear-gradient(135deg, #2196F3, #1976D2);
+    background: linear-gradient(135deg, #2196f3, #1976d2);
     border-radius: 30rpx;
     padding: 28rpx 0;
     display: flex;
@@ -746,13 +796,13 @@ const handleGoWordSetting = () => {
 }
 
 .continue-btn::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #64B5F6, #2196F3);
+    background: linear-gradient(135deg, #64b5f6, #2196f3);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -773,7 +823,12 @@ const handleGoWordSetting = () => {
     left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
     animation: btnShine 3s infinite;
     z-index: 1;
 }
@@ -782,7 +837,8 @@ const handleGoWordSetting = () => {
     0% {
         left: -100%;
     }
-    50%, 100% {
+    50%,
+    100% {
         left: 150%;
     }
 }
@@ -805,7 +861,8 @@ const handleGoWordSetting = () => {
 }
 
 @keyframes arrowMove {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateX(0);
     }
     50% {
@@ -860,13 +917,17 @@ const handleGoWordSetting = () => {
     flex-direction: column;
     align-items: center;
     position: relative;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 0.8)
+    );
     backdrop-filter: blur(20rpx);
     -webkit-backdrop-filter: blur(20rpx);
     border-radius: 28rpx;
     padding: 40rpx 20rpx 32rpx;
     margin: 0 4rpx;
-    box-shadow: 
+    box-shadow:
         0 8rpx 32rpx rgba(0, 0, 0, 0.08),
         0 2rpx 8rpx rgba(0, 0, 0, 0.04),
         inset 0 1rpx 2rpx rgba(255, 255, 255, 1);
@@ -876,26 +937,34 @@ const handleGoWordSetting = () => {
 }
 
 .stat-item::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.4) 0%,
+        transparent 50%
+    );
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s ease;
 }
 
 .stat-item::after {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.3) 0%,
+        transparent 70%
+    );
     opacity: 0;
     transition: all 0.6s ease;
     pointer-events: none;
@@ -903,7 +972,7 @@ const handleGoWordSetting = () => {
 
 .stat-item:active {
     transform: translateY(-6rpx) scale(0.98);
-    box-shadow: 
+    box-shadow:
         0 12rpx 40rpx rgba(0, 0, 0, 0.12),
         0 4rpx 12rpx rgba(0, 0, 0, 0.06),
         inset 0 1rpx 2rpx rgba(255, 255, 255, 1);
@@ -929,43 +998,59 @@ const handleGoWordSetting = () => {
     font-size: 32rpx;
     margin-bottom: 24rpx;
     position: relative;
-    box-shadow: 
+    box-shadow:
         0 4rpx 16rpx rgba(0, 0, 0, 0.06),
         inset 0 1rpx 1rpx rgba(255, 255, 255, 0.8);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .stat-icon::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     border-radius: 24rpx;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        transparent 50%
+    );
     pointer-events: none;
 }
 
 .stat-item:active .stat-icon {
     transform: scale(1.1) rotate(5deg);
-    box-shadow: 
+    box-shadow:
         0 6rpx 20rpx rgba(0, 0, 0, 0.1),
         inset 0 2rpx 4rpx rgba(255, 255, 255, 1);
 }
 
 .blue-icon {
-    background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(33, 150, 243, 0.08));
+    background: linear-gradient(
+        135deg,
+        rgba(33, 150, 243, 0.15),
+        rgba(33, 150, 243, 0.08)
+    );
     border: 1rpx solid rgba(33, 150, 243, 0.2);
 }
 
 .purple-icon {
-    background: linear-gradient(135deg, rgba(156, 39, 176, 0.15), rgba(156, 39, 176, 0.08));
+    background: linear-gradient(
+        135deg,
+        rgba(156, 39, 176, 0.15),
+        rgba(156, 39, 176, 0.08)
+    );
     border: 1rpx solid rgba(156, 39, 176, 0.2);
 }
 
 .green-icon {
-    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.08));
+    background: linear-gradient(
+        135deg,
+        rgba(76, 175, 80, 0.15),
+        rgba(76, 175, 80, 0.08)
+    );
     border: 1rpx solid rgba(76, 175, 80, 0.2);
 }
 
@@ -1011,7 +1096,7 @@ const handleGoWordSetting = () => {
     position: absolute;
     top: -8rpx;
     right: -8rpx;
-    background: #FF5722;
+    background: #ff5722;
     color: #fff;
     width: 32rpx;
     height: 32rpx;

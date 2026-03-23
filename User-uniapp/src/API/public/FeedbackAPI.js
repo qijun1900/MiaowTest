@@ -1,4 +1,4 @@
-import { http } from '../../util/http.js';
+import { http } from "../../util/http.js";
 
 /**
  * 提交用户反馈
@@ -9,15 +9,15 @@ import { http } from '../../util/http.js';
  * @param {string} feedbackData.relatedId - 关联ID（如题目ID、考试ID等），可选
  * @returns {Promise} 返回提交反馈的响应
  */
-export const submitFeedbackAPI = async(feedbackData) => {
-   try{
-       return await http({
-           url: '/uniappAPI/Feedback/submitFeedback',
-           method: 'POST',
-           data: feedbackData,
-       });
-   }catch(error){
-       console.error("submitFeedback 失败", error);
-       throw error;
-   }
-}
+export const submitFeedbackAPI = async (feedbackData) => {
+  try {
+    return await http({
+      url: "/uniappAPI/Feedback/submitFeedback",
+      method: "POST",
+      data: feedbackData,
+    });
+  } catch (error) {
+    console.error("submitFeedback 失败", error);
+    throw error;
+  }
+};

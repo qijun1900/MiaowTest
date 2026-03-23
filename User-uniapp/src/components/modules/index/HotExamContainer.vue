@@ -1,19 +1,24 @@
 <template>
     <view class="container">
-        <scroll-view 
-            class="hot-exam-scroll" 
-            scroll-x="true" 
+        <scroll-view
+            class="hot-exam-scroll"
+            scroll-x="true"
             scroll-left="0"
-            :show-scrollbar="false">
+            :show-scrollbar="false"
+        >
             <view class="hot-exam-list">
-                <view class="exam-item" 
-                    v-for="(exam, index) in hotExamList" 
-                    :key="index" @click="handleClickExam(exam)">
-                    <image 
-                        class="exam-cover" 
-                        :src="exam.coverImage" 
+                <view
+                    class="exam-item"
+                    v-for="(exam, index) in hotExamList"
+                    :key="index"
+                    @click="handleClickExam(exam)"
+                >
+                    <image
+                        class="exam-cover"
+                        :src="exam.coverImage"
                         :lazy-load="true"
-                        mode="aspectFill">
+                        mode="aspectFill"
+                    >
                     </image>
                     <view class="exam-title">{{ exam.name }}</view>
                 </view>
@@ -28,49 +33,47 @@
 </template>
 
 <script setup>
-import { ref ,onMounted} from 'vue'
-import { getHotExamList } from '../../../API/Index/HotExamAPI' 
-import escconfig from '../../../config/esc.config'
-import checkLogin from '../../../util/checkLogin'
+import { ref, onMounted } from "vue";
+import { getHotExamList } from "../../../API/Index/HotExamAPI";
+import escconfig from "../../../config/esc.config";
+import checkLogin from "../../../util/checkLogin";
 
-const hotExamList = ref([])
-const isLoading = ref(true)
+const hotExamList = ref([]);
+const isLoading = ref(true);
 
 const fetchHotExamData = async () => {
     try {
-        isLoading.value = true
-        const res = await getHotExamList()
-        hotExamList.value = res.data.map(item => ({
+        isLoading.value = true;
+        const res = await getHotExamList();
+        hotExamList.value = res.data.map((item) => ({
             id: item._id,
             name: item.name,
             coverImage: `${escconfig.ossDomain}${item.cover}`, // 根据实际情况调整URL
-            ...item
-        }))
+            ...item,
+        }));
     } catch (error) {
-        console.error('获取热门考试数据失败:', error)
+        console.error("获取热门考试数据失败:", error);
     } finally {
-        isLoading.value = false
+        isLoading.value = false;
     }
-}
-
-const handleClickExam = async (subject) => {
-    
-  // 检查用户是否登录
-  const isLogin = await checkLogin();
-  if (!isLogin) {
-    return; // 如果未登录，不执行后续操作
-  }
-
-  // 跳转到考试详情页，传递完整科目数据作为参数
-  uni.navigateTo({
-    url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`
-  });
 };
 
-onMounted(()=>{
-    fetchHotExamData()
-    
-})
+const handleClickExam = async (subject) => {
+    // 检查用户是否登录
+    const isLogin = await checkLogin();
+    if (!isLogin) {
+        return; // 如果未登录，不执行后续操作
+    }
+
+    // 跳转到考试详情页，传递完整科目数据作为参数
+    uni.navigateTo({
+        url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`,
+    });
+};
+
+onMounted(() => {
+    fetchHotExamData();
+});
 </script>
 
 <style scoped>
@@ -93,7 +96,7 @@ onMounted(()=>{
 }
 
 .exam-item {
-    flex-shrink: 0;/*  防止元素缩小 */
+    flex-shrink: 0; /*  防止元素缩小 */
     width: 218rpx;
     margin-right: 22rpx;
     background-color: #f0f0f0;

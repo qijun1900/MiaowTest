@@ -3,44 +3,50 @@
         <view class="question-explanation-container" key="explanation">
             <view class="question-explanation-header">
                 <text class="explanation-label">解析:</text>
-                <uni-icons 
+                <uni-icons
                     type="help"
-                    size="21" 
+                    size="21"
                     class="explanation-icon"
-                    color="#6f89ff"></uni-icons>
+                    color="#6f89ff"
+                ></uni-icons>
             </view>
             <view class="question-explanation-content">
-                <up-markdown :content="analysis" v-if="analysis && analysis !== ''"></up-markdown>
+                <up-markdown
+                    :content="analysis"
+                    v-if="analysis && analysis !== ''"
+                ></up-markdown>
                 <text v-else>暂无解析</text>
             </view>
             <view class="AI-warning" v-if="isAIanswer">
                 <up-icon name="error" color="#f4ae2c" size="15px"></up-icon>
-                <text class="AI-warning-lable">本解析由 AI 生成，内容仅供参考，请仔细甄别!</text>
+                <text class="AI-warning-lable"
+                    >本解析由 AI 生成，内容仅供参考，请仔细甄别!</text
+                >
             </view>
         </view>
     </uni-transition>
 </template>
 
 <script setup>
-import {computed} from 'vue'
+import { computed } from "vue";
 const props = defineProps({
     analysis: {
         type: String,
-        default: ''
+        default: "",
     },
     showAnalysis: {
         type: Boolean,
-        default: false
+        default: false,
     },
     isAIanswer: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
 });
 
 const analysis = computed(() => {
     return props.analysis;
-})
+});
 </script>
 <style lang="scss" scoped>
 /* 解析容器样式 */
@@ -62,11 +68,11 @@ const analysis = computed(() => {
     color: #303030;
     font-weight: 538;
 }
-.AI-warning{
+.AI-warning {
     display: flex;
     align-items: center;
 }
-.AI-warning-lable{
+.AI-warning-lable {
     font-size: 24rpx;
     color: #898989;
     font-weight: 580;

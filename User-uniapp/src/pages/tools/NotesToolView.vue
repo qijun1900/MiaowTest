@@ -1,14 +1,7 @@
 <template>
-  <view class="container">
-
-  </view>                                                                                    
+    <view class="container"> </view>
 </template>
 
-<script setup>
+<script setup></script>
 
-
-</script>
-
-<style scoped>
-
-</style>
+<style scoped></style>

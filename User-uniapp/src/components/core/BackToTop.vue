@@ -1,107 +1,118 @@
 <template>
-    <view class="top-back" 
-        @click="topBack" 
+    <view
+        class="top-back"
+        @click="topBack"
         v-if="showButton"
         :class="[
             `position-${props.position}`,
-            showButton ? 'fade-in' : 'fade-out'
+            showButton ? 'fade-in' : 'fade-out',
         ]"
-        :style="{ zIndex: props.zIndex }">
+        :style="{ zIndex: props.zIndex }"
+    >
         <button class="back-button" :disabled="isScrolling">
             <view class="back-icon">
-                <uni-icons type="arrow-up" size="24" :color="primaryColor"></uni-icons>
+                <uni-icons
+                    type="arrow-up"
+                    size="24"
+                    :color="primaryColor"
+                ></uni-icons>
             </view>
-        </button>    
+        </button>
     </view>
 </template>
 
 <script setup>
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted } from "vue";
 
 const props = defineProps({
     // 按钮位置
     position: {
         type: String,
-        default: 'bottom-right',
+        default: "bottom-right",
         validator: (value) => {
-            return ['bottom-right', 'bottom-left', 'top-right', 'top-left'].includes(value)
-        }
+            return [
+                "bottom-right",
+                "bottom-left",
+                "top-right",
+                "top-left",
+            ].includes(value);
+        },
     },
     // 按钮层级
     zIndex: {
         type: Number,
-        default: 999
+        default: 999,
     },
     // 滚动多少距离后显示按钮
     scrollDistance: {
         type: Number,
-        default: 300
+        default: 300,
     },
     // 防抖延迟时间
     debounceDelay: {
         type: Number,
-        default: 100
+        default: 100,
     },
     // 主要颜色
     primaryColor: {
         type: String,
-        default: '#007AFF'
-    }
-})
+        default: "#007AFF",
+    },
+});
 
-const showButton = ref(false)
-const isScrolling = ref(false)
-let debounceTimer = null
+const showButton = ref(false);
+const isScrolling = ref(false);
+let debounceTimer = null;
 
 const topBack = () => {
-    if (isScrolling.value) return
-    
-    isScrolling.value = true
-    showButton.value = false
-    
+    if (isScrolling.value) return;
+
+    isScrolling.value = true;
+    showButton.value = false;
+
     uni.pageScrollTo({
         scrollTop: 0,
         duration: 300,
         success: () => {
             setTimeout(() => {
-                isScrolling.value = false
-                showButton.value = true
-            }, 500)
+                isScrolling.value = false;
+                showButton.value = true;
+            }, 500);
         },
         fail: () => {
-            isScrolling.value = false
-            showButton.value = true
-        }
+            isScrolling.value = false;
+            showButton.value = true;
+        },
     });
-}
+};
 
 // 暴露方法给父组件调用
 const handlePageScroll = (e) => {
     if (isScrolling.value) return;
-    
+
     // 清除之前的定时器
     if (debounceTimer) {
-        clearTimeout(debounceTimer)
+        clearTimeout(debounceTimer);
     }
-    
+
     // 设置防抖
     debounceTimer = setTimeout(() => {
         const scrollTop = e.scrollTop;
         showButton.value = scrollTop > props.scrollDistance;
-    }, props.debounceDelay)
-}
+    }, props.debounceDelay);
+};
 
 // 组件卸载时清理定时器
 onUnmounted(() => {
     if (debounceTimer) {
-        clearTimeout(debounceTimer)
+        clearTimeout(debounceTimer);
     }
-})
+});
 
 // 暴露方法给父组件
 defineExpose({
-    handlePageScroll
-})
+    handlePageScroll,
+});
 </script>
 
 <style scoped>

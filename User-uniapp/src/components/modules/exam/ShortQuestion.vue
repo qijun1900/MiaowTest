@@ -21,15 +21,27 @@
                 </uni-icons>
             </view>
             <view class="input-textarea">
-                <up-textarea v-model="userinput" placeholder="请在此处输入答案~" autoHeight :height="75" count :maxlength="-1">
+                <up-textarea
+                    v-model="userinput"
+                    placeholder="请在此处输入答案~"
+                    autoHeight
+                    :height="75"
+                    count
+                    :maxlength="-1"
+                >
                 </up-textarea>
             </view>
         </view>
         <!-- 查看答案 -->
         <view class="check-container">
-            <up-button v-if="props.currentMode === 0" @click="isShowAnswer = !isShowAnswer" type="primary"
-                :text="showAnswerComputed ? '隐藏答案' : '显示答案'" shape="circle"
-                :icon="showAnswerComputed ? 'eye-off' : 'eye-fill'">
+            <up-button
+                v-if="props.currentMode === 0"
+                @click="isShowAnswer = !isShowAnswer"
+                type="primary"
+                :text="showAnswerComputed ? '隐藏答案' : '显示答案'"
+                shape="circle"
+                :icon="showAnswerComputed ? 'eye-off' : 'eye-fill'"
+            >
             </up-button>
         </view>
         <!-- 答案 -->
@@ -42,57 +54,78 @@
             </view>
         </uni-transition>
         <!-- 用户判断 -->
-        <uni-transition name="fade" mode="out-in" :show="showAnswerComputed && props.currentMode === 0">
+        <uni-transition
+            name="fade"
+            mode="out-in"
+            :show="showAnswerComputed && props.currentMode === 0"
+        >
             <view class="user-judgment-container" key="judgment">
-                <up-button icon="close-circle-fill" type="primary" :plain="true" text="答错了" shape="circle"
-                    class="user-judgment-but" @click="handleSelfEvaluation(false)"></up-button>
-                <up-button icon="checkmark-circle-fill" type="primary" :plain="true" text="答对了" shape="circle"
-                    class="user-judgment-but" @click="handleSelfEvaluation(true)"></up-button>
+                <up-button
+                    icon="close-circle-fill"
+                    type="primary"
+                    :plain="true"
+                    text="答错了"
+                    shape="circle"
+                    class="user-judgment-but"
+                    @click="handleSelfEvaluation(false)"
+                ></up-button>
+                <up-button
+                    icon="checkmark-circle-fill"
+                    type="primary"
+                    :plain="true"
+                    text="答对了"
+                    shape="circle"
+                    class="user-judgment-but"
+                    @click="handleSelfEvaluation(true)"
+                ></up-button>
             </view>
         </uni-transition>
         <!-- 解析 -->
-        <AnalysisCom :analysis="question.analysis" :showAnalysis="showAnswerComputed"
-            :isAIanswer="question.isAIanswer === 1 ? true : false" />
+        <AnalysisCom
+            :analysis="question.analysis"
+            :showAnalysis="showAnswerComputed"
+            :isAIanswer="question.isAIanswer === 1 ? true : false"
+        />
     </view>
 </template>
 
 <script setup>
 //TODO 1. 长按题干触发单词选择模式，选中单词后显示单词信息（音标、翻译、例句等）
 //TODO 2. 显示单词信息的弹窗可以集成真实的词典API
-import { ref, computed, onMounted, watch } from 'vue';
-import { useSubjectiveAnswerStore } from '@/stores/modules/SubjectiveAnswerStore';
-import AnalysisCom from '@/components/modules/exam/Analysiscom.vue';
+import { ref, computed, onMounted, watch } from "vue";
+import { useSubjectiveAnswerStore } from "@/stores/modules/SubjectiveAnswerStore";
+import AnalysisCom from "@/components/modules/exam/Analysiscom.vue";
 
-const subjectiveAnswerStore = useSubjectiveAnswerStore();// 初始化 store
+const subjectiveAnswerStore = useSubjectiveAnswerStore(); // 初始化 store
 const props = defineProps({
     question: {
         type: Object,
-        required: true
+        required: true,
     },
     questionIndex: {
         type: Number,
-        required: true
+        required: true,
     },
     currentMode: {
         type: Number,
-        default: 0 // 默认值为0，表示答题模式 1为学习模式
+        default: 0, // 默认值为0，表示答题模式 1为学习模式
     },
     enableWordQuery: {
         type: Boolean,
-        default: false // 默认禁用单词查询功能
+        default: false, // 默认禁用单词查询功能
         // 使用说明：
         // 1. 双击题干中的单词（500ms内）可以查看单词信息
         // 2. 显示内容包括：音标、翻译、例句
         // 3. 可以集成真实的词典API（如百度翻译、有道词典等）
         // 4. 设置为false可以禁用单词查询功能，恢复原始显示
-    }
+    },
 });
-const userinput = ref('');
+const userinput = ref("");
 const isShowAnswer = ref(false);
-const selectedWord = ref('');
+const selectedWord = ref("");
 const processedStem = ref(null);
 const lastTapTime = ref(0);
-const lastTapWord = ref('');
+const lastTapWord = ref("");
 const enableWordQuery = ref(true); // 是否启用单词查询功能
 
 const showAnswerComputed = computed(() => {
@@ -104,9 +137,13 @@ const showAnswerComputed = computed(() => {
     return isShowAnswer.value;
 });
 // 监听用户输入变化，保存到 store
-watch(userinput, (newInput) => {
-    subjectiveAnswerStore.saveUserAnswer(props.question._id, newInput);
-}, { deep: true });
+watch(
+    userinput,
+    (newInput) => {
+        subjectiveAnswerStore.saveUserAnswer(props.question._id, newInput);
+    },
+    { deep: true },
+);
 
 // 处理用户自评
 const handleSelfEvaluation = (isCorrect) => {
@@ -116,7 +153,7 @@ const handleSelfEvaluation = (isCorrect) => {
 // 处理长按事件
 const handleLongPress = (e) => {
     // 长按可以触发单词选择模式
-    console.log('长按触发单词选择模式');
+    console.log("长按触发单词选择模式");
 };
 
 // 处理单词点击（模拟双击）
@@ -129,7 +166,10 @@ const handleWordClick = (word) => {
         // 双击事件触发
         selectedWord.value = word;
         // 清理单词，去除标点符号
-        const cleanWord = word.replace(/[，。！？；：""（）【】《》〈〉「」『』〔〕［］｛｝\s]/g, '');
+        const cleanWord = word.replace(
+            /[，。！？；：""（）【】《》〈〉「」『』〔〕［］｛｝\s]/g,
+            "",
+        );
         if (!cleanWord) return;
 
         // 显示单词信息弹窗
@@ -148,17 +188,17 @@ const showWordInfo = async (word) => {
         const wordInfo = await getWordInfo(word);
 
         uni.showModal({
-            title: '单词信息',
-            content: `单词: ${word}\n音标: [${wordInfo.phonetic || '暂无'}]\n翻译: ${wordInfo.translation || '暂无'}\n例句: ${wordInfo.example || '暂无'}`,
+            title: "单词信息",
+            content: `单词: ${word}\n音标: [${wordInfo.phonetic || "暂无"}]\n翻译: ${wordInfo.translation || "暂无"}\n例句: ${wordInfo.example || "暂无"}`,
             showCancel: false,
-            confirmText: '确定'
+            confirmText: "确定",
         });
     } catch (error) {
         uni.showModal({
-            title: '单词信息',
+            title: "单词信息",
             content: `单词: ${word}\n\n暂无详细信息`,
             showCancel: false,
-            confirmText: '确定'
+            confirmText: "确定",
         });
     }
 };
@@ -168,13 +208,13 @@ const getWordInfo = async (word) => {
     try {
         // 显示加载中
         uni.showLoading({
-            title: '查询中...',
-            mask: true
+            title: "查询中...",
+            mask: true,
         });
 
         // 这里可以配置真实的词典API
         // 例如：有道词典API、百度翻译API等
-        const API_KEY = ''; // 如果需要API密钥
+        const API_KEY = ""; // 如果需要API密钥
 
         // 模拟API调用，实际使用时替换为真实API
         // const response = await uni.request({
@@ -186,7 +226,7 @@ const getWordInfo = async (word) => {
         // });
 
         // 模拟数据 - 实际使用时删除这部分
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         uni.hideLoading();
 
@@ -194,12 +234,11 @@ const getWordInfo = async (word) => {
         return {
             phonetic: getPhonetic(word),
             translation: getTranslation(word),
-            example: getExample(word)
+            example: getExample(word),
         };
-
     } catch (error) {
         uni.hideLoading();
-        console.error('获取单词信息失败:', error);
+        console.error("获取单词信息失败:", error);
         throw error;
     }
 };
@@ -207,35 +246,35 @@ const getWordInfo = async (word) => {
 // 模拟音标生成
 const getPhonetic = (word) => {
     const phonetics = {
-        'hello': 'həˈləʊ',
-        'world': 'wɜːld',
-        'word': 'wɜːd',
-        'test': 'test',
-        'question': 'ˈkwestʃən'
+        hello: "həˈləʊ",
+        world: "wɜːld",
+        word: "wɜːd",
+        test: "test",
+        question: "ˈkwestʃən",
     };
-    return phonetics[word.toLowerCase()] || '暂无音标';
+    return phonetics[word.toLowerCase()] || "暂无音标";
 };
 
 // 模拟翻译生成
 const getTranslation = (word) => {
     const translations = {
-        'hello': '你好',
-        'world': '世界',
-        'word': '单词；话语',
-        'test': '测试；考试',
-        'question': '问题；疑问'
+        hello: "你好",
+        world: "世界",
+        word: "单词；话语",
+        test: "测试；考试",
+        question: "问题；疑问",
     };
-    return translations[word.toLowerCase()] || '暂无翻译';
+    return translations[word.toLowerCase()] || "暂无翻译";
 };
 
 // 模拟例句生成
 const getExample = (word) => {
     const examples = {
-        'hello': 'Hello, how are you?',
-        'world': 'The world is beautiful.',
-        'word': 'This is a new word for me.',
-        'test': 'I have a test tomorrow.',
-        'question': 'Can I ask you a question?'
+        hello: "Hello, how are you?",
+        world: "The world is beautiful.",
+        word: "This is a new word for me.",
+        test: "I have a test tomorrow.",
+        question: "Can I ask you a question?",
     };
     return examples[word.toLowerCase()] || `This is a sentence with ${word}.`;
 };
@@ -247,17 +286,19 @@ const processQuestionStem = () => {
         const words = props.question.stem.split(/(\s+)/);
         const result = [];
 
-        words.forEach(segment => {
-            if (segment.trim() === '') {
+        words.forEach((segment) => {
+            if (segment.trim() === "") {
                 // 如果是纯空格，添加一个空格元素
-                if (segment.includes(' ')) {
-                    result.push(' ');
+                if (segment.includes(" ")) {
+                    result.push(" ");
                 }
             } else {
                 // 进一步分割标点符号和单词
-                const subSegments = segment.split(/([，。！？；：""（）【】《》〈〉「」『』〔〕［］｛｝])/);
-                subSegments.forEach(sub => {
-                    if (sub !== '') {
+                const subSegments = segment.split(
+                    /([，。！？；：""（）【】《》〈〉「」『』〔〕［］｛｝])/,
+                );
+                subSegments.forEach((sub) => {
+                    if (sub !== "") {
                         result.push(sub);
                     }
                 });
@@ -268,7 +309,6 @@ const processQuestionStem = () => {
     }
 };
 
-
 onMounted(() => {
     // 组件挂载时，从 store 获取已保存的答案（如果有）
     const savedAnswer = subjectiveAnswerStore.getUserAnswer(props.question._id);
@@ -277,7 +317,10 @@ onMounted(() => {
     }
 
     //挂载时候 保存参考答案到 store
-    subjectiveAnswerStore.saveReferenceAnswer(props.question._id, props.question.content);
+    subjectiveAnswerStore.saveReferenceAnswer(
+        props.question._id,
+        props.question.content,
+    );
 
     // 处理题干文本
     processQuestionStem();
@@ -286,20 +329,19 @@ onMounted(() => {
     if (props.enableWordQuery) {
         setTimeout(() => {
             uni.showToast({
-                title: '双击单词可查看详细信息',
-                icon: 'none',
-                duration: 3000
+                title: "双击单词可查看详细信息",
+                icon: "none",
+                duration: 3000,
             });
         }, 1000);
     }
-})
+});
 </script>
 
 <style scoped>
 .question-container {
     padding: 14rpx 20rpx;
 }
-
 
 .question-index {
     font-size: 28rpx;
@@ -361,7 +403,7 @@ onMounted(() => {
     color: #3797ff;
     font-weight: 572;
     margin-left: 13rpx;
-    margin-top: 10rpx
+    margin-top: 10rpx;
 }
 
 .input-textarea {

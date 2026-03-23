@@ -2,69 +2,87 @@
     <view class="question-container">
         <view class="question-header">
             <view class="question-top-row">
-                <text class="question-index">{{props.questionIndex}}.</text>
+                <text class="question-index">{{ props.questionIndex }}.</text>
                 <text class="question-lable">判断题</text>
             </view>
             <view class="question-stem">
                 <rich-text :nodes="question.stem"></rich-text>
             </view>
         </view>
-        <view 
-            v-for="(option,index) in judgeOptions" 
+        <view
+            v-for="(option, index) in judgeOptions"
             :key="index"
             class="option-container"
             @click="handleOptionClick(index)"
-            :style="{ pointerEvents: props.currentMode === 1 ? 'none' : 'auto' }">
-            <view class="option-item" 
-                  :class="{
-                      'correct-answer': showAnswerComputed && ((question.answer === 1 && index === 0) || (question.answer === 0 && index === 1)),
-                      'selected-answer': isSelected(index),
-                      'wrong-answer': showAnswerComputed && isSelected(index) && !((question.answer === 1 && index === 0) || (question.answer === 0 && index === 1))
-                  }">
-                <text class="option-tag">{{String.fromCharCode(65 + index)}}.</text>
-                <text class="option-content">{{option}}</text>
+            :style="{
+                pointerEvents: props.currentMode === 1 ? 'none' : 'auto',
+            }"
+        >
+            <view
+                class="option-item"
+                :class="{
+                    'correct-answer':
+                        showAnswerComputed &&
+                        ((question.answer === 1 && index === 0) ||
+                            (question.answer === 0 && index === 1)),
+                    'selected-answer': isSelected(index),
+                    'wrong-answer':
+                        showAnswerComputed &&
+                        isSelected(index) &&
+                        !(
+                            (question.answer === 1 && index === 0) ||
+                            (question.answer === 0 && index === 1)
+                        ),
+                }"
+            >
+                <text class="option-tag"
+                    >{{ String.fromCharCode(65 + index) }}.</text
+                >
+                <text class="option-content">{{ option }}</text>
             </view>
         </view>
         <!-- 答案 -->
         <view class="question-answer-container" v-if="showAnswerComputed">
             <text class="answer-label">答案：</text>
-            <text class="answer-content">{{question.answer === 1 ? 'A' : 'B'}}</text>
+            <text class="answer-content">{{
+                question.answer === 1 ? "A" : "B"
+            }}</text>
         </view>
 
         <!-- 解析 -->
-        <AnalysisCom 
-            :analysis="question.analysis" 
-            :showAnalysis="showAnswerComputed" 
-            :isAIanswer="question.isAIanswer=== 1 ? true:false"/>
+        <AnalysisCom
+            :analysis="question.analysis"
+            :showAnalysis="showAnswerComputed"
+            :isAIanswer="question.isAIanswer === 1 ? true : false"
+        />
     </view>
 </template>
 
 <script setup>
-import { ref, onMounted, computed} from 'vue';
-import { useObjectiveAnswerStore } from '../../../stores/modules/ObjectiveAnswerStore';
-import { useQuestionStore } from '../../../stores/modules/QuestionStore';
-import AnalysisCom from '@/components/modules/exam/Analysiscom.vue';
+import { ref, onMounted, computed } from "vue";
+import { useObjectiveAnswerStore } from "../../../stores/modules/ObjectiveAnswerStore";
+import { useQuestionStore } from "../../../stores/modules/QuestionStore";
+import AnalysisCom from "@/components/modules/exam/Analysiscom.vue";
 
 const props = defineProps({
     question: {
         type: Object,
-        required: true
+        required: true,
     },
     questionIndex: {
         type: Number,
-        required: true
+        required: true,
     },
     currentMode: {
         type: Number,
-        default: 0 // 默认值为0，表示答题模式 1为学习模式
-    }
+        default: 0, // 默认值为0，表示答题模式 1为学习模式
+    },
 });
-const judgeOptions = ['正确', '错误'];// 判断题选项，A代表正确，B代表错误
-const answerStore = useObjectiveAnswerStore();// 答案存储
-const selectedOption = ref(null);// 选中的选项
-const questionStore = useQuestionStore();// 问题存储
-const showAnswerSetting = ref(questionStore.UserShowSettings.showAnswer);// 是否显示答案
-
+const judgeOptions = ["正确", "错误"]; // 判断题选项，A代表正确，B代表错误
+const answerStore = useObjectiveAnswerStore(); // 答案存储
+const selectedOption = ref(null); // 选中的选项
+const questionStore = useQuestionStore(); // 问题存储
+const showAnswerSetting = ref(questionStore.UserShowSettings.showAnswer); // 是否显示答案
 
 // 判断选项是否被选中
 const isSelected = (index) => {
@@ -74,7 +92,7 @@ const isSelected = (index) => {
 // 处理选项点击
 const handleOptionClick = (index) => {
     if (props.currentMode === 1) return; // 学习模式不可点击
-    
+
     // 判断题处理逻辑（类似于单选题）
     selectedOption.value = index;
     // 保存用户答案
@@ -84,11 +102,14 @@ const handleOptionClick = (index) => {
 // 组件挂载时，保存正确答案到store
 onMounted(() => {
     // 保存正确答案（判断题的正确答案为0或1，对应选项B或A）
-    answerStore.saveCorrectAnswer(props.question._id, props.question.answer === 1 ? 0 : 1);
-    
+    answerStore.saveCorrectAnswer(
+        props.question._id,
+        props.question.answer === 1 ? 0 : 1,
+    );
+
     // 如果用户之前已经答过题，恢复选择状态
     const userAnswer = answerStore.getUserAnswer(props.question._id);
-    if (userAnswer !== undefined && typeof userAnswer === 'number') {
+    if (userAnswer !== undefined && typeof userAnswer === "number") {
         selectedOption.value = userAnswer;
     }
 });
@@ -109,12 +130,12 @@ const showAnswerComputed = computed(() => {
     padding: 16.5rpx 20rpx;
 }
 
-.question-index{
+.question-index {
     font-size: 28rpx;
     font-weight: bold;
     color: #333;
 }
-.question-lable{
+.question-lable {
     margin-left: 12rpx;
     margin-right: 12rpx;
     background-color: #0d82ff;
@@ -124,15 +145,15 @@ const showAnswerComputed = computed(() => {
     font-size: 20rpx;
     display: inline-block;
 }
-.question-top-row{
+.question-top-row {
     float: inline-start;
 }
-.question-stem{
-    font-size: 34rpx;/**34rpx为最小题干字体，小于该字体，微信小程序题目题干第二行前面将出现空白 */
+.question-stem {
+    font-size: 34rpx; /**34rpx为最小题干字体，小于该字体，微信小程序题目题干第二行前面将出现空白 */
     color: #000000;
     font-weight: 572;
 }
-.option-container{
+.option-container {
     margin-top: 23rpx;
     padding: 0rpx 12rpx;
 }

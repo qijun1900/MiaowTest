@@ -8,14 +8,16 @@
                 <text class="title-text">练习信息</text>
             </view>
         </view>
-        
+
         <view class="card">
             <view class="info-item">
                 <view class="item-content">
                     <view class="label-wrapper">
                         <text class="label">考试名称</text>
                     </view>
-                    <text class="value">{{ QuestionTypeData.examName || '未知考试' }}</text>
+                    <text class="value">{{
+                        QuestionTypeData.examName || "未知考试"
+                    }}</text>
                 </view>
             </view>
             <view class="info-item">
@@ -24,7 +26,9 @@
                         <text class="label">考试题型</text>
                     </view>
                     <view class="value-tag">
-                        <text class="tag-text">{{ QuestionTypeData.subjectTypeName || '未知类型' }}</text>
+                        <text class="tag-text">{{
+                            QuestionTypeData.subjectTypeName || "未知类型"
+                        }}</text>
                     </view>
                 </view>
             </view>
@@ -34,7 +38,9 @@
                         <text class="label">题目数量</text>
                     </view>
                     <view class="value-highlight">
-                        <text class="highlight-number">{{ QuestionTypeData.amount || 0 }}</text>
+                        <text class="highlight-number">{{
+                            QuestionTypeData.amount || 0
+                        }}</text>
                         <text class="highlight-unit">题</text>
                     </view>
                 </view>
@@ -44,7 +50,9 @@
                     <view class="label-wrapper">
                         <text class="label">更新时间</text>
                     </view>
-                    <text class="value">{{ QuestionTypeData.updateTime || '未知时间' }}</text>
+                    <text class="value">{{
+                        QuestionTypeData.updateTime || "未知时间"
+                    }}</text>
                 </view>
             </view>
         </view>
@@ -59,32 +67,34 @@
         </view>
 
         <view class="settings-card">
-            <PracticeSettings 
+            <PracticeSettings
                 v-model:questionCount="questionCount"
                 :maxQuestions="QuestionTypeData.amount"
                 v-model:isRandom="isRandom"
                 v-model:isOptionRandom="isOptionRandom"
                 v-model:isShowAnswer="isShowAnswer"
-                v-model:isShowHelper="isShowHelper"/>
+                v-model:isShowHelper="isShowHelper"
+            />
         </view>
-        
+
         <view class="action-container">
-            <up-button 
-                type="primary" 
-                text="立即练习" 
-                shape="circle" 
+            <up-button
+                type="primary"
+                text="立即练习"
+                shape="circle"
                 size="large"
                 :loading="isLoading"
-                @click="handleStart">
+                @click="handleStart"
+            >
             </up-button>
         </view>
     </view>
 </template>
-<script setup>  
-import { ref } from 'vue';
-import { useQuestionStore } from '../../stores/modules/QuestionStore';
-import { onLoad } from '@dcloudio/uni-app';
-import PracticeSettings from '../../components/modules/exam/PracticeSettings.vue';
+<script setup>
+import { ref } from "vue";
+import { useQuestionStore } from "../../stores/modules/QuestionStore";
+import { onLoad } from "@dcloudio/uni-app";
+import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue";
 
 const QuestionStore = useQuestionStore();
 const QuestionTypeData = ref({}); // 考试题型基本数据
@@ -92,7 +102,7 @@ const isLoading = ref(false); // 加载状态
 const bankInfo = ref(null); // 题库信息
 
 // 练习设置
-const questionCount = ref(1); 
+const questionCount = ref(1);
 const isRandom = ref(false); // 默认不乱序
 const isOptionRandom = ref(false); // 默认选项不乱序
 const isShowAnswer = ref(true); // 是否立即显示答案
@@ -106,28 +116,27 @@ onLoad((options) => {
             const Data = JSON.parse(decodeURIComponent(options.data));
             QuestionTypeData.value = Data;
 
-            
             // 设置默认题目数量为总题数（最大值）
             questionCount.value = Data.amount || 1;
-            
+
             // 准备题库信息（系统题库）
             bankInfo.value = {
                 bankId: Data.examId,
                 bankName: Data.examName,
-                isUserBank: false // 标识这是系统题库
+                isUserBank: false, // 标识这是系统题库
             };
         } catch (error) {
-            console.error('解析科目数据失败:', error);
+            console.error("解析科目数据失败:", error);
             uni.showToast({
-                title: '题型解析失败',
-                icon: 'none'
+                title: "题型解析失败",
+                icon: "none",
             });
         }
     } else {
-        console.error('未接收到题型数据参数');
+        console.error("未接收到题型数据参数");
         uni.showToast({
-            title: '参数错误',
-            icon: 'none'
+            title: "参数错误",
+            icon: "none",
         });
     }
 });
@@ -135,46 +144,46 @@ onLoad((options) => {
 const handleStart = () => {
     if (!QuestionTypeData.value || !QuestionTypeData.value.amount) {
         uni.showToast({
-            title: '数据加载中，请稍候',
-            icon: 'none'
+            title: "数据加载中，请稍候",
+            icon: "none",
         });
         return;
     }
-    
+
     if (questionCount.value > QuestionTypeData.value.amount) {
         uni.showToast({
-            title: '题目数量不能超过总题数',
-            icon: 'none'
+            title: "题目数量不能超过总题数",
+            icon: "none",
         });
         return;
     }
-    
+
     isLoading.value = true;
-    
+
     // 设置当前选择的题目数量，乱序选项等信息
     QuestionStore.setSelectedQuestions(
-        questionCount.value, 
-        isRandom.value, 
-        isOptionRandom.value
+        questionCount.value,
+        isRandom.value,
+        isOptionRandom.value,
     );
-    
+
     // 设置用户显示设置
     QuestionStore.setUserShowSettings({
         showAnswer: isShowAnswer.value,
         showHelper: isShowHelper.value,
         OptionRandom: isOptionRandom.value,
     });
-    
+
     // 添加延迟，确保状态更新完成
     setTimeout(() => {
         isLoading.value = false;
         // 构建URL，传递题库信息
-        let url = '/pages/exam/PracticeView';
+        let url = "/pages/exam/PracticeView";
         if (bankInfo.value) {
             url += `?bankInfo=${encodeURIComponent(JSON.stringify(bankInfo.value))}`;
         }
         uni.navigateTo({
-            url: url
+            url: url,
         });
     }, 300);
 };
@@ -270,14 +279,14 @@ const handleStart = () => {
 }
 
 .label::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 8rpx;
     height: 30rpx;
-    background: linear-gradient(to bottom, #007AFF, #5AC8FA);
+    background: linear-gradient(to bottom, #007aff, #5ac8fa);
     border-radius: 4rpx;
 }
 
@@ -290,7 +299,7 @@ const handleStart = () => {
 }
 
 .value-tag {
-    background: linear-gradient(135deg, #007AFF, #5AC8FA);
+    background: linear-gradient(135deg, #007aff, #5ac8fa);
     border-radius: 30rpx;
     padding: 8rpx 24rpx;
 }
@@ -307,7 +316,7 @@ const handleStart = () => {
 }
 
 .highlight-number {
-    color: #007AFF;
+    color: #007aff;
     font-size: 40rpx;
     font-weight: 700;
     margin-right: 8rpx;
@@ -329,20 +338,21 @@ const handleStart = () => {
     .container {
         padding: 15rpx;
     }
-    
-    .card, .settings-card {
+
+    .card,
+    .settings-card {
         padding: 24rpx;
         border-radius: 12rpx;
     }
-    
+
     .label {
         font-size: 28rpx;
     }
-    
+
     .value {
         font-size: 28rpx;
     }
-    
+
     .title-text {
         font-size: 32rpx;
     }
@@ -368,8 +378,16 @@ const handleStart = () => {
     animation: fadeIn 0.5s ease-out backwards;
 }
 
-.info-item:nth-child(1) { animation-delay: 0.2s; }
-.info-item:nth-child(2) { animation-delay: 0.3s; }
-.info-item:nth-child(3) { animation-delay: 0.5s; }
-.info-item:nth-child(4) { animation-delay: 0.7s; }
+.info-item:nth-child(1) {
+    animation-delay: 0.2s;
+}
+.info-item:nth-child(2) {
+    animation-delay: 0.3s;
+}
+.info-item:nth-child(3) {
+    animation-delay: 0.5s;
+}
+.info-item:nth-child(4) {
+    animation-delay: 0.7s;
+}
 </style>

@@ -1,7 +1,7 @@
-import { ref } from 'vue';
-import { deleteCloudFiles, httpUpload, http } from '../util/http';
-import escconfig from '../config/esc.config';
-import { UserInfoStore } from '../stores/modules/UserinfoStore';
+import { ref } from "vue";
+import { deleteCloudFiles, httpUpload, http } from "../util/http";
+import escconfig from "../config/esc.config";
+import { UserInfoStore } from "../stores/modules/UserinfoStore";
 
 /**
  * 删除远程图片资源（OSS 或 cloud://），可在组件外直接复用。
@@ -11,7 +11,7 @@ import { UserInfoStore } from '../stores/modules/UserinfoStore';
  */
 export async function deleteRemoteImageFile(imageItem, options = {}) {
   const { showToast = true } = options;
-  const imagePath = typeof imageItem === 'string' ? imageItem : imageItem?.url;
+  const imagePath = typeof imageItem === "string" ? imageItem : imageItem?.url;
   if (!imagePath) return false;
 
   // 小程序端对 cloud:// 文件做客户端快速删除
@@ -19,18 +19,18 @@ export async function deleteRemoteImageFile(imageItem, options = {}) {
   if (
     escconfig.useCloudContainer &&
     escconfig.useCloudStorage &&
-    typeof imagePath === 'string' &&
-    imagePath.startsWith('cloud://')
+    typeof imagePath === "string" &&
+    imagePath.startsWith("cloud://")
   ) {
     deleteCloudFiles([imagePath]).catch((err) => {
-      console.warn('小程序端删除云存储文件失败，后端将兜底删除:', err);
+      console.warn("小程序端删除云存储文件失败，后端将兜底删除:", err);
     });
   }
   // #endif
 
   // 构造请求数据
   const requestData = {};
-  if (typeof imageItem === 'object' && imageItem?._id) {
+  if (typeof imageItem === "object" && imageItem?._id) {
     requestData._id = imageItem._id;
     requestData.path = imageItem.url;
   } else {
@@ -39,23 +39,23 @@ export async function deleteRemoteImageFile(imageItem, options = {}) {
 
   // 统一走后端接口：后端自动处理 OSS 和 cloud:// 两种类型的删除
   const res = await http({
-    url: '/uniappAPI/delete/image',
-    method: 'POST',
-    data: requestData
+    url: "/uniappAPI/delete/image",
+    method: "POST",
+    data: requestData,
   });
 
   if (res.code === 200) {
     if (showToast) {
       uni.showToast({
-        title: '图片已删除',
-        position: 'top',
-        icon: 'none'
+        title: "图片已删除",
+        position: "top",
+        icon: "none",
       });
     }
     return true;
   }
 
-  throw new Error(res.message || '删除失败');
+  throw new Error(res.message || "删除失败");
 }
 
 /**
@@ -64,46 +64,46 @@ export async function deleteRemoteImageFile(imageItem, options = {}) {
  * @returns {Promise<{_id: string, url: string}>}
  */
 export function uploadSingleFile(filePath) {
-  const ext = filePath.split('.').pop() || 'jpg';
+  const ext = filePath.split(".").pop() || "jpg";
   const timestamp = Date.now();
   const random = Math.random().toString(36).slice(2, 8);
   const userInfoStore = UserInfoStore();
-  const uid = userInfoStore.userInfo?.uid || 'anonymous';
+  const uid = userInfoStore.userInfo?.uid || "anonymous";
   const cloudPath = `user/wrong_question/${uid}/${timestamp}_${random}.${ext}`;
 
   if (escconfig.useCloudContainer) {
     return httpUpload({
       filePath,
-      url: '/uniappAPI/upload/cloudImage',
-      cloudPath
-    }).then(data => {
+      url: "/uniappAPI/upload/cloudImage",
+      cloudPath,
+    }).then((data) => {
       if (data.code === 200) {
         return { _id: data.data._id, url: data.data.url };
       }
-      throw new Error(data.message || '上传失败');
+      throw new Error(data.message || "上传失败");
     });
   }
 
   return new Promise((resolve, reject) => {
     uni.uploadFile({
-      url: '/uniappAPI/upload/image',
+      url: "/uniappAPI/upload/image",
       filePath,
-      name: 'file',
-      fileType: 'image',
+      name: "file",
+      fileType: "image",
       success: (uploadRes) => {
         try {
           const data = JSON.parse(uploadRes.data);
           if (data.code === 200) {
             resolve({ _id: data.data._id, url: data.data.url });
           } else {
-            reject(new Error(data.message || '上传失败'));
+            reject(new Error(data.message || "上传失败"));
           }
         } catch (e) {
-          reject(new Error('解析响应失败'));
-          console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
+          reject(new Error("解析响应失败"));
+          console.error("上传响应解析失败:", e, "原始响应:", uploadRes.data);
         }
       },
-      fail: reject
+      fail: reject,
     });
   });
 }
@@ -116,7 +116,7 @@ export function useImageUpload(options = {}) {
 
   // 裁剪器状态
   const cropperVisible = ref(false);
-  const pendingCropImage = ref('');
+  const pendingCropImage = ref("");
 
   /**
    * 选择图片 → 打开裁剪器
@@ -124,8 +124,8 @@ export function useImageUpload(options = {}) {
   const addImage = () => {
     uni.chooseImage({
       count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
+      sizeType: ["compressed"],
+      sourceType: ["album", "camera"],
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0];
         // 先展示裁剪器，让用户选择截取区域或使用原图
@@ -133,13 +133,13 @@ export function useImageUpload(options = {}) {
         cropperVisible.value = true;
       },
       fail: (err) => {
-        console.error('选择图片失败:', err);
+        console.error("选择图片失败:", err);
         uni.showToast({
-          title: '图片选择失败',
-          position: 'top',
-          icon: 'none'
+          title: "图片选择失败",
+          position: "top",
+          icon: "none",
         });
-      }
+      },
     });
   };
 
@@ -148,7 +148,7 @@ export function useImageUpload(options = {}) {
    */
   const completeCrop = (croppedPath) => {
     cropperVisible.value = false;
-    pendingCropImage.value = '';
+    pendingCropImage.value = "";
     checkFileSize(croppedPath);
   };
 
@@ -158,7 +158,7 @@ export function useImageUpload(options = {}) {
   const skipCrop = () => {
     const originalPath = pendingCropImage.value;
     cropperVisible.value = false;
-    pendingCropImage.value = '';
+    pendingCropImage.value = "";
     checkFileSize(originalPath);
   };
 
@@ -167,7 +167,7 @@ export function useImageUpload(options = {}) {
    */
   const cancelCrop = () => {
     cropperVisible.value = false;
-    pendingCropImage.value = '';
+    pendingCropImage.value = "";
   };
 
   /**
@@ -178,28 +178,28 @@ export function useImageUpload(options = {}) {
       filePath: filePath,
       success: (res) => {
         const fileSize = res.size; // 字节
-        
+
         if (fileSize > maxSize) {
           const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(1);
           const currentSizeMB = (fileSize / (1024 * 1024)).toFixed(1);
-          
+
           uni.showToast({
             title: `图片过大(${currentSizeMB}MB)，限制${maxSizeMB}MB`,
-            position: 'top',
-            icon: 'none',
-            duration: 2500
+            position: "top",
+            icon: "none",
+            duration: 2500,
           });
           return;
         }
-        
+
         // 大小符合要求，保存文件
         saveToLocalFile(filePath);
       },
       fail: (err) => {
-        console.error('获取文件信息失败:', err);
+        console.error("获取文件信息失败:", err);
         // 如果获取失败，仍然允许保存（降级处理）
         saveToLocalFile(filePath);
-      }
+      },
     });
   };
 
@@ -211,9 +211,9 @@ export function useImageUpload(options = {}) {
     // APP端直接使用临时路径，wx对象不存在于APP平台
     imageList.value.push(tempFilePath);
     uni.showToast({
-      title: '图片已添加',
-      position: 'top',
-      icon: 'none'
+      title: "图片已添加",
+      position: "top",
+      icon: "none",
     });
     // #endif
 
@@ -231,20 +231,20 @@ export function useImageUpload(options = {}) {
         const savedPath = res.savedFilePath;
         imageList.value.push(savedPath);
         uni.showToast({
-          title: '图片已添加',
-          position: 'top',
-          icon: 'none'
+          title: "图片已添加",
+          position: "top",
+          icon: "none",
         });
       },
       fail: (err) => {
-        console.error('保存图片失败:', err);
+        console.error("保存图片失败:", err);
         imageList.value.push(tempFilePath);
         uni.showToast({
-          title: '图片已添加',
-          position: 'top',
-          icon: 'none'
+          title: "图片已添加",
+          position: "top",
+          icon: "none",
         });
-      }
+      },
     });
     // #endif
   };
@@ -254,11 +254,11 @@ export function useImageUpload(options = {}) {
    */
   const isRemoteUrl = (item) => {
     if (!item) return false;
-    
+
     // 支持字符串或对象格式
-    const url = typeof item === 'string' ? item : item.url;
+    const url = typeof item === "string" ? item : item.url;
     if (!url) return false;
-    
+
     // 检查是否以 OSS 域名开头
     const ossDomain = import.meta.env.VITE_OSS_DOMAIN;
     return ossDomain && url.startsWith(ossDomain);
@@ -269,8 +269,8 @@ export function useImageUpload(options = {}) {
    */
   const isCloudFileId = (item) => {
     if (!item) return false;
-    const url = typeof item === 'string' ? item : item.url;
-    return typeof url === 'string' && url.startsWith('cloud://');
+    const url = typeof item === "string" ? item : item.url;
+    return typeof url === "string" && url.startsWith("cloud://");
   };
 
   /**
@@ -283,7 +283,7 @@ export function useImageUpload(options = {}) {
   /**
    * 批量上传所有图片到服务器
    */
-  const uploadAllImages = async (uploadUrl = '/uniappAPI/upload/image') => {
+  const uploadAllImages = async (uploadUrl = "/uniappAPI/upload/image") => {
     if (imageList.value.length === 0) {
       return [];
     }
@@ -298,13 +298,17 @@ export function useImageUpload(options = {}) {
       }
 
       // 本地文件路径：尝试上传
-      const localPath = typeof item === 'string' ? item : item.url;
-      
+      const localPath = typeof item === "string" ? item : item.url;
+
       try {
         const uploadResult = await uploadSingleImage(localPath, uploadUrl);
         results.push(uploadResult); // { _id, url }
       } catch (error) {
-        console.warn('图片上传失败或文件不存在，跳过:', localPath, error.message);
+        console.warn(
+          "图片上传失败或文件不存在，跳过:",
+          localPath,
+          error.message,
+        );
       }
     }
 
@@ -315,14 +319,14 @@ export function useImageUpload(options = {}) {
    * 生成云存储路径（包含用户 UID）
    */
   const generateCloudPath = (filePath) => {
-    const ext = filePath.split('.').pop() || 'jpg';
+    const ext = filePath.split(".").pop() || "jpg";
     const timestamp = Date.now();
     const random = Math.random().toString(36).slice(2, 8);
-    
+
     // 获取当前用户 UID
     const userInfoStore = UserInfoStore();
-    const uid = userInfoStore.userInfo?.uid || 'anonymous';
-    
+    const uid = userInfoStore.userInfo?.uid || "anonymous";
+
     return `user/wrong_question/${uid}/${timestamp}_${random}.${ext}`;
   };
 
@@ -336,32 +340,32 @@ export function useImageUpload(options = {}) {
         filePath: filePath,
         success: (fileInfo) => {
           const fileSize = fileInfo.size;
-          
+
           // 检查文件大小
           if (fileSize > maxSize) {
             const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(1);
             const currentSizeMB = (fileSize / (1024 * 1024)).toFixed(1);
             const errorMsg = `图片过大(${currentSizeMB}MB)，限制${maxSizeMB}MB`;
-            
+
             reject(new Error(errorMsg));
-            
+
             uni.showToast({
               title: errorMsg,
-              position: 'top',
-              icon: 'none',
-              duration: 2500
+              position: "top",
+              icon: "none",
+              duration: 2500,
             });
             return;
           }
-          
+
           // 大小符合要求，开始上传
           doUpload(filePath, uploadUrl).then(resolve).catch(reject);
         },
         fail: (err) => {
-          console.warn('获取文件信息失败，跳过大小检查，直接上传:', err);
+          console.warn("获取文件信息失败，跳过大小检查，直接上传:", err);
           // 如果获取文件信息失败，仍然尝试上传（降级处理）
           doUpload(filePath, uploadUrl).then(resolve).catch(reject);
-        }
+        },
       });
     });
   };
@@ -375,13 +379,13 @@ export function useImageUpload(options = {}) {
       const cloudPath = generateCloudPath(filePath);
       return httpUpload({
         filePath: filePath,
-        url: '/uniappAPI/upload/cloudImage',
-        cloudPath: cloudPath
-      }).then(data => {
+        url: "/uniappAPI/upload/cloudImage",
+        cloudPath: cloudPath,
+      }).then((data) => {
         if (data.code === 200) {
           return { _id: data.data._id, url: data.data.url };
         } else {
-          throw new Error(data.message || '上传失败');
+          throw new Error(data.message || "上传失败");
         }
       });
     }
@@ -391,24 +395,24 @@ export function useImageUpload(options = {}) {
       uni.uploadFile({
         url: uploadUrl,
         filePath: filePath,
-        name: 'file',
-        fileType: 'image',
+        name: "file",
+        fileType: "image",
         success: (uploadRes) => {
           try {
             const data = JSON.parse(uploadRes.data);
             if (data.code === 200) {
               resolve({ _id: data.data._id, url: data.data.url });
             } else {
-              reject(new Error(data.message || '上传失败'));
+              reject(new Error(data.message || "上传失败"));
             }
           } catch (e) {
-            reject(new Error('解析响应失败'));
-            console.error('上传响应解析失败:', e, '原始响应:', uploadRes.data);
+            reject(new Error("解析响应失败"));
+            console.error("上传响应解析失败:", e, "原始响应:", uploadRes.data);
           }
         },
         fail: (err) => {
           reject(err);
-        }
+        },
       });
     });
   };
@@ -435,22 +439,22 @@ export function useImageUpload(options = {}) {
         try {
           await deleteRemoteImage(item);
         } catch (error) {
-          console.warn('远程图片删除失败:', error);
+          console.warn("远程图片删除失败:", error);
         }
       } else {
         // 本地文件路径
-        const filePath = typeof item === 'string' ? item : item.url;
+        const filePath = typeof item === "string" ? item : item.url;
         // #ifdef MP-WEIXIN
         if (filePath && wx.env && filePath.includes(wx.env.USER_DATA_PATH)) {
           const fs = uni.getFileSystemManager();
           fs.unlink({
             filePath: filePath,
             success: () => {
-              console.log('本地文件已删除:', filePath);
+              console.log("本地文件已删除:", filePath);
             },
             fail: (err) => {
-              console.warn('删除本地文件失败:', err);
-            }
+              console.warn("删除本地文件失败:", err);
+            },
           });
         }
         // #endif
@@ -466,21 +470,21 @@ export function useImageUpload(options = {}) {
   const clearImages = () => {
     // 清理本地文件
     // #ifdef MP-WEIXIN
-    imageList.value.forEach(item => {
-      const filePath = typeof item === 'string' ? item : item.url;
+    imageList.value.forEach((item) => {
+      const filePath = typeof item === "string" ? item : item.url;
       if (filePath && wx.env && filePath.includes(wx.env.USER_DATA_PATH)) {
         const fs = uni.getFileSystemManager();
         fs.unlink({
           filePath: filePath,
           success: () => {
-            console.log('本地文件已删除:', filePath);
+            console.log("本地文件已删除:", filePath);
           },
-          fail: () => {}
+          fail: () => {},
         });
       }
     });
     // #endif
-    
+
     imageList.value = [];
   };
 
@@ -490,18 +494,20 @@ export function useImageUpload(options = {}) {
    */
   const setImages = (images) => {
     if (!images || !Array.isArray(images)) return;
-    
-    imageList.value = images.map(img => {
-      // 支持三种格式：string、{ url } 或 { _id, url }
-      if (typeof img === 'string') {
-        return img;
-      } else if (img._id && img.url) {
-        return { _id: img._id, url: img.url };
-      } else if (img.url) {
-        return img.url;
-      }
-      return null;
-    }).filter(item => item);
+
+    imageList.value = images
+      .map((img) => {
+        // 支持三种格式：string、{ url } 或 { _id, url }
+        if (typeof img === "string") {
+          return img;
+        } else if (img._id && img.url) {
+          return { _id: img._id, url: img.url };
+        } else if (img.url) {
+          return img.url;
+        }
+        return null;
+      })
+      .filter((item) => item);
   };
 
   /**
@@ -516,7 +522,7 @@ export function useImageUpload(options = {}) {
         try {
           await deleteRemoteImage(oldItem);
         } catch (error) {
-          console.warn('替换时删除旧远程图片失败:', error);
+          console.warn("替换时删除旧远程图片失败:", error);
         }
       }
 
@@ -537,6 +543,6 @@ export function useImageUpload(options = {}) {
     pendingCropImage,
     completeCrop,
     skipCrop,
-    cancelCrop
+    cancelCrop,
   };
 }

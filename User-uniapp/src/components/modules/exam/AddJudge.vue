@@ -1,36 +1,62 @@
 <template>
     <view>
         <!-- 题目题干/描述标题 -->
-        <QuestionStemHeader 
+        <QuestionStemHeader
             :is-wrong-book-mode="isAddWrongBookQuestion"
             stem-text="题目描述"
             @add-image="stemImages.addImage"
         />
         <!-- 题干编辑器 -->
         <view class="editor-section">
-            <uniEditor 
-                placeholder="请在此处输入题干内容" 
-                v-model="formData.stem" 
-                height="200rpx" 
-                id="stemEditorId3"/>
+            <uniEditor
+                placeholder="请在此处输入题干内容"
+                v-model="formData.stem"
+                height="200rpx"
+                id="stemEditorId3"
+            />
             <!-- 题干图片列表 -->
             <ImageList
                 :images="stemImages.imageList.value"
                 @remove="stemImages.removeImage"
-                @crop="(data) => stemImages.replaceImage(data.index, data.tempFilePath)"
+                @crop="
+                    (data) =>
+                        stemImages.replaceImage(data.index, data.tempFilePath)
+                "
             />
         </view>
         <ThemeDivider text="题目答案" />
         <view class="options-container">
             <!-- 答案列表 -->
             <view class="judge-options">
-                <view class="judge-option" v-for="(option, index) in formData.options" :key="index"
-                    :class="{ 'selected': formData.answer === option.value }" @click="setAnswer(option.value)">
+                <view
+                    class="judge-option"
+                    v-for="(option, index) in formData.options"
+                    :key="index"
+                    :class="{ selected: formData.answer === option.value }"
+                    @click="setAnswer(option.value)"
+                >
                     <!-- 选项图标 -->
-                    <view class="option-icon" :class="option.value === 1 ? 'correct-icon' : 'wrong-icon'">
-                        <uni-icons 
-                            :type="option.value === 1 ? 'checkmarkempty' : 'closeempty'" size="18"
-                            :color="formData.answer === option.value ? '#ffffff' : (option.value === 1 ? '#52c41a' : '#ff4d4f')">
+                    <view
+                        class="option-icon"
+                        :class="
+                            option.value === 1 ? 'correct-icon' : 'wrong-icon'
+                        "
+                    >
+                        <uni-icons
+                            :type="
+                                option.value === 1
+                                    ? 'checkmarkempty'
+                                    : 'closeempty'
+                            "
+                            size="18"
+                            :color="
+                                formData.answer === option.value
+                                    ? '#ffffff'
+                                    : option.value === 1
+                                      ? '#52c41a'
+                                      : '#ff4d4f'
+                            "
+                        >
                         </uni-icons>
                     </view>
 
@@ -39,156 +65,174 @@
 
                     <!-- 答案选择圆圈 -->
                     <view class="radio-btn">
-                        <view class="radio-circle" :class="{ 'selected': formData.answer === option.value }"></view>
+                        <view
+                            class="radio-circle"
+                            :class="{
+                                selected: formData.answer === option.value,
+                            }"
+                        ></view>
                     </view>
                 </view>
             </view>
         </view>
-    
-    <!-- 我的错解部分 (仅在错题本添加模式显示) -->
-    <view v-if="props.isAddWrongBookQuestion" class="my-wrong-answer-section">
-      <view class="wrong-answer-title">我的错解 (选填)</view>
-      
-      <!-- 判断题类型的错解 -->
-      <view class="wrong-answer-judge">
-        <view 
-          class="judge-btn"
-          :class="{ 'selected': formData.myWrongAnswer === '正确' }"
-          @click="selectWrongAnswer('正确')"
-        >
-          正确
-        </view>
-        <view 
-          class="judge-btn"
-          :class="{ 'selected': formData.myWrongAnswer === '错误' }"
-          @click="selectWrongAnswer('错误')"
-        >
-          错误
-        </view>
-      </view>
-    </view>
 
-    <!-- 题目解析/备注标题 -->
-        <QuestionAnalysisHeader 
+        <!-- 我的错解部分 (仅在错题本添加模式显示) -->
+        <view
+            v-if="props.isAddWrongBookQuestion"
+            class="my-wrong-answer-section"
+        >
+            <view class="wrong-answer-title">我的错解 (选填)</view>
+
+            <!-- 判断题类型的错解 -->
+            <view class="wrong-answer-judge">
+                <view
+                    class="judge-btn"
+                    :class="{ selected: formData.myWrongAnswer === '正确' }"
+                    @click="selectWrongAnswer('正确')"
+                >
+                    正确
+                </view>
+                <view
+                    class="judge-btn"
+                    :class="{ selected: formData.myWrongAnswer === '错误' }"
+                    @click="selectWrongAnswer('错误')"
+                >
+                    错误
+                </view>
+            </view>
+        </view>
+
+        <!-- 题目解析/备注标题 -->
+        <QuestionAnalysisHeader
             :is-wrong-book-mode="isAddWrongBookQuestion"
             analysis-text="解析 / 备注 / 笔记"
             @add-image="analysisImages.addImage"
         />
         <!-- 解析编辑器 -->
         <view class="editor-section">
-            <uniEditor 
-                :placeholder="isAddWrongBookQuestion ? '记录解题思路或知识点...' : '请在此处输入解析内容'" 
-                v-model="formData.analysis" 
-                height="200rpx" 
-                id="analysisEditor3"/>
+            <uniEditor
+                :placeholder="
+                    isAddWrongBookQuestion
+                        ? '记录解题思路或知识点...'
+                        : '请在此处输入解析内容'
+                "
+                v-model="formData.analysis"
+                height="200rpx"
+                id="analysisEditor3"
+            />
             <!-- 解析图片列表 -->
             <ImageList
                 :images="analysisImages.imageList.value"
                 @remove="analysisImages.removeImage"
-                @crop="(data) => analysisImages.replaceImage(data.index, data.tempFilePath)"
+                @crop="
+                    (data) =>
+                        analysisImages.replaceImage(
+                            data.index,
+                            data.tempFilePath,
+                        )
+                "
             />
         </view>
-        
+
         <!-- 标签组件 -->
-        <QuestionTags 
-          :show="props.isAddWrongBookQuestion"
-          v-model="formData.tags"
-          :extra-tags="props.extraTags"
+        <QuestionTags
+            :show="props.isAddWrongBookQuestion"
+            v-model="formData.tags"
+            :extra-tags="props.extraTags"
         />
-        
+
         <view class="submit-btn">
             <button type="primary" :loading="butLoading" @click="handleSend">
-                {{ props.isEdit ? '更新题目' : '添加题目' }}
+                {{ props.isEdit ? "更新题目" : "添加题目" }}
             </button>
         </view>
 
         <!-- 图片裁剪器 -->
         <ImageCropper
-          :show="stemImages.cropperVisible.value"
-          :image-path="stemImages.pendingCropImage.value"
-          @confirm="stemImages.completeCrop"
-          @cancel="stemImages.cancelCrop"
-          @use-original="stemImages.skipCrop"
+            :show="stemImages.cropperVisible.value"
+            :image-path="stemImages.pendingCropImage.value"
+            @confirm="stemImages.completeCrop"
+            @cancel="stemImages.cancelCrop"
+            @use-original="stemImages.skipCrop"
         />
         <ImageCropper
-          :show="analysisImages.cropperVisible.value"
-          :image-path="analysisImages.pendingCropImage.value"
-          @confirm="analysisImages.completeCrop"
-          @cancel="analysisImages.cancelCrop"
-          @use-original="analysisImages.skipCrop"
+            :show="analysisImages.cropperVisible.value"
+            :image-path="analysisImages.pendingCropImage.value"
+            @confirm="analysisImages.completeCrop"
+            @cancel="analysisImages.cancelCrop"
+            @use-original="analysisImages.skipCrop"
         />
     </view>
-
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, computed} from 'vue';
-import uniEditor from '../../core/uniEditor.vue';
-import ThemeDivider from '../../core/ThemeDivider.vue';
-import QuestionStemHeader from './QuestionStemHeader.vue';
-import QuestionAnalysisHeader from './QuestionAnalysisHeader.vue';
-import QuestionTags from './QuestionTags.vue';
-import ImageList from '../../common/ImageList.vue';
-import ImageCropper from '../../common/ImageCropper.vue';
-import { saveQuestion } from '../../../API/Exam/QuestionAPI';
-import { useImageUpload } from '../../../composables/useImageUpload.js';
+import { reactive, ref, onMounted, computed } from "vue";
+import uniEditor from "../../core/uniEditor.vue";
+import ThemeDivider from "../../core/ThemeDivider.vue";
+import QuestionStemHeader from "./QuestionStemHeader.vue";
+import QuestionAnalysisHeader from "./QuestionAnalysisHeader.vue";
+import QuestionTags from "./QuestionTags.vue";
+import ImageList from "../../common/ImageList.vue";
+import ImageCropper from "../../common/ImageCropper.vue";
+import { saveQuestion } from "../../../API/Exam/QuestionAPI";
+import { useImageUpload } from "../../../composables/useImageUpload.js";
 
-const butLoading = ref(false)
+const butLoading = ref(false);
 
 // 使用图片上传 composable（限制 5MB）
 const stemImages = useImageUpload({ maxSize: 5 * 1024 * 1024 }); // 题干图片
 const analysisImages = useImageUpload({ maxSize: 5 * 1024 * 1024 }); // 解析图片
 const props = defineProps({
-  currentBankId: { 
-    default: null
-  },
-  isEdit: { 
-    default: false
-  },
-  editData: { 
-    default: null
-  },
-  isAddWrongBookQuestion: { 
-    default: false
-  },
-  extraTags: {
-    type: Array,
-    default: () => []
-  }
-})
+    currentBankId: {
+        default: null,
+    },
+    isEdit: {
+        default: false,
+    },
+    editData: {
+        default: null,
+    },
+    isAddWrongBookQuestion: {
+        default: false,
+    },
+    extraTags: {
+        type: Array,
+        default: () => [],
+    },
+});
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits(["submit"]);
 
-const isAddWrongBookQuestion = computed(() => props.isAddWrongBookQuestion)
+const isAddWrongBookQuestion = computed(() => props.isAddWrongBookQuestion);
 
 // 使用 reactive 集合所有数据
 const formData = reactive({
     Type: 3, // 题目类型，默认为3（判断题）
-    stem: '', // 题干
-    analysis: '', // 解析
-    answer: null,//0:错误，1：正确
-    myWrongAnswer: '', // 我的错解
+    stem: "", // 题干
+    analysis: "", // 解析
+    answer: null, //0:错误，1：正确
+    myWrongAnswer: "", // 我的错解
     tags: [], // 标签
     // 选项数据
     options: [
-        { text: '正确', value: 1},
-        { text: '错误', value: 0 }
-    ]
-})
+        { text: "正确", value: 1 },
+        { text: "错误", value: 0 },
+    ],
+});
 
 // 设置答案
 const setAnswer = (value) => {
-    formData.answer = value
-}
+    formData.answer = value;
+};
 
 // 选择错误答案
 const selectWrongAnswer = (answer) => {
-  if (formData.myWrongAnswer === answer) {
-    formData.myWrongAnswer = '' // 取消选择
-  } else {
-    formData.myWrongAnswer = answer
-  }
-}
+    if (formData.myWrongAnswer === answer) {
+        formData.myWrongAnswer = ""; // 取消选择
+    } else {
+        formData.myWrongAnswer = answer;
+    }
+};
 
 // 提交表单
 const handleSend = async () => {
@@ -196,8 +240,8 @@ const handleSend = async () => {
         // 验证题目是否为空（题干文本或图片至少有一个）
         if (!formData.stem.trim() && stemImages.imageList.value.length === 0) {
             uni.showToast({
-                title: '请输入题目内容或上传题干图片',
-                icon: 'none'
+                title: "请输入题目内容或上传题干图片",
+                icon: "none",
             });
             return;
         }
@@ -205,8 +249,8 @@ const handleSend = async () => {
         // 验证是否选择了答案
         if (formData.answer === null) {
             uni.showToast({
-                title: '请选择正确答案',
-                icon: 'none'
+                title: "请选择正确答案",
+                icon: "none",
             });
             return;
         }
@@ -219,48 +263,48 @@ const handleSend = async () => {
             // 上传所有图片到服务器
             const [stemImageUrls, analysisImageUrls] = await Promise.all([
                 stemImages.uploadAllImages(),
-                analysisImages.uploadAllImages()
+                analysisImages.uploadAllImages(),
             ]);
 
             // 构建符合 WrongQuestionModel 的数据结构
             const wrongQuestionData = {
                 Type: formData.Type,
-                questionSource: 'user',
-                
+                questionSource: "user",
+
                 // 题干（支持富文本和图片）
                 stem: {
                     text: formData.stem,
-                    images: stemImageUrls || []
+                    images: stemImageUrls || [],
                 },
-                
+
                 // 选项（判断题的选项）
                 options: formData.options,
-                
+
                 // 正确答案
                 correctAnswer: {
-                    text: formData.answer === 1 ? '正确' : '错误',
-                    images: []
+                    text: formData.answer === 1 ? "正确" : "错误",
+                    images: [],
                 },
-                
+
                 // 用户的错误答案
                 wrongAnswer: {
                     text: formData.myWrongAnswer,
-                    images: []
+                    images: [],
                 },
-                
+
                 // 解析/备注
                 analysis: {
                     text: formData.analysis,
-                    images: analysisImageUrls || []
+                    images: analysisImageUrls || [],
                 },
-                
+
                 // 标签
                 tags: formData.tags,
-                
+
                 // 其他字段由父组件补充（wrongBookId, difficulty 等）
             };
 
-            emit('submit', wrongQuestionData);
+            emit("submit", wrongQuestionData);
             butLoading.value = false;
             return;
         }
@@ -270,93 +314,99 @@ const handleSend = async () => {
             Type: formData.Type,
             stem: formData.stem,
             answer: formData.answer,
-            analysis: formData.analysis
+            analysis: formData.analysis,
         };
-        
+
         // 如果是编辑模式，添加题目ID
         if (props.isEdit && props.editData && props.editData._id) {
             submitData._id = props.editData._id;
         }
-        
+
         // 如果有题库ID，添加到提交数据中
         if (props.currentBankId) {
             submitData.questionbankId = props.currentBankId;
         }
 
         // 调用API提交数据
-        const res = await saveQuestion(submitData)
+        const res = await saveQuestion(submitData);
         if (res.code === 200) {
             // 只有在非编辑模式下才重置表单
             if (!props.isEdit) {
-                resetForm()
+                resetForm();
             }
             butLoading.value = false;
-            // 提示提交成功 
+            // 提示提交成功
             uni.showToast({
                 title: res.message,
-                icon: 'none'
-            })
+                icon: "none",
+            });
         }
     } catch (e) {
-        console.log(e)
+        console.log(e);
         uni.showToast({
-            title: '提交失败',
-            icon: 'none'
-        })
+            title: "提交失败",
+            icon: "none",
+        });
     } finally {
         butLoading.value = false;
     }
-}
+};
 
 // 重置表单
 const resetForm = () => {
-    formData.stem = '';
-    formData.analysis = '';
+    formData.stem = "";
+    formData.analysis = "";
     formData.answer = null;
-    formData.myWrongAnswer = '';
+    formData.myWrongAnswer = "";
     formData.tags = [];
     stemImages.clearImages();
     analysisImages.clearImages();
-}
+};
 
 // 编辑模式下的数据初始化
 onMounted(() => {
     if (props.isEdit && props.editData) {
         // stem 可能是对象 { text, images } 或字符串
         const stemData = props.editData.stem;
-        formData.stem = typeof stemData === 'object' ? (stemData?.text ?? '') : (stemData || '');
+        formData.stem =
+            typeof stemData === "object"
+                ? (stemData?.text ?? "")
+                : stemData || "";
         if (stemData?.images && stemData.images.length > 0) {
             stemImages.setImages(stemData.images);
         }
-        
+
         // analysis 可能是对象 { text, images } 或字符串
         const analysisData = props.editData.analysis;
-        formData.analysis = typeof analysisData === 'object' ? (analysisData?.text ?? '') : (analysisData || '');
+        formData.analysis =
+            typeof analysisData === "object"
+                ? (analysisData?.text ?? "")
+                : analysisData || "";
         if (analysisData?.images && analysisData.images.length > 0) {
             analysisImages.setImages(analysisData.images);
         }
-        
+
         // 正确答案
         const correctAnswerData = props.editData.correctAnswer;
-        formData.answer = correctAnswerData?.text || 'A';
-        
+        formData.answer = correctAnswerData?.text || "A";
+
         // 初始化我的错解
         const wrongAnswerData = props.editData.wrongAnswer;
         if (wrongAnswerData?.text) {
             formData.myWrongAnswer = wrongAnswerData.text;
         }
-        
+
         // 初始化标签
         if (props.editData.tags && Array.isArray(props.editData.tags)) {
             formData.tags = props.editData.tags;
         }
     }
-})
+});
 
 // 暴露方法给父组件调用
 defineExpose({
-  resetForm
-})
+    resetForm,
+});
 </script>
 
 <style scoped>
@@ -458,7 +508,7 @@ defineExpose({
 }
 
 .radio-circle.selected::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -470,38 +520,38 @@ defineExpose({
 }
 
 .my-wrong-answer-section {
-  margin: 30rpx 0;
+    margin: 30rpx 0;
 }
 
 .wrong-answer-title {
-  font-size: 28rpx;
-  color: #ff4d4f;
-  margin-bottom: 20rpx;
-  font-weight: 500;
+    font-size: 28rpx;
+    color: #ff4d4f;
+    margin-bottom: 20rpx;
+    font-weight: 500;
 }
 
 .wrong-answer-judge {
-  display: flex;
-  gap: 20rpx;
+    display: flex;
+    gap: 20rpx;
 }
 
 .judge-btn {
-  flex: 1;
-  height: 80rpx;
-  border: 2rpx solid #d9d9d9;
-  border-radius: 12rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30rpx;
-  color: #999;
-  background-color: #ffffff;
-  transition: all 0.3s;
+    flex: 1;
+    height: 80rpx;
+    border: 2rpx solid #d9d9d9;
+    border-radius: 12rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30rpx;
+    color: #999;
+    background-color: #ffffff;
+    transition: all 0.3s;
 }
 
 .judge-btn.selected {
-  border-color: #ff4d4f;
-  background-color: #fff1f0;
-  color: #ff4d4f;
+    border-color: #ff4d4f;
+    background-color: #fff1f0;
+    color: #ff4d4f;
 }
 </style>

@@ -1,11 +1,8 @@
 <template>
     <!-- 自定义 添加返回按钮 -->
-    <view 
-        class="back-btn" 
-        :style="{ top: backBtnTop }" 
-        @click="goBack">
-      <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
-      <text class="back-text">返回</text>
+    <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
+        <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
+        <text class="back-text">返回</text>
     </view>
     <view class="container">
         <!-- 页面标题 -->
@@ -18,7 +15,11 @@
         <view class="name-input-section">
             <view class="input-card">
                 <view class="input-header">
-                    <uni-icons type="compose" size="20" color="#2979FF"></uni-icons>
+                    <uni-icons
+                        type="compose"
+                        size="20"
+                        color="#2979FF"
+                    ></uni-icons>
                     <text class="input-title">题库名称</text>
                 </view>
                 <view class="input-container">
@@ -31,16 +32,29 @@
                         @input="validateName"
                     >
                         <template #suffix>
-                            <text class="input-counter">{{ questionBankName.length }}/20</text>
+                            <text class="input-counter"
+                                >{{ questionBankName.length }}/20</text
+                            >
                         </template>
                     </u-input>
                 </view>
                 <view class="input-tips" v-if="nameError">
-                    <uni-icons type="info" size="14" color="#ff4d4f"></uni-icons>
+                    <uni-icons
+                        type="info"
+                        size="14"
+                        color="#ff4d4f"
+                    ></uni-icons>
                     <text class="error-text">{{ nameError }}</text>
                 </view>
-                <view class="input-tips" v-else-if="questionBankName.length > 0">
-                    <uni-icons type="checkmark" size="14" color="#4cd964"></uni-icons>
+                <view
+                    class="input-tips"
+                    v-else-if="questionBankName.length > 0"
+                >
+                    <uni-icons
+                        type="checkmark"
+                        size="14"
+                        color="#4cd964"
+                    ></uni-icons>
                     <text class="success-text">名称格式正确</text>
                 </view>
             </view>
@@ -51,46 +65,82 @@
             <view class="disabled-overlay" v-if="!isNameValid">
                 <text class="disabled-text">请先输入有效的题库名称</text>
             </view>
-            
+
             <!-- 手动导入 -->
-            <view class="option-card" @click="handleManualImport" :class="{ disabled: !isNameValid }">
+            <view
+                class="option-card"
+                @click="handleManualImport"
+                :class="{ disabled: !isNameValid }"
+            >
                 <view class="card-icon">
-                    <uni-icons type="list" size="24" color="#ffffff"></uni-icons>
+                    <uni-icons
+                        type="list"
+                        size="24"
+                        color="#ffffff"
+                    ></uni-icons>
                 </view>
                 <view class="card-content">
                     <text class="option-title">手动导入</text>
                     <text class="option-desc">逐题录入，适合少量题目</text>
                 </view>
                 <view class="card-arrow">
-                    <uni-icons type="forward" size="20" color="#007AFF"></uni-icons>
+                    <uni-icons
+                        type="forward"
+                        size="20"
+                        color="#007AFF"
+                    ></uni-icons>
                 </view>
             </view>
 
             <!-- 拍照导入 -->
-            <view class="option-card" @click="handlePhotoImport" :class="{ disabled: !isNameValid }">
+            <view
+                class="option-card"
+                @click="handlePhotoImport"
+                :class="{ disabled: !isNameValid }"
+            >
                 <view class="card-icon">
-                    <uni-icons type="camera" size="24" color="#ffffff"></uni-icons>
+                    <uni-icons
+                        type="camera"
+                        size="24"
+                        color="#ffffff"
+                    ></uni-icons>
                 </view>
                 <view class="card-content">
                     <text class="option-title">拍照导入</text>
                     <text class="option-desc">拍摄试卷照片，自动识别题目</text>
                 </view>
                 <view class="card-arrow">
-                    <uni-icons type="forward" size="20" color="#007AFF"></uni-icons>
+                    <uni-icons
+                        type="forward"
+                        size="20"
+                        color="#007AFF"
+                    ></uni-icons>
                 </view>
             </view>
 
             <!-- AI导入 -->
-            <view class="option-card" @click="handleAIImport" :class="{ disabled: !isNameValid }">
+            <view
+                class="option-card"
+                @click="handleAIImport"
+                :class="{ disabled: !isNameValid }"
+            >
                 <view class="card-icon">
-                    <uni-icons type="star" size="24" color="#ffffff"></uni-icons>
+                    <uni-icons
+                        type="star"
+                        size="24"
+                        color="#ffffff"
+                    ></uni-icons>
                 </view>
                 <view class="card-content">
                     <text class="option-title">AI导入</text>
                     <text class="option-desc">智能生成题目，快速创建题库</text>
                 </view>
                 <view class="card-arrow">
-                    <uni-icons type="forward" size="20" color="#007AFF"></uni-icons>
+                    <uni-icons
+                        type="forward"
+                        size="20"
+                        color="#007AFF"
+                    ></uni-icons>
                 </view>
             </view>
         </view>
@@ -100,23 +150,45 @@
             <view class="feature-title">导入功能说明</view>
             <view class="feature-list">
                 <view class="feature-item">
-                    <uni-icons type="checkmark" size="16" color="#4cd964"></uni-icons>
-                    <text class="feature-text">支持多种题型：单选、多选、填空、判断、简答</text>
+                    <uni-icons
+                        type="checkmark"
+                        size="16"
+                        color="#4cd964"
+                    ></uni-icons>
+                    <text class="feature-text"
+                        >支持多种题型：单选、多选、填空、判断、简答</text
+                    >
                 </view>
                 <view class="feature-item">
-                    <uni-icons type="checkmark" size="16" color="#4cd964"></uni-icons>
+                    <uni-icons
+                        type="checkmark"
+                        size="16"
+                        color="#4cd964"
+                    ></uni-icons>
                     <text class="feature-text">智能识别题目内容，自动分类</text>
                 </view>
                 <view class="feature-item">
-                    <uni-icons type="checkmark" size="16" color="#4cd964"></uni-icons>
+                    <uni-icons
+                        type="checkmark"
+                        size="16"
+                        color="#4cd964"
+                    ></uni-icons>
                     <text class="feature-text">云端同步，多设备访问</text>
                 </view>
                 <view class="feature-item">
-                    <uni-icons type="checkmark" size="16" color="#4cd964"></uni-icons>
+                    <uni-icons
+                        type="checkmark"
+                        size="16"
+                        color="#4cd964"
+                    ></uni-icons>
                     <text class="feature-text">支持批量导入，提高效率</text>
                 </view>
                 <view class="feature-item">
-                    <uni-icons type="checkmark" size="16" color="#4cd964"></uni-icons>
+                    <uni-icons
+                        type="checkmark"
+                        size="16"
+                        color="#4cd964"
+                    ></uni-icons>
                     <text class="feature-text">支持AI快速生成解析</text>
                 </view>
             </view>
@@ -130,106 +202,110 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { AddUserBank } from '../../API/Exam/ExamAPI';
-import navBarHeightUtil from '../../util/navBarHeight';
-import checkLogin from '../../util/checkLogin';
-import showModal from '../../util/showModal';
+import { ref, computed, onMounted } from "vue";
+import { AddUserBank } from "../../API/Exam/ExamAPI";
+import navBarHeightUtil from "../../util/navBarHeight";
+import checkLogin from "../../util/checkLogin";
+import showModal from "../../util/showModal";
 
-const navBarInfo = ref(0);// 导航栏高度信息
+const navBarInfo = ref(0); // 导航栏高度信息
 // 题库名称和验证状态
-const questionBankName = ref('')
-const nameError = ref('')
+const questionBankName = ref("");
+const nameError = ref("");
 // 计算返回按钮的top位置
 const backBtnTop = computed(() => {
-  // 根据导航栏高度信息计算返回按钮位置
-  return navBarInfo.value ? navBarInfo.value + 'rpx' : '75rpx';
+    // 根据导航栏高度信息计算返回按钮位置
+    return navBarInfo.value ? navBarInfo.value + "rpx" : "75rpx";
 });
 const goBack = () => {
-  uni.navigateBack({ delta: 1 }); // 返回上一页
+    uni.navigateBack({ delta: 1 }); // 返回上一页
 };
 
 // 计算属性：检查名称是否有效
 const isNameValid = computed(() => {
-    return questionBankName.value.length >= 2 && questionBankName.value.length <= 20 && !nameError.value
-})
+    return (
+        questionBankName.value.length >= 2 &&
+        questionBankName.value.length <= 20 &&
+        !nameError.value
+    );
+});
 
 // 名称验证函数
 const validateName = () => {
-    const name = questionBankName.value.trim()
-    
+    const name = questionBankName.value.trim();
+
     if (name.length === 0) {
-        nameError.value = ''
-        return
+        nameError.value = "";
+        return;
     }
-    
+
     if (name.length < 2) {
-        nameError.value = '题库名称至少需要2个字符'
+        nameError.value = "题库名称至少需要2个字符";
     } else if (name.length > 20) {
-        nameError.value = '题库名称不能超过20个字符'
+        nameError.value = "题库名称不能超过20个字符";
     } else if (!/^[\u4e00-\u9fa5a-zA-Z0-9_\-\s]+$/.test(name)) {
-        nameError.value = '名称只能包含中文、英文、数字、下划线和减号'
+        nameError.value = "名称只能包含中文、英文、数字、下划线和减号";
     } else {
-        nameError.value = ''
+        nameError.value = "";
     }
-}
+};
 
 // 手动导入
 const handleManualImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
-            title: '请先输入有效的题库名称',
-            icon: 'none'
-        })
-        return
+            title: "请先输入有效的题库名称",
+            icon: "none",
+        });
+        return;
     }
 
     try {
         const modal = await showModal({
-            title: '手动导入',
-            content: `即将为题库"${questionBankName.value}"进行手动导入`
+            title: "手动导入",
+            content: `即将为题库"${questionBankName.value}"进行手动导入`,
         });
         if (!modal.confirm) {
             return; // 如果用户取消，直接返回
         }
-        const res = await AddUserBank(questionBankName.value)
-        
-        if (modal.confirm && res.code===200) {
+        const res = await AddUserBank(questionBankName.value);
+
+        if (modal.confirm && res.code === 200) {
             // 获取返回的题库ID
             const bankId = res.data?.bankId;
             uni.navigateTo({
-                url: `/pages/exam/ManualImportView?bankName=${questionBankName.value}&bankId=${bankId}&isNewCreate=true`
-            })
+                url: `/pages/exam/ManualImportView?bankName=${questionBankName.value}&bankId=${bankId}&isNewCreate=true`,
+            });
         }
     } catch (error) {
-        console.error('手动导入出错:', error);
+        console.error("手动导入出错:", error);
     }
-}
+};
 //拍照
 //TODO拍照导入题目
 const handlePhotoImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
-            title: '请先输入有效的题库名称',
-            icon: 'none'
-        })
-        return
+            title: "请先输入有效的题库名称",
+            icon: "none",
+        });
+        return;
     }
     uni.showToast({
-        title: '开发中',
-        icon: 'none'
-    })
-    
+        title: "开发中",
+        icon: "none",
+    });
+
     // try {
     //     const modal = await showModal({
     //         title: '拍照导入',
     //         content: `即将为题库"${questionBankName.value}"进行拍照导入`
     //     });
-        
+
     //     if (modal.confirm) {
     //         const res = await AddUserBank(questionBankName.value)
     //         console.log(res)
-            
+
     //         if (res.code===200) {
     //             // 获取返回的题库ID
     //             const bankId = res.data?.bankId;
@@ -241,32 +317,32 @@ const handlePhotoImport = async () => {
     // } catch (error) {
     //     console.error('拍照导入出错:', error);
     // }
-}
+};
 //Ai
 //TODO AI导入题目
 const handleAIImport = async () => {
     if (!isNameValid.value) {
         uni.showToast({
-            title: '请先输入有效的题库名称',
-            icon: 'none'
-        })
-        return
+            title: "请先输入有效的题库名称",
+            icon: "none",
+        });
+        return;
     }
     uni.showToast({
-        title: '开发中',
-        icon: 'none'
-    })
-    
+        title: "开发中",
+        icon: "none",
+    });
+
     // try {
     //     const modal = await showModal({
     //         title: 'AI导入',
     //         content: `即将为题库"${questionBankName.value}"进行AI智能导入`
     //     });
-        
+
     //     if (modal.confirm) {
     //         const res = await AddUserBank(questionBankName.value)
     //         console.log(res)
-            
+
     //         if (res.code===200) {
     //             // 获取返回的题库ID
     //             const bankId = res.data?.bankId;
@@ -278,26 +354,26 @@ const handleAIImport = async () => {
     // } catch (error) {
     //     console.error('AI导入出错:', error);
     // }
-}
+};
 
 // 页面加载时检查用户是否已登录
 onMounted(async () => {
-  // 获取导航栏高度信息
+    // 获取导航栏高度信息
     const info = navBarHeightUtil.getNavBarInfo();
     navBarInfo.value = info.totalHeight;
-    
+
     // 检查用户是否已登录
     const isLoggedIn = await checkLogin("请登录后再创建题库");
     if (!isLoggedIn) {
         // 用户未登录，函数已自动跳转到登录页，无需继续执行
         return;
     }
-})
+});
 </script>
 
 <style lang="scss" scoped>
-  // 返回按钮样式
-  .back-btn {
+// 返回按钮样式
+.back-btn {
     position: absolute;
     left: 20rpx;
     display: flex;
@@ -307,16 +383,16 @@ onMounted(async () => {
     padding: 10rpx 20rpx;
     border-radius: 20rpx;
     background-color: rgba(255, 255, 255, 0.8);
-    
+
     .back-text {
-      font-size: 28rpx;
-      color: #3c9cff;
+        font-size: 28rpx;
+        color: #3c9cff;
     }
-  }
+}
 .container {
     min-height: 100vh;
     background: linear-gradient(135deg, #f5f9ff 0%, #e6f2ff 100%);
-    padding: 100rpx 30rpx 30rpx 30rpx ;
+    padding: 100rpx 30rpx 30rpx 30rpx;
     position: relative;
     overflow: hidden;
 }
@@ -331,7 +407,7 @@ onMounted(async () => {
     display: block;
     font-size: 44rpx;
     font-weight: bold;
-    color: #2979FF;
+    color: #2979ff;
     margin-bottom: 16rpx;
     line-height: 1.3;
 }
@@ -375,7 +451,7 @@ onMounted(async () => {
 
 .name-input {
     width: 100%;
-    
+
     :deep(.u-input) {
         height: 72rpx;
         padding: 0 28rpx;
@@ -385,13 +461,13 @@ onMounted(async () => {
         font-size: 28rpx;
         color: #333;
         transition: all 0.3s ease;
-        
+
         &:focus {
-            border-color: #2979FF;
+            border-color: #2979ff;
             background: #ffffff;
             box-shadow: 0 0 0 3rpx rgba(41, 121, 255, 0.1);
         }
-        
+
         &::placeholder {
             color: #999;
             font-size: 26rpx;
@@ -427,7 +503,7 @@ onMounted(async () => {
 .import-options {
     margin-bottom: 50rpx;
     position: relative;
-    
+
     &.disabled {
         opacity: 0.6;
         pointer-events: none;
@@ -470,13 +546,13 @@ onMounted(async () => {
     border: 1rpx solid rgba(41, 121, 255, 0.1);
     transition: all 0.3s ease;
     cursor: pointer;
-    
+
     &:active:not(.disabled) {
         transform: translateY(2rpx);
         box-shadow: 0 4rpx 16rpx rgba(41, 121, 255, 0.12);
         border-color: rgba(41, 121, 255, 0.2);
     }
-    
+
     &.disabled {
         opacity: 0.5;
         pointer-events: none;
@@ -486,7 +562,7 @@ onMounted(async () => {
 .card-icon {
     width: 72rpx;
     height: 72rpx;
-    background: linear-gradient(135deg, #2979FF 0%, #4dabf5 100%);
+    background: linear-gradient(135deg, #2979ff 0%, #4dabf5 100%);
     border-radius: 18rpx;
     display: flex;
     align-items: center;
@@ -518,7 +594,7 @@ onMounted(async () => {
 }
 
 .card-arrow {
-    color: #007AFF;
+    color: #007aff;
     flex-shrink: 0;
     margin-left: 16rpx;
 }
@@ -535,7 +611,7 @@ onMounted(async () => {
 .feature-title {
     font-size: 28rpx;
     font-weight: bold;
-    color: #2979FF;
+    color: #2979ff;
     margin-bottom: 24rpx;
     text-align: center;
 }
@@ -564,22 +640,26 @@ onMounted(async () => {
     position: absolute;
     border-radius: 50%;
     z-index: 0;
-    background: linear-gradient(135deg, rgba(41, 121, 255, 0.05), rgba(41, 121, 255, 0.02));
-    
+    background: linear-gradient(
+        135deg,
+        rgba(41, 121, 255, 0.05),
+        rgba(41, 121, 255, 0.02)
+    );
+
     &.top-left {
         width: 180rpx;
         height: 180rpx;
         top: -40rpx;
         left: -40rpx;
     }
-    
+
     &.top-right {
         width: 140rpx;
         height: 140rpx;
         top: 80rpx;
         right: -25rpx;
     }
-    
+
     &.bottom-left {
         width: 160rpx;
         height: 160rpx;
@@ -588,29 +668,28 @@ onMounted(async () => {
     }
 }
 
-
 // 响应式适配
 @media (max-width: 750rpx) {
     .container {
         padding: 30rpx 24rpx;
     }
-    
+
     .input-card,
     .option-card {
         padding: 28rpx 24rpx;
     }
-    
+
     .card-icon {
         width: 64rpx;
         height: 64rpx;
         margin-right: 20rpx;
         border-radius: 16rpx;
     }
-    
+
     .option-title {
         font-size: 28rpx;
     }
-    
+
     .option-desc {
         font-size: 22rpx;
     }

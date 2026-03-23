@@ -4,7 +4,12 @@
             <text class="label">练习数量：</text>
             <view class="slider-container">
                 <view class="slider-wrapper">
-                    <up-slider v-if="maxQuestions > 0" v-model="localQuestionCount" :min="1" :max="maxQuestions"></up-slider>
+                    <up-slider
+                        v-if="maxQuestions > 0"
+                        v-model="localQuestionCount"
+                        :min="1"
+                        :max="maxQuestions"
+                    ></up-slider>
                 </view>
                 <text class="slider-value">{{ localQuestionCount }}题</text>
             </view>
@@ -30,7 +35,11 @@
         <view class="setting-item">
             <text class="label">开启刷题助手：</text>
             <view class="switch-wrapper">
-                <up-switch v-model="localIsShowHelper" size="20" :disabled="disableHelper"></up-switch>
+                <up-switch
+                    v-model="localIsShowHelper"
+                    size="20"
+                    :disabled="disableHelper"
+                ></up-switch>
             </view>
             <text v-if="disableHelper" class="helper-tip">{{ helpertip }}</text>
         </view>
@@ -38,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
 // 定义 props
 const props = defineProps({
@@ -53,93 +62,106 @@ const props = defineProps({
     // 题目乱序
     isRandom: {
         type: Boolean,
-        default: false
+        default: false,
     },
     // 选项乱序
     isOptionRandom: {
         type: Boolean,
-        default: false
+        default: false,
     },
     // 立即显示答案
     isShowAnswer: {
         type: Boolean,
-        default: true
+        default: true,
     },
     // 开启AI解析
     isShowHelper: {
         type: Boolean,
-        default: true
+        default: true,
     },
     // 是否禁用刷题助手
     disableHelper: {
         type: Boolean,
-        default: false
+        default: false,
     },
-    helpertip:{
+    helpertip: {
         type: String,
-        default: '个人题库不支持此功能'
-    }
-})
+        default: "个人题库不支持此功能",
+    },
+});
 
-// 定义 emits 
+// 定义 emits
 const emit = defineEmits([
-    'update:questionCount',
-    'update:isRandom', 
-    'update:isOptionRandom',
-    'update:isShowAnswer',
-    'update:isShowAIHelp'
-])
+    "update:questionCount",
+    "update:isRandom",
+    "update:isOptionRandom",
+    "update:isShowAnswer",
+    "update:isShowAIHelp",
+]);
 
 // 本地响应式数据
-const localQuestionCount = ref(props.questionCount)
-const localIsRandom = ref(props.isRandom)
-const localIsOptionRandom = ref(props.isOptionRandom)
-const localIsShowAnswer = ref(props.isShowAnswer)
-const localIsShowHelper = ref(props.isShowHelper)
-
-
+const localQuestionCount = ref(props.questionCount);
+const localIsRandom = ref(props.isRandom);
+const localIsOptionRandom = ref(props.isOptionRandom);
+const localIsShowAnswer = ref(props.isShowAnswer);
+const localIsShowHelper = ref(props.isShowHelper);
 
 // 监听本地数据变化，向父组件发送更新事件
 watch(localQuestionCount, (newVal) => {
-    emit('update:questionCount', newVal)
-})
+    emit("update:questionCount", newVal);
+});
 
 watch(localIsRandom, (newVal) => {
-    emit('update:isRandom', newVal)
-})
+    emit("update:isRandom", newVal);
+});
 
 watch(localIsOptionRandom, (newVal) => {
-    emit('update:isOptionRandom', newVal)
-})
+    emit("update:isOptionRandom", newVal);
+});
 
 watch(localIsShowAnswer, (newVal) => {
-    emit('update:isShowAnswer', newVal)
-})
+    emit("update:isShowAnswer", newVal);
+});
 
 watch(localIsShowHelper, (newVal) => {
-    emit('update:isShowHelper', newVal)
-})
+    emit("update:isShowHelper", newVal);
+});
 
 // 监听 props 变化，更新本地数据
-watch(() => props.questionCount, (newVal) => {
-    localQuestionCount.value = newVal
-})
+watch(
+    () => props.questionCount,
+    (newVal) => {
+        localQuestionCount.value = newVal;
+    },
+);
 
-watch(() => props.isRandom, (newVal) => {
-    localIsRandom.value = newVal
-})
+watch(
+    () => props.isRandom,
+    (newVal) => {
+        localIsRandom.value = newVal;
+    },
+);
 
-watch(() => props.isOptionRandom, (newVal) => {
-    localIsOptionRandom.value = newVal
-})
+watch(
+    () => props.isOptionRandom,
+    (newVal) => {
+        localIsOptionRandom.value = newVal;
+    },
+);
 
-watch(() => props.isShowAnswer, (newVal) => {
-    localIsShowAnswer.value = newVal
-})
+watch(
+    () => props.isShowAnswer,
+    (newVal) => {
+        localIsShowAnswer.value = newVal;
+    },
+);
 
-watch(() => props.isShowHelper, (newVal) => {
-    localIsShowHelper.value = newVal
-})
+watch(
+    () => props.isShowHelper,
+    (newVal) => {
+        localIsShowHelper.value = newVal;
+    },
+);
 </script>
 
 <style scoped>
@@ -175,14 +197,14 @@ watch(() => props.isShowHelper, (newVal) => {
 }
 
 .label::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 8rpx;
     height: 29rpx;
-    background-color: #007AFF;
+    background-color: #007aff;
     border-radius: 2px;
 }
 
@@ -202,7 +224,7 @@ watch(() => props.isShowHelper, (newVal) => {
 .slider-value {
     text-align: right;
     font-size: 28rpx;
-    color: #007AFF;
+    color: #007aff;
     min-width: 50rpx;
     white-space: nowrap;
     flex-shrink: 0;
@@ -237,7 +259,7 @@ watch(() => props.isShowHelper, (newVal) => {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #007AFF;
+    background: #007aff;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
 }
@@ -246,7 +268,7 @@ watch(() => props.isShowHelper, (newVal) => {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #007AFF;
+    background: #007aff;
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);

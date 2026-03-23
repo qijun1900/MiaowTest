@@ -6,20 +6,17 @@ import { http } from "../../util/http";
  * @param {string} data.color - 错题本颜色，必填
  * @returns {Promise} 返回创建错题本的响应
  */
-export async  function createWrongBookAPI({
-    title,
-    color
-}){
-    try {
-        return await http({
-            url: '/uniappAPI/tools/WrongBook/createWrongBook',
-            method: 'POST',
-            data: { title, color },
-        });
-    }catch (error) {
-        console.error("createWrongBook 失败", error);
-        throw error;
-    }
+export async function createWrongBookAPI({ title, color }) {
+  try {
+    return await http({
+      url: "/uniappAPI/tools/WrongBook/createWrongBook",
+      method: "POST",
+      data: { title, color },
+    });
+  } catch (error) {
+    console.error("createWrongBook 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -28,15 +25,15 @@ export async  function createWrongBookAPI({
  * @method GET
  */
 export async function getWrongBooksAPI() {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/getWrongBooks',
-            method: 'GET',
-        });
-    } catch (error) {
-        console.error("getWrongBooks 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/getWrongBooks",
+      method: "GET",
+    });
+  } catch (error) {
+    console.error("getWrongBooks 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -45,15 +42,15 @@ export async function getWrongBooksAPI() {
  * @returns {Promise}
  */
 export async function getWrongBookDetailAPI(id) {
-    try {
-        return await http({
-            url: `/uniappAPI/tools/wrongbook/getWrongBookDetail?id=${id}`,
-            method: 'GET',
-        });
-    } catch (error) {
-        console.error("getWrongBookDetail 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: `/uniappAPI/tools/wrongbook/getWrongBookDetail?id=${id}`,
+      method: "GET",
+    });
+  } catch (error) {
+    console.error("getWrongBookDetail 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -64,16 +61,16 @@ export async function getWrongBookDetailAPI(id) {
  * @param {string} data.color - 颜色
  */
 export async function updateWrongBookAPI({ id, title, color }) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/updateWrongBook',
-            method: 'POST',
-            data: { id, title, color }
-        });
-    } catch (error) {
-        console.error("updateWrongBook 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/updateWrongBook",
+      method: "POST",
+      data: { id, title, color },
+    });
+  } catch (error) {
+    console.error("updateWrongBook 失败", error);
+    throw error;
+  }
 }
 
 /**
@@ -81,16 +78,14 @@ export async function updateWrongBookAPI({ id, title, color }) {
  * @param {string} id - 错题本ID
  */
 export async function deleteWrongBookAPI(id) {
-    try {
-        return await http({
-            url: '/uniappAPI/tools/wrongbook/deleteWrongBook',
-            method: 'POST',
-            data: { id }
-        });
-    } catch (error) {
-        console.error("deleteWrongBook 失败", error);
-        throw error;
-    }
+  try {
+    return await http({
+      url: "/uniappAPI/tools/wrongbook/deleteWrongBook",
+      method: "POST",
+      data: { id },
+    });
+  } catch (error) {
+    console.error("deleteWrongBook 失败", error);
+    throw error;
+  }
 }
-
-

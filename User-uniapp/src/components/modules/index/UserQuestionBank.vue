@@ -1,59 +1,81 @@
 <template>
     <view class="container">
         <!-- 提示 -->
-        <Tips 
-            text="左滑即可对题库进行删除操作" 
-            :duration="10000" 
-            type="info"/>
-        
+        <Tips text="左滑即可对题库进行删除操作" :duration="10000" type="info" />
+
         <!-- 加载状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题库..." />
-        
+
         <!-- 有题库数据时显示题库列表 -->
         <view v-else-if="questionBanks && questionBanks.length > 0">
-            <view class="question-bank-item" 
-                v-for="(item, index) in questionBanks" 
-                :key="index" 
-                @click="handleClick(item)">
+            <view
+                class="question-bank-item"
+                v-for="(item, index) in questionBanks"
+                :key="index"
+                @click="handleClick(item)"
+            >
                 <view
                     class="question-bank-item-swipe"
-                    :class="{ 'swiped': swipeIndex === index }"
+                    :class="{ swiped: swipeIndex === index }"
                     @touchstart="handleTouchStart($event, index)"
                     @touchmove="handleTouchMove($event, index)"
-                    @touchend="handleTouchEnd($event, index)">
+                    @touchend="handleTouchEnd($event, index)"
+                >
                     <!-- 左边静态图片 -->
-                    <image 
-                        class="bank-image" 
-                        src="/static/other/my-questionbank.png" 
-                        mode="aspectFill">
+                    <image
+                        class="bank-image"
+                        src="/static/other/my-questionbank.png"
+                        mode="aspectFill"
+                    >
                     </image>
-                    
+
                     <!-- 右边题库信息 -->
                     <view class="bank-info">
                         <text class="bank-name">{{ item.bankName }}</text>
                         <view class="bank-details">
-                            <text class="question-count">{{ item.questionCount }}题</text>
-                            <text class="time">{{formatTime.getTime2(item.createTime)}}</text>
+                            <text class="question-count"
+                                >{{ item.questionCount }}题</text
+                            >
+                            <text class="time">{{
+                                formatTime.getTime2(item.createTime)
+                            }}</text>
                         </view>
                     </view>
-                    
+
                     <!-- 最右侧指示图标 -->
-                    <view class="more-section" :class="{ 'hidden': swipeIndex === index }">
+                    <view
+                        class="more-section"
+                        :class="{ hidden: swipeIndex === index }"
+                    >
                         <text class="arrow-icon">›</text>
                     </view>
-                    <!-- 滑动删除的操作 -->              
-                    <view class="delete-action" :class="{ 'visible': swipeIndex === index }">
-                        <button class="delete-btn" @click.stop="handleDeleteBank(item, index)">
-                            <uni-icons type="trash" size="24" color="#fff"></uni-icons>
+                    <!-- 滑动删除的操作 -->
+                    <view
+                        class="delete-action"
+                        :class="{ visible: swipeIndex === index }"
+                    >
+                        <button
+                            class="delete-btn"
+                            @click.stop="handleDeleteBank(item, index)"
+                        >
+                            <uni-icons
+                                type="trash"
+                                size="24"
+                                color="#fff"
+                            ></uni-icons>
                         </button>
                     </view>
                 </view>
             </view>
         </view>
-        
+
         <!-- 空状态显示 -->
         <view v-else class="empty-state">
-            <image class="empty-image" src="/static/other/my-questionbank.png" mode="aspectFit"></image>
+            <image
+                class="empty-image"
+                src="/static/other/my-questionbank.png"
+                mode="aspectFit"
+            ></image>
             <text class="empty-text">暂无题库</text>
             <text class="empty-desc">快去创建你的第一个题库吧！</text>
         </view>
@@ -61,82 +83,82 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue'
-import { getUserBankList ,deleteUserBankAPI} from '../../../API/Exam/ExamAPI' 
-import formatTime from '../../../util/formatTime'
-import ThemeLoading from '../../core/ThemeLoading.vue'
-import useSwipe from '../../../composables/useSwipe'
-import Tips from '../../core/Tips.vue'
+import { ref, onMounted } from "vue";
+import { getUserBankList, deleteUserBankAPI } from "../../../API/Exam/ExamAPI";
+import formatTime from "../../../util/formatTime";
+import ThemeLoading from "../../core/ThemeLoading.vue";
+import useSwipe from "../../../composables/useSwipe";
+import Tips from "../../core/Tips.vue";
 
-const questionBanks = ref([])
-const isLoading = ref(false)
+const questionBanks = ref([]);
+const isLoading = ref(false);
 // 滑动删除相关状态与方法（使用封装的 composable）
 const {
-  swipeIndex,
-  handleTouchStart,
-  handleTouchMove,
-  handleTouchEnd,
-  resetSwipe
+    swipeIndex,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    resetSwipe,
 } = useSwipe();
 
 // 点击事件处理
 const handleClick = (item) => {
     uni.navigateTo({
-        url: `/pages/exam/UserBankView?data=${encodeURIComponent(JSON.stringify(item))}`
-    })
-}
+        url: `/pages/exam/UserBankView?data=${encodeURIComponent(JSON.stringify(item))}`,
+    });
+};
 
 // 删除题库
 const handleDeleteBank = (item, index) => {
     uni.showModal({
-        title: '确认删除',
-        content: '确定要删除该题库吗？删除后无法恢复。',
-        confirmColor: '#ff4757',
+        title: "确认删除",
+        content: "确定要删除该题库吗？删除后无法恢复。",
+        confirmColor: "#ff4757",
         success: async (res) => {
             if (res.confirm) {
-                await deleteBank(item.bankId, index)
+                await deleteBank(item.bankId, index);
             }
-            resetSwipe()
-        }
-    })
-}
+            resetSwipe();
+        },
+    });
+};
 
 const deleteBank = async (bankId, index) => {
     try {
-        const res = await deleteUserBankAPI(bankId)
+        const res = await deleteUserBankAPI(bankId);
         if (res.code === 200) {
-          uni.showToast({
-            title: '删除成功',
-            icon: 'success'
-          })
-          questionBanks.value.splice(index, 1)
-        }else{
-          uni.showToast({
-            title: res.message,
-            icon: 'error'
-          })
+            uni.showToast({
+                title: "删除成功",
+                icon: "success",
+            });
+            questionBanks.value.splice(index, 1);
+        } else {
+            uni.showToast({
+                title: res.message,
+                icon: "error",
+            });
         }
     } catch (error) {
         uni.showToast({
-            title: '删除失败，请稍后再试',
-            icon: 'none'
-        })
-        console.error('删除题库失败:', error)
+            title: "删除失败，请稍后再试",
+            icon: "none",
+        });
+        console.error("删除题库失败:", error);
     }
-}
+};
 
-onMounted(async ()=>{
+onMounted(async () => {
     try {
-        isLoading.value = true
-        const res = await getUserBankList()
-        questionBanks.value = res.data || []
+        isLoading.value = true;
+        const res = await getUserBankList();
+        questionBanks.value = res.data || [];
     } catch (error) {
-        console.error('获取题库失败:', error)
-        questionBanks.value = []
+        console.error("获取题库失败:", error);
+        questionBanks.value = [];
     } finally {
-        isLoading.value = false
+        isLoading.value = false;
     }
-})
+});
 </script>
 
 <style scoped>
@@ -146,11 +168,10 @@ onMounted(async ()=>{
 
 .question-bank-item {
     margin-bottom: 28rpx;
-    box-shadow: 0 4rpx 16rpx rgba(77,148,255,0.08);
+    box-shadow: 0 4rpx 16rpx rgba(77, 148, 255, 0.08);
     border-radius: 16rpx;
     background: transparent;
     overflow: hidden;
-
 }
 
 .question-bank-item-swipe {
@@ -163,10 +184,10 @@ onMounted(async ()=>{
     min-height: 110rpx;
     display: flex;
     align-items: center;
-    box-shadow: 0 2rpx 8rpx rgba(77,148,255,0.06);
+    box-shadow: 0 2rpx 8rpx rgba(77, 148, 255, 0.06);
     border: 1rpx solid #f0f7ff;
     transform: translateX(0);
-    transition: transform 0.3s cubic-bezier(.25,.8,.25,1);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .question-bank-item-swipe.swiped {
@@ -217,7 +238,9 @@ onMounted(async ()=>{
     display: flex;
     align-items: center;
     margin-right: 22rpx;
-    transition: opacity 0.3s, transform 0.3s;
+    transition:
+        opacity 0.3s,
+        transform 0.3s;
 }
 .more-section.hidden {
     opacity: 0;
@@ -242,7 +265,7 @@ onMounted(async ()=>{
     justify-content: center;
     background-color: #ff4757;
     transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(.25,.8,.25,1);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     z-index: 2;
     border-radius: 0 16rpx 16rpx 0;
     /* 保证不影响内容宽度 */
@@ -268,7 +291,7 @@ onMounted(async ()=>{
 }
 
 .delete-btn:active {
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* 空状态样式 */
@@ -281,7 +304,7 @@ onMounted(async ()=>{
     background-color: #ffffff;
     border-radius: 12rpx;
     margin-top: 80rpx;
-    box-shadow: 0 2rpx 8rpx rgba(77,148,255,0.06);
+    box-shadow: 0 2rpx 8rpx rgba(77, 148, 255, 0.06);
 }
 
 .empty-image {

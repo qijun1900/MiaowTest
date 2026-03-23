@@ -1,146 +1,276 @@
 <template>
     <view class="editor-section">
         <!-- 工具栏 -->
-        <view class="toolbar-container" 
-            :class="{ 'toolbar-show': showtoolbar, 'toolbar-hide': !showtoolbar }">
+        <view
+            class="toolbar-container"
+            :class="{
+                'toolbar-show': showtoolbar,
+                'toolbar-hide': !showtoolbar,
+            }"
+        >
             <view class="toolbar">
                 <!-- 撤销/重做 -->
-                <view class="toolbar-item" @tap.stop="undo" :class="{ disabled: !canUndo }">
+                <view
+                    class="toolbar-item"
+                    @tap.stop="undo"
+                    :class="{ disabled: !canUndo }"
+                >
                     <text class="iconfont icon-undo">↶</text>
                 </view>
-                <view class="toolbar-item" @tap.stop="redo" :class="{ disabled: !canRedo }">
+                <view
+                    class="toolbar-item"
+                    @tap.stop="redo"
+                    :class="{ disabled: !canRedo }"
+                >
                     <text class="iconfont icon-redo">↷</text>
                 </view>
 
                 <view class="toolbar-divider"></view>
 
                 <!-- 基本格式 -->
-                <view class="toolbar-item" :class="{ active: currentFormat === 'bold' }" data-format="bold"
-                    @tap.stop="formatText" :title="'加粗'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'bold' }"
+                    data-format="bold"
+                    @tap.stop="formatText"
+                    :title="'加粗'"
+                >
                     <text class="iconfont icon-bold">B</text>
                 </view>
-                <view class="toolbar-item" :class="{ active: currentFormat === 'italic' }" data-format="italic"
-                    @tap.stop="formatText" :title="'斜体'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'italic' }"
+                    data-format="italic"
+                    @tap.stop="formatText"
+                    :title="'斜体'"
+                >
                     <text class="iconfont icon-italic">I</text>
                 </view>
-                <view class="toolbar-item" :class="{ active: currentFormat === 'underline' }" data-format="underline"
-                    @tap.stop="formatText" :title="'下划线'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'underline' }"
+                    data-format="underline"
+                    @tap.stop="formatText"
+                    :title="'下划线'"
+                >
                     <text class="iconfont icon-underline">U</text>
                 </view>
-                <view class="toolbar-item" :class="{ active: currentFormat === 'strike' }" data-format="strike"
-                    @tap.stop="formatText" :title="'删除线'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'strike' }"
+                    data-format="strike"
+                    @tap.stop="formatText"
+                    :title="'删除线'"
+                >
                     <text class="iconfont icon-strike">S</text>
                 </view>
 
                 <view class="toolbar-divider"></view>
 
                 <!-- 对齐方式 -->
-                <view class="toolbar-item" :class="{ active: currentFormat === 'alignLeft' }" data-format="align"
-                    data-value="left" @tap.stop="formatText" :title="'左对齐'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'alignLeft' }"
+                    data-format="align"
+                    data-value="left"
+                    @tap.stop="formatText"
+                    :title="'左对齐'"
+                >
                     <text class="iconfont icon-align-left">◀</text>
                 </view>
-                <view class="toolbar-item" :class="{ active: currentFormat === 'alignCenter' }" data-format="align"
-                    data-value="center" @tap.stop="formatText" :title="'居中对齐'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'alignCenter' }"
+                    data-format="align"
+                    data-value="center"
+                    @tap.stop="formatText"
+                    :title="'居中对齐'"
+                >
                     <text class="iconfont icon-align-center">◆</text>
                 </view>
-                <view class="toolbar-item" :class="{ active: currentFormat === 'alignRight' }" data-format="align"
-                    data-value="right" @tap.stop="formatText" :title="'右对齐'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'alignRight' }"
+                    data-format="align"
+                    data-value="right"
+                    @tap.stop="formatText"
+                    :title="'右对齐'"
+                >
                     <text class="iconfont icon-align-right">▶</text>
                 </view>
 
                 <view class="toolbar-divider"></view>
 
                 <!-- 角标 -->
-                <view class="toolbar-item" :class="{ active: currentFormat === 'script-super' }" data-name="script"
-                    data-value="super" @tap.stop="formatText" :title="'上角标'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'script-super' }"
+                    data-name="script"
+                    data-value="super"
+                    @tap.stop="formatText"
+                    :title="'上角标'"
+                >
                     <text class="iconfont icon-superscript">x²</text>
                 </view>
-                <view class="toolbar-item" :class="{ active: currentFormat === 'script-sub' }" data-name="script"
-                    data-value="sub" @tap.stop="formatText" :title="'下角标'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'script-sub' }"
+                    data-name="script"
+                    data-value="sub"
+                    @tap.stop="formatText"
+                    :title="'下角标'"
+                >
                     <text class="iconfont icon-subscript">x₂</text>
                 </view>
 
-                <view class="toolbar-divider"></view> <!-- 分割线 -->
+                <view class="toolbar-divider"></view>
+                <!-- 分割线 -->
 
                 <!-- 颜色 -->
-                <view class="toolbar-item" @tap.stop="showColorPicker" :title="'字体颜色'">
-                    <text class="iconfont icon-color" style="color: #ff0000;">C</text>
+                <view
+                    class="toolbar-item"
+                    @tap.stop="showColorPicker"
+                    :title="'字体颜色'"
+                >
+                    <text class="iconfont icon-color" style="color: #ff0000"
+                        >C</text
+                    >
                 </view>
-                <view class="toolbar-item" @tap.stop="showBgColorPicker" :title="'背景颜色'">
-                    <text class="iconfont icon-bgcolor" style="background-color: #ffff00;">B</text>
+                <view
+                    class="toolbar-item"
+                    @tap.stop="showBgColorPicker"
+                    :title="'背景颜色'"
+                >
+                    <text
+                        class="iconfont icon-bgcolor"
+                        style="background-color: #ffff00"
+                        >B</text
+                    >
                 </view>
 
                 <view class="toolbar-divider"></view>
 
                 <!-- 列表 -->
-                <view class="toolbar-item" :class="{ active: currentFormat === 'list' }" data-format="list"
-                    @tap.stop="formatText" :title="'无序列表'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'list' }"
+                    data-format="list"
+                    @tap.stop="formatText"
+                    :title="'无序列表'"
+                >
                     <text class="iconfont icon-list">L</text>
                 </view>
-                <view class="toolbar-item" :class="{ active: currentFormat === 'orderedList' }" data-format="orderedList"
-                    @tap.stop="formatText" :title="'有序列表'">
+                <view
+                    class="toolbar-item"
+                    :class="{ active: currentFormat === 'orderedList' }"
+                    data-format="orderedList"
+                    @tap.stop="formatText"
+                    :title="'有序列表'"
+                >
                     <text class="iconfont icon-ordered-list">1.</text>
                 </view>
 
                 <view class="toolbar-divider"></view>
 
                 <!-- 清除格式 -->
-                <view class="toolbar-item" @tap.stop="clearFormat" :title="'清除格式'">
+                <view
+                    class="toolbar-item"
+                    @tap.stop="clearFormat"
+                    :title="'清除格式'"
+                >
                     <text class="iconfont icon-clear">✕</text>
                 </view>
 
                 <!-- 清空内容 -->
-                <view class="toolbar-item" @tap.stop="clearContent" :title="'清空内容'">
+                <view
+                    class="toolbar-item"
+                    @tap.stop="clearContent"
+                    :title="'清空内容'"
+                >
                     <text class="iconfont icon-clear-all">⌫</text>
                 </view>
 
                 <!-- 字体颜色选择器 -->
                 <view class="color-picker" v-if="showColor">
-                    <view class="color-option" v-for="color in colors" :key="color" @tap="setFontColor(color)">
-                        <view :style="{ backgroundColor: color }" class="color-circle"></view>
+                    <view
+                        class="color-option"
+                        v-for="color in colors"
+                        :key="color"
+                        @tap="setFontColor(color)"
+                    >
+                        <view
+                            :style="{ backgroundColor: color }"
+                            class="color-circle"
+                        ></view>
                     </view>
                     <view class="custom-color">
-                        <input type="color" class="custom-color-input" v-model="customColor" @change="setFontColor(customColor)" />
+                        <input
+                            type="color"
+                            class="custom-color-input"
+                            v-model="customColor"
+                            @change="setFontColor(customColor)"
+                        />
                     </view>
                 </view>
 
                 <!-- 背景颜色选择器 -->
                 <view class="color-picker" v-if="showBgColor">
-                    <view class="color-option" v-for="color in colors" :key="color" @tap="setBgColor(color)">
-                        <view :style="{ backgroundColor: color }" class="color-circle"></view>
+                    <view
+                        class="color-option"
+                        v-for="color in colors"
+                        :key="color"
+                        @tap="setBgColor(color)"
+                    >
+                        <view
+                            :style="{ backgroundColor: color }"
+                            class="color-circle"
+                        ></view>
                     </view>
                     <view class="custom-color">
-                        <input type="color" class="custom-color-input" v-model="customBgColor" @change="setBgColor(customBgColor)" />
+                        <input
+                            type="color"
+                            class="custom-color-input"
+                            v-model="customBgColor"
+                            @change="setBgColor(customBgColor)"
+                        />
                     </view>
                 </view>
             </view>
         </view>
         <!-- 编辑器 -->
         <view class="editor-wrapper" @touchmove.prevent.stop>
-            <editor 
-                :id="props.id" 
-                class="editor" 
-                :placeholder="props.placeholder" 
+            <editor
+                :id="props.id"
+                class="editor"
+                :placeholder="props.placeholder"
                 @input="handleInput"
-                @ready="handleReady" 
+                @ready="handleReady"
                 @focus="hanleFocus"
                 @blur="handleBlur"
-                @touchmove.prevent.stop />
+                @touchmove.prevent.stop
+            />
         </view>
     </view>
 </template>
 
 <script setup>
-import { ref, watch, getCurrentInstance, onMounted, onUnmounted, nextTick } from 'vue';
+import {
+    ref,
+    watch,
+    getCurrentInstance,
+    onMounted,
+    onUnmounted,
+    nextTick,
+} from "vue";
 
 // 编辑器上下文
 const editorCtx = ref(null);
 // 用于标记是否是用户输入
 const isUserInput = ref(false);
 // 上一次的内容
-const lastContent = ref('');
+const lastContent = ref("");
 // 当前选中的格式
-const currentFormat = ref('');
+const currentFormat = ref("");
 // 撤销/重做状态
 const canUndo = ref(false);
 const canRedo = ref(false);
@@ -154,12 +284,21 @@ const isEditorReady = ref(false);
 
 // 字体颜色选择器
 const showColor = ref(false);
-const colors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
-const customColor = ref('#000000');
+const colors = [
+    "#000000",
+    "#ff0000",
+    "#00ff00",
+    "#0000ff",
+    "#ffff00",
+    "#ff00ff",
+    "#00ffff",
+    "#ffffff",
+];
+const customColor = ref("#000000");
 
 // 背景颜色选择器
 const showBgColor = ref(false);
-const customBgColor = ref('#ffffff');
+const customBgColor = ref("#ffffff");
 
 // 字体大小选择器
 const showFontSize = ref(false);
@@ -174,22 +313,26 @@ const { proxy } = getCurrentInstance();
 
 // 定义组件属性
 const props = defineProps({
-    modelValue: {// 双向绑定的内容
+    modelValue: {
+        // 双向绑定的内容
         type: String,
-        default: ''
+        default: "",
     },
-    placeholder: {// 编辑器占位符
+    placeholder: {
+        // 编辑器占位符
         type: String,
-        default: '请输入内容...'
+        default: "请输入内容...",
     },
-    height: {// 编辑器高度
+    height: {
+        // 编辑器高度
         type: String,
-        default: '400rpx'
+        default: "400rpx",
     },
-    id: {// 编辑器id
+    id: {
+        // 编辑器id
         type: String,
-        default: 'editor'
-    }
+        default: "editor",
+    },
 });
 
 //工具栏显示
@@ -200,23 +343,26 @@ const hanleFocus = () => {
         clearTimeout(hideTimer.value);
         hideTimer.value = null;
     }
-}
+};
 
 const handleBlur = () => {
     // 延迟隐藏工具栏，给用户时间点击工具栏按钮
     hideTimer.value = setTimeout(() => {
         showtoolbar.value = false;
     }, 1500); //1500ms延迟，用户有足够时间点击工具栏
-}
+};
 
 // 定义事件
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 
 // 保存历史记录
 const saveHistory = (content) => {
     // 如果当前不在历史记录的末尾，则删除当前位置之后的所有记录
     if (historyIndex.value < historyStack.value.length - 1) {
-        historyStack.value = historyStack.value.slice(0, historyIndex.value + 1);
+        historyStack.value = historyStack.value.slice(
+            0,
+            historyIndex.value + 1,
+        );
     }
 
     // 添加新的历史记录
@@ -244,17 +390,17 @@ const handleInput = (e) => {
     if (!isMounted.value || !isEditorReady.value) {
         return;
     }
-    
+
     try {
         isUserInput.value = true;
         const html = e.detail.html;
         lastContent.value = html;
-        emit('update:modelValue', html);
+        emit("update:modelValue", html);
 
         // 保存历史记录
         saveHistory(html);
     } catch (error) {
-        console.warn('Input handling failed:', error);
+        console.warn("Input handling failed:", error);
     }
 };
 
@@ -263,17 +409,17 @@ const handleReady = async () => {
     // 等待DOM完全渲染，在弹窗中需要更长的延迟
     await nextTick();
     await nextTick();
-    
+
     // 添加延迟确保在弹窗或动态容器中也能正常工作
-    await new Promise(resolve => setTimeout(resolve, 50));
-    
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
     try {
         // 检查组件是否还在挂载状态
         if (!isMounted.value) {
-            console.warn('Component unmounted before editor ready');
+            console.warn("Component unmounted before editor ready");
             return;
         }
-        
+
         // 获取编辑器上下文
         uni.createSelectorQuery()
             .in(proxy)
@@ -281,23 +427,28 @@ const handleReady = async () => {
             .context((res) => {
                 try {
                     if (!res || !res.context) {
-                        console.error('Editor context not found for id:', props.id);
+                        console.error(
+                            "Editor context not found for id:",
+                            props.id,
+                        );
                         return;
                     }
-                    
+
                     if (!isMounted.value) {
-                        console.warn('Component unmounted during context setup');
+                        console.warn(
+                            "Component unmounted during context setup",
+                        );
                         return;
                     }
-                    
+
                     editorCtx.value = res.context;
                     isEditorReady.value = true;
-                    
+
                     // 编辑器就绪后，如果modelValue有值，设置到编辑器中
                     if (props.modelValue && isMounted.value) {
                         lastContent.value = props.modelValue;
                         editorCtx.value.setContents({
-                            html: props.modelValue
+                            html: props.modelValue,
                         });
 
                         // 初始化历史记录
@@ -306,47 +457,55 @@ const handleReady = async () => {
                         updateUndoRedoStatus();
                     } else if (isMounted.value) {
                         // 初始化空内容的历史记录
-                        historyStack.value = [''];
+                        historyStack.value = [""];
                         historyIndex.value = 0;
                         updateUndoRedoStatus();
                     }
                 } catch (error) {
-                    console.error('Error setting up editor context:', error);
+                    console.error("Error setting up editor context:", error);
                 }
             })
             .exec();
     } catch (error) {
-        console.error('Editor initialization failed:', error);
+        console.error("Editor initialization failed:", error);
     }
 };
 
 // 监听modelValue变化，同步到编辑器
-watch(() => props.modelValue, (newValue) => {
-    // 如果是用户输入导致的modelValue变化，不重新设置内容
-    if (isUserInput.value) {
-        isUserInput.value = false;
-        return;
-    }
-
-    // 如果内容没有变化，不重新设置
-    if (newValue === lastContent.value) {
-        return;
-    }
-
-    if (editorCtx.value && isEditorReady.value && isMounted.value && newValue !== undefined) {
-        try {
-            lastContent.value = newValue;
-            editorCtx.value.setContents({
-                html: newValue
-            });
-
-            // 保存历史记录
-            saveHistory(newValue);
-        } catch (error) {
-            console.warn('Failed to update editor content:', error);
+watch(
+    () => props.modelValue,
+    (newValue) => {
+        // 如果是用户输入导致的modelValue变化，不重新设置内容
+        if (isUserInput.value) {
+            isUserInput.value = false;
+            return;
         }
-    }
-});
+
+        // 如果内容没有变化，不重新设置
+        if (newValue === lastContent.value) {
+            return;
+        }
+
+        if (
+            editorCtx.value &&
+            isEditorReady.value &&
+            isMounted.value &&
+            newValue !== undefined
+        ) {
+            try {
+                lastContent.value = newValue;
+                editorCtx.value.setContents({
+                    html: newValue,
+                });
+
+                // 保存历史记录
+                saveHistory(newValue);
+            } catch (error) {
+                console.warn("Failed to update editor content:", error);
+            }
+        }
+    },
+);
 
 // 显示字体颜色选择器
 const showColorPicker = () => {
@@ -366,7 +525,7 @@ const showBgColorPicker = () => {
 const setFontColor = (color) => {
     if (editorCtx.value && isEditorReady.value && isMounted.value) {
         try {
-            editorCtx.value.format('color', color);
+            editorCtx.value.format("color", color);
             showColor.value = false;
             customColor.value = color;
 
@@ -378,13 +537,16 @@ const setFontColor = (color) => {
                             saveHistory(res.html);
                         },
                         fail: (error) => {
-                            console.warn('Failed to get contents after color change:', error);
-                        }
+                            console.warn(
+                                "Failed to get contents after color change:",
+                                error,
+                            );
+                        },
                     });
                 }
             }, 100);
         } catch (error) {
-            console.warn('Failed to set font color:', error);
+            console.warn("Failed to set font color:", error);
         }
     }
 };
@@ -393,7 +555,7 @@ const setFontColor = (color) => {
 const setBgColor = (color) => {
     if (editorCtx.value && isEditorReady.value && isMounted.value) {
         try {
-            editorCtx.value.format('backgroundColor', color);
+            editorCtx.value.format("backgroundColor", color);
             showBgColor.value = false;
             customBgColor.value = color;
 
@@ -405,20 +567,28 @@ const setBgColor = (color) => {
                             saveHistory(res.html);
                         },
                         fail: (error) => {
-                            console.warn('Failed to get contents after background color change:', error);
-                        }
+                            console.warn(
+                                "Failed to get contents after background color change:",
+                                error,
+                            );
+                        },
                     });
                 }
             }, 100);
         } catch (error) {
-            console.warn('Failed to set background color:', error);
+            console.warn("Failed to set background color:", error);
         }
     }
 };
 
 // 撤销
 const undo = () => {
-    if (canUndo.value && editorCtx.value && isEditorReady.value && isMounted.value) {
+    if (
+        canUndo.value &&
+        editorCtx.value &&
+        isEditorReady.value &&
+        isMounted.value
+    ) {
         try {
             // 移动到上一个历史记录
             historyIndex.value--;
@@ -426,22 +596,27 @@ const undo = () => {
             // 恢复内容
             const content = historyStack.value[historyIndex.value];
             editorCtx.value.setContents({
-                html: content
+                html: content,
             });
 
             // 更新状态
             lastContent.value = content;
-            emit('update:modelValue', content);
+            emit("update:modelValue", content);
             updateUndoRedoStatus();
         } catch (error) {
-            console.warn('Undo operation failed:', error);
+            console.warn("Undo operation failed:", error);
         }
     }
 };
 
 // 重做
 const redo = () => {
-    if (canRedo.value && editorCtx.value && isEditorReady.value && isMounted.value) {
+    if (
+        canRedo.value &&
+        editorCtx.value &&
+        isEditorReady.value &&
+        isMounted.value
+    ) {
         try {
             // 移动到下一个历史记录
             historyIndex.value++;
@@ -449,15 +624,15 @@ const redo = () => {
             // 恢复内容
             const content = historyStack.value[historyIndex.value];
             editorCtx.value.setContents({
-                html: content
+                html: content,
             });
 
             // 更新状态
             lastContent.value = content;
-            emit('update:modelValue', content);
+            emit("update:modelValue", content);
             updateUndoRedoStatus();
         } catch (error) {
-            console.warn('Redo operation failed:', error);
+            console.warn("Redo operation failed:", error);
         }
     }
 };
@@ -467,7 +642,7 @@ const clearFormat = () => {
     if (editorCtx.value && isEditorReady.value && isMounted.value) {
         try {
             editorCtx.value.removeFormat();
-            currentFormat.value = '';
+            currentFormat.value = "";
 
             // 清除格式后获取当前内容并保存历史记录
             setTimeout(() => {
@@ -477,13 +652,16 @@ const clearFormat = () => {
                             saveHistory(res.html);
                         },
                         fail: (error) => {
-                            console.warn('Failed to get contents after format clear:', error);
-                        }
+                            console.warn(
+                                "Failed to get contents after format clear:",
+                                error,
+                            );
+                        },
                     });
                 }
             }, 100);
         } catch (error) {
-            console.warn('Clear format operation failed:', error);
+            console.warn("Clear format operation failed:", error);
         }
     }
 };
@@ -492,24 +670,29 @@ const clearFormat = () => {
 const clearContent = () => {
     if (editorCtx.value && isEditorReady.value && isMounted.value) {
         uni.showModal({
-            title: '提示',
-            content: '确定要清空所有内容吗？',
+            title: "提示",
+            content: "确定要清空所有内容吗？",
             success: (res) => {
-                if (res.confirm && editorCtx.value && isEditorReady.value && isMounted.value) {
+                if (
+                    res.confirm &&
+                    editorCtx.value &&
+                    isEditorReady.value &&
+                    isMounted.value
+                ) {
                     try {
                         editorCtx.value.setContents({
-                            html: ''
+                            html: "",
                         });
-                        lastContent.value = '';
-                        emit('update:modelValue', '');
+                        lastContent.value = "";
+                        emit("update:modelValue", "");
 
                         // 保存历史记录
-                        saveHistory('');
+                        saveHistory("");
                     } catch (error) {
-                        console.warn('Clear content operation failed:', error);
+                        console.warn("Clear content operation failed:", error);
                     }
                 }
-            }
+            },
         });
     }
 };
@@ -520,21 +703,27 @@ const formatText = (e) => {
     const format = e.currentTarget.dataset.format;
     const value = e.currentTarget.dataset.value;
 
-    if ((!name && !format) || !editorCtx.value || !isEditorReady.value || !isMounted.value) return;
+    if (
+        (!name && !format) ||
+        !editorCtx.value ||
+        !isEditorReady.value ||
+        !isMounted.value
+    )
+        return;
 
     try {
         // 处理角标特殊逻辑
-        if (name === 'script') {
+        if (name === "script") {
             const formatKey = `script-${value}`;
             // 如果点击的是当前已选中的格式，则取消选中
             if (currentFormat.value === formatKey) {
-                currentFormat.value = '';
+                currentFormat.value = "";
                 // 取消角标格式
-                editorCtx.value.format('script', false);
+                editorCtx.value.format("script", false);
             } else {
                 currentFormat.value = formatKey;
                 // 设置角标格式
-                editorCtx.value.format('script', value);
+                editorCtx.value.format("script", value);
             }
 
             // 格式化后获取当前内容并保存历史记录
@@ -545,8 +734,11 @@ const formatText = (e) => {
                             saveHistory(res.html);
                         },
                         fail: (error) => {
-                            console.warn('Failed to get contents after script format:', error);
-                        }
+                            console.warn(
+                                "Failed to get contents after script format:",
+                                error,
+                            );
+                        },
                     });
                 }
             }, 100);
@@ -554,17 +746,17 @@ const formatText = (e) => {
         }
 
         // 处理对齐方式
-        if (format === 'align') {
+        if (format === "align") {
             const formatKey = `align${value.charAt(0).toUpperCase() + value.slice(1)}`;
             // 如果点击的是当前已选中的格式，则取消选中
             if (currentFormat.value === formatKey) {
-                currentFormat.value = '';
+                currentFormat.value = "";
                 // 取消对齐格式
-                editorCtx.value.format('align', 'left');
+                editorCtx.value.format("align", "left");
             } else {
                 currentFormat.value = formatKey;
                 // 设置对齐格式
-                editorCtx.value.format('align', value);
+                editorCtx.value.format("align", value);
             }
 
             // 格式化后获取当前内容并保存历史记录
@@ -575,8 +767,11 @@ const formatText = (e) => {
                             saveHistory(res.html);
                         },
                         fail: (error) => {
-                            console.warn('Failed to get contents after align format:', error);
-                        }
+                            console.warn(
+                                "Failed to get contents after align format:",
+                                error,
+                            );
+                        },
                     });
                 }
             }, 100);
@@ -588,15 +783,15 @@ const formatText = (e) => {
 
         // 如果点击的是当前已选中的格式，则取消选中
         if (currentFormat.value === targetFormat) {
-            currentFormat.value = '';
+            currentFormat.value = "";
         } else {
             currentFormat.value = targetFormat;
         }
 
-        if (targetFormat === 'list') {
-            editorCtx.value.format('list', 'unordered');
-        } else if (targetFormat === 'orderedList') {
-            editorCtx.value.format('list', 'ordered');
+        if (targetFormat === "list") {
+            editorCtx.value.format("list", "unordered");
+        } else if (targetFormat === "orderedList") {
+            editorCtx.value.format("list", "ordered");
         } else {
             // 普通格式处理
             editorCtx.value.format(targetFormat, value || true);
@@ -610,13 +805,16 @@ const formatText = (e) => {
                         saveHistory(res.html);
                     },
                     fail: (error) => {
-                        console.warn('Failed to get contents after format:', error);
-                    }
+                        console.warn(
+                            "Failed to get contents after format:",
+                            error,
+                        );
+                    },
                 });
             }
         }, 100);
     } catch (error) {
-        console.warn('Format text operation failed:', error);
+        console.warn("Format text operation failed:", error);
     }
 };
 
@@ -659,7 +857,7 @@ onUnmounted(() => {
 }
 
 .toolbar-show {
-    max-height: 200rpx;     /* 显示时设置最大高度 */
+    max-height: 200rpx; /* 显示时设置最大高度 */
     opacity: 1;
     transform: translateY(0); /* 恢复原始位置 */
 }
@@ -682,7 +880,6 @@ onUnmounted(() => {
     border-radius: 4rpx;
     position: relative;
 }
-
 
 .toolbar-item.active {
     background-color: #007aff;
@@ -771,7 +968,7 @@ onUnmounted(() => {
 }
 
 .editor-wrapper {
-    height: v-bind('props.height');
+    height: v-bind("props.height");
 }
 
 .editor {

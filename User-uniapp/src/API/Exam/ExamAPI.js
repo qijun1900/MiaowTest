@@ -1,8 +1,8 @@
-import { http } from '../../util/http.js';
-import { cacheManager } from '../../util/cache.js';
+import { http } from "../../util/http.js";
+import { cacheManager } from "../../util/cache.js";
 
 // 缓存键
-const CACHE_KEY = 'exam_subjects_cache';
+const CACHE_KEY = "exam_subjects_cache";
 const CACHE_EXPIRY_TIME = 60 * 60 * 1000; // 缓存过期时间(初始为1小时)
 
 /**
@@ -11,9 +11,9 @@ const CACHE_EXPIRY_TIME = 60 * 60 * 1000; // 缓存过期时间(初始为1小时
 export function clearExamSubjectsCache() {
   try {
     cacheManager.remove(CACHE_KEY);
-    console.log('考试科目缓存已清除');
+    console.log("考试科目缓存已清除");
   } catch (error) {
-    console.error('清除考试科目缓存失败:', error);
+    console.error("清除考试科目缓存失败:", error);
   }
 }
 
@@ -27,7 +27,7 @@ export async function getExamSubjects(forceRefresh = false) {
   if (!forceRefresh) {
     const cachedData = cacheManager.get(CACHE_KEY, CACHE_EXPIRY_TIME);
     if (cachedData) {
-      console.log('使用缓存数据获取考试科目');
+      console.log("使用缓存数据获取考试科目");
       return cachedData;
     }
   }
@@ -35,14 +35,13 @@ export async function getExamSubjects(forceRefresh = false) {
   // 缓存无数据或已过期，请求服务器
   try {
     const response = await http({
-      url: '/uniappAPI/Exam/getExamSubjects',
-      method: 'GET',
+      url: "/uniappAPI/Exam/getExamSubjects",
+      method: "GET",
     });
-
 
     // 将数据存入缓存
     cacheManager.set(CACHE_KEY, response);
-    console.log('从服务器获取考试科目数据并缓存');
+    console.log("从服务器获取考试科目数据并缓存");
 
     return response;
   } catch (error) {
@@ -59,14 +58,13 @@ export async function getExamSubjectTypes(examId) {
   try {
     const response = await http({
       url: `/uniappAPI/Exam/getExamSubjectTypes/${examId}`,
-      method: 'GET',
+      method: "GET",
     });
     return response;
   } catch (error) {
     console.error("getExamSubjectTypes 失败", error);
     throw error;
   }
-
 }
 
 /** 匹配题目列表
@@ -77,11 +75,10 @@ export async function FetchMatchQuestionList(extractedData) {
   try {
     const response = await http({
       url: `/uniappAPI/Exam/FetchMatchQuestionList`,
-      method: 'POST',
-      data: extractedData
+      method: "POST",
+      data: extractedData,
     });
     return response;
-
   } catch (error) {
     console.error("FetchMatchQuestionList 失败", error);
     throw error;
@@ -91,15 +88,15 @@ export async function FetchMatchQuestionList(extractedData) {
 /**
  * 添加用户自建题库
  * @param {*String} bankName 题库名称
-**/
+ **/
 export async function AddUserBank(bankName) {
   try {
-      return await http({
-      url:"/uniappAPI/exam/AddUserBank",
-      method: 'POST',
-      data: { bankName: bankName } 
+    return await http({
+      url: "/uniappAPI/exam/AddUserBank",
+      method: "POST",
+      data: { bankName: bankName },
     });
-  }catch (error) {
+  } catch (error) {
     console.error("AddUserBank 失败", error);
     throw error;
   }
@@ -115,13 +112,12 @@ export async function getUserBankList() {
   try {
     return await http({
       url: `/uniappAPI/exam/getUserBankList`,
-      method: 'GET',
+      method: "GET",
     });
-  }catch (error) {
+  } catch (error) {
     console.error("getUserBankList 失败", error);
     throw error;
   }
-  
 }
 /**
  * 删除用户自建题库
@@ -132,10 +128,10 @@ export async function deleteUserBankAPI(bankId) {
   try {
     return await http({
       url: `/uniappAPI/exam/userdelete/bank`,
-      method: 'POST',
-      data: { bankId: bankId }
+      method: "POST",
+      data: { bankId: bankId },
     });
-  }catch (error) {
+  } catch (error) {
     console.error("deleteUserBank 失败", error);
     throw error;
   }
@@ -145,16 +141,16 @@ export async function deleteUserBankAPI(bankId) {
  * @description  获取该考试科目下的资料列表
  * @method POST
  * @param {*String} examId 考试科目ID - 必填
- * @returns {*String} title 资料标题 
+ * @returns {*String} title 资料标题
  */
 export async function getExamSubjectNetMaterialsAPI(examId) {
   try {
     return await http({
       url: `/uniappAPI/exam/getexamsubjectmaterials`,
       data: { examId: examId },
-      method: 'POST',
+      method: "POST",
     });
-  }catch (error) {
+  } catch (error) {
     console.error("getExamSubjectMaterials 失败", error);
     throw error;
   }
@@ -167,17 +163,16 @@ export async function getExamSubjectNetMaterialsAPI(examId) {
  * @param {*String}  titleid 资料ID - 必填
  * @returns {*String} url 资料URL
  */
-export async function getExamTitleNetUrlAPI({examId,titleid}) {
+export async function getExamTitleNetUrlAPI({ examId, titleid }) {
   try {
     return await http({
       url: `/uniappAPI/exam/getexamsubjecttitleurl`,
-      data: { examId: examId,titleid:titleid },
-      method: 'POST',
+      data: { examId: examId, titleid: titleid },
+      method: "POST",
     });
-  }catch (error) {
+  } catch (error) {
     console.error("getExamSubjectMaterials 失败", error);
   }
-  
 }
 /**
  * @description  检查是否需要验证及其是否为认证用户
@@ -189,10 +184,9 @@ export async function checkExamVerifyAPI(examId) {
     return await http({
       url: `/uniappAPI/exam/checkexamverify`,
       data: { examId: examId },
-      method: 'POST',
+      method: "POST",
     });
-  }catch (error){
+  } catch (error) {
     console.error("checkExamVerify 失败", error);
   }
-  
 }
