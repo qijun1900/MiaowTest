@@ -9,15 +9,15 @@ import axios from "axios";
  * @param {*String} data.description 网盘资料描述，可选
  * @param {*Boolean} data.isPublish 发布状态，0-未发布，1-已发布，默认0
  * @param {*String} data.examId 考试ID，必填
- * @return {* Object}  
+ * @return {* Object}
  **/
 export async function postAddNetDiskAPI(data) {
-    try {
-        const response = await axios.post("/adminapi/netDisk/addNetDisk", data);
-        return response.data;
-    } catch (error) {
-        console.error("Error during add net disk:", error);
-    }
+  try {
+    const response = await axios.post("/adminapi/netDisk/addNetDisk", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error during add net disk:", error);
+  }
 }
 
 /**
@@ -27,18 +27,18 @@ export async function postAddNetDiskAPI(data) {
  * @return {*Object}  网盘资料列表
  */
 export async function getNetDiskListAPI(params) {
-    try {
-        const response = await axios.get("/adminapi/netDisk/getNetDiskList", {
-            params: {
-                page: params?.page || 1,
-                size: params?.size || 20,
-                ...params
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error("Error during get net disk list:", error);
-    }
+  try {
+    const response = await axios.get("/adminapi/netDisk/getNetDiskList", {
+      params: {
+        page: params?.page || 1,
+        size: params?.size || 20,
+        ...params,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error during get net disk list:", error);
+  }
 }
 
 /**
@@ -51,33 +51,31 @@ export async function getNetDiskListAPI(params) {
  * @param {*String} data.description 网盘资料描述，可选
  * @param {*Boolean} data.isPublish 发布状态，0-未发布，1-已发布，默认0
  * @param {*String} data.examId 考试ID，必填
- * @returns 
+ * @returns
  */
 export async function updateNetDiskAPI(data) {
-    try {
-        const response = await axios.post("/adminapi/netDisk/updateNetDisk", data);
-        return response.data;
-    } catch (error) {
-        console.error("Error during update net disk:", error);
-    }
+  try {
+    const response = await axios.post("/adminapi/netDisk/updateNetDisk", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error during update net disk:", error);
+  }
 }
 
 /**
- * 
- * @param {*String} _id 
- * @param {*String} examId 
- * @returns 
+ *
+ * @param {*String} _id
+ * @param {*String} examId
+ * @returns
  */
 export async function deleteOneNetDiskAPI(_id, examId) {
-    try {
-        console.log("deleteOneNetDiskAPI", _id, examId);
-        const response = await axios.post("/adminapi/netDisk/deleteOneNetDisk", 
-            { _id, examId }
-        );
-        return response.data;
-    } catch (error) {
-        console.error("Error during delete one net disk:", error);
-    }
+  try {
+    console.log("deleteOneNetDiskAPI", _id, examId);
+    const response = await axios.post("/adminapi/netDisk/deleteOneNetDisk", { _id, examId });
+    return response.data;
+  } catch (error) {
+    console.error("Error during delete one net disk:", error);
+  }
 }
 
 /**
@@ -87,12 +85,14 @@ export async function deleteOneNetDiskAPI(_id, examId) {
  * @returns {*Object}
  */
 export async function updateNetDiskStateAPI({ _id, examId, state }) {
-    try {
-        const response = await axios.post("/adminapi/netDisk/updateNetDiskState", 
-            { _id, examId, state }
-        );
-        return response.data;
-    } catch (error) {
-        console.error("Error during update net disk state:", error);
-    }
+  try {
+    const response = await axios.post("/adminapi/netDisk/updateNetDiskState", {
+      _id,
+      examId,
+      state,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error during update net disk state:", error);
+  }
 }

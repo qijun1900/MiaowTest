@@ -1,11 +1,11 @@
 <template>
-  <div 
+  <div
     class="queue-item"
     :class="{
       'is-uploading': item.status === 'uploading',
       'is-success': item.status === 'success',
       'is-error': item.status === 'error',
-      'is-paused': item.status === 'paused'
+      'is-paused': item.status === 'paused',
     }"
   >
     <div class="item-icon">
@@ -15,33 +15,25 @@
       <el-icon v-else-if="item.category === 4"><Headset /></el-icon>
       <el-icon v-else><Files /></el-icon>
     </div>
-    
+
     <div class="item-content">
       <div class="item-header">
         <span class="item-name" :title="item.name">{{ item.name }}</span>
         <span class="item-size">{{ formatFileSize(item.size) }}</span>
       </div>
-      
+
       <div class="item-meta">
-        <el-tag 
-          :type="getCategoryTagType(item.category)" 
-          size="small" 
-          effect="plain"
-        >
+        <el-tag :type="getCategoryTagType(item.category)" size="small" effect="plain">
           {{ getCategoryLabel(item.category) }}
         </el-tag>
         <span class="item-tag" v-if="item.tag">{{ item.tag }}</span>
       </div>
-      
+
       <!-- 上传进度 -->
       <div v-if="item.status === 'uploading'" class="item-progress">
-        <el-progress 
-          :percentage="item.progress" 
-          :stroke-width="4"
-          :show-text="false"
-        />
+        <el-progress :percentage="item.progress" :stroke-width="4" :show-text="false" />
       </div>
-      
+
       <!-- 状态提示 -->
       <div class="item-status">
         <span v-if="item.status === 'waiting'" class="status-waiting">
@@ -58,7 +50,7 @@
         </span>
         <span v-else-if="item.status === 'error'" class="status-error">
           <el-icon><CircleClose /></el-icon>
-          {{ item.errorMsg || '上传失败' }}
+          {{ item.errorMsg || "上传失败" }}
         </span>
         <span v-else-if="item.status === 'paused'" class="status-paused">
           <el-icon><VideoPause /></el-icon>
@@ -66,38 +58,38 @@
         </span>
       </div>
     </div>
-    
+
     <div class="item-actions">
-      <el-button 
+      <el-button
         v-if="item.status === 'waiting' || item.status === 'paused'"
-        type="primary" 
-        text 
+        type="primary"
+        text
         size="small"
         @click="$emit('upload')"
       >
         <el-icon><VideoPlay /></el-icon>
       </el-button>
-      <el-button 
+      <el-button
         v-if="item.status === 'uploading'"
-        type="warning" 
-        text 
+        type="warning"
+        text
         size="small"
         @click="$emit('pause')"
       >
         <el-icon><VideoPause /></el-icon>
       </el-button>
-      <el-button 
+      <el-button
         v-if="item.status === 'error'"
-        type="success" 
-        text 
+        type="success"
+        text
         size="small"
         @click="$emit('retry')"
       >
         <el-icon><RefreshRight /></el-icon>
       </el-button>
-      <el-button 
-        type="danger" 
-        text 
+      <el-button
+        type="danger"
+        text
         size="small"
         @click="$emit('remove')"
         :disabled="item.status === 'uploading'"
@@ -110,11 +102,20 @@
 
 <script setup>
 import {
-  Picture, Document, VideoPlay, Headset, Files,
-  Clock, Loading, CircleCheck, CircleClose, VideoPause,
-  RefreshRight, Delete
-} from '@element-plus/icons-vue'
-import { formatFileSize, getCategoryLabel, getCategoryTagType } from '@/util/resourceUtils'
+  Picture,
+  Document,
+  VideoPlay,
+  Headset,
+  Files,
+  Clock,
+  Loading,
+  CircleCheck,
+  CircleClose,
+  VideoPause,
+  RefreshRight,
+  Delete,
+} from "@element-plus/icons-vue";
+import { formatFileSize, getCategoryLabel, getCategoryTagType } from "@/util/resourceUtils";
 
 defineProps({
   // ========== 队列项数据 ==========
@@ -123,16 +124,16 @@ defineProps({
     required: true,
     // 包含：id, file, name, size, category, tag, status, progress, errorMsg等
     // status: 'waiting' | 'uploading' | 'success' | 'error' | 'paused'
-  }
-})
+  },
+});
 
 // ========== 事件定义 ==========
 defineEmits([
-  'upload',  // 开始上传此文件
-  'pause',   // 暂停上传此文件
-  'retry',   // 重试上传此文件
-  'remove'   // 从队列移除此文件
-])
+  "upload", // 开始上传此文件
+  "pause", // 暂停上传此文件
+  "retry", // 重试上传此文件
+  "remove", // 从队列移除此文件
+]);
 </script>
 
 <style scoped>

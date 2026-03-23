@@ -5,14 +5,13 @@ import axios from "axios";
  * @returns {Promise<number>} 用户消息数量
  */
 export async function getMessageCount() {
-    try {
-        const response = await axios.get("/adminapi/consumermessage/getcount"); 
-        return response.data;
-        
-    }catch (error) {
-        console.error("Error fetching message count:", error); // 修正错误描述
-        throw error;
-    }
+  try {
+    const response = await axios.get("/adminapi/consumermessage/getcount");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching message count:", error); // 修正错误描述
+    throw error;
+  }
 }
 
 /**
@@ -23,20 +22,20 @@ export async function getMessageCount() {
  * @returns {Promise<Array>} 用户消息列表
  */
 export async function getMessageList(params) {
-    try {
-        const response = await axios.get("/adminapi/consumermessage/getlist",{
-             params:{
-                page: params?.page || 1,
-                size: params?.size || 10,
-                // 保留其他可能的查询参数
-                ...params 
-            }
-        }); 
-        return response.data;
-    }catch (error) {
-        console.error("Error fetching message list:", error); // 修正错误描述
-        throw error;
-    }
+  try {
+    const response = await axios.get("/adminapi/consumermessage/getlist", {
+      params: {
+        page: params?.page || 1,
+        size: params?.size || 10,
+        // 保留其他可能的查询参数
+        ...params,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching message list:", error); // 修正错误描述
+    throw error;
+  }
 }
 
 /**
@@ -48,16 +47,16 @@ export async function getMessageList(params) {
  * @returns {Promise<Object>} 处理结果
  */
 export async function handleFeedback(_id, handleForm) {
-    try {
-        const response = await axios.post("/adminapi/consumermessage/handlefeedback", {
-            _id,
-            ...handleForm// 展开处理表单数据
-        });
-        return response.data;
-    }catch (error) {
-        console.error("Error fetching message list:", error); // 修正错误描述
-        throw error;
-    }
+  try {
+    const response = await axios.post("/adminapi/consumermessage/handlefeedback", {
+      _id,
+      ...handleForm, // 展开处理表单数据
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching message list:", error); // 修正错误描述
+    throw error;
+  }
 }
 
 /**
@@ -65,13 +64,13 @@ export async function handleFeedback(_id, handleForm) {
  * @returns {Promise<Object>} 处理结果
  */
 export async function deleteFeedback(_id) {
-    try {
-        const response = await axios.post("/adminapi/consumermessage/deletefeedback", {
-            _id,
-        });
-        return response.data;
-    }catch (error) {
-        console.error("Error fetching message list:", error); // 修正错误描述
-        throw error;
-    }
+  try {
+    const response = await axios.post("/adminapi/consumermessage/deletefeedback", {
+      _id,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching message list:", error); // 修正错误描述
+    throw error;
+  }
 }

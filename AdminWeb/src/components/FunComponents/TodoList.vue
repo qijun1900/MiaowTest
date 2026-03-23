@@ -1,30 +1,22 @@
 <template>
   <div class="todo-container">
-    <el-input 
-      v-model="newTodo" 
-      placeholder="输入新任务" 
-      @keyup.enter="addTodo"
-      class="todo-input"
-    >
+    <el-input v-model="newTodo" placeholder="输入新任务" @keyup.enter="addTodo" class="todo-input">
       <template #append>
         <el-button @click="addTodo" :icon="Plus" />
       </template>
     </el-input>
-    
+
     <el-scrollbar height="200px" v-loading="loading">
       <div v-for="todo in todos" :key="todo.id" class="todo-item">
-        <el-checkbox 
-          :model-value="todo.completed" 
-          @change="() => toggleTodo(todo)"
-        >
-          <span :class="{ 'completed': todo.completed }">
+        <el-checkbox :model-value="todo.completed" @change="() => toggleTodo(todo)">
+          <span :class="{ completed: todo.completed }">
             {{ todo.title }}
           </span>
         </el-checkbox>
-        <el-button 
-          type="danger" 
-          :icon="Delete" 
-          circle 
+        <el-button
+          type="danger"
+          :icon="Delete"
+          circle
           size="small"
           @click="removeTodo(todo)"
           :loading="loading"
@@ -35,64 +27,63 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Plus, Delete } from '@element-plus/icons-vue'
-import { getTodos, postTodos ,postDeleteTodos,postUpdateTodos} from '@/API/Fun/todos'
+import { ref, onMounted } from "vue";
+import { Plus, Delete } from "@element-plus/icons-vue";
+import { getTodos, postTodos, postDeleteTodos, postUpdateTodos } from "@/API/Fun/todos";
 
-const newTodo = ref('')
-const todos = ref([])
-const loading = ref(false)
+const newTodo = ref("");
+const todos = ref([]);
+const loading = ref(false);
 
 // 获取待办事项列表
 const fetchTodos = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    const res = await getTodos()
-    todos.value = res.data
+    const res = await getTodos();
+    todos.value = res.data;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // 添加待办事项
 const addTodo = async () => {
-  if (!newTodo.value.trim()) return
-  
-  try {
+  if (!newTodo.value.trim()) return;
 
-    await postTodos({ title: newTodo.value.trim() })
-    await fetchTodos()
-    newTodo.value = ''
+  try {
+    await postTodos({ title: newTodo.value.trim() });
+    await fetchTodos();
+    newTodo.value = "";
   } catch (error) {
-    console.error('添加失败:', error)
+    console.error("添加失败:", error);
   }
-}
+};
 
 // 删除待办事项
 const removeTodo = async (todo) => {
   try {
-    await postDeleteTodos(todo._id)
-    console.log(todo._id)
-    await fetchTodos()
+    await postDeleteTodos(todo._id);
+    console.log(todo._id);
+    await fetchTodos();
   } catch (error) {
-    console.error('删除失败:', error)
+    console.error("删除失败:", error);
   }
-}
+};
 
 // 切换完成状态
 const toggleTodo = async (todo) => {
   try {
-    await postUpdateTodos(todo._id)
-    await fetchTodos()
+    await postUpdateTodos(todo._id);
+    await fetchTodos();
   } catch (error) {
-    console.error('状态更新失败:', error)
+    console.error("状态更新失败:", error);
   }
-}
+};
 
 // 初始化加载数据
 onMounted(() => {
-  fetchTodos()
-})
+  fetchTodos();
+});
 </script>
 
 <style scoped>

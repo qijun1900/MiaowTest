@@ -7,35 +7,33 @@ import axios from "axios";
  * @returns {Promise<Array>} 用户信息列表
  */
 export async function getConsumerList(params) {
-    try {
-        const response = await axios.get('/adminapi/consumer/getlist', { 
-            params:{
-                page: params?.page || 1,
-                size: params?.size || 10,
-                ...params 
-            }
-        });
-        return response.data;
-
-    }catch(error) {
-        console.error('获取客户端用户信息列表失败:', error);
-        throw error;
-    }
+  try {
+    const response = await axios.get("/adminapi/consumer/getlist", {
+      params: {
+        page: params?.page || 1,
+        size: params?.size || 10,
+        ...params,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取客户端用户信息列表失败:", error);
+    throw error;
+  }
 }
 /**
- * @description: 获取全部考试认证列表 
+ * @description: 获取全部考试认证列表
  * @param {*} uid 用户ID
  */
-export async function GetAuthExamListAPI({uid}) {
-    try {
-        const response = await axios.post("/adminapi/exam/getAuthExamList", { 
-            uid 
-        });
-        return response.data;
-    }catch (error) {
-        console.error("Error during get auth exam list:", error);
-    }
-    
+export async function GetAuthExamListAPI({ uid }) {
+  try {
+    const response = await axios.post("/adminapi/exam/getAuthExamList", {
+      uid,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error during get auth exam list:", error);
+  }
 }
 
 /**
@@ -43,15 +41,14 @@ export async function GetAuthExamListAPI({uid}) {
  * @param {*} uid 用户ID
  * @param {*} examId 考试ID
  */
-export async function updateExamAuthStatusAPI({uid,examId}) {
-    try {
-        const response = await axios.post("/adminapi/exam/updateExamAuth", {
-            uid,
-            examId
-        });
-        return response.data;
-        
-    }catch (error) {
-        console.error("Error during add auth exam:", error);
-    }
+export async function updateExamAuthStatusAPI({ uid, examId }) {
+  try {
+    const response = await axios.post("/adminapi/exam/updateExamAuth", {
+      uid,
+      examId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error during add auth exam:", error);
+  }
 }

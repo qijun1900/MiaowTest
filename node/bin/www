@@ -7,14 +7,14 @@
  */
 
 // 加载环境变量
-require('dotenv').config();
+require("dotenv").config();
 
 // 导入增强版数据库管理器
-const { dbManager } = require('../db/db.enhanced.js');
+const { dbManager } = require("../db/db.enhanced.js");
 
 // 开发环境检测
-const isDevelopment = process.env.NODE_ENV !== 'production';
-const environment = process.env.NODE_ENV || 'development';
+const isDevelopment = process.env.NODE_ENV !== "production";
+const environment = process.env.NODE_ENV || "development";
 
 /**
  * 异步启动应用
@@ -22,85 +22,108 @@ const environment = process.env.NODE_ENV || 'development';
 async function startApplication() {
   try {
     // 检测云托管环境
-    const isCloudRuntime = process.env.K_SERVICE || process.env.CONTAINER_NAME || process.env.KUBERNETES_SERVICE_HOST;
-    const mongoProvider = process.env.MONGO_PROVIDER || (isCloudRuntime ? 'cloud' : 'local');
-    
+    const isCloudRuntime =
+      process.env.K_SERVICE ||
+      process.env.CONTAINER_NAME ||
+      process.env.KUBERNETES_SERVICE_HOST;
+    const mongoProvider =
+      process.env.MONGO_PROVIDER || (isCloudRuntime ? "cloud" : "local");
+
     // 显示启动信息
-    console.log('\n========================================');
-    console.log('🚀 题喵喵答题系统正在启动...');
-    console.log('========================================');
+    console.log("\n========================================");
+    console.log("🚀 题喵喵答题系统正在启动...");
+    console.log("========================================");
     console.log(`环境: ${environment}`);
-    console.log(`运行环境: ${isCloudRuntime ? '云托管' : '本地'}`);
-    console.log(`数据库提供商: ${mongoProvider === 'local' ? '本地MongoDB' : mongoProvider === 'cloud' ? '云数据库' : mongoProvider}`);
-    console.log(`开发模式: ${isDevelopment ? '开启' : '关闭'}`);
-    
+    console.log(`运行环境: ${isCloudRuntime ? "云托管" : "本地"}`);
+    console.log(
+      `数据库提供商: ${mongoProvider === "local" ? "本地MongoDB" : mongoProvider === "cloud" ? "云数据库" : mongoProvider}`,
+    );
+    console.log(`开发模式: ${isDevelopment ? "开启" : "关闭"}`);
+
     // 云托管环境自动切换数据库提供商
     if (isCloudRuntime && !process.env.MONGO_PROVIDER) {
-      console.log('🔄 检测到云托管环境，自动切换到云数据库');
-      process.env.MONGO_PROVIDER = 'cloud';
+      console.log("🔄 检测到云托管环境，自动切换到云数据库");
+      process.env.MONGO_PROVIDER = "cloud";
     }
-    
+
     // 环境变量检查
-    if (mongoProvider === 'cloud') {
-      console.log('\n🔍 云数据库环境变量检查:');
-      console.log(`   MONGO_CLOUD_HOST: ${process.env.MONGO_CLOUD_HOST ? '✅' : '❌'}`);
-      console.log(`   MONGO_CLOUD_USERNAME: ${process.env.MONGO_CLOUD_USERNAME ? '✅' : '❌'}`);
-      console.log(`   MONGO_CLOUD_PASSWORD: ${process.env.MONGO_CLOUD_PASSWORD ? '✅' : '❌'}`);
-      console.log(`   MONGO_CLOUD_DATABASE: ${process.env.MONGO_CLOUD_DATABASE || 'examinationsystem'}`);
+    if (mongoProvider === "cloud") {
+      console.log("\n🔍 云数据库环境变量检查:");
+      console.log(
+        `   MONGO_CLOUD_HOST: ${process.env.MONGO_CLOUD_HOST ? "✅" : "❌"}`,
+      );
+      console.log(
+        `   MONGO_CLOUD_USERNAME: ${process.env.MONGO_CLOUD_USERNAME ? "✅" : "❌"}`,
+      );
+      console.log(
+        `   MONGO_CLOUD_PASSWORD: ${process.env.MONGO_CLOUD_PASSWORD ? "✅" : "❌"}`,
+      );
+      console.log(
+        `   MONGO_CLOUD_DATABASE: ${process.env.MONGO_CLOUD_DATABASE || "examinationsystem"}`,
+      );
     }
 
     // OSS 配置检查
-    console.log('\n🔍 OSS 配置检查:');
-    console.log(`   OSS_BUCKET: ${process.env.OSS_BUCKET || '❌ 未设置'}`);
-    console.log(`   OSS_REGION: ${process.env.OSS_REGION || '❌ 未设置'}`);
-    console.log(`   OSS_CDN_DOMAIN: ${process.env.OSS_CDN_DOMAIN || '❌ 未设置'}`);
-    console.log(`   OSS_ACCESS_KEY_ID: ${process.env.OSS_ACCESS_KEY_ID ? '✅' : '❌ 未设置'}`);
-    console.log(`   TOKEN_SECRET: ${process.env.TOKEN_SECRET ? '✅' : '❌ 未设置'}`);
-    
+    console.log("\n🔍 OSS 配置检查:");
+    console.log(`   OSS_BUCKET: ${process.env.OSS_BUCKET || "❌ 未设置"}`);
+    console.log(`   OSS_REGION: ${process.env.OSS_REGION || "❌ 未设置"}`);
+    console.log(
+      `   OSS_CDN_DOMAIN: ${process.env.OSS_CDN_DOMAIN || "❌ 未设置"}`,
+    );
+    console.log(
+      `   OSS_ACCESS_KEY_ID: ${process.env.OSS_ACCESS_KEY_ID ? "✅" : "❌ 未设置"}`,
+    );
+    console.log(
+      `   TOKEN_SECRET: ${process.env.TOKEN_SECRET ? "✅" : "❌ 未设置"}`,
+    );
+
     // 连接数据库
-    console.log('\n💾 正在连接数据库...');
+    console.log("\n💾 正在连接数据库...");
     await dbManager.connect();
-    console.log('✅ 数据库连接成功');
+    console.log("✅ 数据库连接成功");
 
     // 导入应用模块
-    const app = require('../app');
-    const debug = require('debug')('project:server');
-    const http = require('http');
+    const app = require("../app");
+    const debug = require("debug")("project:server");
+    const http = require("http");
 
     // 获取端口
-    const port = normalizePort(process.env.PORT || '3000');
-    app.set('port', port);
+    const port = normalizePort(process.env.PORT || "3000");
+    app.set("port", port);
 
     // 创建 HTTP 服务器
     const server = http.createServer(app);
 
     // 云托管环境绑定到 0.0.0.0，本地环境支持灵活配置
     // 默认使用 0.0.0.0 以支持 localhost 和 127.0.0.1 访问
-    const host = process.env.HOST || (isCloudRuntime ? '0.0.0.0' : '0.0.0.0');
-    
+    const host = process.env.HOST || (isCloudRuntime ? "0.0.0.0" : "0.0.0.0");
+
     // 绑定端口和事件监听
     server.listen(port, host);
-    server.on('error', (error) => onError(error, port));
-    server.on('listening', () => onListening(server, port, host, isCloudRuntime));
+    server.on("error", (error) => onError(error, port));
+    server.on("listening", () =>
+      onListening(server, port, host, isCloudRuntime),
+    );
 
     // 设置优雅关闭处理
     setupGracefulShutdown(server);
-
   } catch (error) {
-    console.error('\n❌ 应用启动失败:', error.message);
+    console.error("\n❌ 应用启动失败:", error.message);
     if (isDevelopment) {
-      console.error('详细错误信息:', error.stack);
+      console.error("详细错误信息:", error.stack);
     }
-    
+
     // 云托管环境的结构化错误输出
     if (process.env.K_SERVICE || process.env.CONTAINER_NAME) {
-      console.error('\n📋 云托管诊断信息:');
+      console.error("\n📋 云托管诊断信息:");
       console.error(`   环境变量数量: ${Object.keys(process.env).length}`);
       console.error(`   Node.js版本: ${process.version}`);
       console.error(`   当前工作目录: ${process.cwd()}`);
-      console.error(`   数据库提供商: ${process.env.MONGO_PROVIDER || '未设置'}`);
+      console.error(
+        `   数据库提供商: ${process.env.MONGO_PROVIDER || "未设置"}`,
+      );
     }
-    
+
     process.exit(1);
   }
 }
@@ -126,20 +149,18 @@ function normalizePort(val) {
  * HTTP 服务器错误事件处理
  */
 function onError(error, port) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  const bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   switch (error.code) {
-    case 'EACCES':
+    case "EACCES":
       console.error(`\n❌ ${bind} 需要管理员权限`);
       process.exit(1);
       break;
-    case 'EADDRINUSE':
+    case "EADDRINUSE":
       console.error(`\n❌ ${bind} 已被占用`);
       process.exit(1);
       break;
@@ -151,15 +172,13 @@ function onError(error, port) {
 /**
  * HTTP 服务器监听事件处理
  */
-function onListening(server, port, host = 'localhost', isCloudRuntime = false) {
+function onListening(server, port, host = "localhost", isCloudRuntime = false) {
   const addr = server.address();
-  const bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  
-  console.log('\n========================================');
-  console.log('✅ 服务器启动成功！');
-  console.log('========================================');
+  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+
+  console.log("\n========================================");
+  console.log("✅ 服务器启动成功！");
+  console.log("========================================");
   console.log(`📍 监听地址: ${host}:${port}`);
   if (!isCloudRuntime) {
     console.log(`🌐 访问地址: http://localhost:${port}`);
@@ -169,70 +188,72 @@ function onListening(server, port, host = 'localhost', isCloudRuntime = false) {
     console.log(`🌐 云托管地址: 由平台分配`);
     console.log(`📊 健康检查: /health`);
   }
-  console.log(`💾 数据库状态: ${dbManager.isHealthy() ? '✅ 健康' : '❌ 异常'}`);
-  
+  console.log(
+    `💾 数据库状态: ${dbManager.isHealthy() ? "✅ 健康" : "❌ 异常"}`,
+  );
+
   if (isDevelopment) {
     console.log(`🔧 开发模式: 热重载已开启`);
   }
-  
+
   if (isCloudRuntime) {
     console.log(`☁️  云托管模式: 已优化配置`);
   }
-  
-  console.log('========================================\n');
-  
+
+  console.log("========================================\n");
+
   // debug 输出
-  const debug = require('debug')('project:server');
-  debug('Listening on ' + bind);
+  const debug = require("debug")("project:server");
+  debug("Listening on " + bind);
 }
 
 /**
  * 优雅关闭处理
  */
 function setupGracefulShutdown(server) {
-  const signals = ['SIGTERM', 'SIGINT'];
-  
+  const signals = ["SIGTERM", "SIGINT"];
+
   signals.forEach((signal) => {
     process.on(signal, async () => {
       console.log(`\n\n🚨 收到 ${signal} 信号，正在优雅关闭...`);
-      
+
       // 停止接受新连接
       server.close(async () => {
-        console.log('✅ HTTP服务器已关闭');
-        
+        console.log("✅ HTTP服务器已关闭");
+
         // 关闭数据库连接
         try {
           await dbManager.disconnect();
-          console.log('✅ 数据库连接已关闭');
-          console.log('👋 再见！');
+          console.log("✅ 数据库连接已关闭");
+          console.log("👋 再见！");
           process.exit(0);
         } catch (error) {
-          console.error('❌ 关闭数据库连接时出错:', error.message);
+          console.error("❌ 关闭数据库连接时出错:", error.message);
           process.exit(1);
         }
       });
-      
+
       // 设置超时强制退出
       setTimeout(() => {
-        console.error('⚠️  超时，强制退出应用');
+        console.error("⚠️  超时，强制退出应用");
         process.exit(1);
       }, 10000); // 10秒超时
     });
   });
-  
+
   // 捕获未处理的异常
-  process.on('uncaughtException', (error) => {
-    console.error('\n❌ 未捕获异常:', error.message);
+  process.on("uncaughtException", (error) => {
+    console.error("\n❌ 未捕获异常:", error.message);
     if (isDevelopment) {
       console.error(error.stack);
     }
     process.exit(1);
   });
-  
-  process.on('unhandledRejection', (reason, promise) => {
-    console.error('\n❌ 未处理的Promise拒绝:', reason);
+
+  process.on("unhandledRejection", (reason, promise) => {
+    console.error("\n❌ 未处理的Promise拒绝:", reason);
     if (isDevelopment) {
-      console.error('Promise:', promise);
+      console.error("Promise:", promise);
     }
     process.exit(1);
   });

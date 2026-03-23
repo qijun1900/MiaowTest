@@ -9,12 +9,7 @@
     @dialog-confirm="handleConfirm"
   >
     <template #dialogcontent>
-      <el-form
-        ref="formRef"
-        :model="formData"
-        label-position="top"
-        class="edit-form"
-      >
+      <el-form ref="formRef" :model="formData" label-position="top" class="edit-form">
         <!-- 文件上传区域 -->
         <el-form-item label="替换文件（可选）">
           <el-alert
@@ -23,10 +18,10 @@
             type="info"
             :closable="false"
             show-icon
-            style="margin-bottom: 12px;"
+            style="margin-bottom: 12px"
           >
             <template #default>
-              <span style="font-size: 13px;">如需替换文件，请上传新文件；否则仅更新文件信息</span>
+              <span style="font-size: 13px">如需替换文件，请上传新文件；否则仅更新文件信息</span>
             </template>
           </el-alert>
           <el-alert
@@ -35,13 +30,13 @@
             type="warning"
             :closable="false"
             show-icon
-            style="margin-bottom: 12px;"
+            style="margin-bottom: 12px"
           >
             <template #default>
-              <span style="font-size: 13px;">确认后将使用新文件替换原文件，原文件将被删除</span>
+              <span style="font-size: 13px">确认后将使用新文件替换原文件，原文件将被删除</span>
             </template>
           </el-alert>
-          
+
           <div class="upload-wrapper-edit" :class="{ 'has-file': !!formData.file }">
             <el-upload
               ref="uploadRef"
@@ -65,7 +60,7 @@
                     <p>不上传则保持原文件不变</p>
                   </div>
                 </div>
-                
+
                 <!-- 选中文件后的预览 -->
                 <div v-else class="file-selected-edit">
                   <div class="file-icon-wrapper-edit">
@@ -77,10 +72,12 @@
                       <el-icon v-else><Files /></el-icon>
                     </div>
                   </div>
-                  <div class="file-name-edit" :title="formData.file.name">{{ formData.file.name }}</div>
+                  <div class="file-name-edit" :title="formData.file.name">
+                    {{ formData.file.name }}
+                  </div>
                   <div class="file-actions-edit">
                     <el-button type="primary" text bg @click.stop="handleRemove">
-                      <el-icon style="margin-right: 4px;"><RefreshLeft /></el-icon>
+                      <el-icon style="margin-right: 4px"><RefreshLeft /></el-icon>
                       取消替换
                     </el-button>
                   </div>
@@ -88,7 +85,7 @@
               </div>
             </el-upload>
           </div>
-          
+
           <!-- 文件元数据 -->
           <transition name="el-fade-in">
             <div v-if="fileInfo" class="file-meta-card-edit">
@@ -103,12 +100,17 @@
                 </div>
                 <div class="meta-item-edit">
                   <span class="label">文件类型</span>
-                  <span class="value">{{ fileInfo.mimeType || '未知' }}</span>
+                  <span class="value">{{ fileInfo.mimeType || "未知" }}</span>
                 </div>
                 <div class="meta-item-edit full">
                   <span class="label">智能分类</span>
                   <span class="value">
-                    <el-tag :type="getCategoryTagType(formData.category)" effect="plain" round size="small">
+                    <el-tag
+                      :type="getCategoryTagType(formData.category)"
+                      effect="plain"
+                      round
+                      size="small"
+                    >
                       {{ getCategoryLabel(formData.category) }}
                     </el-tag>
                   </span>
@@ -133,19 +135,29 @@
         <el-form-item label="资源分类" required>
           <el-radio-group v-model="formData.category" class="category-radio-group-edit">
             <el-radio-button :value="1">
-              <div class="radio-content-edit"><el-icon><Picture /></el-icon> 图片</div>
+              <div class="radio-content-edit">
+                <el-icon><Picture /></el-icon> 图片
+              </div>
             </el-radio-button>
             <el-radio-button :value="2">
-              <div class="radio-content-edit"><el-icon><Document /></el-icon> 文档</div>
+              <div class="radio-content-edit">
+                <el-icon><Document /></el-icon> 文档
+              </div>
             </el-radio-button>
             <el-radio-button :value="3">
-              <div class="radio-content-edit"><el-icon><VideoPlay /></el-icon> 视频</div>
+              <div class="radio-content-edit">
+                <el-icon><VideoPlay /></el-icon> 视频
+              </div>
             </el-radio-button>
             <el-radio-button :value="4">
-              <div class="radio-content-edit"><el-icon><Headset /></el-icon> 音频</div>
+              <div class="radio-content-edit">
+                <el-icon><Headset /></el-icon> 音频
+              </div>
             </el-radio-button>
             <el-radio-button :value="5">
-              <div class="radio-content-edit"><el-icon><More /></el-icon> 其他</div>
+              <div class="radio-content-edit">
+                <el-icon><More /></el-icon> 其他
+              </div>
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -193,19 +205,26 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, computed, watch } from "vue";
+import { ElMessage } from "element-plus";
 import {
-  UploadFilled, RefreshLeft, InfoFilled,
-  Picture, Document, VideoPlay, Headset, Files, More
-} from '@element-plus/icons-vue'
-import Dialog from '@/components/ReuseComponents/Dialog .vue'
+  UploadFilled,
+  RefreshLeft,
+  InfoFilled,
+  Picture,
+  Document,
+  VideoPlay,
+  Headset,
+  Files,
+  More,
+} from "@element-plus/icons-vue";
+import Dialog from "@/components/ReuseComponents/Dialog .vue";
 import {
   formatFileSize as formatSize,
   getCategoryLabel,
   getCategoryTagType,
-  autoDetectCategory
-} from '@/util/resourceUtils'
+  autoDetectCategory,
+} from "@/util/resourceUtils";
 
 const props = defineProps({
   // ========== 对话框状态 ==========
@@ -214,125 +233,129 @@ const props = defineProps({
     default: false,
     // 对话框显示状态
   },
-  
+
   // ========== 文件数据 ==========
   fileData: {
     type: Object,
     default: null,
     // 要编辑的文件数据
   },
-  
+
   // ========== 标签选项 ==========
   tagOptions: {
     type: Array,
     default: () => [],
     // 标签选项列表
   },
-  
+
   // ========== 更新状态 ==========
   isUpdating: {
     type: Boolean,
     default: false,
     // 是否正在更新
-  }
-})
+  },
+});
 
 // ========== 事件定义 ==========
 const emit = defineEmits([
-  'update:modelValue',  // 更新对话框状态
-  'confirm'             // 确认更新
-])
+  "update:modelValue", // 更新对话框状态
+  "confirm", // 确认更新
+]);
 
 // ========== 本地状态 ==========
-const uploadRef = ref()
-const formRef = ref()
+const uploadRef = ref();
+const formRef = ref();
 const formData = ref({
-  _id: '',
+  _id: "",
   file: null,
-  name: '',
+  name: "",
   category: 5,
-  description: '',
-  tag: '',
-  ext: '',
+  description: "",
+  tag: "",
+  ext: "",
   size: 0,
-  mimeType: '',
-  originalUrl: ''
-})
+  mimeType: "",
+  originalUrl: "",
+});
 
 // ========== 计算属性 ==========
 const visible = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
-})
+  set: (val) => emit("update:modelValue", val),
+});
 
 const fileInfo = computed(() => {
-  if (!formData.value.file) return null
+  if (!formData.value.file) return null;
   return {
     size: formData.value.file.size,
-    mimeType: formData.value.file.type
-  }
-})
+    mimeType: formData.value.file.type,
+  };
+});
 
 // ========== 监听文件数据变化 ==========
-watch(() => props.fileData, (newData) => {
-  if (newData) {
-    Object.assign(formData.value, {
-      _id: newData._id,
-      file: null,
-      name: newData.name,
-      category: newData.category || 5,
-      description: newData.description || '',
-      tag: newData.tag || '',
-      ext: newData.ext || '',
-      size: newData.size || 0,
-      mimeType: newData.mimeType || '',
-      originalUrl: newData.url
-    })
-  }
-}, { immediate: true })
+watch(
+  () => props.fileData,
+  (newData) => {
+    if (newData) {
+      Object.assign(formData.value, {
+        _id: newData._id,
+        file: null,
+        name: newData.name,
+        category: newData.category || 5,
+        description: newData.description || "",
+        tag: newData.tag || "",
+        ext: newData.ext || "",
+        size: newData.size || 0,
+        mimeType: newData.mimeType || "",
+        originalUrl: newData.url,
+      });
+    }
+  },
+  { immediate: true },
+);
 
 // ========== 文件处理 ==========
 const handleFileChange = (uploadFile) => {
-  const rawFile = uploadFile.raw
-  if (!rawFile) return
+  const rawFile = uploadFile.raw;
+  if (!rawFile) return;
 
-  formData.value.file = rawFile
-  formData.value.name = rawFile.name
-  
-  const fileName = rawFile.name
-  const lastDotIndex = fileName.lastIndexOf('.')
-  formData.value.ext = lastDotIndex > -1 ? fileName.substring(lastDotIndex + 1).toLowerCase() : ''
-  
-  formData.value.size = rawFile.size
-  formData.value.mimeType = rawFile.type
-  formData.value.category = autoDetectCategory(rawFile.type, rawFile.name)
-  
-  ElMessage.success('文件已选择，将替换原文件')
-}
+  formData.value.file = rawFile;
+  formData.value.name = rawFile.name;
+
+  const fileName = rawFile.name;
+  const lastDotIndex = fileName.lastIndexOf(".");
+  formData.value.ext = lastDotIndex > -1 ? fileName.substring(lastDotIndex + 1).toLowerCase() : "";
+
+  formData.value.size = rawFile.size;
+  formData.value.mimeType = rawFile.type;
+  formData.value.category = autoDetectCategory(rawFile.type, rawFile.name);
+
+  ElMessage.success("文件已选择，将替换原文件");
+};
 
 const handleExceed = (files) => {
   if (uploadRef.value) {
-    uploadRef.value.clearFiles()
-    const file = files[0]
-    uploadRef.value.handleStart(file)
+    uploadRef.value.clearFiles();
+    const file = files[0];
+    uploadRef.value.handleStart(file);
   }
-}
+};
 
 const handleRemove = () => {
-  formData.value.file = null
-  if (uploadRef.value) uploadRef.value.clearFiles()
-  ElMessage.info('已取消文件替换')
-}
+  formData.value.file = null;
+  if (uploadRef.value) uploadRef.value.clearFiles();
+  ElMessage.info("已取消文件替换");
+};
 
 // ========== 确认处理 ==========
 const handleConfirm = () => {
   if (!formData.value.name) {
-    ElMessage.warning('请输入文件名')
-    return
+    ElMessage.warning("请输入文件名");
+    return;
   }
   if (!formData.value.tag) {
-    ElMessage.warning('请选择或输入业务标签')
-    return
+    ElMessage.warning("请选择或输入业务标签");
+    return;
   }
 
   const submitData = {
@@ -345,33 +368,33 @@ const handleConfirm = () => {
       file: formData.value.file,
       ext: formData.value.ext,
       size: formData.value.size,
-      mimeType: formData.value.mimeType
-    })
-  }
+      mimeType: formData.value.mimeType,
+    }),
+  };
 
-  emit('confirm', submitData)
-}
+  emit("confirm", submitData);
+};
 
 // ========== 重置表单 ==========
 const resetForm = () => {
   Object.assign(formData.value, {
-    _id: '',
+    _id: "",
     file: null,
-    name: '',
+    name: "",
     category: 5,
-    description: '',
-    tag: '',
-    ext: '',
+    description: "",
+    tag: "",
+    ext: "",
     size: 0,
-    mimeType: '',
-    originalUrl: ''
-  })
-  if (uploadRef.value) uploadRef.value.clearFiles()
-}
+    mimeType: "",
+    originalUrl: "",
+  });
+  if (uploadRef.value) uploadRef.value.clearFiles();
+};
 
 defineExpose({
-  resetForm
-})
+  resetForm,
+});
 </script>
 
 <style scoped>

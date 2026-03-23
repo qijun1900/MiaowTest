@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require("axios");
 
 /**
  * 获取微信用户信息的辅助函数
@@ -8,25 +8,25 @@ const axios = require('axios');
  * https://developers.weixin.qq.com/miniprogram/dev/wxcloudservice/wxcloudrun/src/guide/weixin/open.html#%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D
  */
 const wxAuth = async (code) => {
-    const wxApiUrl = 'http://api.weixin.qq.com/sns/jscode2session';
-    const wxResponse = await axios.get(wxApiUrl, {
-        params: {
-            appid: process.env.WECHAT_APPID,
-            secret: process.env.WECHAT_SECRET,
-            js_code: code,
-            grant_type: 'authorization_code'
-        },
-        timeout: 10000 // 10秒超时
-    });
+  const wxApiUrl = "http://api.weixin.qq.com/sns/jscode2session";
+  const wxResponse = await axios.get(wxApiUrl, {
+    params: {
+      appid: process.env.WECHAT_APPID,
+      secret: process.env.WECHAT_SECRET,
+      js_code: code,
+      grant_type: "authorization_code",
+    },
+    timeout: 10000, // 10秒超时
+  });
 
-    if (wxResponse.data.errcode) {
-        throw new Error(`微信API错误: ${wxResponse.data.errmsg}`);
-    }
-    
-    const { openid, session_key, unionid } = wxResponse.data;
-    return { openid, session_key };
+  if (wxResponse.data.errcode) {
+    throw new Error(`微信API错误: ${wxResponse.data.errmsg}`);
+  }
+
+  const { openid, session_key, unionid } = wxResponse.data;
+  return { openid, session_key };
 };
 
 module.exports = {
-    wxAuth
+  wxAuth,
 };

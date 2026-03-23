@@ -15,13 +15,13 @@ import upload from "@/util/upload";
  * @returns {Promise} 上传结果
  */
 export async function uploadFile(formdata) {
-    try {
-        const response = await upload("/adminapi/admin/file/upload", formdata);
-        return response;
-    }catch (error) {
-        console.error("Error during file upload:", error);
-        throw error;
-    }
+  try {
+    const response = await upload("/adminapi/admin/file/upload", formdata);
+    return response;
+  } catch (error) {
+    console.error("Error during file upload:", error);
+    throw error;
+  }
 }
 
 /**
@@ -30,27 +30,29 @@ export async function uploadFile(formdata) {
  * @returns {Promise} 批量上传结果
  */
 export async function batchUploadFiles(files) {
-    try {
-        const uploadPromises = files.map(fileData => uploadFile(fileData));
-        const results = await Promise.allSettled(uploadPromises);
-        
-        const successCount = results.filter(r => r.status === 'fulfilled' && r.value.code === 200).length;
-        const failCount = results.length - successCount;
-        
-        return {
-            code: 200,
-            message: `批量上传完成：成功 ${successCount} 个，失败 ${failCount} 个`,
-            data: {
-                total: results.length,
-                success: successCount,
-                fail: failCount,
-                results: results
-            }
-        };
-    } catch (error) {
-        console.error("Error during batch file upload:", error);
-        throw error;
-    }
+  try {
+    const uploadPromises = files.map((fileData) => uploadFile(fileData));
+    const results = await Promise.allSettled(uploadPromises);
+
+    const successCount = results.filter(
+      (r) => r.status === "fulfilled" && r.value.code === 200,
+    ).length;
+    const failCount = results.length - successCount;
+
+    return {
+      code: 200,
+      message: `批量上传完成：成功 ${successCount} 个，失败 ${failCount} 个`,
+      data: {
+        total: results.length,
+        success: successCount,
+        fail: failCount,
+        results: results,
+      },
+    };
+  } catch (error) {
+    console.error("Error during batch file upload:", error);
+    throw error;
+  }
 }
 
 /**
@@ -58,13 +60,13 @@ export async function batchUploadFiles(files) {
  * @returns {Promise} 标签数组
  */
 export async function getTags() {
-    try {
-        const response = await axios.get("/adminapi/admin/file/tags");
-        return response.data;
-    }catch (error) {
-        console.error("Error during get tags:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get("/adminapi/admin/file/tags");
+    return response.data;
+  } catch (error) {
+    console.error("Error during get tags:", error);
+    throw error;
+  }
 }
 
 /**
@@ -77,20 +79,19 @@ export async function getTags() {
  * @returns {Promise<Array>} 用户文件列表
  */
 export async function getFileList(params) {
-    try {
-        const response = await axios.get("/adminapi/admin/file/list",{
-             params:{
-                page: params?.page || 1,
-                size: params?.size || 10,
-               ...params
-            }
-        });
-        return response.data;
-    }
-    catch (error) {
-        console.error("Error fetching file list:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get("/adminapi/admin/file/list", {
+      params: {
+        page: params?.page || 1,
+        size: params?.size || 10,
+        ...params,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching file list:", error);
+    throw error;
+  }
 }
 
 /**
@@ -99,17 +100,15 @@ export async function getFileList(params) {
  * @returns {Promise} 删除结果
  */
 export async function deleteFile(fileId) {
-    try {
-        const response = await axios.post("/adminapi/admin/file/deleteone", 
-            {
-                fileId: fileId
-            }
-        )
-        return response.data;
-    }catch (error) {
-        console.error("Error during delete file:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.post("/adminapi/admin/file/deleteone", {
+      fileId: fileId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error during delete file:", error);
+    throw error;
+  }
 }
 
 /**
@@ -124,13 +123,13 @@ export async function deleteFile(fileId) {
  * @returns {Promise} 更新结果
  */
 export async function updateFile(formdata) {
-    try {
-        const response = await upload("/adminapi/admin/file/update", formdata);
-        return response;
-    }catch (error) {
-        console.error("Error during file update:", error);
-        throw error;
-    }
+  try {
+    const response = await upload("/adminapi/admin/file/update", formdata);
+    return response;
+  } catch (error) {
+    console.error("Error during file update:", error);
+    throw error;
+  }
 }
 
 /**
@@ -139,15 +138,13 @@ export async function updateFile(formdata) {
  * @returns {Promise} 状态改变结果
  */
 export async function changeFileStatus(fileId) {
-    try {
-        const response = await axios.post("/adminapi/admin/file/change-status",
-            {
-                fileId: fileId
-            }
-        )
-        return response.data;
-    }catch (error) {
-        console.error("Error during change file status:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.post("/adminapi/admin/file/change-status", {
+      fileId: fileId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error during change file status:", error);
+    throw error;
+  }
 }

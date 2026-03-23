@@ -1,10 +1,5 @@
 ﻿const ProductService = require("../../services/user/ProductService");
 
-const ProductController ={
+const ProductController = {};
 
-
-
-}
-
-
-module.exports = ProductController
+module.exports = ProductController;

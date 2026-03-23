@@ -1,25 +1,25 @@
 import axios from "axios";
 
 export async function modelappBatchaddQuestion(message, examId, category) {
-    try {
-        const res = await axios({
-            url: '/adminapi/modelapp/batchaddquestion',
-            method: 'POST',
-            data: { message, examId, category },
-            timeout: 600000 // 设置超时时间为600秒（10分钟）
-        })
-        return res.data
-    } catch (error) {
-        console.error("Error:", error);
-        return {
-            code: 500,
-            message: error.message || "请求超时或服务器错误",
-            data: null
-        };
-    }
+  try {
+    const res = await axios({
+      url: "/adminapi/modelapp/batchaddquestion",
+      method: "POST",
+      data: { message, examId, category },
+      timeout: 600000, // 设置超时时间为600秒（10分钟）
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error:", error);
+    return {
+      code: 500,
+      message: error.message || "请求超时或服务器错误",
+      data: null,
+    };
+  }
 }
 
-/** 
+/**
  * 智能体获取题目解析
  * @param {*} message // 问题描述
  * @param {*} questionType // 题目类型
@@ -30,27 +30,24 @@ export async function modelappBatchaddQuestion(message, examId, category) {
  *    data: {
  *        success: true,
  *        message: '数据插入成功',
- *      } 
- * } 
+ *      }
+ * }
  */
-export async function modelappGetQuestionAnalysis({
-    message,
-    questionType,
-    _id,
-}) {
-    try {
-        // 添加超时设置，默认为60秒
-        const res = await axios.post("/adminapi/modelapp/getquestionanalysis", 
-            { message, questionType, _id },
-            { timeout: 300000 } // 设置超时时间为300秒
-        )
-        return res.data
-    } catch (error) {
-        console.error("Error:", error);
-        return {
-            code: 500,
-            message: error.message || "请求超时或服务器错误",
-            data: null
-        };
-    }
+export async function modelappGetQuestionAnalysis({ message, questionType, _id }) {
+  try {
+    // 添加超时设置，默认为60秒
+    const res = await axios.post(
+      "/adminapi/modelapp/getquestionanalysis",
+      { message, questionType, _id },
+      { timeout: 300000 }, // 设置超时时间为300秒
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error:", error);
+    return {
+      code: 500,
+      message: error.message || "请求超时或服务器错误",
+      data: null,
+    };
+  }
 }

@@ -1,9 +1,6 @@
 <template>
   <div class="question-display">
-    <el-dialog 
-        v-model="dialogVisible" 
-        title="题目格式示例" 
-        width="70%">
+    <el-dialog v-model="dialogVisible" title="题目格式示例" width="70%">
       <div class="format-examples">
         <!-- 选择题 -->
         <div class="format-example">
@@ -14,43 +11,45 @@ The department secretary was ______ the guest speaker at the station at 10 this 
    B. meeting
    C. to be meeting
    D. to have met
-正确答案：D</pre>
+正确答案：D</pre
+          >
         </div>
-        
+
         <!-- 填空题 -->
         <div class="format-example">
           <h4>填空类题格式：</h4>
           <pre>
 中国历史上第一个封建王朝是________。
-正确答案：夏朝</pre>
+正确答案：夏朝</pre
+          >
         </div>
-        
+
         <!-- 判断题 -->
         <div class="format-example">
           <h4>判断类题格式：</h4>
           <pre>
 Python是一种编译型语言。
-正确答案：错误</pre>
+正确答案：错误</pre
+          >
         </div>
-        
+
         <!-- 简答题 -->
         <div class="format-example">
           <h4>简答类题格式：</h4>
           <pre>
 简述抗日战争胜利的历史意义。
-正确答案：抗日战争不仅捍卫了国家主权，也重塑了世界格局，对中国现代化进程和民族复兴具有深远影响。</pre>
+正确答案：抗日战争不仅捍卫了国家主权，也重塑了世界格局，对中国现代化进程和民族复兴具有深远影响。</pre
+          >
         </div>
       </div>
     </el-dialog>
-    
-    <el-button color="#a591db" @click="showFormat">
-      查看题目格式
-    </el-button>
+
+    <el-button color="#a591db" @click="showFormat"> 查看题目格式 </el-button>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const dialogVisible = ref(false);
 

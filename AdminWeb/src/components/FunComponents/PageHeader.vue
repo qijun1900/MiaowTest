@@ -8,11 +8,7 @@
           </el-tag>
         </div>
         <div v-if="options.length > 0" class="custom-style">
-          <el-segmented
-            v-model="activeTab"
-            :options="options"
-            @change="handleSegmentedChange"
-          />
+          <el-segmented v-model="activeTab" :options="options" @change="handleSegmentedChange" />
         </div>
       </div>
     </template>
@@ -37,19 +33,22 @@ const goBack = () => {
  * value: 对应的 value (用于 segmented 选中状态)
  */
 const routeRules = [
-  { match: (path) => path.startsWith('/exam/questionlist/'), value: 'questionlist' },
-  { match: (path) => path.startsWith('/exam/questionadd/'), value: 'questionadd' },
-  { match: (path) => path.startsWith('/exam/batchadd/'), value: 'batchadd' },
-  { match: (path) => path.startsWith('/exam/createExamType/'), value: 'questiontype' },
-  { match: (path) => path.startsWith('/exam/examfilemanage/'), value: 'examfile' },
-  { match: (path) => path.startsWith('/users'), value: 'users' },
-  { match: (path) => path.startsWith('/consumer') && !path.startsWith('/consumer/message'), value: 'consumer' },
+  { match: (path) => path.startsWith("/exam/questionlist/"), value: "questionlist" },
+  { match: (path) => path.startsWith("/exam/questionadd/"), value: "questionadd" },
+  { match: (path) => path.startsWith("/exam/batchadd/"), value: "batchadd" },
+  { match: (path) => path.startsWith("/exam/createExamType/"), value: "questiontype" },
+  { match: (path) => path.startsWith("/exam/examfilemanage/"), value: "examfile" },
+  { match: (path) => path.startsWith("/users"), value: "users" },
+  {
+    match: (path) => path.startsWith("/consumer") && !path.startsWith("/consumer/message"),
+    value: "consumer",
+  },
 ];
 
 // 计算当前激活的 tab 值
 const getCurrentTab = (path) => {
-  const rule = routeRules.find(r => r.match(path));
-  return rule ? rule.value : '';
+  const rule = routeRules.find((r) => r.match(path));
+  return rule ? rule.value : "";
 };
 
 const activeTab = ref(getCurrentTab(route.path));
@@ -59,7 +58,7 @@ watch(
   () => route.path,
   (newPath) => {
     activeTab.value = getCurrentTab(newPath);
-  }
+  },
 );
 
 /**
@@ -90,15 +89,9 @@ const options = computed(() => {
     path.startsWith("/exam/batchadd/")
   ) {
     return tabGroups.examQuestions;
-  } else if (
-    path.startsWith("/exam/createExamType/") ||
-    path.startsWith("/exam/examfilemanage/")
-  ) {
+  } else if (path.startsWith("/exam/createExamType/") || path.startsWith("/exam/examfilemanage/")) {
     return tabGroups.examManagement;
-  } else if (
-    (path === "/users" || path === "/consumer") &&
-    !path.startsWith("/consumer/message")
-  ) {
+  } else if ((path === "/users" || path === "/consumer") && !path.startsWith("/consumer/message")) {
     return tabGroups.userManagement;
   }
   return [];
@@ -115,8 +108,8 @@ const navigationMap = {
   batchadd: (id, query) => `/exam/batchadd/${id}?category=${query.category}`,
   questiontype: (id) => `/exam/createExamType/${id}`,
   examfile: (id) => `/exam/examfilemanage/${id}`,
-  users: () => '/users',
-  consumer: () => '/consumer',
+  users: () => "/users",
+  consumer: () => "/consumer",
 };
 
 const handleSegmentedChange = (newValue) => {

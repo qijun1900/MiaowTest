@@ -1,10 +1,10 @@
 <template>
-  <div 
-    class="batch-upload-area" 
-    :class="{ 
+  <div
+    class="batch-upload-area"
+    :class="{
       'has-file': hasFiles,
       'is-dragging': isDragging,
-      'is-expanded': !hasFiles
+      'is-expanded': !hasFiles,
     }"
     @drop.prevent="handleDrop"
     @dragover.prevent="handleDragOver"
@@ -31,7 +31,9 @@
           <div class="upload-text">
             <h3>点击或拖拽文件到此处批量上传</h3>
             <p>支持 JPG, PNG, PDF, MP4, MP3 等常见格式</p>
-            <p class="upload-limit">单个文件最大 {{ maxFileSizeMB }}MB，最多同时上传 {{ maxFileCount }} 个文件</p>
+            <p class="upload-limit">
+              单个文件最大 {{ maxFileSizeMB }}MB，最多同时上传 {{ maxFileCount }} 个文件
+            </p>
           </div>
           <div class="upload-features">
             <div class="feature-item">
@@ -48,18 +50,20 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 队列统计 -->
         <div v-else class="queue-stats">
           <div class="stats-header">
             <div class="stats-info">
               <el-icon class="stats-icon"><Files /></el-icon>
-              <span class="stats-text">已选择 <strong>{{ fileCount }}</strong> 个文件</span>
+              <span class="stats-text"
+                >已选择 <strong>{{ fileCount }}</strong> 个文件</span
+              >
             </div>
-            <el-button 
-              type="danger" 
-              text 
-              bg 
+            <el-button
+              type="danger"
+              text
+              bg
               size="small"
               @click.stop="handleClearQueue"
               :disabled="isUploading"
@@ -68,18 +72,14 @@
               清空队列
             </el-button>
           </div>
-          
+
           <!-- 整体进度条 -->
           <div v-if="isUploading && overallProgress !== null" class="overall-progress">
             <div class="progress-info">
               <span>总体进度</span>
               <span class="progress-text">{{ uploadedCount }}/{{ fileCount }}</span>
             </div>
-            <el-progress 
-              :percentage="overallProgress" 
-              :status="progressStatus"
-              :stroke-width="8"
-            />
+            <el-progress :percentage="overallProgress" :status="progressStatus" :stroke-width="8" />
           </div>
         </div>
       </div>
@@ -88,10 +88,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { 
-  UploadFilled, Files, Delete, MagicStick, CircleCheck
-} from '@element-plus/icons-vue'
+import { ref } from "vue";
+import { UploadFilled, Files, Delete, MagicStick, CircleCheck } from "@element-plus/icons-vue";
 
 const props = defineProps({
   // ========== 文件状态 ==========
@@ -105,7 +103,7 @@ const props = defineProps({
     default: 0,
     // 队列中的文件数量
   },
-  
+
   // ========== 上传状态 ==========
   isUploading: {
     type: Boolean,
@@ -117,7 +115,7 @@ const props = defineProps({
     default: 0,
     // 已完成上传的文件数量
   },
-  
+
   // ========== 进度信息 ==========
   overallProgress: {
     type: Number,
@@ -129,7 +127,7 @@ const props = defineProps({
     default: undefined,
     // 进度状态：success/exception/undefined
   },
-  
+
   // ========== 上传限制 ==========
   maxFileSizeMB: {
     type: Number,
@@ -141,57 +139,58 @@ const props = defineProps({
     default: 20,
     // 最多上传文件数量
   },
-  
+
   // ========== 文件格式 ==========
   acceptedFileTypes: {
     type: String,
-    default: '.jpg,.jpeg,.png,.gif,.bmp,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp4,.avi,.mov,.wmv,.flv,.mp3,.wav,.aac,.flac',
+    default:
+      ".jpg,.jpeg,.png,.gif,.bmp,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp4,.avi,.mov,.wmv,.flv,.mp3,.wav,.aac,.flac",
     // 支持的文件格式（逗号分隔的扩展名）
-  }
-})
+  },
+});
 
-const emit = defineEmits(['file-change', 'clear-queue'])
+const emit = defineEmits(["file-change", "clear-queue"]);
 
-const uploadRef = ref()
-const isDragging = ref(false)
+const uploadRef = ref();
+const isDragging = ref(false);
 
 const handleFileChange = (uploadFile) => {
-  emit('file-change', uploadFile)
-}
+  emit("file-change", uploadFile);
+};
 
 const handleDragEnter = () => {
-  isDragging.value = true
-}
+  isDragging.value = true;
+};
 
 const handleDragOver = () => {
-  isDragging.value = true
-}
+  isDragging.value = true;
+};
 
 const handleDragLeave = (e) => {
-  if (e.target.classList.contains('batch-upload-area')) {
-    isDragging.value = false
+  if (e.target.classList.contains("batch-upload-area")) {
+    isDragging.value = false;
   }
-}
+};
 
 const handleDrop = () => {
-  isDragging.value = false
-  const files = Array.from(event.dataTransfer.files)
-  emit('file-change', files)
-}
+  isDragging.value = false;
+  const files = Array.from(event.dataTransfer.files);
+  emit("file-change", files);
+};
 
 const handleClearQueue = () => {
-  emit('clear-queue')
-}
+  emit("clear-queue");
+};
 
 const clearFiles = () => {
   if (uploadRef.value) {
-    uploadRef.value.clearFiles()
+    uploadRef.value.clearFiles();
   }
-}
+};
 
 defineExpose({
-  clearFiles
-})
+  clearFiles,
+});
 </script>
 
 <style scoped>
@@ -414,15 +413,15 @@ defineExpose({
   .batch-upload-area.is-expanded {
     min-height: 400px;
   }
-  
+
   .upload-features {
     gap: 16px;
   }
-  
+
   .feature-item {
     padding: 10px 12px;
   }
-  
+
   .icon-box {
     font-size: 64px;
   }

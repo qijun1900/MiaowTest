@@ -2,7 +2,7 @@
  * @file init-database.js
  * @description 初始化数据库，包括创建必要的集合和初始数据
  * @script node script/init-database.js
- * @example 
+ * @example
 🚀 开始初始化数据库...
 🔍 数据库提供商: local
 🏠 使用本地数据库配置
@@ -16,40 +16,38 @@
 🎉 数据库初始化完成!
 🎯 脚本执行完成
  */
-const dbManager = require('../db/db.enhanced').dbManager;// 数据库连接管理
-const UserModel = require('../models/UserModel');
+const dbManager = require("../db/db.enhanced").dbManager; // 数据库连接管理
+const UserModel = require("../models/UserModel");
 
 // 管理员账户信息
 const adminUser = {
-  username: 'admin',
-  password: 'admin123', // 建议创建后立即修改密码
+  username: "admin",
+  password: "admin123", // 建议创建后立即修改密码
   role: 1, // 1表示管理员角色
   gender: 0, // 0表示保密
-  introduction: '系统初始管理员',
-  avatar: '', // 可选，默认无头像
+  introduction: "系统初始管理员",
+  avatar: "", // 可选，默认无头像
   state: 1, // 1表示正常状态
-  createTime: new Date()
+  createTime: new Date(),
 };
-
 
 /**
  * 初始化数据库
  */
 async function initDatabase() {
   try {
-    console.log('🚀 开始初始化数据库...');
-    
+    console.log("🚀 开始初始化数据库...");
+
     // 连接数据库
     await dbManager.connect();
-    console.log('✅ 数据库连接成功');
-    
+    console.log("✅ 数据库连接成功");
+
     // 检查并创建管理员账户
     await createAdminUser();
 
-    
-    console.log('🎉 数据库初始化完成!');
+    console.log("🎉 数据库初始化完成!");
   } catch (error) {
-    console.error('❌ 数据库初始化失败:', error.message);
+    console.error("❌ 数据库初始化失败:", error.message);
     throw error;
   }
 }
@@ -60,20 +58,22 @@ async function initDatabase() {
 async function createAdminUser() {
   try {
     // 检查是否已存在管理员账户
-    const existingAdmin = await UserModel.findOne({ username: adminUser.username });
+    const existingAdmin = await UserModel.findOne({
+      username: adminUser.username,
+    });
     if (existingAdmin) {
-      console.log('⚠️ 管理员账户已存在，跳过创建');
+      console.log("⚠️ 管理员账户已存在，跳过创建");
       return;
     }
 
     // 创建新管理员
     const newAdmin = await UserModel.create(adminUser);
-    console.log('✅ 管理员账户创建成功:');
+    console.log("✅ 管理员账户创建成功:");
     console.log(`   用户名: ${newAdmin.username}`);
     console.log(`   密码: ${adminUser.password}`);
-    console.log(`   角色: ${newAdmin.role === 1 ? '管理员' : '其他'}`);
+    console.log(`   角色: ${newAdmin.role === 1 ? "管理员" : "其他"}`);
   } catch (error) {
-    console.error('❌ 创建管理员账户失败:', error.message);
+    console.error("❌ 创建管理员账户失败:", error.message);
     throw error;
   }
 }
@@ -82,11 +82,11 @@ async function createAdminUser() {
 if (require.main === module) {
   initDatabase()
     .then(() => {
-      console.log('🎯 脚本执行完成');
+      console.log("🎯 脚本执行完成");
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 脚本执行失败:', error);
+      console.error("💥 脚本执行失败:", error);
       process.exit(1);
     });
 }

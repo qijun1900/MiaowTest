@@ -1,20 +1,18 @@
 <template>
-    <el-popconfirm 
-        :title="props.title"
-        @confirm="$emit('confirm')">
-        <template #reference>
-            <slot></slot>
-        </template>
-    </el-popconfirm>
+  <el-popconfirm :title="props.title" @confirm="$emit('confirm')">
+    <template #reference>
+      <slot></slot>
+    </template>
+  </el-popconfirm>
 </template>
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits } from "vue";
 const props = defineProps({
-    title: {
-        type: String,
-        default: '默认提示'
-    }
-})
+  title: {
+    type: String,
+    default: "默认提示",
+  },
+});
 
-defineEmits(['confirm'])
+defineEmits(["confirm"]);
 </script>

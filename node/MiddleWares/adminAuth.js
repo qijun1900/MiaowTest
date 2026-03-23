@@ -1,4 +1,4 @@
-const JWT = require('./jwt');
+const JWT = require("./jwt");
 
 const adminAuth = (req, res, next) => {
   // 登录接口不验证token
@@ -18,11 +18,14 @@ const adminAuth = (req, res, next) => {
     const payload = JWT.verify(token);
     if (payload) {
       // 生成新的token，有效期3d (保留原有逻辑)
-      const newToken = JWT.generate({
-        _id: payload._id,
-        username: payload.username
-      }, "3d");
-      res.header('Authorization', newToken); // 将新的token返回给客户端
+      const newToken = JWT.generate(
+        {
+          _id: payload._id,
+          username: payload.username,
+        },
+        "3d",
+      );
+      res.header("Authorization", newToken); // 将新的token返回给客户端
       next();
     } else {
       res.status(401).send({ errCode: "-1", errInfo: "token过期" });

@@ -1,11 +1,11 @@
-import { createStore } from 'vuex'
+import { createStore } from "vuex";
 export default createStore({
   state: {
-  isGetterRouter:false,
+    isGetterRouter: false,
   },
   mutations: {
-    ChangesGetterRouter(state,value){
-      state.isGetterRouter =value
+    ChangesGetterRouter(state, value) {
+      state.isGetterRouter = value;
     },
   },
-})
+});

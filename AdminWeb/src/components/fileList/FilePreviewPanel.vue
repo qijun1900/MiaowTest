@@ -1,9 +1,6 @@
 <template>
   <div class="file-preview-panel">
-    <div 
-      v-if="file" 
-      class="preview-container"
-    >
+    <div v-if="file" class="preview-container">
       <!-- 预览头部 -->
       <div class="preview-header">
         <h3 class="preview-title">
@@ -13,20 +10,10 @@
           {{ fileName }}
         </h3>
         <div class="preview-actions">
-          <el-button 
-            type="primary" 
-            link 
-            :icon="CopyDocument"
-            @click="$emit('copy-link', file.url)"
-          >
+          <el-button type="primary" link :icon="CopyDocument" @click="$emit('copy-link', file.url)">
             复制链接
           </el-button>
-          <el-button 
-            type="success"       
-            link 
-            :icon="Download"
-            @click="$emit('download', file)"
-          >
+          <el-button type="success" link :icon="Download" @click="$emit('download', file)">
             下载
           </el-button>
         </div>
@@ -37,9 +24,9 @@
         <!-- 图片预览 -->
         <div v-if="isImage(file)" class="media-wrapper image-wrapper">
           <div class="image-preview-container">
-            <el-image 
-              :src="file.url" 
-              :preview-src-list="[file.url]" 
+            <el-image
+              :src="file.url"
+              :preview-src-list="[file.url]"
               fit="contain"
               class="preview-image"
               :preview-teleported="true"
@@ -57,14 +44,14 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 视频预览 -->
         <div v-else-if="isVideo(file)" class="media-wrapper video-wrapper">
           <video controls :src="file.url" class="preview-video" preload="metadata">
             您的浏览器不支持视频播放
           </video>
         </div>
-        
+
         <!-- 音频预览 -->
         <div v-else-if="isAudio(file)" class="media-wrapper audio-wrapper">
           <div class="audio-icon-container">
@@ -79,7 +66,7 @@
             </audio>
           </div>
         </div>
-        
+
         <!-- 其他文件 -->
         <div v-else class="media-wrapper file-wrapper">
           <div class="file-icon-container">
@@ -88,7 +75,7 @@
             </el-icon>
           </div>
           <p class="file-not-supported">该文件类型不支持预览</p>
-          <p class="file-type-hint">{{ file.mimeType || '未知类型' }}</p>
+          <p class="file-type-hint">{{ file.mimeType || "未知类型" }}</p>
         </div>
       </div>
 
@@ -107,8 +94,8 @@
           <span class="label">URL</span>
           <div class="url-container">
             <span class="value link" @click="$emit('copy-link', file.url)">{{ file.url }}</span>
-            <el-button 
-              type="primary" 
+            <el-button
+              type="primary"
               size="small"
               :icon="CopyDocument"
               @click="$emit('copy-link', file.url)"
@@ -119,7 +106,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 空状态 -->
     <div v-else class="empty-state">
       <div class="empty-state-content">
@@ -134,18 +121,18 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
 import {
-  Picture, Document, VideoPlay, Headset,
-  CopyDocument, Download, ZoomIn
-} from '@element-plus/icons-vue'
-import { 
-  isImage,
-  isVideo, 
-  isAudio, 
-  getFileIcon
-} from '@/util/resourceUtils'
-import { generateFileInfoList } from '@/util/fileListUtils'
+  Picture,
+  Document,
+  VideoPlay,
+  Headset,
+  CopyDocument,
+  Download,
+  ZoomIn,
+} from "@element-plus/icons-vue";
+import { isImage, isVideo, isAudio, getFileIcon } from "@/util/resourceUtils";
+import { generateFileInfoList } from "@/util/fileListUtils";
 
 const props = defineProps({
   // ========== 文件数据 ==========
@@ -153,33 +140,32 @@ const props = defineProps({
     type: Object,
     default: null,
     // 当前选中的文件对象
-  }
-})
+  },
+});
 
 // ========== 事件定义 ==========
 defineEmits([
-  'copy-link',   // 复制链接
-  'download'     // 下载文件
-])
+  "copy-link", // 复制链接
+  "download", // 下载文件
+]);
 
 // ========== 计算属性 ==========
 const fileInfoList = computed(() => {
-  return generateFileInfoList(props.file)
-})
+  return generateFileInfoList(props.file);
+});
 //对文件名进行截断
 const fileName = computed(() => {
-  if (!props.file || !props.file.name) return ''
-  const name = props.file.name
-  const maxLength = 20
+  if (!props.file || !props.file.name) return "";
+  const name = props.file.name;
+  const maxLength = 20;
   if (name.length <= maxLength) {
-    return name
+    return name;
   }
-  const extIndex = name.lastIndexOf('.')
-  const ext = extIndex !== -1 ? name.slice(extIndex) : ''
-  const truncatedName = name.slice(0, maxLength - ext.length - 3)
-  return `${truncatedName}...${ext}`
-})
-
+  const extIndex = name.lastIndexOf(".");
+  const ext = extIndex !== -1 ? name.slice(extIndex) : "";
+  const truncatedName = name.slice(0, maxLength - ext.length - 3);
+  return `${truncatedName}...${ext}`;
+});
 </script>
 
 <style scoped>
@@ -388,11 +374,12 @@ const fileName = computed(() => {
 }
 
 @keyframes audioPulse {
-  0%, 100% { 
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
-  50% { 
+  50% {
     transform: scale(1.05);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
   }

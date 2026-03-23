@@ -8,7 +8,9 @@
         </div>
         <div class="title-content">
           <h2>资源上传中心</h2>
-          <p class="header-desc">支持批量拖拽上传，自动识别文件类型并提取元数据，实时显示上传进度</p>
+          <p class="header-desc">
+            支持批量拖拽上传，自动识别文件类型并提取元数据，实时显示上传进度
+          </p>
         </div>
       </div>
     </div>
@@ -51,10 +53,7 @@
 
         <!-- 右侧：批量配置表单 -->
         <el-col :xs="24" :lg="14" class="right-panel">
-          <BatchConfigForm
-            :config="batchConfig"
-            :tag-options="tagOptions"
-          />
+          <BatchConfigForm :config="batchConfig" :tag-options="tagOptions" />
         </el-col>
       </el-row>
     </el-card>
@@ -62,17 +61,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { FolderAdd } from '@element-plus/icons-vue'
-import { useAppStore } from '@/stores'
-import { getTags } from '@/API/Resource/FileAPI'
-import { useBatchUpload } from '@/composables/useBatchUpload'
-import BatchUploadArea from '@/components/upload/BatchUploadArea.vue'
-import UploadQueueList from '@/components/upload/UploadQueueList.vue'
-import BatchConfigForm from '@/components/upload/BatchConfigForm.vue'
+import { ref, onMounted } from "vue";
+import { FolderAdd } from "@element-plus/icons-vue";
+import { useAppStore } from "@/stores";
+import { getTags } from "@/API/Resource/FileAPI";
+import { useBatchUpload } from "@/composables/useBatchUpload";
+import BatchUploadArea from "@/components/upload/BatchUploadArea.vue";
+import UploadQueueList from "@/components/upload/UploadQueueList.vue";
+import BatchConfigForm from "@/components/upload/BatchConfigForm.vue";
 
-const appStore = useAppStore()
-const uploadAreaRef = ref()
+const appStore = useAppStore();
+const uploadAreaRef = ref();
 
 // 使用批量上传组合式函数
 const {
@@ -92,54 +91,54 @@ const {
   startBatchUpload,
   pauseUpload,
   pauseAllUploads,
-  retryUpload
-} = useBatchUpload(appStore)
+  retryUpload,
+} = useBatchUpload(appStore);
 
 // 标签选项
-const tagOptions = ref([])
+const tagOptions = ref([]);
 
 // 获取标签列表
 const fetchTags = async () => {
   try {
-    const response = await getTags()
+    const response = await getTags();
     if (response.code === 200) {
-      tagOptions.value = response.data.map(tag => ({
+      tagOptions.value = response.data.map((tag) => ({
         label: tag,
-        value: tag
-      }))
+        value: tag,
+      }));
     }
   } catch (error) {
-    console.error('获取标签失败', error)
+    console.error("获取标签失败", error);
   }
-}
+};
 
 onMounted(() => {
-  fetchTags()
-})
+  fetchTags();
+});
 
 // 文件变动处理
 const handleFileChange = (data) => {
   if (Array.isArray(data)) {
     // 拖拽多个文件
-    addFilesToQueue(data)
+    addFilesToQueue(data);
   } else if (data.raw) {
     // 点击选择单个文件
-    addFilesToQueue([data.raw])
+    addFilesToQueue([data.raw]);
   }
-}
+};
 
 // 清空队列
 const handleClearQueue = async () => {
-  const result = await clearQueue()
+  const result = await clearQueue();
   if (result && uploadAreaRef.value) {
-    uploadAreaRef.value.clearFiles()
+    uploadAreaRef.value.clearFiles();
   }
-}
+};
 
 // 开始上传
 const handleStartUpload = () => {
-  startBatchUpload(tagOptions)
-}
+  startBatchUpload(tagOptions);
+};
 </script>
 
 <style scoped>
@@ -272,15 +271,15 @@ const handleStartUpload = () => {
     height: auto;
     overflow: auto;
   }
-  
+
   .main-card {
     flex: none;
   }
-  
+
   .left-panel {
     height: auto;
   }
-  
+
   .right-panel {
     padding-left: 0;
     border-left: none;

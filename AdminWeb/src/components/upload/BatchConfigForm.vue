@@ -4,10 +4,10 @@
       <span class="title-line"></span>
       <span class="title-text">批量配置</span>
     </div>
-    
-    <el-form 
-      ref="formRef" 
-      :model="config" 
+
+    <el-form
+      ref="formRef"
+      :model="config"
       :rules="rules"
       label-position="top"
       class="resource-form"
@@ -17,32 +17,46 @@
         type="info"
         :closable="false"
         show-icon
-        style="margin-bottom: 20px;"
+        style="margin-bottom: 20px"
       >
         <template #default>
-          以下配置将应用到所有上传文件，文件名将自动使用原始文件名。<strong style="color: #409eff;">标签为必填项</strong>，请务必填写。
+          以下配置将应用到所有上传文件，文件名将自动使用原始文件名。<strong style="color: #409eff"
+            >标签为必填项</strong
+          >，请务必填写。
         </template>
       </el-alert>
 
       <el-form-item label="默认分类">
         <el-radio-group v-model="config.category" class="category-radio-group">
           <el-radio-button :value="0">
-            <div class="radio-content"><el-icon><MagicStick /></el-icon> 自动识别</div>
+            <div class="radio-content">
+              <el-icon><MagicStick /></el-icon> 自动识别
+            </div>
           </el-radio-button>
           <el-radio-button :value="1">
-            <div class="radio-content"><el-icon><Picture /></el-icon> 图片</div>
+            <div class="radio-content">
+              <el-icon><Picture /></el-icon> 图片
+            </div>
           </el-radio-button>
           <el-radio-button :value="2">
-            <div class="radio-content"><el-icon><Document /></el-icon> 文档</div>
+            <div class="radio-content">
+              <el-icon><Document /></el-icon> 文档
+            </div>
           </el-radio-button>
           <el-radio-button :value="3">
-            <div class="radio-content"><el-icon><VideoPlay /></el-icon> 视频</div>
+            <div class="radio-content">
+              <el-icon><VideoPlay /></el-icon> 视频
+            </div>
           </el-radio-button>
           <el-radio-button :value="4">
-            <div class="radio-content"><el-icon><Headset /></el-icon> 音频</div>
+            <div class="radio-content">
+              <el-icon><Headset /></el-icon> 音频
+            </div>
           </el-radio-button>
           <el-radio-button :value="5">
-            <div class="radio-content"><el-icon><More /></el-icon> 其他</div>
+            <div class="radio-content">
+              <el-icon><More /></el-icon> 其他
+            </div>
           </el-radio-button>
         </el-radio-group>
       </el-form-item>
@@ -71,11 +85,11 @@
       </el-form-item>
 
       <el-form-item label="统一描述">
-        <el-input 
-          v-model="config.description" 
-          type="textarea" 
-          :rows="3" 
-          placeholder="为所有文件添加统一描述（可选）" 
+        <el-input
+          v-model="config.description"
+          type="textarea"
+          :rows="3"
+          placeholder="为所有文件添加统一描述（可选）"
           resize="none"
           maxlength="200"
           show-word-limit
@@ -88,10 +102,10 @@
       </el-divider>
 
       <el-form-item label="并发上传数">
-        <el-slider 
-          v-model="config.concurrency" 
-          :min="1" 
-          :max="5" 
+        <el-slider
+          v-model="config.concurrency"
+          :min="1"
+          :max="5"
           :marks="{ 1: '1', 3: '3', 5: '5' }"
           show-stops
         />
@@ -112,11 +126,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 import {
-  MagicStick, Picture, Document, VideoPlay, Headset, More,
-  InfoFilled, Setting
-} from '@element-plus/icons-vue'
+  MagicStick,
+  Picture,
+  Document,
+  VideoPlay,
+  Headset,
+  More,
+  InfoFilled,
+  Setting,
+} from "@element-plus/icons-vue";
 
 const props = defineProps({
   // ========== 配置对象 ==========
@@ -125,30 +145,28 @@ const props = defineProps({
     required: true,
     // 包含：category(分类), tag(标签), description(描述), concurrency(并发数), errorHandling(错误处理)
   },
-  
+
   // ========== 标签选项 ==========
   tagOptions: {
     type: Array,
     default: () => [],
     // 格式：[{ label: '标签名', value: '标签值' }]
-  }
-})
+  },
+});
 
-const formRef = ref()
+const formRef = ref();
 
 const rules = {
-  tag: [
-    { required: true, message: '请选择或输入标签', trigger: 'change' }
-  ]
-}
+  tag: [{ required: true, message: "请选择或输入标签", trigger: "change" }],
+};
 
 const validate = () => {
-  return formRef.value?.validate()
-}
+  return formRef.value?.validate();
+};
 
 defineExpose({
-  validate
-})
+  validate,
+});
 </script>
 
 <style scoped>

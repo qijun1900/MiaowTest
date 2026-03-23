@@ -6,7 +6,7 @@
  * @example
  * routerPush('/home', { id: 1 })
  */
-import router from '@/router';
-export default function (path,query) {
-    router.push({path:path,query:query})
+import router from "@/router";
+export default function (path, query) {
+  router.push({ path: path, query: query });
 }

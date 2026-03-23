@@ -3,10 +3,7 @@
     <!-- 分割布局 -->
     <div class="split-layout" ref="splitLayout">
       <!-- 左侧面板：文件列表 -->
-      <div 
-        class="pane-left" 
-        :style="{ width: leftPaneWidth + '%' }"
-      >
+      <div class="pane-left" :style="{ width: leftPaneWidth + '%' }">
         <FileListTable
           :table-data="tableData"
           :loading="loading"
@@ -28,24 +25,13 @@
       </div>
 
       <!-- 调整大小手柄 -->
-      <div 
-        class="resizer" 
-        @mousedown="startResize" 
-        :class="{ 'resizer-active': isResizing }"
-      >
+      <div class="resizer" @mousedown="startResize" :class="{ 'resizer-active': isResizing }">
         <div class="resizer-line"></div>
       </div>
 
       <!-- 右侧面板：预览和详情 -->
-      <div 
-        class="pane-right" 
-        :style="{ width: (100 - leftPaneWidth) + '%' }"
-      >
-        <FilePreviewPanel
-          :file="selectedFile"
-          @copy-link="copyLink"
-          @download="downloadFile"
-        />
+      <div class="pane-right" :style="{ width: 100 - leftPaneWidth + '%' }">
+        <FilePreviewPanel :file="selectedFile" @copy-link="copyLink" @download="downloadFile" />
       </div>
     </div>
 
@@ -62,12 +48,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import RouterPush from '@/util/RouterPush'
-import { useFileList } from '@/composables/useFileList'
-import FileListTable from '@/components/fileList/FileListTable.vue'
-import FilePreviewPanel from '@/components/fileList/FilePreviewPanel.vue'
-import FileEditDialog from '@/components/fileList/FileEditDialog.vue'
+import { ref, onMounted } from "vue";
+import RouterPush from "@/util/RouterPush";
+import { useFileList } from "@/composables/useFileList";
+import FileListTable from "@/components/fileList/FileListTable.vue";
+import FilePreviewPanel from "@/components/fileList/FilePreviewPanel.vue";
+import FileEditDialog from "@/components/fileList/FileEditDialog.vue";
 
 // ========== 使用文件列表组合式函数 ==========
 const {
@@ -91,75 +77,75 @@ const {
   copyLink,
   downloadFile,
   handleStateChange,
-} = useFileList()
+} = useFileList();
 
 // ========== 布局调整逻辑 ==========
-const leftPaneWidth = ref(65)
-const isResizing = ref(false)
-const splitLayout = ref(null)
+const leftPaneWidth = ref(65);
+const isResizing = ref(false);
+const splitLayout = ref(null);
 
 const startResize = () => {
-  isResizing.value = true
-  document.addEventListener('mousemove', handleResize)
-  document.addEventListener('mouseup', stopResize)
-  document.body.style.cursor = 'col-resize'
-  document.body.style.userSelect = 'none'
-}
+  isResizing.value = true;
+  document.addEventListener("mousemove", handleResize);
+  document.addEventListener("mouseup", stopResize);
+  document.body.style.cursor = "col-resize";
+  document.body.style.userSelect = "none";
+};
 
 const handleResize = (e) => {
-  if (!isResizing.value || !splitLayout.value) return
-  const containerRect = splitLayout.value.getBoundingClientRect()
-  const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100
+  if (!isResizing.value || !splitLayout.value) return;
+  const containerRect = splitLayout.value.getBoundingClientRect();
+  const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
 
   if (newLeftWidth > 20 && newLeftWidth < 80) {
-    leftPaneWidth.value = newLeftWidth
+    leftPaneWidth.value = newLeftWidth;
   }
-}
+};
 
 const stopResize = () => {
-  isResizing.value = false
-  document.removeEventListener('mousemove', handleResize)
-  document.removeEventListener('mouseup', stopResize)
-  document.body.style.cursor = ''
-  document.body.style.userSelect = ''
-}
+  isResizing.value = false;
+  document.removeEventListener("mousemove", handleResize);
+  document.removeEventListener("mouseup", stopResize);
+  document.body.style.cursor = "";
+  document.body.style.userSelect = "";
+};
 
 // ========== 编辑对话框逻辑 ==========
-const dialogVisible = ref(false)
-const editDialogRef = ref()
-const editingFile = ref(null)
-const isUpdating = ref(false)
+const dialogVisible = ref(false);
+const editDialogRef = ref();
+const editingFile = ref(null);
+const isUpdating = ref(false);
 
 const handleEdit = (file) => {
-  editingFile.value = file
-  dialogVisible.value = true
-}
+  editingFile.value = file;
+  dialogVisible.value = true;
+};
 
 const handleConfirmEdit = async (data) => {
-  isUpdating.value = true
+  isUpdating.value = true;
   try {
-    const success = await handleUpdate(data)
+    const success = await handleUpdate(data);
     if (success) {
-      dialogVisible.value = false
+      dialogVisible.value = false;
       if (editDialogRef.value) {
-        editDialogRef.value.resetForm()
+        editDialogRef.value.resetForm();
       }
     }
   } finally {
-    isUpdating.value = false
+    isUpdating.value = false;
   }
-}
+};
 
 // ========== 上传处理 ==========
 const handleUpload = () => {
-  RouterPush('/resource/fileupload')
-}
+  RouterPush("/resource/fileupload");
+};
 
 // ========== 初始化 ==========
 onMounted(() => {
-  fetchTags()
-  fetchData()
-})
+  fetchTags();
+  fetchData();
+});
 </script>
 
 <style scoped>
@@ -243,11 +229,11 @@ onMounted(() => {
   .pane-left {
     width: 100% !important;
   }
-  
+
   .pane-right {
     display: none;
   }
-  
+
   .resizer {
     display: none;
   }

@@ -1,526 +1,573 @@
-const WrongBookModel = require('../../models/WrongBookModel');
-const WrongQuestionModel = require('../../models/WrongQuestionModel');
-const mongoose = require('mongoose');
+const WrongBookModel = require("../../models/WrongBookModel");
+const WrongQuestionModel = require("../../models/WrongQuestionModel");
+const mongoose = require("mongoose");
 
-const escapeRegex = (keyword = '') => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegex = (keyword = "") =>
+  keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const WrongBookService = {
-    /**
-     * 获取错题本列表
-     */
-    getWrongBooks: async ({ uid}) => {
-        try {
-            const wrongBooks = await WrongBookModel.find({ Uid:uid },{
-                _id: 1,
-                title: 1,
-                color: 1,
-                updatedAt: 1,
-                count: 1
-            }).sort({ updatedAt: -1 }).lean();
-            return wrongBooks;
-        } catch (error) {
-            console.error("DATABASE:获取错题本列表失败", error);
-            throw error;
-        }
-    },
-    /**
-     * 创建错题本
-     */
-    createWrongBook: async ({ uid, title, color }) => {
-        try {
-            const newWrongBook = new WrongBookModel({
-                Uid: uid,
-                title,
-                color,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            });
-            const saved = await newWrongBook.save();
-            return {
-                success: true,
-                data: saved
-            };
-        } catch (error) {
-            console.error("DATABASE:创建错题本失败", error);
-            throw error;
-        }
-    },
-    /**
-     * 添加错题
-     */
-    addWrongQuestion: async ({ uid, questionData }) => {
-        try {
-            const { wrongBookId, Type, questionSource, stem, options, correctAnswer, wrongAnswer, analysis, tags, difficulty } = questionData;
-            
-            // 验证错题本是否存在且属于该用户
-            const wrongBook = await WrongBookModel.findOne({ _id: wrongBookId, Uid: uid });
-            if (!wrongBook) {
-                return {
-                    success: false,
-                    message: '错题本不存在或无权限'
-                };
-            }
-            
-            // 生成题目ID（用户自建题目）
-            const questionId = new mongoose.Types.ObjectId();
-            
-            // 创建错题记录
-            const newWrongQuestion = new WrongQuestionModel({
-                Uid: uid,
-                wrongBookId: wrongBookId,
-                questionId: questionId,
-                Type: Type,
-                questionSource: questionSource || 'user',
-                stem: stem || { text: '', images: [] },
-                options: options || [],
-                correctAnswer: correctAnswer || { text: '', images: [] },
-                wrongAnswer: wrongAnswer || { text: '', images: [] },
-                analysis: analysis || { text: '', images: [] },
-                tags: tags || [],
-                difficulty: difficulty || 'medium',
-                status: 0,
-                reviewCount: 0,
-                wrongCount: 1,
-                addedAt: new Date(),
-                lastWrongAt: new Date(),
-                createdAt: new Date(),
-                updatedAt: new Date()
-            });
-            
-            // 保存错题
-            const savedQuestion = await newWrongQuestion.save();
-            
-            // 更新错题本的题目数量和更新时间
-            await WrongBookModel.updateOne(
-                { _id: wrongBookId },
-                { 
-                    $inc: { count: 1 },
-                    $set: { updatedAt: new Date() }
-                }
-            );
-            
-            return {
-                success: true,
-                data: savedQuestion
-            };
-        } catch (error) {
-            console.error("DATABASE:添加错题失败", error);
-            throw error;
-        }
-    },
-    /**
-     * 获取错题列表
-     */
-    getWrongQuestions: async ({ uid, wrongBookId, page = 1, pageSize = 20, keyword = '', tag = '' }) => {
-        try {
-            const safePage = Math.max(1, Number(page) || 1);
-            const safePageSize = Math.min(50, Math.max(1, Number(pageSize) || 20));
+  /**
+   * 获取错题本列表
+   */
+  getWrongBooks: async ({ uid }) => {
+    try {
+      const wrongBooks = await WrongBookModel.find(
+        { Uid: uid },
+        {
+          _id: 1,
+          title: 1,
+          color: 1,
+          updatedAt: 1,
+          count: 1,
+        },
+      )
+        .sort({ updatedAt: -1 })
+        .lean();
+      return wrongBooks;
+    } catch (error) {
+      console.error("DATABASE:获取错题本列表失败", error);
+      throw error;
+    }
+  },
+  /**
+   * 创建错题本
+   */
+  createWrongBook: async ({ uid, title, color }) => {
+    try {
+      const newWrongBook = new WrongBookModel({
+        Uid: uid,
+        title,
+        color,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      const saved = await newWrongBook.save();
+      return {
+        success: true,
+        data: saved,
+      };
+    } catch (error) {
+      console.error("DATABASE:创建错题本失败", error);
+      throw error;
+    }
+  },
+  /**
+   * 添加错题
+   */
+  addWrongQuestion: async ({ uid, questionData }) => {
+    try {
+      const {
+        wrongBookId,
+        Type,
+        questionSource,
+        stem,
+        options,
+        correctAnswer,
+        wrongAnswer,
+        analysis,
+        tags,
+        difficulty,
+      } = questionData;
 
-            const query = {
-                Uid: uid,
-                wrongBookId: wrongBookId
-            };
+      // 验证错题本是否存在且属于该用户
+      const wrongBook = await WrongBookModel.findOne({
+        _id: wrongBookId,
+        Uid: uid,
+      });
+      if (!wrongBook) {
+        return {
+          success: false,
+          message: "错题本不存在或无权限",
+        };
+      }
 
-            if (tag && tag !== 'all') {
-                query.tags = tag;
-            }
+      // 生成题目ID（用户自建题目）
+      const questionId = new mongoose.Types.ObjectId();
 
-            const trimmedKeyword = String(keyword || '').trim();
-            if (trimmedKeyword) {
-                const regex = new RegExp(escapeRegex(trimmedKeyword), 'i');
-                query.$or = [
-                    { 'stem.text': regex },
-                    { 'wrongAnswer.text': regex },
-                    { 'correctAnswer.text': regex },
-                    { 'analysis.text': regex },
-                    { tags: regex },
-                    { 'options.text': regex },
-                    { 'options.content.text': regex }
-                ];
-            }
+      // 创建错题记录
+      const newWrongQuestion = new WrongQuestionModel({
+        Uid: uid,
+        wrongBookId: wrongBookId,
+        questionId: questionId,
+        Type: Type,
+        questionSource: questionSource || "user",
+        stem: stem || { text: "", images: [] },
+        options: options || [],
+        correctAnswer: correctAnswer || { text: "", images: [] },
+        wrongAnswer: wrongAnswer || { text: "", images: [] },
+        analysis: analysis || { text: "", images: [] },
+        tags: tags || [],
+        difficulty: difficulty || "medium",
+        status: 0,
+        reviewCount: 0,
+        wrongCount: 1,
+        addedAt: new Date(),
+        lastWrongAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-            const total = await WrongQuestionModel.countDocuments(query);
+      // 保存错题
+      const savedQuestion = await newWrongQuestion.save();
 
-            const questions = await WrongQuestionModel.find(query,{
-                questionSource :0,
-                note: 0,
-                noteUpdatedAt: 0,
-                createdAt: 0,
-                __v: 0,
-                masteredAt: 0,
-                nextReviewAt:0,
-                lastReviewAt:0,
-                addedAt:0,
-                reviewHistory:0,
-                Uid:0,
-            })
-            .sort({ updatedAt: -1, _id: -1 })
-            .skip((safePage - 1) * safePageSize)
-            .limit(safePageSize)
-            .lean();
+      // 更新错题本的题目数量和更新时间
+      await WrongBookModel.updateOne(
+        { _id: wrongBookId },
+        {
+          $inc: { count: 1 },
+          $set: { updatedAt: new Date() },
+        },
+      );
 
-            return {
-                list: questions,
-                pagination: {
-                    page: safePage,
-                    pageSize: safePageSize,
-                    total,
-                    hasMore: safePage * safePageSize < total
-                }
-            };
-        } catch (error) {
-            console.error("DATABASE:获取错题列表失败", error);
-            throw error;
-        }
-    },
-    /**
-     * 删除错题(先查找后删除 以更新错题本数量，同时带出url 以删除图片)
-     */
-    deleteWrongQuestion: async ({ uid, id }) => {
-        try {
-            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
-            if (!question) {
-                return { 
-                    success: false ,
-                    message: '错题不存在或无权限'
-                };
-            }
-            const wrongBookId = question.wrongBookId;
-            const result = await WrongQuestionModel.deleteOne({ _id: id, Uid: uid });
-            if (result.deletedCount > 0) {
-                await WrongBookModel.updateOne(
-                    { _id: wrongBookId },
-                    { 
-                        $inc: { count: -1 },
-                        $set: { updatedAt: new Date() }
-                    }
-                );
-            }
-            return { 
-                success: result.deletedCount > 0 ,
-                    data: {
-                        images: [
-                            ...question.stem.images,
-                            ...question.correctAnswer.images,
-                            ...question.wrongAnswer.images,
-                            ...question.analysis.images,
-                            ...question.note.images
-                        ]
-                    }
-            };
-        } catch (error) {
-            console.error("DATABASE:删除错题失败", error);
-            throw error;
-        }
-    },
+      return {
+        success: true,
+        data: savedQuestion,
+      };
+    } catch (error) {
+      console.error("DATABASE:添加错题失败", error);
+      throw error;
+    }
+  },
+  /**
+   * 获取错题列表
+   */
+  getWrongQuestions: async ({
+    uid,
+    wrongBookId,
+    page = 1,
+    pageSize = 20,
+    keyword = "",
+    tag = "",
+  }) => {
+    try {
+      const safePage = Math.max(1, Number(page) || 1);
+      const safePageSize = Math.min(50, Math.max(1, Number(pageSize) || 20));
 
-    /**
-     * 标记为已掌握
-     */
-    markAsMastered: async ({ uid, id }) => {
-        try {
-            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
-            if (!question) {
-                return { success: false };
-            }
-            await question.markAsMastered();
-            return { success: true };
-        } catch (error) {
-            console.error("DATABASE:标记为已掌握失败", error);
-            throw error;
-        }
-    },
+      const query = {
+        Uid: uid,
+        wrongBookId: wrongBookId,
+      };
 
-    /**
-     * 标记为需要复习
-     */
-    markAsNeedReview: async ({ uid, id }) => {
-        try {
-            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
-            if (!question) {
-                return { success: false };
-            }
-            await question.markAsNeedReview();
-            return { success: true };
-        } catch (error) {
-            console.error("DATABASE:标记为需要复习失败", error);
-            throw error;
-        }
-    },
+      if (tag && tag !== "all") {
+        query.tags = tag;
+      }
 
-    /**
-     * 获取错题本详情
-     */
-    getWrongBookDetail: async ({ uid, id }) => {
-        try {
-            const detail = await WrongBookModel.findOne({ _id: id, Uid: uid }, {
-                title: 1,
-                color: 1,
-                count: 1,
-                updatedAt: 1
-            }).lean();
-            return detail;
-        } catch (error) {
-            console.error("DATABASE:获取错题本详情失败", error);
-            throw error;
-        }
-    },
+      const trimmedKeyword = String(keyword || "").trim();
+      if (trimmedKeyword) {
+        const regex = new RegExp(escapeRegex(trimmedKeyword), "i");
+        query.$or = [
+          { "stem.text": regex },
+          { "wrongAnswer.text": regex },
+          { "correctAnswer.text": regex },
+          { "analysis.text": regex },
+          { tags: regex },
+          { "options.text": regex },
+          { "options.content.text": regex },
+        ];
+      }
 
-    /**
-     * 更新错题本
-     */
-    updateWrongBook: async ({ uid, id, title, color }) => {
-        try {
-            const result = await WrongBookModel.updateOne(
-                { _id: id, Uid: uid },
-                { 
-                    $set: { 
-                        title, 
-                        color,
-                        updatedAt: new Date()
-                    } 
-                }
-            );
-            return {
-                success: result.modifiedCount > 0
-            };
-        } catch (error) {
-            console.error("DATABASE:更新错题本失败", error);
-            throw error;
-        }
-    },
+      const total = await WrongQuestionModel.countDocuments(query);
 
-    /**
-     * 删除错题本
-     */
-    deleteWrongBook: async ({ uid, id }) => {
-        try {
-            // 1. 检查错题本是否存在且属于该用户
-            const wrongBook = await WrongBookModel.findOne({ _id: id, Uid: uid });
-            if (!wrongBook) {
-                return {
-                    success: false,
-                    message: '错题本不存在或无权限'
-                };
-            }
-            
-            // 2. 检查错题本中是否有题目
-            const questionCount = await WrongQuestionModel.countDocuments({ 
-                wrongBookId: id, 
-                Uid: uid 
-            });
-            
-            if (questionCount > 0) {
-                return {
-                    success: false,
-                    message: `错题本中还有 ${questionCount} 道题目，请先删除所有题目后再删除错题本`,
-                    questionCount: questionCount
-                };
-            }
-            
-            // 3. 如果没有题目，则可以删除
-            const result = await WrongBookModel.deleteOne({ _id: id, Uid: uid });
-            
-            return {
-                success: result.deletedCount > 0,
-                message: result.deletedCount > 0 ? '删除成功' : '删除失败'
-            };
-        } catch (error) {
-            console.error("DATABASE:删除错题本失败", error);
-            throw error;
-        }
-    },
+      const questions = await WrongQuestionModel.find(query, {
+        questionSource: 0,
+        note: 0,
+        noteUpdatedAt: 0,
+        createdAt: 0,
+        __v: 0,
+        masteredAt: 0,
+        nextReviewAt: 0,
+        lastReviewAt: 0,
+        addedAt: 0,
+        reviewHistory: 0,
+        Uid: 0,
+      })
+        .sort({ updatedAt: -1, _id: -1 })
+        .skip((safePage - 1) * safePageSize)
+        .limit(safePageSize)
+        .lean();
 
-    /**
-     * 获取错题详情 
-     */
-    getWrongQuestionDetail: async ({ uid, id }) => {
-        try {
-            const detail = await WrongQuestionModel.findOne({ _id: id, Uid: uid }).lean();
-            return detail;
-        } catch (error) {
-            console.error("DATABASE:获取错题详情失败", error);
-            throw error;
-        }
-    },
+      return {
+        list: questions,
+        pagination: {
+          page: safePage,
+          pageSize: safePageSize,
+          total,
+          hasMore: safePage * safePageSize < total,
+        },
+      };
+    } catch (error) {
+      console.error("DATABASE:获取错题列表失败", error);
+      throw error;
+    }
+  },
+  /**
+   * 删除错题(先查找后删除 以更新错题本数量，同时带出url 以删除图片)
+   */
+  deleteWrongQuestion: async ({ uid, id }) => {
+    try {
+      const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+      if (!question) {
+        return {
+          success: false,
+          message: "错题不存在或无权限",
+        };
+      }
+      const wrongBookId = question.wrongBookId;
+      const result = await WrongQuestionModel.deleteOne({ _id: id, Uid: uid });
+      if (result.deletedCount > 0) {
+        await WrongBookModel.updateOne(
+          { _id: wrongBookId },
+          {
+            $inc: { count: -1 },
+            $set: { updatedAt: new Date() },
+          },
+        );
+      }
+      return {
+        success: result.deletedCount > 0,
+        data: {
+          images: [
+            ...question.stem.images,
+            ...question.correctAnswer.images,
+            ...question.wrongAnswer.images,
+            ...question.analysis.images,
+            ...question.note.images,
+          ],
+        },
+      };
+    } catch (error) {
+      console.error("DATABASE:删除错题失败", error);
+      throw error;
+    }
+  },
 
-    /**
-     * 更新错题
-     */
-    updateWrongQuestion: async ({ uid, id, wrongBookId, Type, questionSource, stem, options, correctAnswer, wrongAnswer, analysis, tags, difficulty }) => {
-        try {
-            // 验证错题是否存在且属于该用户
-            const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
-            if (!question) {
-                return {
-                    success: false,
-                    message: '错题不存在或无权限'
-                };
-            }
+  /**
+   * 标记为已掌握
+   */
+  markAsMastered: async ({ uid, id }) => {
+    try {
+      const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+      if (!question) {
+        return { success: false };
+      }
+      await question.markAsMastered();
+      return { success: true };
+    } catch (error) {
+      console.error("DATABASE:标记为已掌握失败", error);
+      throw error;
+    }
+  },
 
-            const updateData = {
-                updatedAt: new Date()
-            };
+  /**
+   * 标记为需要复习
+   */
+  markAsNeedReview: async ({ uid, id }) => {
+    try {
+      const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+      if (!question) {
+        return { success: false };
+      }
+      await question.markAsNeedReview();
+      return { success: true };
+    } catch (error) {
+      console.error("DATABASE:标记为需要复习失败", error);
+      throw error;
+    }
+  },
 
-            // 只更新传入的字段
-            if (wrongBookId !== undefined) updateData.wrongBookId = wrongBookId;
-            if (Type !== undefined) updateData.Type = Type;
-            if (questionSource !== undefined) updateData.questionSource = questionSource;
-            if (stem !== undefined) updateData.stem = stem;
-            if (options !== undefined) updateData.options = options;
-            if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
-            if (wrongAnswer !== undefined) updateData.wrongAnswer = wrongAnswer;
-            if (analysis !== undefined) updateData.analysis = analysis;
-            if (tags !== undefined) updateData.tags = tags;
-            if (difficulty !== undefined) updateData.difficulty = difficulty;
+  /**
+   * 获取错题本详情
+   */
+  getWrongBookDetail: async ({ uid, id }) => {
+    try {
+      const detail = await WrongBookModel.findOne(
+        { _id: id, Uid: uid },
+        {
+          title: 1,
+          color: 1,
+          count: 1,
+          updatedAt: 1,
+        },
+      ).lean();
+      return detail;
+    } catch (error) {
+      console.error("DATABASE:获取错题本详情失败", error);
+      throw error;
+    }
+  },
 
-            const result = await WrongQuestionModel.updateOne(
-                { _id: id, Uid: uid },
-                { $set: updateData }
-            );
-            return {
-                success: result.modifiedCount > 0
-            };
-        } catch (error) {
-            console.error("DATABASE:更新错题失败", error);
-            throw error;
-        }
-    },
+  /**
+   * 更新错题本
+   */
+  updateWrongBook: async ({ uid, id, title, color }) => {
+    try {
+      const result = await WrongBookModel.updateOne(
+        { _id: id, Uid: uid },
+        {
+          $set: {
+            title,
+            color,
+            updatedAt: new Date(),
+          },
+        },
+      );
+      return {
+        success: result.modifiedCount > 0,
+      };
+    } catch (error) {
+      console.error("DATABASE:更新错题本失败", error);
+      throw error;
+    }
+  },
 
-    /**
-     * 获取错题统计
-     */
-    getWrongBookStatistics: async ({ uid }) => {
-        try {
-            const totalCount = await WrongBookModel.countDocuments({ uid });
-            
-            // 按分类统计
-            const categoryStats = await WrongBookModel.aggregate([
-                { $match: { uid } },
-                {
-                    $group: {
-                        _id: '$category',
-                        count: { $sum: 1 }
-                    }
-                },
-                {
-                    $project: {
-                        category: '$_id',
-                        count: 1,
-                        _id: 0
-                    }
-                }
-            ]);
+  /**
+   * 删除错题本
+   */
+  deleteWrongBook: async ({ uid, id }) => {
+    try {
+      // 1. 检查错题本是否存在且属于该用户
+      const wrongBook = await WrongBookModel.findOne({ _id: id, Uid: uid });
+      if (!wrongBook) {
+        return {
+          success: false,
+          message: "错题本不存在或无权限",
+        };
+      }
 
-            return {
-                totalCount,
-                categoryStats
-            };
-        } catch (error) {
-            console.error("获取错题统计失败", error);
-            throw error;
-        }
-    },
+      // 2. 检查错题本中是否有题目
+      const questionCount = await WrongQuestionModel.countDocuments({
+        wrongBookId: id,
+        Uid: uid,
+      });
 
-    /**
-     * 上传图片并保存记录
-     */
-    uploadImage: async ({ uid, url }) => {
-        try {
-            const imageId = new mongoose.Types.ObjectId();
-            
-            // 创建临时图片记录（未关联到具体题目）
-            const imageRecord = {
-                _id: imageId,
-                url: url,
-                uploadedAt: new Date()
-            };
-            
-            return {
-                success: true,
-                data: {
-                    _id: imageId.toString(),
-                    url: url
-                }
-            };
-        } catch (error) {
-            console.error("DATABASE:保存图片记录失败", error);
-            throw error;
-        }
-    },
+      if (questionCount > 0) {
+        return {
+          success: false,
+          message: `错题本中还有 ${questionCount} 道题目，请先删除所有题目后再删除错题本`,
+          questionCount: questionCount,
+        };
+      }
 
-    /**
-     * 通过图片ID删除图片记录
-     */
-    removeImageById: async ({ uid, imageId, imageUrl }) => {
-        try {
-            // 先查找包含该图片的题目（仅限当前用户）
-            const questions = await WrongQuestionModel.find({
-                Uid: uid,
-                $or: [
-                    { 'stem.images._id': imageId },
-                    { 'wrongAnswer.images._id': imageId },
-                    { 'correctAnswer.images._id': imageId },
-                    { 'analysis.images._id': imageId },
-                    { 'note.images._id': imageId }
-                ]
-            });
+      // 3. 如果没有题目，则可以删除
+      const result = await WrongBookModel.deleteOne({ _id: id, Uid: uid });
 
-            if (questions.length === 0) {
-                return {
-                    success: true,
-                    modifiedCount: 0,
-                    message: '未找到包含该图片的题目'
-                };
-            }
+      return {
+        success: result.deletedCount > 0,
+        message: result.deletedCount > 0 ? "删除成功" : "删除失败",
+      };
+    } catch (error) {
+      console.error("DATABASE:删除错题本失败", error);
+      throw error;
+    }
+  },
 
-            // 从找到的题目中移除该图片
-            const updateOperations = {
-                $pull: {
-                    'stem.images': { _id: imageId },
-                    'wrongAnswer.images': { _id: imageId },
-                    'correctAnswer.images': { _id: imageId },
-                    'analysis.images': { _id: imageId },
-                    'note.images': { _id: imageId }
-                },
-                $set: {
-                    updatedAt: new Date()
-                }
-            };
+  /**
+   * 获取错题详情
+   */
+  getWrongQuestionDetail: async ({ uid, id }) => {
+    try {
+      const detail = await WrongQuestionModel.findOne({
+        _id: id,
+        Uid: uid,
+      }).lean();
+      return detail;
+    } catch (error) {
+      console.error("DATABASE:获取错题详情失败", error);
+      throw error;
+    }
+  },
 
-            const result = await WrongQuestionModel.updateMany(
-                { 
-                    Uid: uid,
-                    _id: { $in: questions.map(q => q._id) }
-                },
-                updateOperations
-            );
+  /**
+   * 更新错题
+   */
+  updateWrongQuestion: async ({
+    uid,
+    id,
+    wrongBookId,
+    Type,
+    questionSource,
+    stem,
+    options,
+    correctAnswer,
+    wrongAnswer,
+    analysis,
+    tags,
+    difficulty,
+  }) => {
+    try {
+      // 验证错题是否存在且属于该用户
+      const question = await WrongQuestionModel.findOne({ _id: id, Uid: uid });
+      if (!question) {
+        return {
+          success: false,
+          message: "错题不存在或无权限",
+        };
+      }
 
-            return {
-                success: true,
-                modifiedCount: result.modifiedCount
-            };
-        } catch (error) {
-            console.error("DATABASE:删除图片记录失败", error);
-            throw error;
-        }
-    },
+      const updateData = {
+        updatedAt: new Date(),
+      };
 
-    /**
-     * 获取用户所有已使用的标签（去重）
-     */
-    getUserTags: async ({ uid, wrongBookId }) => {
-        try {
-            const tags = await WrongQuestionModel.distinct('tags', {
-                Uid: uid,
-                wrongBookId
-            });
-            return tags.filter(tag => tag); // 过滤空值
-        } catch (error) {
-            console.error("DATABASE:获取用户标签失败", error);
-            throw error;
-        }
-    },
-}
+      // 只更新传入的字段
+      if (wrongBookId !== undefined) updateData.wrongBookId = wrongBookId;
+      if (Type !== undefined) updateData.Type = Type;
+      if (questionSource !== undefined)
+        updateData.questionSource = questionSource;
+      if (stem !== undefined) updateData.stem = stem;
+      if (options !== undefined) updateData.options = options;
+      if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
+      if (wrongAnswer !== undefined) updateData.wrongAnswer = wrongAnswer;
+      if (analysis !== undefined) updateData.analysis = analysis;
+      if (tags !== undefined) updateData.tags = tags;
+      if (difficulty !== undefined) updateData.difficulty = difficulty;
+
+      const result = await WrongQuestionModel.updateOne(
+        { _id: id, Uid: uid },
+        { $set: updateData },
+      );
+      return {
+        success: result.modifiedCount > 0,
+      };
+    } catch (error) {
+      console.error("DATABASE:更新错题失败", error);
+      throw error;
+    }
+  },
+
+  /**
+   * 获取错题统计
+   */
+  getWrongBookStatistics: async ({ uid }) => {
+    try {
+      const totalCount = await WrongBookModel.countDocuments({ uid });
+
+      // 按分类统计
+      const categoryStats = await WrongBookModel.aggregate([
+        { $match: { uid } },
+        {
+          $group: {
+            _id: "$category",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            category: "$_id",
+            count: 1,
+            _id: 0,
+          },
+        },
+      ]);
+
+      return {
+        totalCount,
+        categoryStats,
+      };
+    } catch (error) {
+      console.error("获取错题统计失败", error);
+      throw error;
+    }
+  },
+
+  /**
+   * 上传图片并保存记录
+   */
+  uploadImage: async ({ uid, url }) => {
+    try {
+      const imageId = new mongoose.Types.ObjectId();
+
+      // 创建临时图片记录（未关联到具体题目）
+      const imageRecord = {
+        _id: imageId,
+        url: url,
+        uploadedAt: new Date(),
+      };
+
+      return {
+        success: true,
+        data: {
+          _id: imageId.toString(),
+          url: url,
+        },
+      };
+    } catch (error) {
+      console.error("DATABASE:保存图片记录失败", error);
+      throw error;
+    }
+  },
+
+  /**
+   * 通过图片ID删除图片记录
+   */
+  removeImageById: async ({ uid, imageId, imageUrl }) => {
+    try {
+      // 先查找包含该图片的题目（仅限当前用户）
+      const questions = await WrongQuestionModel.find({
+        Uid: uid,
+        $or: [
+          { "stem.images._id": imageId },
+          { "wrongAnswer.images._id": imageId },
+          { "correctAnswer.images._id": imageId },
+          { "analysis.images._id": imageId },
+          { "note.images._id": imageId },
+        ],
+      });
+
+      if (questions.length === 0) {
+        return {
+          success: true,
+          modifiedCount: 0,
+          message: "未找到包含该图片的题目",
+        };
+      }
+
+      // 从找到的题目中移除该图片
+      const updateOperations = {
+        $pull: {
+          "stem.images": { _id: imageId },
+          "wrongAnswer.images": { _id: imageId },
+          "correctAnswer.images": { _id: imageId },
+          "analysis.images": { _id: imageId },
+          "note.images": { _id: imageId },
+        },
+        $set: {
+          updatedAt: new Date(),
+        },
+      };
+
+      const result = await WrongQuestionModel.updateMany(
+        {
+          Uid: uid,
+          _id: { $in: questions.map((q) => q._id) },
+        },
+        updateOperations,
+      );
+
+      return {
+        success: true,
+        modifiedCount: result.modifiedCount,
+      };
+    } catch (error) {
+      console.error("DATABASE:删除图片记录失败", error);
+      throw error;
+    }
+  },
+
+  /**
+   * 获取用户所有已使用的标签（去重）
+   */
+  getUserTags: async ({ uid, wrongBookId }) => {
+    try {
+      const tags = await WrongQuestionModel.distinct("tags", {
+        Uid: uid,
+        wrongBookId,
+      });
+      return tags.filter((tag) => tag); // 过滤空值
+    } catch (error) {
+      console.error("DATABASE:获取用户标签失败", error);
+      throw error;
+    }
+  },
+};
 
 module.exports = WrongBookService;

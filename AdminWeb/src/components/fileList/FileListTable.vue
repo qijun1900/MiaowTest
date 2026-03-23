@@ -9,16 +9,16 @@
         <span>文件管理</span>
       </div>
       <div class="header-actions">
-        <el-input 
-          v-model="searchQuery" 
-          placeholder="搜索文件名..." 
-          :prefix-icon="Search" 
+        <el-input
+          v-model="searchQuery"
+          placeholder="搜索文件名..."
+          :prefix-icon="Search"
           clearable
-          class="search-input" 
+          class="search-input"
           @input="handleSearch"
           :class="{ 'search-input-focused': isSearchFocused }"
           @focus="isSearchFocused = true"
-          @blur="isSearchFocused = false" 
+          @blur="isSearchFocused = false"
         />
         <el-select
           v-model="selectedTag"
@@ -36,32 +36,27 @@
             :value="item.value"
           />
         </el-select>
-        <el-button 
-          type="primary" 
-          :icon="Upload" 
-          @click="$emit('upload')"
-          class="upload-button"
-        >
+        <el-button type="primary" :icon="Upload" @click="$emit('upload')" class="upload-button">
           上传文件
         </el-button>
-        <el-button 
-          :icon="Refresh" 
-          circle 
+        <el-button
+          :icon="Refresh"
+          circle
           @click="$emit('refresh')"
           class="refresh-button"
-          :class="{ 'refresh-button-spinning': isRefreshing }" 
+          :class="{ 'refresh-button-spinning': isRefreshing }"
         />
       </div>
     </div>
 
     <!-- 表格内容 -->
     <div class="table-content">
-      <el-table 
-        :data="tableData" 
-        style="width: 100%; height: 100%" 
-        height="100%" 
+      <el-table
+        :data="tableData"
+        style="width: 100%; height: 100%"
+        height="100%"
         highlight-current-row
-        @current-change="handleCurrentChange" 
+        @current-change="handleCurrentChange"
         v-loading="loading"
         :row-class-name="tableRowClassName"
         class="file-table"
@@ -79,7 +74,7 @@
         <el-table-column prop="mimeType" label="业务标签" width="120" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag size="small" type="success">
-              {{ row.tag}}
+              {{ row.tag }}
             </el-tag>
           </template>
         </el-table-column>
@@ -91,7 +86,7 @@
         <el-table-column prop="mimeType" label="类型" width="120" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag size="small" :type="getFileTypeTagType(row.mimeType)">
-              {{ row.mimeType.split('/')[1] }}
+              {{ row.mimeType.split("/")[1] }}
             </el-tag>
           </template>
         </el-table-column>
@@ -102,10 +97,11 @@
               v-model="scope.row.status"
               inline-prompt
               :active-value="1"
-              :inactive-value="0" 
+              :inactive-value="0"
               active-text="已发布"
               inactive-text="未发布"
-              @change="handleChangeStatus(scope.row._id)">
+              @change="handleChangeStatus(scope.row._id)"
+            >
             </el-switch>
           </template>
         </el-table-column>
@@ -117,9 +113,9 @@
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <div class="file-actions">
-              <el-button 
-                link 
-                type="danger" 
+              <el-button
+                link
+                type="danger"
                 size="small"
                 @click.stop="$emit('delete', row)"
                 class="action-button delete-button"
@@ -127,8 +123,8 @@
                 删除
               </el-button>
               <el-button
-                link 
-                type="primary" 
+                link
+                type="primary"
                 size="small"
                 @click.stop="$emit('edit', row)"
                 class="action-button edit-button"
@@ -155,20 +151,26 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 import {
-  Search, Upload, Refresh, FolderOpened,
-  Picture, Document, VideoPlay, Headset
-} from '@element-plus/icons-vue'
-import Pagination from '@/components/ReuseComponents/Pagination.vue'
-import { getFileIcon } from '@/util/resourceUtils'
-import { 
-  getFileIconClass, 
-  getFileTypeTagType, 
-  tableRowClassName, 
-  formatFileSize 
-} from '@/util/fileListUtils'
-import formatTime from '@/util/formatTime'
+  Search,
+  Upload,
+  Refresh,
+  FolderOpened,
+  Picture,
+  Document,
+  VideoPlay,
+  Headset,
+} from "@element-plus/icons-vue";
+import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import { getFileIcon } from "@/util/resourceUtils";
+import {
+  getFileIconClass,
+  getFileTypeTagType,
+  tableRowClassName,
+  formatFileSize,
+} from "@/util/fileListUtils";
+import formatTime from "@/util/formatTime";
 
 const props = defineProps({
   // ========== 表格数据 ==========
@@ -182,7 +184,7 @@ const props = defineProps({
     default: false,
     // 加载状态
   },
-  
+
   // ========== 分页信息 ==========
   total: {
     type: Number,
@@ -199,65 +201,67 @@ const props = defineProps({
     default: 20,
     // 每页数量
   },
-  
+
   // ========== 筛选选项 ==========
   tagOptions: {
     type: Array,
     default: () => [],
     // 标签选项列表
   },
-  
+
   // ========== 刷新状态 ==========
   isRefreshing: {
     type: Boolean,
     default: false,
     // 是否正在刷新
-  }
-})
+  },
+});
 
 // ========== 事件定义 ==========
 const emit = defineEmits([
-  'current-change',  // 当前行变化
-  'search',          // 搜索
-  'tag-change',      // 标签筛选变化
-  'page-change',     // 分页变化
-  'upload',          // 上传文件
-  'refresh',         // 刷新数据
-  'delete',          // 删除文件
-  'edit' ,            // 编辑文件
-  'change-status'     // 状态变化
-
-])
+  "current-change", // 当前行变化
+  "search", // 搜索
+  "tag-change", // 标签筛选变化
+  "page-change", // 分页变化
+  "upload", // 上传文件
+  "refresh", // 刷新数据
+  "delete", // 删除文件
+  "edit", // 编辑文件
+  "change-status", // 状态变化
+]);
 
 // ========== 本地状态 ==========
-const searchQuery = ref('')
-const selectedTag = ref('')
-const isSearchFocused = ref(false)
+const searchQuery = ref("");
+const selectedTag = ref("");
+const isSearchFocused = ref(false);
 
 // ========== 事件处理 ==========
 const handleCurrentChange = (val) => {
-  emit('current-change', val)
-}
+  emit("current-change", val);
+};
 
 const handleSearch = () => {
-  emit('search', searchQuery.value)
-}
+  emit("search", searchQuery.value);
+};
 
 const handleTagChange = () => {
-  emit('tag-change', selectedTag.value)
-}
+  emit("tag-change", selectedTag.value);
+};
 
 const handlePageChange = ({ page, size }) => {
-  emit('page-change', { page, size })
-}
+  emit("page-change", { page, size });
+};
 const handleChangeStatus = (fileId) => {
-  emit('change-status', fileId)
-}
+  emit("change-status", fileId);
+};
 
 // ========== 监听外部变化 ==========
-watch(() => props.currentPage, () => {
-  // 同步外部页码变化
-})
+watch(
+  () => props.currentPage,
+  () => {
+    // 同步外部页码变化
+  },
+);
 </script>
 
 <style scoped>
@@ -294,8 +298,13 @@ watch(() => props.currentPage, () => {
 }
 
 @keyframes folderPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .header-actions {
@@ -340,8 +349,12 @@ watch(() => props.currentPage, () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .table-content {
@@ -434,16 +447,16 @@ watch(() => props.currentPage, () => {
     align-items: stretch;
     gap: 12px;
   }
-  
+
   .header-actions {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .search-input {
     width: 100%;
   }
-  
+
   .tag-select {
     width: 100%;
   }
