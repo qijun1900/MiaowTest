@@ -57,6 +57,46 @@
                     </view>
                 </scroll-view>
             </view>
+
+            <!-- 筛选与排序栏 -->
+            <view class="filter-toolbar">
+                <view
+                    class="filter-chip"
+                    hover-class="none"
+                    @click="toggleSortOrder"
+                >
+                    <uni-icons
+                        :type="sortOrder === 'desc' ? 'arrowdown' : 'arrowup'"
+                        size="14"
+                        color="#ff9555"
+                    ></uni-icons>
+                    <text class="filter-chip-text">{{ sortOrderText }}</text>
+                </view>
+
+                <scroll-view
+                    class="status-filter-scroll"
+                    scroll-x
+                    :show-scrollbar="false"
+                >
+                    <view class="status-filter-row">
+                        <view
+                            v-for="option in statusFilterOptions"
+                            :key="option.value"
+                            class="status-filter-item"
+                            :class="{
+                                'status-filter-item-active':
+                                    statusFilter === option.value,
+                            }"
+                            hover-class="none"
+                            @click="setStatusFilter(option.value)"
+                        >
+                            <text class="status-filter-text">{{
+                                option.label
+                            }}</text>
+                        </view>
+                    </view>
+                </scroll-view>
+            </view>
         </view>
 
         <!-- 错题列表 -->
@@ -68,7 +108,10 @@
             </view>
 
             <!-- 空状态提示 -->
-            <view v-else-if="questionList.length === 0" class="empty-state">
+            <view
+                v-else-if="displayQuestionList.length === 0"
+                class="empty-state"
+            >
                 <view class="empty-icon">
                     <uni-icons
                         type="folder-add"
@@ -95,8 +138,8 @@
 
             <!-- 错题卡片列表 -->
             <view
-                v-for="(item, index) in questionList"
-                :key="index"
+                v-for="item in displayQuestionList"
+                :key="item.id"
                 class="question-card"
             >
                 <!-- 状态标签 - 卡片右上角 -->
@@ -145,7 +188,7 @@
                     <view
                         class="answer-status"
                         hover-class="none"
-                        @click="toggleAnswer(index)"
+                        @click="toggleAnswer(item)"
                     >
                         <text
                             :class="
@@ -361,7 +404,10 @@
                 </view>
             </view>
 
-            <view v-if="questionList.length > 0" class="load-more-container">
+            <view
+                v-if="displayQuestionList.length > 0"
+                class="load-more-container"
+            >
                 <view v-if="loadingMore" class="load-more-loading">
                     <view class="load-more-spinner"></view>
                     <text class="load-more-text">加载更多...</text>
@@ -389,7 +435,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
 import SelectOptionsPreview from "../../../components/modules/exam/SelectOptionsPreview.vue";
@@ -422,10 +468,52 @@ const totalQuestions = ref(0);
 const PAGE_SIZE = 20;
 let searchDebounceTimer = null;
 
+// 排序与状态筛选
+const sortOrder = ref("desc");
+const statusFilter = ref("all");
+const statusToApiValueMap = {
+    new: 0,
+    reviewing: 1,
+    mastered: 2,
+};
+const statusFilterOptions = [
+    { label: "全部状态", value: "all" },
+    { label: "新题", value: "new" },
+    { label: "复习中", value: "reviewing" },
+    { label: "已掌握", value: "mastered" },
+];
+
 // 当前列表数据
 const questionList = ref([]);
 // 标签列表（通过接口加载全部标签）
 const tabs = ref([{ label: "全部", value: "all", count: 0 }]);
+
+const sortOrderText = computed(() =>
+    sortOrder.value === "desc" ? "时间倒序" : "时间正序",
+);
+
+const getQuestionTimestamp = (item) => {
+    const sourceTime =
+        item?._raw?.updatedAt || item?._raw?.createdAt || item?._raw?.date;
+    const timestamp = sourceTime ? new Date(sourceTime).getTime() : 0;
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const displayQuestionList = computed(() => {
+    let list = [...questionList.value];
+
+    if (statusFilter.value !== "all") {
+        list = list.filter((item) => item.status === statusFilter.value);
+    }
+
+    list.sort((a, b) => {
+        const timeA = getQuestionTimestamp(a);
+        const timeB = getQuestionTimestamp(b);
+        return sortOrder.value === "desc" ? timeB - timeA : timeA - timeB;
+    });
+
+    return list;
+});
 
 const handleSearch = () => {
     if (searchDebounceTimer) {
@@ -447,10 +535,19 @@ const switchTab = (value) => {
     resetAndFetchQuestions();
 };
 
+const toggleSortOrder = () => {
+    sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
+};
+
+const setStatusFilter = (value) => {
+    if (statusFilter.value === value) return;
+    statusFilter.value = value;
+    resetAndFetchQuestions();
+};
+
 // 切换答案显示状态
-const toggleAnswer = (index) => {
-    questionList.value[index].showAnswer =
-        !questionList.value[index].showAnswer;
+const toggleAnswer = (item) => {
+    item.showAnswer = !item.showAnswer;
 };
 
 const rebuildTabsFromLoadedQuestions = () => {
@@ -778,6 +875,12 @@ const getEmptyMessage = () => {
     if (searchKeyword.value.trim()) {
         return `没有找到包含"${searchKeyword.value}"的错题`;
     }
+    if (statusFilter.value !== "all") {
+        const currentStatus = statusFilterOptions.find(
+            (option) => option.value === statusFilter.value,
+        );
+        return `暂无"${currentStatus?.label || "当前状态"}"错题`;
+    }
     if (activeTab.value !== "all") {
         return `暂无"${activeTab.value}"标签的错题`;
     }
@@ -804,6 +907,10 @@ const fetchWrongQuestions = async ({ append = false } = {}) => {
             pageSize: PAGE_SIZE,
             keyword: searchKeyword.value.trim(),
             tag: activeTab.value === "all" ? "" : activeTab.value,
+            status:
+                statusFilter.value === "all"
+                    ? ""
+                    : statusToApiValueMap[statusFilter.value],
         });
 
         if (res.code === 200) {
@@ -951,6 +1058,66 @@ onReachBottom(() => {
 /* 分类标签栏样式 */
 .category-tabs {
     padding: 0 32rpx;
+}
+
+.filter-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+    padding: 16rpx 32rpx 0;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8rpx;
+    padding: 12rpx 20rpx;
+    border-radius: 28rpx;
+    border: 2rpx solid #ffd9bc;
+    background: #fff3e8;
+    flex-shrink: 0;
+}
+
+.filter-chip-text {
+    font-size: 24rpx;
+    color: #ff9555;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status-filter-scroll {
+    flex: 1;
+    white-space: nowrap;
+}
+
+.status-filter-row {
+    display: inline-flex;
+    gap: 12rpx;
+    align-items: center;
+}
+
+.status-filter-item {
+    padding: 12rpx 20rpx;
+    border-radius: 28rpx;
+    border: 2rpx solid #ffe8d6;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.status-filter-item-active {
+    background: #ff9555;
+    border-color: #ff9555;
+}
+
+.status-filter-text {
+    font-size: 24rpx;
+    color: #8b8b8b;
+    white-space: nowrap;
+}
+
+.status-filter-item-active .status-filter-text {
+    color: #ffffff;
+    font-weight: 500;
 }
 
 .tabs-scroll {
