@@ -1,12 +1,16 @@
 const UserModel = require("../../models/UserModel");
 const { deleteFile } = require("../../helpers/ossHelper");
+const bcrypt = require("bcryptjs");
 
 const UserService = {
   login: async ({ username, password }) => {
-    return UserModel.find({
-      username,
-      password,
-    });
+    // 先按用户名查找用户
+    const users = await UserModel.find({ username });
+    if (users.length === 0) return [];
+    // 用 bcrypt 比对密码
+    const isMatch = await bcrypt.compare(password, users[0].password);
+    if (!isMatch) return [];
+    return users;
   },
   upload: async ({ _id, username, introduction, gender, avatar }) => {
     if (avatar) {
@@ -45,9 +49,11 @@ const UserService = {
     state,
     createTime,
   }) => {
+    // 添加用户前对密码进行哈希加密，盐值为 10
+    const hashedPassword = await bcrypt.hash(password, 10);
     return UserModel.create({
       username,
-      password,
+      password: hashedPassword,
       introduction,
       gender,
       avatar,
@@ -55,6 +61,10 @@ const UserService = {
       state,
       createTime,
     });
+  },
+  // 根据用户名查找用户（用于注册时检查重复）
+  findByUsername: async (username) => {
+    return UserModel.findOne({ username });
   },
   // 修改getlist方法，添加分页
   getlist: async ({ id, page, size }) => {

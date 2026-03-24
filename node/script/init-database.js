@@ -18,17 +18,23 @@
  */
 const dbManager = require("../db/db.enhanced").dbManager; // 数据库连接管理
 const UserModel = require("../models/UserModel");
+const bcrypt = require("bcryptjs");
 
 // 管理员账户信息
-const adminUser = {
-  username: "admin",
-  password: "admin123", // 建议创建后立即修改密码
-  role: 1, // 1表示管理员角色
-  gender: 0, // 0表示保密
-  introduction: "系统初始管理员",
-  avatar: "", // 可选，默认无头像
-  state: 1, // 1表示正常状态
-  createTime: new Date(),
+const ADMIN_DEFAULT_PASSWORD = "admin123"; // 建议首次登录后立即修改密码
+
+const buildAdminUser = async () => {
+  const hashedPassword = await bcrypt.hash(ADMIN_DEFAULT_PASSWORD, 10);
+  return {
+    username: "admin",
+    password: hashedPassword,
+    role: 1, // 1表示管理员角色
+    gender: 0, // 0表示保密
+    introduction: "系统初始管理员",
+    avatar: "", // 可选，默认无头像
+    state: 1, // 1表示正常状态
+    createTime: new Date(),
+  };
 };
 
 /**
@@ -58,19 +64,22 @@ async function initDatabase() {
 async function createAdminUser() {
   try {
     // 检查是否已存在管理员账户
-    const existingAdmin = await UserModel.findOne({
-      username: adminUser.username,
-    });
+    const existingAdmin = await UserModel.findOne({ username: "admin" });
     if (existingAdmin) {
       console.log("⚠️ 管理员账户已存在，跳过创建");
       return;
     }
 
+    // 构建并加密管理员信息
+    const adminUser = await buildAdminUser();
+
     // 创建新管理员
     const newAdmin = await UserModel.create(adminUser);
     console.log("✅ 管理员账户创建成功:");
     console.log(`   用户名: ${newAdmin.username}`);
-    console.log(`   密码: ${adminUser.password}`);
+    console.log(
+      `   密码: ${ADMIN_DEFAULT_PASSWORD}  （密码已加密存储，请登录后尽快修改）`,
+    );
     console.log(`   角色: ${newAdmin.role === 1 ? "管理员" : "其他"}`);
   } catch (error) {
     console.error("❌ 创建管理员账户失败:", error.message);
