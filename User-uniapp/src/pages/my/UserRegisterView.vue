@@ -39,6 +39,28 @@
                     ></u-input>
                 </u-form-item>
 
+                <!-- UID输入 -->
+                <u-form-item prop="uid">
+                    <view class="uid-wrapper">
+                        <view class="uid-input-wrap">
+                            <u-input
+                                v-model="formData.uid"
+                                placeholder="请输入用户UID"
+                                prefixIcon="account"
+                                prefixIconStyle="font-size: 22px;color: #909399"
+                                clearable
+                            ></u-input>
+                        </view>
+                        <u-button
+                            text="获取UID"
+                            size="small"
+                            type="primary"
+                            class="uid-btn"
+                            @click="handleGetUid"
+                        ></u-button>
+                    </view>
+                </u-form-item>
+
                 <!-- 验证码输入 -->
                 <u-form-item prop="verifyCode">
                     <view class="verify-wrapper">
@@ -127,6 +149,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import { UserRegister, BindAccount } from "../../API/My/UserLoginAPI";
 import navBarHeightUtil from "../../util/navBarHeight";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
+import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 
 // 绑定模式状态
 const bindMode = ref(false);
@@ -134,10 +157,13 @@ const showPassword = ref(true);
 const showConfirmPassword = ref(true);
 const agreed = ref(false);
 const navBarInfo = ref(0);
+const isAppPlatform = ref(false);
+const userInfoStore = UserInfoStore();
 
 // 表单数据
 const formData = reactive({
     email: "",
+    uid: "",
     verifyCode: "",
     password: "",
     confirmPassword: "",
@@ -162,10 +188,13 @@ const verifyBtnText = computed(() => {
     return "获取验证码";
 });
 
+const isUidRequired = computed(() => isAppPlatform.value);
+
 // 是否可以提交表单
 const canSubmit = computed(() => {
     return (
         formData.email &&
+        (!isUidRequired.value || formData.uid.trim()) &&
         formData.verifyCode &&
         formData.password &&
         formData.confirmPassword
@@ -177,6 +206,127 @@ const goToLogin = () => {
     uni.navigateTo({
         url: "/pages/my/UserLoginView",
     });
+};
+
+const getLocalUid = () => {
+    // 优先从当前用户状态读取
+    if (userInfoStore.userInfo?.uid) {
+        return String(userInfoStore.userInfo.uid).trim();
+    }
+
+    // 兜底从本地持久化读取
+    const cachedUserInfo = uni.getStorageSync("userinfo");
+    let parsedUserInfo = cachedUserInfo;
+
+    if (typeof cachedUserInfo === "string") {
+        try {
+            parsedUserInfo = JSON.parse(cachedUserInfo);
+        } catch {
+            parsedUserInfo = null;
+        }
+    }
+
+    const uid = parsedUserInfo?.uid || parsedUserInfo?.userInfo?.uid;
+    return uid ? String(uid).trim() : "";
+};
+
+// 获取UID（按平台处理）
+const handleGetUid = async () => {
+    try {
+        const platform = uni.getSystemInfoSync().uniPlatform;
+
+        if (platform === "mp-weixin") {
+        const localUid = getLocalUid();
+        if (!localUid) {
+            uni.showToast({
+                title: "本地未找到UID，请先登录后重试",
+                icon: "none",
+                duration: 2000,
+            });
+            return;
+        }
+        formData.uid = localUid;
+        uni.showToast({
+            title: "已从本地填入UID",
+            icon: "success",
+            duration: 1500,
+        });
+        return;
+        }
+
+        if (platform === "app") {
+        uni.showModal({
+            title: "前往微信获取UID",
+            content: "将为你拉起微信，请在微信小程序中搜索“题喵喵”获取UID。",
+            confirmText: "去微信",
+            success: (res) => {
+                if (!res.confirm) return;
+
+                uni.setClipboardData({
+                    data: "题喵喵",
+                    success: () => {
+                        uni.showToast({
+                            title: "已复制“题喵喵”到剪贴板",
+                            icon: "none",
+                            duration: 1800,
+                        });
+                    },
+                });
+
+                if (
+                    typeof plus !== "undefined" &&
+                    plus.runtime &&
+                    typeof plus.runtime.launchApplication === "function"
+                ) {
+                    plus.runtime.launchApplication(
+                        { pname: "com.tencent.mm" },
+                        () => {
+                            uni.showToast({
+                                title: "未检测到微信客户端",
+                                icon: "none",
+                                duration: 2000,
+                            });
+                        },
+                    );
+                } else {
+                    uni.showToast({
+                        title: "当前环境不支持拉起微信",
+                        icon: "none",
+                        duration: 2000,
+                    });
+                }
+            },
+        });
+        return;
+        }
+
+        // 其他平台兜底：从剪贴板读取
+        const res = await uni.getClipboardData();
+        const uid = (res?.data || "").toString().trim();
+
+        if (!uid) {
+            uni.showToast({
+                title: "剪贴板为空，请先复制UID",
+                icon: "none",
+                duration: 2000,
+            });
+            return;
+        }
+
+        formData.uid = uid;
+        uni.showToast({
+            title: "UID已填入",
+            icon: "success",
+            duration: 1500,
+        });
+    } catch (error) {
+        console.error("获取UID失败:", error);
+        uni.showToast({
+            title: "获取失败，请手动输入",
+            icon: "none",
+            duration: 2000,
+        });
+    }
 };
 
 // 发送验证码
@@ -235,6 +385,15 @@ const handleLogin = async () => {
             throw new Error("表单填写不完整");
         }
 
+        if (isUidRequired.value && !formData.uid.trim()) {
+            uni.showToast({
+                title: "App端请先填写UID",
+                icon: "none",
+                duration: 2000,
+            });
+            throw new Error("App端UID必填");
+        }
+
         if (formData.password !== formData.confirmPassword) {
             await new Promise((resolve) => {
                 uni.showModal({
@@ -255,12 +414,14 @@ const handleLogin = async () => {
         if (bindMode.value) {
             result = await BindAccount({
                 account: formData.email,
+                uid: formData.uid,
                 verifyCode: formData.verifyCode,
                 password: formData.password,
             });
         } else {
             result = await UserRegister({
                 account: formData.email,
+                uid: formData.uid,
                 verifyCode: formData.verifyCode,
                 password: formData.password,
             });
@@ -335,6 +496,9 @@ onLoad((options) => {
     if (options.isBind === "true") {
         bindMode.value = true;
     }
+
+    const platform = uni.getSystemInfoSync().uniPlatform;
+    isAppPlatform.value = platform === "app";
 });
 
 onMounted(() => {
@@ -351,7 +515,7 @@ onUnmounted(() => {
 .login-container {
     min-height: 100vh;
     background-color: #f5f9ff;
-    padding: 40rpx;
+    padding: 12rpx 40rpx 40rpx;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -421,7 +585,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 60rpx;
+    margin-top: 24rpx;
     margin-bottom: 60rpx;
     position: relative;
     z-index: 1;
@@ -484,6 +648,23 @@ onUnmounted(() => {
         }
 
         .verify-btn {
+            margin-left: 20rpx;
+            flex-shrink: 0;
+            width: 200rpx;
+        }
+    }
+
+    .uid-wrapper {
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        .uid-input-wrap {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .uid-btn {
             margin-left: 20rpx;
             flex-shrink: 0;
             width: 200rpx;

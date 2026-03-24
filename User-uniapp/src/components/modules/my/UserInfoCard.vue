@@ -53,7 +53,7 @@
                             </view>
                         </view>
                         <view class="user-id-row">
-                            <text class="id-label">ID:</text>
+                            <text class="id-label">UID:</text>
                             <text class="id-value">{{
                                 userInfo?.uid || "欢迎回来"
                             }}</text>
