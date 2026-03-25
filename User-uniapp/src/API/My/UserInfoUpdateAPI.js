@@ -31,5 +31,6 @@ export const checkUserBind = async () => {
     });
   } catch (error) {
     console.error("checkUserBind 失败", error);
+    throw error;
   }
 };

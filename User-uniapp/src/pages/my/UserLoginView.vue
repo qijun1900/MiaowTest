@@ -115,10 +115,12 @@
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from "vue";
 import { UserAccountLogin } from "../../API/My/UserLoginAPI";
+import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import { wechatLogin } from "../../util/wechatLogin";
 import navBarHeightUtil from "../../util/navBarHeight";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
+
 
 const showPassword = ref(true);
 const rememberMe = ref([]);
@@ -287,6 +289,23 @@ const goToRegister = async () => {
     if (!token) {
         uni.showToast({
             title: "请先完成微信登录",
+            icon: "none",
+            duration: 2000,
+        });
+        return;
+    }
+
+    try {
+        const bindResponse = await checkUserBind();
+        if (bindResponse.code === 200 && bindResponse.data?.isBind) {
+            uni.switchTab({
+                url: "/pages/my/my",
+            });
+            return;
+        }
+    } catch {
+        uni.showToast({
+            title: "绑定状态校验失败，请稍后重试",
             icon: "none",
             duration: 2000,
         });
