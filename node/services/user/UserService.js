@@ -1,5 +1,7 @@
 const wxAuth = require("../../MiddleWares/wxAuth");
 const JWT = require("../../MiddleWares/jwt");
+const bcrypt = require("bcryptjs");
+const { verifyCode } = require("../../helpers/emailHelper");
 const ConsumerModel = require("../../models/ConsumerModel");
 const ExamModel = require("../../models/ExamModel");
 const FeedbackModel = require("../../models/ConsumerFeedbackModel");
@@ -69,32 +71,80 @@ const UserService = {
       };
     }
   },
-  UserRegister: async (account, verifyCode, password) => {
+  UserRegister: async (account, inputCode, password, uid) => {
     try {
-      // 检查验证码是否正确（这里需要实现验证码验证逻辑）
-      // 假设验证码验证通过，直接注册用户
-      console.log(account, verifyCode, password);
+      // 1. 校验验证码
+      const codeResult = verifyCode(account, inputCode);
+      if (!codeResult.valid) {
+        return {
+          code: 400,
+          success: false,
+          message: codeResult.message,
+        };
+      }
 
-      // 为新用户生成注册顺序号
+      // 2. 检查邮箱是否已注册
+      const existingUser = await ConsumerModel.findOne({
+        $or: [{ username: account }, { email: account }],
+      });
+
+      if (existingUser && !uid) {
+        // 纯邮箱注册时，邮箱已存在则拒绝
+        return {
+          code: 409,
+          success: false,
+          message: "该邮箱已被注册，请直接登录或找回密码",
+        };
+      }
+
+      // 3. 对密码进行哈希加密
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // 4. 如果携带了 uid（App/微信端已有匿名用户），直接更新该用户的邮箱和密码
+      if (uid) {
+        const wechatUser = await ConsumerModel.findById(uid);
+        if (wechatUser) {
+          // 若邮箱已被其他账号占用，合并数据后删除旧账号
+          if (existingUser && existingUser._id.toString() !== uid) {
+            if (existingUser.favoriteExams?.length > 0) {
+              wechatUser.favoriteExams = [
+                ...new Set([
+                  ...(wechatUser.favoriteExams || []),
+                  ...existingUser.favoriteExams,
+                ]),
+              ];
+            }
+            await ConsumerModel.deleteOne({ _id: existingUser._id });
+          }
+          wechatUser.username = account;
+          wechatUser.email = account;
+          wechatUser.password = hashedPassword;
+          await wechatUser.save();
+          return {
+            code: 200,
+            success: true,
+            message: "注册并绑定成功",
+            data: { userCount: wechatUser.userCount },
+          };
+        }
+      }
+
+      // 5. 普通邮箱注册：创建新用户
       const userCount = await getNextUserCount();
-
       const newUser = new ConsumerModel({
         username: account,
         email: account,
-        password,
+        password: hashedPassword,
         createTime: new Date(),
-        userCount: userCount, // 设置用户注册顺序号
+        userCount,
       });
-
       await newUser.save();
 
       return {
         code: 200,
         success: true,
         message: "注册成功",
-        data: {
-          userCount: userCount, // 返回注册顺序号
-        },
+        data: { userCount },
       };
     } catch (error) {
       console.error("UserRegister 失败", error);
@@ -116,8 +166,34 @@ const UserService = {
           message: "账号尚未注册",
         };
       }
-      // 检查密码是否匹配（这里假设密码是明文存储，实际应用中应使用哈希存储）
-      if (user.password !== password) {
+
+      // 检查是否设置了密码（微信用户未绑定时 password 为空）
+      if (!user.password) {
+        return {
+          code: 401,
+          success: false,
+          message: "该账号未设置密码，请使用微信登录或先完成账号绑定",
+        };
+      }
+
+      // 使用 bcrypt 比对密码（兼容旧明文密码）
+      let passwordMatch = false;
+      if (user.password.startsWith("$2")) {
+        // 已哈希
+        passwordMatch = await bcrypt.compare(password, user.password);
+      } else {
+        // 旧明文密码：比对后立即迁移为哈希
+        passwordMatch = user.password === password;
+        if (passwordMatch) {
+          user.password = await bcrypt.hash(password, 10);
+          await user.save();
+          console.log(
+            `[UserAccountLogin] 用户 ${user._id} 密码已自动迁移为哈希`,
+          );
+        }
+      }
+
+      if (!passwordMatch) {
         return {
           code: 401,
           success: false,
@@ -389,7 +465,7 @@ const UserService = {
         if (existingUser._id.toString() === uid) {
           wechatUser.username = account;
           wechatUser.email = account;
-          wechatUser.password = password;
+          wechatUser.password = await bcrypt.hash(password, 10);
           await wechatUser.save();
           return {
             code: 200,
@@ -421,7 +497,7 @@ const UserService = {
       // 更新微信用户信息，绑定账号和密码
       wechatUser.username = account;
       wechatUser.email = account; // 将账号同时作为邮箱
-      wechatUser.password = password;
+      wechatUser.password = await bcrypt.hash(password, 10);
 
       await wechatUser.save();
 

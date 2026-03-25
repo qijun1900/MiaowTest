@@ -1,6 +1,27 @@
 import { http } from "../../util/http.js";
 
 /**
+ * 发送邮箱验证码
+ * @param {string} email - 目标邮箱地址
+ * @returns {Promise} 返回发送结果
+ */
+export const sendEmailVerifyCode = async (email) => {
+  try {
+    if (!email) {
+      throw new Error("请输入邮箱地址");
+    }
+    return await http({
+      url: "/uniappAPI/User/sendVerifyCode",
+      method: "POST",
+      data: { email },
+    });
+  } catch (error) {
+    console.error("sendEmailVerifyCode 失败", error);
+    throw error;
+  }
+};
+
+/**
  * 微信用户登录/注册
  * @param {string} message - 登录信息
  * @param {string} code - 登录凭证

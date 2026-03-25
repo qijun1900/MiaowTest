@@ -1,4 +1,7 @@
 ﻿const UserService = require("../../services/user/UserService");
+const {
+  sendVerifyCode: sendVerifyCodeEmail,
+} = require("../../helpers/emailHelper");
 const multer = require("multer");
 const path = require("path");
 const ConsumerModel = require("../../models/ConsumerModel");
@@ -48,13 +51,40 @@ const UserController = {
       throw error;
     }
   },
+  // 发送邮箱验证码
+  sendVerifyCode: async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(200).send({
+          code: 400,
+          ActionType: "ERROR",
+          message: "请输入有效的邮箱地址",
+        });
+      }
+      const result = await sendVerifyCodeEmail(email);
+      res.status(200).send({
+        code: result.success ? 200 : 429,
+        ActionType: result.success ? "OK" : "ERROR",
+        message: result.message,
+      });
+    } catch (error) {
+      console.error("sendVerifyCode 失败", error);
+      res.status(200).send({
+        code: 500,
+        ActionType: "ERROR",
+        message: "服务器错误，请稍后重试",
+      });
+    }
+  },
   UserRegister: async (req, res) => {
     try {
-      const { account, verifyCode, password } = req.body;
+      const { account, verifyCode, password, uid } = req.body;
       const result = await UserService.UserRegister(
         account,
         verifyCode,
         password,
+        uid || null,
       );
       if (result.success) {
         res.status(200).send({
@@ -63,10 +93,20 @@ const UserController = {
           message: result.message,
           data: result.data,
         });
+      } else {
+        res.status(200).send({
+          code: result.code || 400,
+          ActionType: "ERROR",
+          message: result.message,
+        });
       }
     } catch (error) {
       console.error("UserRegister 失败", error);
-      throw error;
+      res.status(200).send({
+        code: 500,
+        ActionType: "ERROR",
+        message: "注册失败，请稍后重试",
+      });
     }
   },
   // 用户账号登录

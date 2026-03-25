@@ -146,7 +146,11 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { UserRegister, BindAccount } from "../../API/My/UserLoginAPI";
+import {
+    UserRegister,
+    BindAccount,
+    sendEmailVerifyCode,
+} from "../../API/My/UserLoginAPI";
 import navBarHeightUtil from "../../util/navBarHeight";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
@@ -234,70 +238,70 @@ const getLocalUid = () => {
 const handleGetUid = async () => {
     try {
         const platform = uni.getSystemInfoSync().uniPlatform;
-
         if (platform === "mp-weixin") {
-        const localUid = getLocalUid();
-        if (!localUid) {
+            const localUid = getLocalUid();
+            if (!localUid) {
+                uni.showToast({
+                    title: "本地未找到UID，请先登录后重试",
+                    icon: "none",
+                    duration: 2000,
+                });
+                return;
+            }
+            formData.uid = localUid;
             uni.showToast({
-                title: "本地未找到UID，请先登录后重试",
-                icon: "none",
-                duration: 2000,
+                title: "已从本地填入UID",
+                icon: "success",
+                duration: 1500,
             });
             return;
         }
-        formData.uid = localUid;
-        uni.showToast({
-            title: "已从本地填入UID",
-            icon: "success",
-            duration: 1500,
-        });
-        return;
-        }
 
         if (platform === "app") {
-        uni.showModal({
-            title: "前往微信获取UID",
-            content: "将为你拉起微信，请在微信小程序中搜索“题喵喵”获取UID。",
-            confirmText: "去微信",
-            success: (res) => {
-                if (!res.confirm) return;
+            uni.showModal({
+                title: "前往微信获取UID",
+                content:
+                    "将为你拉起微信，请在微信小程序中搜索“题喵喵”获取UID。",
+                confirmText: "去微信",
+                success: (res) => {
+                    if (!res.confirm) return;
 
-                uni.setClipboardData({
-                    data: "题喵喵",
-                    success: () => {
-                        uni.showToast({
-                            title: "已复制“题喵喵”到剪贴板",
-                            icon: "none",
-                            duration: 1800,
-                        });
-                    },
-                });
-
-                if (
-                    typeof plus !== "undefined" &&
-                    plus.runtime &&
-                    typeof plus.runtime.launchApplication === "function"
-                ) {
-                    plus.runtime.launchApplication(
-                        { pname: "com.tencent.mm" },
-                        () => {
+                    uni.setClipboardData({
+                        data: "题喵喵",
+                        success: () => {
                             uni.showToast({
-                                title: "未检测到微信客户端",
+                                title: "已复制“题喵喵”到剪贴板",
                                 icon: "none",
-                                duration: 2000,
+                                duration: 1800,
                             });
                         },
-                    );
-                } else {
-                    uni.showToast({
-                        title: "当前环境不支持拉起微信",
-                        icon: "none",
-                        duration: 2000,
                     });
-                }
-            },
-        });
-        return;
+
+                    if (
+                        typeof plus !== "undefined" &&
+                        plus.runtime &&
+                        typeof plus.runtime.launchApplication === "function"
+                    ) {
+                        plus.runtime.launchApplication(
+                            { pname: "com.tencent.mm" },
+                            () => {
+                                uni.showToast({
+                                    title: "未检测到微信客户端",
+                                    icon: "none",
+                                    duration: 2000,
+                                });
+                            },
+                        );
+                    } else {
+                        uni.showToast({
+                            title: "当前环境不支持拉起微信",
+                            icon: "none",
+                            duration: 2000,
+                        });
+                    }
+                },
+            });
+            return;
         }
 
         // 其他平台兜底：从剪贴板读取
@@ -331,35 +335,42 @@ const handleGetUid = async () => {
 
 // 发送验证码
 const sendVerifyCode = async () => {
-    if (isCountingDown.value) {
+    if (isCountingDown.value || !isEmailValid.value) {
         return;
     }
 
     try {
-        uni.showLoading({
-            title: "发送中...",
-            mask: true,
-        });
+        uni.showLoading({ title: "发送中...", mask: true });
 
-        // 这里应该调用实际的API发送验证码
-        // 例如: await api.sendVerifyCode(formData.email);
+        const result = await sendEmailVerifyCode(formData.email);
 
         uni.hideLoading();
 
-        uni.showToast({
-            title: "验证码已发送",
-            icon: "success",
-            duration: 2000,
-        });
-
-        startCountdown();
+        if (result.code === 200) {
+            uni.showToast({
+                title: "验证码已发送，请查收邮件",
+                icon: "success",
+                duration: 2500,
+                position: "bottom",
+            });
+            startCountdown();
+        } else {
+            // 频率限制或其他业务错误
+            uni.showToast({
+                title: result.message || "发送失败，请重试",
+                icon: "none",
+                duration: 3000,
+                position: "bottom",
+            });
+        }
     } catch (error) {
         console.error("验证码发送失败:", error);
         uni.hideLoading();
         uni.showToast({
-            title: "发送失败，请重试",
+            title: "网络异常，请稍后重试",
             icon: "none",
             duration: 2000,
+            position: "bottom",
         });
     }
 };

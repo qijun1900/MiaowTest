@@ -4,6 +4,10 @@ const JWT = require("../../MiddleWares/jwt"); // 引入JWT中间件，用于验�
 var UserRouter = express.Router();
 
 UserRouter.post("/uniappAPI/User/Userlogin", UserController.Userlogin); //微信登录接口
+UserRouter.post(
+  "/uniappAPI/User/sendVerifyCode",
+  UserController.sendVerifyCode,
+); //发送邮箱验证码接口
 UserRouter.post("/uniappAPI/User/UserRegister", UserController.UserRegister); //用户注册接口
 UserRouter.post(
   "/uniappAPI/User/UserAccountLogin",

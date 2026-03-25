@@ -270,13 +270,34 @@ const handleUseWXLogin = async () => {
     }
 };
 
-const goToRegister = () => {
+const goToRegister = async () => {
     // #ifdef MP-WEIXIN
-    uni.showToast({
-        title: "请使用微信登录",
-        icon: "error",
+    let token = uni.getStorageSync("token");
+    if (!token) {
+        try {
+            await wechatLogin({
+                navigateToMy: false,
+            });
+            token = uni.getStorageSync("token");
+        } catch {
+            return;
+        }
+    }
+
+    if (!token) {
+        uni.showToast({
+            title: "请先完成微信登录",
+            icon: "none",
+            duration: 2000,
+        });
+        return;
+    }
+
+    uni.navigateTo({
+        url: "/pages/my/UserRegisterView?isBind=true",
     });
     // #endif
+
     // #ifndef MP-WEIXIN
     uni.navigateTo({
         url: "/pages/my/UserRegisterView",
