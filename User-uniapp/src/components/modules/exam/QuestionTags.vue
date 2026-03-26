@@ -181,7 +181,9 @@ const recommendedLimit = computed(() =>
 
 const visibleSelectedTags = computed(() => {
     const withIndex = selectedTags.value.map((tag, index) => ({ tag, index }));
-    return selectedExpanded.value ? withIndex : withIndex.slice(0, selectedLimit.value);
+    return selectedExpanded.value
+        ? withIndex
+        : withIndex.slice(0, selectedLimit.value);
 });
 
 const hiddenSelectedCount = computed(() =>
@@ -279,7 +281,8 @@ watch(
         const original = Array.isArray(newVal) ? newVal : [];
         const sameLength = normalized.length === original.length;
         const sameValue =
-            sameLength && normalized.every((item, idx) => item === original[idx]);
+            sameLength &&
+            normalized.every((item, idx) => item === original[idx]);
 
         if (!sameValue) {
             emit("update:modelValue", normalized);
