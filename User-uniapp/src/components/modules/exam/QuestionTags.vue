@@ -5,18 +5,31 @@
         <!-- 已选标签 -->
         <view v-if="selectedTags.length > 0" class="selected-tags">
             <view
-                v-for="(tag, index) in selectedTags"
-                :key="index"
+                v-for="tagItem in visibleSelectedTags"
+                :key="`${tagItem.tag}-${tagItem.index}`"
                 class="tag-item selected"
             >
-                <text>{{ tag }}</text>
-                <view class="tag-close" @click="removeTag(index)">
+                <text>{{ tagItem.tag }}</text>
+                <view class="tag-close" @click="removeTag(tagItem.index)">
                     <uni-icons
                         type="close"
                         size="14"
                         color="#ffffff"
                     ></uni-icons>
                 </view>
+            </view>
+
+            <view
+                v-if="hiddenSelectedCount > 0"
+                class="tag-fold-toggle selected-toggle"
+                @click="toggleSelectedExpanded"
+            >
+                <text class="tag-fold-text">{{ selectedFoldText }}</text>
+                <uni-icons
+                    :type="selectedExpanded ? 'arrowup' : 'arrowdown'"
+                    size="14"
+                    color="#a67c52"
+                ></uni-icons>
             </view>
         </view>
 
@@ -36,14 +49,27 @@
         <!-- 推荐标签 -->
         <view class="recommended-tags">
             <view
-                v-for="(tag, index) in recommendedTags"
-                :key="index"
+                v-for="(tag, index) in visibleRecommendedTags"
+                :key="`${tag}-${index}`"
                 class="tag-item recommended"
                 :class="{ added: selectedTags.includes(tag) }"
                 @click="addRecommendedTag(tag)"
             >
                 <uni-icons type="plus" size="12" color="#999"></uni-icons>
                 <text>{{ tag }}</text>
+            </view>
+
+            <view
+                v-if="hiddenRecommendedCount > 0"
+                class="tag-fold-toggle recommended-toggle"
+                @click="toggleRecommendedExpanded"
+            >
+                <text class="tag-fold-text">{{ recommendedFoldText }}</text>
+                <uni-icons
+                    :type="recommendedExpanded ? 'arrowup' : 'arrowdown'"
+                    size="14"
+                    color="#a67c52"
+                ></uni-icons>
             </view>
         </view>
     </view>
@@ -65,11 +91,21 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    maxVisibleSelectedTags: {
+        type: Number,
+        default: 8,
+    },
+    maxVisibleRecommendedTags: {
+        type: Number,
+        default: 10,
+    },
 });
 
 const emit = defineEmits(["update:modelValue"]);
 
 const customTagInput = ref("");
+const selectedExpanded = ref(false);
+const recommendedExpanded = ref(false);
 const defaultTags = [
     "公式",
     "概念",
@@ -80,6 +116,36 @@ const defaultTags = [
     "其他",
 ];
 
+const normalizeSingleTag = (tag) => {
+    if (typeof tag === "string") {
+        return tag.trim();
+    }
+
+    if (typeof tag === "number") {
+        return String(tag).trim();
+    }
+
+    if (tag && typeof tag === "object") {
+        const maybeText = tag.text ?? tag.label ?? tag.name ?? tag.value;
+        return typeof maybeText === "string"
+            ? maybeText.trim()
+            : String(maybeText || "").trim();
+    }
+
+    return "";
+};
+
+const normalizeTagList = (list = []) => {
+    const normalized = [];
+    for (const item of Array.isArray(list) ? list : []) {
+        const text = normalizeSingleTag(item);
+        if (text && !normalized.includes(text)) {
+            normalized.push(text);
+        }
+    }
+    return normalized;
+};
+
 // 合并默认标签和用户历史标签（去重），使用 watch 确保 uni-app 下响应性
 const recommendedTags = ref([...defaultTags]);
 
@@ -87,8 +153,9 @@ watch(
     () => props.extraTags,
     (newTags) => {
         const merged = [...defaultTags];
-        if (newTags && newTags.length > 0) {
-            for (const tag of newTags) {
+        const normalizedExtraTags = normalizeTagList(newTags);
+        if (normalizedExtraTags.length > 0) {
+            for (const tag of normalizedExtraTags) {
                 if (tag && !merged.includes(tag)) {
                     merged.push(tag);
                 }
@@ -100,14 +167,79 @@ watch(
 );
 
 const selectedTags = computed({
-    get: () => [...props.modelValue],
-    set: (val) => emit("update:modelValue", [...val]),
+    get: () => normalizeTagList(props.modelValue),
+    set: (val) => emit("update:modelValue", normalizeTagList(val)),
 });
+
+const selectedLimit = computed(() =>
+    Math.max(1, Number(props.maxVisibleSelectedTags) || 8),
+);
+
+const recommendedLimit = computed(() =>
+    Math.max(1, Number(props.maxVisibleRecommendedTags) || 10),
+);
+
+const visibleSelectedTags = computed(() => {
+    const withIndex = selectedTags.value.map((tag, index) => ({ tag, index }));
+    return selectedExpanded.value ? withIndex : withIndex.slice(0, selectedLimit.value);
+});
+
+const hiddenSelectedCount = computed(() =>
+    Math.max(0, selectedTags.value.length - selectedLimit.value),
+);
+
+const selectedFoldText = computed(() =>
+    selectedExpanded.value
+        ? "收起已选标签"
+        : `展开剩余${hiddenSelectedCount.value}个`,
+);
+
+const visibleRecommendedTags = computed(() =>
+    recommendedExpanded.value
+        ? [...recommendedTags.value]
+        : recommendedTags.value.slice(0, recommendedLimit.value),
+);
+
+const hiddenRecommendedCount = computed(() =>
+    Math.max(0, recommendedTags.value.length - recommendedLimit.value),
+);
+
+const recommendedFoldText = computed(() =>
+    recommendedExpanded.value
+        ? "收起推荐标签"
+        : `展开剩余${hiddenRecommendedCount.value}个`,
+);
+
+const toggleSelectedExpanded = () => {
+    selectedExpanded.value = !selectedExpanded.value;
+};
+
+const toggleRecommendedExpanded = () => {
+    recommendedExpanded.value = !recommendedExpanded.value;
+};
+
+watch(
+    () => selectedTags.value.length,
+    (len) => {
+        if (len <= selectedLimit.value) {
+            selectedExpanded.value = false;
+        }
+    },
+);
+
+watch(
+    () => recommendedTags.value.length,
+    (len) => {
+        if (len <= recommendedLimit.value) {
+            recommendedExpanded.value = false;
+        }
+    },
+);
 
 // 添加自定义标签
 const addCustomTag = () => {
     const tag = customTagInput.value.trim();
-    const currentTags = [...props.modelValue];
+    const currentTags = [...selectedTags.value];
     if (tag && !currentTags.includes(tag)) {
         emit("update:modelValue", [...currentTags, tag]);
         customTagInput.value = "";
@@ -121,9 +253,10 @@ const addCustomTag = () => {
 
 // 添加推荐标签
 const addRecommendedTag = (tag) => {
-    const currentTags = [...props.modelValue];
-    if (!currentTags.includes(tag)) {
-        emit("update:modelValue", [...currentTags, tag]);
+    const normalizedTag = normalizeSingleTag(tag);
+    const currentTags = [...selectedTags.value];
+    if (normalizedTag && !currentTags.includes(normalizedTag)) {
+        emit("update:modelValue", [...currentTags, normalizedTag]);
     } else {
         uni.showToast({
             title: "标签已存在",
@@ -134,10 +267,26 @@ const addRecommendedTag = (tag) => {
 
 // 移除标签
 const removeTag = (index) => {
-    const currentTags = [...props.modelValue];
+    const currentTags = [...selectedTags.value];
     currentTags.splice(index, 1);
     emit("update:modelValue", currentTags);
 };
+
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        const normalized = normalizeTagList(newVal);
+        const original = Array.isArray(newVal) ? newVal : [];
+        const sameLength = normalized.length === original.length;
+        const sameValue =
+            sameLength && normalized.every((item, idx) => item === original[idx]);
+
+        if (!sameValue) {
+            emit("update:modelValue", normalized);
+        }
+    },
+    { immediate: true, deep: true },
+);
 </script>
 
 <style scoped>
@@ -246,5 +395,27 @@ const removeTag = (index) => {
 
 .tag-item.recommended uni-icons {
     transform: scale(0.9);
+}
+
+.tag-fold-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6rpx;
+    padding: 10rpx 18rpx;
+    border-radius: 999rpx;
+    border: 1rpx dashed #ffd4b3;
+}
+
+.selected-toggle {
+    background: #fff4eb;
+}
+
+.recommended-toggle {
+    background: #fff9f4;
+}
+
+.tag-fold-text {
+    font-size: 24rpx;
+    color: #a67c52;
 }
 </style>
