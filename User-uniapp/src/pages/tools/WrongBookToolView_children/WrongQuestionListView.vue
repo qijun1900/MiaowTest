@@ -1,7 +1,10 @@
 <template>
     <view class="container">
         <!-- 固定头部区域 -->
-        <view class="fixed-header">
+        <view
+            class="fixed-header"
+            :class="{ 'header-hidden': !isHeaderVisible }"
+        >
             <!-- 搜索栏 -->
             <view class="search-section">
                 <view class="search-box">
@@ -436,7 +439,8 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
+import { useAutoHideHeader } from "../../../composables/useAutoHideHeader.js";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
 import SelectOptionsPreview from "../../../components/modules/exam/SelectOptionsPreview.vue";
 import JudgeOptionsPreview from "../../../components/modules/exam/JudgeOptionsPreview.vue";
@@ -459,6 +463,13 @@ const WrongbookTitle = ref("");
 const searchKeyword = ref("");
 const activeTab = ref("all");
 const isShowdragButton = ref(true);
+
+// 固定头部自动隐藏（3 秒无滚动隐藏，滚动时显示）
+// handlePageScroll 必须在页面 <script setup> 中通过 onPageScroll() 直接注册
+// 原因：uni-app 编译小程序时静态分析 <script setup>，写在 composable 内部会被漏掉
+const { isHeaderVisible, handlePageScroll } = useAutoHideHeader(3000);
+onPageScroll(handlePageScroll);
+
 const isFullscreen = ref(false); // 是否有图片在全屏查看
 const loading = ref(false); // 加载状态
 const loadingMore = ref(false); // 触底加载状态
@@ -754,6 +765,7 @@ const markAsMastered = async (item) => {
             uni.showToast({
                 title: "修改成功",
                 icon: "none",
+                position: "bottom",
             });
         } else {
             uni.showToast({
@@ -787,6 +799,7 @@ const markNeedReview = async (item) => {
             uni.showToast({
                 title: "修改成功",
                 icon: "none",
+                position: "bottom",
             });
         } else {
             uni.showToast({
@@ -992,6 +1005,7 @@ onShow(() => {
     if (WrongbookId.value) {
         resetAndFetchQuestions();
     }
+    // 头部显示重置由 useAutoHideHeader 内部的 onShow 钩子自动处理
 });
 
 onReachBottom(() => {
@@ -1012,6 +1026,20 @@ onReachBottom(() => {
     z-index: 100;
     padding-bottom: 16rpx;
     box-shadow: 0 2rpx 8rpx rgba(255, 149, 85, 0.05);
+    /* transform/opacity 属于合成层属性，不触发重排，不产生滚动事件 */
+    transition:
+        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+    opacity: 1;
+    will-change: transform, opacity;
+}
+
+/* 隐藏状态：向上滑出 + 淡出，pointer-events:none 防止误触隐藏区域 */
+.header-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* 搜索栏样式 */
