@@ -367,6 +367,7 @@ const WrongBookController = {
         pageSize = 20,
         keyword = "",
         tag = "",
+        status,
       } = req.query;
       const data = await WrongBookService.getWrongQuestions({
         uid,
@@ -375,6 +376,7 @@ const WrongBookController = {
         pageSize: Number(pageSize) || 20,
         keyword,
         tag,
+        status,
       });
       res.send({
         code: 200,

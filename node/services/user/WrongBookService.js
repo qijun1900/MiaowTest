@@ -138,6 +138,7 @@ const WrongBookService = {
     pageSize = 20,
     keyword = "",
     tag = "",
+    status,
   }) => {
     try {
       const safePage = Math.max(1, Number(page) || 1);
@@ -150,6 +151,14 @@ const WrongBookService = {
 
       if (tag && tag !== "all") {
         query.tags = tag;
+      }
+
+      const normalizedStatus =
+        status === undefined || status === null || status === ""
+          ? undefined
+          : Number(status);
+      if ([0, 1, 2].includes(normalizedStatus)) {
+        query.status = normalizedStatus;
       }
 
       const trimmedKeyword = String(keyword || "").trim();
