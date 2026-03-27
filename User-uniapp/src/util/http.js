@@ -17,16 +17,29 @@ const getPlatform = () => {
     try {
         // 使用 uni.getAppBaseInfo 替代 uni.getSystemInfoSync
         const appBaseInfo = uni.getAppBaseInfo();
-        if (appBaseInfo.uniPlatform === 'web') {
+        const uniPlatform = appBaseInfo.uniPlatform;
+
+        if (uniPlatform === 'web') {
             return 'h5';
-        } else if (appBaseInfo.uniPlatform === 'mp-weixin') {
+        } else if (uniPlatform === 'mp-weixin') {
             return 'miniapp';
+        } else if (uniPlatform === 'app' || uniPlatform === 'app-plus' || uniPlatform === 'app-android' || uniPlatform === 'app-ios') {
+            return 'app';
         }
+
+        // 兜底：App 端通常存在 plus 对象
+        if (typeof plus !== 'undefined') {
+            return 'app';
+        }
+
         // 默认按小程序处理
         return 'miniapp';
     } catch (e) {
-        // 如果获取系统信息失败，默认按小程序处理
+        // 如果获取系统信息失败，优先按 App 端兜底
         console.error('获取系统信息失败:', e);
+        if (typeof plus !== 'undefined') {
+            return 'app';
+        }
         return 'miniapp';
     }
 };
@@ -42,13 +55,13 @@ const httpInterceptor = {
         options.timeout = 40000;
 
         //根据平台添加不同的客户端标识
-        const platform = getPlatform();//获取平台 h5/miniapp
-        const clientHeader = platform === 'h5' ? 'web' : 'miniapp';
+        const platform = getPlatform();//获取平台 h5/miniapp/app
+        const clientHeader = platform === 'h5' ? 'web' : platform === 'app' ? 'app' : 'miniapp';
 
         options.header = {
             ...options.header,
-            'source-client': clientHeader,//客户端来源 web/miniapp
-            'platform': platform//平台 h5/miniapp
+            'source-client': clientHeader,//客户端来源 web/miniapp/app
+            'platform': platform//平台 h5/miniapp/app
         }
         //添加token
         const token = uni.getStorageSync('token');//从本地获取token
@@ -84,7 +97,7 @@ function cloudRequest(options) {
         
         // 添加平台标识
         const platform = getPlatform();
-        const clientHeader = platform === 'h5' ? 'web' : 'miniapp';
+        const clientHeader = platform === 'h5' ? 'web' : platform === 'app' ? 'app' : 'miniapp';
         
         // 初始化header
         processedOptions.header = {

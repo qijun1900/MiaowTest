@@ -6,10 +6,11 @@ const clientDetector = (req, res, next) => {
 
   // 将客户端信息添加到请求对象中，供后续中间件和控制器使用
   req.clientInfo = {
-    sourceClient: sourceClient || "unknown", // 'web' 或 'miniapp'
-    platform: platform || "unknown", // 'h5' 或 'miniapp'
+    sourceClient: sourceClient || "unknown", // 'web' 或 'miniapp' 或 'app'
+    platform: platform || "unknown", // 'h5' 或 'miniapp' 或 'app'
     isWeb: sourceClient === "web", // 用于判断是否为Web端请求
     isMiniApp: sourceClient === "miniapp", // 用于判断是否为小程序请求
+    isApp: sourceClient === "app" || platform === "app", // 用于判断是否为App端请求
     isH5: platform === "h5", // 用于判断是否为H5平台请求
   };
 
