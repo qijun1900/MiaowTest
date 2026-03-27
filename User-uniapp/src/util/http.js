@@ -5,12 +5,12 @@ const baseURl = escconfig.useTunnel
     : `http://${escconfig.serverHost}:${escconfig.serverPort}`;
 
 // 统一的HTTP请求封装
-// 适用于uni-app的http请求封装，支持小程序和H5平台
+// 适用于uni-app的http请求封装，支持小程序和H5平台和APP
 // 支持拦截器，支持Promise化
 // 支持自动添加baseURL，支持自动添加token，支持自动添加客户端标识，支持自动添加平台标识
 // 支持自动处理错误，支持自动处理超时，支持自动处理网络错误，支持自动处理401错误
 //支持小程序云托管
-//自动检测运行环境，支持H5和小程序
+//自动检测运行环境，支持H5和小程序和APP，自动添加客户端和平台标识
 
 // 检测当前运行环境
 const getPlatform = () => {
