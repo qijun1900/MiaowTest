@@ -12,6 +12,8 @@ const rateLimit = require("express-rate-limit");
 const JWT = require("./MiddleWares/jwt");
 const clientDetector = require("./MiddleWares/clientDetector"); // 引入客户端检测中间件
 const adminAuth = require("./MiddleWares/adminAuth"); // 引入Admin认证中间件
+const requestTraceLogger = require("./MiddleWares/requestTraceLogger"); // 请求追踪与自动访问日志
+const LogService = require("./services/user/LogService"); // 日志服务（用于错误日志）
 var indexRouter = require("./routes/index"); // 引入路由模块
 const UserRouter = require("./routes/admin/UserRouter"); // 引入Admin用户路由模块
 const NewsRouter = require("./routes/admin/NewsRouter"); // 引入Admin新闻路由模块
@@ -28,6 +30,7 @@ const VocabularyRouter = require("./routes/user/VocabularyRouter"); // 引入用
 const AdminFileRouter = require("./routes/admin/FileRouter"); // 引入Admin资源路由模块
 const UserResourceRouter = require("./routes/user/ResourceRouter"); //用户资源相关路由模块
 const UserWrongBookRouter = require("./routes/user/WrongBookRouter"); //用户错题本相关路由模块
+const UserLogRouter = require("./routes/user/LogRouter"); //用户端日志路由
 
 var app = express();
 
@@ -73,8 +76,9 @@ app.use((req, res, next) => {
   // 这些是客户端在发送请求时可以包含的自定义头部信息
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, source-client, platform, Authorization",
+    "Origin, X-Requested-With, Content-Type, Accept, source-client, platform, Authorization, X-Trace-Id",
   ); // 允许的头部信息
+  res.setHeader("Access-Control-Expose-Headers", "X-Trace-Id");
 
   // 设置允许的HTTP请求方法
   // 定义了客户端可以使用的请求方式类型
@@ -85,6 +89,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(clientDetector); // 使用客户端检测中间件
+app.use(requestTraceLogger); // 注入traceId并自动记录uniapp请求日志
 
 // 健康检查路由
 app.get("/health", (req, res) => {
@@ -106,6 +111,7 @@ app.use(ConsumerLLMRouter); // 注册llm路由(用户端)
 app.use(VocabularyRouter); // 注册词汇相关路由(用户端)
 app.use(UserResourceRouter); //注册资源相关路由(用户端)
 app.use(UserWrongBookRouter); //注册错题本相关路由(用户端)
+app.use(UserLogRouter); //注册用户端日志路由
 /*
 adminapi===后台管理接口
 */
@@ -127,6 +133,11 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+  // 记录用户端异常日志（不阻塞主流程）
+  LogService.captureAppError(err, req, err.status || 500).catch((logError) => {
+    console.error("captureAppError 失败:", logError.message || logError);
+  });
+
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
