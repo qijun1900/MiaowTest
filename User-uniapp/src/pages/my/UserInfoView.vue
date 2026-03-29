@@ -62,13 +62,16 @@
                 }}</view>
                 <view class="info-value">
                     <text class="openid-text">{{
-                        accountBindStatus ? "您已经绑定账号" : "立即绑定账号"
+                        accountBindStatus
+                            ? userInfoStore.userInfo?.username
+                            : "立即绑定账号"
                     }}</text>
                     <up-icon
                         v-if="!accountBindStatus"
                         name="arrow-right"
                         size="14px"
                     ></up-icon>
+                    <up-icon v-else name="file-text" size="18px"></up-icon>
                 </view>
             </view>
             <!-- #endif -->
@@ -220,6 +223,8 @@ const handleUserRsgister = () => {
         uni.navigateTo({
             url: "/pages/my/UserRegisterView?isBind=true",
         });
+    } else {
+        handleCopy(userInfoStore.userInfo?.username);
     }
 };
 
