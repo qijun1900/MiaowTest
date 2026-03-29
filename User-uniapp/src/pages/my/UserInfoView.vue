@@ -72,6 +72,20 @@
                 </view>
             </view>
             <!-- #endif -->
+            <!-- #ifndef MP-WEIXIN -->
+            <view
+                class="info-item"
+                @click="handleCopy(userInfoStore.userInfo?.username)"
+            >
+                <view class="info-label">当前账号</view>
+                <view class="info-value">
+                    <text class="openid-text">{{
+                        userInfoStore.userInfo?.username
+                    }}</text>
+                    <up-icon name="file-text" size="18px"></up-icon>
+                </view>
+            </view>
+            <!-- #endif -->
         </view>
         <!-- 退出登录按钮 -->
         <view class="logout-section">
