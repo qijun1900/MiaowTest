@@ -1,9 +1,16 @@
 import escconfig from "../config/esc.config";
 import { UserInfoStore } from "../stores/modules/UserinfoStore";
 import logSDK from "./logSDK";
+import showModal from "./showModal";
 const baseURl = escconfig.useTunnel
   ? escconfig.tunnelUrl
   : `http://${escconfig.serverHost}:${escconfig.serverPort}`;
+
+const CLOUD_READY_CHECK_PATH = "/health";
+const CLOUD_READY_CHECK_INTERVAL = 2000;
+const CLOUD_READY_CHECK_TIMEOUT = 45000;
+
+let cloudWakeupPromise = null;
 
 // 统一的HTTP请求封装
 // 适用于uni-app的http请求封装，支持小程序和H5平台和APP
@@ -83,93 +90,276 @@ const httpInterceptor = {
 uni.addInterceptor("request", httpInterceptor);
 uni.addInterceptor("uploadFile", httpInterceptor);
 
-// 云托管请求封装
-function cloudRequest(options) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getCloudErrorMessage(error) {
+  if (!error) return "";
+  if (typeof error === "string") return error;
+  return String(error.message || error.errMsg || "");
+}
+
+function getResponseErrorMessage(data) {
+  if (!data || typeof data !== "object") return "";
+  return String(data.message || data.msg || "");
+}
+
+function isCloudWakeupRelatedStatus(statusCode) {
+  return [502, 503, 504].includes(Number(statusCode));
+}
+
+function isCloudWakeupRelatedResponse(response) {
+  if (!response) return false;
+  if (isCloudWakeupRelatedStatus(response.statusCode)) return true;
+
+  const message = getResponseErrorMessage(response.data).toLowerCase();
+  if (!message) return false;
+
+  return /(upstream|bad gateway|service unavailable|timeout|timed out|cold|starting)/.test(
+    message,
+  );
+}
+
+function isCloudWakeupRelatedError(error) {
+  const message = getCloudErrorMessage(error).toLowerCase();
+  if (!message) return false;
+
+  return /(timeout|timed out|econnreset|bad gateway|service unavailable|upstream|502|503|504|connect|disconnect|reset)/.test(
+    message,
+  );
+}
+
+function isWechatCloudRuntime() {
+  return (
+    escconfig.useCloudContainer &&
+    typeof wx !== "undefined" &&
+    !!wx.cloud &&
+    getPlatform() === "miniapp"
+  );
+}
+
+function buildCloudHeaders(customHeader = {}) {
+  const platform = getPlatform();
+  const clientHeader =
+    platform === "h5" ? "web" : platform === "app" ? "app" : "miniapp";
+
+  const headers = {
+    ...customHeader,
+    "source-client": clientHeader,
+    platform: platform,
+  };
+
+  const token = uni.getStorageSync("token");
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return {
+    "X-WX-SERVICE": escconfig.cloudService,
+    ...headers,
+  };
+}
+
+function callCloudContainer(options) {
   return new Promise((resolve, reject) => {
     if (!wx.cloud) {
       reject(new Error("请在微信小程序环境下使用云托管API"));
       return;
     }
 
-    // 手动应用拦截器逻辑，因为uni.addInterceptor对wx.cloud.callContainer无效
-    const processedOptions = { ...options };
-
-    // 处理URL
-    if (!processedOptions.url.startsWith("http")) {
-      processedOptions.url = baseURl + processedOptions.url;
-    }
-
-    // 设置超时
-    processedOptions.timeout = processedOptions.timeout || 15000; // 默认15秒
-
-    // 添加平台标识
-    const platform = getPlatform();
-    const clientHeader =
-      platform === "h5" ? "web" : platform === "app" ? "app" : "miniapp";
-
-    // 初始化header
-    processedOptions.header = {
-      ...processedOptions.header,
-      "source-client": clientHeader,
-      platform: platform,
-    };
-
-    // 添加token
-    const token = uni.getStorageSync("token");
-    if (token) {
-      processedOptions.header.Authorization = `Bearer ${token}`;
-    }
-
-    // 构建最终的请求头
-    const finalHeader = {
-      "X-WX-SERVICE": escconfig.cloudService,
-      ...processedOptions.header,
-    };
-
     wx.cloud.callContainer({
       config: {
         env: escconfig.cloudEnv,
       },
-      path: options.url, // 注意：path应该使用原始URL，而不是处理后的URL
-      header: finalHeader,
-      method: processedOptions.method || "GET",
-      data: processedOptions.data || {},
-      success: (res) => {
-        // 兼容原有 resolve 行为
+      path: options.url,// 注意：path应该使用原始URL，而不是处理后的URL
+      header: buildCloudHeaders(options.header),
+      method: options.method || "GET",
+      data: options.data || {},
+      timeout: options.timeout || 15000,
+      success: (res) => resolve(res),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+async function probeCloudReady() {
+  try {
+    const res = await callCloudContainer({
+      url: CLOUD_READY_CHECK_PATH,
+      method: "GET",
+      timeout: 5000,
+      header: {
+        "x-cloud-probe": "1",
+      },
+    });
+
+    return (
+      res.statusCode >= 200 &&
+      res.statusCode < 300 &&
+      (res?.data?.status === "ok" || res?.data?.database === "connected")
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function waitForCloudReady() {
+  const deadline = Date.now() + CLOUD_READY_CHECK_TIMEOUT;
+  while (Date.now() < deadline) {
+    const ready = await probeCloudReady();
+    if (ready) return;
+    await sleep(CLOUD_READY_CHECK_INTERVAL);
+  }
+
+  const timeoutError = new Error("服务启动时间较长，请稍后再试");
+  timeoutError.code = "CLOUD_WAKEUP_TIMEOUT";
+  throw timeoutError;
+}
+
+function ensureCloudReadyWithPrompt() {
+  if (cloudWakeupPromise) {
+    return cloudWakeupPromise;
+  }
+
+  cloudWakeupPromise = (async () => {
+    const modalRes = await showModal({
+      title: "服务启动中",
+      content:
+        "当前云托管服务正在自动启动，预计需要 30~60 秒。是否等待服务恢复后自动重试？",
+      confirmText: "等待恢复",
+      cancelText: "稍后再试",
+      showCancel: true,
+    });
+
+    if (!modalRes?.confirm) {
+      const cancelError = new Error("已取消等待服务启动");
+      cancelError.code = "CLOUD_WAKEUP_CANCEL";
+      throw cancelError;
+    }
+
+    await waitForCloudReady();
+    uni.showToast({
+      title: "服务已恢复，正在重试",
+      icon: "none",
+      mask: true,
+    });
+  })().finally(() => {
+    cloudWakeupPromise = null;
+  });
+
+  return cloudWakeupPromise;
+}
+
+function handle401(options, reject, responsePayload) {
+  logSDK.track("AUTH_TOKEN_REFRESH", {
+    result: logSDK.results.FAIL,
+    errorCode: "401",
+    errorMessage: "登录过期，请重新登录",
+    metadata: { trigger: "cloud_http_401", path: options.url },
+  });
+  uni.removeStorageSync("token");
+  const userInfoStore = UserInfoStore();
+  userInfoStore.clearUserInfo();
+  uni.navigateTo({ url: "/pages/my/my" });
+  reject("登录过期，请重新登录", responsePayload);
+}
+
+// 云托管请求封装
+function cloudRequest(options) {
+  const requestOptions = { ...options };
+  const hasWakeupRetry = Boolean(requestOptions.__cloudWakeupRetried);
+  delete requestOptions.__cloudWakeupRetried;
+
+  return new Promise((resolve, reject) => {
+    if (!wx.cloud) {
+      reject(new Error("请在微信小程序环境下使用云托管API"));
+      return;
+    }
+
+    callCloudContainer(requestOptions)
+      .then(async (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data);
-        } else if (res.statusCode === 401) {
-          // 处理401错误，清除token并跳转登录页
-          // 埋点：token 过期导致被动登出
-          logSDK.track("AUTH_TOKEN_REFRESH", {
-            result: logSDK.results.FAIL,
-            errorCode: "401",
-            errorMessage: "登录过期，请重新登录",
-            metadata: { trigger: "cloud_http_401", path: options.url },
-          });
-          uni.removeStorageSync("token");
-          const userInfoStore = UserInfoStore();
-          userInfoStore.clearUserInfo();
-          uni.navigateTo({ url: "/pages/my/my" });
-          reject("登录过期，请重新登录", res);
-        } else {
-          uni.showToast({
-            title: res.data.message || "请求错误",
-            icon: "none",
-            mask: true,
-          });
-          reject(res);
+          return;
         }
-      },
-      fail: (err) => {
+
+        if (res.statusCode === 401) {
+          handle401(requestOptions, reject, res);
+          return;
+        }
+
+        if (
+          isWechatCloudRuntime() &&
+          !hasWakeupRetry &&
+          isCloudWakeupRelatedResponse(res)
+        ) {
+          try {
+            await ensureCloudReadyWithPrompt();
+            const retryData = await cloudRequest({
+              ...requestOptions,
+              __cloudWakeupRetried: true,
+            });
+            resolve(retryData);
+          } catch (error) {
+            if (
+              error?.code === "CLOUD_WAKEUP_TIMEOUT" ||
+              error?.code === "CLOUD_WAKEUP_CANCEL"
+            ) {
+              uni.showToast({
+                title: getCloudErrorMessage(error) || "服务启动中，请稍后重试",
+                icon: "none",
+                mask: true,
+              });
+            }
+            reject(error);
+          }
+          return;
+        }
+
+        uni.showToast({
+          title: getResponseErrorMessage(res.data) || "请求错误",
+          icon: "none",
+          mask: true,
+        });
+        reject(res);
+      })
+      .catch(async (err) => {
+        if (
+          isWechatCloudRuntime() &&
+          !hasWakeupRetry &&
+          isCloudWakeupRelatedError(err)
+        ) {
+          try {
+            await ensureCloudReadyWithPrompt();
+            const retryData = await cloudRequest({
+              ...requestOptions,
+              __cloudWakeupRetried: true,
+            });
+            resolve(retryData);
+          } catch (error) {
+            if (
+              error?.code === "CLOUD_WAKEUP_TIMEOUT" ||
+              error?.code === "CLOUD_WAKEUP_CANCEL"
+            ) {
+              uni.showToast({
+                title: getCloudErrorMessage(error) || "服务启动中，请稍后重试",
+                icon: "none",
+                mask: true,
+              });
+            }
+            reject(error);
+          }
+          return;
+        }
+
         uni.showToast({
           title: "网络异常，请稍后重试",
           icon: "none",
           mask: true,
         });
         reject(err);
-      },
-    });
+      });
   });
 }
 
