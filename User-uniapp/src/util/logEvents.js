@@ -51,6 +51,36 @@ export const LOG_EVENT_DICT = Object.freeze({
     module: LOG_MODULES.APP,
     desc: "应用切后台",
   },
+
+  // ── 认证模块事件 ────────────────────────────────────────────────────────────
+  // 覆盖登录、登出、静默登录、注册、token 刷新五个核心认证动作。
+  // 建议配合 result（SUCCESS/FAIL）+ errorCode + bizId（用户 ID）一起上报。
+
+  AUTH_LOGIN: {
+    eventName: "auth.login",
+    module: LOG_MODULES.AUTH,
+    desc: "用户主动登录（账号密码 / 手机号等）",
+  },
+  AUTH_AUTO_LOGIN: {
+    eventName: "auth.auto_login",
+    module: LOG_MODULES.AUTH,
+    desc: "静默自动登录（启动时读取本地 token 校验）",
+  },
+  AUTH_REGISTER: {
+    eventName: "auth.register",
+    module: LOG_MODULES.AUTH,
+    desc: "用户注册",
+  },
+  AUTH_LOGOUT: {
+    eventName: "auth.logout",
+    module: LOG_MODULES.AUTH,
+    desc: "用户主动登出",
+  },
+  AUTH_TOKEN_REFRESH: {
+    eventName: "auth.token_refresh",
+    module: LOG_MODULES.AUTH,
+    desc: "Token 续期刷新（过期后自动请求新 token）",
+  },
 });
 
 // ── 事件精简视图（对外暴露给业务层）──────────────────────────────────────────

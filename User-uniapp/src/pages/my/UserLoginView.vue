@@ -120,7 +120,7 @@ import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import { wechatLogin } from "../../util/wechatLogin";
 import navBarHeightUtil from "../../util/navBarHeight";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
-
+import logSDK from "../../util/logSDK";
 
 const showPassword = ref(true);
 const rememberMe = ref([]);
@@ -202,6 +202,12 @@ const handleLogin = async () => {
             userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
             persistRememberLogin();
 
+            // 埋点：账号密码登录成功
+            logSDK.track("AUTH_LOGIN", {
+                result: logSDK.results.SUCCESS,
+                metadata: { method: "account" },
+            });
+
             // 登录成功后返回上一页
             setTimeout(() => {
                 uni.switchTab({
@@ -226,12 +232,26 @@ const handleLogin = async () => {
                     }
                 },
             });
+            // 埋点：账号不存在
+            logSDK.track("AUTH_LOGIN", {
+                result: logSDK.results.FAIL,
+                errorCode: "404",
+                errorMessage: response.message || "账号尚未注册",
+                metadata: { method: "account" },
+            });
         } else if (response.code === 401) {
             // 密码或账号错误
             uni.showToast({
                 title: response.message || "密码或账号错误",
                 icon: "none",
                 duration: 2000,
+            });
+            // 埋点：密码或账号错误
+            logSDK.track("AUTH_LOGIN", {
+                result: logSDK.results.FAIL,
+                errorCode: "401",
+                errorMessage: response.message || "密码或账号错误",
+                metadata: { method: "account" },
             });
         } else {
             // 其他错误
@@ -240,6 +260,13 @@ const handleLogin = async () => {
                 icon: "none",
                 duration: 2000,
             });
+            // 埋点：其他业务错误
+            logSDK.track("AUTH_LOGIN", {
+                result: logSDK.results.FAIL,
+                errorCode: String(response.code || ""),
+                errorMessage: response.message || "登录失败，请稍后重试",
+                metadata: { method: "account" },
+            });
         }
     } catch (error) {
         // 网络错误或其他异常
@@ -247,6 +274,12 @@ const handleLogin = async () => {
             title: error.message || "网络异常，请稍后重试",
             icon: "none",
             duration: 2000,
+        });
+        // 埋点：网络异常或未知错误
+        logSDK.track("AUTH_LOGIN", {
+            result: logSDK.results.FAIL,
+            errorMessage: error.message || "网络异常，请稍后重试",
+            metadata: { method: "account" },
         });
     }
 };

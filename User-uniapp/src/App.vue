@@ -18,7 +18,7 @@ export default {
         // 仅在微信小程序环境下执行（条件编译），初始化微信云开发能力。
         // logSDK 的 requestByCloud 依赖 wx.cloud，必须在 SDK 初始化前完成。
         //#ifdef MP-WEIXIN
-            wx.cloud.init();
+        wx.cloud.init();
         //#endif
 
         // ── 初始化日志 SDK ────────────────────────────────────────────────────────
@@ -41,6 +41,16 @@ export default {
         logSDK.track("APP_LAUNCH", {
             result: logSDK.results.SUCCESS,
         });
+
+        // ── 检测启动时是否已有登录态（自动登录）────────────────────────────────────
+        // 若本地 Storage 中存在 token，说明用户上次已登录且未主动退出，
+        // 记录一次 AUTH_AUTO_LOGIN 事件，便于统计用户留存与 token 有效率。
+        const existingToken = uni.getStorageSync("token");
+        if (existingToken) {
+            logSDK.track("AUTH_AUTO_LOGIN", {
+                result: logSDK.results.SUCCESS,
+            });
+        }
     },
 
     onShow() {

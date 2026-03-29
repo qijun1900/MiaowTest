@@ -64,9 +64,11 @@
                     <text class="openid-text">{{
                         accountBindStatus ? "您已经绑定账号" : "立即绑定账号"
                     }}</text>
-                    <up-icon 
-                    v-if="!accountBindStatus "
-                    name="arrow-right" size="14px"></up-icon>
+                    <up-icon
+                        v-if="!accountBindStatus"
+                        name="arrow-right"
+                        size="14px"
+                    ></up-icon>
                 </view>
             </view>
             <!-- #endif -->
@@ -86,6 +88,7 @@ import { onMounted, ref } from "vue";
 import userAvatar from "../../components/core/userAvatar.vue";
 import { httpUpload } from "../../util/http";
 import escconfig from "../../config/esc.config";
+import logSDK from "../../util/logSDK";
 
 const accountBindStatus = ref(false); // 账号绑定状态
 const userInfoStore = UserInfoStore();
@@ -97,17 +100,17 @@ const genderMap = {
 };
 
 // 账号绑定状态计算属性，使用API来获取
-const CheckaccountBindStatus =async()=> {
-  try{
-    const response = await checkUserBind();
-    if(response.code===200){
-      accountBindStatus.value = response.data.isBind;
+const CheckaccountBindStatus = async () => {
+    try {
+        const response = await checkUserBind();
+        if (response.code === 200) {
+            accountBindStatus.value = response.data.isBind;
+        }
+    } catch (e) {
+        console.error("获取账号绑定状态失败:", e);
+        return false;
     }
-  }catch(e){
-    console.error("获取账号绑定状态失败:",e);
-    return false;
-  }
-}
+};
 
 // 将性别数字转换为文本
 const getGenderText = (genderValue) => {
@@ -199,10 +202,10 @@ const handleEditGender = () => {
 
 // 处理账号绑定
 const handleUserRsgister = () => {
-    if(!accountBindStatus.value){
-      uni.navigateTo({
-        url: '/pages/my/UserRegisterView?isBind=true',
-      });
+    if (!accountBindStatus.value) {
+        uni.navigateTo({
+            url: "/pages/my/UserRegisterView?isBind=true",
+        });
     }
 };
 
@@ -254,13 +257,22 @@ const handleLogout = () => {
         content: "确定要退出登录吗？",
         success: (res) => {
             if (res.confirm) {
+                // 在清除 Store 之前先保存 uid，否则 clearUserInfo() 执行后 uid 已丢失
+                const uid = userInfoStore.userInfo?.uid;
+
                 userInfoStore.clearUserInfo(); // 清除Pinia用户信息
                 uni.removeStorageSync("token"); // 清除 token
-                uni.navigateBack();
                 uni.showToast({
                     title: "已退出登录",
                     icon: "success",
                 });
+
+                // 埋点：主动退出登录，bizId 记录是哪个用户退出
+                logSDK.track("AUTH_LOGOUT", {
+                    result: logSDK.results.SUCCESS,
+                    bizId: uid || "",
+                });
+
                 uni.navigateBack();
             }
         },

@@ -154,6 +154,7 @@ import {
 import navBarHeightUtil from "../../util/navBarHeight";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
+import logSDK from "../../util/logSDK";
 
 // 绑定模式状态
 const bindMode = ref(false);
@@ -445,6 +446,12 @@ const handleLogin = async () => {
                 duration: 2000,
             });
 
+            // 埋点：注册 / 绑定账号成功
+            logSDK.track("AUTH_REGISTER", {
+                result: logSDK.results.SUCCESS,
+                metadata: { mode: bindMode.value ? "bind" : "register" },
+            });
+
             if (bindMode.value) {
                 setTimeout(() => {
                     uni.navigateBack();
@@ -454,6 +461,14 @@ const handleLogin = async () => {
                     uni.navigateTo({ url: "/pages/my/UserLoginView" });
                 }, 1500);
             }
+        } else {
+            // 埋点：注册 / 绑定账号业务失败（服务端返回非 200）
+            logSDK.track("AUTH_REGISTER", {
+                result: logSDK.results.FAIL,
+                errorCode: String(result.code || ""),
+                errorMessage: result.message || "注册失败，请稍后重试",
+                metadata: { mode: bindMode.value ? "bind" : "register" },
+            });
         }
     } catch (error) {
         console.error(bindMode.value ? "绑定异常:" : "注册异常:", error);
@@ -462,6 +477,14 @@ const handleLogin = async () => {
             title: errorMsg,
             icon: "none",
             duration: 2000,
+        });
+        // 埋点：注册 / 绑定账号异常（表单校验失败或网络错误）
+        // 注意：表单校验类错误（密码不一致、字段缺失）也会走到此处，
+        //       通过 errorMessage 区分具体原因。
+        logSDK.track("AUTH_REGISTER", {
+            result: logSDK.results.FAIL,
+            errorMessage: errorMsg,
+            metadata: { mode: bindMode.value ? "bind" : "register" },
         });
         throw error;
     }
