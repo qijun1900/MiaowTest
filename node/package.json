@@ -7,7 +7,9 @@
     "prod": "set NODE_ENV=production&&node ./bin/www",
     "dev": "set NODE_ENV=development&&node-dev ./bin/www",
     "docker": "set NODE_ENV=production&&node ./bin/www",
-    "migrate:oss": "node ./script/migrateToOSS.js"
+    "migrate:oss": "node ./script/migrateToOSS.js",
+    "zip:no-deps": "node ./script/zip-backend-no-deps.js",
+    "zip": "npm run zip:no-deps"
   },
   "dependencies": {
     "ali-oss": "^6.23.0",
@@ -32,6 +34,7 @@
     "openai": "^5.0.1"
   },
   "devDependencies": {
+    "archiver": "^7.0.1",
     "node-dev": "^8.0.0"
   }
 }

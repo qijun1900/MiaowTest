@@ -84,7 +84,7 @@ const LogService = {
       const uid = req?.user?.uid || null;
       const { sourceClient, platform } = getClientContext(req);
 
-      await ApiRequestLogModel.create({
+      await ApiRequestLogModel.create({ //路由日志记录，包含请求基本信息和上下文，便于后续分析和排查问题。
         traceId: toSafeString(req.traceId, 80),
         uid: toObjectIdOrNull(uid),
         sourceClient,
@@ -115,7 +115,7 @@ const LogService = {
     const { sourceClient, platform } = getClientContext(req);
     const traceId = toSafeString(req.traceId, 80);
 
-    const actionDocs = events
+    const actionDocs = events //用户端上报的行为事件，经过安全裁剪和结构化后批量写入数据库。
       .slice(0, MAX_ACTION_BATCH_SIZE)
       .map((event) => {
         const eventName = toSafeString(event.eventName, 80);
