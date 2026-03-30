@@ -1,4 +1,4 @@
-const OpenAI = require("openai");
+const OpenAI = require("openai/index.js");
 const { filterLastUserMessage } = require("../../../helpers/MessageFilter");
 
 const openai = new OpenAI({

@@ -1,4 +1,4 @@
-const OpenAI = require("openai");
+const OpenAI = require("openai/index.js");
 
 const openai = new OpenAI({
   apiKey: process.env.DASHSCOPE_API_KEY,
