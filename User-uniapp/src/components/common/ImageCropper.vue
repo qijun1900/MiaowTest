@@ -487,7 +487,8 @@ const handleConfirm = async () => {
         canvasWidth.value = Math.max(1, Math.round(cropW * ratio));
         canvasHeight.value = Math.max(1, Math.round(cropH * ratio));
 
-        await nextTick();
+        // App端需要等原生canvas组件尺寸真正更新 (与旋转逻辑同理)
+        await new Promise((resolve) => setTimeout(resolve, 150));
 
         // 使用 canvas 绘制裁剪区域
         const ctx = uni.createCanvasContext("cropCanvas", instance.proxy);
