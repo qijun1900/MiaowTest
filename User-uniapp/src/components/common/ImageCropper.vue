@@ -18,7 +18,7 @@
             @touchend.prevent="onTouchEnd"
         >
             <image
-                :src="imagePath"
+                :src="internalImagePath"
                 class="source-image"
                 mode="aspectFit"
                 @load="onImageLoad"
@@ -60,7 +60,10 @@
                 <text class="btn-text cancel-text">取消</text>
             </view>
             <view class="footer-btn" @click="handleUseOriginal">
-                <text class="btn-text original-text">使用原图</text>
+                <text class="btn-text btn-action-text">原图</text>
+            </view>
+            <view class="footer-btn" @click="handleRotate">
+                <text class="btn-text btn-action-text">旋转</text>
             </view>
             <view
                 class="footer-btn confirm-btn"
@@ -154,14 +157,23 @@ const cropping = ref(false);
 // 本地图片路径（用于 canvas 绘制，兼容远程URL）
 const localImagePath = ref("");
 
+// 内部管理的图片路径，支持旋转后更新
+const internalImagePath = ref("");
+
+// 旋转中状态
+const rotating = ref(false);
+
 // 当 show 变为 false 时重置状态
 watch(
     () => props.show,
     (val) => {
         if (!val) {
             resetState();
+        } else {
+            internalImagePath.value = props.imagePath;
         }
     },
+    { immediate: true }
 );
 
 /**
@@ -169,12 +181,12 @@ watch(
  */
 const onImageLoad = () => {
     uni.getImageInfo({
-        src: props.imagePath,
+        src: internalImagePath.value,
         success: (info) => {
             originalWidth.value = info.width;
             originalHeight.value = info.height;
             // 保存本地路径，确保 canvas drawImage 兼容远程URL
-            localImagePath.value = info.path || props.imagePath;
+            localImagePath.value = info.path || internalImagePath.value;
 
             nextTick(() => {
                 uni.createSelectorQuery()
@@ -527,6 +539,90 @@ const handleConfirm = async () => {
 };
 
 /**
+ * 旋转
+ */
+const handleRotate = async () => {
+    if (rotating.value || cropping.value || !localImagePath.value) return;
+    
+    try {
+        rotating.value = true;
+        uni.showLoading({ title: "旋转中..." });
+
+        const info = await new Promise((resolve, reject) => {
+            uni.getImageInfo({
+                src: localImagePath.value,
+                success: resolve,
+                fail: reject
+            });
+        });
+
+        const ow = info.width;
+        const oh = info.height;
+
+        // 限制 canvas 尺寸，避免性能问题
+        const MAX_SIZE = 1500;
+        const ratio = Math.min(1, MAX_SIZE / Math.max(ow, oh));
+        const drawW = Math.max(1, Math.round(ow * ratio));
+        const drawH = Math.max(1, Math.round(oh * ratio));
+        
+        // 旋转后画布尺寸交换宽高
+        canvasWidth.value = drawH;
+        canvasHeight.value = drawW;
+
+        // App端需要等原生canvas组件尺寸真正更新
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        const ctx = uni.createCanvasContext("cropCanvas", instance.proxy);
+        
+        // 平移到中心，旋转90度
+        ctx.translate(drawH / 2, drawW / 2);
+        ctx.rotate(90 * Math.PI / 180);
+        ctx.drawImage(info.path, -drawW / 2, -drawH / 2, drawW, drawH);
+        
+        ctx.draw(false, () => {
+            setTimeout(() => {
+                uni.canvasToTempFilePath(
+                    {
+                        canvasId: "cropCanvas",
+                        width: drawH,
+                        height: drawW,
+                        destWidth: drawH,
+                        destHeight: drawW,
+                        fileType: "jpg",
+                        quality: 0.9,
+                        success: (res) => {
+                            // 更新路径
+                            localImagePath.value = res.tempFilePath;
+                            internalImagePath.value = res.tempFilePath;
+                            // 清空选区
+                            selectionRect.left = 0;
+                            selectionRect.top = 0;
+                            selectionRect.width = 0;
+                            selectionRect.height = 0;
+                            hasSelection.value = false;
+                        },
+                        fail: (err) => {
+                            console.error("旋转导出失败:", err);
+                            uni.showToast({ title: "旋转失败", icon: "none" });
+                        },
+                        complete: () => {
+                            uni.hideLoading();
+                            rotating.value = false;
+                        }
+                    },
+                    instance.proxy
+                );
+            }, 300);
+        });
+    } catch (error) {
+        console.error("旋转出错:", error);
+        uni.hideLoading();
+        uni.showToast({ title: "旋转失败", icon: "none" });
+        rotating.value = false;
+    }
+};
+
+/**
  * 使用原图
  */
 const handleUseOriginal = () => {
@@ -551,7 +647,9 @@ const resetState = () => {
     hasSelection.value = false;
     interactionMode.value = "none";
     cropping.value = false;
+    rotating.value = false;
     localImagePath.value = "";
+    internalImagePath.value = "";
 };
 </script>
 
@@ -779,7 +877,7 @@ const resetState = () => {
     color: rgba(255, 255, 255, 0.8);
 }
 
-.original-text {
+.btn-action-text {
     color: #fff;
 }
 
