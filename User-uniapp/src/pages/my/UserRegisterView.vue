@@ -221,7 +221,7 @@ const generateCaptcha = () => {
 };
 
 const openCaptcha = () => {
-    if (isCountingDown.value || !isEmailValid.value) {
+    if (isCountingDown.value || !isEmailValid.value || !formData.email) {
         return;
     }
     generateCaptcha();
