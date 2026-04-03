@@ -79,7 +79,7 @@
                             type="primary"
                             class="verify-btn"
                             :disabled="isCountingDown || !isEmailValid"
-                            @click="sendVerifyCode"
+                            @click="openCaptcha"
                         ></u-button>
                     </view>
                 </u-form-item>
@@ -140,6 +140,31 @@
             @showUserAgreement="showUserAgreement"
             @showPrivacyPolicy="showPrivacyPolicy"
         />
+
+        <!-- 人机验证弹窗 -->
+        <view class="captcha-modal" v-if="showCaptcha">
+            <view class="captcha-mask" @click="closeCaptcha"></view>
+            <view class="captcha-content">
+                <view class="captcha-title">人机验证</view>
+                <view class="captcha-subtitle">请完成下方计算以继续发送验证码</view>
+                <view class="captcha-question">{{ captchaQuestion }}</view>
+                <view class="captcha-input-wrap">
+                    <u-input
+                        v-model="captchaConfig.answer"
+                        placeholder="请输入结果"
+                        type="number"
+                        border="surround"
+                        clearable
+                        focus
+                        @confirm="verifyCaptcha"
+                    ></u-input>
+                </view>
+                <view class="captcha-btns">
+                    <view class="captcha-btn cancel" @click="closeCaptcha">取消</view>
+                    <view class="captcha-btn confirm" @click="verifyCaptcha">确认</view>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -178,6 +203,53 @@ const formData = reactive({
 const isCountingDown = ref(false);
 const countdown = ref(0);
 const countdownTimer = ref(null);
+
+// 人机验证相关状态
+const showCaptcha = ref(false);
+const captchaConfig = reactive({
+    num1: 0,
+    num2: 0,
+    answer: '',
+});
+
+const captchaQuestion = computed(() => `${captchaConfig.num1} + ${captchaConfig.num2} = ?`);
+
+const generateCaptcha = () => {
+    captchaConfig.num1 = Math.floor(Math.random() * 10) + 1; // 1-10
+    captchaConfig.num2 = Math.floor(Math.random() * 10) + 1; // 1-10
+    captchaConfig.answer = '';
+};
+
+const openCaptcha = () => {
+    if (isCountingDown.value || !isEmailValid.value) {
+        return;
+    }
+    generateCaptcha();
+    showCaptcha.value = true;
+};
+
+const closeCaptcha = () => {
+    showCaptcha.value = false;
+    captchaConfig.answer = '';
+};
+
+const verifyCaptcha = () => {
+    const expected = captchaConfig.num1 + captchaConfig.num2;
+    if (parseInt(captchaConfig.answer) === expected) {
+        // 验证通过
+        closeCaptcha();
+        sendVerifyCode();
+    } else {
+        uni.showToast({
+            title: "验证码错误，请重新计算",
+            icon: "none",
+            duration: 2000,
+            position: "bottom"
+        });
+        generateCaptcha(); // 错误后重新生成新题目
+        captchaConfig.answer = ''; // 清空输入
+    }
+};
 
 // 邮箱验证
 const isEmailValid = computed(() => {
@@ -735,6 +807,98 @@ onUnmounted(() => {
 
         .link-text {
             color: #3c9cff;
+        }
+    }
+}
+
+/* 人机验证弹窗样式 */
+.captcha-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .captcha-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+
+    .captcha-content {
+        width: 80%;
+        background-color: #fff;
+        border-radius: 20rpx;
+        padding: 40rpx 40rpx 20rpx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.1);
+
+        .captcha-title {
+            font-size: 34rpx;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10rpx;
+        }
+        
+        .captcha-subtitle {
+            font-size: 26rpx;
+            color: #909399;
+            margin-bottom: 30rpx;
+            text-align: center;
+        }
+
+        .captcha-question {
+            font-size: 40rpx;
+            font-weight: bold;
+            color: #3c9cff;
+            margin: 20rpx 0 30rpx;
+            background: #f5f9ff;
+            padding: 20rpx 40rpx;
+            border-radius: 12rpx;
+            letter-spacing: 2rpx;
+        }
+
+        .captcha-input-wrap {
+            width: 100%;
+            margin-bottom: 40rpx;
+        }
+
+        .captcha-btns {
+            width: 100%;
+            display: flex;
+            border-top: 1rpx solid #eee;
+
+            .captcha-btn {
+                flex: 1;
+                font-size: 32rpx;
+                text-align: center;
+                padding: 30rpx 0;
+                transition: background-color 0.2s;
+
+                &:active {
+                    background-color: #f5f5f5;
+                }
+
+                &.cancel {
+                    color: #909399;
+                    border-right: 1rpx solid #eee;
+                }
+
+                &.confirm {
+                    color: #3c9cff;
+                    font-weight: bold;
+                }
+            }
         }
     }
 }
