@@ -1,40 +1,48 @@
 <template>
-    <view class="user-info-card" :style="{ marginTop: marginTop }">
-        <!-- 背景装饰元素 -->
+    <view
+        class="user-info-card"
+        :style="{ marginTop: marginTop }"
+        hover-class="card-hover"
+        :hover-stay-time="150"
+        @click="handleClick"
+    >
+        <!-- 极简流体背景装饰 -->
         <view class="card-bg-decoration">
-            <view class="decoration-circle circle-1"></view>
-            <view class="decoration-circle circle-2"></view>
-            <view class="decoration-wave"></view>
+            <view class="fluid-shape shape-1"></view>
+            <view class="fluid-shape shape-2"></view>
+            <view class="fluid-shape shape-3"></view>
+            <view class="glass-overlay"></view>
         </view>
 
-        <!-- 主内容区 -->
-        <view class="user-info-main" @click="handleClick">
+        <!-- 核心用户信息交互区 -->
+        <view class="user-info-main">
             <!-- 头像区域 -->
             <view class="avatar-section">
                 <view class="avatar-container">
-                    <!-- 头像 -->
                     <userAvatar
                         :showOnline="false"
-                        :width="110"
-                        :height="110"
+                        :width="112"
+                        :height="112"
                     />
+                </view>
+                <!-- VIP皇冠挂件（如果在登录且VIP状态） -->
+                <view class="vip-crown" v-if="isLoggedIn && showVip">
+                    <up-icon name="level" color="#FFE14C" size="14px"></up-icon>
                 </view>
             </view>
 
-            <!-- 用户信息区域 -->
+            <!-- 信息文本区域 -->
             <view class="user-detail-section">
                 <view class="user-info-wrapper">
                     <!-- 未登录状态 -->
                     <template v-if="!isLoggedIn">
                         <view class="login-prompt">
-                            <text class="login-title">点击登录</text>
-                            <view class="login-badge">
-                                <text class="badge-text">新用户</text>
-                            </view>
+                            <text class="login-title">未登录 / 注册</text>
                         </view>
                         <view class="login-desc">
-                            <text class="desc-icon">✨</text>
-                            <text class="desc-text">登录后可享受更多服务</text>
+                            <text class="desc-text"
+                                >点击登录，开启云端同步学习</text
+                            >
                         </view>
                     </template>
 
@@ -44,53 +52,37 @@
                             <text class="username-text">
                                 {{
                                     userInfo?.nickname ||
-                                    `第${userInfo?.userCount}位哈基米`
+                                    `第${userInfo?.userCount || 0}位哈基米`
                                 }}
                             </text>
-                            <!-- VIP标识（可选） -->
-                            <view class="vip-badge" v-if="showVip">
-                                <text class="vip-text">VIP</text>
+                            <!-- 高级质感VIP标识 -->
+                            <view class="pro-badge" v-if="showVip">
+                                <text class="pro-text">PRO</text>
                             </view>
                         </view>
                         <view class="user-id-row">
-                            <text class="id-label">UID:</text>
-                            <text class="id-value">{{
-                                userInfo?.uid || "欢迎回来"
-                            }}</text>
+                            <view class="id-capsule">
+                                <text class="id-label">UID</text>
+                                <text class="id-value">{{
+                                    userInfo?.uid || "88888"
+                                }}</text>
+                            </view>
                         </view>
                     </template>
                 </view>
+            </view>
 
-                <!-- 箭头指示器 -->
-                <view class="arrow-indicator" v-if="isLoggedIn">
-                    <view class="arrow-icon">
-                        <up-icon
-                            name="arrow-right"
-                            size="16px"
-                            color="#999"
-                        ></up-icon>
-                    </view>
+            <!-- 极简箭头指示器 -->
+            <view class="arrow-indicator">
+                <view class="arrow-circle">
+                    <up-icon
+                        name="arrow-right"
+                        size="14px"
+                        color="#fff"
+                    ></up-icon>
                 </view>
             </view>
         </view>
-
-        <!-- 底部状态栏（可选） -->
-        <!-- <view class="user-status-bar" v-if="isLoggedIn && showStatusBar">
-      <view class="status-item">
-        <text class="status-value">{{ userInfo?.examCount || 0 }}</text>
-        <text class="status-label">考试</text>
-      </view>
-      <view class="status-divider"></view>
-      <view class="status-item">
-        <text class="status-value">{{ userInfo?.favoriteCount || 0 }}</text>
-        <text class="status-label">收藏</text>
-      </view>
-      <view class="status-divider"></view>
-      <view class="status-item">
-        <text class="status-value">{{ userInfo?.noteCount || 0 }}</text>
-        <text class="status-label">笔记</text>
-      </view>
-    </view> -->
     </view>
 </template>
 
@@ -135,115 +127,156 @@ const handleClick = () => {
 </script>
 
 <style scoped>
-/* ==================== 用户信息卡片 - 美化版 ==================== */
+/* ==================== 极致美化版用户信息卡片 ==================== */
 .user-info-card {
     position: relative;
-    margin: 0 0 30rpx 0;
-    border-radius: 24rpx;
-    overflow: hidden;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 50%, #f0f7ff 100%);
-    box-shadow:
-        0 8rpx 32rpx rgba(66, 133, 244, 0.08),
-        0 2rpx 8rpx rgba(66, 133, 244, 0.04),
-        inset 0 1rpx 0 rgba(255, 255, 255, 0.8);
-    border: 1rpx solid rgba(255, 255, 255, 0.9);
-    z-index: 9999;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 10rpx 40rpx 10rpx;
+    border-radius: 36rpx;
+    background: #ffffff;
+    box-shadow: 0 20rpx 40rpx -12rpx rgba(66, 133, 244, 0.15),
+        0 8rpx 16rpx -8rpx rgba(66, 133, 244, 0.08); /* 高级弥散阴影 */
+    z-index: 10000;
+    /* 移除 overflow: hidden 允许头像突破卡片上方 */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
-/* 卡片点击效果 */
-.user-info-card:active {
-    transform: scale(0.98);
-    box-shadow:
-        0 4rpx 16rpx rgba(66, 133, 244, 0.12),
-        0 1rpx 4rpx rgba(66, 133, 244, 0.08);
+.card-hover {
+    transform: translateY(2rpx) scale(0.99);
+    box-shadow: 0 10rpx 20rpx -8rpx rgba(66, 133, 244, 0.12),
+        0 4rpx 8rpx -4rpx rgba(66, 133, 244, 0.05);
 }
 
-/* 背景装饰元素 */
+/* ====== 流体背景与玻璃态 ====== */
 .card-bg-decoration {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* 保留截断内部气泡效果 */
     pointer-events: none;
     z-index: 0;
+    border-radius: 36rpx;
 }
 
-.decoration-circle {
+.glass-overlay {
     position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.6) 100%
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 2;
+}
+
+.fluid-shape {
+    position: absolute;
+    filter: blur(30px);
+    opacity: 0.6;
     border-radius: 50%;
+    z-index: 1;
+    animation: shapeMove 10s ease-in-out infinite alternate;
+}
+
+.shape-1 {
+    width: 240rpx;
+    height: 240rpx;
     background: radial-gradient(
         circle,
-        rgba(66, 133, 244, 0.08) 0%,
-        transparent 70%
+        #d4e4ff 0%,
+        rgba(212, 228, 255, 0) 70%
     );
+    top: -40rpx;
+    right: -40rpx;
+    animation-delay: 0s;
 }
 
-.circle-1 {
-    width: 200rpx;
-    height: 200rpx;
-    top: -80rpx;
-    right: -60rpx;
-    animation: float 6s ease-in-out infinite;
-}
-
-.circle-2 {
-    width: 150rpx;
-    height: 150rpx;
-    bottom: -50rpx;
-    left: -40rpx;
-    animation: float 8s ease-in-out infinite reverse;
-}
-
-.decoration-wave {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60rpx;
-    background: linear-gradient(
-        90deg,
-        rgba(66, 133, 244, 0.03) 0%,
-        rgba(66, 133, 244, 0.05) 50%,
-        rgba(66, 133, 244, 0.03) 100%
+.shape-2 {
+    width: 300rpx;
+    height: 300rpx;
+    background: radial-gradient(
+        circle,
+        #e1f0ff 0%,
+        rgba(225, 240, 255, 0) 70%
     );
-    border-radius: 50% 50% 0 0;
+    bottom: -100rpx;
+    left: -80rpx;
+    animation-delay: -3s;
 }
 
-@keyframes float {
-    0%,
-    100% {
-        transform: translateY(0) scale(1);
+.shape-3 {
+    width: 180rpx;
+    height: 180rpx;
+    background: radial-gradient(
+        circle,
+        #ebf5ff 0%,
+        rgba(235, 245, 255, 0) 70%
+    );
+    top: 50%;
+    left: 30%;
+    transform: translateY(-50%);
+    animation-delay: -5s;
+}
+
+@keyframes shapeMove {
+    0% {
+        transform: translate(0, 0) scale(1);
     }
     50% {
-        transform: translateY(-20rpx) scale(1.05);
+        transform: translate(20rpx, 15rpx) scale(1.1);
+    }
+    100% {
+        transform: translate(-10rpx, 25rpx) scale(0.95);
     }
 }
 
-/* 主内容区 */
+/* ====== 主信息区域 ====== */
 .user-info-main {
     position: relative;
     display: flex;
     align-items: center;
-    padding: 32rpx 28rpx;
-    z-index: 1;
+    padding: 36rpx 36rpx;
+    z-index: 3;
 }
 
-/* 头像区域 */
+/* --- 头像 --- */
 .avatar-section {
-    margin-right: 24rpx;
+    position: relative;
+    margin-right: 32rpx;
     flex-shrink: 0;
 }
 
 .avatar-container {
-    position: relative;
-    width: 110rpx;
-    height: 110rpx;
+    border-radius: 50%;
+    /* 弱化后的轻量级悬浮立体阴影 */
+    box-shadow: 0 8rpx 20rpx -6rpx rgba(66, 133, 244, 0.15), 
+                0 2rpx 8rpx -2rpx rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff; /* 确保背景纯净，避免PNG透明底漏出阴影重叠 */
 }
 
-/* 用户信息区域 */
+.vip-crown {
+    position: absolute;
+    bottom: -4rpx;
+    right: -4rpx;
+    width: 40rpx;
+    height: 40rpx;
+    background: linear-gradient(135deg, #333, #1a1a1a);
+    border: 4rpx solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.15);
+}
+
+/* --- 用户信息 --- */
 .user-detail-section {
     flex: 1;
     display: flex;
@@ -255,184 +288,110 @@ const handleClick = () => {
 .user-info-wrapper {
     flex: 1;
     min-width: 0;
-}
-
-/* 未登录状态 */
-.login-prompt {
     display: flex;
-    align-items: center;
-    margin-bottom: 8rpx;
-    gap: 12rpx;
+    flex-direction: column;
+    justify-content: center;
 }
 
+/* 未登录 */
 .login-title {
-    font-size: 36rpx;
-    font-weight: 600;
+    font-size: 40rpx;
+    font-weight: 700;
     color: #1a1a1a;
-    letter-spacing: 0.5rpx;
+    margin-bottom: 8rpx;
+    display: block;
 }
 
-.login-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4rpx 12rpx;
-    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
-    border-radius: 20rpx;
-    box-shadow: 0 2rpx 8rpx rgba(66, 133, 244, 0.25);
-}
-
-.badge-text {
-    font-size: 20rpx;
-    font-weight: 500;
-    color: #ffffff;
-    letter-spacing: 0.5rpx;
-}
-
-.login-desc {
-    display: flex;
-    align-items: center;
-    gap: 6rpx;
-}
-
-.desc-icon {
-    font-size: 24rpx;
-    line-height: 1;
-}
-
-.desc-text {
+.login-desc .desc-text {
     font-size: 26rpx;
-    color: #666666;
-    line-height: 1.4;
+    color: #8c9aaf;
 }
 
-/* 已登录状态 */
+/* 已登录 */
 .user-name-row {
     display: flex;
     align-items: center;
-    margin-bottom: 8rpx;
-    gap: 12rpx;
+    margin-bottom: 12rpx;
+    gap: 16rpx;
 }
 
 .username-text {
-    font-size: 36rpx;
-    font-weight: 600;
-    color: #1a1a1a;
+    font-size: 38rpx;
+    font-weight: 700;
+    color: #1a2332;
     letter-spacing: 0.5rpx;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 400rpx;
+    max-width: 320rpx;
 }
 
-.vip-badge {
-    display: inline-flex;
+.pro-badge {
+    padding: 4rpx 14rpx;
+    background: linear-gradient(135deg, #2c3e50, #000000);
+    border-radius: 8rpx 20rpx 8rpx 20rpx;
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+    display: flex;
     align-items: center;
-    padding: 4rpx 12rpx;
-    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
-    border-radius: 20rpx;
-    box-shadow: 0 2rpx 8rpx rgba(255, 215, 0, 0.3);
+    justify-content: center;
 }
 
-.vip-text {
+.pro-text {
     font-size: 20rpx;
-    font-weight: 600;
-    color: #ffffff;
-    letter-spacing: 1rpx;
+    font-weight: 800;
+    color: #d4af37;
+    font-style: italic;
+    line-height: 1.2;
 }
 
 .user-id-row {
     display: flex;
     align-items: center;
-    gap: 6rpx;
+}
+
+.id-capsule {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(66, 133, 244, 0.08);
+    border: 1px solid rgba(66, 133, 244, 0.15);
+    border-radius: 100rpx;
+    padding: 4rpx 16rpx;
 }
 
 .id-label {
-    font-size: 24rpx;
-    color: #999999;
-    font-weight: 500;
+    font-size: 22rpx;
+    color: #4285f4;
+    font-weight: 600;
+    margin-right: 8rpx;
 }
 
 .id-value {
-    font-size: 24rpx;
-    color: #666666;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 350rpx;
+    font-size: 22rpx;
+    color: #64748b;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 500;
+    letter-spacing: 0.5rpx;
 }
 
-/* 箭头指示器 */
+/* --- 箭头 --- */
 .arrow-indicator {
-    margin-left: 16rpx;
+    margin-left: 20rpx;
     flex-shrink: 0;
 }
 
-.arrow-icon {
+.arrow-circle {
+    width: 52rpx;
+    height: 52rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4285f4, #3b76e2);
+    box-shadow: 0 6rpx 16rpx rgba(66, 133, 244, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48rpx;
-    height: 48rpx;
-    background: rgba(66, 133, 244, 0.06);
-    border-radius: 50%;
-    transition: all 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.user-info-main:active .arrow-icon {
-    background: rgba(66, 133, 244, 0.12);
-    transform: translateX(4rpx);
-}
-
-/* 底部状态栏 */
-.user-status-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 24rpx 28rpx;
-    border-top: 1rpx solid rgba(66, 133, 244, 0.08);
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.5) 0%,
-        rgba(248, 251, 255, 0.8) 100%
-    );
-    z-index: 1;
-}
-
-.status-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6rpx;
-    flex: 1;
-    transition: transform 0.3s ease;
-}
-
-.status-item:active {
-    transform: scale(0.95);
-}
-
-.status-value {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #4285f4;
-    line-height: 1;
-}
-
-.status-label {
-    font-size: 24rpx;
-    color: #999999;
-    line-height: 1;
-}
-
-.status-divider {
-    width: 1rpx;
-    height: 40rpx;
-    background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(66, 133, 244, 0.15) 50%,
-        transparent 100%
-    );
+.user-info-card:active .arrow-circle {
+    transform: scale(0.9) translateX(4rpx);
 }
 </style>
