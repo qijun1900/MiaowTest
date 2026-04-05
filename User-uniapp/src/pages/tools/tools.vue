@@ -45,13 +45,13 @@ const defaultToolsList = [
     //   path: '/pages/tools/WordsToolView',
     //   needLogin: true
     // },
-    // {
-    //   title: '喵喵笔记',
-    //   desc: '笔记工具，帮助你快速记录和管理笔记',
-    //   icon: '/static/tools/tools-notes.png',
-    //   path: '/pages/tools/NotesToolView',
-    //   needLogin: true
-    // } ,
+    {
+      title: '喵喵笔记',
+      desc: '笔记工具，帮助你快速记录和管理笔记',
+      icon: '/static/tools/tools-notes.png',
+      path: '/pages/tools/NotesBookToolView',
+      needLogin: true
+    } ,
     {
         title: "喵喵错题本",
         desc: "错题记录工具，帮助你快速记录和管理错题",

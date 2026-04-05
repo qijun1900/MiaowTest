@@ -249,9 +249,9 @@
 			}
 		},
 		{
-			"path": "pages/tools/NotesToolView",
+			"path": "pages/tools/NotesBookToolView",
 			"style": {
-				"navigationBarTitleText": "喵喵笔记"
+				"navigationBarTitleText": "笔记本"
 			}
 		},
 		{
