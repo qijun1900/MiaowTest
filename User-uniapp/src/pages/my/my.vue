@@ -11,9 +11,14 @@
             <!-- 仅保留状态栏占位，不显示标题 -->
         </view>
 
+        <GreetingBanner
+            :statusBarHeight="navBarInfo.statusBarHeight || 0"
+            :topInset="8"
+        />
+
         <!-- 用户信息区域 - 美化版 -->
         <UserInfoCard
-            :marginTop="navBarInfo.totalHeight - 5 + 'px'"
+            :marginTop="'8rpx'"
             :showVip="false"
             :showStatusBar="true"
             @click="handleUserinfo"
@@ -75,16 +80,6 @@
                 </view>
             </template>
         </uviewOverlay>
-        <!-- <uviewOverlay v-model:show="AuthorOverlayShow">
-      <template #overlaycontent>
-        <view class="rect">
-          <view class="overlay-header">
-            <view class="overlay-title">开发作者</view>
-            <img class="author-image" src="/static/other/author-wechat.jpg" alt="作者微信二维码">
-          </view>
-          </view>
-      </template>
-    </uviewOverlay> -->
     </view>
 </template>
 
@@ -100,6 +95,7 @@ import { clearExamCache } from "../../util/cacheCleaner.js";
 import showShareMenu from "../../util/wechatShare.js";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import UserInfoCard from "../../components/modules/my/UserInfoCard.vue";
+import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
 
 const LoginOverlayShow = ref(false);
 const AuthorOverlayShow = ref(false);
