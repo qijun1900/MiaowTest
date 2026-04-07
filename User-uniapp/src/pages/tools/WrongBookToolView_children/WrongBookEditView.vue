@@ -179,7 +179,7 @@ import {
     updateWrongBookAPI,
     deleteWrongBookAPI,
 } from "../../../API/Tools/WrongBookAPI";
-import { wrongBookColors } from "../../../util/wrongBookColors";
+import { wrongBookColors } from "../../../util/cardThemes";
 
 const bookId = ref("");
 const loading = ref(true);

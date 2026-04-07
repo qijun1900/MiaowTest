@@ -1,5 +1,19 @@
 <template>
     <view class="container">
+        <view class="hero">
+            <view class="hero-left">
+                <view class="section-header">
+                    <view class="section-dot"></view>
+                    <text class="section-title">所有错题本</text>
+                </view>
+                <text class="hero-subtitle">归纳错题，追踪你的薄弱环节</text>
+            </view>
+            <view class="hero-stat">
+                <text class="hero-stat-value">{{ wrongBooks.length }}</text>
+                <text class="hero-stat-label">个错题本</text>
+            </view>
+        </view>
+
         <!-- 加载中状态 -->
         <view v-if="loading" class="loading-container">
             <view class="loading-spinner">
@@ -203,7 +217,7 @@ import formatTime from "../../util/formatTime";
 import {
     wrongBookColors,
     generateDisplayColorList,
-} from "../../util/wrongBookColors";
+} from "../../util/cardThemes";
 
 const popupShow = ref(false);
 
@@ -334,6 +348,68 @@ onShow(() => {
     min-height: 100vh;
     background: #fff9f2;
     padding: 30rpx 20rpx;
+}
+
+.hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16rpx;
+    margin: 4rpx 6rpx 26rpx;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 14rpx;
+}
+
+.section-dot {
+    width: 14rpx;
+    height: 14rpx;
+    border-radius: 50%;
+    background: #3fa24b;
+    box-shadow: 0 0 0 8rpx rgba(63, 162, 75, 0.14);
+    flex-shrink: 0;
+}
+
+.section-title {
+    font-size: 44rpx;
+    color: #1f2a1f;
+    font-weight: 700;
+    letter-spacing: 0.8rpx;
+}
+
+.hero-subtitle {
+    margin-top: 14rpx;
+    display: block;
+    font-size: 27rpx;
+    color: #5e6d62;
+    line-height: 1.45;
+}
+
+.hero-stat {
+    flex-shrink: 0;
+    background: #ffffff;
+    border-radius: 24rpx;
+    border: 2rpx solid #dfe7df;
+    padding: 12rpx 18rpx;
+    box-shadow: 0 8rpx 20rpx rgba(86, 118, 86, 0.1);
+    display: flex;
+    align-items: baseline;
+    gap: 6rpx;
+    margin-top: 2rpx;
+}
+
+.hero-stat-value {
+    font-size: 38rpx;
+    color: #2c7a36;
+    font-weight: 700;
+}
+
+.hero-stat-label {
+    font-size: 24rpx;
+    color: #76837a;
 }
 
 .book-list {
@@ -710,7 +786,7 @@ onShow(() => {
 
 /* Loading 样式 */
 .loading-container {
-    min-height: 100vh;
+    min-height: 56vh;
     display: flex;
     flex-direction: column;
     align-items: center;

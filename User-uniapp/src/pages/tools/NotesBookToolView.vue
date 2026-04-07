@@ -12,15 +12,22 @@
                 <text class="hero-subtitle">整理知识，沉淀你的学习轨迹</text>
             </view>
             <view class="hero-stat">
-                <text class="hero-stat-value">{{ notebookList.length }}</text>
+                <text class="hero-stat-value">{{ decoratedNotebookList.length }}</text>
                 <text class="hero-stat-label">个笔记本</text>
             </view>
         </view>
 
-        <view class="card-list">
+        <view v-if="loading" class="loading-container">
+            <view class="loading-spinner">
+                <view class="spinner-circle"></view>
+            </view>
+            <text class="loading-text">加载中...</text>
+        </view>
+
+        <view class="card-list" v-else>
             <view
-                v-for="(item, index) in notebookList"
-                :key="item.id"
+                v-for="(item, index) in decoratedNotebookList"
+                :key="item._id || index"
                 class="notebook-card"
                 :style="[item.cardStyle, { animationDelay: `${index * 70}ms` }]"
             >
@@ -68,15 +75,153 @@
                 </view>
             </view>
         </view>
+
+        <uviewPopup
+            v-model:show="popupShow"
+            title="创建笔记本"
+            :closeable="true"
+            @close="handleClosePopup"
+        >
+            <template #popupcontent>
+                <view class="form-container">
+                    <view class="form-item">
+                        <view class="form-label">
+                            笔记本名称
+                            <text class="required">*</text>
+                        </view>
+                        <view
+                            class="input-wrapper"
+                            :class="{ 'has-error': validationErrors.title }"
+                        >
+                            <uni-icons
+                                type="compose"
+                                size="18"
+                                :color="validationErrors.title ? '#f44336' : '#999'"
+                            ></uni-icons>
+                            <input
+                                class="form-input"
+                                :class="{ 'is-error': validationErrors.title }"
+                                v-model="formData.title"
+                                placeholder="请输入笔记本名称（最多20个字）"
+                                maxlength="20"
+                                @input="handleTitleInput"
+                            />
+                            <text class="char-count">{{ formData.title.length }}/20</text>
+                        </view>
+                        <view v-if="validationErrors.title" class="form-error">
+                            <uni-icons
+                                type="info-filled"
+                                size="14"
+                                color="#f44336"
+                            ></uni-icons>
+                            <text>{{ validationErrors.title }}</text>
+                        </view>
+                    </view>
+
+                    <view class="form-item">
+                        <view class="form-label">描述</view>
+                        <view class="textarea-wrapper">
+                            <textarea
+                                class="form-textarea"
+                                v-model="formData.description"
+                                placeholder="可选，简单描述这个笔记本"
+                                maxlength="60"
+                            ></textarea>
+                            <text class="char-count description-count"
+                                >{{ formData.description.length }}/60</text
+                            >
+                        </view>
+                    </view>
+
+                    <view class="form-actions">
+                        <button
+                            class="btn btn-cancel"
+                            :disabled="submitting"
+                            @click="handleClosePopup"
+                        >
+                            <uni-icons
+                                type="closeempty"
+                                size="16"
+                                color="#666"
+                            ></uni-icons>
+                            取消
+                        </button>
+                        <button
+                            class="btn btn-submit"
+                            :disabled="submitting"
+                            :class="{ 'btn-loading': submitting }"
+                            @click="handleSubmit"
+                        >
+                            <view v-if="submitting" class="btn-spinner">
+                                <view class="spinner-circle-small"></view>
+                            </view>
+                            <uni-icons
+                                v-else
+                                type="checkmarkempty"
+                                size="16"
+                                color="#fff"
+                            ></uni-icons>
+                            {{ submitting ? "创建中..." : "创建" }}
+                        </button>
+                    </view>
+                </view>
+            </template>
+        </uviewPopup>
     </view>
 </template>
 
-<script setup lang="ts">
-const handleCreateNotebook = () => {
-    uni.showToast({
-        title: "创建功能开发中",
-        icon: "none",
+<script setup>
+import { computed, ref } from "vue";
+import { onShow } from "@dcloudio/uni-app";
+import uviewPopup from "../../components/core/uviewPopup.vue";
+import { createNotebookAPI, getNotebooksAPI } from "../../API/Tools/NotesBookAPI";
+import formatTime from "../../util/formatTime";
+import { getRandomNotebookCardThemes } from "../../util/cardThemes";
+
+const popupShow = ref(false);
+const loading = ref(false);
+const submitting = ref(false);
+
+const notebookList = ref([]);
+
+const formData = ref({
+    title: "",
+    description: "",
+});
+
+const validationErrors = ref({
+    title: "",
+});
+
+const cardThemes = ref(getRandomNotebookCardThemes());
+
+const decoratedNotebookList = computed(() => {
+    return notebookList.value.map((item, index) => {
+        const theme = cardThemes.value[index % cardThemes.value.length];
+        return {
+            ...item,
+            noteCount: Number(item.noteCount) || 0,
+            description: item.description || "暂无描述",
+            updatedAtText: item.updatedAt ? formatTime.getTime2(item.updatedAt) : "今天",
+            cardStyle: theme.cardStyle,
+            tagStyle: theme.tagStyle,
+            auraStyle: theme.auraStyle,
+        };
     });
+});
+
+const resetForm = () => {
+    formData.value = {
+        title: "",
+        description: "",
+    };
+    validationErrors.value = {
+        title: "",
+    };
+};
+
+const handleCreateNotebook = () => {
+    popupShow.value = true;
 };
 
 const handleEditNotebook = (item) => {
@@ -86,65 +231,78 @@ const handleEditNotebook = (item) => {
     });
 };
 
-const notebookList = [
-    {
-        id: 1,
-        title: "数学笔记",
-        description: "高等数学和线性代数相关内容",
-        noteCount: 2,
-        updatedAtText: "今天",
-        cardStyle: {
-            borderColor: "#dce3f4",
-            background: "linear-gradient(145deg, #ffffff 0%, #f7f9ff 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(70, 90, 132, 0.13)",
-        },
-        tagStyle: {
-            background: "#eaf0ff",
-        },
-        auraStyle: {
-            background:
-                "radial-gradient(circle at center, rgba(111, 135, 255, 0.16) 0%, rgba(111, 135, 255, 0) 65%)",
-        },
-    },
-    {
-        id: 2,
-        title: "编程学习",
-        description: "Web开发、算法和数据结构",
-        noteCount: 1,
-        updatedAtText: "今天",
-        cardStyle: {
-            borderColor: "#dbe6fb",
-            background: "linear-gradient(145deg, #ffffff 0%, #f2f8ff 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(67, 107, 169, 0.14)",
-        },
-        tagStyle: {
-            background: "#e5f0ff",
-        },
-        auraStyle: {
-            background:
-                "radial-gradient(circle at center, rgba(82, 143, 255, 0.2) 0%, rgba(82, 143, 255, 0) 65%)",
-        },
-    },
-    {
-        id: 3,
-        title: "英语笔记",
-        description: "词汇、语法和阅读材料",
-        noteCount: 1,
-        updatedAtText: "今天",
-        cardStyle: {
-            borderColor: "#e0e3f8",
-            background: "linear-gradient(145deg, #ffffff 0%, #f8f8ff 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(96, 96, 162, 0.12)",
-        },
-        tagStyle: {
-            background: "#ecebff",
-        },
-        auraStyle: {
-            background:
-                "radial-gradient(circle at center, rgba(143, 120, 255, 0.16) 0%, rgba(143, 120, 255, 0) 65%)",
-        },
-    },
-];
+const handleTitleInput = () => {
+    if (validationErrors.value.title) {
+        validationErrors.value.title = "";
+    }
+};
+
+const handleClosePopup = () => {
+    popupShow.value = false;
+    resetForm();
+};
+
+const fetchNotebooks = async () => {
+    loading.value = true;
+    try {
+        const res = await getNotebooksAPI();
+        if (res.code !== 200) {
+            throw new Error(res.message || "获取笔记本失败");
+        }
+        notebookList.value = Array.isArray(res.data) ? res.data : [];
+    } catch (error) {
+        notebookList.value = [];
+        uni.showToast({
+            title: "获取笔记本失败",
+            icon: "none",
+        });
+        console.error("获取笔记本失败:", error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const handleSubmit = async () => {
+    const title = formData.value.title.trim();
+    const description = formData.value.description.trim();
+
+    if (!title) {
+        validationErrors.value.title = "请输入笔记本名称";
+        return;
+    }
+
+    submitting.value = true;
+    try {
+        const res = await createNotebookAPI({
+            title,
+            description,
+        });
+
+        if (res.code !== 200) {
+            throw new Error(res.message || "创建失败，请重试");
+        }
+
+        uni.showToast({
+            title: "创建成功",
+            icon: "success",
+        });
+        await fetchNotebooks();
+        handleClosePopup();
+    } catch (error) {
+        uni.showToast({
+            title: error?.message || "创建失败，请重试",
+            icon: "none",
+        });
+        console.error("创建笔记本失败:", error);
+    } finally {
+        submitting.value = false;
+    }
+};
+
+onShow(() => {
+    cardThemes.value = getRandomNotebookCardThemes();
+    fetchNotebooks();
+});
 </script>
 
 <style scoped>
@@ -418,6 +576,227 @@ const notebookList = [
     color: #999;
     font-size: 28rpx;
     font-weight: 500;
+}
+
+.loading-container {
+    min-height: 56vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-spinner {
+    width: 80rpx;
+    height: 80rpx;
+    position: relative;
+}
+
+.spinner-circle {
+    width: 100%;
+    height: 100%;
+    border: 6rpx solid #e0e0e0;
+    border-top-color: #4d62ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    margin-top: 24rpx;
+    font-size: 28rpx;
+    color: #666;
+}
+
+.form-container {
+    padding: 50rpx 40rpx;
+}
+
+.form-item {
+    margin-bottom: 46rpx;
+}
+
+.form-label {
+    font-size: 30rpx;
+    color: #333;
+    margin-bottom: 20rpx;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.required {
+    color: #f44336;
+    margin-left: 8rpx;
+    font-weight: normal;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f8f8f8;
+    border-radius: 16rpx;
+    padding: 0 20rpx;
+    border: 2rpx solid transparent;
+    transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+    background: #fff;
+    border-color: #4d62ff;
+    box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
+}
+
+.input-wrapper.has-error {
+    background: #fff;
+    border-color: #f44336;
+    box-shadow: 0 0 0 4rpx rgba(244, 67, 54, 0.1);
+}
+
+.form-input {
+    flex: 1;
+    height: 88rpx;
+    padding: 0 16rpx;
+    font-size: 30rpx;
+    color: #333;
+    box-sizing: border-box;
+    border: none;
+    background: transparent;
+}
+
+.form-input.is-error {
+    color: #f44336;
+}
+
+.textarea-wrapper {
+    background: #f8f8f8;
+    border-radius: 16rpx;
+    padding: 18rpx 20rpx 16rpx;
+    border: 2rpx solid transparent;
+}
+
+.textarea-wrapper:focus-within {
+    background: #fff;
+    border-color: #4d62ff;
+    box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
+}
+
+.form-textarea {
+    width: 100%;
+    min-height: 100rpx;
+    font-size: 28rpx;
+    line-height: 1.5;
+    color: #333;
+}
+
+.char-count {
+    font-size: 24rpx;
+    color: #999;
+}
+
+.description-count {
+    display: block;
+    text-align: right;
+}
+
+.form-error {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    margin-top: 16rpx;
+    font-size: 26rpx;
+    color: #f44336;
+    animation: slideDown 0.3s ease;
+}
+
+.form-actions {
+    display: flex;
+    gap: 30rpx;
+    margin-top: 54rpx;
+    padding-top: 36rpx;
+    border-top: 2rpx solid #f0f0f0;
+}
+
+.btn {
+    flex: 1;
+    height: 96rpx;
+    border-radius: 48rpx;
+    font-size: 30rpx;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12rpx;
+}
+
+.btn-cancel {
+    background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
+    color: #666;
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.btn-cancel:active {
+    background: linear-gradient(135deg, #e8e8e8 0%, #ddd 100%);
+    transform: scale(0.98);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #4d62ff 0%, #3f57f0 100%);
+    color: #fff;
+    box-shadow: 0 8rpx 24rpx rgba(77, 98, 255, 0.32);
+}
+
+.btn-submit:active {
+    background: linear-gradient(135deg, #4158ef 0%, #344be4 100%);
+    transform: scale(0.98);
+    box-shadow: 0 4rpx 16rpx rgba(77, 98, 255, 0.22);
+}
+
+.btn-submit:disabled,
+.btn-cancel:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-loading {
+    background: linear-gradient(135deg, #7f8cff 0%, #707fff 100%) !important;
+}
+
+.btn-spinner {
+    width: 32rpx;
+    height: 32rpx;
+    margin-right: 8rpx;
+}
+
+.spinner-circle-small {
+    width: 100%;
+    height: 100%;
+    border: 4rpx solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes card-enter {
