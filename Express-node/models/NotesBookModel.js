@@ -13,6 +13,10 @@ const NotesBookSchema = new mongoose.Schema({
     trim: true,
     maxlength: 20,
   },
+  normalizedTitle: {
+    type: String,
+    trim: true,
+  },
   description: {
     type: String,
     default: "",
@@ -33,12 +37,24 @@ const NotesBookSchema = new mongoose.Schema({
   },
 });
 
-NotesBookSchema.pre("save", function (next) {
+NotesBookSchema.pre("save", function (next) { // 在保存笔记本之前，计算 normalizedTitle 和 updatedAt 字段
+  this.normalizedTitle = String(this.title || "")
+    .trim()
+    .toLowerCase();
   this.updatedAt = Date.now();
   next();
 });
 
 NotesBookSchema.index({ Uid: 1, updatedAt: -1 });
+NotesBookSchema.index( // 创建复合唯一索引，确保同一用户下笔记本名称唯一，忽略大小写
+  { Uid: 1, normalizedTitle: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      normalizedTitle: { $type: "string" },
+    },
+  },
+);
 
 const NotesBookModel = mongoose.model("notes_book", NotesBookSchema);
 

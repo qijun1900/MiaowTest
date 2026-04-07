@@ -237,6 +237,15 @@ const handleTitleInput = () => {
     }
 };
 
+const normalizeTitle = (title = "") => String(title).trim().toLowerCase();
+
+const isDuplicateTitle = (title = "") => {
+    const normalized = normalizeTitle(title);
+    return notebookList.value.some(
+        (item) => normalizeTitle(item.title) === normalized,
+    );
+};
+
 const handleClosePopup = () => {
     popupShow.value = false;
     resetForm();
@@ -271,6 +280,11 @@ const handleSubmit = async () => {
         return;
     }
 
+    if (isDuplicateTitle(title)) {
+        validationErrors.value.title = "笔记本名称已存在，请更换名称";
+        return;
+    }
+
     submitting.value = true;
     try {
         const res = await createNotebookAPI({
@@ -289,6 +303,9 @@ const handleSubmit = async () => {
         await fetchNotebooks();
         handleClosePopup();
     } catch (error) {
+        if (String(error?.message || "").includes("已存在")) {
+            validationErrors.value.title = "笔记本名称已存在，请更换名称";
+        }
         uni.showToast({
             title: error?.message || "创建失败，请重试",
             icon: "none",

@@ -39,8 +39,8 @@ const NotesBookController = {
 
       if (!result.success) {
         return res.status(200).send({
-          code: 400,
-          message: "创建笔记本失败",
+          code: result.code === "DUPLICATE_TITLE" ? 409 : 400,
+          message: result.message || "创建笔记本失败",
         });
       }
 

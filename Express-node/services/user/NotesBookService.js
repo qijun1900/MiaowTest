@@ -1,5 +1,8 @@
 const NotesBookModel = require("../../models/NotesBookModel");
 
+const escapeRegex = (keyword = "") =>
+  keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const NotesBookService = {
   /**
    * 获取笔记本列表
@@ -31,9 +34,27 @@ const NotesBookService = {
    */
   createNotebook: async ({ uid, title, description = "" }) => {
     try {
+      const safeTitle = String(title || "").trim();
+      const duplicated = await NotesBookModel.findOne({
+        Uid: uid,
+        title: {
+          $regex: new RegExp(`^${escapeRegex(safeTitle)}$`, "i"),
+        },
+      })
+        .select({ _id: 1 })
+        .lean();
+
+      if (duplicated) {
+        return {
+          success: false,
+          code: "DUPLICATE_TITLE",
+          message: "笔记本名称已存在，请更换名称",
+        };
+      }
+
       const newNotebook = new NotesBookModel({
         Uid: uid,
-        title,
+        title: safeTitle,
         description,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -45,6 +66,13 @@ const NotesBookService = {
         data: saved,
       };
     } catch (error) {
+      if (error && error.code === 11000) {
+        return {
+          success: false,
+          code: "DUPLICATE_TITLE",
+          message: "笔记本名称已存在，请更换名称",
+        };
+      }
       console.error("DATABASE:创建笔记本失败", error);
       throw error;
     }
