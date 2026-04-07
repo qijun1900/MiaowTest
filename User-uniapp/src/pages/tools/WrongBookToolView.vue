@@ -16,10 +16,13 @@
 
         <!-- 加载中状态 -->
         <view v-if="loading" class="loading-container">
-            <view class="loading-spinner">
-                <view class="spinner-circle"></view>
+            <view class="loading-orbit">
+                <view class="loading-ring ring-1"></view>
+                <view class="loading-ring ring-2"></view>
+                <view class="loading-core"></view>
             </view>
-            <text class="loading-text">加载中...</text>
+            <text class="loading-text">正在加载错题本...</text>
+            <text class="loading-subtext">马上就好</text>
         </view>
 
         <!-- 错题本列表 -->
@@ -792,21 +795,51 @@ onShow(() => {
     align-items: center;
     justify-content: center;
     background: #fff9f2;
+    gap: 14rpx;
 }
 
-.loading-spinner {
-    width: 80rpx;
-    height: 80rpx;
+.loading-orbit {
     position: relative;
+    width: 120rpx;
+    height: 120rpx;
 }
 
-.spinner-circle {
-    width: 100%;
-    height: 100%;
-    border: 6rpx solid #e0e0e0;
-    border-top-color: #4caf50;
+.loading-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    border: 4rpx solid transparent;
+    transform: translate(-50%, -50%);
+}
+
+.ring-1 {
+    width: 120rpx;
+    height: 120rpx;
+    border-top-color: #4caf50;
+    border-right-color: #4caf50;
+    animation: spin 1.1s linear infinite;
+}
+
+.ring-2 {
+    width: 86rpx;
+    height: 86rpx;
+    border-bottom-color: #81c784;
+    border-left-color: #81c784;
+    animation: spin-reverse 0.9s linear infinite;
+}
+
+.loading-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30rpx;
+    height: 30rpx;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    box-shadow: 0 0 0 10rpx rgba(76, 175, 80, 0.16);
+    animation: pulse-core 1.4s ease-in-out infinite;
 }
 
 .btn-spinner {
@@ -834,8 +867,33 @@ onShow(() => {
 }
 
 .loading-text {
-    margin-top: 24rpx;
-    font-size: 28rpx;
-    color: #666;
+    margin-top: 10rpx;
+    font-size: 30rpx;
+    color: #3d6f43;
+    font-weight: 600;
+}
+
+.loading-subtext {
+    font-size: 24rpx;
+    color: #8aa18e;
+}
+
+@keyframes spin-reverse {
+    from {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+}
+
+@keyframes pulse-core {
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(0.92);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.08);
+    }
 }
 </style>
