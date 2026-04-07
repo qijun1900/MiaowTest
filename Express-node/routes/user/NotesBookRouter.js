@@ -12,11 +12,25 @@ NotesBookRouter.get(
   NotesBookController.getNotebooks,
 );
 
+NotesBookRouter.get(
+  "/uniappAPI/tools/notebook/getNotebookDetail",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  NotesBookController.getNotebookDetail,
+);
+
 NotesBookRouter.post(
   "/uniappAPI/tools/notebook/createNotebook",
   JWT.verifyTokenMiddleware(),
   requireUid,
   NotesBookController.createNotebook,
+);
+
+NotesBookRouter.post(
+  "/uniappAPI/tools/notebook/updateNotebook",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  NotesBookController.updateNotebook,
 );
 
 module.exports = NotesBookRouter;

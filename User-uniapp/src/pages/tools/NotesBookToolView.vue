@@ -225,9 +225,16 @@ const handleCreateNotebook = () => {
 };
 
 const handleEditNotebook = (item) => {
-    uni.showToast({
-        title: `编辑 ${item.title}`,
-        icon: "none",
+    if (!item?._id) {
+        uni.showToast({
+            title: "笔记本ID无效",
+            icon: "none",
+        });
+        return;
+    }
+
+    uni.navigateTo({
+        url: `/pages/tools/NotesBookToolView_children/NotesBookEditView?id=${item._id}`,
     });
 };
 
@@ -687,7 +694,7 @@ onShow(() => {
 .textarea-wrapper {
     background: #f8f8f8;
     border-radius: 16rpx;
-    padding: 18rpx 20rpx 16rpx;
+    padding: 10rpx 20rpx 8rpx;
     border: 2rpx solid transparent;
 }
 
@@ -699,7 +706,8 @@ onShow(() => {
 
 .form-textarea {
     width: 100%;
-    min-height: 100rpx;
+    height: 140rpx;
+    min-height: 120rpx;
     font-size: 28rpx;
     line-height: 1.5;
     color: #333;

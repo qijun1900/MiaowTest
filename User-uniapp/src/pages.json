@@ -255,6 +255,12 @@
 			}
 		},
 		{
+			"path": "pages/tools/NotesBookToolView_children/NotesBookEditView",
+			"style": {
+				"navigationBarTitleText": "编辑笔记本"
+			}
+		},
+		{
 			"path": "pages/tools/WrongBookToolView",
 			"style": {
 				"navigationBarTitleText": "喵喵错题本"
