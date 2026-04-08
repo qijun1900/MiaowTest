@@ -30,6 +30,7 @@
                 :key="item._id || index"
                 class="notebook-card"
                 :style="[item.cardStyle, { animationDelay: `${index * 70}ms` }]"
+                @click="handleOpenNotesList(item)"
             >
                 <view class="card-aura" :style="item.auraStyle"></view>
 
@@ -195,6 +196,17 @@ const validationErrors = ref({
 
 const cardThemes = ref(getRandomNotebookCardThemes());
 
+const handleCreateNotebook = () => {
+    popupShow.value = true;
+};
+
+
+const handleClosePopup = () => {
+    popupShow.value = false;
+    resetForm();
+};
+
+//对笔记本列表的装饰计算属性
 const decoratedNotebookList = computed(() => {
     return notebookList.value.map((item, index) => {
         const theme = cardThemes.value[index % cardThemes.value.length];
@@ -220,9 +232,6 @@ const resetForm = () => {
     };
 };
 
-const handleCreateNotebook = () => {
-    popupShow.value = true;
-};
 
 const handleEditNotebook = (item) => {
     if (!item?._id) {
@@ -238,14 +247,17 @@ const handleEditNotebook = (item) => {
     });
 };
 
+//增加了输入事件处理函数，实时清除错误提示
 const handleTitleInput = () => {
     if (validationErrors.value.title) {
         validationErrors.value.title = "";
     }
 };
 
+//增加了标题规范化函数，确保在进行重复校验时能够正确识别不同格式但内容相同的标题，提升校验的准确性
 const normalizeTitle = (title = "") => String(title).trim().toLowerCase();
 
+//增加了笔记本名称的重复校验，提升用户体验，避免创建多个同名笔记本导致混淆
 const isDuplicateTitle = (title = "") => {
     const normalized = normalizeTitle(title);
     return notebookList.value.some(
@@ -253,11 +265,9 @@ const isDuplicateTitle = (title = "") => {
     );
 };
 
-const handleClosePopup = () => {
-    popupShow.value = false;
-    resetForm();
-};
 
+
+//取数据时增加了对接口返回数据格式的兼容处理，避免因接口变更导致的页面崩溃
 const fetchNotebooks = async () => {
     loading.value = true;
     try {
@@ -278,6 +288,7 @@ const fetchNotebooks = async () => {
     }
 };
 
+//添加笔记本重名校验，避免用户创建多个同名笔记本导致混淆
 const handleSubmit = async () => {
     const title = formData.value.title.trim();
     const description = formData.value.description.trim();
@@ -321,6 +332,14 @@ const handleSubmit = async () => {
     } finally {
         submitting.value = false;
     }
+};
+
+//增加了打开笔记列表的函数
+const handleOpenNotesList = (item) => {
+    console.log("打开笔记列表，笔记本ID:", item._id);
+    uni.navigateTo({
+        url: `/pages/tools/NotesBookToolView_children/NotesListView?id=${item._id}`,
+    });
 };
 
 onShow(() => {

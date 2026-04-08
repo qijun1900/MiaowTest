@@ -283,6 +283,12 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
+		},
+		{
+			"path": "pages/tools/NotesBookToolView_children/NotesListView",
+			"style": {
+				"navigationBarTitleText": "NotesListView"
+			}
 		}
 	],
 	"globalStyle": {
