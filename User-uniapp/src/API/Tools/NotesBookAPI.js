@@ -68,3 +68,21 @@ export async function updateNotebookAPI({ id, title, description }) {
     throw error;
   }
 }
+
+/**
+ * @description 删除笔记本
+ */
+export async function deleteNotebookAPI(id) {
+  try {
+    return await http({
+      url: "/uniappAPI/tools/notebook/deleteNotebook",
+      method: "POST",
+      data: {
+        id,
+      },
+    });
+  } catch (error) {
+    console.error("deleteNotebookAPI 失败", error);
+    throw error;
+  }
+}

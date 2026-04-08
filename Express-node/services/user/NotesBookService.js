@@ -112,6 +112,41 @@ const NotesBookService = {
   },
 
   /**
+   * 删除笔记本
+   */
+  deleteNotebook: async ({ uid, id }) => {
+    try {
+      const notebook = await NotesBookModel.findOne({ _id: id, Uid: uid });
+      if (!notebook) {
+        return {
+          success: false,
+          code: "NOTEBOOK_NOT_FOUND",
+          message: "笔记本不存在或无权限",
+        };
+      }
+
+      const noteCount = Number(notebook.noteCount) || 0;
+      if (noteCount > 0) {
+        return {
+          success: false,
+          code: "NOTEBOOK_HAS_NOTES",
+          message: `笔记本中还有 ${noteCount} 条笔记，请先清空后再删除`,
+          noteCount,
+        };
+      }
+
+      const result = await NotesBookModel.deleteOne({ _id: id, Uid: uid });
+      return {
+        success: result.deletedCount > 0,
+        message: result.deletedCount > 0 ? "删除成功" : "删除失败",
+      };
+    } catch (error) {
+      console.error("DATABASE:删除笔记本失败", error);
+      throw error;
+    }
+  },
+
+  /**
    * 创建笔记本
    */
   createNotebook: async ({ uid, title, description = "" }) => {

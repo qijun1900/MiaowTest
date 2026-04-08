@@ -33,7 +33,9 @@
                             maxlength="20"
                             @input="handleTitleInput"
                         />
-                        <text class="char-count">{{ formData.title.length }}/20</text>
+                        <text class="char-count"
+                            >{{ formData.title.length }}/20</text
+                        >
                     </view>
                     <view v-if="validationErrors.title" class="form-error">
                         <uni-icons
@@ -87,6 +89,19 @@
                             <text>保存修改</text>
                         </block>
                     </button>
+
+                    <button
+                        class="btn btn-delete"
+                        :disabled="submitting"
+                        @click="handleDelete"
+                    >
+                        <uni-icons
+                            type="trash"
+                            size="20"
+                            color="#f44336"
+                        ></uni-icons>
+                        <text>删除笔记本</text>
+                    </button>
                 </view>
             </view>
         </view>
@@ -99,6 +114,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import {
     getNotebookDetailAPI,
     updateNotebookAPI,
+    deleteNotebookAPI,
 } from "../../../API/Tools/NotesBookAPI";
 
 const bookId = ref("");
@@ -197,6 +213,56 @@ const handleSubmit = async () => {
     } finally {
         submitting.value = false;
     }
+};
+
+const handleDelete = () => {
+    uni.showModal({
+        title: "确认删除",
+        content: "删除后无法恢复，确定要删除这个笔记本吗？",
+        confirmColor: "#f44336",
+        success: async (confirm) => {
+            if (!confirm.confirm) return;
+
+            submitting.value = true;
+            try {
+                const res = await deleteNotebookAPI(bookId.value);
+
+                if (res.code === 200) {
+                    uni.showToast({
+                        title: "删除成功",
+                        icon: "success",
+                    });
+                    setTimeout(() => {
+                        uni.navigateBack();
+                    }, 1200);
+                    return;
+                }
+
+                if (res.code === 409 && Number(res.data?.noteCount) > 0) {
+                    uni.showModal({
+                        title: "无法删除",
+                        content:
+                            res.message || "该笔记本还有笔记，请先清空后再删除",
+                        showCancel: false,
+                        confirmText: "知道了",
+                    });
+                } else {
+                    uni.showToast({
+                        title: res.message || "删除失败",
+                        icon: "none",
+                    });
+                }
+            } catch (error) {
+                console.error("删除笔记本失败:", error);
+                uni.showToast({
+                    title: "删除失败",
+                    icon: "none",
+                });
+            } finally {
+                submitting.value = false;
+            }
+        },
+    });
 };
 </script>
 
@@ -312,6 +378,9 @@ const handleSubmit = async () => {
 
 .form-actions {
     margin-top: 20rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 20rpx;
 }
 
 .btn {
@@ -334,6 +403,16 @@ const handleSubmit = async () => {
 }
 
 .btn-submit:disabled {
+    opacity: 0.6;
+}
+
+.btn-delete {
+    background: #fff;
+    color: #f44336;
+    border: 2rpx solid #ffd6d6;
+}
+
+.btn-delete:disabled {
     opacity: 0.6;
 }
 

@@ -33,4 +33,11 @@ NotesBookRouter.post(
   NotesBookController.updateNotebook,
 );
 
+NotesBookRouter.post(
+  "/uniappAPI/tools/notebook/deleteNotebook",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  NotesBookController.deleteNotebook,
+);
+
 module.exports = NotesBookRouter;

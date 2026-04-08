@@ -12,7 +12,9 @@
                 <text class="hero-subtitle">整理知识，沉淀你的学习轨迹</text>
             </view>
             <view class="hero-stat">
-                <text class="hero-stat-value">{{ decoratedNotebookList.length }}</text>
+                <text class="hero-stat-value">{{
+                    decoratedNotebookList.length
+                }}</text>
                 <text class="hero-stat-label">个笔记本</text>
             </view>
         </view>
@@ -44,7 +46,9 @@
 
                 <view class="card-top">
                     <view class="count-tag" :style="item.tagStyle">
-                        <text class="count-text">{{ item.noteCount }} 笔记</text>
+                        <text class="count-text"
+                            >{{ item.noteCount }} 笔记</text
+                        >
                     </view>
                 </view>
 
@@ -54,14 +58,21 @@
                 </view>
 
                 <view class="card-footer">
-                    <uni-icons type="clock" size="15" color="#7d8697"></uni-icons>
+                    <uni-icons
+                        type="clock"
+                        size="15"
+                        color="#7d8697"
+                    ></uni-icons>
                     <text class="footer-text">{{ item.updatedAtText }}</text>
                     <view class="footer-line"></view>
                     <text class="footer-hint">最近更新</text>
                 </view>
             </view>
 
-            <view class="notebook-card create-card" @click="handleCreateNotebook">
+            <view
+                class="notebook-card create-card"
+                @click="handleCreateNotebook"
+            >
                 <view class="create-content">
                     <view class="create-icon-wrapper">
                         <view class="create-icon">
@@ -97,7 +108,9 @@
                             <uni-icons
                                 type="compose"
                                 size="18"
-                                :color="validationErrors.title ? '#f44336' : '#999'"
+                                :color="
+                                    validationErrors.title ? '#f44336' : '#999'
+                                "
                             ></uni-icons>
                             <input
                                 class="form-input"
@@ -107,7 +120,9 @@
                                 maxlength="20"
                                 @input="handleTitleInput"
                             />
-                            <text class="char-count">{{ formData.title.length }}/20</text>
+                            <text class="char-count"
+                                >{{ formData.title.length }}/20</text
+                            >
                         </view>
                         <view v-if="validationErrors.title" class="form-error">
                             <uni-icons
@@ -175,7 +190,10 @@
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import uviewPopup from "../../components/core/uviewPopup.vue";
-import { createNotebookAPI, getNotebooksAPI } from "../../API/Tools/NotesBookAPI";
+import {
+    createNotebookAPI,
+    getNotebooksAPI,
+} from "../../API/Tools/NotesBookAPI";
 import formatTime from "../../util/formatTime";
 import { getRandomNotebookCardThemes } from "../../util/cardThemes";
 
@@ -200,7 +218,6 @@ const handleCreateNotebook = () => {
     popupShow.value = true;
 };
 
-
 const handleClosePopup = () => {
     popupShow.value = false;
     resetForm();
@@ -214,7 +231,9 @@ const decoratedNotebookList = computed(() => {
             ...item,
             noteCount: Number(item.noteCount) || 0,
             description: item.description || "暂无描述",
-            updatedAtText: item.updatedAt ? formatTime.getTime2(item.updatedAt) : "今天",
+            updatedAtText: item.updatedAt
+                ? formatTime.getTime2(item.updatedAt)
+                : "今天",
             cardStyle: theme.cardStyle,
             tagStyle: theme.tagStyle,
             auraStyle: theme.auraStyle,
@@ -231,7 +250,6 @@ const resetForm = () => {
         title: "",
     };
 };
-
 
 const handleEditNotebook = (item) => {
     if (!item?._id) {
@@ -264,8 +282,6 @@ const isDuplicateTitle = (title = "") => {
         (item) => normalizeTitle(item.title) === normalized,
     );
 };
-
-
 
 //取数据时增加了对接口返回数据格式的兼容处理，避免因接口变更导致的页面崩溃
 const fetchNotebooks = async () => {
@@ -356,7 +372,8 @@ onShow(() => {
     background: #fff9f2;
     padding: 26rpx 20rpx calc(46rpx + env(safe-area-inset-bottom));
     overflow: hidden;
-    font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family:
+        "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 .bg-blob {
@@ -370,7 +387,11 @@ onShow(() => {
     height: 360rpx;
     top: -110rpx;
     right: -90rpx;
-    background: radial-gradient(circle, rgba(255, 211, 158, 0.34) 0%, rgba(255, 211, 158, 0) 68%);
+    background: radial-gradient(
+        circle,
+        rgba(255, 211, 158, 0.34) 0%,
+        rgba(255, 211, 158, 0) 68%
+    );
 }
 
 .blob-2 {
@@ -378,7 +399,11 @@ onShow(() => {
     height: 300rpx;
     left: -120rpx;
     top: 280rpx;
-    background: radial-gradient(circle, rgba(173, 196, 255, 0.24) 0%, rgba(173, 196, 255, 0) 70%);
+    background: radial-gradient(
+        circle,
+        rgba(173, 196, 255, 0.24) 0%,
+        rgba(173, 196, 255, 0) 70%
+    );
 }
 
 .hero {
@@ -493,7 +518,11 @@ onShow(() => {
     width: 52rpx;
     height: 52rpx;
     border-radius: 50%;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.92) 0%, rgba(241, 247, 255, 0.92) 100%);
+    background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.92) 0%,
+        rgba(241, 247, 255, 0.92) 100%
+    );
     border: 1rpx solid rgba(129, 149, 192, 0.35);
     display: flex;
     align-items: center;

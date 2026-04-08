@@ -92,6 +92,43 @@ const NotesBookController = {
     }
   },
 
+  deleteNotebook: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const { id } = req.body;
+      const result = await NotesBookService.deleteNotebook({ uid, id });
+
+      if (!result.success) {
+        let responseCode = 400;
+        if (result.code === "NOTEBOOK_NOT_FOUND") {
+          responseCode = 404;
+        }
+        if (result.code === "NOTEBOOK_HAS_NOTES") {
+          responseCode = 409;
+        }
+
+        return res.status(200).send({
+          code: responseCode,
+          message: result.message || "删除笔记本失败",
+          data: {
+            noteCount: result.noteCount,
+          },
+        });
+      }
+
+      res.status(200).send({
+        code: 200,
+        message: "删除笔记本成功",
+      });
+    } catch (error) {
+      console.error("删除笔记本失败", error);
+      res.status(200).send({
+        code: 500,
+        message: "删除笔记本失败",
+      });
+    }
+  },
+
   createNotebook: async (req, res) => {
     try {
       const { uid } = req.user;
