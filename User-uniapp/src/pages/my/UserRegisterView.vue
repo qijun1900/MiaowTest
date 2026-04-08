@@ -413,7 +413,9 @@ const sendVerifyCode = async () => {
     }
 
     try {
-        uni.showLoading({ title: "发送中...", mask: true });
+        uni.showLoading({ 
+            title: "发送中...", mask: true 
+        });
 
         const result = await sendEmailVerifyCode(formData.email);
 
@@ -427,6 +429,10 @@ const sendVerifyCode = async () => {
                 position: "bottom",
             });
             startCountdown();
+            // 埋点：发送验证码成功
+            logSDK.track("AUTH_LOGIN_SEND_VERIFY_CODE", {
+                result: logSDK.results.SUCCESS,
+            });
         } else {
             // 频率限制或其他业务错误
             uni.showToast({
@@ -434,6 +440,12 @@ const sendVerifyCode = async () => {
                 icon: "none",
                 duration: 3000,
                 position: "bottom",
+            });
+            // 埋点：发送验证码业务失败（服务端返回非 200）
+            logSDK.track("AUTH_LOGIN_SEND_VERIFY_CODE", {
+                result: logSDK.results.FAIL,
+                errorCode: String(result.code || ""),
+                errorMessage: result.message || "发送验证码失败",
             });
         }
     } catch (error) {

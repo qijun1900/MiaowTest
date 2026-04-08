@@ -81,6 +81,11 @@ export const LOG_EVENT_DICT = Object.freeze({
     module: LOG_MODULES.AUTH,
     desc: "Token 续期刷新（过期后自动请求新 token）",
   },
+  AUTH_LOGIN_SEND_VERIFY_CODE: {
+    eventName: "auth.login_send_verify_code",
+    module: LOG_MODULES.AUTH,
+    desc: "登录/注册发送验证码",
+  },
 });
 
 // ── 事件精简视图（对外暴露给业务层）──────────────────────────────────────────
