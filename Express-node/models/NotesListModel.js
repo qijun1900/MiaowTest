@@ -52,6 +52,16 @@ const NotesListSchema = new mongoose.Schema({
         },
       },
     ],
+    isAIgengrated: {
+      // 是否经过AI生成/改写
+      type: Boolean,
+      default: false,
+    },
+    AIIntegrationInfo: {
+      // AI生成/改写相关信息（如使用的模型、参数等）
+      model: String,
+        parameters: mongoose.Schema.Types.Mixed,
+    },
   },
   tags: {
     // 自定义标签
