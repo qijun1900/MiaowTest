@@ -1,5 +1,14 @@
 const NotesBookService = require("../../services/user/NotesBookService");
 
+const isValidObjectId = (value) =>
+  /^[a-f\d]{24}$/i.test(String(value || "").trim());
+
+const resolveErrorStatus = (code) => {
+  if (["NOTEBOOK_NOT_FOUND", "NOTE_NOT_FOUND"].includes(code)) return 404;
+  if (code === "DUPLICATE_TITLE") return 409;
+  return 400;
+};
+
 const NotesBookController = {
   getNotebooks: async (req, res) => {
     try {
@@ -164,6 +173,182 @@ const NotesBookController = {
       res.status(200).send({
         code: 500,
         message: "创建笔记本失败",
+      });
+    }
+  },
+
+  getNotebookNotes: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const bookId = String(req.query.bookId || "").trim();
+
+      if (!isValidObjectId(bookId)) {
+        return res.status(200).send({
+          code: 400,
+          message: "bookId格式不正确",
+        });
+      }
+
+      const result = await NotesBookService.getNotebookNotes({
+        uid,
+        bookId,
+      });
+
+      if (!result.success) {
+        return res.status(200).send({
+          code: resolveErrorStatus(result.code),
+          message: result.message || "获取笔记列表失败",
+        });
+      }
+
+      res.status(200).send({
+        code: 200,
+        data: result.data,
+      });
+    } catch (error) {
+      console.error("获取笔记列表失败", error);
+      res.status(200).send({
+        code: 500,
+        message: "获取笔记列表失败",
+      });
+    }
+  },
+
+  getNotebookNoteDetail: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const id = String(req.query.id || "").trim();
+      const bookId = String(req.query.bookId || "").trim();
+
+      if (!isValidObjectId(id)) {
+        return res.status(200).send({
+          code: 400,
+          message: "id格式不正确",
+        });
+      }
+
+      if (bookId && !isValidObjectId(bookId)) {
+        return res.status(200).send({
+          code: 400,
+          message: "bookId格式不正确",
+        });
+      }
+
+      const result = await NotesBookService.getNotebookNoteDetail({
+        uid,
+        id,
+        bookId,
+      });
+
+      if (!result.success) {
+        return res.status(200).send({
+          code: resolveErrorStatus(result.code),
+          message: result.message || "获取笔记详情失败",
+        });
+      }
+
+      res.status(200).send({
+        code: 200,
+        data: result.data,
+      });
+    } catch (error) {
+      console.error("获取笔记详情失败", error);
+      res.status(200).send({
+        code: 500,
+        message: "获取笔记详情失败",
+      });
+    }
+  },
+
+  saveNotebookNote: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const id = String(req.body.id || "").trim();
+      const bookId = String(req.body.bookId || "").trim();
+      const title = String(req.body.title || "");
+      const content = String(req.body.content || "");
+
+      if (!isValidObjectId(bookId)) {
+        return res.status(200).send({
+          code: 400,
+          message: "bookId格式不正确",
+        });
+      }
+
+      if (id && !isValidObjectId(id)) {
+        return res.status(200).send({
+          code: 400,
+          message: "id格式不正确",
+        });
+      }
+
+      const result = await NotesBookService.saveNotebookNote({
+        uid,
+        id,
+        bookId,
+        title,
+        content,
+      });
+
+      if (!result.success) {
+        return res.status(200).send({
+          code: resolveErrorStatus(result.code),
+          message: result.message || "保存笔记失败",
+        });
+      }
+
+      res.status(200).send({
+        code: 200,
+        message: "保存成功",
+        data: {
+          id: result.id,
+          action: result.action,
+        },
+      });
+    } catch (error) {
+      console.error("保存笔记失败", error);
+      res.status(200).send({
+        code: 500,
+        message: "保存笔记失败",
+      });
+    }
+  },
+
+  deleteNotebookNote: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const id = String(req.body.id || "").trim();
+      const bookId = String(req.body.bookId || "").trim();
+
+      if (!isValidObjectId(id) || !isValidObjectId(bookId)) {
+        return res.status(200).send({
+          code: 400,
+          message: "参数格式不正确",
+        });
+      }
+
+      const result = await NotesBookService.deleteNotebookNote({
+        uid,
+        id,
+        bookId,
+      });
+
+      if (!result.success) {
+        return res.status(200).send({
+          code: resolveErrorStatus(result.code),
+          message: result.message || "删除笔记失败",
+        });
+      }
+
+      res.status(200).send({
+        code: 200,
+        message: "删除成功",
+      });
+    } catch (error) {
+      console.error("删除笔记失败", error);
+      res.status(200).send({
+        code: 500,
+        message: "删除笔记失败",
       });
     }
   },

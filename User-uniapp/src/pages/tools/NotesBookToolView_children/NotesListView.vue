@@ -46,25 +46,37 @@
     </view>
 
     <view class="list-content">
-      <view v-if="filteredNotes.length === 0" class="empty-state">
+      <view v-if="isLoading" class="empty-state">
         <uni-icons type="info" size="26" color="#b2bdd3"></uni-icons>
-        <text class="empty-text">没有找到匹配的笔记</text>
+        <text class="empty-text">正在加载笔记...</text>
+      </view>
+
+      <view v-else-if="filteredNotes.length === 0" class="empty-state">
+        <uni-icons
+          :type="isSearching ? 'search' : 'compose'"
+          size="26"
+          color="#b2bdd3"
+        ></uni-icons>
+        <text class="empty-text">{{ isSearching ? "没有找到匹配的笔记" : "还没有笔记" }}</text>
+        <text class="empty-desc">{{
+          isSearching ? "试试其他关键词" : "点击右下角按钮创建第一篇笔记"
+        }}</text>
       </view>
 
       <view v-else class="list-wrap">
         <view v-for="item in filteredNotes" :key="item.id" class="note-card">
-          <view class="card-content">
+          <view class="card-content" @click="handleEditNote(item)">
             <view class="card-header">
               <text class="note-title">{{ item.title }}</text>
               <view class="header-actions">
-                <view class="delete-btn">
+                <view class="delete-btn" @click.stop="handleDeleteNote(item)">
                   <uni-icons
                     type="trash"
                     size="17"
                     color="#b4bbca"
                   ></uni-icons>
                 </view>
-                <view class="edit-btn">
+                <view class="edit-btn" @click.stop="handleEditNote(item)">
                   <uni-icons
                     type="compose"
                     size="17"
@@ -113,262 +125,30 @@
 
 <script setup>
 import { computed, ref } from "vue";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
+import formatTime from "../../../util/formatTime";
+import {
+  getNotebookNotesAPI,
+  deleteNotebookNoteAPI,
+} from "../../../API/Tools/NotesBookAPI";
 
 const searchKeyword = ref("");
 const sortOrder = ref("desc");
 const isShowdragButton = ref(true);
-
-const mockNotes = ref([
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-1",
-    title: "导数与微分",
-    preview:
-      "导数的定义 导数表示函数在某一点的瞬时变化率... 基本公式 (x^n)' = nx^(n1) (sin x)' = cos x (e^x)'...",
-    dateText: "昨天",
-    readTime: "1 分钟阅读",
-    tags: ["微积分", "导数"],
-    updatedAt: Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    id: "n-2",
-    title: "矩阵运算",
-    preview:
-      "矩阵乘法 两个矩阵相乘的条件：第一个矩阵的列数等于第二个矩阵的行数。性质 1. 不满足交换律 2...",
-    dateText: "2天前",
-    readTime: "1 分钟阅读",
-    tags: ["线性代数", "矩阵"],
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-  },
-]);
+const isLoading = ref(false);
+const notesBookId = ref("");
+const notes = ref([]);
 
 const sortOrderText = computed(() =>
   sortOrder.value === "desc" ? "最近优先" : "最早优先",
 );
 
+const isSearching = computed(() => Boolean(searchKeyword.value.trim()));
+
 const filteredNotes = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase();
-  const list = mockNotes.value.filter((item) => {
+  const list = notes.value.filter((item) => {
     if (!keyword) return true;
     return (
       item.title.toLowerCase().includes(keyword) ||
@@ -384,6 +164,50 @@ const filteredNotes = computed(() => {
   );
 });
 
+const estimateReadTime = (text = "") => {
+  const plainText = String(text || "").trim();
+  const minutes = Math.max(1, Math.ceil(plainText.length / 280));
+  return `${minutes} 分钟阅读`;
+};
+
+const normalizeNoteItem = (item = {}) => {
+  const previewText = String(item.summary || item.plainText || "").trim();
+  const updatedAt = Number(new Date(item.updatedAt).getTime()) || 0;
+
+  return {
+    id: String(item._id || ""),
+    title: String(item.title || "未命名笔记"),
+    preview: previewText || "暂无内容",
+    dateText: formatTime.getRelativeTime(item.updatedAt),
+    readTime: estimateReadTime(item.plainText || previewText),
+    tags: Array.isArray(item.tags) ? item.tags : [],
+    updatedAt,
+  };
+};
+
+const fetchNotes = async () => {
+  if (!notesBookId.value) return;
+
+  isLoading.value = true;
+  try {
+    const res = await getNotebookNotesAPI(notesBookId.value);
+    if (res.code !== 200) {
+      throw new Error(res.message || "获取笔记列表失败");
+    }
+
+    const list = Array.isArray(res.data) ? res.data : [];
+    notes.value = list.map(normalizeNoteItem);
+  } catch (error) {
+    console.error("获取笔记列表失败:", error);
+    uni.showToast({
+      title: error?.message || "获取笔记列表失败",
+      icon: "none",
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 const clearSearch = () => {
   searchKeyword.value = "";
 };
@@ -392,12 +216,73 @@ const toggleSort = () => {
   sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
 };
 
-const handleFloatingAddNote = () => {
-  uni.navigateTo({
-    url: "/pages/tools/NotesBookToolView_children/NoteEditView",
+const getDraftStorageKey = (noteId) =>
+  `note-editor-draft:${notesBookId.value}:${noteId}`;
+
+const handleDeleteNote = (item) => {
+  uni.showModal({
+    title: "删除笔记",
+    content: `确认删除「${item.title}」吗？此操作无法撤销。`,
+    confirmText: "删除",
+    cancelText: "取消",
+    success: async ({ confirm }) => {
+      if (!confirm) return;
+
+      try {
+        const res = await deleteNotebookNoteAPI({
+          id: item.id,
+          bookId: notesBookId.value,
+        });
+
+        if (res.code !== 200) {
+          throw new Error(res.message || "删除失败，请重试");
+        }
+
+        notes.value = notes.value.filter((note) => note.id !== item.id);
+        uni.removeStorageSync(getDraftStorageKey(item.id));
+
+        uni.showToast({
+          title: "删除成功",
+          icon: "success",
+        });
+      } catch (error) {
+        console.error("删除笔记失败:", error);
+        uni.showToast({
+          title: error?.message || "删除失败，请重试",
+          icon: "none",
+        });
+      }
+    },
   });
 };
 
+const handleEditNote = (item) => {
+  uni.navigateTo({
+    url: `/pages/tools/NotesBookToolView_children/NoteEditView?bookId=${notesBookId.value}&id=${item.id}`,
+  });
+};
+
+const handleFloatingAddNote = () => {
+  if (!notesBookId.value) {
+    uni.showToast({
+      title: "笔记本ID无效",
+      icon: "none",
+    });
+    return;
+  }
+
+  uni.navigateTo({
+    url: `/pages/tools/NotesBookToolView_children/NoteEditView?bookId=${notesBookId.value}`,
+  });
+};
+
+onLoad((options = {}) => {
+  notesBookId.value = String(options.id || options.bookId || "").trim();
+});
+
+onShow(() => {
+  fetchNotes();
+});
 </script>
 
 <style scoped>
@@ -626,6 +511,11 @@ const handleFloatingAddNote = () => {
 .empty-text {
   font-size: 28rpx;
   color: #9ca8bf;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: #b2bdd3;
 }
 
 :deep(.drag) {

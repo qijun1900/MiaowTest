@@ -15,8 +15,8 @@ const navBarHeightUtil = {
         
         let menuButtonRect = null;// 胶囊布局位置信息
         
-        // #ifndef APP || H5
-        // 判断获取微信小程序胶囊API是否可用 H5出现为true情况无法使用
+        // #ifdef MP
+        // 小程序端优先使用胶囊信息计算导航栏高度，适配不同机型
         if (uni.canIUse('getMenuButtonBoundingClientRect')) {
             try {
                 // 获取微信小程序胶囊布局位置信息
@@ -27,12 +27,10 @@ const navBarHeightUtil = {
                     navBarHeight = (menuButtonRect.top - statusBarHeight) * 2 + menuButtonRect.height;
                     // 确保导航栏高度不小于最小值
                     navBarHeight = Math.max(navBarHeight, defaultNavBarHeight);
-                    // 状态栏高度 + 导航栏高度 = 自定义导航栏高度总和
                     totalHeight = statusBarHeight + navBarHeight;
                 }
             } catch (error) {
                 console.warn('获取胶囊信息失败，使用默认高度:', error);
-                // 发生错误时使用默认值
                 navBarHeight = defaultNavBarHeight;
                 totalHeight = statusBarHeight + defaultNavBarHeight;
             }
