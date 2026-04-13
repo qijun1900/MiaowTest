@@ -46,9 +46,36 @@
     </view>
 
     <view class="list-content">
-      <view v-if="isLoading" class="empty-state">
-        <uni-icons type="info" size="26" color="#b2bdd3"></uni-icons>
-        <text class="empty-text">正在加载笔记...</text>
+      <view v-if="isLoading" class="loading-wrap">
+        <view
+          v-for="index in 3"
+          :key="`loading-${index}`"
+          class="note-card loading-card"
+        >
+          <view class="card-content">
+            <view class="card-header">
+              <view class="loading-title shimmer"></view>
+              <view class="header-actions">
+                <view class="loading-action shimmer"></view>
+                <view class="loading-action shimmer"></view>
+              </view>
+            </view>
+
+            <view class="loading-line shimmer"></view>
+            <view class="loading-line shimmer"></view>
+            <view class="loading-line loading-line-short shimmer"></view>
+
+            <view class="card-footer">
+              <view class="loading-meta shimmer"></view>
+              <view class="tag-wrap">
+                <view class="loading-tag shimmer"></view>
+                <view class="loading-tag loading-tag-small shimmer"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <text class="loading-caption">笔记加载中...</text>
       </view>
 
       <view v-else-if="filteredNotes.length === 0" class="empty-state">
@@ -398,6 +425,88 @@ onShow(() => {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
+}
+
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.loading-card {
+  background: #fffaf5;
+}
+
+.loading-title {
+  width: 46%;
+  height: 42rpx;
+  border-radius: 12rpx;
+}
+
+.loading-action {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 22rpx;
+}
+
+.loading-line {
+  margin-top: 12rpx;
+  height: 28rpx;
+  border-radius: 12rpx;
+}
+
+.loading-line-short {
+  width: 66%;
+}
+
+.loading-meta {
+  width: 180rpx;
+  height: 24rpx;
+  border-radius: 10rpx;
+}
+
+.loading-tag {
+  width: 96rpx;
+  height: 34rpx;
+  border-radius: 12rpx;
+}
+
+.loading-tag-small {
+  width: 72rpx;
+}
+
+.loading-caption {
+  text-align: center;
+  font-size: 24rpx;
+  color: #b2bdd3;
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: #efe7dd;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 130%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmerMove 1.35s ease-in-out infinite;
+}
+
+@keyframes shimmerMove {
+  to {
+    left: 130%;
+  }
 }
 
 .note-card {
