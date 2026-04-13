@@ -92,7 +92,7 @@
 
       <view v-else class="list-wrap">
         <view v-for="item in filteredNotes" :key="item.id" class="note-card">
-          <view class="card-content" @click="handleEditNote(item)">
+          <view class="card-content" @click="handleCheckNote(item)">
             <view class="card-header">
               <text class="note-title">{{ item.title }}</text>
               <view class="header-actions">
@@ -197,6 +197,7 @@ const estimateReadTime = (text = "") => {
   return `${minutes} 分钟阅读`;
 };
 
+//将后端笔记数据转换为前端显示格式
 const normalizeNoteItem = (item = {}) => {
   const previewText = String(item.summary || item.plainText || "").trim();
   const updatedAt = Number(new Date(item.updatedAt).getTime()) || 0;
@@ -212,6 +213,7 @@ const normalizeNoteItem = (item = {}) => {
   };
 };
 
+//获取笔记列表
 const fetchNotes = async () => {
   if (!notesBookId.value) return;
 
@@ -283,9 +285,17 @@ const handleDeleteNote = (item) => {
   });
 };
 
+//编辑/添加笔记（跳转到编辑页，携带笔记ID参数）
 const handleEditNote = (item) => {
   uni.navigateTo({
     url: `/pages/tools/NotesBookToolView_children/NoteEditView?bookId=${notesBookId.value}&id=${item.id}`,
+  });
+};
+
+//查看笔记详情
+const handleCheckNote = (item) => {
+  uni.navigateTo({
+    url: `/pages/tools/NotesBookToolView_children/NoteDetailView?bookId=${notesBookId.value}&id=${item.id}`,
   });
 };
 
@@ -528,20 +538,31 @@ onShow(() => {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12rpx;
+  min-width: 0;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
   gap: 10rpx;
+  flex-shrink: 0;
 }
 
 .note-title {
-  flex: 1;
+  flex: 1 1 0;
+  width: 0;
+  max-width: 100%;
+  display: -webkit-box;
   font-size: 42rpx;
   line-height: 1.28;
   color: #403a40;
   font-weight: 600;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
 }
 
 .edit-btn,
