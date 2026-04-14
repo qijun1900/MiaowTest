@@ -6,6 +6,20 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+const DB_PROVIDER_LABELS = {
+  local: "本地MongoDB",
+  cloud: "云数据库",
+  "1panel": "1Panel MongoDB",
+};
+
+function getProviderDisplay(provider) {
+  return `${provider} (${DB_PROVIDER_LABELS[provider] || provider})`;
+}
+
+function toConfigState(value) {
+  return value ? "已设置" : "未设置";
+}
+
 // 导入配置文件
 const localConfig = require("../config/db.config");
 const panelConfig = require("../config/1panelmongo.config");
@@ -25,13 +39,13 @@ class DatabaseManager {
   getConnectionString() {
     const provider = process.env.MONGO_PROVIDER || "local";
 
-    console.log(`🔍 数据库提供商: ${provider}`);
+    console.log(`🧭 数据库提供商: ${getProviderDisplay(provider)}`);
 
     switch (provider) {
       case "cloud":
         // 云数据库配置 - 支持云服务器MongoDB ，数据库为cloud如果没有MONGO_CLOUD_URI则使用cloud.mongo.config.js配置文件
         if (process.env.MONGO_CLOUD_URI) {
-          console.log("🌩️ 使用云数据库URI连接");
+          console.log("🌩️ 配置来源: MONGO_CLOUD_URI");
           return process.env.MONGO_CLOUD_URI;
         }
 
@@ -46,12 +60,12 @@ class DatabaseManager {
 
         if (!cloudHost || !cloudUsername || !cloudPassword) {
           console.error("❌ 云数据库环境变量缺失：");
-          console.error(`   MONGO_CLOUD_HOST: ${cloudHost ? "✅" : "❌"}`);
+          console.error(`   MONGO_CLOUD_HOST: ${toConfigState(cloudHost)}`);
           console.error(
-            `   MONGO_CLOUD_USERNAME: ${cloudUsername ? "✅" : "❌"}`,
+            `   MONGO_CLOUD_USERNAME: ${toConfigState(cloudUsername)}`,
           );
           console.error(
-            `   MONGO_CLOUD_PASSWORD: ${cloudPassword ? "✅" : "❌"}`,
+            `   MONGO_CLOUD_PASSWORD: ${toConfigState(cloudPassword)}`,
           );
 
           // 尝试使用配置文件作为降级方案
@@ -64,14 +78,14 @@ class DatabaseManager {
               throw new Error("云数据库配置文件参数也不完整");
             }
 
-            console.log("⚠️ 使用配置文件作为降级方案");
+            console.log("⚠️ 配置来源: cloud.mongo.config.js (降级)");
             return `mongodb://${username}:${password}@${host}:${port || "27017"}/${databasename || "examinationsystem"}${authSource ? `?authSource=${authSource}` : "?authSource=admin"}`;
           } catch (configError) {
             throw new Error(`云数据库配置错误: ${configError.message}`);
           }
         }
 
-        console.log("🌩️ 使用云数据库环境变量连接");
+        console.log("🌩️ 配置来源: 云环境变量");
         return `mongodb://${cloudUsername}:${cloudPassword}@${cloudHost}:${cloudPort}/${cloudDatabase}?authSource=${cloudAuthSource}`;
 
       case "1panel":
@@ -86,14 +100,14 @@ class DatabaseManager {
         if (!panelUser || !panelPass || !panelHost || !sport || !panelDb) {
           throw new Error("1Panel数据库配置参数不完整，请检查环境变量");
         }
-        console.log("🔧 使用1Panel数据库配置");
+        console.log("🔧 配置来源: 1Panel 配置文件");
         return `mongodb://${panelUser}:${panelPass}@${panelHost}:${sport}/${panelDb}?authSource=admin`;
 
       case "local":
       default:
         // 本地开发环境，使用本地配置文件，不使用环境变量
         const { DBHOST, DBPORT, DBNAME } = localConfig;
-        console.log("🏠 使用本地数据库配置");
+        console.log("🏠 配置来源: 本地配置文件");
         return `mongodb://${DBHOST}:${DBPORT}/${DBNAME}`;
     }
   }
@@ -129,18 +143,18 @@ class DatabaseManager {
    */
   async connect() {
     try {
+      const provider = process.env.MONGO_PROVIDER || "local";
       const connectionString = this.getConnectionString();
       const options = this.getConnectionOptions();
 
-      console.log(
-        `💾 正在连接数据库... (提供商: ${process.env.MONGO_PROVIDER || "local"})`,
-      );
+      console.log("💾 正在建立数据库连接...");
+      console.log(`   提供商: ${getProviderDisplay(provider)}`);
 
       this.connection = await mongoose.connect(connectionString, options);
       this.isConnected = true;
       this.retryCount = 0;
 
-      console.log("✅ 数据库连接成功");
+      console.log("✅ 数据库连接成功，连接已就绪");
 
       // 设置事件监听器
       this.setupEventListeners();

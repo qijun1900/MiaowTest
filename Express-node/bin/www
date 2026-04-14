@@ -11,10 +11,22 @@ require("dotenv").config();
 
 // 导入增强版数据库管理器
 const { dbManager } = require("../db/db.enhanced.js");
+const { printInfoSection, printMiaowBanner } = require("../helpers/consoleHelper");
 
 // 开发环境检测
 const isDevelopment = process.env.NODE_ENV !== "production";
 const environment = process.env.NODE_ENV || "development";
+const REPOSITORY_URL = "https://github.com/qijun1900/MiaowTest";
+
+const MIAOW_BANNER_LINES = [
+  "████████╗███╗   ███╗███╗   ███╗",
+  "╚══██╔══╝████╗ ████║████╗ ████║",
+  "   ██║   ██╔████╔██║██╔████╔██║",
+  "   ██║   ██║╚██╔╝██║██║╚██╔╝██║",
+  "   ██║   ██║ ╚═╝ ██║██║ ╚═╝ ██║",
+  "   ╚═╝   ╚═╝     ╚═╝╚═╝     ╚═╝",
+  "            题喵喵              ",
+];
 
 /**
  * 异步启动应用
@@ -32,13 +44,36 @@ async function startApplication() {
     // 显示启动信息
     console.log("\n========================================");
     console.log("🚀 题喵喵答题系统正在启动...");
+    printMiaowBanner(MIAOW_BANNER_LINES);
+    console.log(`🔗 仓库地址: ${REPOSITORY_URL}`);
     console.log("========================================");
-    console.log(`环境: ${environment}`);
-    console.log(`运行环境: ${isCloudRuntime ? "云托管" : "本地"}`);
-    console.log(
-      `数据库提供商: ${mongoProvider === "local" ? "本地MongoDB" : mongoProvider === "cloud" ? "云数据库" : mongoProvider}`,
-    );
-    console.log(`开发模式: ${isDevelopment ? "开启" : "关闭"}`);
+    const dbProviderText =
+      mongoProvider === "local"
+        ? "本地MongoDB"
+        : mongoProvider === "cloud"
+          ? "云数据库"
+          : mongoProvider;
+    printInfoSection("运行参数", [
+      {
+        label: "环境",
+        value: environment,
+        tone: isDevelopment ? "success" : "warn",
+      },
+      {
+        label: "运行环境",
+        value: isCloudRuntime ? "云托管" : "本地",
+        tone: isCloudRuntime ? "warn" : "success",
+      },
+      {
+        label: "数据库提供商",
+        value: dbProviderText,
+      },
+      {
+        label: "开发模式",
+        value: isDevelopment ? "开启" : "关闭",
+        tone: isDevelopment ? "success" : "warn",
+      },
+    ]);
 
     // 云托管环境自动切换数据库提供商
     if (isCloudRuntime && !process.env.MONGO_PROVIDER) {
@@ -48,39 +83,60 @@ async function startApplication() {
 
     // 环境变量检查
     if (mongoProvider === "cloud") {
-      console.log("\n🔍 云数据库环境变量检查:");
-      console.log(
-        `   MONGO_CLOUD_HOST: ${process.env.MONGO_CLOUD_HOST ? "✅" : "❌"}`,
-      );
-      console.log(
-        `   MONGO_CLOUD_USERNAME: ${process.env.MONGO_CLOUD_USERNAME ? "✅" : "❌"}`,
-      );
-      console.log(
-        `   MONGO_CLOUD_PASSWORD: ${process.env.MONGO_CLOUD_PASSWORD ? "✅" : "❌"}`,
-      );
-      console.log(
-        `   MONGO_CLOUD_DATABASE: ${process.env.MONGO_CLOUD_DATABASE || "examinationsystem"}`,
-      );
+      printInfoSection("云数据库环境变量", [
+        {
+          label: "MONGO_CLOUD_HOST",
+          value: process.env.MONGO_CLOUD_HOST ? "已设置" : "未设置",
+          tone: process.env.MONGO_CLOUD_HOST ? "success" : "danger",
+        },
+        {
+          label: "MONGO_CLOUD_USERNAME",
+          value: process.env.MONGO_CLOUD_USERNAME ? "已设置" : "未设置",
+          tone: process.env.MONGO_CLOUD_USERNAME ? "success" : "danger",
+        },
+        {
+          label: "MONGO_CLOUD_PASSWORD",
+          value: process.env.MONGO_CLOUD_PASSWORD ? "已设置" : "未设置",
+          tone: process.env.MONGO_CLOUD_PASSWORD ? "success" : "danger",
+        },
+        {
+          label: "MONGO_CLOUD_DATABASE",
+          value: process.env.MONGO_CLOUD_DATABASE || "examinationsystem",
+        },
+      ]);
     }
 
     // OSS 配置检查
-    console.log("\n🔍 OSS 配置检查:");
-    console.log(`   OSS_BUCKET: ${process.env.OSS_BUCKET || "❌ 未设置"}`);
-    console.log(`   OSS_REGION: ${process.env.OSS_REGION || "❌ 未设置"}`);
-    console.log(
-      `   OSS_CDN_DOMAIN: ${process.env.OSS_CDN_DOMAIN || "❌ 未设置"}`,
-    );
-    console.log(
-      `   OSS_ACCESS_KEY_ID: ${process.env.OSS_ACCESS_KEY_ID ? "✅" : "❌ 未设置"}`,
-    );
-    console.log(
-      `   TOKEN_SECRET: ${process.env.TOKEN_SECRET ? "✅" : "❌ 未设置"}`,
-    );
+    printInfoSection("OSS 配置检查", [
+      {
+        label: "OSS_BUCKET",
+        value: process.env.OSS_BUCKET || "未设置",
+        tone: process.env.OSS_BUCKET ? "success" : "danger",
+      },
+      {
+        label: "OSS_REGION",
+        value: process.env.OSS_REGION || "未设置",
+        tone: process.env.OSS_REGION ? "success" : "danger",
+      },
+      {
+        label: "OSS_CDN_DOMAIN",
+        value: process.env.OSS_CDN_DOMAIN || "未设置",
+        tone: process.env.OSS_CDN_DOMAIN ? "success" : "danger",
+      },
+      {
+        label: "OSS_ACCESS_KEY_ID",
+        value: process.env.OSS_ACCESS_KEY_ID ? "已设置" : "未设置",
+        tone: process.env.OSS_ACCESS_KEY_ID ? "success" : "danger",
+      },
+      {
+        label: "TOKEN_SECRET",
+        value: process.env.TOKEN_SECRET ? "已设置" : "未设置",
+        tone: process.env.TOKEN_SECRET ? "success" : "danger",
+      },
+    ]);
 
     // 连接数据库
-    console.log("\n💾 正在连接数据库...");
     await dbManager.connect();
-    console.log("✅ 数据库连接成功");
 
     // 导入应用模块
     const app = require("../app");

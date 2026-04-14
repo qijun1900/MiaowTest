@@ -246,7 +246,7 @@ const readDraftFromStorage = () => {
     return null;
   }
 };
-
+// 将草稿数据应用到编辑器和快照
 const applyDraftData = (cached = {}) => {
   noteTitle.value = String(cached.title || "");
   noteContent.value = normalizeToHtml(cached.content || "");
