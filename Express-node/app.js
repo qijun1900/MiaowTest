@@ -29,6 +29,7 @@ const WordBooksRouter = require("./routes/admin/WordBooksRouter"); // 引入Admi
 const VocabularyRouter = require("./routes/user/VocabularyRouter"); // 引入用户端词汇相关路由模块
 const AdminFileRouter = require("./routes/admin/FileRouter"); // 引入Admin资源路由模块
 const UserResourceRouter = require("./routes/user/ResourceRouter"); //用户资源相关路由模块
+const UserImageRouter = require("./routes/user/ImageRouter"); //用户图片上传删除统一路由模块
 const UserWrongBookRouter = require("./routes/user/WrongBookRouter"); //用户错题本相关路由模块
 const UserNotesBookRouter = require("./routes/user/NotesBookRouter"); //用户笔记本相关路由模块
 const UserLogRouter = require("./routes/user/LogRouter"); //用户端日志路由
@@ -111,6 +112,7 @@ app.use(ConsumerExamRouter); // 注册考试路由(用户端)
 app.use(ConsumerLLMRouter); // 注册llm路由(用户端)
 app.use(VocabularyRouter); // 注册词汇相关路由(用户端)
 app.use(UserResourceRouter); //注册资源相关路由(用户端)
+app.use(UserImageRouter); //注册图片上传/删除统一路由(用户端)
 app.use(UserWrongBookRouter); //注册错题本相关路由(用户端)
 app.use(UserNotesBookRouter); //注册笔记本相关路由(用户端)
 app.use(UserLogRouter); //注册用户端日志路由

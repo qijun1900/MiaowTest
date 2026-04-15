@@ -61,6 +61,7 @@
               :editor-id="'noteEditEditor'"
               @init="handleEditorInit"
               @input="handleEditorInput"
+              @upinImage="handleEditorUploadImage"
             />
           </view>
         </view>
@@ -86,6 +87,7 @@ import {
   getNotebookNoteDetailAPI,
   saveNotebookNoteAPI,
 } from "../../../API/Tools/NotesBookAPI";
+import { uploadSingleFile } from "../../../composables/useImageUpload";
 
 // 顶部导航与安全区信息，用于多端自定义导航适配
 const navBarInfo = ref({
@@ -111,6 +113,8 @@ const storageDraftKey = ref("note-editor-draft:default:new");
 const editorCtx = ref(null);
 const notesBookId = ref("");
 const noteId = ref("");
+const EDITOR_IMAGE_MAX_SIZE = 10 * 1024 * 1024;
+const NOTEBOOK_CLOUD_PATH_PREFIX = "user/notebook";
 
 // 用于未保存变更比对的快照
 const initialSnapshot = ref({
@@ -118,7 +122,7 @@ const initialSnapshot = ref({
   content: "",
 });
 
-// sp-editor 工具栏配置，可按需要继续扩展按键
+// sp-editor 工具栏配置：开启 image 按键以支持插图上传
 const toolbarConfig = ref({
   keys: [
     "header",
@@ -131,6 +135,7 @@ const toolbarConfig = ref({
     "listBullet",
     "listCheck",
     "divider",
+    "image",
     "date",
     "undo",
     "redo",
@@ -362,6 +367,108 @@ const handleEditorInit = (ctx) => {
 const handleEditorInput = ({ html, text }) => {
   noteContent.value = String(html || "");
   notePlainText.value = String(text || "");
+};
+
+const getEditorTempFilePath = (file = {}) => {
+  return String(file?.tempFilePath || file?.path || file?.url || "").trim();
+};
+
+const insertImageToEditor = (ctx, source) =>
+  new Promise((resolve, reject) => {
+    if (!ctx || typeof ctx.insertImage !== "function") {
+      reject(new Error("编辑器未初始化"));
+      return;
+    }
+
+    ctx.insertImage({
+      src: source,
+      alt: "note-image",
+      success: () => resolve(),
+      fail: (error) => {
+        reject(new Error(error?.errMsg || "插入图片失败"));
+      },
+    });
+  });
+
+// 处理 sp-editor 图片按钮上传（自动兼容 OSS / 微信云托管）
+const handleEditorUploadImage = async (tempFiles = [], eventEditorCtx) => {
+  const fileList = Array.isArray(tempFiles) ? tempFiles : [];
+  if (!fileList.length) return;
+
+  const currentEditorCtx =
+    eventEditorCtx && typeof eventEditorCtx.insertImage === "function"
+      ? eventEditorCtx
+      : editorCtx.value;
+
+  if (!currentEditorCtx) {
+    uni.showToast({
+      title: "编辑器尚未就绪",
+      icon: "none",
+      position: "top",
+    });
+    return;
+  }
+
+  let successCount = 0;
+  let failCount = 0;
+  let oversizeCount = 0;
+
+  uni.showLoading({
+    title: "上传图片中",
+    mask: true,
+  });
+
+  try {
+    for (const fileItem of fileList) {
+      const localPath = getEditorTempFilePath(fileItem);
+      const fileSize = Number(fileItem?.size || 0);
+
+      if (!localPath) {
+        failCount += 1;
+        continue;
+      }
+
+      if (fileSize > 0 && fileSize > EDITOR_IMAGE_MAX_SIZE) {
+        failCount += 1;
+        oversizeCount += 1;
+        continue;
+      }
+
+      try {
+        const uploadResult = await uploadSingleFile(localPath, {
+          cloudPathPrefix: NOTEBOOK_CLOUD_PATH_PREFIX,
+          formData: {
+            biz: "notebook",
+          },
+        });
+        await insertImageToEditor(currentEditorCtx, uploadResult.url);
+        successCount += 1;
+      } catch (error) {
+        failCount += 1;
+        console.error("笔记编辑器图片上传失败:", error);
+      }
+    }
+  } finally {
+    uni.hideLoading();
+  }
+
+  await syncContentFromEditor();
+
+  if (failCount > 0) {
+    const failMessage =
+      oversizeCount > 0
+        ? `有${oversizeCount}张超过10MB，未插入`
+        : "图片上传失败，请稍后重试";
+
+    uni.showToast({
+      title:
+        successCount > 0
+          ? `已插入${successCount}张，${failMessage}`
+          : failMessage,
+      icon: "none",
+      position: "top",
+    });
+  }
 };
 
 // 持久化草稿

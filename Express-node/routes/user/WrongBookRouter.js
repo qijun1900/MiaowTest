@@ -2,7 +2,6 @@ var express = require("express");
 const WrongBookController = require("../../controllers/user/WrongBookController");
 const JWT = require("../../MiddleWares/jwt");
 const requireUid = require("../../MiddleWares/requireUid");
-const WrongBookModel = require("../../models/WrongBookModel");
 var WrongBookRouter = express.Router();
 
 // 获取错题本列表
@@ -39,27 +38,6 @@ WrongBookRouter.post(
   JWT.verifyTokenMiddleware(),
   requireUid,
   WrongBookController.deleteWrongBook,
-);
-// 添加图片
-WrongBookRouter.post(
-  "/uniappAPI/upload/image",
-  JWT.verifyTokenMiddleware(),
-  requireUid,
-  WrongBookController.uploadImage,
-);
-// 云托管上传图片
-WrongBookRouter.post(
-  "/uniappAPI/upload/cloudImage",
-  JWT.verifyTokenMiddleware(),
-  requireUid,
-  WrongBookController.uploadCloudImage,
-);
-//删除图片
-WrongBookRouter.post(
-  "/uniappAPI/delete/image",
-  JWT.verifyTokenMiddleware(),
-  requireUid,
-  WrongBookController.deleteImage,
 );
 // 添加错题
 WrongBookRouter.post(

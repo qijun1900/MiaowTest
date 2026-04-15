@@ -3,6 +3,26 @@ import { deleteCloudFiles, httpUpload, http } from "../util/http";
 import escconfig from "../config/esc.config";
 import { UserInfoStore } from "../stores/modules/UserinfoStore";
 
+const DEFAULT_IMAGE_UPLOAD_URL = "/uniappAPI/upload/image";
+const DEFAULT_CLOUD_IMAGE_UPLOAD_URL = "/uniappAPI/upload/cloudImage";
+const DEFAULT_CLOUD_PATH_PREFIX = "user/wrong_question";
+
+const buildCloudPath = (
+  filePath,
+  cloudPathPrefix = DEFAULT_CLOUD_PATH_PREFIX,
+) => {
+  const ext = String(filePath || "").split(".").pop() || "jpg";
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).slice(2, 8);
+  const userInfoStore = UserInfoStore();
+  const uid = userInfoStore.userInfo?.uid || "anonymous";
+  const prefix = String(cloudPathPrefix || DEFAULT_CLOUD_PATH_PREFIX).replace(
+    /\/+$/,
+    "",
+  );
+  return `${prefix}/${uid}/${timestamp}_${random}.${String(ext).toLowerCase()}`;
+};
+
 /**
  * 删除远程图片资源（OSS 或 cloud://），可在组件外直接复用。
  * @param {string|{_id?: string, url: string}} imageItem
@@ -61,23 +81,27 @@ export async function deleteRemoteImageFile(imageItem, options = {}) {
 /**
  * 上传单个图片文件（独立函数，不依赖 composable 实例）
  * @param {string} filePath - 本地图片路径
+ * @param {{ uploadUrl?: string, cloudUploadUrl?: string, cloudPathPrefix?: string, formData?: Record<string, any> }} options
  * @returns {Promise<{_id: string, url: string}>}
  */
-export function uploadSingleFile(filePath) {
-  const ext = filePath.split(".").pop() || "jpg";
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).slice(2, 8);
-  const userInfoStore = UserInfoStore();
-  const uid = userInfoStore.userInfo?.uid || "anonymous";
-  const cloudPath = `user/wrong_question/${uid}/${timestamp}_${random}.${ext}`;
+export function uploadSingleFile(filePath, options = {}) {
+  const {
+    uploadUrl = DEFAULT_IMAGE_UPLOAD_URL,
+    cloudUploadUrl = DEFAULT_CLOUD_IMAGE_UPLOAD_URL,
+    cloudPathPrefix = DEFAULT_CLOUD_PATH_PREFIX,
+    formData = {},
+  } = options;
+
+  const cloudPath = buildCloudPath(filePath, cloudPathPrefix);
 
   if (escconfig.useCloudContainer) {
     return httpUpload({
       filePath,
-      url: "/uniappAPI/upload/cloudImage",
+      url: cloudUploadUrl,
       cloudPath,
+      formData,
     }).then((data) => {
-      if (data.code === 200) {
+      if (data.code === 200 && data?.data?.url) {
         return { _id: data.data._id, url: data.data.url };
       }
       throw new Error(data.message || "上传失败");
@@ -86,14 +110,15 @@ export function uploadSingleFile(filePath) {
 
   return new Promise((resolve, reject) => {
     uni.uploadFile({
-      url: "/uniappAPI/upload/image",
+      url: uploadUrl,
       filePath,
       name: "file",
       fileType: "image",
+      formData,
       success: (uploadRes) => {
         try {
           const data = JSON.parse(uploadRes.data);
-          if (data.code === 200) {
+          if (data.code === 200 && data?.data?.url) {
             resolve({ _id: data.data._id, url: data.data.url });
           } else {
             reject(new Error(data.message || "上传失败"));
@@ -113,6 +138,12 @@ export function useImageUpload(options = {}) {
 
   // 默认配置：最大 10MB
   const maxSize = options.maxSize || 10 * 1024 * 1024;
+  const uploadUrl = options.uploadUrl || DEFAULT_IMAGE_UPLOAD_URL;
+  const cloudUploadUrl =
+    options.cloudUploadUrl || DEFAULT_CLOUD_IMAGE_UPLOAD_URL;
+  const cloudPathPrefix =
+    options.cloudPathPrefix || DEFAULT_CLOUD_PATH_PREFIX;
+  const uploadFormData = options.uploadFormData || {};
 
   // 裁剪器状态
   const cropperVisible = ref(false);
@@ -283,7 +314,7 @@ export function useImageUpload(options = {}) {
   /**
    * 批量上传所有图片到服务器
    */
-  const uploadAllImages = async (uploadUrl = "/uniappAPI/upload/image") => {
+  const uploadAllImages = async (customUploadUrl = uploadUrl) => {
     if (imageList.value.length === 0) {
       return [];
     }
@@ -301,7 +332,7 @@ export function useImageUpload(options = {}) {
       const localPath = typeof item === "string" ? item : item.url;
 
       try {
-        const uploadResult = await uploadSingleImage(localPath, uploadUrl);
+        const uploadResult = await uploadSingleImage(localPath, customUploadUrl);
         results.push(uploadResult); // { _id, url }
       } catch (error) {
         console.warn(
@@ -313,21 +344,6 @@ export function useImageUpload(options = {}) {
     }
 
     return results;
-  };
-
-  /**
-   * 生成云存储路径（包含用户 UID）
-   */
-  const generateCloudPath = (filePath) => {
-    const ext = filePath.split(".").pop() || "jpg";
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).slice(2, 8);
-
-    // 获取当前用户 UID
-    const userInfoStore = UserInfoStore();
-    const uid = userInfoStore.userInfo?.uid || "anonymous";
-
-    return `user/wrong_question/${uid}/${timestamp}_${random}.${ext}`;
   };
 
   /**
@@ -374,46 +390,11 @@ export function useImageUpload(options = {}) {
    * 实际执行上传
    */
   const doUpload = (filePath, uploadUrl) => {
-    // 云托管模式：通过 httpUpload 统一处理（内部自动区分云对象存储 / base64中转OSS）
-    if (escconfig.useCloudContainer) {
-      const cloudPath = generateCloudPath(filePath);
-      return httpUpload({
-        filePath: filePath,
-        url: "/uniappAPI/upload/cloudImage",
-        cloudPath: cloudPath,
-      }).then((data) => {
-        if (data.code === 200) {
-          return { _id: data.data._id, url: data.data.url };
-        } else {
-          throw new Error(data.message || "上传失败");
-        }
-      });
-    }
-
-    // 普通模式：使用 uni.uploadFile
-    return new Promise((resolve, reject) => {
-      uni.uploadFile({
-        url: uploadUrl,
-        filePath: filePath,
-        name: "file",
-        fileType: "image",
-        success: (uploadRes) => {
-          try {
-            const data = JSON.parse(uploadRes.data);
-            if (data.code === 200) {
-              resolve({ _id: data.data._id, url: data.data.url });
-            } else {
-              reject(new Error(data.message || "上传失败"));
-            }
-          } catch (e) {
-            reject(new Error("解析响应失败"));
-            console.error("上传响应解析失败:", e, "原始响应:", uploadRes.data);
-          }
-        },
-        fail: (err) => {
-          reject(err);
-        },
-      });
+    return uploadSingleFile(filePath, {
+      uploadUrl,
+      cloudUploadUrl,
+      cloudPathPrefix,
+      formData: uploadFormData,
     });
   };
 
