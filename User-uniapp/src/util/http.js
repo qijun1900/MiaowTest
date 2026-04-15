@@ -489,6 +489,7 @@ export const httpUpload = (options) => {
         options.cloudPath,
         options.onProgress,
       ).then((fileID) => {
+        console.log("Image Upload")
         return cloudRequest({
           url: options.url,
           method: "POST",

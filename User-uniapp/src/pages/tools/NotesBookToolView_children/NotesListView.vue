@@ -155,6 +155,7 @@ import { computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
 import formatTime from "../../../util/formatTime";
+import { stripHtml } from "../../../util/notePreview";
 import {
   getNotebookNotesAPI,
   deleteNotebookNoteAPI,
@@ -197,9 +198,23 @@ const estimateReadTime = (text = "") => {
   return `${minutes} 分钟阅读`;
 };
 
+const IMAGE_NOTE_PLACEHOLDER = "[\u56fe\u7247]";
+
+const hasImageTag = (value = "") => /<img\b/i.test(String(value || ""));
+
+const normalizePreviewText = (value = "") =>
+  stripHtml(String(value || "")).trim();
+
 //将后端笔记数据转换为前端显示格式
 const normalizeNoteItem = (item = {}) => {
-  const previewText = String(item.summary || item.plainText || "").trim();
+  const rawSummary = String(item.summary || "");
+  const rawPlainText = String(item.plainText || "");
+  const normalizedSummary = normalizePreviewText(rawSummary);
+  const normalizedPlainText = normalizePreviewText(rawPlainText);
+  const previewText =
+    normalizedSummary ||
+    normalizedPlainText ||
+    (hasImageTag(rawSummary) ? IMAGE_NOTE_PLACEHOLDER : "");
   const updatedAt = Number(new Date(item.updatedAt).getTime()) || 0;
 
   return {
@@ -207,7 +222,7 @@ const normalizeNoteItem = (item = {}) => {
     title: String(item.title || "未命名笔记"),
     preview: previewText || "暂无内容",
     dateText: formatTime.getRelativeTime(item.updatedAt),
-    readTime: estimateReadTime(item.plainText || previewText),
+    readTime: estimateReadTime(normalizedPlainText || previewText),
     tags: Array.isArray(item.tags) ? item.tags : [],
     updatedAt,
   };

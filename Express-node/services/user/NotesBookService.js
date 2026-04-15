@@ -14,6 +14,8 @@ const stripHtml = (value = "") =>
     .replace(/\s+/g, " ")
     .trim();
 
+const IMAGE_NOTE_PLACEHOLDER = "[\u56fe\u7247]";
+
 const buildSafeNoteTitle = ({ title = "", plainText = "" }) => {
   const safeTitle = String(title || "").trim();
   if (safeTitle) return safeTitle.slice(0, 80);
@@ -257,7 +259,13 @@ const NotesBookService = {
       const list = notes.map((item) => {
         const contentText = String(item?.content?.text || "");
         const plainText = stripHtml(contentText);
-        const summary = String(item.summary || "").trim() || plainText.slice(0, 120);
+        const rawSummary = String(item.summary || "");
+        const hasImage =
+          /<img\b/i.test(contentText) || /<img\b/i.test(rawSummary);
+        const summary =
+          stripHtml(rawSummary) ||
+          plainText.slice(0, 120) ||
+          (hasImage ? IMAGE_NOTE_PLACEHOLDER : "");
 
         return {
           _id: item._id,
@@ -368,7 +376,9 @@ const NotesBookService = {
         };
       }
 
-      const summary = plainText.slice(0, 120);
+      const summary =
+        plainText.slice(0, 120) ||
+        (/<img\b/i.test(safeContent) ? IMAGE_NOTE_PLACEHOLDER : "");
 
       if (id) {
         const note = await NotesListModel.findOne({
