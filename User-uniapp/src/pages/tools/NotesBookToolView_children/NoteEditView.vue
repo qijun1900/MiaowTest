@@ -762,8 +762,8 @@ onBackPress(() => {
 }
 
 .editor-panel {
-  min-height: 720rpx;
-  height: 720rpx;
+  min-height: 1000rpx;
+  height: 1000rpx;
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -778,7 +778,7 @@ onBackPress(() => {
 }
 
 .preview-panel {
-  min-height: 720rpx;
+  min-height: 1000rpx;
   overflow: auto;
 }
 
