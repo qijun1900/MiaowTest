@@ -12,20 +12,6 @@
                 <text class="nav-title">{{ title }}</text>
             </view>
             <view class="nav-right">
-                <view
-                    v-if="showRefresh"
-                    class="refresh-btn"
-                    @click="handleRefresh"
-                    :class="{ refreshing: loading }"
-                >
-                    <uni-icons
-                        type="refreshempty"
-                        size="14"
-                        color="#ffffff"
-                        :class="{ rotating: loading }"
-                    ></uni-icons>
-                    <text class="refresh-text">{{ refreshText }}</text>
-                </view>
                 <slot name="right-content"></slot>
             </view>
             <!-- #endif -->
@@ -94,16 +80,8 @@ const props = defineProps({
     },
 });
 
-// 自定义事件
-const emit = defineEmits(["refresh"]);
-
 // 导航栏信息
 const navBarInfo = ref(navBarHeightUtil.getNavBarInfo());
-
-// 刷新处理
-const handleRefresh = () => {
-    emit("refresh");
-};
 
 // 计算内容区域的 padding-top，确保不被导航栏遮挡
 const contentPaddingTop = computed(() => {
@@ -153,77 +131,6 @@ defineExpose({
 .nav-right {
     display: flex;
     align-items: center;
-}
-
-// 根据规范，刷新采用与主题色匹配的三段渐变背景
-.refresh-btn {
-    display: flex;
-    align-items: center;
-    padding: 12rpx 24rpx;
-    background: linear-gradient(135deg, #007aff 0%, #0056b3 50%, #003d82 100%);
-    border-radius: 30rpx;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow:
-        0 4rpx 12rpx rgba(0, 122, 255, 0.3),
-        inset 0 1rpx 0 rgba(255, 255, 255, 0.3);
-    position: relative;
-    overflow: hidden;
-
-    // 流光动画效果
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.4),
-            transparent
-        );
-        transition: left 0.5s ease;
-    }
-
-    // 点击按压效果
-    &:active {
-        transform: scale(0.95) translateY(1rpx);
-        box-shadow:
-            0 2rpx 6rpx rgba(0, 122, 255, 0.2),
-            inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
-
-        &::before {
-            left: 100%;
-        }
-    }
-
-    // 加载状态样式
-    &.refreshing {
-        opacity: 0.8;
-        pointer-events: none;
-    }
-}
-
-.refresh-text {
-    font-size: 24rpx;
-    color: #ffffff;
-    margin-left: 8rpx;
-    font-weight: 500;
-}
-
-// 旋转动画
-.rotating {
-    animation: rotate360 1s linear infinite;
-}
-
-@keyframes rotate360 {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
 }
 /* #endif */
 

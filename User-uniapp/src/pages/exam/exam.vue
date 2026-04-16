@@ -4,12 +4,9 @@
         <PageHead
             ref="pageHeadRef"
             title="所有考试科目"
-            :show-refresh="true"
-            refresh-text="刷新考试"
             :show-search="true"
             search-placeholder="搜索考试科目~"
             :loading="loading"
-            @refresh="handleRefresh"
         />
 
         <!-- 内容区域 -->
@@ -116,14 +113,6 @@ const handleSubjectClick = async (subject) => {
         url: `/pages/exam/subjectdetailview?data=${encodeURIComponent(JSON.stringify(subject))}`,
     });
 };
-
-// #ifdef H5
-const handleRefresh = async () => {
-    // 清除缓存并重新获取数据
-    clearExamSubjectsCache();
-    await fetchExamSubjects(true);
-};
-// #endif
 
 // 下拉刷新事件
 onPullDownRefresh(async () => {
