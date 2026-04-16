@@ -76,8 +76,8 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { onBackPress, onLoad, onShow } from "@dcloudio/uni-app";
-import navBarHeightUtil from "../../../util/navBarHeight";
+import { onBackPress, onLoad } from "@dcloudio/uni-app";
+import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import {
   stripHtml,
   normalizeToHtml,
@@ -89,18 +89,14 @@ import {
 } from "../../../API/Tools/NotesBookAPI";
 import { uploadSingleFile } from "../../../composables/useImageUpload";
 
-// 顶部导航与安全区信息，用于多端自定义导航适配
-const navBarInfo = ref({
-  statusBarHeight: 0,
-  navBarHeight: 44,
-  totalHeight: 44,
-});
-
-const safeAreaInfo = ref({
-  top: 0,
-  bottom: 0,
-  left: 0,
-  right: 0,
+// 顶部导航与安全区适配（可复用于其他页面）
+const { 
+    safeAreaInfo, 
+    customNavbarStyle, 
+    navRowStyle 
+  } = useNavBarSafeArea({
+  reserveMenuButtonRight: true, // 小程序端为右上角胶囊预留空间，避免标题/按钮遮挡
+  rightPaddingExtra: 8, // 在胶囊安全距离基础上额外增加一点视觉留白
 });
 
 // 编辑页核心状态：标题、富文本内容、纯文本内容（用于空内容校验）
@@ -167,35 +163,6 @@ const previewHtml = computed(() => {
     content: noteContent.value,
   });
 });
-
-// 每次进入/返回页面时刷新导航高度与安全区
-const refreshLayoutInfo = () => {
-  navBarInfo.value = navBarHeightUtil.getNavBarInfo();
-  safeAreaInfo.value = navBarHeightUtil.getSafeAreaInfo();
-};
-
-// 头部位置采用 totalHeight 驱动，确保小程序端状态栏+导航栏整体高度正确
-const customNavbarStyle = computed(() => {
-  const style = {
-    height: `${navBarInfo.value.totalHeight}px`,
-    paddingTop: `${navBarInfo.value.statusBarHeight}px`,
-  };
-
-  const menuRect = navBarInfo.value.menuButtonRect;
-  if (!menuRect || !menuRect.left) {
-    return style;
-  }
-
-  const windowWidth = uni.getWindowInfo().windowWidth || 0;
-  const rightReserve = Math.max(windowWidth - menuRect.left + 8, 0);
-  style.paddingRight = `${rightReserve}px`;
-  return style;
-});
-
-// 导航内容区高度使用 navBarHeight，保存按钮保持在可用区域最右侧
-const navRowStyle = computed(() => ({
-  height: `${navBarInfo.value.navBarHeight}px`,
-}));
 
 // 以笔记本ID+笔记ID区分草稿，避免不同笔记互相覆盖
 const buildStorageKey = (options = {}) => {
@@ -602,11 +569,6 @@ onLoad((options = {}) => {
   });
 
   initializeNoteData(options);
-  refreshLayoutInfo();
-});
-
-onShow(() => {
-  refreshLayoutInfo();
 });
 
 // 物理返回键拦截，避免误退出造成内容丢失
