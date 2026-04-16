@@ -251,6 +251,7 @@ const readDraftFromStorage = () => {
     return null;
   }
 };
+
 // 将草稿数据应用到编辑器和快照
 const applyDraftData = (cached = {}) => {
   noteTitle.value = String(cached.title || "");
@@ -278,6 +279,7 @@ const clearDraftFromStorage = (key = storageDraftKey.value) => {
   }
 };
 
+// 云端加载笔记详情，编辑态优先展示云端内容，失败时回退到本地草稿（如果有）
 const loadNoteFromCloud = async () => {
   if (!notesBookId.value || !noteId.value) return false;
 

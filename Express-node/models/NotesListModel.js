@@ -98,6 +98,24 @@ const NotesListSchema = new mongoose.Schema({
   },
 });
 
+const extractImageUrlsFromHtml = (html = "") => {
+  const safeHtml = String(html || "");
+  const imageUrlSet = new Set();
+  const imageSrcRegex =
+    /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'<>]+))/gi;
+
+  let match = imageSrcRegex.exec(safeHtml);
+  while (match) {
+    const imageUrl = String(match[1] || match[2] || match[3] || "").trim();
+    if (imageUrl) {
+      imageUrlSet.add(imageUrl);
+    }
+    match = imageSrcRegex.exec(safeHtml);
+  }
+
+  return Array.from(imageUrlSet).map((url) => ({ url }));
+};
+
 // 保存前自动维护规范化字段与统计字段
 NotesListSchema.pre("save", function (next) {
   const safeTitle = String(this.title || "").trim();
@@ -106,6 +124,16 @@ NotesListSchema.pre("save", function (next) {
   this.normalizedTitle = safeTitle.toLowerCase();
   this.wordCount = safeText.trim() ? safeText.trim().length : 0;
   this.updatedAt = Date.now();
+
+  if (!this.content || typeof this.content !== "object") {
+    this.content = {
+      text: safeText,
+      images: [],
+    };
+  }
+
+  // 自动同步正文中的图片 URL 到 content.images
+  this.content.images = extractImageUrlsFromHtml(safeText);
 
   // 自动生成摘要（若未提供）
   if (!String(this.summary || "").trim()) {

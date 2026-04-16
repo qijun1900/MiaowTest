@@ -92,7 +92,7 @@
 
       <view v-else class="list-wrap">
         <view v-for="item in filteredNotes" :key="item.id" class="note-card">
-          <view class="card-content" @click="handleCheckNote(item)">
+          <view class="card-content" @click="handleEditNote(item)">
             <view class="card-header">
               <text class="note-title">{{ item.title }}</text>
               <view class="header-actions">
