@@ -1,5 +1,11 @@
 const NotesBookModel = require("../../models/NotesBookModel");
 const NotesListModel = require("../../models/NotesListModel");
+const { deleteFileByUrl } = require("../../helpers/ossHelper");
+const {
+  isCloudFileId,
+  deleteCloudFiles,
+} = require("../../helpers/cloudStorageHelper");
+const ossConfig = require("../../config/oss.config");
 
 const escapeRegex = (keyword = "") =>
   keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -16,6 +22,7 @@ const stripHtml = (value = "") =>
 
 const IMAGE_NOTE_PLACEHOLDER = "[\u56fe\u7247]";
 
+// 根据标题和正文生成安全的笔记标题，优先使用用户输入的标题，如果没有则使用正文前20个字符，最后回退到默认标题
 const buildSafeNoteTitle = ({ title = "", plainText = "" }) => {
   const safeTitle = String(title || "").trim();
   if (safeTitle) return safeTitle.slice(0, 80);
@@ -25,6 +32,104 @@ const buildSafeNoteTitle = ({ title = "", plainText = "" }) => {
   }
 
   return "未命名笔记";
+};
+// 从 HTML 内容中提取图片 URL，支持 <img> 标签的 src 属性，返回去重后的 URL 列表
+const extractImageUrlsFromHtml = (html = "") => {
+  const safeHtml = String(html || "");
+  const imageUrlSet = new Set();
+  const imageSrcRegex =
+    /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'<>]+))/gi;
+
+  let match = imageSrcRegex.exec(safeHtml);
+  while (match) {
+    const imageUrl = String(match[1] || match[2] || match[3] || "").trim();
+    if (imageUrl) {
+      imageUrlSet.add(imageUrl);
+    }
+    match = imageSrcRegex.exec(safeHtml);
+  }
+
+  return Array.from(imageUrlSet);
+};
+// 获取笔记中的图片 URL，包含 content.images 数组和 content.text 中的图片
+const getNoteImageUrls = (note = {}) => {
+  const imageList = Array.isArray(note?.content?.images)
+    ? note.content.images
+    : [];
+  const imageUrls = imageList
+    .map((item) => String(item?.url || item || "").trim())
+    .filter(Boolean);
+  const textImageUrls = extractImageUrlsFromHtml(note?.content?.text || "");
+
+  return Array.from(new Set([...imageUrls, ...textImageUrls]));
+};
+// 判断 URL 是否为当前系统管理的 OSS 存储链接，支持自定义 CDN 域名和标准 OSS 域名两种形式
+const isManagedOssUrl = (url = "") => {
+  const safeUrl = String(url || "").trim();
+  if (!/^https?:\/\//i.test(safeUrl)) return false;
+
+  if (ossConfig.cdnDomain && safeUrl.includes(`${ossConfig.cdnDomain}/`)) {
+    return true;
+  }
+
+  if (ossConfig.bucket && ossConfig.region) {
+    const ossHost = `${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com/`;
+    if (safeUrl.includes(ossHost)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const deleteNoteImagesFromStorage = async (imageUrls = []) => {
+  const safeUrls = Array.from(
+    new Set(
+      (Array.isArray(imageUrls) ? imageUrls : [])
+        .map((item) => String(item || "").trim())
+        .filter(Boolean),
+    ),
+  );
+
+  if (!safeUrls.length) return;
+
+  const cloudFileIds = [];
+  const ossUrls = [];
+
+  safeUrls.forEach((url) => {
+    if (isCloudFileId(url)) {
+      cloudFileIds.push(url);
+      return;
+    }
+
+    if (isManagedOssUrl(url)) {
+      ossUrls.push(url);
+    }
+  });
+
+  const deleteJobs = [];
+
+  if (ossUrls.length > 0) {
+    deleteJobs.push(
+      ...ossUrls.map((url) =>
+        deleteFileByUrl(url).catch((error) => {
+          console.warn("删除 OSS 笔记图片失败:", url, error?.message || error);
+        }),
+      ),
+    );
+  }
+
+  if (cloudFileIds.length > 0) {
+    deleteJobs.push(
+      deleteCloudFiles(cloudFileIds).catch((error) => {
+        console.warn("删除微信云存储笔记图片失败:", error?.message || error);
+      }),
+    );
+  }
+
+  if (deleteJobs.length > 0) {
+    await Promise.all(deleteJobs);
+  }
 };
 
 const NotesBookService = {
@@ -395,6 +500,12 @@ const NotesBookService = {
           };
         }
 
+        const previousImageUrls = getNoteImageUrls(note);
+        const nextImageUrlSet = new Set(extractImageUrlsFromHtml(safeContent));
+        const removedImageUrls = previousImageUrls.filter(
+          (url) => !nextImageUrlSet.has(url),
+        );
+
         note.title = safeTitle;
         note.summary = summary;
         // 仅更新正文文本，避免把 undefined 的嵌套对象回写触发 schema cast 错误
@@ -405,6 +516,8 @@ const NotesBookService = {
           { _id: bookId, Uid: uid },
           { $set: { updatedAt: new Date() } },
         );
+
+        await deleteNoteImagesFromStorage(removedImageUrls);
 
         return {
           success: true,
@@ -447,13 +560,17 @@ const NotesBookService = {
    */
   deleteNotebookNote: async ({ uid, id, bookId }) => {
     try {
-      const result = await NotesListModel.deleteOne({
+      const note = await NotesListModel.findOneAndDelete({
         _id: id,
         Uid: uid,
         notesBookId: bookId,
+      }).select({
+        _id: 1,
+        "content.text": 1,
+        "content.images.url": 1,
       });
 
-      if (!result.deletedCount) {
+      if (!note) {
         return {
           success: false,
           code: "NOTE_NOT_FOUND",
@@ -461,16 +578,28 @@ const NotesBookService = {
         };
       }
 
+      await deleteNoteImagesFromStorage(getNoteImageUrls(note));
+
       await NotesBookModel.updateOne(
         {
           _id: bookId,
           Uid: uid,
-          noteCount: { $gt: 0 },
         },
-        {
-          $inc: { noteCount: -1 },
-          $set: { updatedAt: new Date() },
-        },
+        [
+          {
+            $set: {
+              noteCount: {
+                $max: [
+                  {
+                    $subtract: [{ $ifNull: ["$noteCount", 0] }, 1],
+                  },
+                  0,
+                ],
+              },
+              updatedAt: "$$NOW",
+            },
+          },
+        ],
       );
 
       return {
