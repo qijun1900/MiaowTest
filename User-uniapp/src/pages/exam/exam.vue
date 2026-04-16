@@ -16,7 +16,20 @@
         >
             <!-- 考试列表 -->
             <view class="exam-list">
-                <ThemeLoading v-if="loading" text="正在加载考试科目..." />
+                <view v-if="loading" class="subject-list skeleton-list">
+                    <view
+                        v-for="index in 6"
+                        :key="`exam-skeleton-${index}`"
+                        class="subject-item skeleton-item"
+                    >
+                        <view class="subject-icon skeleton-icon shimmer"></view>
+                        <view class="subject-info">
+                            <view class="skeleton-line skeleton-title shimmer"></view>
+                            <view class="skeleton-line skeleton-time shimmer"></view>
+                        </view>
+                        <view class="skeleton-arrow shimmer"></view>
+                    </view>
+                </view>
                 <view v-else class="subject-list">
                     <view
                         v-for="subject in examSubjects"
@@ -25,10 +38,20 @@
                         @click="handleSubjectClick(subject)"
                     >
                         <view class="subject-icon">
+                            <view
+                                v-if="!isCoverLoaded(subject)"
+                                class="cover-placeholder"
+                                :style="getCoverPlaceholderStyle(subject)"
+                            ></view>
                             <image
                                 :src="subject.coverImage"
                                 mode="aspectFill"
                                 class="subject-image"
+                                :class="{
+                                    'subject-image-visible': isCoverLoaded(subject),
+                                }"
+                                @load="handleCoverLoaded(subject)"
+                                @error="handleCoverError(subject)"
                             />
                         </view>
                         <view class="subject-info">
@@ -67,7 +90,6 @@ import PageHead from "../../components/core/PageHead.vue";
 import escconfig from "../../config/esc.config";
 import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import formatTime from "../../util/formatTime";
-import ThemeLoading from "../../components/core/ThemeLoading.vue";
 import showShareMenu from "../../util/wechatShare.js";
 import checkLogin from "../../util/checkLogin.js";
 
@@ -76,6 +98,61 @@ const examSubjects = ref([]);
 const loading = ref(false);
 const backToTopRef = ref();
 const pageHeadRef = ref();
+const coverLoadedMap = ref({});
+
+const COVER_PLACEHOLDER_COLORS = [
+    ["#f2c37a", "#ef8f6f"],
+    ["#8fd1a8", "#57b78f"],
+    ["#f5b7a1", "#eb8c8c"],
+    ["#f2d177", "#d7ad5b"],
+    ["#c7d88c", "#97b06a"],
+];
+
+const getSubjectId = (subject = {}) =>
+    String(subject.id || subject._id || "").trim();
+
+const getHashCode = (value = "") => {
+    let hash = 0;
+    const text = String(value || "");
+    for (let index = 0; index < text.length; index += 1) {
+        hash = (hash << 5) - hash + text.charCodeAt(index);
+        hash |= 0;
+    }
+    return Math.abs(hash);
+};
+
+const isCoverLoaded = (subject = {}) => {
+    const subjectId = getSubjectId(subject);
+    return Boolean(subjectId && coverLoadedMap.value[subjectId]);
+};
+
+const handleCoverLoaded = (subject = {}) => {
+    const subjectId = getSubjectId(subject);
+    if (!subjectId) return;
+    coverLoadedMap.value = {
+        ...coverLoadedMap.value,
+        [subjectId]: true,
+    };
+};
+
+const handleCoverError = (subject = {}) => {
+    const subjectId = getSubjectId(subject);
+    if (!subjectId) return;
+    coverLoadedMap.value = {
+        ...coverLoadedMap.value,
+        [subjectId]: false,
+    };
+};
+
+const getCoverPlaceholderStyle = (subject = {}) => {
+    const subjectId = getSubjectId(subject);
+    const hash = getHashCode(subjectId || subject.name || "default");
+    const colorPair = COVER_PLACEHOLDER_COLORS[hash % COVER_PLACEHOLDER_COLORS.length];
+
+    return {
+        background: `linear-gradient(145deg, ${colorPair[0]} 0%, ${colorPair[1]} 100%)`,
+    };
+};
 
 /**
  * 获取考试科目数据
@@ -85,13 +162,21 @@ const fetchExamSubjects = async (forceRefresh = false) => {
     loading.value = true;
     try {
         const data = await getExamSubjects(forceRefresh);
-        examSubjects.value = data.data.map((item) => ({
+        const nextSubjects = data.data.map((item) => ({
             id: item._id,
             name: item.name,
             coverImage: `${escconfig.ossDomain}${item.cover}`,
             updateTime: item.createdTime,
             ...item,
         }));
+        examSubjects.value = nextSubjects;
+        coverLoadedMap.value = nextSubjects.reduce((accumulator, item) => {
+            const subjectId = getSubjectId(item);
+            if (subjectId) {
+                accumulator[subjectId] = false;
+            }
+            return accumulator;
+        }, {});
     } catch (error) {
         console.error("获取考试科目失败:", error);
         uni.showToast({
@@ -170,6 +255,57 @@ onMounted(() => {
     transition: transform 0.2s ease;
 }
 
+.skeleton-item {
+    pointer-events: none;
+}
+
+.skeleton-icon {
+    background: #e8dccf;
+}
+
+.skeleton-line {
+    border-radius: 12rpx;
+}
+
+.skeleton-title {
+    width: 72%;
+    height: 34rpx;
+    margin-bottom: 14rpx;
+}
+
+.skeleton-time {
+    width: 54%;
+    height: 24rpx;
+}
+
+.skeleton-arrow {
+    width: 24rpx;
+    height: 36rpx;
+    border-radius: 10rpx;
+    background: #e6d8ca;
+}
+
+.shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -130%;
+    width: 130%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.72) 48%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: skeletonSweep 1.2s ease-in-out infinite;
+}
+
 .subject-item:active {
     transform: scale(0.98);
 }
@@ -178,19 +314,46 @@ onMounted(() => {
     width: 80rpx;
     height: 80rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #eadfce;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-right: 30rpx;
     flex-shrink: 0;
     overflow: hidden;
+    position: relative;
 }
 
 .subject-image {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+}
+
+.subject-image-visible {
+    opacity: 1;
+}
+
+.cover-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-placeholder::after {
+    content: "";
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(
+        circle at 28% 22%,
+        rgba(255, 255, 255, 0.35) 0%,
+        rgba(255, 255, 255, 0) 48%
+    );
 }
 
 .subject-info {
@@ -213,8 +376,14 @@ onMounted(() => {
 
 .subject-arrow {
     font-size: 32rpx;
-    color: #007aff;
+    color: #c77f4d;
     font-weight: bold;
     margin-left: 20rpx;
+}
+
+@keyframes skeletonSweep {
+    to {
+        left: 130%;
+    }
 }
 </style>
