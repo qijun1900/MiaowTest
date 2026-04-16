@@ -15,14 +15,23 @@
         </view>
 
         <!-- 加载中状态 -->
-        <view v-if="loading" class="loading-container">
-            <view class="loading-orbit">
-                <view class="loading-ring ring-1"></view>
-                <view class="loading-ring ring-2"></view>
-                <view class="loading-core"></view>
+        <view v-if="loading" class="book-list skeleton-list">
+            <view
+                v-for="index in 4"
+                :key="`skeleton-${index}`"
+                class="book-card skeleton-card"
+            >
+                <view class="card-header">
+                    <view class="skeleton-circle shimmer"></view>
+                </view>
+
+                <view class="skeleton-title shimmer"></view>
+                <view class="skeleton-subtitle shimmer"></view>
+
+                <view class="card-footer skeleton-footer">
+                    <view class="skeleton-meta shimmer"></view>
+                </view>
             </view>
-            <text class="loading-text">正在加载错题本...</text>
-            <text class="loading-subtext">马上就好</text>
         </view>
 
         <!-- 错题本列表 -->
@@ -787,59 +796,76 @@ onShow(() => {
     background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%) !important;
 }
 
-/* Loading 样式 */
-.loading-container {
-    min-height: 56vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #fff9f2;
-    gap: 14rpx;
+/* Skeleton Loading 样式 */
+.skeleton-list {
+    align-items: stretch;
 }
 
-.loading-orbit {
-    position: relative;
-    width: 120rpx;
-    height: 120rpx;
+.skeleton-card {
+    background: #fffefb;
+    border: 2rpx solid #efe4d8;
+    box-shadow: 0 10rpx 24rpx rgba(141, 116, 86, 0.08);
 }
 
-.loading-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+.skeleton-card::before {
+    display: none;
+}
+
+.skeleton-card:active {
+    transform: none;
+    box-shadow: 0 10rpx 24rpx rgba(141, 116, 86, 0.08);
+}
+
+.skeleton-circle {
+    width: 56rpx;
+    height: 56rpx;
     border-radius: 50%;
-    border: 4rpx solid transparent;
-    transform: translate(-50%, -50%);
 }
 
-.ring-1 {
-    width: 120rpx;
-    height: 120rpx;
-    border-top-color: #4caf50;
-    border-right-color: #4caf50;
-    animation: spin 1.1s linear infinite;
+.skeleton-title {
+    margin-top: 6rpx;
+    width: 78%;
+    height: 44rpx;
+    border-radius: 14rpx;
 }
 
-.ring-2 {
-    width: 86rpx;
-    height: 86rpx;
-    border-bottom-color: #81c784;
-    border-left-color: #81c784;
-    animation: spin-reverse 0.9s linear infinite;
-}
-
-.loading-core {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30rpx;
+.skeleton-subtitle {
+    margin-top: 20rpx;
+    width: 56%;
     height: 30rpx;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-    box-shadow: 0 0 0 10rpx rgba(76, 175, 80, 0.16);
-    animation: pulse-core 1.4s ease-in-out infinite;
+    border-radius: 12rpx;
+}
+
+.skeleton-footer {
+    margin-top: auto;
+}
+
+.skeleton-meta {
+    width: 42%;
+    height: 32rpx;
+    border-radius: 12rpx;
+}
+
+.shimmer {
+    position: relative;
+    overflow: hidden;
+    background: #ede5dc;
+}
+
+.shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -140%;
+    width: 140%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: skeletonShimmer 1.3s ease-in-out infinite;
 }
 
 .btn-spinner {
@@ -866,34 +892,12 @@ onShow(() => {
     }
 }
 
-.loading-text {
-    margin-top: 10rpx;
-    font-size: 30rpx;
-    color: #3d6f43;
-    font-weight: 600;
-}
-
-.loading-subtext {
-    font-size: 24rpx;
-    color: #8aa18e;
-}
-
-@keyframes spin-reverse {
+@keyframes skeletonShimmer {
     from {
-        transform: translate(-50%, -50%) rotate(360deg);
+        left: -140%;
     }
     to {
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-}
-
-@keyframes pulse-core {
-    0%,
-    100% {
-        transform: translate(-50%, -50%) scale(0.92);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.08);
+        left: 140%;
     }
 }
 </style>
