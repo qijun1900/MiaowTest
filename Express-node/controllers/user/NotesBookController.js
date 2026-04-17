@@ -267,6 +267,7 @@ const NotesBookController = {
       const bookId = String(req.body.bookId || "").trim();
       const title = String(req.body.title || "");
       const content = String(req.body.content || "");
+      const tags = req.body.tags;
 
       if (!isValidObjectId(bookId)) {
         return res.status(200).send({
@@ -288,6 +289,7 @@ const NotesBookController = {
         bookId,
         title,
         content,
+        tags,
       });
 
       if (!result.success) {

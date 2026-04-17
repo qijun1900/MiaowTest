@@ -33,6 +33,30 @@ const buildSafeNoteTitle = ({ title = "", plainText = "" }) => {
 
   return "未命名笔记";
 };
+
+const normalizeNoteTags = (tags = []) => {
+  const source = Array.isArray(tags) ? tags : [tags];
+  const normalized = [];
+
+  for (const item of source) {
+    let rawTag = "";
+
+    if (typeof item === "string" || typeof item === "number") {
+      rawTag = String(item).trim();
+    } else if (item && typeof item === "object") {
+      rawTag = String(item.text ?? item.label ?? item.name ?? item.value ?? "").trim();
+    }
+
+    if (!rawTag) continue;
+    const safeTag = rawTag.slice(0, 20);
+    if (!safeTag || normalized.includes(safeTag)) continue;
+
+    normalized.push(safeTag);
+    if (normalized.length >= 20) break;
+  }
+
+  return normalized;
+};
 // 从 HTML 内容中提取图片 URL，支持 <img> 标签的 src 属性，返回去重后的 URL 列表
 const extractImageUrlsFromHtml = (html = "") => {
   const safeHtml = String(html || "");
@@ -452,7 +476,7 @@ const NotesBookService = {
   /**
    * 保存笔记（有id为更新，无id为新增）
    */
-  saveNotebookNote: async ({ uid, id, bookId, title, content }) => {
+  saveNotebookNote: async ({ uid, id, bookId, title, content, tags = [] }) => {
     try {
       const notebook = await NotesBookModel.findOne({ _id: bookId, Uid: uid })
         .select({ _id: 1 })
@@ -468,6 +492,7 @@ const NotesBookService = {
 
       const safeContent = String(content || "").trim();
       const plainText = stripHtml(safeContent);
+      const safeTags = normalizeNoteTags(tags);
       const safeTitle = buildSafeNoteTitle({
         title,
         plainText,
@@ -508,6 +533,7 @@ const NotesBookService = {
 
         note.title = safeTitle;
         note.summary = summary;
+        note.tags = safeTags;
         // 仅更新正文文本，避免把 undefined 的嵌套对象回写触发 schema cast 错误
         note.set("content.text", safeContent);
 
@@ -531,6 +557,7 @@ const NotesBookService = {
         notesBookId: bookId,
         title: safeTitle,
         summary,
+        tags: safeTags,
         content: {
           text: safeContent,
         },

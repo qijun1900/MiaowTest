@@ -69,6 +69,20 @@
         <view v-else class="panel preview-panel">
           <rich-text class="preview-rich" :nodes="previewHtml"></rich-text>
         </view>
+
+        <view class="tag-selector-block">
+          <TagSelector
+            :show="true"
+            v-model="noteTags"
+            title="笔记标签"
+            :default-tags="defaultNoteTags"
+            :max-visible-selected-tags="6"
+            :max-visible-recommended-tags="12"
+            :allow-custom-input="editorMode === 'edit'"
+            :read-only="editorMode === 'preview'"
+            theme="default"
+          />
+        </view>
       </view>
     </scroll-view>
   </view>
@@ -77,6 +91,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { onBackPress, onLoad, onUnload } from "@dcloudio/uni-app";
+import TagSelector from "../../../components/core/TagSelector.vue";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import {
   stripHtml,
@@ -106,6 +121,7 @@ const {
 const noteTitle = ref("");
 const noteContent = ref("");
 const notePlainText = ref("");
+const noteTags = ref([]);
 const editorMode = ref("edit");
 const isBypassBackGuard = ref(false);
 const storageDraftKey = ref("note-editor-draft:default:new");
@@ -116,12 +132,58 @@ const EDITOR_IMAGE_MAX_SIZE = 10 * 1024 * 1024;
 const NOTEBOOK_CLOUD_PATH_PREFIX = "user/notebook";
 const pendingUploadedImageUrls = ref([]);
 const isCleaningPendingUploads = ref(false);
+const defaultNoteTags = [
+  "复习",
+  "重点",
+  "易错",
+  "知识点",
+  "待整理",
+  "待补充",
+  "总结",
+  "灵感",
+];
 
 // 用于未保存变更比对的快照
 const initialSnapshot = ref({
   title: "",
   content: "",
+  tags: [],
 });
+
+const normalizeSingleTag = (tag) => {
+  if (typeof tag === "string") return tag.trim();
+  if (typeof tag === "number") return String(tag).trim();
+
+  if (tag && typeof tag === "object") {
+    const maybeText = tag.text ?? tag.label ?? tag.name ?? tag.value;
+    return typeof maybeText === "string"
+      ? maybeText.trim()
+      : String(maybeText || "").trim();
+  }
+
+  return "";
+};
+
+const normalizeTagList = (list = []) => {
+  const normalized = [];
+
+  for (const item of Array.isArray(list) ? list : []) {
+    const text = normalizeSingleTag(item);
+    if (text && !normalized.includes(text)) {
+      normalized.push(text);
+    }
+  }
+
+  return normalized;
+};
+
+const isSameTagList = (left = [], right = []) => {
+  const leftList = normalizeTagList(left);
+  const rightList = normalizeTagList(right);
+
+  if (leftList.length !== rightList.length) return false;
+  return leftList.every((item, index) => item === rightList[index]);
+};
 
 // sp-editor 工具栏配置：开启 image 按键以支持插图上传
 const toolbarConfig = ref({
@@ -157,7 +219,8 @@ const editorModes = [
 const hasUnsavedChanges = computed(() => {
   return (
     noteTitle.value !== initialSnapshot.value.title ||
-    noteContent.value !== initialSnapshot.value.content
+    noteContent.value !== initialSnapshot.value.content ||
+    !isSameTagList(noteTags.value, initialSnapshot.value.tags)
   );
 });
 
@@ -181,6 +244,7 @@ const applySnapshot = () => {
   initialSnapshot.value = {
     title: noteTitle.value,
     content: noteContent.value,
+    tags: normalizeTagList(noteTags.value),
   };
 };
 
@@ -321,6 +385,7 @@ const applyDraftData = (cached = {}) => {
   noteTitle.value = String(cached.title || "");
   noteContent.value = normalizeToHtml(cached.content || "");
   notePlainText.value = String(cached.text || stripHtml(noteContent.value));
+  noteTags.value = normalizeTagList(cached.tags || []);
   pendingUploadedImageUrls.value = [];
   applySnapshot();
   setTimeout(() => {
@@ -361,6 +426,7 @@ const loadNoteFromCloud = async () => {
     noteTitle.value = String(res.data.title || "");
     noteContent.value = normalizeToHtml(res.data.content || "");
     notePlainText.value = stripHtml(noteContent.value);
+    noteTags.value = normalizeTagList(res?.data?.tags || []);
     pendingUploadedImageUrls.value = [];
     applySnapshot();
     setTimeout(() => {
@@ -386,6 +452,7 @@ const hydrateFromOptions = (options = {}) => {
     noteTitle.value = inputTitle;
     noteContent.value = normalizeToHtml(inputContent);
     notePlainText.value = stripHtml(noteContent.value);
+    noteTags.value = [];
     pendingUploadedImageUrls.value = [];
     applySnapshot();
     setTimeout(() => {
@@ -552,6 +619,7 @@ const persistDraft = (extraPayload = {}) => {
     title: noteTitle.value,
     content: noteContent.value,
     text: notePlainText.value,
+    tags: normalizeTagList(noteTags.value),
     updatedAt: Date.now(),
     pendingCloudSync: false,
     ...extraPayload,
@@ -566,6 +634,7 @@ const handleSave = async () => {
 
   const title = String(noteTitle.value || "").trim();
   const contentText = String(notePlainText.value || "").trim();
+  const tags = normalizeTagList(noteTags.value);
 
   if (!title && !contentText) {
     uni.showToast({
@@ -599,6 +668,7 @@ const handleSave = async () => {
       bookId: notesBookId.value,
       title,
       content: noteContent.value,
+      tags,
     });
 
     if (res.code !== 200) {
@@ -874,6 +944,14 @@ onUnload(() => {
   font-size: 32rpx;
   color: #4f576b;
   line-height: 1.8;
+}
+
+.tag-selector-block {
+  margin-top: 18rpx;
+}
+
+.tag-selector-block :deep(.tags-section) {
+  margin: 0;
 }
 
 :deep(.sp-editor) {

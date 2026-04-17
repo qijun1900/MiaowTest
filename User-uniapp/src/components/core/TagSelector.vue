@@ -1,5 +1,10 @@
 <template>
-    <view v-if="show" class="tags-section" :style="themeVars">
+    <view
+        v-if="show"
+        class="tags-section"
+        :class="{ readonly: readOnly }"
+        :style="themeVars"
+    >
         <view class="tags-title">{{ title }}</view>
 
         <view v-if="selectedTags.length > 0" class="selected-tags">
@@ -7,9 +12,14 @@
                 v-for="tagItem in visibleSelectedTags"
                 :key="`${tagItem.tag}-${tagItem.index}`"
                 class="tag-item selected"
+                :class="{ readonly: readOnly }"
             >
                 <text>{{ tagItem.tag }}</text>
-                <view class="tag-close" @click="removeTag(tagItem.index)">
+                <view
+                    v-if="!readOnly"
+                    class="tag-close"
+                    @click="removeTag(tagItem.index)"
+                >
                     <uni-icons
                         type="close"
                         size="14"
@@ -32,7 +42,7 @@
             </view>
         </view>
 
-        <view v-if="allowCustomInput" class="custom-tag-input">
+        <view v-if="allowCustomInput && !readOnly" class="custom-tag-input">
             <input
                 class="tag-input"
                 v-model="customTagInput"
@@ -53,10 +63,11 @@
                 v-for="(tag, index) in visibleRecommendedTags"
                 :key="`${tag}-${index}`"
                 class="tag-item recommended"
-                :class="{ added: selectedTags.includes(tag) }"
+                :class="{ added: selectedTags.includes(tag), readonly: readOnly }"
                 @click="addRecommendedTag(tag)"
             >
                 <uni-icons
+                    v-if="!readOnly"
                     type="plus"
                     size="12"
                     :color="currentPalette.recommendedIconColor"
@@ -120,6 +131,10 @@ const props = defineProps({
     maxVisibleRecommendedTags: { // 推荐标签最大显示数量，超过后会折叠
         type: Number,
         default: 10,
+    },
+    readOnly: { // 是否只读（禁用增删操作）
+        type: Boolean,
+        default: false,
     },
     // 默认 default：与 QuestionTags 的暖色风格一致
     // 可选：default | white | blue
@@ -388,6 +403,8 @@ watch(
 );
 
 const addCustomTag = () => {
+    if (props.readOnly) return;
+
     const tag = customTagInput.value.trim();
     if (!tag) return;
 
@@ -405,6 +422,8 @@ const addCustomTag = () => {
 };
 
 const addRecommendedTag = (tag) => {
+    if (props.readOnly) return;
+
     const normalizedTag = normalizeSingleTag(tag);
     if (!normalizedTag) return;
 
@@ -421,6 +440,8 @@ const addRecommendedTag = (tag) => {
 };
 
 const removeTag = (index) => {
+    if (props.readOnly) return;
+
     const currentTags = [...selectedTags.value];
     currentTags.splice(index, 1);
     emit("update:modelValue", currentTags);
@@ -481,6 +502,10 @@ watch(
     color: var(--tag-selected-text);
     gap: 12rpx;
     box-shadow: var(--tag-selected-shadow);
+}
+
+.tag-item.selected.readonly {
+    gap: 0;
 }
 
 .tag-close {
@@ -545,6 +570,10 @@ watch(
 
 .tag-item.recommended:active {
     background: var(--tag-recommended-active-bg);
+}
+
+.tag-item.recommended.readonly:active {
+    background: var(--tag-recommended-bg);
 }
 
 .tag-item.recommended uni-icons {
