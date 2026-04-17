@@ -76,7 +76,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { onBackPress, onLoad } from "@dcloudio/uni-app";
+import { onBackPress, onLoad, onUnload } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import {
   stripHtml,
@@ -87,7 +87,10 @@ import {
   getNotebookNoteDetailAPI,
   saveNotebookNoteAPI,
 } from "../../../API/Tools/NotesBookAPI";
-import { uploadSingleFile } from "../../../composables/useImageUpload";
+import {
+  deleteRemoteImageFile,
+  uploadSingleFile,
+} from "../../../composables/useImageUpload";
 
 // 顶部导航与安全区适配（可复用于其他页面）
 const { 
@@ -111,6 +114,8 @@ const notesBookId = ref("");
 const noteId = ref("");
 const EDITOR_IMAGE_MAX_SIZE = 10 * 1024 * 1024;
 const NOTEBOOK_CLOUD_PATH_PREFIX = "user/notebook";
+const pendingUploadedImageUrls = ref([]);
+const isCleaningPendingUploads = ref(false);
 
 // 用于未保存变更比对的快照
 const initialSnapshot = ref({
@@ -189,6 +194,98 @@ const setEditorContent = (content = "") => {
   });
 };
 
+const normalizeImageUrl = (value = "") => String(value || "").trim();
+
+const extractImageUrlsFromHtml = (html = "") => {
+  const content = String(html || "");
+  if (!content || !/<img\b/i.test(content)) {
+    return [];
+  }
+
+  const result = [];
+  content.replace(
+    /<img\b[^>]*\bsrc\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/gi,
+    (fullMatch, quoted, doubleQuoted, singleQuoted, bare) => {
+      const source = normalizeImageUrl(doubleQuoted || singleQuoted || bare || "");
+      if (!source) return fullMatch;
+
+      result.push(source);
+      return fullMatch;
+    },
+  );
+
+  return Array.from(new Set(result));
+};
+
+const trackPendingUploadedImage = (url = "") => {
+  const normalizedUrl = normalizeImageUrl(url);
+  if (!normalizedUrl) return;
+  if (pendingUploadedImageUrls.value.includes(normalizedUrl)) return;
+
+  pendingUploadedImageUrls.value.push(normalizedUrl);
+};
+
+const cleanupRemoteImagesByUrls = async (urlList = []) => {
+  const queue = Array.from(
+    new Set(
+      (Array.isArray(urlList) ? urlList : []).map((item) =>
+        normalizeImageUrl(item),
+      ),
+    ),
+  ).filter(Boolean);
+
+  const failedUrls = [];
+
+  for (const imageUrl of queue) {
+    try {
+      await deleteRemoteImageFile(imageUrl, { showToast: false });
+    } catch (error) {
+      failedUrls.push(imageUrl);
+      console.warn("清理未保存上传图片失败:", imageUrl, error);
+    }
+  }
+
+  return failedUrls;
+};
+
+// 保存后仅清理“已上传但当前正文未引用”的图片；放弃编辑时清理所有待提交图片。
+const cleanupPendingUploadedImages = async ({ forceAll = false } = {}) => {
+  if (isCleaningPendingUploads.value) return;
+
+  const snapshot = Array.from(new Set(pendingUploadedImageUrls.value)).filter(
+    Boolean,
+  );
+  if (!snapshot.length) return;
+
+  isCleaningPendingUploads.value = true;
+  try {
+    const currentContentImageSet = new Set(
+      extractImageUrlsFromHtml(noteContent.value),
+    );
+    const cleanupTargets = forceAll
+      ? snapshot
+      : snapshot.filter((url) => !currentContentImageSet.has(url));
+
+    if (!cleanupTargets.length) {
+      if (!forceAll) {
+        pendingUploadedImageUrls.value = [];
+      }
+      return;
+    }
+
+    const failedUrls = await cleanupRemoteImagesByUrls(cleanupTargets);
+    pendingUploadedImageUrls.value = failedUrls;
+  } finally {
+    isCleaningPendingUploads.value = false;
+  }
+};
+
+const handleDiscardAndLeave = async () => {
+  await cleanupPendingUploadedImages({ forceAll: true });
+  isBypassBackGuard.value = true;
+  uni.navigateBack();
+};
+
 // 从编辑器主动拉取最新内容，避免输入事件未及时同步
 const syncContentFromEditor = () =>
   new Promise((resolve) => {
@@ -224,6 +321,7 @@ const applyDraftData = (cached = {}) => {
   noteTitle.value = String(cached.title || "");
   noteContent.value = normalizeToHtml(cached.content || "");
   notePlainText.value = String(cached.text || stripHtml(noteContent.value));
+  pendingUploadedImageUrls.value = [];
   applySnapshot();
   setTimeout(() => {
     setEditorContent(noteContent.value);
@@ -263,6 +361,7 @@ const loadNoteFromCloud = async () => {
     noteTitle.value = String(res.data.title || "");
     noteContent.value = normalizeToHtml(res.data.content || "");
     notePlainText.value = stripHtml(noteContent.value);
+    pendingUploadedImageUrls.value = [];
     applySnapshot();
     setTimeout(() => {
       setEditorContent(noteContent.value);
@@ -287,6 +386,7 @@ const hydrateFromOptions = (options = {}) => {
     noteTitle.value = inputTitle;
     noteContent.value = normalizeToHtml(inputContent);
     notePlainText.value = stripHtml(noteContent.value);
+    pendingUploadedImageUrls.value = [];
     applySnapshot();
     setTimeout(() => {
       setEditorContent(noteContent.value);
@@ -410,7 +510,13 @@ const handleEditorUploadImage = async (tempFiles = [], eventEditorCtx) => {
             biz: "notebook",
           },
         });
-        await insertImageToEditor(currentEditorCtx, uploadResult.url);
+        try {
+          await insertImageToEditor(currentEditorCtx, uploadResult.url);
+          trackPendingUploadedImage(uploadResult.url);
+        } catch (insertError) {
+          await cleanupRemoteImagesByUrls([uploadResult.url]);
+          throw insertError;
+        }
         successCount += 1;
       } catch (error) {
         failCount += 1;
@@ -475,6 +581,7 @@ const handleSave = async () => {
     if (!notesBookId.value) {
       persistDraft();
       applySnapshot();
+      await cleanupPendingUploadedImages({ forceAll: false });
       uni.showToast({
         title: "已保存到本地草稿",
         icon: "success",
@@ -510,6 +617,7 @@ const handleSave = async () => {
     clearDraftFromStorage(oldDraftKey);
     clearDraftFromStorage();
     applySnapshot();
+    await cleanupPendingUploadedImages({ forceAll: false });
     uni.showToast({
       title: "云端保存成功",
       icon: "success",
@@ -521,6 +629,7 @@ const handleSave = async () => {
     try {
       persistDraft({ pendingCloudSync: true });
       applySnapshot();
+      await cleanupPendingUploadedImages({ forceAll: false });
     } catch (storageError) {
       console.error("保存本地草稿失败:", storageError);
     }
@@ -542,8 +651,7 @@ const confirmLeave = () => {
     cancelText: "继续编辑",
     success: ({ confirm }) => {
       if (!confirm) return;
-      isBypassBackGuard.value = true;
-      uni.navigateBack();
+      handleDiscardAndLeave();
     },
     position: "top",
   });
@@ -553,7 +661,11 @@ const confirmLeave = () => {
 
 const handleCancel = () => {
   if (!hasUnsavedChanges.value) {
-    uni.navigateBack();
+    if (!pendingUploadedImageUrls.value.length) {
+      uni.navigateBack();
+      return;
+    }
+    handleDiscardAndLeave();
     return;
   }
   confirmLeave();
@@ -573,11 +685,25 @@ onLoad((options = {}) => {
 
 // 物理返回键拦截，避免误退出造成内容丢失
 onBackPress(() => {
-  if (isBypassBackGuard.value || !hasUnsavedChanges.value) {
+  if (isBypassBackGuard.value) {
     return false;
   }
+
+  if (!hasUnsavedChanges.value) {
+    if (!pendingUploadedImageUrls.value.length) {
+      return false;
+    }
+    handleDiscardAndLeave();
+    return true;
+  }
+
   confirmLeave();
   return true;
+});
+
+onUnload(() => {
+  if (!pendingUploadedImageUrls.value.length) return;
+  cleanupPendingUploadedImages({ forceAll: true });
 });
 </script>
 

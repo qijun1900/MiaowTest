@@ -36,16 +36,84 @@ export const normalizeCloudImageSrcInHtml = (value = "") => {
     return content;
   }
 
-  return content.replace(
-    /(<img\b[^>]*\bsrc\s*=\s*)(["'])(cloud:\/\/[^"']+)(\2)/gi,
-    (fullMatch, prefix, quote, source) => {
-      const resolved = cloudFileToHttpUrl(source);
-      if (resolved === source) {
-        return fullMatch;
-      }
-      return `${prefix}${quote}${resolved}${quote}`;
-    },
-  );
+  return content.replace(/<img\b[^>]*>/gi, (imgTag) => {
+    const srcMatch = imgTag.match(
+      /\bsrc\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i,
+    );
+    if (!srcMatch) return imgTag;
+
+    const source = String(srcMatch[2] || srcMatch[3] || srcMatch[4] || "");
+    if (!source.startsWith("cloud://")) {
+      return imgTag;
+    }
+
+    const resolved = cloudFileToHttpUrl(source);
+    if (resolved === source) {
+      return imgTag;
+    }
+
+    return imgTag.replace(srcMatch[0], `src="${resolved}"`);
+  });
+};
+
+const PREVIEW_IMG_STYLE = {
+  width: "100%",
+  "max-width": "100%",
+  height: "auto",
+  display: "block",
+};
+
+const buildPreviewImgStyle = (styleValue = "") => {
+  const styleMap = {};
+
+  String(styleValue)
+    .split(";")
+    .forEach((item) => {
+      const chunk = String(item || "").trim();
+      if (!chunk) return;
+
+      const separatorIndex = chunk.indexOf(":");
+      if (separatorIndex < 0) return;
+
+      const key = chunk.slice(0, separatorIndex).trim().toLowerCase();
+      const value = chunk.slice(separatorIndex + 1).trim();
+      if (!key || !value) return;
+
+      styleMap[key] = value;
+    });
+
+  Object.assign(styleMap, PREVIEW_IMG_STYLE);
+
+  return Object.entries(styleMap)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(";");
+};
+
+export const normalizePreviewImageInHtml = (value = "") => {
+  const content = String(value || "");
+  if (!content || !/<img\b/i.test(content)) {
+    return content;
+  }
+
+  return content.replace(/<img\b[^>]*>/gi, (imgTag) => {
+    // 去除固定宽高属性，避免在 rich-text 预览时发生图片裁切。
+    let nextTag = imgTag.replace(
+      /\s(width|height)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi,
+      "",
+    );
+
+    const styleMatch = nextTag.match(/\sstyle\s*=\s*("([^"]*)"|'([^']*)')/i);
+    const styleValue = String(styleMatch?.[2] || styleMatch?.[3] || "");
+    const mergedStyle = buildPreviewImgStyle(styleValue);
+
+    if (styleMatch) {
+      nextTag = nextTag.replace(styleMatch[0], ` style="${mergedStyle}"`);
+    } else {
+      nextTag = nextTag.replace(/<img\b/i, `<img style="${mergedStyle}"`);
+    }
+
+    return nextTag;
+  });
 };
 
 export const buildNotePreviewHtml = ({
@@ -55,7 +123,9 @@ export const buildNotePreviewHtml = ({
 } = {}) => {
   const safeTitle = String(title || "").trim();
   const safeContent = String(content || "").trim();
-  const body = normalizeCloudImageSrcInHtml(safeContent || emptyHtml);
+  const body = normalizePreviewImageInHtml(
+    normalizeCloudImageSrcInHtml(safeContent || emptyHtml),
+  );
 
   const titleHtml = safeTitle
     ? `<h2 style="font-size:22px;line-height:1.4;color:#3d4456;margin:0 0 12px;">${escapeHtml(safeTitle)}</h2>`
