@@ -84,7 +84,7 @@ export async function deleteRemoteImageFile(imageItem, options = {}) {
  * @param {{ uploadUrl?: string, cloudUploadUrl?: string, cloudPathPrefix?: string, formData?: Record<string, any> }} options
  * @returns {Promise<{_id: string, url: string}>}
  */
-export function uploadSingleFile(filePath, options = {}) {
+export async function uploadSingleFile(filePath, options = {}) {
   const {
     uploadUrl = DEFAULT_IMAGE_UPLOAD_URL,
     cloudUploadUrl = DEFAULT_CLOUD_IMAGE_UPLOAD_URL,
@@ -95,42 +95,47 @@ export function uploadSingleFile(filePath, options = {}) {
   const cloudPath = buildCloudPath(filePath, cloudPathPrefix);
 
   if (escconfig.useCloudContainer) {
-    return httpUpload({
+    const data = await httpUpload({
       filePath,
       url: cloudUploadUrl,
       cloudPath,
       formData,
-    }).then((data) => {
-      if (data.code === 200 && data?.data?.url) {
-        return { _id: data.data._id, url: data.data.url };
-      }
-      throw new Error(data.message || "上传失败");
     });
+
+    if (data.code === 200 && data?.data?.url) {
+      return { _id: data.data._id, url: data.data.url };
+    }
+    throw new Error(data.message || "上传失败");
   }
 
-  return new Promise((resolve, reject) => {
+  const uploadRes = await new Promise((resolve, reject) => {
     uni.uploadFile({
       url: uploadUrl,
       filePath,
       name: "file",
       fileType: "image",
       formData,
-      success: (uploadRes) => {
-        try {
-          const data = JSON.parse(uploadRes.data);
-          if (data.code === 200 && data?.data?.url) {
-            resolve({ _id: data.data._id, url: data.data.url });
-          } else {
-            reject(new Error(data.message || "上传失败"));
-          }
-        } catch (e) {
-          reject(new Error("解析响应失败"));
-          console.error("上传响应解析失败:", e, "原始响应:", uploadRes.data);
-        }
-      },
+      success: resolve,
       fail: reject,
     });
   });
+
+  let data;
+  try {
+    data =
+      typeof uploadRes?.data === "string"
+        ? JSON.parse(uploadRes.data)
+        : uploadRes?.data || {};
+  } catch (e) {
+    console.error("上传响应解析失败:", e, "原始响应:", uploadRes?.data);
+    throw new Error("解析响应失败");
+  }
+
+  if (data.code === 200 && data?.data?.url) {
+    return { _id: data.data._id, url: data.data.url };
+  }
+
+  throw new Error(data.message || "上传失败");
 }
 
 export function useImageUpload(options = {}) {
