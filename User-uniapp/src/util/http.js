@@ -468,7 +468,7 @@ function cloudUploadFile(filePath, cloudPath, onProgress) {
 /**
  * 统一的文件上传方法
  * 云托管模式下支持两种上传方式（由 useCloudStorage 配置控制）：
- *   1. 云托管云对象存储（useCloudStorage=true）：wx.cloud.uploadFile 上传到云存储，再 callContainer 通知后端记录 fileID
+ *   1. 云托管云对象存储（useCloudStorage=true）：wx.cloud.uploadFile 上传到微信云存储，再 callContainer 通知后端记录 fileID
  *   2. base64 中转 OSS（useCloudStorage=false）：读取文件为 base64，通过 callContainer 发给后端，后端上传到 OSS（大小不能超过 100KB）
  * 普通模式：使用 uni.uploadFile 直接上传到后端
  * @param {object} options - 上传选项
