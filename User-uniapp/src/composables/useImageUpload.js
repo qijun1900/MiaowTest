@@ -5,7 +5,7 @@ import { UserInfoStore } from "../stores/modules/UserinfoStore";
 
 const DEFAULT_IMAGE_UPLOAD_URL = "/uniappAPI/upload/image";
 const DEFAULT_CLOUD_IMAGE_UPLOAD_URL = "/uniappAPI/upload/cloudImage";
-const DEFAULT_CLOUD_PATH_PREFIX = "user/wrong_question";
+const DEFAULT_CLOUD_PATH_PREFIX = "user/wrong_question"; //老的云路径前缀，保持兼容。新的云路径前缀由调用方通过 options.cloudPathPrefix 传入，默认为 DEFAULT_CLOUD_PATH_PREFIX
 
 const buildCloudPath = (
   filePath,

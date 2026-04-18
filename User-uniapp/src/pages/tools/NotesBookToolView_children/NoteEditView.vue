@@ -244,6 +244,7 @@ const trackPendingUploadedImage = (url = "") => {
   pendingUploadedImageUrls.value.push(normalizedUrl);
 };
 
+//清理远程图片接口
 const cleanupRemoteImagesByUrls = async (urlList = []) => {
   const queue = Array.from(
     new Set(
@@ -464,6 +465,7 @@ const getEditorTempFilePath = (file = {}) => {
   return String(file?.tempFilePath || file?.path || file?.url || "").trim();
 };
 
+// 将图片插入编辑器并监听结果，成功时记录 URL 以便后续清理，失败时抛出错误以触发上传回退逻辑
 const insertImageToEditor = (ctx, source) =>
   new Promise((resolve, reject) => {
     if (!ctx || typeof ctx.insertImage !== "function") {
@@ -589,9 +591,10 @@ const handleSave = async () => {
 
   const title = String(noteTitle.value || "").trim();
   const contentText = String(notePlainText.value || "").trim();
+  const hasImageContent = extractImageUrlsFromHtml(noteContent.value).length > 0;
   const tags = normalizeTagList(noteTags.value);
 
-  if (!title && !contentText) {
+  if (!title && !contentText && !hasImageContent) {
     uni.showToast({
       title: "请输入内容后再保存",
       icon: "none",
