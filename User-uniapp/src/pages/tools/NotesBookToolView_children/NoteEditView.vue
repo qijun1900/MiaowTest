@@ -99,6 +99,11 @@ import {
   buildNotePreviewHtml,
 } from "../../../util/notePreview";
 import {
+  normalizeTagList,
+  normalizeImageUrl,
+  extractImageUrlsFromHtml,
+} from "../../../util/noteNormalize";
+import {
   getNotebookNoteDetailAPI,
   saveNotebookNoteAPI,
 } from "../../../API/Tools/NotesBookAPI";
@@ -149,33 +154,6 @@ const initialSnapshot = ref({
   content: "",
   tags: [],
 });
-
-const normalizeSingleTag = (tag) => {
-  if (typeof tag === "string") return tag.trim();
-  if (typeof tag === "number") return String(tag).trim();
-
-  if (tag && typeof tag === "object") {
-    const maybeText = tag.text ?? tag.label ?? tag.name ?? tag.value;
-    return typeof maybeText === "string"
-      ? maybeText.trim()
-      : String(maybeText || "").trim();
-  }
-
-  return "";
-};
-
-const normalizeTagList = (list = []) => {
-  const normalized = [];
-
-  for (const item of Array.isArray(list) ? list : []) {
-    const text = normalizeSingleTag(item);
-    if (text && !normalized.includes(text)) {
-      normalized.push(text);
-    }
-  }
-
-  return normalized;
-};
 
 const isSameTagList = (left = [], right = []) => {
   const leftList = normalizeTagList(left);
@@ -256,29 +234,6 @@ const setEditorContent = (content = "") => {
   editorCtx.value.setContents({
     html: content,
   });
-};
-
-const normalizeImageUrl = (value = "") => String(value || "").trim();
-
-const extractImageUrlsFromHtml = (html = "") => {
-  const content = String(html || "");
-  if (!content || !/<img\b/i.test(content)) {
-    return [];
-  }
-
-  const result = [];
-  content.replace(
-    /<img\b[^>]*\bsrc\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/gi,
-    (fullMatch, quoted, doubleQuoted, singleQuoted, bare) => {
-      const source = normalizeImageUrl(doubleQuoted || singleQuoted || bare || "");
-      if (!source) return fullMatch;
-
-      result.push(source);
-      return fullMatch;
-    },
-  );
-
-  return Array.from(new Set(result));
 };
 
 const trackPendingUploadedImage = (url = "") => {

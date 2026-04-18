@@ -147,8 +147,7 @@
 import { computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
-import formatTime from "../../../util/formatTime";
-import { stripHtml } from "../../../util/notePreview";
+import { normalizeNoteListItem } from "../../../util/noteNormalize";
 import {
   getNotebookNotesAPI,
 } from "../../../API/Tools/NotesBookAPI";
@@ -184,35 +183,6 @@ const filteredNotes = computed(() => {
   );
 });
 
-const IMAGE_NOTE_PLACEHOLDER = "[\u56fe\u7247]";
-
-const hasImageTag = (value = "") => /<img\b/i.test(String(value || ""));
-
-const normalizePreviewText = (value = "") =>
-  stripHtml(String(value || "")).trim();
-
-//将后端笔记数据转换为前端显示格式
-const normalizeNoteItem = (item = {}) => {
-  const rawSummary = String(item.summary || "");
-  const rawPlainText = String(item.plainText || "");
-  const normalizedSummary = normalizePreviewText(rawSummary);
-  const normalizedPlainText = normalizePreviewText(rawPlainText);
-  const previewText =
-    normalizedSummary ||
-    normalizedPlainText ||
-    (hasImageTag(rawSummary) ? IMAGE_NOTE_PLACEHOLDER : "");
-  const updatedAt = Number(new Date(item.updatedAt).getTime()) || 0;
-
-  return {
-    id: String(item._id || ""),
-    title: String(item.title || "未命名笔记"),
-    preview: previewText || "暂无内容",
-    dateText: formatTime.getRelativeTime(item.updatedAt),
-    tags: Array.isArray(item.tags) ? item.tags : [],
-    updatedAt,
-  };
-};
-
 //获取笔记列表
 const fetchNotes = async () => {
   if (!notesBookId.value) return;
@@ -225,7 +195,7 @@ const fetchNotes = async () => {
     }
 
     const list = Array.isArray(res.data) ? res.data : [];
-    notes.value = list.map(normalizeNoteItem);
+    notes.value = list.map(normalizeNoteListItem);
   } catch (error) {
     console.error("获取笔记列表失败:", error);
     uni.showToast({

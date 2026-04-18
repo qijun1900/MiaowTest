@@ -81,8 +81,8 @@
 import { computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
-import formatTime from "../../../util/formatTime";
-import { buildNotePreviewHtml, normalizeToHtml, stripHtml } from "../../../util/notePreview";
+import { buildNotePreviewHtml, stripHtml } from "../../../util/notePreview";
+import { normalizeNoteDetailData } from "../../../util/noteNormalize";
 import {
   getNotebookNoteDetailAPI,
   deleteNotebookNoteAPI,
@@ -103,33 +103,6 @@ const detailState = ref({
   tags: [],
   dateText: "刚刚更新",
 });
-
-const normalizeTagList = (list = []) => {
-  const normalized = [];
-
-  for (const item of Array.isArray(list) ? list : []) {
-    const text = String(item || "").trim();
-    if (text && !normalized.includes(text)) {
-      normalized.push(text);
-    }
-  }
-
-  return normalized;
-};
-
-const normalizeDetailData = (data = {}) => {
-  const title = String(data.title || "").trim() || "未命名笔记";
-  const content = normalizeToHtml(data.content || data.summary || data.plainText || "");
-  const tags = normalizeTagList(data.tags || []);
-  const timeValue = data.updatedAt || data.updated_at || data.createTime || data.createdAt;
-
-  return {
-    title,
-    content,
-    tags,
-    dateText: timeValue ? formatTime.getRelativeTime(timeValue) : "刚刚更新",
-  };
-};
 
 const detailHtml = computed(() =>
   buildNotePreviewHtml({
@@ -165,7 +138,7 @@ const fetchNoteDetail = async () => {
       throw new Error(res.message || "获取笔记详情失败");
     }
 
-    detailState.value = normalizeDetailData(res.data);
+    detailState.value = normalizeNoteDetailData(res.data);
   } catch (error) {
     console.error("获取笔记详情失败:", error);
     loadError.value = error?.message || "获取笔记详情失败";
