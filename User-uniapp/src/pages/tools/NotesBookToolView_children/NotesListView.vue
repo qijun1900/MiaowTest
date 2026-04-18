@@ -92,17 +92,10 @@
 
       <view v-else class="list-wrap">
         <view v-for="item in filteredNotes" :key="item.id" class="note-card">
-          <view class="card-content" @click="handleEditNote(item)">
+          <view class="card-content" @click="handleCheckNote(item)">
             <view class="card-header">
               <text class="note-title">{{ item.title }}</text>
               <view class="header-actions">
-                <view class="delete-btn" @click.stop="handleDeleteNote(item)">
-                  <uni-icons
-                    type="trash"
-                    size="17"
-                    color="#b4bbca"
-                  ></uni-icons>
-                </view>
                 <view class="edit-btn" @click.stop="handleEditNote(item)">
                   <uni-icons
                     type="compose"
@@ -119,7 +112,7 @@
               <view class="meta-wrap">
                 <uni-icons type="clock" size="13" color="#8a93aa"></uni-icons>
                 <text class="meta-text"
-                  >{{ item.dateText }} · {{ item.readTime }}</text
+                  >{{ item.dateText }}</text
                 >
               </view>
 
@@ -158,7 +151,6 @@ import formatTime from "../../../util/formatTime";
 import { stripHtml } from "../../../util/notePreview";
 import {
   getNotebookNotesAPI,
-  deleteNotebookNoteAPI,
 } from "../../../API/Tools/NotesBookAPI";
 
 const searchKeyword = ref("");
@@ -192,12 +184,6 @@ const filteredNotes = computed(() => {
   );
 });
 
-const estimateReadTime = (text = "") => {
-  const plainText = String(text || "").trim();
-  const minutes = Math.max(1, Math.ceil(plainText.length / 280));
-  return `${minutes} 分钟阅读`;
-};
-
 const IMAGE_NOTE_PLACEHOLDER = "[\u56fe\u7247]";
 
 const hasImageTag = (value = "") => /<img\b/i.test(String(value || ""));
@@ -222,7 +208,6 @@ const normalizeNoteItem = (item = {}) => {
     title: String(item.title || "未命名笔记"),
     preview: previewText || "暂无内容",
     dateText: formatTime.getRelativeTime(item.updatedAt),
-    readTime: estimateReadTime(normalizedPlainText || previewText),
     tags: Array.isArray(item.tags) ? item.tags : [],
     updatedAt,
   };
@@ -258,46 +243,6 @@ const clearSearch = () => {
 
 const toggleSort = () => {
   sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
-};
-
-const getDraftStorageKey = (noteId) =>
-  `note-editor-draft:${notesBookId.value}:${noteId}`;
-
-const handleDeleteNote = (item) => {
-  uni.showModal({
-    title: "删除笔记",
-    content: `确认删除「${item.title}」吗？此操作无法撤销。`,
-    confirmText: "删除",
-    cancelText: "取消",
-    success: async ({ confirm }) => {
-      if (!confirm) return;
-
-      try {
-        const res = await deleteNotebookNoteAPI({
-          id: item.id,
-          bookId: notesBookId.value,
-        });
-
-        if (res.code !== 200) {
-          throw new Error(res.message || "删除失败，请重试");
-        }
-
-        notes.value = notes.value.filter((note) => note.id !== item.id);
-        uni.removeStorageSync(getDraftStorageKey(item.id));
-
-        uni.showToast({
-          title: "删除成功",
-          icon: "success",
-        });
-      } catch (error) {
-        console.error("删除笔记失败:", error);
-        uni.showToast({
-          title: error?.message || "删除失败，请重试",
-          icon: "none",
-        });
-      }
-    },
-  });
 };
 
 //编辑/添加笔记（跳转到编辑页，携带笔记ID参数）
@@ -580,8 +525,7 @@ onShow(() => {
   word-break: break-all;
 }
 
-.edit-btn,
-.delete-btn {
+.edit-btn {
   width: 44rpx;
   height: 44rpx;
   border-radius: 22rpx;
@@ -589,10 +533,6 @@ onShow(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.edit-btn {
-  background: #efe6db;
 }
 
 .note-preview {
