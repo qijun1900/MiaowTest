@@ -12,7 +12,7 @@
 ## 小程序扫码体验
 
 <p align="center">
-  <img src="https://picui.ogmua.cn/s1/2026/03/27/69c6969558d78.webp" alt="题喵喵微信小程序扫码体验" width="220">
+  <img src="https://free.picui.cn/free/2026/04/18/69e3960545c05.jpg" alt="题喵喵微信小程序扫码体验" width="220">
 </p>
 
 ## 项目概览
