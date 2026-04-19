@@ -21,10 +21,12 @@
       </view>
 
       <view class="toolbar">
-        <text class="result-count">共 {{ filteredNotes.length }} 篇笔记</text>
+        <view v-if="isLoading" class="result-count-skeleton shimmer"></view>
+        <text v-else class="result-count">共 {{ filteredNotes.length }} 篇笔记</text>
 
         <view class="toolbar-right">
-          <view class="sort-pill" @click="toggleSort">
+          <view v-if="isLoading" class="sort-pill skeleton-pill shimmer"></view>
+          <view v-else class="sort-pill" @click="toggleSort">
             <uni-icons
               :type="sortOrder === 'desc' ? 'arrowdown' : 'arrowup'"
               size="13"
@@ -33,7 +35,8 @@
             <text class="sort-pill-text">{{ sortOrderText }}</text>
           </view>
 
-          <view class="view-btn">
+          <view v-if="isLoading" class="view-btn skeleton-view-btn shimmer"></view>
+          <view v-else class="view-btn">
             <view class="grid-icon">
               <view class="grid-dot"></view>
               <view class="grid-dot"></view>
@@ -46,24 +49,22 @@
     </view>
 
     <view class="list-content">
-      <view v-if="isLoading" class="loading-wrap">
+      <view v-if="isLoading" class="list-wrap skeleton-list">
         <view
-          v-for="index in 3"
+          v-for="index in 4"
           :key="`loading-${index}`"
           class="note-card loading-card"
         >
           <view class="card-content">
             <view class="card-header">
               <view class="loading-title shimmer"></view>
-              <view class="header-actions">
-                <view class="loading-action shimmer"></view>
-                <view class="loading-action shimmer"></view>
-              </view>
+              <view class="loading-action shimmer"></view>
             </view>
 
             <view class="loading-line shimmer"></view>
             <view class="loading-line shimmer"></view>
             <view class="loading-line loading-line-short shimmer"></view>
+            <view class="loading-line loading-line-tiny shimmer"></view>
 
             <view class="card-footer">
               <view class="loading-meta shimmer"></view>
@@ -74,8 +75,6 @@
             </view>
           </view>
         </view>
-
-        <text class="loading-caption">笔记加载中...</text>
       </view>
 
       <view v-else-if="filteredNotes.length === 0" class="empty-state">
@@ -313,6 +312,12 @@ onShow(() => {
   color: #6b7690;
 }
 
+.result-count-skeleton {
+  width: 210rpx;
+  height: 34rpx;
+  border-radius: 12rpx;
+}
+
 .toolbar-right {
   display: flex;
   align-items: center;
@@ -335,6 +340,13 @@ onShow(() => {
   color: #5f6d84;
 }
 
+.skeleton-pill {
+  width: 164rpx;
+  padding: 0;
+  border: none;
+  background: #efe7dd;
+}
+
 .view-btn {
   width: 62rpx;
   height: 62rpx;
@@ -344,6 +356,11 @@ onShow(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.skeleton-view-btn {
+  border: none;
+  background: #efe7dd;
 }
 
 .grid-icon {
@@ -367,18 +384,18 @@ onShow(() => {
   gap: 24rpx;
 }
 
-.loading-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
+.skeleton-list {
+  gap: 20rpx;
 }
 
 .loading-card {
   background: #fffaf5;
+  border-color: #efe4d8;
+  box-shadow: 0 10rpx 24rpx rgba(141, 116, 86, 0.08);
 }
 
 .loading-title {
-  width: 46%;
+  width: 52%;
   height: 42rpx;
   border-radius: 12rpx;
 }
@@ -399,6 +416,10 @@ onShow(() => {
   width: 66%;
 }
 
+.loading-line-tiny {
+  width: 48%;
+}
+
 .loading-meta {
   width: 180rpx;
   height: 24rpx;
@@ -415,37 +436,31 @@ onShow(() => {
   width: 72rpx;
 }
 
-.loading-caption {
-  text-align: center;
-  font-size: 24rpx;
-  color: #b2bdd3;
-}
-
 .shimmer {
   position: relative;
   overflow: hidden;
-  background: #efe7dd;
+  background: #ede4d8;
 }
 
 .shimmer::after {
   content: "";
   position: absolute;
   top: 0;
-  left: -130%;
-  width: 130%;
+  left: -140%;
+  width: 140%;
   height: 100%;
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.7) 50%,
     rgba(255, 255, 255, 0) 100%
   );
-  animation: shimmerMove 1.35s ease-in-out infinite;
+  animation: shimmerMove 1.3s ease-in-out infinite;
 }
 
 @keyframes shimmerMove {
   to {
-    left: 130%;
+    left: 140%;
   }
 }
 
