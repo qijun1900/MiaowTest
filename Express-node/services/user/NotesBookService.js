@@ -351,7 +351,7 @@ const NotesBookService = {
   /**
    * 获取某个笔记本下的笔记列表
    */
-  getNotebookNotes: async ({ uid, bookId }) => {
+  getNotebookNotes: async ({ uid, bookId, page = 1, pageSize = 12, keyword = "" }) => {
     try {
       const notebook = await NotesBookModel.findOne({ _id: bookId, Uid: uid })
         .select({ _id: 1 })// 仅验证笔记本存在与权限，不返回其他字段
@@ -365,12 +365,35 @@ const NotesBookService = {
         };
       }
 
+      const safeKeyword = String(keyword || "").trim();
+      const query = {
+        Uid: uid,
+        notesBookId: bookId,
+        isArchived: { $ne: true },
+      };
+
+      if (safeKeyword) {
+        const keywordRegex = new RegExp(escapeRegex(safeKeyword), "i");
+        query.$or = [
+          { title: keywordRegex },
+          { summary: keywordRegex },
+          { "content.text": keywordRegex },
+          { tags: keywordRegex },
+        ];
+      }
+
+      const safePage = Number.isFinite(Number(page))
+        ? Math.max(Number(page), 1)
+        : 1;
+      const safePageSize = Number.isFinite(Number(pageSize))
+        ? Math.min(Math.max(Number(pageSize), 1), 50)
+        : 12;
+      const skip = (safePage - 1) * safePageSize;
+
+      const total = await NotesListModel.countDocuments(query);
+
       const notes = await NotesListModel.find(
-        {
-          Uid: uid,
-          notesBookId: bookId,
-          isArchived: { $ne: true },
-        },
+        query,
         {
           _id: 1,
           notesBookId: 1,
@@ -383,6 +406,8 @@ const NotesBookService = {
         },
       )
         .sort({ isPinned: -1, updatedAt: -1 })
+        .skip(skip)
+        .limit(safePageSize)
         .lean();
 
       const list = notes.map((item) => {
@@ -410,7 +435,15 @@ const NotesBookService = {
 
       return {
         success: true,
-        data: list,
+        data: {
+          list,
+          pagination: {
+            page: safePage,
+            pageSize: safePageSize,
+            total,
+            hasMore: skip + list.length < total,
+          },
+        },
       };
     } catch (error) {
       console.error("DATABASE:获取笔记列表失败", error);

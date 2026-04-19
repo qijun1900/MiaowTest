@@ -90,10 +90,20 @@ export async function deleteNotebookAPI(id) {
 /**
  * @description 获取笔记本下的笔记列表
  */
-export async function getNotebookNotesAPI(bookId) {
+export async function getNotebookNotesAPI(
+  bookId,
+  { page = 1, pageSize = 12, keyword = "" } = {},
+) {
   try {
+    const query = [
+      `bookId=${encodeURIComponent(bookId)}`,
+      `page=${encodeURIComponent(page)}`,
+      `pageSize=${encodeURIComponent(pageSize)}`,
+      `keyword=${encodeURIComponent(keyword)}`,
+    ].join("&");
+
     return await http({
-      url: `/uniappAPI/tools/notebook/getNotebookNotes?bookId=${bookId}`,
+      url: `/uniappAPI/tools/notebook/getNotebookNotes?${query}`,
       method: "GET",
     });
   } catch (error) {

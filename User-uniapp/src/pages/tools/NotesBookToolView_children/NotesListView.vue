@@ -9,6 +9,7 @@
             class="search-input"
             placeholder="搜索笔记..."
             placeholder-class="search-placeholder"
+            @input="handleSearch"
           />
           <uni-icons
             v-if="searchKeyword"
@@ -22,7 +23,7 @@
 
       <view class="toolbar">
         <view v-if="isLoading" class="result-count-skeleton shimmer"></view>
-        <text v-else class="result-count">共 {{ filteredNotes.length }} 篇笔记</text>
+        <text v-else class="result-count">共 {{ totalNotes }} 篇笔记</text>
 
         <view class="toolbar-right">
           <view v-if="isLoading" class="sort-pill skeleton-pill shimmer"></view>
@@ -124,6 +125,14 @@
           </view>
         </view>
       </view>
+
+      <view v-if="!isLoading && notes.length > 0" class="load-more-container">
+        <view v-if="loadingMore" class="load-more-loading">
+          <view class="load-more-spinner"></view>
+          <text class="load-more-text">加载更多...</text>
+        </view>
+        <text v-else class="load-more-text">{{ hasMore ? "上拉加载更多" : "没有更多了" }}</text>
+      </view>
     </view>
 
     <dragButton
@@ -144,7 +153,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onReachBottom, onShow, onUnload } from "@dcloudio/uni-app";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
 import { normalizeNoteListItem } from "../../../util/noteNormalize";
 import {
@@ -155,8 +164,14 @@ const searchKeyword = ref("");
 const sortOrder = ref("desc");
 const isShowdragButton = ref(true);
 const isLoading = ref(false);
+const loadingMore = ref(false);
+const hasMore = ref(true);
+const currentPage = ref(1);
+const totalNotes = ref(0);
 const notesBookId = ref("");
 const notes = ref([]);
+const PAGE_SIZE = 12;
+let searchDebounceTimer = null;
 
 const sortOrderText = computed(() =>
   sortOrder.value === "desc" ? "最近优先" : "最早优先",
@@ -165,36 +180,80 @@ const sortOrderText = computed(() =>
 const isSearching = computed(() => Boolean(searchKeyword.value.trim()));
 
 const filteredNotes = computed(() => {
-  const keyword = searchKeyword.value.trim().toLowerCase();
-  const list = notes.value.filter((item) => {
-    if (!keyword) return true;
-    return (
-      item.title.toLowerCase().includes(keyword) ||
-      item.preview.toLowerCase().includes(keyword) ||
-      item.tags.some((tag) => tag.toLowerCase().includes(keyword))
-    );
-  });
-
-  return [...list].sort((a, b) =>
+  return [...notes.value].sort((a, b) =>
     sortOrder.value === "desc"
       ? b.updatedAt - a.updatedAt
       : a.updatedAt - b.updatedAt,
   );
 });
 
+const mergeNoteList = (oldList, newList) => {
+  const idMap = new Map();
+  [...oldList, ...newList].forEach((item) => {
+    idMap.set(item.id, item);
+  });
+  return Array.from(idMap.values());
+};
+
 //获取笔记列表
-const fetchNotes = async () => {
+const fetchNotes = async ({ append = false } = {}) => {
   if (!notesBookId.value) return;
 
-  isLoading.value = true;
+  if (append) {
+    if (isLoading.value || loadingMore.value || !hasMore.value) {
+      return;
+    }
+    loadingMore.value = true;
+  } else {
+    if (isLoading.value) {
+      return;
+    }
+    isLoading.value = true;
+  }
+
+  const page = append ? currentPage.value : 1;
+
   try {
-    const res = await getNotebookNotesAPI(notesBookId.value);
+    const res = await getNotebookNotesAPI(notesBookId.value, {
+      page,
+      pageSize: PAGE_SIZE,
+      keyword: searchKeyword.value.trim(),
+    });
+
     if (res.code !== 200) {
       throw new Error(res.message || "获取笔记列表失败");
     }
 
-    const list = Array.isArray(res.data) ? res.data : [];
-    notes.value = list.map(normalizeNoteListItem);
+    const payload = res.data || {};
+    const list = Array.isArray(payload) ? payload : payload.list || [];
+    const pagination = Array.isArray(payload) ? null : payload.pagination;
+    const normalizedList = list.map(normalizeNoteListItem);
+
+    if (append) {
+      notes.value = mergeNoteList(notes.value, normalizedList);
+    } else {
+      notes.value = normalizedList;
+    }
+
+    if (pagination && typeof pagination.total === "number") {
+      totalNotes.value = pagination.total;
+    } else {
+      totalNotes.value = notes.value.length;
+    }
+
+    if (pagination && typeof pagination.hasMore === "boolean") {
+      hasMore.value = pagination.hasMore;
+    } else {
+      hasMore.value = normalizedList.length >= PAGE_SIZE;
+    }
+
+    if (append) {
+      if (hasMore.value) {
+        currentPage.value = page + 1;
+      }
+    } else {
+      currentPage.value = hasMore.value ? 2 : 1;
+    }
   } catch (error) {
     console.error("获取笔记列表失败:", error);
     uni.showToast({
@@ -202,12 +261,35 @@ const fetchNotes = async () => {
       icon: "none",
     });
   } finally {
-    isLoading.value = false;
+    if (append) {
+      loadingMore.value = false;
+    } else {
+      isLoading.value = false;
+    }
   }
+};
+
+const resetAndFetchNotes = () => {
+  hasMore.value = true;
+  currentPage.value = 1;
+  totalNotes.value = 0;
+  notes.value = [];
+  fetchNotes({ append: false });
+};
+
+const handleSearch = () => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+
+  searchDebounceTimer = setTimeout(() => {
+    resetAndFetchNotes();
+  }, 300);
 };
 
 const clearSearch = () => {
   searchKeyword.value = "";
+  resetAndFetchNotes();
 };
 
 const toggleSort = () => {
@@ -247,7 +329,18 @@ onLoad((options = {}) => {
 });
 
 onShow(() => {
-  fetchNotes();
+  resetAndFetchNotes();
+});
+
+onReachBottom(() => {
+  fetchNotes({ append: true });
+});
+
+onUnload(() => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = null;
+  }
 });
 </script>
 
@@ -386,6 +479,43 @@ onShow(() => {
 
 .skeleton-list {
   gap: 20rpx;
+}
+
+.load-more-container {
+  padding: 16rpx 0 24rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.load-more-loading {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.load-more-spinner {
+  width: 24rpx;
+  height: 24rpx;
+  border: 3rpx solid #ead9c9;
+  border-top-color: #c89b73;
+  border-radius: 50%;
+  animation: spinLoadMore 0.8s linear infinite;
+}
+
+.load-more-text {
+  font-size: 24rpx;
+  color: #b0a69c;
+}
+
+@keyframes spinLoadMore {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-card {

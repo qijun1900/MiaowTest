@@ -9,6 +9,14 @@ const resolveErrorStatus = (code) => {
   return 400;
 };
 
+const parsePositiveInteger = (value, defaultValue) => {
+  const num = Number.parseInt(value, 10);
+  if (!Number.isFinite(num) || num <= 0) {
+    return defaultValue;
+  }
+  return num;
+};
+
 const NotesBookController = {
   getNotebooks: async (req, res) => {
     try {
@@ -181,6 +189,12 @@ const NotesBookController = {
     try {
       const { uid } = req.user;
       const bookId = String(req.query.bookId || "").trim();
+      const page = parsePositiveInteger(req.query.page, 1);
+      const pageSize = Math.min(
+        parsePositiveInteger(req.query.pageSize, 12),
+        50,
+      );
+      const keyword = String(req.query.keyword || "").trim();
 
       if (!isValidObjectId(bookId)) {
         return res.status(200).send({
@@ -192,6 +206,9 @@ const NotesBookController = {
       const result = await NotesBookService.getNotebookNotes({
         uid,
         bookId,
+        page,
+        pageSize,
+        keyword,
       });
 
       if (!result.success) {
