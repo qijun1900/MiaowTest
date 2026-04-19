@@ -113,10 +113,10 @@ import {
 } from "../../../composables/useImageUpload";
 
 // 顶部导航与安全区适配（可复用于其他页面）
-const { 
-    safeAreaInfo, 
-    customNavbarStyle, 
-    navRowStyle 
+const {
+    safeAreaInfo,
+    customNavbarStyle,
+    navRowStyle
   } = useNavBarSafeArea({
   reserveMenuButtonRight: true, // 小程序端为右上角胶囊预留空间，避免标题/按钮遮挡
   rightPaddingExtra: 8, // 在胶囊安全距离基础上额外增加一点视觉留白
