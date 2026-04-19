@@ -61,6 +61,13 @@ NotesBookRouter.post(
   requireUid,
   NotesBookController.saveNotebookNote,
 );
+//切换笔记置顶状态
+NotesBookRouter.post(
+  "/uniappAPI/tools/notebook/toggleNotebookNotePin",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  NotesBookController.toggleNotebookNotePin,
+);
 //删除笔记本内的笔记
 NotesBookRouter.post(
   "/uniappAPI/tools/notebook/deleteNotebookNote",

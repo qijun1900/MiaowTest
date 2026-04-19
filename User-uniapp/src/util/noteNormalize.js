@@ -75,6 +75,7 @@ export const normalizeNoteListItem = (item = {}) => {
     preview: previewText || "暂无内容",
     dateText: formatTime.getRelativeTime(item.updatedAt),
     tags: normalizeTagList(item.tags || []),
+    isPinned: Boolean(item.isPinned),
     updatedAt,
   };
 };

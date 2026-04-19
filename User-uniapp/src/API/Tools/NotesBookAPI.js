@@ -153,6 +153,26 @@ export async function saveNotebookNoteAPI({ id, bookId, title, content, tags }) 
 }
 
 /**
+ * @description 切换笔记置顶状态
+ */
+export async function toggleNotebookNotePinAPI({ id, bookId, isPinned }) {
+  try {
+    return await http({
+      url: "/uniappAPI/tools/notebook/toggleNotebookNotePin",
+      method: "POST",
+      data: {
+        id,
+        bookId,
+        isPinned,
+      },
+    });
+  } catch (error) {
+    console.error("toggleNotebookNotePinAPI 失败", error);
+    throw error;
+  }
+}
+
+/**
  * @description 删除单条笔记
  */
 export async function deleteNotebookNoteAPI({ id, bookId }) {

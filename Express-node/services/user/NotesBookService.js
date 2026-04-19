@@ -400,6 +400,7 @@ const NotesBookService = {
           title: 1,
           summary: 1,
           tags: 1,
+          isPinned: 1,
           updatedAt: 1,
           createdAt: 1,
           "content.text": 1,
@@ -428,6 +429,7 @@ const NotesBookService = {
           summary,
           plainText,
           tags: item.tags || [],
+          isPinned: Boolean(item.isPinned),
           updatedAt: item.updatedAt,
           createdAt: item.createdAt,
         };
@@ -611,6 +613,62 @@ const NotesBookService = {
       };
     } catch (error) {
       console.error("DATABASE:保存笔记失败", error);
+      throw error;
+    }
+  },
+
+  /**
+   * 切换单条笔记置顶状态
+   */
+  toggleNotebookNotePin: async ({ uid, id, bookId, isPinned }) => {
+    try {
+      const query = {
+        _id: id,
+        Uid: uid,
+        notesBookId: bookId,
+      };
+
+      const note = await NotesListModel.findOne(query)
+        .select({ _id: 1, isPinned: 1 })
+        .lean();
+
+      if (!note) {
+        return {
+          success: false,
+          code: "NOTE_NOT_FOUND",
+          message: "笔记不存在或无权限",
+        };
+      }
+
+      const currentPinned = Boolean(note.isPinned);
+      const nextPinned =
+        typeof isPinned === "boolean" ? isPinned : !currentPinned;
+
+      if (currentPinned !== nextPinned) {
+        await NotesListModel.updateOne(
+          query,
+          {
+            $set: {
+              isPinned: nextPinned,
+            },
+          },
+        );
+
+        await NotesBookModel.updateOne(
+          { _id: bookId, Uid: uid },
+          { $set: { updatedAt: new Date() } },
+        );
+      }
+
+      return {
+        success: true,
+        data: {
+          id,
+          isPinned: nextPinned,
+        },
+      };
+    } catch (error) {
+      console.error("DATABASE:切换笔记置顶状态失败", error);
       throw error;
     }
   },

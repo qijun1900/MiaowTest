@@ -17,6 +17,16 @@ const parsePositiveInteger = (value, defaultValue) => {
   return num;
 };
 
+const parseBooleanLike = (value) => {
+  if (typeof value === "boolean") return value;
+
+  const safeValue = String(value || "").trim().toLowerCase();
+  if (["1", "true"].includes(safeValue)) return true;
+  if (["0", "false"].includes(safeValue)) return false;
+
+  return null;
+};
+
 const NotesBookController = {
   getNotebooks: async (req, res) => {
     try {
@@ -329,6 +339,58 @@ const NotesBookController = {
       res.status(200).send({
         code: 500,
         message: "保存笔记失败",
+      });
+    }
+  },
+
+  toggleNotebookNotePin: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const id = String(req.body.id || "").trim();
+      const bookId = String(req.body.bookId || "").trim();
+
+      if (!isValidObjectId(id) || !isValidObjectId(bookId)) {
+        return res.status(200).send({
+          code: 400,
+          message: "参数格式不正确",
+        });
+      }
+
+      let isPinned;
+      if (Object.prototype.hasOwnProperty.call(req.body, "isPinned")) {
+        isPinned = parseBooleanLike(req.body.isPinned);
+        if (isPinned === null) {
+          return res.status(200).send({
+            code: 400,
+            message: "isPinned参数不正确",
+          });
+        }
+      }
+
+      const result = await NotesBookService.toggleNotebookNotePin({
+        uid,
+        id,
+        bookId,
+        isPinned,
+      });
+
+      if (!result.success) {
+        return res.status(200).send({
+          code: resolveErrorStatus(result.code),
+          message: result.message || "切换置顶状态失败",
+        });
+      }
+
+      res.status(200).send({
+        code: 200,
+        message: "设置成功",
+        data: result.data,
+      });
+    } catch (error) {
+      console.error("切换置顶状态失败", error);
+      res.status(200).send({
+        code: 500,
+        message: "切换置顶状态失败",
       });
     }
   },

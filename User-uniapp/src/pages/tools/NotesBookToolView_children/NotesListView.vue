@@ -96,6 +96,22 @@
             <view class="card-header">
               <text class="note-title">{{ item.title }}</text>
               <view class="header-actions">
+                <view
+                  class="pin-btn"
+                  :class="{
+                    'pin-btn-active': item.isPinned,
+                    'pin-btn-disabled': isPinning(item.id),
+                  }"
+                  @click.stop="handleTogglePin(item)"
+                >
+                  <uni-icons
+                    class="pin-btn-icon"
+                    type="map-pin-ellipse"
+                    size="20"
+                    :color="item.isPinned ? '#af7440' : '#9f8b79'"
+                  ></uni-icons>
+                </view>
+
                 <view class="edit-btn" @click.stop="handleEditNote(item)">
                   <uni-icons
                     type="compose"
@@ -158,6 +174,7 @@ import dragButton from "../../../components/plug-in/drag-button/drag-button.vue"
 import { normalizeNoteListItem } from "../../../util/noteNormalize";
 import {
   getNotebookNotesAPI,
+  toggleNotebookNotePinAPI,
 } from "../../../API/Tools/NotesBookAPI";
 
 const searchKeyword = ref("");
@@ -170,6 +187,7 @@ const currentPage = ref(1);
 const totalNotes = ref(0);
 const notesBookId = ref("");
 const notes = ref([]);
+const pinningNoteIds = ref([]);
 const PAGE_SIZE = 12;
 let searchDebounceTimer = null;
 
@@ -181,11 +199,28 @@ const isSearching = computed(() => Boolean(searchKeyword.value.trim()));
 
 const filteredNotes = computed(() => {
   return [...notes.value].sort((a, b) =>
-    sortOrder.value === "desc"
-      ? b.updatedAt - a.updatedAt
-      : a.updatedAt - b.updatedAt,
+    a.isPinned !== b.isPinned
+      ? a.isPinned
+        ? -1
+        : 1
+      : sortOrder.value === "desc"
+        ? b.updatedAt - a.updatedAt
+        : a.updatedAt - b.updatedAt,
   );
 });
+
+const isPinning = (id) => pinningNoteIds.value.includes(id);
+
+const setPinningStatus = (id, pending) => {
+  if (pending) {
+    if (!pinningNoteIds.value.includes(id)) {
+      pinningNoteIds.value = [...pinningNoteIds.value, id];
+    }
+    return;
+  }
+
+  pinningNoteIds.value = pinningNoteIds.value.filter((item) => item !== id);
+};
 
 const mergeNoteList = (oldList, newList) => {
   const idMap = new Map();
@@ -294,6 +329,47 @@ const clearSearch = () => {
 
 const toggleSort = () => {
   sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
+};
+
+const handleTogglePin = async (item) => {
+  if (!item?.id || !notesBookId.value || isPinning(item.id)) {
+    return;
+  }
+
+  const nextPinned = !item.isPinned;
+  setPinningStatus(item.id, true);
+
+  try {
+    const res = await toggleNotebookNotePinAPI({
+      id: item.id,
+      bookId: notesBookId.value,
+      isPinned: nextPinned,
+    });
+
+    if (res.code !== 200) {
+      throw new Error(res.message || "设置置顶失败");
+    }
+
+    const serverPinned =
+      typeof res?.data?.isPinned === "boolean"
+        ? res.data.isPinned
+        : nextPinned;
+    item.isPinned = serverPinned;
+
+    uni.showToast({
+      title: serverPinned ? "已置顶" : "已取消置顶",
+      icon: "none",
+      position: "bottom",
+    });
+  } catch (error) {
+    console.error("设置置顶失败:", error);
+    uni.showToast({
+      title: error?.message || "设置置顶失败",
+      icon: "none",
+    });
+  } finally {
+    setPinningStatus(item.id, false);
+  }
 };
 
 //编辑/添加笔记（跳转到编辑页，携带笔记ID参数）
@@ -621,6 +697,29 @@ onUnload(() => {
   align-items: center;
   gap: 10rpx;
   flex-shrink: 0;
+}
+
+.pin-btn {
+  min-width: 86rpx;
+  height: 44rpx;
+  padding: 0 14rpx;
+  border-radius: 22rpx;
+  background: #f5eee6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-btn-active {
+  background: #f2e2cf;
+}
+
+.pin-btn-disabled {
+  opacity: 0.55;
+}
+
+.pin-btn-icon {
+  line-height: 1;
 }
 
 .note-title {
