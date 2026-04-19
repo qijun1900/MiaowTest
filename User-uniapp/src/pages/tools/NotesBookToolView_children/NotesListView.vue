@@ -37,12 +37,18 @@
           </view>
 
           <view v-if="isLoading" class="view-btn skeleton-view-btn shimmer"></view>
-          <view v-else class="view-btn">
-            <view class="grid-icon">
+          <view v-else class="view-btn" @click="toggleViewMode">
+            <view v-if="!isGridView" class="grid-icon">
               <view class="grid-dot"></view>
               <view class="grid-dot"></view>
               <view class="grid-dot"></view>
               <view class="grid-dot"></view>
+            </view>
+
+            <view v-else class="list-icon">
+              <view class="list-line"></view>
+              <view class="list-line"></view>
+              <view class="list-line"></view>
             </view>
           </view>
         </view>
@@ -90,12 +96,19 @@
         }}</text>
       </view>
 
-      <view v-else class="list-wrap">
-        <view v-for="item in filteredNotes" :key="item.id" class="note-card">
-          <view class="card-content" @click="handleCheckNote(item)">
-            <view class="card-header">
-              <text class="note-title">{{ item.title }}</text>
-              <view class="header-actions">
+      <view v-else :class="['list-wrap', { 'grid-wrap': isGridView }]">
+        <view
+          v-for="item in filteredNotes"
+          :key="item.id"
+          :class="['note-card', { 'grid-note-card': isGridView }]"
+        >
+          <view
+            :class="['card-content', { 'grid-card-content': isGridView }]"
+            @click="handleCheckNote(item)"
+          >
+            <view :class="['card-header', { 'grid-card-header': isGridView }]">
+              <text :class="['note-title', { 'grid-note-title': isGridView }]">{{ item.title }}</text>
+              <view v-if="!isGridView" class="header-actions">
                 <view
                   class="pin-btn"
                   :class="{
@@ -122,9 +135,9 @@
               </view>
             </view>
 
-            <text class="note-preview">{{ item.preview }}</text>
+            <text :class="['note-preview', { 'grid-note-preview': isGridView }]">{{ item.preview }}</text>
 
-            <view class="card-footer">
+            <view :class="['card-footer', { 'grid-card-footer': isGridView }]">
               <view class="meta-wrap">
                 <uni-icons type="clock" size="13" color="#8a93aa"></uni-icons>
                 <text class="meta-text"
@@ -132,7 +145,7 @@
                 >
               </view>
 
-              <view class="tag-wrap">
+              <view v-if="!isGridView" class="tag-wrap">
                 <text v-for="tag in item.tags" :key="tag" class="tag-item">{{
                   tag
                 }}</text>
@@ -188,6 +201,7 @@ const totalNotes = ref(0);
 const notesBookId = ref("");
 const notes = ref([]);
 const pinningNoteIds = ref([]);
+const isGridView = ref(false);
 const PAGE_SIZE = 12;
 let searchDebounceTimer = null;
 
@@ -329,6 +343,10 @@ const clearSearch = () => {
 
 const toggleSort = () => {
   sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
+};
+
+const toggleViewMode = () => {
+  isGridView.value = !isGridView.value;
 };
 
 const handleTogglePin = async (item) => {
@@ -525,6 +543,13 @@ onUnload(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.view-btn:active {
+  transform: scale(0.95);
 }
 
 .skeleton-view-btn {
@@ -540,6 +565,15 @@ onUnload(() => {
   gap: 4rpx;
 }
 
+.list-icon {
+  width: 24rpx;
+  height: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4rpx;
+}
+
 .grid-dot {
   width: 10rpx;
   height: 10rpx;
@@ -547,10 +581,23 @@ onUnload(() => {
   background: #8190ac;
 }
 
+.list-line {
+  width: 24rpx;
+  height: 4rpx;
+  border-radius: 4rpx;
+  background: #8190ac;
+}
+
 .list-wrap {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
+}
+
+.grid-wrap {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16rpx;
 }
 
 .skeleton-list {
@@ -677,11 +724,35 @@ onUnload(() => {
   background: #fffefb;
   overflow: hidden;
   box-shadow: 0 8rpx 18rpx rgba(132, 112, 95, 0.1);
+  transition:
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.grid-note-card {
+  width: calc((100% - 16rpx) / 2);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .card-content {
   flex: 1;
   padding: 20rpx 22rpx 20rpx;
+}
+
+.grid-card-content {
+  padding: 18rpx;
+}
+
+.grid-card-header {
+  gap: 0;
+}
+
+.grid-note-title {
+  font-size: 32rpx;
+  line-height: 1.3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .card-header {
@@ -762,12 +833,26 @@ onUnload(() => {
   min-height: 150rpx;
 }
 
+.grid-note-preview {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+  min-height: 112rpx;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
 .card-footer {
   margin-top: 14rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16rpx;
+}
+
+.grid-card-footer {
+  margin-top: 12rpx;
+  justify-content: flex-start;
 }
 
 .meta-wrap {
