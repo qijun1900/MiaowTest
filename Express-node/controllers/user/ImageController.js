@@ -95,7 +95,8 @@ const ImageController = {
           extension,
         });
 
-        const fileUrl = await uploadBuffer(req.file.buffer, filePath);
+        const fileUrl = await uploadBuffer(req.file.buffer, filePath); // 上传到云存储
+        
         const data = await buildUploadResponseData({
           biz,
           uid,
