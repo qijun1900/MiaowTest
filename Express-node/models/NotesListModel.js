@@ -101,16 +101,27 @@ const NotesListSchema = new mongoose.Schema({
 const extractImageUrlsFromHtml = (html = "") => {
   const safeHtml = String(html || "");
   const imageUrlSet = new Set();
-  const imageSrcRegex =
-    /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'<>]+))/gi;
+  const imgTagRegex = /<img\b[^>]*>/gi;
+  const imageAttrRegex =
+    /\b(?:src|data-cloud)\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'<>]+))/gi;
 
-  let match = imageSrcRegex.exec(safeHtml);
-  while (match) {
-    const imageUrl = String(match[1] || match[2] || match[3] || "").trim();
-    if (imageUrl) {
-      imageUrlSet.add(imageUrl);
+  let tagMatch = imgTagRegex.exec(safeHtml);
+  while (tagMatch) {
+    const imgTag = String(tagMatch[0] || "");
+    imageAttrRegex.lastIndex = 0;
+
+    let attrMatch = imageAttrRegex.exec(imgTag);
+    while (attrMatch) {
+      const imageUrl = String(
+        attrMatch[1] || attrMatch[2] || attrMatch[3] || "",
+      ).trim();
+      if (imageUrl) {
+        imageUrlSet.add(imageUrl);
+      }
+      attrMatch = imageAttrRegex.exec(imgTag);
     }
-    match = imageSrcRegex.exec(safeHtml);
+
+    tagMatch = imgTagRegex.exec(safeHtml);
   }
 
   return Array.from(imageUrlSet).map((url) => ({ url }));

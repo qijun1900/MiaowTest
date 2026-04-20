@@ -39,16 +39,26 @@ export const extractImageUrlsFromHtml = (html = "") => {
   }
 
   const result = [];
-  content.replace(
-    /<img\b[^>]*\bsrc\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/gi,
-    (fullMatch, quoted, doubleQuoted, singleQuoted, bare) => {
-      const source = normalizeImageUrl(doubleQuoted || singleQuoted || bare || "");
-      if (!source) return fullMatch;
+  const imgTagRegex = /<img\b[^>]*>/gi;
+  const imageAttrRegex =
+    /\b(?:src|data-cloud)\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/gi;
 
-      result.push(source);
-      return fullMatch;
-    },
-  );
+  content.replace(imgTagRegex, (imgTag) => {
+    imageAttrRegex.lastIndex = 0;
+    let attrMatch = imageAttrRegex.exec(imgTag);
+
+    while (attrMatch) {
+      const source = normalizeImageUrl(
+        attrMatch[2] || attrMatch[3] || attrMatch[4] || "",
+      );
+      if (source) {
+        result.push(source);
+      }
+      attrMatch = imageAttrRegex.exec(imgTag);
+    }
+
+    return imgTag;
+  });
 
   return Array.from(new Set(result));
 };

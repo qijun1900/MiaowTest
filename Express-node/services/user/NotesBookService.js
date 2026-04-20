@@ -57,20 +57,31 @@ const normalizeNoteTags = (tags = []) => {
 
   return normalized;
 };
-// 从 HTML 内容中提取图片 URL，支持 <img> 标签的 src 属性，返回去重后的 URL 列表
+// 从 HTML 内容中提取图片 URL，支持 <img> 标签的 src 与 data-cloud 属性，返回去重后的 URL 列表
 const extractImageUrlsFromHtml = (html = "") => {
   const safeHtml = String(html || "");
   const imageUrlSet = new Set();
-  const imageSrcRegex =
-    /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'<>]+))/gi;
+  const imgTagRegex = /<img\b[^>]*>/gi;
+  const imageAttrRegex =
+    /\b(?:src|data-cloud)\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'<>]+))/gi;
 
-  let match = imageSrcRegex.exec(safeHtml);
-  while (match) {
-    const imageUrl = String(match[1] || match[2] || match[3] || "").trim();
-    if (imageUrl) {
-      imageUrlSet.add(imageUrl);
+  let tagMatch = imgTagRegex.exec(safeHtml);
+  while (tagMatch) {
+    const imgTag = String(tagMatch[0] || "");
+    imageAttrRegex.lastIndex = 0;
+
+    let attrMatch = imageAttrRegex.exec(imgTag);
+    while (attrMatch) {
+      const imageUrl = String(
+        attrMatch[1] || attrMatch[2] || attrMatch[3] || "",
+      ).trim();
+      if (imageUrl) {
+        imageUrlSet.add(imageUrl);
+      }
+      attrMatch = imageAttrRegex.exec(imgTag);
     }
-    match = imageSrcRegex.exec(safeHtml);
+
+    tagMatch = imgTagRegex.exec(safeHtml);
   }
 
   return Array.from(imageUrlSet);
