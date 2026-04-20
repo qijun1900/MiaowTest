@@ -2,13 +2,35 @@ const UserModel = require("../../models/UserModel");
 const { deleteFile } = require("../../helpers/ossHelper");
 const bcrypt = require("bcryptjs");
 
+const BCRYPT_HASH_REGEXP = /^\$2[aby]\$\d{2}\$.{53}$/;
+
+function isBcryptHash(value) {
+  return typeof value === "string" && BCRYPT_HASH_REGEXP.test(value);
+}
+
 const UserService = {
   login: async ({ username, password }) => {
     // 先按用户名查找用户
     const users = await UserModel.find({ username });
     if (users.length === 0) return [];
-    // 用 bcrypt 比对密码
-    const isMatch = await bcrypt.compare(password, users[0].password);
+
+    const user = users[0];
+    if (!user.password) return [];
+
+    let isMatch = false;
+    if (isBcryptHash(user.password)) {
+      // 新用户或已迁移用户：使用 bcrypt 校验
+      isMatch = await bcrypt.compare(password, user.password);
+    } else {
+      // 兼容历史明文密码：校验通过后自动迁移为哈希
+      isMatch = user.password === password;
+      if (isMatch) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await UserModel.updateOne({ _id: user._id }, { password: hashedPassword });
+        user.password = hashedPassword;
+      }
+    }
+
     if (!isMatch) return [];
     return users;
   },
@@ -101,7 +123,17 @@ const UserService = {
     return UserModel.deleteOne({ _id });
   },
   putlist: async (body) => {
-    return UserModel.updateOne({ _id: body._id }, body);
+    const updatePayload = { ...body };
+
+    if (typeof updatePayload.password === "string") {
+      if (updatePayload.password.length === 0) {
+        delete updatePayload.password;
+      } else if (!isBcryptHash(updatePayload.password)) {
+        updatePayload.password = await bcrypt.hash(updatePayload.password, 10);
+      }
+    }
+
+    return UserModel.updateOne({ _id: updatePayload._id }, updatePayload);
   },
   delManylist: async (body) => {
     return UserModel.deleteMany({ _id: { $in: body._ids } });
