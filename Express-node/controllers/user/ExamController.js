@@ -1,4 +1,5 @@
 ﻿const ExamService = require("../../services/user/ExamService");
+const ActivityService = require("../../services/user/ActivityService");
 
 const ExamController = {
   //uniappAPI
@@ -57,6 +58,22 @@ const ExamController = {
         questionData, // 问题数据对象
       );
       if (result.success) {
+        ActivityService.recordBusinessActivity(req, {
+          eventName: "USER_QUESTION_ADDED",
+          module: "exam",
+          bizId: String(questionData?.questionbankId || ""),
+          score: 2,
+          metadata: {
+            questionType: questionData?.Type,
+            questionbankId: questionData?.questionbankId,
+          },
+        }).catch((error) => {
+          console.warn(
+            "记录 USER_QUESTION_ADDED 失败",
+            error?.message || error,
+          );
+        });
+
         res.status(200).send({
           code: 200,
           ActionType: "OK",
@@ -79,6 +96,21 @@ const ExamController = {
       const result = await ExamService.AddUserBank(uid, bankName);
 
       if (result.success) {
+        ActivityService.recordBusinessActivity(req, {
+          eventName: "QUESTION_BANK_CREATED",
+          module: "exam",
+          bizId: String(result?.data?.bankId || ""),
+          score: 3,
+          metadata: {
+            bankName,
+          },
+        }).catch((error) => {
+          console.warn(
+            "记录 QUESTION_BANK_CREATED 失败",
+            error?.message || error,
+          );
+        });
+
         res.status(200).send({
           code: 200,
           ActionType: "OK",
@@ -212,6 +244,27 @@ const ExamController = {
         examId,
         Type,
       });
+
+      if (result.code === 200 && String(result.message).includes("添加成功")) {
+        ActivityService.recordBusinessActivity(req, {
+          eventName: "WRONG_QUESTION_ADDED",
+          module: "exam",
+          bizId: String(questionId || ""),
+          score: 2,
+          metadata: {
+            examId,
+            questionId,
+            questionType: Type,
+            source: "exam_practice",
+          },
+        }).catch((error) => {
+          console.warn(
+            "记录 WRONG_QUESTION_ADDED(exam) 失败",
+            error?.message || error,
+          );
+        });
+      }
+
       res.status(200).send({
         code: result.code,
         message: result.message,
@@ -244,6 +297,27 @@ const ExamController = {
         examId,
         Type,
       });
+
+      if (result.code === 200 && String(result.message).includes("添加成功")) {
+        ActivityService.recordBusinessActivity(req, {
+          eventName: "FAVORITE_QUESTION_ADDED",
+          module: "favorite",
+          bizId: String(questionId || ""),
+          score: 1,
+          metadata: {
+            examId,
+            questionId,
+            questionType: Type,
+            source: "exam_question",
+          },
+        }).catch((error) => {
+          console.warn(
+            "记录 FAVORITE_QUESTION_ADDED 失败",
+            error?.message || error,
+          );
+        });
+      }
+
       res.status(200).send({
         code: result.code,
         message: result.message,

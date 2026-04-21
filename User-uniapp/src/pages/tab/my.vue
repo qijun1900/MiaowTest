@@ -29,6 +29,10 @@
             <myNavbar />
         </view>
 
+        <ThemeDivider text="学习贡献" />
+
+        <UserActivityHeatmap />
+
         <ThemeDivider text="更多功能" />
 
         <!-- 功能列表 -->
@@ -96,6 +100,7 @@ import showShareMenu from "../../util/wechatShare.js";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import UserInfoCard from "../../components/modules/my/UserInfoCard.vue";
 import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
+import UserActivityHeatmap from "../../components/modules/my/UserActivityHeatmap.vue";
 
 const LoginOverlayShow = ref(false);
 const AuthorOverlayShow = ref(false);

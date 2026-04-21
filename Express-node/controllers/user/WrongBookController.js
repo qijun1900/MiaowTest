@@ -1,6 +1,7 @@
 const WrongBookService = require("../../services/user/WrongBookService");
 const { deleteFileByUrl } = require("../../helpers/ossHelper");
 const { deleteCloudFiles } = require("../../helpers/cloudStorageHelper");
+const ActivityService = require("../../services/user/ActivityService");
 
 const WrongBookController = {
   // 获取错题本列表
@@ -36,6 +37,20 @@ const WrongBookController = {
           message: "创建错题本失败",
         });
       }
+
+      ActivityService.recordBusinessActivity(req, {
+        eventName: "WRONGBOOK_CREATED",
+        module: "wrongbook",
+        bizId: String(result?.data?._id || ""),
+        score: 2,
+        metadata: {
+          title,
+          color,
+        },
+      }).catch((error) => {
+        console.warn("记录 WRONGBOOK_CREATED 失败", error?.message || error);
+      });
+
       res.status(200).send({
         code: 200,
         message: "创建错题本成功",
@@ -171,6 +186,20 @@ const WrongBookController = {
         code: 200,
         message: "添加错题成功",
         data: result.data,
+      });
+
+      ActivityService.recordBusinessActivity(req, {
+        eventName: "WRONG_QUESTION_ADDED",
+        module: "wrongbook",
+        bizId: String(result?.data?._id || questionData.wrongBookId || ""),
+        score: 3,
+        metadata: {
+          wrongBookId: questionData.wrongBookId,
+          questionType: questionData.Type,
+          questionSource: questionData.questionSource || "user",
+        },
+      }).catch((error) => {
+        console.warn("记录 WRONG_QUESTION_ADDED 失败", error?.message || error);
       });
     } catch (error) {
       console.error("添加错题失败", error);

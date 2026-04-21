@@ -1,4 +1,5 @@
 const NotesBookService = require("../../services/user/NotesBookService");
+const ActivityService = require("../../services/user/ActivityService");
 
 const isValidObjectId = (value) =>
   /^[a-f\d]{24}$/i.test(String(value || "").trim());
@@ -20,7 +21,9 @@ const parsePositiveInteger = (value, defaultValue) => {
 const parseBooleanLike = (value) => {
   if (typeof value === "boolean") return value;
 
-  const safeValue = String(value || "").trim().toLowerCase();
+  const safeValue = String(value || "")
+    .trim()
+    .toLowerCase();
   if (["1", "true"].includes(safeValue)) return true;
   if (["0", "false"].includes(safeValue)) return false;
 
@@ -181,6 +184,19 @@ const NotesBookController = {
           message: result.message || "创建笔记本失败",
         });
       }
+
+      ActivityService.recordBusinessActivity(req, {
+        eventName: "NOTEBOOK_CREATED",
+        module: "notebook",
+        bizId: String(result?.data?._id || ""),
+        score: 2,
+        metadata: {
+          title,
+          description: description || "",
+        },
+      }).catch((error) => {
+        console.error("NOTEBOOK_CREATED记录失败", error);
+      });
 
       res.status(200).send({
         code: 200,

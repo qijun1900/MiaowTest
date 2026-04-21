@@ -11,6 +11,7 @@ const {
   isCloudFileId,
   deleteCloudFiles,
 } = require("../../helpers/cloudStorageHelper");
+const ActivityService = require("../../services/user/ActivityService");
 
 // 使用内存存储，方便后续上传到OSS
 const storage = multer.memoryStorage();
@@ -306,6 +307,22 @@ const UserController = {
       const { uid } = req.user; //获取用户openid
       const result = await UserService.addExamFavorite(examId, uid);
       if (result.success) {
+        ActivityService.recordBusinessActivity(req, {
+          eventName: "EXAM_FAVORITE_ADDED",
+          module: "favorite",
+          bizId: String(examId || ""),
+          score: 1,
+          metadata: {
+            examId,
+            source: "my_favorite",
+          },
+        }).catch((error) => {
+          console.warn(
+            "记录 EXAM_FAVORITE_ADDED 失败",
+            error?.message || error,
+          );
+        });
+
         res.status(200).send({
           code: 200,
           ActionType: "OK",
@@ -459,6 +476,24 @@ const UserController = {
         relatedId,
       }); // 调用服务层方法处理反馈
       if (result.success) {
+        if (uid && String(content || "").trim()) {
+          ActivityService.recordBusinessActivity(req, {
+            eventName: "FEEDBACK_SUBMITTED",
+            module: "feedback",
+            bizId: String(relatedId || ""),
+            score: 1,
+            metadata: {
+              type,
+              relatedId,
+            },
+          }).catch((error) => {
+            console.warn(
+              "记录 FEEDBACK_SUBMITTED 失败",
+              error?.message || error,
+            );
+          });
+        }
+
         res.status(200).send({
           code: 200,
           ActionType: "OK",
@@ -499,6 +534,22 @@ const UserController = {
       });
 
       if (result.success) {
+        if (typeof content === "string" && content.trim()) {
+          ActivityService.recordBusinessActivity(req, {
+            eventName: "NOTE_SAVED",
+            module: "note",
+            bizId: String(questionId || ""),
+            score: 2,
+            metadata: {
+              source: "exam_practice",
+              questionType,
+              examId,
+            },
+          }).catch((error) => {
+            console.warn("记录 NOTE_SAVED 失败", error?.message || error);
+          });
+        }
+
         res.status(200).send({
           code: 200,
           ActionType: "OK",
@@ -660,6 +711,25 @@ const UserController = {
       }); // 调用服务层方法保存用户笔记
 
       if (result.success) {
+        if (typeof content === "string" && content.trim()) {
+          ActivityService.recordBusinessActivity(req, {
+            eventName: "NOTE_SAVED",
+            module: "note",
+            bizId: String(questionId || ""),
+            score: 2,
+            metadata: {
+              source: "user_bank",
+              questionType,
+              examId,
+            },
+          }).catch((error) => {
+            console.warn(
+              "记录 NOTE_SAVED(user_bank) 失败",
+              error?.message || error,
+            );
+          });
+        }
+
         res.status(200).send({
           code: 200,
           ActionType: "OK",
@@ -737,6 +807,24 @@ const UserController = {
         todos_content,
       });
       if (result.success) {
+        const todoText =
+          typeof todos_content === "string"
+            ? todos_content
+            : todos_content?.content || "";
+        if (String(todoText).trim()) {
+          ActivityService.recordBusinessActivity(req, {
+            eventName: "TODO_CREATED",
+            module: "todo",
+            bizId: String(fulldate || ""),
+            score: 1,
+            metadata: {
+              fulldate,
+            },
+          }).catch((error) => {
+            console.warn("记录 TODO_CREATED 失败", error?.message || error);
+          });
+        }
+
         res.status(200).send({
           code: 200,
           message: result.message,
