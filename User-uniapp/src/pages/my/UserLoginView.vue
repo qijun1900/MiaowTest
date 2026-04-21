@@ -171,7 +171,7 @@ const persistRememberLogin = () => {
 // 返回上一页的方法
 const goBack = () => {
     uni.switchTab({
-        url: "/pages/my/my",
+        url: "/pages/tab/my",
     });
 };
 
@@ -211,7 +211,7 @@ const handleLogin = async () => {
             // 登录成功后返回上一页
             setTimeout(() => {
                 uni.switchTab({
-                    url: "/pages/my/my",
+                    url: "/pages/tab/my",
                 });
             }, 1500);
             return;
@@ -332,7 +332,7 @@ const goToRegister = async () => {
         const bindResponse = await checkUserBind();
         if (bindResponse.code === 200 && bindResponse.data?.isBind) {
             uni.switchTab({
-                url: "/pages/my/my",
+                url: "/pages/tab/my",
             });
             return;
         }

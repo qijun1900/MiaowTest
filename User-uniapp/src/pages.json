@@ -20,13 +20,7 @@
 			}
 		},
 		{
-			"path": "pages/test/translateTest",
-			"style": {
-				"navigationBarTitleText": "翻译测试"
-			}
-		},
-		{
-			"path": "pages/my/my",
+			"path": "pages/tab/my",
 			"style": {
 				"navigationBarTitleText": "我的",
 				"navigationStyle": "custom",
@@ -36,7 +30,7 @@
 			}
 		},
 		{
-			"path": "pages/exam/exam",
+			"path": "pages/tab/exam",
 			"style": {
 				"navigationBarTitleText": "所有考试",
 				"navigationStyle": "custom",
@@ -55,254 +49,287 @@
 			}
 		},
 		{
-			"path": "pages/tools/tools",
+			"path": "pages/tab/tools",
 			"style": {
 				"navigationBarTitleText": "所有工具",
 				"navigationStyle": "custom",
 				"disableScroll": false,
 				"navigationBarTextStyle": "black"
 			}
+		}
+	],
+	"subPackages": [
+		{
+			"root": "pages/test",
+			"pages": [
+				{
+					"path": "translateTest",
+					"style": {
+						"navigationBarTitleText": "翻译测试"
+					}
+				}
+			]
 		},
 		{
-			"path": "pages/public/searchview",
-			"style": {
-				"navigationBarTitleText": "搜索"
-			}
+			"root": "pages/public",
+			"pages": [
+				{
+					"path": "searchview",
+					"style": {
+						"navigationBarTitleText": "搜索"
+					}
+				},
+				{
+					"path": "feedbackview",
+					"style": {
+						"navigationBarTitleText": "意见反馈"
+					}
+				},
+				{
+					"path": "PrivacyPolicyView",
+					"style": {
+						"navigationBarTitleText": "隐私政策"
+					}
+				},
+				{
+					"path": "UserAgreementView",
+					"style": {
+						"navigationBarTitleText": "用户协议"
+					}
+				}
+			]
 		},
 		{
-			"path": "pages/exam/crquestionbankView",
-			"style": {
-				"navigationBarTitleText": "创建题库",
-				"navigationStyle": "custom"
-			}
+			"root": "pages/exam",
+			"pages": [
+				{
+					"path": "crquestionbankView",
+					"style": {
+						"navigationBarTitleText": "创建题库",
+						"navigationStyle": "custom"
+					}
+				},
+				{
+					"path": "subjectdetailview",
+					"style": {
+						"navigationBarTitleText": "考试详情"
+					}
+				},
+				{
+					"path": "PracticeSettingView",
+					"style": {
+						"navigationBarTitleText": "练习设置"
+					}
+				},
+				{
+					"path": "PracticeView",
+					"style": {
+						"navigationBarTitleText": "练习",
+						"navigationStyle": "custom",
+						"navigationBarTextStyle": "black" // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
+					}
+				},
+				{
+					"path": "PracticeInGameSettingsView",
+					"style": {
+						"navigationBarTitleText": "练习设置"
+					}
+				},
+				{
+					"path": "PracticeResultsView",
+					"style": {
+						"navigationBarTitleText": "练习结果"
+					}
+				},
+				{
+					"path": "ManualImportView",
+					"style": {
+						"navigationBarTitleText": "手动导入"
+					}
+				},
+				{
+					"path": "UserBankView",
+					"style": {
+						"navigationBarTitleText": "题库详情",
+						"disableScroll": true // 禁止页面滚动
+					}
+				},
+				{
+					"path": "WrongQuestionView",
+					"style": {
+						"navigationBarTitleText": "我的错题"
+					}
+				},
+				{
+					"path": "ExamDiskView",
+					"style": {
+						"navigationBarTitleText": "资料详情",
+						"disableScroll": true
+					}
+				}
+			]
 		},
 		{
-			"path": "pages/exam/subjectdetailview",
-			"style": {
-				"navigationBarTitleText": "考试详情"
-			}
+			"root": "pages/my",
+			"pages": [
+				{
+					"path": "UserInfoView",
+					"style": {
+						"navigationBarTitleText": "个人信息",
+						"disableScroll": true // 禁止页面滚动
+					}
+				},
+				{
+					"path": "UserRegisterView",
+					"style": {
+						"navigationBarTitleText": "注册"
+					}
+				},
+				{
+					"path": "UserLoginView",
+					"style": {
+						"navigationBarTitleText": "登录",
+						"navigationStyle": "custom"
+					}
+				},
+				{
+					"path": "MyFavoriteView",
+					"style": {
+						"navigationBarTitleText": "我的收藏",
+						"navigationStyle": "custom" //自定义导航栏
+					}
+				},
+				{
+					"path": "MyWrongView",
+					"style": {
+						"navigationBarTitleText": "我的错题"
+					}
+				},
+				{
+					"path": "MyNoteView",
+					"style": {
+						"navigationBarTitleText": "我的笔记"
+					}
+				},
+				{
+					"path": "MyNoteDetailView",
+					"style": {
+						"navigationBarTitleText": "笔记详情"
+					}
+				},
+				{
+					"path": "MySettingView",
+					"style": {
+						"navigationBarTitleText": "设置"
+					}
+				},
+				{
+					"path": "MyMessageView",
+					"style": {
+						"navigationBarTitleText": "我的消息"
+					}
+				},
+				{
+					"path": "UserQuestionBankView",
+					"style": {
+						"navigationBarTitleText": "我的题库"
+					}
+				}
+			]
 		},
 		{
-			"path": "pages/exam/PracticeSettingView",
-			"style": {
-				"navigationBarTitleText": "练习设置"
-			}
-		},
-		{
-			"path": "pages/exam/PracticeView",
-			"style": {
-				"navigationBarTitleText": "练习",
-				"navigationStyle": "custom",
-				"navigationBarTextStyle": "black" // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
-			}
-		},
-		{
-			"path": "pages/exam/PracticeInGameSettingsView",
-			"style": {
-				"navigationBarTitleText": "练习设置"
-			}
-		},
-		{
-			"path": "pages/exam/PracticeResultsView",
-			"style": {
-				"navigationBarTitleText": "练习结果"
-			}
-		},
-		{
-			"path": "pages/my/UserInfoView",
-			"style": {
-				"navigationBarTitleText": "个人信息",
-				"disableScroll": true // 禁止页面滚动
-			}
-		},
-		{
-			"path": "pages/my/UserRegisterView",
-			"style": {
-				"navigationBarTitleText": "注册"
-			}
-		},
-		{
-			"path": "pages/my/UserLoginView",
-			"style": {
-				"navigationBarTitleText": "登录",
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/exam/ManualImportView",
-			"style": {
-				"navigationBarTitleText": "手动导入"
-			}
-		},
-		{
-			"path": "pages/exam/UserBankView",
-			"style": {
-				"navigationBarTitleText": "题库详情",
-				"disableScroll": true // 禁止页面滚动
-			}
-		},
-		{
-			"path": "pages/exam/WrongQuestionView",
-			"style": {
-				"navigationBarTitleText": "我的错题"
-			}
-		},
-		{
-			"path": "pages/my/MyFavoriteView",
-			"style": {
-				"navigationBarTitleText": "我的收藏",
-				"navigationStyle": "custom" //自定义导航栏
-			}
-		},
-		{
-			"path": "pages/my/MyWrongView",
-			"style": {
-				"navigationBarTitleText": "我的错题"
-			}
-		},
-		{
-			"path": "pages/tools/TimerToolView",
-			"style": {
-				"navigationBarTitleText": "计时器",
-				"disableScroll": false,
-				"navigationBarTextStyle": "black"
-			}
-		},
-		{
-			"path": "pages/public/feedbackview",
-			"style": {
-				"navigationBarTitleText": "意见反馈"
-			}
-		},
-		{
-			"path": "pages/exam/ExamDiskView",
-			"style": {
-				"navigationBarTitleText": "资料详情",
-				"disableScroll": true
-			}
-		},
-		{
-			"path": "pages/my/MyNoteView",
-			"style": {
-				"navigationBarTitleText": "我的笔记"
-			}
-		},
-		{
-			"path": "pages/my/MyNoteDetailView",
-			"style": {
-				"navigationBarTitleText": "笔记详情"
-			}
-		},
-		{
-			"path": "pages/my/MySettingView",
-			"style": {
-				"navigationBarTitleText": "设置"
-			}
-		},
-		{
-			"path": "pages/my/MyMessageView",
-			"style": {
-				"navigationBarTitleText": "我的消息"
-			}
-		},
-		{
-			"path": "pages/public/PrivacyPolicyView",
-			"style": {
-				"navigationBarTitleText": "隐私政策"
-			}
-		},
-		{
-			"path": "pages/public/UserAgreementView",
-			"style": {
-				"navigationBarTitleText": "用户协议"
-			}
-		},
-		{
-			"path": "pages/tools/TodoToolView",
-			"style": {
-				"navigationBarTitleText": "TODO"
-			}
-		},
-		{
-			"path": "pages/tools/WordsToolView",
-			"style": {
-				"navigationBarTitleText": "喵喵单词",
-				"navigationStyle": "custom" //自定义导航栏
-			}
-		},
-		{
-			"path": "pages/my/UserQuestionBankView",
-			"style": {
-				"navigationBarTitleText": "我的题库"
-			}
-		},
-		{
-			"path": "pages/tools/WordsToolView_children/wordSettingView",
-			"style": {
-				"navigationBarTitleText": "单词设置"
-			}
-		},
-		{
-			"path": "pages/tools/WordsToolView_children/wordListView",
-			"style": {
-				"navigationBarTitleText": "单词列表"
-			}
-		},
-		{
-			"path": "pages/tools/NotesBookToolView",
-			"style": {
-				"navigationBarTitleText": "笔记本"
-			}
-		},
-		{
-			"path": "pages/tools/NotesBookToolView_children/NotesBookEditView",
-			"style": {
-				"navigationBarTitleText": "编辑笔记本"
-			}
-		},
-		{
-			"path": "pages/tools/WrongBookToolView",
-			"style": {
-				"navigationBarTitleText": "喵喵错题本"
-			}
-		},
-		{
-			"path": "pages/tools/WrongBookToolView_children/WrongBookEditView",
-			"style": {
-				"navigationBarTitleText": "编辑错题本"
-			}
-		},
-		{
-			"path": "pages/tools/WrongBookToolView_children/WrongQuestionListView",
-			"style": {
-				"navigationBarTitleText": "错题列表"
-			}
-		},
-		{
-			"path": "pages/tools/WrongBookToolView_children/WrongQuestionDetailView",
-			"style": {
-				"navigationBarTitleText": ""
-			}
-		},
-		{
-			"path": "pages/tools/NotesBookToolView_children/NotesListView",
-			"style": {
-				"navigationBarTitleText": "笔记列表"
-			}
-		},
-		{
-			"path": "pages/tools/NotesBookToolView_children/NoteDetailView",
-			"style": {
-				"navigationBarTitleText": "笔记详情",
-				"navigationStyle": "custom" //自定义导航栏
-			}
-		},
-		{
-			"path": "pages/tools/NotesBookToolView_children/NoteEditView",
-			"style": {
-				"navigationBarTitleText": "编辑/添加笔记",
-				"navigationStyle": "custom" //自定义导航栏
-			}
+			"root": "pages/tools",
+			"pages": [
+				{
+					"path": "TimerToolView",
+					"style": {
+						"navigationBarTitleText": "计时器",
+						"disableScroll": false,
+						"navigationBarTextStyle": "black"
+					}
+				},
+				{
+					"path": "TodoToolView",
+					"style": {
+						"navigationBarTitleText": "TODO"
+					}
+				},
+				{
+					"path": "WordsToolView",
+					"style": {
+						"navigationBarTitleText": "喵喵单词",
+						"navigationStyle": "custom" //自定义导航栏
+					}
+				},
+				{
+					"path": "WordsToolView_children/wordSettingView",
+					"style": {
+						"navigationBarTitleText": "单词设置"
+					}
+				},
+				{
+					"path": "WordsToolView_children/wordListView",
+					"style": {
+						"navigationBarTitleText": "单词列表"
+					}
+				},
+				{
+					"path": "NotesBookToolView",
+					"style": {
+						"navigationBarTitleText": "笔记本"
+					}
+				},
+				{
+					"path": "NotesBookToolView_children/NotesBookEditView",
+					"style": {
+						"navigationBarTitleText": "编辑笔记本"
+					}
+				},
+				{
+					"path": "WrongBookToolView",
+					"style": {
+						"navigationBarTitleText": "喵喵错题本"
+					}
+				},
+				{
+					"path": "WrongBookToolView_children/WrongBookEditView",
+					"style": {
+						"navigationBarTitleText": "编辑错题本"
+					}
+				},
+				{
+					"path": "WrongBookToolView_children/WrongQuestionListView",
+					"style": {
+						"navigationBarTitleText": "错题列表"
+					}
+				},
+				{
+					"path": "WrongBookToolView_children/WrongQuestionDetailView",
+					"style": {
+						"navigationBarTitleText": ""
+					}
+				},
+				{
+					"path": "NotesBookToolView_children/NotesListView",
+					"style": {
+						"navigationBarTitleText": "笔记列表"
+					}
+				},
+				{
+					"path": "NotesBookToolView_children/NoteDetailView",
+					"style": {
+						"navigationBarTitleText": "笔记详情",
+						"navigationStyle": "custom" //自定义导航栏
+					}
+				},
+				{
+					"path": "NotesBookToolView_children/NoteEditView",
+					"style": {
+						"navigationBarTitleText": "编辑/添加笔记",
+						"navigationStyle": "custom" //自定义导航栏
+					}
+				}
+			]
 		}
 	],
 	"globalStyle": {
@@ -324,19 +351,19 @@
 				"selectedIconPath": "static/tabBar/index-active.png"
 			},
 			{
-				"pagePath": "pages/exam/exam",
+				"pagePath": "pages/tab/exam",
 				"text": "考试",
 				"iconPath": "static/tabBar/exam.png",
 				"selectedIconPath": "static/tabBar/exam-active.png"
 			},
 			{
-				"pagePath": "pages/tools/tools",
+				"pagePath": "pages/tab/tools",
 				"text": "工具",
 				"iconPath": "static/tabBar/tool.png",
 				"selectedIconPath": "static/tabBar/tool-active.png"
 			},
 			{
-				"pagePath": "pages/my/my",
+				"pagePath": "pages/tab/my",
 				"text": "我的",
 				"iconPath": "static/tabBar/my.png",
 				"selectedIconPath": "static/tabBar/my-active.png"

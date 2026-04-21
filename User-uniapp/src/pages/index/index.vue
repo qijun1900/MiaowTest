@@ -115,7 +115,7 @@ const fetchBannerInfo = async () => {
 
 const handleViewMore = () => {
     uni.switchTab({
-        url: "/pages/exam/exam",
+        url: "/pages/tab/exam",
     });
 };
 

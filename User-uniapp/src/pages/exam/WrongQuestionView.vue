@@ -567,7 +567,7 @@ const getUserSubjectiveAnswer = (questionId) => {
  */
 const goToPractice = () => {
     uni.switchTab({
-        url: "/pages/exam/exam",
+        url: "/pages/tab/exam",
     });
 };
 // 页面滚动事件

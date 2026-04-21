@@ -35,7 +35,7 @@ const navItems = ref([
     },
     {
         title: "所有考试",
-        path: "/pages/exam/exam",
+        path: "/pages/tab/exam",
         imageSrc: "/static/navBar/all-exam.png",
     },
     {

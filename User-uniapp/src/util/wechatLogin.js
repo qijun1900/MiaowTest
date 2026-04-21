@@ -54,7 +54,7 @@ export const wechatLogin = async (options = {}) => {
       // 跳转到我的页面
       if (navigateToMy) {
         uni.switchTab({
-          url: "/pages/my/my",
+          url: "/pages/tab/my",
         });
       }
 

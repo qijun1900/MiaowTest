@@ -261,7 +261,7 @@ function handle401(options, reject, responsePayload) {
   uni.removeStorageSync("token");
   const userInfoStore = UserInfoStore();
   userInfoStore.clearUserInfo();
-  uni.navigateTo({ url: "/pages/my/my" });
+  uni.switchTab({ url: "/pages/tab/my" });
   reject("登录过期，请重新登录", responsePayload);
 }
 
@@ -386,7 +386,7 @@ export const http = (options) => {
             uni.removeStorageSync("token");
             const userInfoStore = UserInfoStore();
             userInfoStore.clearUserInfo();
-            uni.navigateTo({ url: "/pages/my/my" });
+            uni.switchTab({ url: "/pages/tab/my" });
             reject("登录过期，请重新登录", res);
           } else {
             uni.showToast({
