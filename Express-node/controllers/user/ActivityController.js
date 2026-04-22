@@ -30,7 +30,7 @@ const ActivityController = {
     }
   },
 
-  // 获取活动热力图。
+  // 获取活动热力图
   getActivityHeatmap: async (req, res) => {
     try {
       const result = await ActivityService.getUserActivityHeatmap(
@@ -54,7 +54,7 @@ const ActivityController = {
     }
   },
 
-  // 获取指定日期活动详情。
+  // 获取指定日期活动详情
   getActivityByDate: async (req, res) => {
     try {
       const result = await ActivityService.getUserActivityByDate(
