@@ -14,6 +14,11 @@ UserRouter.post(
   UserController.UserAccountLogin,
 ); //用户账号登录接口
 UserRouter.post(
+  "/uniappAPI/User/reportLoginStatus",
+  JWT.verifyTokenMiddleware(),
+  UserController.reportLoginStatus,
+); //用户登录状态上报接口（每日热力）
+UserRouter.post(
   "/uniappAPI/User/updateUserInfo",
   JWT.verifyTokenMiddleware(),
   UserController.updateUserInfo,

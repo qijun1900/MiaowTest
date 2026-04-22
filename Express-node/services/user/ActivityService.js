@@ -422,7 +422,7 @@ const ActivityService = {
    *
    * 约定：
    * - 强制 activitySource=business
-  * - module 默认为 业务
+    * - module 默认为 业务
    * - 实际写入委托给 addUserActivity，保持单一入库路径
    */
   async recordBusinessActivity(req, payload = {}) {
@@ -449,6 +449,92 @@ const ActivityService = {
         message: "记录业务活动失败",
       };
     }
+  },
+
+  /**
+   * 每日唯一业务打点：同一用户同一事件+模块在北京时间当天只记录一次。
+   *
+   * 场景：登录态心跳、每日签到等“当天仅需记一次”的热力动作。
+   * @param {object} req Express Request
+   * @param {object} payload 活动负载
+   * @returns {Promise<{success:boolean,recorded:boolean,date?:string,addedScore?:number,message?:string}>}
+   */
+  async recordBusinessActivityOncePerDay(req, payload = {}) {
+    const uid = req?.user?.uid || null;
+    const objectUid = toObjectIdOrNull(uid);
+
+    if (!objectUid) {
+      return {
+        success: false,
+        recorded: false,
+        message: "用户未登录",
+      };
+    }
+
+    const dayRange = getChinaDayRange(new Date());
+    if (!dayRange) {
+      return {
+        success: false,
+        recorded: false,
+        message: "日期解析失败",
+      };
+    }
+
+    const eventName = toSafeString(payload.eventName || "业务活动", 80);
+    const moduleName = toSafeString(payload.module || "业务", 50);
+    const uniqueBizId =
+      toSafeString(payload.bizId, 120) ||
+      `DAILY_${dayRange.dateKey}_${eventName}_${moduleName}`;
+
+    const exists = await UserActivityEventModel.findOne({
+      uid: objectUid,
+      eventName,
+      module: moduleName,
+      bizId: uniqueBizId,
+      activityAt: {
+        $gte: dayRange.start,
+        $lt: dayRange.end,
+      },
+    })
+      .select("_id")
+      .lean();
+
+    if (exists) {
+      return {
+        success: true,
+        recorded: false,
+        date: dayRange.dateKey,
+        addedScore: 0,
+        message: "今日已记录",
+      };
+    }
+
+    const result = await this.recordBusinessActivity(req, {
+      ...payload,
+      eventName,
+      module: moduleName,
+      bizId: uniqueBizId,
+      metadata: {
+        ...(payload.metadata && typeof payload.metadata === "object"
+          ? payload.metadata
+          : {}),
+        uniqueScope: "day",
+        uniqueDate: dayRange.dateKey,
+      },
+    });
+
+    if (!result?.success) {
+      return {
+        success: false,
+        recorded: false,
+        message: result?.message || "记录业务活动失败",
+      };
+    }
+
+    return {
+      ...result,
+      recorded: true,
+    };
   },
 
   /**

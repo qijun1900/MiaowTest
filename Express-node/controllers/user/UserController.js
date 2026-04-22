@@ -126,6 +126,55 @@ const UserController = {
       throw error;
     }
   },
+
+  // 上报用户登录状态，并按天记录一次登录热力。
+  reportLoginStatus: async (req, res) => {
+    try {
+      const result = await ActivityService.recordBusinessActivityOncePerDay(req, {
+        eventName: "每日登录",
+        module: "登录",
+        score: 1,
+        metadata: {
+          source: "login_status_route",
+        },
+      });
+
+      if (!result.success) {
+        return res.status(200).send({
+          code: 500,
+          message: result.message || "登录状态上报失败",
+          data: {
+            isLoggedIn: true,
+            recorded: false,
+            addedScore: 0,
+          },
+        });
+      }
+
+      return res.status(200).send({
+        code: 200,
+        message: "用户已登录",
+        data: {
+          isLoggedIn: true,
+          recorded: Boolean(result.recorded),
+          date: result.date || "",
+          addedScore: result.addedScore || 0,
+        },
+      });
+    } catch (error) {
+      console.error("reportLoginStatus 失败", error);
+      return res.status(200).send({
+        code: 500,
+        message: "登录状态上报失败",
+        data: {
+          isLoggedIn: true,
+          recorded: false,
+          addedScore: 0,
+        },
+      });
+    }
+  },
+
   // 更新用户信息
   updateUserInfo: async (req, res) => {
     try {

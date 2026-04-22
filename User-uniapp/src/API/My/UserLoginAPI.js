@@ -127,3 +127,19 @@ export const BindAccount = async ({ account, uid, verifyCode, password }) => {
     throw error;
   }
 };
+
+/**
+ * 上报用户已登录状态（同一天仅累计一次登录热力）
+ * @returns {Promise} 返回登录状态与热力记录结果
+ */
+export const reportLoginStatus = async () => {
+  try {
+    return await http({
+      url: "/uniappAPI/User/reportLoginStatus",
+      method: "POST",
+    });
+  } catch (error) {
+    console.error("reportLoginStatus 失败", error);
+    throw error;
+  }
+};

@@ -88,6 +88,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { onShow } from "@dcloudio/uni-app";
 import uviewOverlay from "../../components/core/uviewOverlay.vue";
 import { wechatLogin } from "../../util/wechatLogin";
 import myNavbar from "../../components/modules/my/myNavbar.vue";
@@ -96,6 +97,7 @@ import navBarHeightUtil from "../../util/navBarHeight.js";
 import CustomNavbar from "../../components/core/CustomNavbar.vue";
 import { clearExamCache } from "../../util/cacheCleaner.js";
 import showShareMenu from "../../util/wechatShare.js";
+import { reportLoginStatus } from "../../API/My/UserLoginAPI";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import UserInfoCard from "../../components/modules/my/UserInfoCard.vue";
 import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
@@ -228,12 +230,27 @@ const showPrivacyPolicy = () => {
     });
 };
 
+const reportLoginStatusIfNeeded = async () => {
+    const token = uni.getStorageSync("token");
+    if (!token) return;
+
+    try {
+        await reportLoginStatus();
+    } catch (error) {
+        console.warn("reportLoginStatus 失败", error?.message || error);
+    }
+};
+
 // 获取导航栏高度信息
 onMounted(() => {
     navBarInfo.value = navBarHeightUtil.getNavBarInfo();
     //#ifdef MP-WEIXIN
     showShareMenu();
     //#endif
+});
+
+onShow(() => {
+    reportLoginStatusIfNeeded();
 });
 </script>
 
