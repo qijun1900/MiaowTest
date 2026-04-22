@@ -39,8 +39,8 @@ const WrongBookController = {
       }
 
       ActivityService.recordBusinessActivity(req, {
-        eventName: "WRONGBOOK_CREATED",
-        module: "wrongbook",
+        eventName: "创建错题本",
+        module: "错题本",
         bizId: String(result?.data?._id || ""),
         score: 2,
         metadata: {
@@ -48,7 +48,7 @@ const WrongBookController = {
           color,
         },
       }).catch((error) => {
-        console.warn("记录 WRONGBOOK_CREATED 失败", error?.message || error);
+        console.warn("记录 创建错题本 失败", error?.message || error);
       });
 
       res.status(200).send({
@@ -189,8 +189,8 @@ const WrongBookController = {
       });
 
       ActivityService.recordBusinessActivity(req, {
-        eventName: "WRONG_QUESTION_ADDED",
-        module: "wrongbook",
+        eventName: "添加错题",
+        module: "错题本",
         bizId: String(result?.data?._id || questionData.wrongBookId || ""),
         score: 3,
         metadata: {
@@ -199,7 +199,7 @@ const WrongBookController = {
           questionSource: questionData.questionSource || "user",
         },
       }).catch((error) => {
-        console.warn("记录 WRONG_QUESTION_ADDED 失败", error?.message || error);
+        console.warn("记录 添加错题 失败", error?.message || error);
       });
     } catch (error) {
       console.error("添加错题失败", error);

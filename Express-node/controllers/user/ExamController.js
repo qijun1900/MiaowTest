@@ -59,8 +59,8 @@ const ExamController = {
       );
       if (result.success) {
         ActivityService.recordBusinessActivity(req, {
-          eventName: "USER_QUESTION_ADDED",
-          module: "exam",
+          eventName: "添加题目",
+          module: "题库",
           bizId: String(questionData?.questionbankId || ""),
           score: 2,
           metadata: {
@@ -68,10 +68,7 @@ const ExamController = {
             questionbankId: questionData?.questionbankId,
           },
         }).catch((error) => {
-          console.warn(
-            "记录 USER_QUESTION_ADDED 失败",
-            error?.message || error,
-          );
+          console.warn("记录 添加题目 失败", error?.message || error);
         });
 
         res.status(200).send({
@@ -97,18 +94,15 @@ const ExamController = {
 
       if (result.success) {
         ActivityService.recordBusinessActivity(req, {
-          eventName: "QUESTION_BANK_CREATED",
-          module: "exam",
+          eventName: "创建题库",
+          module: "题库",
           bizId: String(result?.data?.bankId || ""),
           score: 3,
           metadata: {
             bankName,
           },
         }).catch((error) => {
-          console.warn(
-            "记录 QUESTION_BANK_CREATED 失败",
-            error?.message || error,
-          );
+          console.warn("记录 创建题库 失败", error?.message || error);
         });
 
         res.status(200).send({
@@ -247,8 +241,8 @@ const ExamController = {
 
       if (result.code === 200 && String(result.message).includes("添加成功")) {
         ActivityService.recordBusinessActivity(req, {
-          eventName: "WRONG_QUESTION_ADDED",
-          module: "exam",
+          eventName: "添加错题",
+          module: "题库",
           bizId: String(questionId || ""),
           score: 2,
           metadata: {
@@ -258,10 +252,7 @@ const ExamController = {
             source: "exam_practice",
           },
         }).catch((error) => {
-          console.warn(
-            "记录 WRONG_QUESTION_ADDED(exam) 失败",
-            error?.message || error,
-          );
+          console.warn("记录 添加错题(exam) 失败", error?.message || error);
         });
       }
 
@@ -300,8 +291,8 @@ const ExamController = {
 
       if (result.code === 200 && String(result.message).includes("添加成功")) {
         ActivityService.recordBusinessActivity(req, {
-          eventName: "FAVORITE_QUESTION_ADDED",
-          module: "favorite",
+          eventName: "添加收藏题",
+          module: "收藏",
           bizId: String(questionId || ""),
           score: 1,
           metadata: {
@@ -311,10 +302,7 @@ const ExamController = {
             source: "exam_question",
           },
         }).catch((error) => {
-          console.warn(
-            "记录 FAVORITE_QUESTION_ADDED 失败",
-            error?.message || error,
-          );
+          console.warn("记录 添加收藏题 失败", error?.message || error);
         });
       }
 

@@ -37,8 +37,6 @@
         </view>
 
         <!-- 热力图 -->
-        <ThemeDivider text="学习贡献" />
-
         <UserActivityHeatmap />
 
         <!-- 登录显示 -->

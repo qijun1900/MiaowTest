@@ -186,8 +186,8 @@ const NotesBookController = {
       }
 
       ActivityService.recordBusinessActivity(req, {
-        eventName: "NOTEBOOK_CREATED",
-        module: "notebook",
+        eventName: "创建笔记本",
+        module: "笔记本",
         bizId: String(result?.data?._id || ""),
         score: 2,
         metadata: {
@@ -195,7 +195,7 @@ const NotesBookController = {
           description: description || "",
         },
       }).catch((error) => {
-        console.error("NOTEBOOK_CREATED记录失败", error);
+        console.error("记录 创建笔记本 失败", error);
       });
 
       res.status(200).send({

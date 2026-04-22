@@ -308,8 +308,8 @@ const UserController = {
       const result = await UserService.addExamFavorite(examId, uid);
       if (result.success) {
         ActivityService.recordBusinessActivity(req, {
-          eventName: "EXAM_FAVORITE_ADDED",
-          module: "favorite",
+          eventName: "收藏考试",
+          module: "收藏",
           bizId: String(examId || ""),
           score: 1,
           metadata: {
@@ -317,10 +317,7 @@ const UserController = {
             source: "my_favorite",
           },
         }).catch((error) => {
-          console.warn(
-            "记录 EXAM_FAVORITE_ADDED 失败",
-            error?.message || error,
-          );
+          console.warn("记录 收藏考试 失败", error?.message || error);
         });
 
         res.status(200).send({
@@ -478,8 +475,8 @@ const UserController = {
       if (result.success) {
         if (uid && String(content || "").trim()) {
           ActivityService.recordBusinessActivity(req, {
-            eventName: "FEEDBACK_SUBMITTED",
-            module: "feedback",
+            eventName: "提交反馈",
+            module: "反馈",
             bizId: String(relatedId || ""),
             score: 1,
             metadata: {
@@ -487,10 +484,7 @@ const UserController = {
               relatedId,
             },
           }).catch((error) => {
-            console.warn(
-              "记录 FEEDBACK_SUBMITTED 失败",
-              error?.message || error,
-            );
+            console.warn("记录 提交反馈 失败", error?.message || error);
           });
         }
 
@@ -536,8 +530,8 @@ const UserController = {
       if (result.success) {
         if (typeof content === "string" && content.trim()) {
           ActivityService.recordBusinessActivity(req, {
-            eventName: "NOTE_SAVED",
-            module: "note",
+            eventName: "保存笔记",
+            module: "笔记",
             bizId: String(questionId || ""),
             score: 2,
             metadata: {
@@ -546,7 +540,7 @@ const UserController = {
               examId,
             },
           }).catch((error) => {
-            console.warn("记录 NOTE_SAVED 失败", error?.message || error);
+            console.warn("记录 保存笔记 失败", error?.message || error);
           });
         }
 
@@ -713,8 +707,8 @@ const UserController = {
       if (result.success) {
         if (typeof content === "string" && content.trim()) {
           ActivityService.recordBusinessActivity(req, {
-            eventName: "NOTE_SAVED",
-            module: "note",
+            eventName: "保存笔记",
+            module: "笔记",
             bizId: String(questionId || ""),
             score: 2,
             metadata: {
@@ -724,7 +718,7 @@ const UserController = {
             },
           }).catch((error) => {
             console.warn(
-              "记录 NOTE_SAVED(user_bank) 失败",
+              "记录 保存笔记(user_bank) 失败",
               error?.message || error,
             );
           });
@@ -813,15 +807,15 @@ const UserController = {
             : todos_content?.content || "";
         if (String(todoText).trim()) {
           ActivityService.recordBusinessActivity(req, {
-            eventName: "TODO_CREATED",
-            module: "todo",
+            eventName: "创建待办",
+            module: "待办",
             bizId: String(fulldate || ""),
             score: 1,
             metadata: {
               fulldate,
             },
           }).catch((error) => {
-            console.warn("记录 TODO_CREATED 失败", error?.message || error);
+            console.warn("记录 创建待办 失败", error?.message || error);
           });
         }
 

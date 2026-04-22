@@ -422,7 +422,7 @@ const ActivityService = {
    *
    * 约定：
    * - 强制 activitySource=business
-   * - module 默认为 business
+  * - module 默认为 业务
    * - 实际写入委托给 addUserActivity，保持单一入库路径
    */
   async recordBusinessActivity(req, payload = {}) {
@@ -436,7 +436,7 @@ const ActivityService = {
 
       return await this.addUserActivity(req, {
         ...payload,
-        module: toSafeString(payload.module || "business", 50),
+        module: toSafeString(payload.module || "业务", 50),
         metadata: mergedMetadata,
       });
     } catch (error) {
@@ -470,10 +470,10 @@ const ActivityService = {
 
     const { sourceClient, platform } = getClientContext(req);
     const eventName = toSafeString(
-      payload.eventName || "BUSINESS_ACTIVITY",
+      payload.eventName || "业务活动",
       80,
     );
-    const moduleName = toSafeString(payload.module || "business", 50);
+    const moduleName = toSafeString(payload.module || "业务", 50);
     const score = Math.max(
       1,
       Math.min(20, Math.round(toSafeNumber(payload.score, 1))),
