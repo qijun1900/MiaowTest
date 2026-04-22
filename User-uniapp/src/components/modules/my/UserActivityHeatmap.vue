@@ -3,7 +3,7 @@
     <view class="card-header">
       <view>
         <text class="title">学习活跃热力</text>
-        <text class="subtitle">按业务动作累计（如添加笔记、添加错题）</text>
+        <text class="subtitle">按业务动作累计（如添加笔记、添加错题等）</text>
       </view>
       <view class="month-switch">
         <text
@@ -167,14 +167,17 @@ import {
 } from "../../../API/My/UserActivityAPI";
 import { UserInfoStore } from "../../../stores/modules/UserinfoStore";
 
+// 一天的毫秒数，用于日期步进计算。
 const DAY_MS = 24 * 60 * 60 * 1000;
+// 每一周列在横向上的步进宽度，用于月份标签定位。
 const CELL_STEP_RPX = 38;
 
 const userInfoStore = UserInfoStore();
 
 const loading = ref(false);
 const detailLoading = ref(false);
-const selectedMonths = ref(12);
+// 默认展示最近 1 个月。
+const selectedMonths = ref(3);
 const selectedPalette = ref("green");
 const selectedDate = ref("");
 
@@ -208,6 +211,7 @@ const dayDetail = ref({
 });
 
 const monthOptions = [
+  { label: "1个月", value: 1 },
   { label: "3个月", value: 3 },
   { label: "6个月", value: 6 },
   { label: "12个月", value: 12 },
@@ -239,6 +243,7 @@ const paletteOptions = [
     label: "玫瑰粉",
     colors: ["#ebedf0", "#f5c8dc", "#ec92b8", "#d96091", "#a63864"],
   },
+  
 ];
 
 const weekdayLabels = ["周一", "", "周三", "", "周五", "", "周日"];
@@ -260,6 +265,7 @@ const selectedSummary = computed(() => {
 });
 
 const dayMap = computed(() => {
+  // 将按天数组转为 Map，便于后续按日期 O(1) 查找。
   const map = new Map();
   for (const day of heatmap.value.days || []) {
     map.set(day.date, day);
@@ -275,6 +281,7 @@ const weekColumns = computed(() => {
 
   if (!startDate || !endDate) return [];
 
+  // 为了完整渲染周视图，将起止日期扩展到周一到周日。
   const alignedStart = alignToMonday(startDate);
   const alignedEnd = alignToSunday(endDate);
 
@@ -315,6 +322,7 @@ const weekColumns = computed(() => {
 });
 
 const monthMarkers = computed(() => {
+  // 在每个新月份出现的第一周打一个月标签。
   const markers = [];
   let previousMonthKey = "";
 
@@ -395,6 +403,7 @@ async function loadHeatmap() {
 
   loading.value = true;
   try {
+    // 根据当前选中的月份窗口请求热力图汇总数据。
     const result = await getUserActivityHeatmap({
       months: selectedMonths.value,
     });
@@ -417,6 +426,7 @@ async function loadHeatmap() {
       [...heatmap.value.days].reverse().find((item) => item.totalScore > 0) ||
       heatmap.value.days[heatmap.value.days.length - 1];
 
+    // 默认定位到最近有热度的一天，提升首次打开的可读性。
     if (activeDay?.date) {
       selectedDate.value = activeDay.date;
       await loadDayDetail(activeDay.date);
@@ -433,6 +443,7 @@ async function loadDayDetail(date) {
 
   detailLoading.value = true;
   try {
+    // 按日期拉取当天行为详情（明细 + 汇总）。
     const result = await getUserActivityByDate(date);
     if (result?.code === 200 && result.data) {
       dayDetail.value = result.data;
@@ -494,6 +505,7 @@ watch(
 .card-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 20rpx;
 }
 
@@ -512,18 +524,22 @@ watch(
 }
 
 .month-switch {
-  display: flex;
-  gap: 12rpx;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10rpx;
+  min-width: 376rpx;
 }
 
 .month-pill {
+  display: block;
+  text-align: center;
   font-size: 22rpx;
   color: #5c6b84;
   background: #f2f5fb;
   border: 1px solid #dce5f2;
   border-radius: 999rpx;
-  padding: 6rpx 18rpx;
+  padding: 8rpx 0;
+  box-sizing: border-box;
 }
 
 .month-pill-active {
@@ -820,13 +836,19 @@ watch(
 }
 
 @media (max-width: 640px) {
+  .card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .month-switch {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    min-width: 0;
+    width: 100%;
+    margin-top: 8rpx;
   }
 }
 </style>

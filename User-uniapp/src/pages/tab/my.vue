@@ -29,16 +29,17 @@
             <myNavbar />
         </view>
 
-        <ThemeDivider text="学习贡献" />
-
-        <UserActivityHeatmap />
-
         <ThemeDivider text="更多功能" />
 
         <!-- 功能列表 -->
         <view class="function-list">
             <CustomNavbar :items="CustomNavbarList" @nav-click="handleClick" />
         </view>
+
+        <!-- 热力图 -->
+        <ThemeDivider text="学习贡献" />
+
+        <UserActivityHeatmap />
 
         <!-- 登录显示 -->
         <uviewOverlay v-model:show="LoginOverlayShow">
