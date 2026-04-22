@@ -341,6 +341,20 @@ const NotesBookController = {
           message: result.message || "保存笔记失败",
         });
       }
+      
+      if(result.isCreate){
+        ActivityService.recordBusinessActivity(req, {
+          eventName: "创建笔记",
+          module: "笔记本",
+          bizId: String(result.id || ""),
+          score: 1,
+          metadata: {
+            bookId,
+          },
+        }).catch((error) => {
+          console.error("记录 创建笔记 失败", error);
+        });
+      }
 
       res.status(200).send({
         code: 200,

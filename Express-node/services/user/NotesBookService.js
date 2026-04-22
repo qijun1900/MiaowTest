@@ -595,6 +595,7 @@ const NotesBookService = {
           success: true,
           action: "updated",
           id: note._id,
+          isCreate: false,
         };
       }
 
@@ -621,6 +622,7 @@ const NotesBookService = {
         success: true,
         action: "created",
         id: created._id,
+        isCreate: true,
       };
     } catch (error) {
       console.error("DATABASE:保存笔记失败", error);

@@ -243,7 +243,12 @@ const paletteOptions = [
     label: "玫瑰粉",
     colors: ["#ebedf0", "#f5c8dc", "#ec92b8", "#d96091", "#a63864"],
   },
-  
+  {
+    key: "slate",
+    label: "深空灰",
+    colors: ["#ebedf0", "#d6dee8", "#a9bbcc", "#6f88a1", "#40566f"],
+  },
+
 ];
 
 const weekdayLabels = ["周一", "", "周三", "", "周五", "", "周日"];
