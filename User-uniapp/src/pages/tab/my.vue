@@ -1,16 +1,5 @@
 <template>
     <view class="container">
-        <!-- 自定义导航栏 -->
-        <view
-            class="custom-navbar"
-            :style="{
-                height: navBarInfo.totalHeight + 'px',
-                paddingTop: navBarInfo.statusBarHeight + 'px',
-            }"
-        >
-            <!-- 仅保留状态栏占位，不显示标题 -->
-        </view>
-
         <GreetingBanner
             :statusBarHeight="navBarInfo.statusBarHeight || 0"
             :topInset="8"
@@ -259,6 +248,9 @@ onShow(() => {
     min-height: 100vh;
     height: 100vh; /* 设置固定高度 */
     overflow-y: auto; /* 内容超出时自动滚动 */
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     background: linear-gradient(
         180deg,
         #e6f3ff 0%,
@@ -269,45 +261,15 @@ onShow(() => {
     ); /* 优雅的淡蓝色到白色渐变 */
     padding: 0 15rpx 0 15rpx;
     position: relative;
+
 }
 
-/* 自定义导航栏样式 */
-.custom-navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 9999;
-    background: linear-gradient(
-        180deg,
-        #c6e2ff 0%,
-        #d9ecff 20%,
-        #e6f3ff 40%,
-        #f0f8ff 60%,
-        #f5faff 80%,
-        rgba(245, 250, 255, 0.95) 100%
-    ); /* 优雅的淡蓝色渐变 */
-    backdrop-filter: blur(10px); /* 毛玻璃效果 */
-    -webkit-backdrop-filter: blur(10px);
-    pointer-events: none; /* 让导航栏不阻挡点击事件 */
+.container::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
 }
 
-.logout-btn {
-    background-color: #ffffff;
-    border-radius: 16rpx;
-    height: 100rpx;
-    line-height: 100rpx;
-    text-align: center;
-    font-size: 32rpx;
-    color: #ff4d4f;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-}
-.warp {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
 .rect {
     width: 600rpx;
     height: 380rpx;
@@ -356,27 +318,5 @@ onShow(() => {
 
 .function-list {
     margin-bottom: 20rpx;
-}
-
-/* 作者图片样式 */
-.author-image {
-    width: 270rpx;
-    height: 280rpx;
-    border-radius: 20rpx;
-    box-shadow:
-        0 8rpx 24rpx rgba(0, 0, 0, 0.15),
-        0 2rpx 8rpx rgba(0, 0, 0, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.9);
-    margin-top: 20rpx;
-    object-fit: cover;
-    transition: all 0.3s ease;
-}
-
-/* 图片悬停效果 */
-.author-image:hover {
-    transform: scale(1.02);
-    box-shadow:
-        0 12rpx 32rpx rgba(0, 0, 0, 0.2),
-        0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 }
 </style>

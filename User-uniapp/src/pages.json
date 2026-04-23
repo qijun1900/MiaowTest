@@ -16,7 +16,10 @@
 			"style": {
 				"navigationBarTitleText": "题喵喵",
 				"navigationBarTextStyle": "white",
-				"navigationBarBackgroundColor": "#007AFF"
+				"navigationBarBackgroundColor": "#007AFF",
+				"app-plus": {
+					"scrollIndicator": "none"
+				}
 			}
 		},
 		{
@@ -25,6 +28,9 @@
 				"navigationBarTitleText": "我的",
 				"navigationStyle": "custom",
 				"disableScroll": false, // 允许页面滚动
+				"app-plus": {
+					"scrollIndicator": "none"
+				},
 				"enablePullDownRefresh": false, // 启用下拉刷新
 				"backgroundColor": "#F8FDFF"
 			}
@@ -40,6 +46,7 @@
 				"navigationBarTextStyle": "black", // 导航栏文字颜色
 				"app-plus": {
 					"bounce": "none",
+					"scrollIndicator": "none",
 					"pullToRefresh": {
 						"support": true, // 是否支持下拉刷新
 						"style": "circle",
@@ -288,7 +295,8 @@
 				{
 					"path": "WrongBookToolView",
 					"style": {
-						"navigationBarTitleText": "喵喵错题本"
+						"navigationBarTitleText": "喵喵错题本",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -300,7 +308,8 @@
 				{
 					"path": "WrongBookToolView_children/WrongQuestionListView",
 					"style": {
-						"navigationBarTitleText": "错题列表"
+						"navigationBarTitleText": "错题列表",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -312,7 +321,8 @@
 				{
 					"path": "NotesBookToolView_children/NotesListView",
 					"style": {
-						"navigationBarTitleText": "笔记列表"
+						"navigationBarTitleText": "笔记列表",
+						"scrollIndicator": "none"
 					}
 				},
 				{

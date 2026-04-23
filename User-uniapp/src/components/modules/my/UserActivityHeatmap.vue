@@ -19,7 +19,6 @@
     </view>
 
     <view class="palette-bar">
-      <text class="palette-title">配色</text>
       <view class="palette-list">
         <view
           v-for="palette in paletteOptions"
@@ -77,13 +76,20 @@
         </view>
 
         <scroll-view class="heatmap-scroll" scroll-x :show-scrollbar="false">
-          <view class="heatmap-content">
+          <view
+            class="heatmap-content"
+            :class="[heatmapContentClass, { 'heatmap-content-refreshing': heatmapRefreshing }]"
+            :style="{ width: `${heatmapContentWidth}rpx` }"
+          >
             <view class="month-marker-layer">
               <text
                 v-for="marker in monthMarkers"
                 :key="`${marker.label}_${marker.column}`"
                 class="month-marker"
-                :style="{ left: `${marker.leftRpx}rpx` }"
+                :style="{
+                  left: `${marker.leftRpx}rpx`,
+                  width: `${CELL_STEP_RPX}rpx`,
+                }"
               >
                 {{ marker.label }}
               </text>
@@ -133,12 +139,12 @@
 
         <view class="detail-stats">
           <view class="detail-chip">热度 {{ selectedSummary.totalScore }}</view>
-          <view class="detail-chip">业务 {{ selectedSummary.actionEventCount }}</view>
+          <!-- <view class="detail-chip">业务 {{ selectedSummary.actionEventCount }}</view> -->
           <view class="detail-chip">记录 {{ selectedSummary.manualEventCount }}</view>
         </view>
 
         <view class="detail-section">
-          <text class="section-title">行为事件</text>
+          <!-- <text class="section-title">行为事件</text> -->
           <view v-if="(dayDetail.actionLogs || []).length === 0" class="section-empty">
             暂无行为数据
           </view>
@@ -153,14 +159,12 @@
           </view>
         </view>
       </view>
-
-      <view class="loading-tip" v-if="loading">热力图加载中...</view>
     </view>
   </view>
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import {
   getUserActivityByDate,
   getUserActivityHeatmap,
@@ -176,6 +180,9 @@ const userInfoStore = UserInfoStore();
 
 const loading = ref(false);
 const detailLoading = ref(false);
+const heatmapRefreshing = ref(false);
+const heatmapMotionState = ref("idle");
+let heatmapRequestSeq = 0;
 // 默认展示最近 1 个月。
 const selectedMonths = ref(3);
 const selectedPalette = ref("green");
@@ -342,11 +349,28 @@ const monthMarkers = computed(() => {
     markers.push({
       label: `${Number(firstInRange.date.slice(5, 7))}月`,
       column,
-      leftRpx: column * CELL_STEP_RPX,
+      leftRpx: column * CELL_STEP_RPX + CELL_STEP_RPX / 2,
     });
   });
 
   return markers;
+});
+
+const heatmapContentWidth = computed(() => {
+  const columnCount = weekColumns.value.length;
+  return Math.max(columnCount * CELL_STEP_RPX, CELL_STEP_RPX * 2);
+});
+
+const heatmapContentClass = computed(() => {
+  if (heatmapMotionState.value === "entering") {
+    return "heatmap-content-entering";
+  }
+
+  if (heatmapMotionState.value === "loading") {
+    return "heatmap-content-loading";
+  }
+
+  return "";
 });
 
 function parseDateKey(dateKey) {
@@ -407,6 +431,8 @@ async function loadHeatmap() {
   if (!isLoggedIn.value) return;
 
   loading.value = true;
+  heatmapRefreshing.value = true;
+  const requestSeq = ++heatmapRequestSeq;
   try {
     // 根据当前选中的月份窗口请求热力图汇总数据。
     const result = await getUserActivityHeatmap({
@@ -421,11 +447,19 @@ async function loadHeatmap() {
       return;
     }
 
+    if (requestSeq !== heatmapRequestSeq) {
+      return;
+    }
+
     heatmap.value = {
       ...heatmap.value,
       ...result.data,
       days: Array.isArray(result.data.days) ? result.data.days : [],
     };
+
+    heatmapMotionState.value = "entering";
+    await nextTick();
+    heatmapMotionState.value = "idle";
 
     const activeDay =
       [...heatmap.value.days].reverse().find((item) => item.totalScore > 0) ||
@@ -440,6 +474,7 @@ async function loadHeatmap() {
     console.error("loadHeatmap 失败", error);
   } finally {
     loading.value = false;
+    heatmapRefreshing.value = false;
   }
 }
 
@@ -642,33 +677,61 @@ watch(
 .heatmap-shell {
   margin-top: 24rpx;
   display: flex;
+  align-items: flex-start;
 }
 
 .weekday-axis {
+  flex: 0 0 54rpx;
   width: 54rpx;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: center;
   padding-top: 48rpx;
   gap: 8rpx;
+  margin-right: 6rpx;
+  flex-shrink: 0;
 }
 
 .weekday-label {
+  width: 100%;
   height: 30rpx;
   line-height: 30rpx;
   font-size: 20rpx;
   color: #94a2ba;
+  text-align: center;
 }
 
 .heatmap-scroll {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   white-space: nowrap;
 }
 
 .heatmap-content {
   position: relative;
   padding-top: 38rpx;
-  min-width: 640rpx;
+  min-width: 0;
+  box-sizing: border-box;
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    filter 0.28s ease;
+}
+
+.heatmap-content-refreshing {
+  animation: heatmap-refresh-in 0.28s ease both;
+}
+
+.heatmap-content-entering {
+  opacity: 0.56;
+  transform: translateY(8rpx) scale(0.99);
+  filter: saturate(0.96);
+}
+
+.heatmap-content-loading {
+  opacity: 0.72;
+  transform: translateY(4rpx);
 }
 
 .month-marker-layer {
@@ -681,8 +744,22 @@ watch(
 
 .month-marker {
   position: absolute;
+  transform: translateX(-50%);
+  text-align: center;
+  white-space: nowrap;
   font-size: 20rpx;
   color: #6f7f98;
+}
+
+@keyframes heatmap-refresh-in {
+  from {
+    opacity: 0.35;
+    transform: translateY(8rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .heatmap-grid {
@@ -781,6 +858,25 @@ watch(
 
 .detail-section {
   margin-top: 16rpx;
+  position: relative;
+  padding-left: 28rpx;
+}
+
+.detail-section::before {
+  content: "";
+  position: absolute;
+  left: 12rpx;
+  top: 6rpx;
+  bottom: 6rpx;
+  width: 2rpx;
+  border-radius: 2rpx;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(145, 165, 196, 0.8) 0,
+    rgba(145, 165, 196, 0.8) 10rpx,
+    transparent 10rpx,
+    transparent 18rpx
+  );
 }
 
 .section-title {
@@ -805,6 +901,8 @@ watch(
 }
 
 .detail-time {
+  position: relative;
+  z-index: 1;
   font-size: 21rpx;
   color: #6d7f9f;
 }
