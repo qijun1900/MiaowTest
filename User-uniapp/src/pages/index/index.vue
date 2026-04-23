@@ -75,7 +75,7 @@ import escconfig from "../../config/esc.config";
 import uniSearch from "../../components/core/uniSearch.vue";
 import uviewSubsection from "../../components/core/uviewSubsection.vue";
 import UserExamFavorite from "../../components/modules/index/UserExamFavorite.vue";
-import { onPageScroll } from "@dcloudio/uni-app";
+import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import BackToTop from "../../components/core/BackToTop.vue";
 import showShareMenu from "../../util/wechatShare.js";
 
@@ -124,6 +124,15 @@ const handleCreateQuestionBank = () => {
         url: "/pages/exam/crquestionbankView",
     });
 };
+
+// 下拉刷新页面数据
+onPullDownRefresh(async () => {
+    try {
+        await Promise.all([fetchNoticeInfo(), fetchBannerInfo()]);
+    } finally {
+        uni.stopPullDownRefresh();
+    }
+});
 
 // 页面滚动事件
 onPageScroll((e) => {

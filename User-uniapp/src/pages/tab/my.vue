@@ -26,7 +26,7 @@
         </view>
 
         <!-- 热力图 -->
-        <UserActivityHeatmap />
+        <UserActivityHeatmap ref="activityHeatmapRef" />
 
         <!-- 登录显示 -->
         <uviewOverlay v-model:show="LoginOverlayShow">
@@ -77,7 +77,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onShow, onPullDownRefresh } from "@dcloudio/uni-app";
 import uviewOverlay from "../../components/core/uviewOverlay.vue";
 import { wechatLogin } from "../../util/wechatLogin";
 import myNavbar from "../../components/modules/my/myNavbar.vue";
@@ -96,6 +96,7 @@ const LoginOverlayShow = ref(false);
 const AuthorOverlayShow = ref(false);
 const agreed = ref(false);
 const navBarInfo = ref({});
+const activityHeatmapRef = ref(null);
 const CustomNavbarList = ref([
     {
         title: "清除缓存",
@@ -229,6 +230,19 @@ const reportLoginStatusIfNeeded = async () => {
         console.warn("reportLoginStatus 失败", error?.message || error);
     }
 };
+
+// 下拉刷新页面状态
+onPullDownRefresh(async () => {
+    try {
+        navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+        await reportLoginStatusIfNeeded();
+        if (activityHeatmapRef.value?.refresh) {
+            await activityHeatmapRef.value.refresh();
+        }
+    } finally {
+        uni.stopPullDownRefresh();
+    }
+});
 
 // 获取导航栏高度信息
 onMounted(() => {

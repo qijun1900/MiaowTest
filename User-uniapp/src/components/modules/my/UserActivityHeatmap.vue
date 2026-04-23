@@ -515,6 +515,14 @@ async function handleDayClick(day) {
   await loadDayDetail(day.date);
 }
 
+async function refresh() {
+  await loadHeatmap();
+}
+
+defineExpose({
+  refresh,
+});
+
 watch(
   () => isLoggedIn.value,
   async (loggedIn) => {

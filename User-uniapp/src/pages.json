@@ -17,8 +17,14 @@
 				"navigationBarTitleText": "题喵喵",
 				"navigationBarTextStyle": "white",
 				"navigationBarBackgroundColor": "#007AFF",
+				"enablePullDownRefresh": true,
 				"app-plus": {
-					"scrollIndicator": "none"
+					"scrollIndicator": "none",
+					"pullToRefresh": {
+						"support": true, // 是否支持下拉刷新
+						"style": "circle",
+						"color": "#007AFF" // 下拉刷新圆圈的颜色
+					}
 				}
 			}
 		},
@@ -29,9 +35,14 @@
 				"navigationStyle": "custom",
 				"disableScroll": false, // 允许页面滚动
 				"app-plus": {
-					"scrollIndicator": "none"
+					"scrollIndicator": "none",
+					"pullToRefresh": {
+						"support": true, // 是否支持下拉刷新
+						"style": "circle",
+						"color": "#007AFF" // 下拉刷新圆圈的颜色
+					}
 				},
-				"enablePullDownRefresh": false, // 启用下拉刷新
+				"enablePullDownRefresh": true,
 				"backgroundColor": "#F8FDFF"
 			}
 		},
@@ -283,7 +294,8 @@
 				{
 					"path": "NotesBookToolView",
 					"style": {
-						"navigationBarTitleText": "笔记本"
+						"navigationBarTitleText": "笔记本",
+						"scrollIndicator": "none"
 					}
 				},
 				{
