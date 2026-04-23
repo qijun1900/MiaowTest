@@ -183,6 +183,7 @@ const detailLoading = ref(false);
 const heatmapRefreshing = ref(false);
 const heatmapMotionState = ref("idle");
 let heatmapRequestSeq = 0;
+const HEATMAP_MOTION_DURATION_MS = 220;
 // 默认展示最近 1 个月。
 const selectedMonths = ref(3);
 const selectedPalette = ref("green");
@@ -421,6 +422,12 @@ function formatClock(value) {
   return `${hours}:${minutes}`;
 }
 
+function waitForHeatmapMotion(duration = HEATMAP_MOTION_DURATION_MS) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
+}
+
 function handleMonthChange(monthValue) {
   if (selectedMonths.value === monthValue) return;
   selectedMonths.value = monthValue;
@@ -459,6 +466,7 @@ async function loadHeatmap() {
 
     heatmapMotionState.value = "entering";
     await nextTick();
+    await waitForHeatmapMotion();
     heatmapMotionState.value = "idle";
 
     const activeDay =
