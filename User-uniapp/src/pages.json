@@ -106,13 +106,15 @@
 				{
 					"path": "PrivacyPolicyView",
 					"style": {
-						"navigationBarTitleText": "隐私政策"
+						"navigationBarTitleText": "隐私政策",
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "UserAgreementView",
 					"style": {
-						"navigationBarTitleText": "用户协议"
+						"navigationBarTitleText": "用户协议",
+						"scrollIndicator": "none"
 					}
 				}
 			]
@@ -341,14 +343,16 @@
 					"path": "NotesBookToolView_children/NoteDetailView",
 					"style": {
 						"navigationBarTitleText": "笔记详情",
-						"navigationStyle": "custom" //自定义导航栏
+						"navigationStyle": "custom", //自定义导航栏
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "NotesBookToolView_children/NoteEditView",
 					"style": {
 						"navigationBarTitleText": "编辑/添加笔记",
-						"navigationStyle": "custom" //自定义导航栏
+						"navigationStyle": "custom", //自定义导航栏
+						"scrollIndicator": "none"
 					}
 				}
 			]
