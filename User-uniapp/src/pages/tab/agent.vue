@@ -5,6 +5,9 @@
             @new-chat="handleNewChat"
             @model-change="handleModelChange"
         />
+        <view class="content">
+            1111
+        </view>
     </view>
 </template>
 
@@ -40,5 +43,8 @@ const handleNewChat = () => {
 .container {
     min-height: 100vh;
     background: #f6f7f9;
+}
+.content{
+    padding: 10rpx 20rpx;
 }
 </style>

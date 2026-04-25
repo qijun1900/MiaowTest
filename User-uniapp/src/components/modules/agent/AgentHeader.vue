@@ -84,6 +84,7 @@ const handleNewChat = () => {
 .custom-navbar {
     background: #f6f7f9;
     border-bottom: 1rpx solid rgba(15, 23, 42, 0.08);
+    box-sizing: border-box; 
 }
 
 .nav-row {
