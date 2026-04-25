@@ -19,11 +19,33 @@
             </view>
         </view>
 
-        <view v-if="loading" class="loading-container">
-            <view class="loading-spinner">
-                <view class="spinner-circle"></view>
+        <view v-if="loading" class="card-list skeleton-list">
+            <view
+                v-for="index in skeletonCount"
+                :key="`skeleton-${index}`"
+                class="notebook-card skeleton-card"
+            >
+                <view class="skeleton-aura"></view>
+
+                <view class="card-top">
+                    <view class="skeleton-pill skeleton-shimmer"></view>
+                </view>
+
+                <view class="card-content skeleton-content">
+                    <view class="skeleton-title skeleton-shimmer"></view>
+                    <view class="skeleton-desc skeleton-shimmer"></view>
+                    <view
+                        class="skeleton-desc skeleton-desc-short skeleton-shimmer"
+                    ></view>
+                </view>
+
+                <view class="card-footer skeleton-footer">
+                    <view class="skeleton-icon skeleton-shimmer"></view>
+                    <view class="skeleton-time skeleton-shimmer"></view>
+                    <view class="skeleton-line"></view>
+                    <view class="skeleton-hint skeleton-shimmer"></view>
+                </view>
             </view>
-            <text class="loading-text">加载中...</text>
         </view>
 
         <view class="card-list" v-else>
@@ -200,6 +222,7 @@ import { getRandomNotebookCardThemes } from "../../util/cardThemes";
 const popupShow = ref(false);
 const loading = ref(false);
 const submitting = ref(false);
+const skeletonCount = 6;
 
 const notebookList = ref([]);
 
@@ -650,33 +673,95 @@ onShow(() => {
     font-weight: 500;
 }
 
-.loading-container {
-    min-height: 56vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.skeleton-list {
+    pointer-events: none;
 }
 
-.loading-spinner {
-    width: 80rpx;
-    height: 80rpx;
-    position: relative;
+.skeleton-card {
+    background: linear-gradient(160deg, #fff 0%, #f8faff 100%);
+    border-color: #e7ecf8;
+    animation: none;
 }
 
-.spinner-circle {
-    width: 100%;
-    height: 100%;
-    border: 6rpx solid #e0e0e0;
-    border-top-color: #4d62ff;
+.skeleton-aura {
+    position: absolute;
+    width: 320rpx;
+    height: 320rpx;
+    right: -72rpx;
+    top: -124rpx;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    background: radial-gradient(
+        circle,
+        rgba(131, 147, 255, 0.16) 0%,
+        rgba(131, 147, 255, 0) 70%
+    );
 }
 
-.loading-text {
-    margin-top: 24rpx;
-    font-size: 28rpx;
-    color: #666;
+.skeleton-content {
+    margin-top: 18rpx;
+}
+
+.skeleton-pill {
+    width: 130rpx;
+    height: 42rpx;
+    border-radius: 999rpx;
+}
+
+.skeleton-title {
+    width: 76%;
+    height: 42rpx;
+    border-radius: 12rpx;
+}
+
+.skeleton-desc {
+    margin-top: 16rpx;
+    width: 100%;
+    height: 30rpx;
+    border-radius: 10rpx;
+}
+
+.skeleton-desc-short {
+    width: 68%;
+}
+
+.skeleton-footer {
+    gap: 10rpx;
+}
+
+.skeleton-icon {
+    width: 24rpx;
+    height: 24rpx;
+    border-radius: 50%;
+}
+
+.skeleton-time {
+    width: 112rpx;
+    height: 24rpx;
+    border-radius: 10rpx;
+}
+
+.skeleton-line {
+    width: 1rpx;
+    height: 22rpx;
+    background: #d8deea;
+    margin: 0 2rpx 0 4rpx;
+}
+
+.skeleton-hint {
+    width: 90rpx;
+    height: 22rpx;
+    border-radius: 10rpx;
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(
+        110deg,
+        rgba(233, 238, 250, 0.95) 8%,
+        rgba(248, 251, 255, 0.95) 18%,
+        rgba(233, 238, 250, 0.95) 33%
+    );
+    background-size: 220% 100%;
+    animation: skeleton-shimmer 1.2s ease-in-out infinite;
 }
 
 .form-container {
@@ -869,6 +954,15 @@ onShow(() => {
     }
     to {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes skeleton-shimmer {
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: -100% 0;
     }
 }
 
