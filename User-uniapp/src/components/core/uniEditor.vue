@@ -238,7 +238,7 @@
             </view>
         </view>
         <!-- 编辑器 -->
-        <view class="editor-wrapper" @touchmove.prevent.stop>
+        <view class="editor-wrapper">
             <editor
                 :id="props.id"
                 class="editor"
@@ -247,7 +247,6 @@
                 @ready="handleReady"
                 @focus="hanleFocus"
                 @blur="handleBlur"
-                @touchmove.prevent.stop
             />
         </view>
     </view>
@@ -973,6 +972,8 @@ onUnmounted(() => {
 
 .editor {
     height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 20rpx;
     background-color: #fff;
     line-height: 1.5;
