@@ -164,7 +164,8 @@
 				{
 					"path": "ManualImportView",
 					"style": {
-						"navigationBarTitleText": "手动导入"
+						"navigationBarTitleText": "手动导入",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -202,14 +203,16 @@
 				{
 					"path": "UserRegisterView",
 					"style": {
-						"navigationBarTitleText": "注册"
+						"navigationBarTitleText": "注册",
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "UserLoginView",
 					"style": {
 						"navigationBarTitleText": "登录",
-						"navigationStyle": "custom"
+						"navigationStyle": "custom",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -222,19 +225,22 @@
 				{
 					"path": "MyWrongView",
 					"style": {
-						"navigationBarTitleText": "我的错题"
+						"navigationBarTitleText": "我的错题",
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "MyNoteView",
 					"style": {
-						"navigationBarTitleText": "我的笔记"
+						"navigationBarTitleText": "我的笔记",
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "MyNoteDetailView",
 					"style": {
-						"navigationBarTitleText": "笔记详情"
+						"navigationBarTitleText": "笔记详情",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -246,7 +252,8 @@
 				{
 					"path": "MyMessageView",
 					"style": {
-						"navigationBarTitleText": "我的消息"
+						"navigationBarTitleText": "我的消息",
+						"scrollIndicator": "none"
 					}
 				},
 				{
