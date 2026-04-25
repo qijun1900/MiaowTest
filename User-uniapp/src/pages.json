@@ -197,7 +197,8 @@
 					"path": "UserInfoView",
 					"style": {
 						"navigationBarTitleText": "个人信息",
-						"disableScroll": true // 禁止页面滚动
+						"disableScroll": true, // 禁止页面滚动
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -219,7 +220,8 @@
 					"path": "MyFavoriteView",
 					"style": {
 						"navigationBarTitleText": "我的收藏",
-						"navigationStyle": "custom" //自定义导航栏
+						"navigationStyle": "custom", //自定义导航栏
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -246,7 +248,8 @@
 				{
 					"path": "MySettingView",
 					"style": {
-						"navigationBarTitleText": "设置"
+						"navigationBarTitleText": "设置",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -259,7 +262,8 @@
 				{
 					"path": "UserQuestionBankView",
 					"style": {
-						"navigationBarTitleText": "我的题库"
+						"navigationBarTitleText": "我的题库",
+						"scrollIndicator": "none"
 					}
 				}
 			]
