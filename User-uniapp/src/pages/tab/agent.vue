@@ -1,0 +1,44 @@
+<template>
+    <view class="container">
+        <AgentHeader
+            @menu-click="handleMenuClick"
+            @new-chat="handleNewChat"
+            @model-change="handleModelChange"
+        />
+    </view>
+</template>
+
+<script setup>
+import AgentHeader from "../../components/modules/agent/AgentHeader.vue";
+
+const handleMenuClick = () => {
+    uni.showToast({
+        title: "菜单功能开发中",
+        icon: "none",
+    });
+};
+
+const handleModelChange = (modelName) => {
+    if (!modelName) {
+        return;
+    }
+    uni.showToast({
+        title: `已切换 ${modelName}`,
+        icon: "none",
+    });
+};
+
+const handleNewChat = () => {
+    uni.showToast({
+        title: "新建会话",
+        icon: "none",
+    });
+};
+</script>
+
+<style scoped>
+.container {
+    min-height: 100vh;
+    background: #f6f7f9;
+}
+</style>

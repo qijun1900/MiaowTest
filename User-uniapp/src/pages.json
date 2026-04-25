@@ -74,6 +74,19 @@
 				"disableScroll": false,
 				"navigationBarTextStyle": "black"
 			}
+		},
+		{
+			"path": "pages/tab/agent",
+			"style": {
+				"navigationBarTitleText": "Agent",
+				"navigationStyle": "custom",
+				"disableScroll": false,
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#F8FDFF",
+				"app-plus": {
+					"scrollIndicator": "none"
+				}
+			}
 		}
 	],
 	"subPackages": [
@@ -392,6 +405,12 @@
 				"text": "考试",
 				"iconPath": "static/tabBar/exam.png",
 				"selectedIconPath": "static/tabBar/exam-active.png"
+			},
+			{
+				"pagePath": "pages/tab/agent",
+				"text": "Mio",
+				"iconPath": "static/tabBar/Agent.png",
+				"selectedIconPath": "static/tabBar/Agent.png"
 			},
 			{
 				"pagePath": "pages/tab/tools",
