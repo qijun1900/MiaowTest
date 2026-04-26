@@ -6,7 +6,7 @@
             @model-change="handleModelChange"
         />
         <view class="content">
-            1111
+            <WelcomePanel @action-click="handleWelcomeActionClick" />
         </view>
         <AgentSidebar
             v-model:show="sidebarVisible"
@@ -19,6 +19,7 @@
 import { ref } from "vue";
 import AgentHeader from "../../components/modules/agent/AgentHeader.vue";
 import AgentSidebar from "../../components/modules/agent/AgentSidebar.vue";
+import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
 
 const sidebarVisible = ref(false);
 
@@ -49,6 +50,17 @@ const handleSelectChat = (chatId) => {
         icon: "none",
     });
 };
+
+const handleWelcomeActionClick = (item) => {
+    if (!item?.key) {
+        return;
+    }
+
+    uni.showToast({
+        title: `点击了${item.title}`,
+        icon: "none",
+    });
+};
 </script>
 
 <style scoped>
@@ -56,7 +68,8 @@ const handleSelectChat = (chatId) => {
     min-height: 100vh;
     background: #f6f7f9;
 }
-.content{
-    padding: 10rpx 20rpx;
+
+.content {
+    padding: 24rpx 0 20rpx;
 }
 </style>
