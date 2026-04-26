@@ -8,17 +8,22 @@
         <view class="content">
             1111
         </view>
+        <AgentSidebar
+            v-model:show="sidebarVisible"
+            @select-chat="handleSelectChat"
+        />
     </view>
 </template>
 
 <script setup>
+import { ref } from "vue";
 import AgentHeader from "../../components/modules/agent/AgentHeader.vue";
+import AgentSidebar from "../../components/modules/agent/AgentSidebar.vue";
+
+const sidebarVisible = ref(false);
 
 const handleMenuClick = () => {
-    uni.showToast({
-        title: "菜单功能开发中",
-        icon: "none",
-    });
+    sidebarVisible.value = true;
 };
 
 const handleModelChange = (modelName) => {
@@ -34,6 +39,13 @@ const handleModelChange = (modelName) => {
 const handleNewChat = () => {
     uni.showToast({
         title: "新建会话",
+        icon: "none",
+    });
+};
+
+const handleSelectChat = (chatId) => {
+    uni.showToast({
+        title: `切换到会话 ${chatId}`,
         icon: "none",
     });
 };
