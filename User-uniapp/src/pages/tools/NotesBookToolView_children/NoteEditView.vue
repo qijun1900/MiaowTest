@@ -85,12 +85,22 @@
         </view>
       </view>
     </scroll-view>
+
+    <!-- 图片裁剪组件 -->
+    <ImageCropper
+      :show="showCropper"
+      :imagePath="currentCropImage"
+      @confirm="onCropConfirm"
+      @cancel="onCropCancel"
+      @useOriginal="onCropUseOriginal"
+    />
   </view>
 </template>
 
 <script setup>
 import { computed, ref } from "vue";
 import { onBackPress, onLoad, onUnload } from "@dcloudio/uni-app";
+import ImageCropper from "../../../components/common/ImageCropper.vue";
 import TagSelector from "../../../components/core/TagSelector.vue";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import {
@@ -192,6 +202,41 @@ const editorModes = [
   { label: "编辑", value: "edit" },
   { label: "预览", value: "preview" },
 ];
+
+//图片裁剪
+const showCropper = ref(false);
+const currentCropImage = ref("");
+let cropResolve = null;
+
+const promptCrop = (imagePath) => {
+  return new Promise((resolve) => {
+    uni.hideKeyboard();
+    currentCropImage.value = imagePath;
+    showCropper.value = true;
+    cropResolve = resolve;
+  });
+};
+
+const onCropConfirm = (croppedPath) => {
+  if (cropResolve) cropResolve(croppedPath);
+  closeCropper();
+};
+
+const onCropUseOriginal = () => {
+  if (cropResolve) cropResolve(currentCropImage.value);
+  closeCropper();
+};
+
+const onCropCancel = () => {
+  if (cropResolve) cropResolve(null); // Cancel means skip this image
+  closeCropper();
+};
+
+const closeCropper = () => {
+  showCropper.value = false;
+  currentCropImage.value = "";
+  cropResolve = null;
+};
 
 // 通过快照判断是否存在未保存修改
 const hasUnsavedChanges = computed(() => {
@@ -485,6 +530,8 @@ const insertImageToEditor = (ctx, source) =>
 
 // 处理 sp-editor 图片按钮上传（自动兼容 OSS / 微信云托管）
 const handleEditorUploadImage = async (tempFiles = [], eventEditorCtx) => {
+  uni.hideKeyboard();
+
   const fileList = Array.isArray(tempFiles) ? tempFiles : [];
   if (!fileList.length) return;
 
@@ -492,6 +539,10 @@ const handleEditorUploadImage = async (tempFiles = [], eventEditorCtx) => {
     eventEditorCtx && typeof eventEditorCtx.insertImage === "function"
       ? eventEditorCtx
       : editorCtx.value;
+
+  if (currentEditorCtx && typeof currentEditorCtx.blur === "function") {
+    currentEditorCtx.blur();
+  }
 
   if (!currentEditorCtx) {
     uni.showToast({
@@ -505,50 +556,72 @@ const handleEditorUploadImage = async (tempFiles = [], eventEditorCtx) => {
   let successCount = 0;
   let failCount = 0;
   let oversizeCount = 0;
+  const pathsToProcess = [];
 
-  uni.showLoading({
-    title: "上传图片中",
-    mask: true,
-  });
+  // 第一阶段：挨个对选中的图片进行裁剪（暂不插入编辑器，避免触发焦点拉起键盘）
+  for (const fileItem of fileList) {
+    let localPath = getEditorTempFilePath(fileItem);
+    const fileSize = Number(fileItem?.size || 0);
 
-  try {
-    for (const fileItem of fileList) {
-      const localPath = getEditorTempFilePath(fileItem);
-      const fileSize = Number(fileItem?.size || 0);
-
-      if (!localPath) {
-        failCount += 1;
-        continue;
-      }
-
-      if (fileSize > 0 && fileSize > EDITOR_IMAGE_MAX_SIZE) {
-        failCount += 1;
-        oversizeCount += 1;
-        continue;
-      }
-
-      try {
-        const uploadResult = await uploadSingleFile(localPath, {
-          cloudPathPrefix: NOTEBOOK_CLOUD_PATH_PREFIX,
-          formData: {
-            biz: "notebook",
-          },
-        });
-        try {
-          await insertImageToEditor(currentEditorCtx, uploadResult.url);
-          trackPendingUploadedImage(uploadResult.url);
-        } catch (insertError) {
-          await cleanupRemoteImagesByUrls([uploadResult.url]);
-          throw insertError;
-        }
-        successCount += 1;
-      } catch (error) {
-        failCount += 1;
-        console.error("笔记编辑器图片上传失败:", error);
-      }
+    if (!localPath) {
+      failCount += 1;
+      continue;
     }
-  } finally {
-    uni.hideLoading();
+
+    if (fileSize > 0 && fileSize > EDITOR_IMAGE_MAX_SIZE) {
+      failCount += 1;
+      oversizeCount += 1;
+      continue;
+    }
+
+    const croppedPath = await promptCrop(localPath);
+    uni.hideKeyboard(); // 在每张图片裁剪完成之后再次尝试隐藏键盘，防扰乱
+
+    if (!croppedPath) {
+      // user cancelled crop, skip uploading this image
+      continue;
+    }
+    pathsToProcess.push(croppedPath);
+  }
+
+  // 第二阶段：所有的裁剪结束之后，再统一上传并插入编辑器
+  if (pathsToProcess.length > 0) {
+    uni.showLoading({
+      title: "处理并上传中",
+      mask: true,
+    });
+
+    try {
+      for (const processPath of pathsToProcess) {
+        try {
+          const uploadResult = await uploadSingleFile(processPath, {
+            cloudPathPrefix: NOTEBOOK_CLOUD_PATH_PREFIX,
+            formData: {
+              biz: "notebook",
+            },
+          });
+          try {
+            await insertImageToEditor(currentEditorCtx, uploadResult.url);
+            trackPendingUploadedImage(uploadResult.url);
+
+            // 自动插入换行，避免相邻图片连在一行，也方便光标定位
+            if (typeof currentEditorCtx.insertText === "function") {
+              // 插入带零宽空格或普通空格的换行，避免单纯 \n 被富文本编辑器吞掉
+              currentEditorCtx.insertText({ text: "\n\n" });
+            }
+          } catch (insertError) {
+            await cleanupRemoteImagesByUrls([uploadResult.url]);
+            throw insertError;
+          }
+          successCount += 1;
+        } catch (error) {
+          failCount += 1;
+          console.error("笔记编辑器图片上传失败:", error);
+        }
+      }
+    } finally {
+      uni.hideLoading();
+    }
   }
 
   await syncContentFromEditor();
