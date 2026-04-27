@@ -36,6 +36,7 @@
                         type="text"
                         placeholder="搜索会话..."
                         placeholder-class="search-placeholder"
+                        :adjust-position="false"
                         v-model="searchText"
                     />
                 </view>
@@ -76,10 +77,7 @@
                     </view>
                 </view>
                 <view class="footer-settings" @click="handleSettings">
-                    <uni-icons 
-                        type="gear" 
-                        size="25" 
-                        color="#2f333b">
+                    <uni-icons type="gear" size="25" color="#2f333b">
                     </uni-icons>
                 </view>
             </view>
@@ -130,7 +128,7 @@ const filteredChats = computed(() => {
     if (!searchText.value) return chatList.value;
     const keyword = searchText.value.toLowerCase();
     return chatList.value.filter((item) =>
-        item.title.toLowerCase().includes(keyword)
+        item.title.toLowerCase().includes(keyword),
     );
 });
 
@@ -150,7 +148,7 @@ watch(
                 visible.value = false;
             }, 300);
         }
-    }
+    },
 );
 
 const headerStyle = computed(() => customNavbarStyle.value);

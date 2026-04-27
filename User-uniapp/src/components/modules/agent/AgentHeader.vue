@@ -1,5 +1,5 @@
 <template>
-    <view class="top-wrapper">
+    <view class="top-wrapper" :style="topWrapperStyle">
         <view class="custom-navbar" :style="customNavbarStyle">
             <view class="nav-row" :style="navRowStyle">
                 <view class="nav-left" @click="handleMenuClick">
@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 
 const props = defineProps({
@@ -42,10 +42,14 @@ const emit = defineEmits(["menu-click", "new-chat", "model-change"]);
 
 const currentModel = ref(props.initialModel);
 
-const { customNavbarStyle, navRowStyle } = useNavBarSafeArea({
+const { navBarInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
     rightPaddingExtra: 8,
 });
+
+const topWrapperStyle = computed(() => ({
+    height: `${navBarInfo.value.totalHeight}px`,
+}));
 
 const handleMenuClick = () => {
     emit("menu-click");
@@ -78,13 +82,20 @@ const handleNewChat = () => {
 .top-wrapper {
     position: relative;
     z-index: 10;
+    flex-shrink: 0;
     background: #f6f7f9;
+    box-sizing: border-box;
 }
 
 .custom-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
     background: #f6f7f9;
     border-bottom: 1rpx solid rgba(15, 23, 42, 0.08);
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .nav-row {
@@ -167,7 +178,9 @@ const handleNewChat = () => {
     box-shadow:
         0 6rpx 14rpx rgba(30, 42, 62, 0.14),
         inset 0 2rpx 4rpx rgba(255, 255, 255, 0.95);
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    transition:
+        transform 0.16s ease,
+        box-shadow 0.16s ease;
 }
 
 .plus-circle::before {

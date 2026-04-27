@@ -84,7 +84,8 @@
 				"navigationBarTextStyle": "black",
 				"backgroundColor": "#F8FDFF",
 				"app-plus": {
-					"scrollIndicator": "none"
+					"scrollIndicator": "none",
+					"softinputMode": "adjustResize"
 				}
 			}
 		}
