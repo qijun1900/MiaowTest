@@ -11,6 +11,9 @@
         <view
             class="sidebar-panel"
             :class="{ 'panel-active': animating }"
+            @touchstart="handlePanelTouchStart"
+            @touchmove="handlePanelTouchMove"
+            @touchend="handlePanelTouchEnd"
         >
             <!-- 顶部安全区 + 关闭按钮 -->
             <view class="sidebar-header" :style="headerStyle">
@@ -106,6 +109,10 @@ const visible = ref(false);
 const animating = ref(false);
 const searchText = ref("");
 const currentChatId = ref("1");
+const touchStartX = ref(0);
+const touchStartY = ref(0);
+const touchDeltaX = ref(0);
+const touchDeltaY = ref(0);
 
 // 占位会话数据
 const chatList = ref([
@@ -151,6 +158,40 @@ const headerRowStyle = computed(() => navRowStyle.value);
 
 const handleClose = () => {
     emit("update:show", false);
+};
+
+const handlePanelTouchStart = (event) => {
+    const touch = event?.touches?.[0];
+    if (!touch) {
+        return;
+    }
+    touchStartX.value = touch.clientX;
+    touchStartY.value = touch.clientY;
+    touchDeltaX.value = 0;
+    touchDeltaY.value = 0;
+};
+
+const handlePanelTouchMove = (event) => {
+    const touch = event?.touches?.[0];
+    if (!touch) {
+        return;
+    }
+    touchDeltaX.value = touch.clientX - touchStartX.value;
+    touchDeltaY.value = touch.clientY - touchStartY.value;
+};
+
+const handlePanelTouchEnd = () => {
+    const horizontalDistance = Math.abs(touchDeltaX.value);
+    const verticalDistance = Math.abs(touchDeltaY.value);
+    const isHorizontalSwipe = horizontalDistance > verticalDistance * 1.2;
+    const isLeftSwipe = touchDeltaX.value < -60;
+
+    if (isHorizontalSwipe && isLeftSwipe) {
+        handleClose();
+    }
+
+    touchDeltaX.value = 0;
+    touchDeltaY.value = 0;
 };
 
 const handleSelectChat = (chatId) => {
