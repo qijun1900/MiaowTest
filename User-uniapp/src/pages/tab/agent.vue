@@ -1,6 +1,6 @@
 <template>
     <page-meta page-style="overflow: hidden;" />
-    <view class="container" :style="containerStyle" @touchstart="handleTouchStart">
+    <view class="container" :style="containerStyle">
         <!--
             AgentHeader 内部结构说明：
             · .top-wrapper  →  flex 占位 spacer（高度 = 导航栏总高）
@@ -10,10 +10,11 @@
             @menu-click="handleMenuClick"
             @new-chat="handleNewChat"
             @model-change="handleModelChange"
+            @touchstart="handleTouchStart"
         />
 
         <!-- 内容滚动区 -->
-        <scroll-view class="content" scroll-y :show-scrollbar="false" @scroll="handleScroll">
+        <scroll-view class="content" scroll-y :show-scrollbar="false" @scroll="handleScroll" @touchstart="handleTouchStart">
             <view class="content-inner">
                 <WelcomePanel @action-click="handleWelcomeActionClick" />
             </view>
@@ -22,9 +23,8 @@
         <!--
             当 container 的 bottom 随键盘上移时，sender 自然贴在容器底部，
             即键盘顶部，不会留下任何灰色空隙。
-            此处使用 @touchstart.stop 阻止事件冒泡，使得点击输入区域时不会唤出 TabBar
         -->
-        <view class="sender-area" :style="senderAreaStyle" @touchstart.stop>
+        <view class="sender-area" :style="senderAreaStyle">
             <AgentSender
                 v-model="senderText"
                 v-model:thinking="thinkingMode"
