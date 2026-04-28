@@ -6,15 +6,15 @@ const { ChatOpenAI } = require("@langchain/openai");
 class ModelFactory {
   /**
    * 获取OpenAI或兼容的Chat模型
-   * @param {string} modelName - 模型名称，默认 gpt-3.5-turbo
+   * @param {string} modelName - 模型名称，默认 qwen-plus
    * @param {number} temperature - 温度值
    * @returns {ChatOpenAI} LLM实例
    */
-  static getModel(modelName = 'gpt-3.5-turbo', temperature = 0.7) {
+  static getModel(modelName = 'qwen-plus', temperature = 0.7) {
     return new ChatOpenAI({
-      openAIApiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.DASHSCOPE_API_KEY,
       configuration: {
-        baseURL: process.env.OPENAI_BASE_URL
+        baseURL: process.env.DASHSCOPE_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
       },
       modelName: modelName,
       temperature: temperature,
