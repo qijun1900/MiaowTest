@@ -12,6 +12,7 @@
     "zip": "npm run zip:no-deps"
   },
   "dependencies": {
+    "@langchain/openai": "^1.4.5",
     "ali-oss": "^6.23.0",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.3",
@@ -25,6 +26,7 @@
     "helmet": "^8.1.0",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^1.3.5",
     "moment": "^2.30.1",
     "mongodb-extjson": "^3.0.3",
     "mongoose": "^8.10.1",
