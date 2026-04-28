@@ -51,6 +51,7 @@ import AgentSender from "../../components/modules/agent/AgentSender.vue";
 import AgentSidebar from "../../components/modules/agent/AgentSidebar.vue";
 import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
+import {chatAPI} from "../../API/LLM/test.js"
 
 // ─── 响应式状态 ────────────────────────────────────────────────────────────────
 const sidebarVisible = ref(false);
@@ -176,7 +177,9 @@ const handleSenderSubmit = ({ text, thinking }) => {
         title: thinking ? "思考模式发送" : "普通模式发送",
         icon: "none",
     });
-    senderText.value = "";
+    console.log("发送内容：", text);
+    const response = chatAPI(text);
+    console.log("模型回复：", response);
 };
 </script>
 

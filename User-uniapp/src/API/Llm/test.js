@@ -1,11 +1,11 @@
 import { http } from "../../util/http.js";
 
-export async function chatAPI(message, model) {
+export async function chatAPI(message) {
   try {
     return await http({
-      url: "/adminapi/llm/chat",
+      url: "/uniappAPI/llm/chat",
       method: "POST",
-      data: { message, model },
+      data: { message },
       timeout: 15000, // 设置超时时间为60秒
     });
   } catch (error) {

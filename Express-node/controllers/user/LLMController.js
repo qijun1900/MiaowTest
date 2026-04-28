@@ -1,66 +1,17 @@
-﻿const LLMService = require("../../services/user/LLMService");
-
+﻿const llm = require("../../llm/index");
 const LLMController = {
-  sendExamAIanalyse: async (req, res) => {
+  chat : async (req, res) => {
     try {
-      const { message, QuestionID, Type, prompt, model } = req.body; // 从请求体中获取问题和题目ID,如果QuestionID不存在，则调用大模型api获得
-
-      const newmessage = prompt + ":" + map; // 拼接提示词和映射后的问题
-
-      const result = await LLMService.sendExamAIanalyse(
-        newmessage,
-        QuestionID,
-        Type,
-        model,
-      ); // 调用服务层的sendExamAIanalyse方法
-      res.status(200).send({
-        code: 200,
-        ActionType: "OK",
-        data: result, // 返回服务层的响应结果
-      });
+      const { message } = req.body;
+      console.log("收到消息：", message);
+      const response = await llm.chat(message);
+      console.log("模型回复：", response);
+      res.json({ success: true, data: response });
     } catch (error) {
-      console.error("Error fetching sendExamAIanalyse details:", error); // 处理错误
+      console.error("LLMController.chat 错误", error);
+      res.status(500).json({ success: false, error: "LLM对话失败" });
     }
-  },
-  UserChat: async (req, res) => {
-    try {
-      const { message, model } = req.body;
-      console.log("用户输入的问题:", message, "模型:", model);
-      const result = await LLMService.UserChat(message, model);
-      res.status(200).send({
-        code: 200,
-        ActionType: "OK",
-        data: result, // 返回服务层的响应结果
-      });
-    } catch (error) {
-      console.error("Error fetching UserChat details:", error); // 处理错误
-    }
-  },
-  getLLMList: async (req, res) => {
-    try {
-      const result = await LLMService.getLLMList(); // 调用服务层的getLLMList方法
-      res.status(200).send({
-        code: 200,
-        ActionType: "OK",
-        data: result, // 返回服务层的响应结果
-      });
-    } catch (error) {
-      console.error("Error fetching getLLMList details:", error); // 处理错误
-    }
-  },
-  postTranslateWorld: async (req, res) => {
-    try {
-      const { word } = req.body;
-      console.log("要翻译的单词:", word);
-      const result = await LLMService.postTranslateWorld(word); // 调用服务层的postTranslateWorld方法
-      res.status(200).send({
-        code: 200,
-        ActionType: "OK",
-        data: result, // 返回服务层的响应结果
-      });
-    } catch (error) {
-      console.error("Error fetching postTranslateWorld details:", error); // 处理错误
-    }
-  },
+  }
 };
+
 module.exports = LLMController;
