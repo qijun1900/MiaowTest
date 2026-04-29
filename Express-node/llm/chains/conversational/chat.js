@@ -8,7 +8,7 @@ const { StringOutputParser } = require("@langchain/core/output_parsers");
  * @param {string} modelName - 模型名称
  * @returns {Promise<string>} AI回复内容
  */
-async function chat(message, modelName = 'qwen-plus') {
+async function useChat(message, modelName = 'qwen-plus') {
   // 1. 获取模型实例
   const model = ModelFactory.getModel(modelName);
 
@@ -24,5 +24,5 @@ async function chat(message, modelName = 'qwen-plus') {
 }
 
 module.exports = {
-  chat
+  useChat
 };
