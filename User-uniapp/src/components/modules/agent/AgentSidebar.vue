@@ -21,7 +21,7 @@
                     <view class="close-btn" @click="handleClose">
                         <view class="close-icon"></view>
                     </view>
-                    <text class="sidebar-title">会话列表</text>
+                    <text class="sidebar-title">Mio</text>
                 </view>
             </view>
 

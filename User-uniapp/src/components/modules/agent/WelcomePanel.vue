@@ -12,8 +12,12 @@
                 class="welcome-action"
                 @click="handleActionClick(item)"
             >
-                <view class="action-icon" :style="{ color: item.color }">
-                    <text class="action-emoji">{{ item.emoji }}</text>
+                <view
+                    class="action-icon"
+                    :class="`action-icon-${item.icon || item.key}`"
+                    :style="{ color: item.color }"
+                >
+                    <view class="icon-shape"></view>
                 </view>
                 <text class="action-title">{{ item.title }}</text>
             </view>
@@ -36,10 +40,24 @@ const props = defineProps({
     actions: {
         type: Array,
         default: () => [
-            { key: "create-image", emoji: "🖼️", title: "制作图片", color: "#26a85d" },
-            { key: "create-music", emoji: "🎸", title: "创作音乐", color: "#e05a4f" },
-            { key: "help-study", emoji: "📚", title: "帮我学习", color: "#5973ff" },
-            { key: "write-anything", emoji: "📄", title: "随便写点什么", color: "#8a6cff" },
+            {
+                key: "create-image",
+                icon: "image",
+                title: "创建图片",
+                color: "#25b95f",
+            },
+            {
+                key: "analyze-data",
+                icon: "chart",
+                title: "分析数据",
+                color: "#6cc9dd",
+            },
+            {
+                key: "make-plan",
+                icon: "plan",
+                title: "制定计划",
+                color: "#dcc82f",
+            },
         ],
     },
 });
@@ -61,7 +79,7 @@ const handleActionClick = (item) => {
 }
 
 .welcome-copy {
-    margin-bottom: 28rpx;
+    margin-bottom: 30rpx;
 }
 
 .welcome-greeting {
@@ -79,53 +97,189 @@ const handleActionClick = (item) => {
     line-height: 1.18;
     font-weight: 800;
     color: #121826;
-    letter-spacing: 0.2rpx;
 }
 
 .welcome-actions {
     display: flex;
     flex-direction: column;
-    gap: 18rpx;
+    align-items: flex-start;
+    gap: 28rpx;
 }
 
 .welcome-action {
-    width: fit-content;
-    min-width: 246rpx;
-    min-height: 76rpx;
-    padding: 14rpx 22rpx;
+    min-width: 288rpx;
+    height: 84rpx;
+    padding: 0 34rpx 0 30rpx;
     border-radius: 999rpx;
     background: #ffffff;
-    border: 1rpx solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 10rpx 22rpx rgba(17, 24, 39, 0.05);
-    display: flex;
+    border: 1rpx solid #edf0f4;
+    box-shadow: 0 4rpx 12rpx rgba(17, 24, 39, 0.035);
+    display: inline-flex;
     align-items: center;
-    gap: 12rpx;
+    gap: 20rpx;
     box-sizing: border-box;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, background 0.15s ease;
 }
 
 .welcome-action:active {
     transform: scale(0.985);
-    box-shadow: 0 6rpx 16rpx rgba(17, 24, 39, 0.08);
+    background: #fafbfc;
 }
 
 .action-icon {
-    width: 36rpx;
-    height: 36rpx;
+    width: 48rpx;
+    height: 48rpx;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.action-emoji {
-    font-size: 26rpx;
-    line-height: 1;
+.icon-shape,
+.icon-shape::before,
+.icon-shape::after {
+    box-sizing: border-box;
 }
 
 .action-title {
-    font-size: 28rpx;
-    font-weight: 500;
-    color: #3d4758;
+    font-size: 30rpx;
+    line-height: 1;
+    font-weight: 700;
+    color: #8e9198;
+    white-space: nowrap;
+}
+
+.action-icon-image .icon-shape {
+    width: 36rpx;
+    height: 32rpx;
+    border: 6rpx solid currentColor;
+    border-radius: 5rpx;
+    position: relative;
+}
+
+.action-icon-image .icon-shape::before {
+    content: "";
+    position: absolute;
+    left: 4rpx;
+    bottom: 2rpx;
+    width: 18rpx;
+    height: 18rpx;
+    border-left: 6rpx solid currentColor;
+    border-bottom: 6rpx solid currentColor;
+    transform: rotate(45deg);
+    transform-origin: center;
+}
+
+.action-icon-image .icon-shape::after {
+    content: "";
+    position: absolute;
+    right: -11rpx;
+    top: -13rpx;
+    width: 18rpx;
+    height: 18rpx;
+    border-top: 5rpx solid currentColor;
+    border-right: 5rpx solid currentColor;
+}
+
+.action-icon-chart .icon-shape {
+    width: 38rpx;
+    height: 38rpx;
+    border-left: 6rpx solid currentColor;
+    border-bottom: 6rpx solid currentColor;
+    border-radius: 3rpx;
+    position: relative;
+}
+
+.action-icon-chart .icon-shape::before,
+.action-icon-chart .icon-shape::after {
+    content: "";
+    position: absolute;
+    bottom: 3rpx;
+    width: 7rpx;
+    border-radius: 999rpx 999rpx 0 0;
+    background: currentColor;
+}
+
+.action-icon-chart .icon-shape::before {
+    left: 9rpx;
+    height: 34rpx;
+}
+
+.action-icon-chart .icon-shape::after {
+    left: 24rpx;
+    height: 24rpx;
+}
+
+.action-icon-write .icon-shape {
+    width: 40rpx;
+    height: 13rpx;
+    border: 6rpx solid currentColor;
+    border-left: 0;
+    border-radius: 0 999rpx 999rpx 0;
+    position: relative;
+    transform: rotate(-36deg);
+}
+
+.action-icon-write .icon-shape::before {
+    content: "";
+    position: absolute;
+    left: -17rpx;
+    top: -6rpx;
+    width: 0;
+    height: 0;
+    border-top: 12rpx solid transparent;
+    border-bottom: 12rpx solid transparent;
+    border-right: 16rpx solid currentColor;
+}
+
+.action-icon-write .icon-shape::after {
+    content: "";
+    position: absolute;
+    left: -39rpx;
+    top: -15rpx;
+    width: 20rpx;
+    height: 6rpx;
+    border-radius: 999rpx;
+    background: currentColor;
+    box-shadow: -18rpx 14rpx 0 currentColor;
+}
+
+.action-icon-plan .icon-shape {
+    width: 29rpx;
+    height: 29rpx;
+    border: 6rpx solid currentColor;
+    border-radius: 50%;
+    position: relative;
+}
+
+.action-icon-plan .icon-shape::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -17rpx;
+    width: 18rpx;
+    height: 13rpx;
+    border-radius: 0 0 6rpx 6rpx;
+    border: 5rpx solid currentColor;
+    border-top: 0;
+    transform: translateX(-50%);
+}
+
+.action-icon-plan .icon-shape::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -20rpx;
+    width: 6rpx;
+    height: 6rpx;
+    border-radius: 50%;
+    background: currentColor;
+    transform: translateX(-50%);
+    box-shadow:
+        -19rpx 8rpx 0 currentColor,
+        19rpx 8rpx 0 currentColor,
+        -26rpx 27rpx 0 currentColor,
+        26rpx 27rpx 0 currentColor;
 }
 </style>

@@ -13,24 +13,33 @@
         />
 
         <view class="sender-tools">
-            <view
-                v-if="showThinkingToggle"
-                class="thinking-chip"
-                :class="{ 'thinking-chip-active': thinking }"
-                @click="toggleThinking"
-            >
-                <view class="chip-dot"></view>
-                <text class="chip-text">思考模式</text>
+            <view class="sender-tools-left">
+                <view class="attach-btn" @click="handleAddAttachment">
+                    <view class="attach-plus"></view>
+                </view>
+
+                <view
+                    v-if="showThinkingToggle"
+                    class="thinking-chip"
+                    :class="{ 'thinking-chip-active': thinking }"
+                    @click="toggleThinking"
+                >
+                    <view class="chip-dot"></view>
+                    <text class="chip-text">思考模式</text>
+                </view>
             </view>
 
-            <view class="attach-btn" @click="handleAddAttachment">
-                <view class="attach-plus"></view>
+            <view v-if="hasText" class="send-btn" @click="submitCurrent">
+                <uni-icons type="paperplane-filled" size="20" color="#ffffff">
+                </uni-icons>
             </view>
         </view>
     </view>
 </template>
 
 <script setup>
+import { computed } from "vue";
+
 const props = defineProps({
     modelValue: {
         type: String,
@@ -59,6 +68,8 @@ const emit = defineEmits([
     "blur",
 ]);
 
+const hasText = computed(() => (props.modelValue || "").trim().length > 0);
+
 const handleFocus = (event) => {
     emit("focus", event);
 };
@@ -71,11 +82,15 @@ const handleInput = (event) => {
     emit("update:modelValue", event?.detail?.value || "");
 };
 
-const handleConfirm = () => {
+const submitCurrent = () => {
     emit("submit", {
         text: (props.modelValue || "").trim(),
         thinking: props.thinking,
     });
+};
+
+const handleConfirm = () => {
+    submitCurrent();
 };
 
 const toggleThinking = () => {
@@ -113,6 +128,13 @@ const handleAddAttachment = () => {
     gap: 16rpx;
 }
 
+.sender-tools-left {
+    display: flex;
+    align-items: center;
+    gap: 14rpx;
+    min-width: 0;
+}
+
 .thinking-chip {
     min-height: 58rpx;
     padding: 0 20rpx;
@@ -142,16 +164,25 @@ const handleAddAttachment = () => {
     font-weight: 600;
 }
 
-.attach-btn {
+.attach-btn,
+.send-btn {
     width: 60rpx;
     height: 60rpx;
     border-radius: 50%;
-    background: #ffffff;
-    border: 1rpx solid rgba(15, 23, 42, 0.18);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+.attach-btn {
+    background: #ffffff;
+    border: 1rpx solid rgba(15, 23, 42, 0.18);
+}
+
+.send-btn {
+    background: #2f6bff;
+    box-shadow: 0 8rpx 18rpx rgba(47, 107, 255, 0.26);
 }
 
 .attach-plus {
