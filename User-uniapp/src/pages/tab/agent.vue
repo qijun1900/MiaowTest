@@ -17,6 +17,21 @@
         <scroll-view class="content" scroll-y :show-scrollbar="false" @scroll="handleScroll" @touchstart="handleTouchStart">
             <view class="content-inner">
                 <WelcomePanel @action-click="handleWelcomeActionClick" />
+                <view class="bubble-test-area">
+                    <Bubble
+                        ref="bubbleRef"
+                        :content="bubbleTestContent"
+                        :showAvatar="false"
+                        avatar-icon="person-filled"
+                        avatar-size="38px"
+                        shape="corner"
+                        variant="shadow"
+                        max-width="620rpx"
+                        :is-markdown="true"
+                        :typing="{ step: 2, interval: 35, suffix: '|' }"
+                        @finish="handleBubbleFinish"
+                    />
+                </view>
             </view>
         </scroll-view>
 
@@ -49,6 +64,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import AgentHeader from "../../components/modules/agent/AgentHeader.vue";
 import AgentSender from "../../components/modules/agent/AgentSender.vue";
 import AgentSidebar from "../../components/modules/agent/AgentSidebar.vue";
+import Bubble from "../../components/modules/agent/Bubble.vue";
 import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import {chatAPI} from "../../API/LLM/test.js"
@@ -58,6 +74,33 @@ const sidebarVisible = ref(false);
 const senderText = ref("");
 const thinkingMode = ref(false);
 const showThinkingToggle = ref(true);
+const bubbleRef = ref(null);
+const bubbleTestContent = ref(
+    `# Bubble 数学与表格测试
+
+行内公式：$E = mc^2$，二次方程求根公式：$x = (-b ± sqrt(b^2 - 4ac)) / 2a$。
+
+块级公式：
+$$
+f(x) = integral_0^x (t^2 + 2t + 1) dt
+S_n = n(a_1 + a_n) / 2
+$$
+
+| 指标 | 公式 | 说明 | 状态 |
+| --- | --- | --- | --- |
+| 平均值 | $mean = sum(x_i) / n$ | 用于描述集中趋势 | **通过** |
+| 方差 | $var = sum((x_i - mean)^2) / n$ | 用于描述离散程度 | **通过** |
+| 增长率 | $rate = (new - old) / old$ | 适合百分比展示 | \`待验证\` |
+
+复杂表格：
+
+| 模块 | 子项 | App | H5 | 微信小程序 | 备注 |
+| --- | --- | --- | --- | --- | --- |
+| Markdown | 标题/列表/强调 | 支持 | 支持 | 支持 | 由 Bubble 解析 |
+| 数学公式 | 行内/块级 | 文本渲染 | 文本渲染 | 文本渲染 | 暂不依赖 KaTeX |
+| 表格 | 多列数据 | 支持 | 支持 | 支持 | 由 mp-html 展示 |
+| 打字效果 | step/interval/suffix | 支持 | 支持 | 支持 | 打完后切换富文本 |`,
+);
 
 // ─── 键盘高度监听 ──────────────────────────────────────────────────────────────
 const keyboardHeight = ref(0);
@@ -167,6 +210,10 @@ const handleWelcomeActionClick = (item) => {
     uni.showToast({ title: `点击了${item.title}`, icon: "none" });
 };
 
+const handleBubbleFinish = () => {
+    console.log("Bubble 打字完成", bubbleRef.value?.progress);
+};
+
 const handleAddAttachment = () => {
     uni.showToast({ title: "添加附件", icon: "none" });
 };
@@ -215,6 +262,10 @@ const handleSenderSubmit = ({ text, thinking }) => {
 
 .content-inner {
     padding: 24rpx 0 32rpx;
+}
+
+.bubble-test-area {
+    padding: 24rpx;
 }
 
 /*
