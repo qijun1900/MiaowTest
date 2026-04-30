@@ -1,7 +1,7 @@
 <template>
     <view class="welcome-panel">
         <view class="welcome-copy">
-            <text class="welcome-greeting">{{ greeting }}</text>
+            <text class="welcome-greeting">{{ dynamicGreeting }}</text>
             <text class="welcome-title">{{ title }}</text>
         </view>
 
@@ -27,12 +27,12 @@
 
 <script setup>
 import { computed } from "vue";
+import { UserInfoStore } from "@/stores/modules/UserinfoStore";
+import { getGreetingInfo } from "@/util/greet";
+
+const userInfoStore = UserInfoStore();
 
 const props = defineProps({
-    greeting: {
-        type: String,
-        default: "qijun，你好",
-    },
     title: {
         type: String,
         default: "需要我为你做些什么？",
@@ -62,6 +62,12 @@ const props = defineProps({
     },
 });
 
+const dynamicGreeting = computed(() => {
+    const greetingInfo = getGreetingInfo();
+    const name = userInfoStore.userInfo?.nickname || '同学';
+    return `${name}，${greetingInfo.text}`;
+});
+
 const emit = defineEmits(["action-click"]);
 
 const actionItems = computed(() => props.actions || []);
@@ -84,16 +90,16 @@ const handleActionClick = (item) => {
 
 .welcome-greeting {
     display: block;
-    font-size: 28rpx;
-    line-height: 1.4;
-    font-weight: 500;
+    font-size: 38rpx;
+    line-height: 1.5;
+    font-weight: 600;
     color: #313644;
     margin-bottom: 8rpx;
 }
 
 .welcome-title {
     display: block;
-    font-size: 52rpx;
+    font-size: 48rpx;
     line-height: 1.18;
     font-weight: 800;
     color: #121826;
