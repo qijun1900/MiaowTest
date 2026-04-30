@@ -21,7 +21,7 @@
                     <Bubble
                         ref="bubbleRef"
                         :content="bubbleTestContent"
-                        :showAvatar="false"
+                        :show-avatar="false"
                         avatar-icon="person-filled"
                         avatar-size="38px"
                         shape="corner"
@@ -78,19 +78,19 @@ const bubbleRef = ref(null);
 const bubbleTestContent = ref(
     `# Bubble 数学与表格测试
 
-行内公式：$E = mc^2$，二次方程求根公式：$x = (-b ± sqrt(b^2 - 4ac)) / 2a$。
+行内公式：$E = mc^2$，二次方程求根公式：$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$。
 
 块级公式：
 $$
-f(x) = integral_0^x (t^2 + 2t + 1) dt
-S_n = n(a_1 + a_n) / 2
+f(x) = \\int_0^x (t^2 + 2t + 1) dt
+S_n = \\frac{n(a_1 + a_n)}{2}
 $$
 
 | 指标 | 公式 | 说明 | 状态 |
 | --- | --- | --- | --- |
-| 平均值 | $mean = sum(x_i) / n$ | 用于描述集中趋势 | **通过** |
-| 方差 | $var = sum((x_i - mean)^2) / n$ | 用于描述离散程度 | **通过** |
-| 增长率 | $rate = (new - old) / old$ | 适合百分比展示 | \`待验证\` |
+| 平均值 | $\\bar{x} = \\frac{\\sum x_i}{n}$ | 用于描述集中趋势 | **通过** |
+| 方差 | $\\sigma^2 = \\frac{\\sum (x_i - \\bar{x})^2}{n}$ | 用于描述离散程度 | **通过** |
+| 增长率 | $rate = \\frac{new - old}{old}$ | 适合百分比展示 | \`待验证\` |
 
 复杂表格：
 
@@ -99,7 +99,17 @@ $$
 | Markdown | 标题/列表/强调 | 支持 | 支持 | 支持 | 由 Bubble 解析 |
 | 数学公式 | 行内/块级 | 文本渲染 | 文本渲染 | 文本渲染 | 暂不依赖 KaTeX |
 | 表格 | 多列数据 | 支持 | 支持 | 支持 | 由 mp-html 展示 |
-| 打字效果 | step/interval/suffix | 支持 | 支持 | 支持 | 打完后切换富文本 |`,
+| 打字效果 | step/interval/suffix | 支持 | 支持 | 支持 | 打完后切换富文本 |
+
+代码高亮测试：
+
+\`\`\`js
+const sum = (list) => {
+    return list.reduce((total, item) => total + item, 0);
+};
+
+console.log(sum([1, 2, 3]));
+\`\`\``,
 );
 
 // ─── 键盘高度监听 ──────────────────────────────────────────────────────────────

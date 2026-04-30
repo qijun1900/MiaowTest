@@ -68,6 +68,7 @@
                         v-if="shouldRenderMarkdown"
                         class="bubble-mp-html"
                         :content="renderHtml"
+                        :markdown="isMarkdown"
                         :tag-style="htmlTagStyle"
                         :selectable="selectable"
                         :preview-img="previewImg"
@@ -230,11 +231,6 @@ const progress = ref(0);
 // 只使用 setTimeout / clearTimeout，避免依赖浏览器 DOM API，保证 App、H5、小程序都可运行。
 let timer = null;
 let cursor = 0;
-const INLINE_MATH_STYLE =
-    "font-family:monospace;background:#eef2f7;color:#1f3a8a;border-radius:4px;padding:1px 5px;";
-const BLOCK_MATH_STYLE =
-    "font-family:monospace;white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;margin:8px 0;color:#1f2937;";
-const TABLE_WRAP_STYLE = "max-width:100%;overflow-x:auto;margin:8px 0;";
 
 const typingOptions = computed(() => {
     // false / null / undefined 都视为关闭打字效果。
@@ -300,9 +296,6 @@ const htmlTagStyle = computed(() => ({
     div: "line-height:1.7;",
     img: "max-width:100%;border-radius:8px;",
     table: "border-collapse:collapse;max-width:100%;",
-    ".table-wrap": "max-width:100%;overflow-x:auto;margin:8px 0;",
-    ".math-inline": "font-family:monospace;background:#eef2f7;color:#1f3a8a;border-radius:4px;padding:1px 5px;",
-    ".math-block": "font-family:monospace;white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;margin:8px 0;color:#1f2937;",
     th: "border:1px solid #e5e7eb;padding:6px;background:#f8fafc;",
     td: "border:1px solid #e5e7eb;padding:6px;",
     thead: "background:#f8fafc;",
@@ -318,13 +311,13 @@ const renderHtml = computed(() => {
     if (!props.isMarkdown) {
         return escapeHtml(renderedContent.value).replace(/\n/g, "<br />");
     }
-    // isMarkdown 开启时先把 Markdown 转成 HTML，再交给项目内置 mp-html 渲染。
-    return markdownToHtml(renderedContent.value);
+    // Markdown / highlight / latex are handled by mp-html official plugins.
+    return renderedContent.value;
 });
 
 const shouldRenderMarkdown = computed(() => {
-    // mp-html is stable with complete HTML, but typing produces partial Markdown.
-    // During typing we render plain text, then switch to mp-html when finished.
+    // 只有在 isMarkdown 开启且正在展示内容时才渲染 mp-html，避免不必要的组件树和事件绑定，提升性能和稳定性。
+    // 即使父组件传了 isMarkdown，关闭 typing 后也不渲染 mp-html，直接展示纯文本，避免不必要的组件树和事件绑定，提升性能和稳定性。
     return props.isMarkdown && !isTyping.value;
 });
 
@@ -494,177 +487,6 @@ function escapeHtml(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
-}
-
-function parseInlineMarkdown(value) {
-    // Inline Markdown covers common chat content plus lightweight math tokens.
-    return escapeHtml(value)
-        .replace(/\$([^$\n]+)\$/g, `<span style="${INLINE_MATH_STYLE}">$1</span>`)
-        .replace(/`([^`]+)`/g, "<code>$1</code>")
-        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" />')
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-}
-
-function markdownToHtml(markdown) {
-    // Lightweight fallback: headings, lists, code blocks, math blocks, tables and paragraphs.
-    const source = String(markdown || "");
-    const lines = source.replace(/\r\n/g, "\n").split("\n");
-    const html = [];
-    let inCode = false;
-    let inMath = false;
-    let codeBuffer = [];
-    let mathBuffer = [];
-    let inList = false;
-
-    const closeList = () => {
-        if (inList) {
-            html.push("</ul>");
-            inList = false;
-        }
-    };
-
-    for (let index = 0; index < lines.length; index += 1) {
-        const line = lines[index];
-        const trimmed = line.trim();
-
-        if (line.trim().startsWith("```")) {
-            if (inCode) {
-                html.push(`<pre><code>${escapeHtml(codeBuffer.join("\n"))}</code></pre>`);
-                codeBuffer = [];
-                inCode = false;
-            } else {
-                closeList();
-                inCode = true;
-            }
-            continue;
-        }
-
-        if (inCode) {
-            codeBuffer.push(line);
-            continue;
-        }
-
-        if (trimmed.startsWith("$$")) {
-            if (inMath) {
-                html.push(`<div style="${BLOCK_MATH_STYLE}">${escapeHtml(mathBuffer.join("\n"))}</div>`);
-                mathBuffer = [];
-                inMath = false;
-            } else {
-                closeList();
-                inMath = true;
-            }
-            continue;
-        }
-
-        if (inMath) {
-            mathBuffer.push(line);
-            continue;
-        }
-
-        if (!trimmed) {
-            closeList();
-            continue;
-        }
-
-        const heading = /^(#{1,6})\s+(.+)$/.exec(trimmed);
-        if (heading) {
-            closeList();
-            const level = heading[1].length;
-            html.push(`<h${level}>${parseInlineMarkdown(heading[2])}</h${level}>`);
-            continue;
-        }
-
-        if (isMarkdownTable(lines, index)) {
-            closeList();
-            const table = collectMarkdownTable(lines, index);
-            html.push(renderMarkdownTable(table.rows));
-            index = table.nextIndex - 1;
-            continue;
-        }
-
-        const listItem = /^[-*]\s+(.+)$/.exec(trimmed);
-        if (listItem) {
-            if (!inList) {
-                html.push("<ul>");
-                inList = true;
-            }
-            html.push(`<li>${parseInlineMarkdown(listItem[1])}</li>`);
-            continue;
-        }
-
-        closeList();
-        html.push(`<p>${parseInlineMarkdown(trimmed)}</p>`);
-    }
-
-    if (inCode) {
-        html.push(`<pre><code>${escapeHtml(codeBuffer.join("\n"))}</code></pre>`);
-    }
-    if (inMath) {
-        html.push(`<div style="${BLOCK_MATH_STYLE}">${escapeHtml(mathBuffer.join("\n"))}</div>`);
-    }
-    closeList();
-
-    return html.join("");
-}
-
-function splitTableRow(line) {
-    return line
-        .trim()
-        .replace(/^\|/, "")
-        .replace(/\|$/, "")
-        .split("|")
-        .map((cell) => cell.trim());
-}
-
-function isTableSeparator(line) {
-    return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line || "");
-}
-
-function isMarkdownTable(lines, index) {
-    return (
-        lines[index]?.includes("|") &&
-        lines[index + 1]?.includes("|") &&
-        isTableSeparator(lines[index + 1])
-    );
-}
-
-function collectMarkdownTable(lines, startIndex) {
-    const rows = [splitTableRow(lines[startIndex])];
-    let index = startIndex + 2;
-
-    while (index < lines.length && lines[index].includes("|") && lines[index].trim()) {
-        rows.push(splitTableRow(lines[index]));
-        index += 1;
-    }
-
-    return {
-        rows,
-        nextIndex: index,
-    };
-}
-
-function renderMarkdownTable(rows) {
-    if (!rows.length) {
-        return "";
-    }
-
-    const headers = rows[0];
-    const bodyRows = rows.slice(1);
-    const thead = headers
-        .map((cell) => `<th>${parseInlineMarkdown(cell)}</th>`)
-        .join("");
-    const tbody = bodyRows
-        .map((row) => {
-            const cells = headers
-                .map((_, index) => `<td>${parseInlineMarkdown(row[index] || "")}</td>`)
-                .join("");
-            return `<tr>${cells}</tr>`;
-        })
-        .join("");
-
-    return `<div style="${TABLE_WRAP_STYLE}"><table><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table></div>`;
 }
 </script>
 
