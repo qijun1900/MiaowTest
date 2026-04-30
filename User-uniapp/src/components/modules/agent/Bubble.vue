@@ -137,7 +137,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    // 是否把 content 按 Markdown 处理；开启后会转成 HTML 并交给 mp-html 渲染。
+    // 是否将 content 作为 Markdown 解析渲染，支持常见的 Markdown 语法和 mp-html 插件（highlight、latex 等）。
     isMarkdown: {
         type: Boolean,
         default: false,

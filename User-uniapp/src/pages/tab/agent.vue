@@ -22,11 +22,9 @@
                         ref="bubbleRef"
                         :content="bubbleTestContent"
                         :show-avatar="false"
-                        avatar-icon="person-filled"
-                        avatar-size="38px"
                         shape="corner"
                         variant="shadow"
-                        max-width="620rpx"
+                        max-width="650rpx"
                         :is-markdown="true"
                         :typing="{ step: 2, interval: 35, suffix: '|' }"
                         @finish="handleBubbleFinish"
@@ -271,7 +269,7 @@ const handleSenderSubmit = ({ text, thinking }) => {
 }
 
 .content-inner {
-    padding: 24rpx 0 32rpx;
+    padding: 24rpx 0 160rpx;
 }
 
 .bubble-test-area {
@@ -279,13 +277,23 @@ const handleSenderSubmit = ({ text, thinking }) => {
 }
 
 /*
- * ── 底部输入区（flex 末项，非 position:fixed）─────────────────────────────────
- * 作为 flex 末项，它始终紧贴容器底部（= 键盘顶部），
- * padding-bottom 由 senderAreaStyle 动态注入以适配安全区。
+ * ── 底部输入区（悬浮在内容上方）─────────────────────────────────
+ * 使用 absolute 定位并贴在容器底部，不占用 flex 空间，使得文字可以滚动到被输入框遮挡的下方
  */
 .sender-area {
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
     padding-top: 14rpx;
+    background: transparent;
+    pointer-events: none; /* 让空白区域透传点击 */
     /* padding-bottom 由 :style 绑定（senderAreaStyle）动态注入 */
+}
+
+/* 恢复内部元素的点击响应，因为外层使用 pointer-events: none */
+.sender-area :deep( .sender-shell ) {
+    pointer-events: auto;
 }
 </style>
