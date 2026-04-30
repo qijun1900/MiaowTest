@@ -142,7 +142,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    // 打字效果配置。true 使用默认速度；对象支持 step、interval、suffix。
+    // 打字效果配置。true 使用默认速度；对象支持 step--步数 、interval -- 间隔、suffix--后缀修饰。
     typing: {
         type: [Boolean, Object],
         default: false,

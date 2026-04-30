@@ -26,7 +26,7 @@
                         variant="shadow"
                         max-width="650rpx"
                         :is-markdown="true"
-                        :typing="{ step: 2, interval: 35, suffix: '|' }"
+                        :typing="{ step: 5, interval: 15, suffix: '|' }"
                         @finish="handleBubbleFinish"
                     />
                 </view>
