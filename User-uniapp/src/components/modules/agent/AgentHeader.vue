@@ -12,10 +12,39 @@
                     <view class="model-arrow"></view>
                 </view>
 
-                <view class="nav-right" @click="handleNewChat">
-                    <view class="plus-circle">
-                        <view class="plus-line plus-horizontal"></view>
-                        <view class="plus-line plus-vertical"></view>
+                <view class="nav-right">
+                    <view class="more-trigger" @click.stop="toggleOptionsMenu">
+                        <view class="more-dot"></view>
+                        <view class="more-dot"></view>
+                        <view class="more-dot"></view>
+                    </view>
+
+                    <!-- 遮罩层，用于点击外部关闭菜单 -->
+                    <view v-if="showOptionsMenu" class="options-mask" @click.stop="closeOptionsMenu"></view>
+                    
+                    <!-- 下拉菜单 -->
+                    <view v-if="showOptionsMenu" class="options-dropdown" @click.stop>
+                        <view class="option-item" @click="handleOption('rename')">
+                            <text class="option-text">Rename</text>
+                            <uni-icons type="compose" size="18" color="#333"></uni-icons>
+                        </view>
+                        <view class="option-item" @click="handleOption('star')">
+                            <text class="option-text">Star</text>
+                            <uni-icons type="star" size="18" color="#333"></uni-icons>
+                        </view>
+                        <view class="option-item" @click="handleOption('add-to-home')">
+                            <text class="option-text">Add to home</text>
+                            <uni-icons type="home" size="18" color="#333"></uni-icons>
+                        </view>
+                        <view class="option-item option-item-danger" @click="handleOption('delete')">
+                            <text class="option-text">Delete</text>
+                            <uni-icons type="trash" size="18" color="#ef4444"></uni-icons>
+                        </view>
+                        <view class="dropdown-divider"></view>
+                        <view class="option-item" @click="handleOption('new-chat')">
+                            <text class="option-text">New chat</text>
+                            <uni-icons type="plusempty" size="18" color="#333"></uni-icons>
+                        </view>
                     </view>
                 </view>
             </view>
@@ -38,9 +67,10 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["menu-click", "new-chat", "model-change"]);
+const emit = defineEmits(["menu-click", "new-chat", "model-change", "option-click"]);
 
 const currentModel = ref(props.initialModel);
+const showOptionsMenu = ref(false);
 
 const { navBarInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
@@ -75,6 +105,23 @@ const handleModelSwitch = () => {
 
 const handleNewChat = () => {
     emit("new-chat");
+};
+
+const toggleOptionsMenu = () => {
+    showOptionsMenu.value = !showOptionsMenu.value;
+};
+
+const closeOptionsMenu = () => {
+    showOptionsMenu.value = false;
+};
+
+const handleOption = (action) => {
+    closeOptionsMenu();
+    if (action === 'new-chat') {
+        handleNewChat();
+    } else {
+        emit("option-click", action);
+    }
 };
 </script>
 
@@ -167,65 +214,80 @@ const handleNewChat = () => {
     transform: rotate(45deg) translateY(-2rpx);
 }
 
-.plus-circle {
-    width: 58rpx;
-    height: 58rpx;
-    border-radius: 50%;
+.nav-right {
     position: relative;
-    overflow: hidden;
-    background: linear-gradient(180deg, #ffffff 0%, #f0f3f8 100%);
-    border: 1.6rpx solid rgba(39, 47, 66, 0.2);
-    box-shadow:
-        0 6rpx 14rpx rgba(30, 42, 62, 0.14),
-        inset 0 2rpx 4rpx rgba(255, 255, 255, 0.95);
-    transition:
-        transform 0.16s ease,
-        box-shadow 0.16s ease;
+    width: 60rpx;
+    display: flex;
+    justify-content: flex-end;
 }
 
-.plus-circle::before {
-    content: "";
-    position: absolute;
-    left: 10rpx;
-    top: 8rpx;
-    width: 26rpx;
-    height: 14rpx;
-    border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.75);
+.more-trigger {
+    width: 60rpx;
+    height: 60rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
 }
 
-.plus-circle::after {
-    content: "";
-    position: absolute;
-    inset: 3rpx;
+.more-trigger:active {
+    opacity: 0.7;
+}
+
+.more-dot {
+    width: 8rpx;
+    height: 8rpx;
+    background-color: #30323a;
     border-radius: 50%;
-    border: 1rpx solid rgba(255, 255, 255, 0.7);
 }
 
-.plus-line {
+.options-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+.options-dropdown {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    background: linear-gradient(180deg, #31384a 0%, #1f2635 100%);
-    border-radius: 999rpx;
-    box-shadow: 0 1rpx 0 rgba(255, 255, 255, 0.35);
-    transform: translate(-50%, -50%);
+    top: 90rpx;
+    right: 0;
+    width: 320rpx;
+    background: #ffffff;
+    border-radius: 16rpx;
+    padding: 10rpx 0;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.12);
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
 }
 
-.plus-horizontal {
-    width: 24rpx;
-    height: 4rpx;
+.option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24rpx 30rpx;
 }
 
-.plus-vertical {
-    width: 4rpx;
-    height: 24rpx;
+.option-item:active {
+    background-color: #f7f8f9;
 }
 
-.nav-right:active .plus-circle {
-    transform: scale(0.94);
-    box-shadow:
-        0 3rpx 8rpx rgba(30, 42, 62, 0.18),
-        inset 0 1rpx 2rpx rgba(255, 255, 255, 0.88);
+.option-text {
+    font-size: 30rpx;
+    color: #333;
+}
+
+.option-item-danger .option-text {
+    color: #ef4444; 
+}
+
+.dropdown-divider {
+    height: 1rpx;
+    background-color: #f0f0f0;
+    margin: 8rpx 0;
 }
 </style>
