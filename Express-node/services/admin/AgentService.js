@@ -1,5 +1,6 @@
 const AgentDefinitionModel = require("../../models/AgentDefinitionModel");
 const chat = require("../../llm/admin/Chat/chat");
+const { runAgentChain } = require("../../llm/chains/agent/agentChat");
 
 const AgentService = {
   addAgent: async (data) => {
@@ -44,24 +45,20 @@ const AgentService = {
     // 1. 获取 Agent 配置
     const agentConfig = await AgentDefinitionModel.findOne({ agentKey });
     
-    let defaultModel = "qwen-plus"; // fallback
+    let defaultModel = "qwen-plus"; // fallback底座模型
+    let systemPrompt = "你是一个有用的AI助手。"; // fallback默认系统引导词
+    
     if (agentConfig) {
       if (agentConfig.defaultModel) {
         defaultModel = agentConfig.defaultModel;
       }
-      
-      // 2. 如果存在 systemPrompt，将其作为 system 角色插入
       if (agentConfig.systemPrompt) {
-        // 先检查 messages 里是否已经有 system prompt
-        const hasSystem = messages.some(m => m.role === 'system' || m.role === 'AI助手'); // simple check
-        if (!hasSystem) {
-          messages.unshift({ role: "system", content: agentConfig.systemPrompt });
-        }
+        systemPrompt = agentConfig.systemPrompt;
       }
     }
 
-    // 3. 调用底层大模型聊天
-    return await chat.postUserSingleChat(messages, defaultModel);
+    // 2. 通过构建的 LCEL Chain 注入 prompt 执行链条对话
+    return await runAgentChain(messages, systemPrompt, defaultModel);
   },
   getChatAgents: async () => {
     return await AgentDefinitionModel.find({ isPublish: 1 }).sort({ sort: 1, createTime: -1 });
