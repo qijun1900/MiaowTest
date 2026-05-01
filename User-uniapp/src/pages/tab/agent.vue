@@ -17,6 +17,17 @@
         <scroll-view class="content" scroll-y :show-scrollbar="false" @scroll="handleScroll" @touchstart="handleTouchStart">
             <view class="content-inner">
                 <WelcomePanel @action-click="handleWelcomeActionClick" />
+                
+                <view style="padding: 24rpx;">
+                    <ThoughtChain 
+                        status="thinking" 
+                        content="我正在思考如何评估这三个模型的表现...\n首先，我会分析XGBoost的混淆矩阵。\n其次，我会关注SHAP特征重要性。" 
+                        buttonWidth="240rpx"
+                        maxWidth="100%"
+                        :typing="{ step: 1, interval: 50, suffix: '|' }"
+                    />
+                </view>
+
                 <view class="bubble-test-area">
                     <Bubble
                         ref="bubbleRef"
@@ -64,6 +75,7 @@ import AgentSender from "../../components/modules/agent/AgentSender.vue";
 import AgentSidebar from "../../components/modules/agent/AgentSidebar.vue";
 import Bubble from "../../components/modules/agent/Bubble.vue";
 import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
+import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import {chatAPI} from "../../API/LLM/test.js"
 
