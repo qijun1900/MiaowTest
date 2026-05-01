@@ -245,7 +245,6 @@ import { useTableState } from "@/composables/State/useTableState";
 import { useTableActions } from "@/composables/Action/useTableActions";
 import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
 import { ref, reactive, defineAsyncComponent, onMounted } from "vue";
-import formatTime from "@/util/formatTime";
 import Pagination from "@/components/ReuseComponents/Pagination.vue";
 import { ElMessage } from "element-plus";
 import {
@@ -347,6 +346,7 @@ const handlePublishChange = async (row) => {
     }
   } catch (error) {
     ElMessage.error("状态更新失败");
+    console.error("状态更新失败:", error);
   }
 };
 

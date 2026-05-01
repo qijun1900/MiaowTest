@@ -2,6 +2,7 @@
   <div class="container">
     <XWelcome
       v-show="!isSendValue"
+      icon="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
       title="欢迎配置测试 ~！"
       :extra="`当前目标：${selectedAgent || '请选择 Agent'}`"
       :description="
@@ -37,7 +38,7 @@
           :isLoading="message.isLoading || false"
           :bubbleAvatarSrc="
             message.role === 'user'
-              ? `http://${escconfig.serverHost}:${escconfig.serverPort}` + appStore.userInfo.avatar
+              ? (appStore.userInfo.avatar ? formatImageUrl(appStore.userInfo.avatar) : 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png')
               : 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
           "
           :typingsteps="4"
@@ -55,10 +56,10 @@ import { useAppStore } from "@/stores";
 import { onMounted, ref } from "vue";
 import XWelcome from "@/components/Element-plus-x/XWelcome.vue";
 import XBubble from "@/components/Element-plus-x/XBubble.vue";
+import formatImageUrl from "@/util/formatImageUrl";
 import { testChatAPI, getChatAgents } from "@/API/LLM/agentAPI";
 import ElSelect from "@/components/ReuseComponents/ElSelect.vue";
 import { useRoute } from "vue-router";
-import escconfig from "../../config/esc.config";
 import { ElMessage } from "element-plus";
 
 const appStore = useAppStore();
