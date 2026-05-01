@@ -1,5 +1,5 @@
-const ModelFactory = require('../../models/factory');
-const { basicChatPrompt } = require('../../prompts/templates');
+const ModelFactory = require("../../models/factory");
+const { basicChatPrompt } = require("../../prompts/templates");
 const { StringOutputParser } = require("@langchain/core/output_parsers");
 
 /**
@@ -8,7 +8,7 @@ const { StringOutputParser } = require("@langchain/core/output_parsers");
  * @param {string} modelName - 模型名称
  * @returns {Promise<string>} AI回复内容
  */
-async function useChat(message, modelName = 'qwen-plus') {
+async function useChat(message, modelName = "qwen-plus") {
   // 1. 获取模型实例
   const model = ModelFactory.getModel(modelName);
 
@@ -17,12 +17,12 @@ async function useChat(message, modelName = 'qwen-plus') {
 
   // 3. 执行链
   const response = await chain.invoke({
-    input: message
+    input: message,
   });
 
   return response;
 }
 
 module.exports = {
-  useChat
+  useChat,
 };

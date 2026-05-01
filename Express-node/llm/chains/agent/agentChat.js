@@ -1,4 +1,7 @@
-const { ChatPromptTemplate, MessagesPlaceholder } = require("@langchain/core/prompts");
+const {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} = require("@langchain/core/prompts");
 const { StringOutputParser } = require("@langchain/core/output_parsers");
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const ModelFactory = require("../../models/factory");
@@ -7,7 +10,7 @@ const ModelFactory = require("../../models/factory");
 const agentPrompt = ChatPromptTemplate.fromMessages([
   ["system", "{systemPrompt}"],
   new MessagesPlaceholder("history"),
-  ["human", "{input}"]
+  ["human", "{input}"],
 ]);
 
 /**
@@ -15,9 +18,13 @@ const agentPrompt = ChatPromptTemplate.fromMessages([
  * @param {Array} rawMessages - 前端传来的原始对话记录 (包含 role 和 content)
  * @param {String} systemPrompt - 需要注入的 Agent 人设提示词
  * @param {String} modelName - Agent 指定的底层模型
- * @returns 
+ * @returns
  */
-async function runAgentChain(rawMessages, systemPrompt, modelName = 'qwen-plus') {
+async function runAgentChain(
+  rawMessages,
+  systemPrompt,
+  modelName = "qwen-plus",
+) {
   // 1. 通过统一工厂获取对应的模型实例
   const model = ModelFactory.getModel(modelName);
 
@@ -27,16 +34,16 @@ async function runAgentChain(rawMessages, systemPrompt, modelName = 'qwen-plus')
 
   rawMessages.forEach((msg, index) => {
     // 过滤掉因为兼容旧代码混入其中的原生 system 提示词
-    if (msg.role === 'system') return;
+    if (msg.role === "system") return;
 
     // 定位最后一条用户消息作为本次最新提问的 Input
-    if (index === rawMessages.length - 1 && msg.role === 'user') {
+    if (index === rawMessages.length - 1 && msg.role === "user") {
       input = msg.content;
       return;
     }
 
     // 构建 LangChain Message 阵列，还原对话历史 Memory
-    if (msg.role === 'user') {
+    if (msg.role === "user") {
       history.push(new HumanMessage(msg.content));
     } else {
       // 除了 user 之外（如 AI助手, assistant 或底层模型名），皆视为系统历史回复
@@ -57,12 +64,12 @@ async function runAgentChain(rawMessages, systemPrompt, modelName = 'qwen-plus')
   const result = await chain.invoke({
     systemPrompt: systemPrompt || "你是一个有用的AI对话助手。",
     history: history,
-    input: input || "你好"
+    input: input || "你好",
   });
 
   return {
     Aidata: result, // 规范统一向前端输出字段
-    modelName: modelName
+    modelName: modelName,
   };
 }
 

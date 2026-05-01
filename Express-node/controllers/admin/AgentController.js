@@ -2,7 +2,19 @@ const AgentService = require("../../services/admin/AgentService");
 
 const AgentController = {
   addAgent: async (req, res) => {
-    const { agentName, agentKey, agentType, description, defaultModel, systemPrompt, capabilities, isPublish, sort, config, creator } = req.body;
+    const {
+      agentName,
+      agentKey,
+      agentType,
+      description,
+      defaultModel,
+      systemPrompt,
+      capabilities,
+      isPublish,
+      sort,
+      config,
+      creator,
+    } = req.body;
     await AgentService.addAgent({
       agentName,
       agentKey,
@@ -22,13 +34,14 @@ const AgentController = {
     });
   },
   getAgentList: async (req, res) => {
-    const { page, size, agentNameSearch, agentKeySearch, isPublishFilter } = req.query;
+    const { page, size, agentNameSearch, agentKeySearch, isPublishFilter } =
+      req.query;
     const result = await AgentService.getAgentList({
       page: Number(page),
       size: Number(size),
-      agentNameSearch, 
-      agentKeySearch, 
-      isPublishFilter: isPublishFilter ? Number(isPublishFilter) : undefined
+      agentNameSearch,
+      agentKeySearch,
+      isPublishFilter: isPublishFilter ? Number(isPublishFilter) : undefined,
     });
     res.status(200).send({
       code: 200,
@@ -37,7 +50,20 @@ const AgentController = {
     });
   },
   updateAgent: async (req, res) => {
-    const { _id, agentName, agentKey, agentType, description, defaultModel, systemPrompt, capabilities, isPublish, sort, config, creator } = req.body;
+    const {
+      _id,
+      agentName,
+      agentKey,
+      agentType,
+      description,
+      defaultModel,
+      systemPrompt,
+      capabilities,
+      isPublish,
+      sort,
+      config,
+      creator,
+    } = req.body;
     await AgentService.updateAgent({
       _id,
       agentName,

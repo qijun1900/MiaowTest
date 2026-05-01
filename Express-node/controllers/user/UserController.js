@@ -130,14 +130,17 @@ const UserController = {
   // 上报用户登录状态，并按天记录一次登录热力。
   reportLoginStatus: async (req, res) => {
     try {
-      const result = await ActivityService.recordBusinessActivityOncePerDay(req, {
-        eventName: "每日登录",
-        module: "登录",
-        score: 1,
-        metadata: {
-          source: "login_status_route",
+      const result = await ActivityService.recordBusinessActivityOncePerDay(
+        req,
+        {
+          eventName: "每日登录",
+          module: "登录",
+          score: 1,
+          metadata: {
+            source: "login_status_route",
+          },
         },
-      });
+      );
 
       if (!result.success) {
         return res.status(200).send({
@@ -824,20 +827,6 @@ const UserController = {
       }
     } catch (e) {
       console.error("getUserBankPracticeNote 失败", e);
-    }
-  },
-  useLLMChat: async (req, res) => {
-    try {
-      const { message, model } = req.body;
-      console.log(message, model);
-      const result = await UserService.useLLMChat({ message, model });
-      res.status(200).send({
-        code: 200,
-        ActionType: "OK",
-        data: result,
-      });
-    } catch (e) {
-      console.error("useLLMChat 失败", e);
     }
   },
   setTodayTodos: async (req, res) => {

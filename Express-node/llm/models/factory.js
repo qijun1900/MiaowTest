@@ -10,11 +10,13 @@ class ModelFactory {
    * @param {number} temperature - 温度值
    * @returns {ChatOpenAI} LLM实例
    */
-  static getModel(modelName = 'qwen-plus', temperature = 0.7) {
+  static getModel(modelName = "qwen-plus", temperature = 0.7) {
     return new ChatOpenAI({
       apiKey: process.env.DASHSCOPE_API_KEY,
       configuration: {
-        baseURL: process.env.DASHSCOPE_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        baseURL:
+          process.env.DASHSCOPE_BASE_URL ||
+          "https://dashscope.aliyuncs.com/compatible-mode/v1",
       },
       modelName: modelName,
       temperature: temperature,
