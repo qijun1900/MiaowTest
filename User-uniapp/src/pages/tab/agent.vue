@@ -14,7 +14,13 @@
         />
 
         <!-- 内容滚动区 -->
-        <scroll-view class="content" scroll-y :show-scrollbar="false" @scroll="handleScroll" @touchstart="handleTouchStart">
+        <scroll-view 
+            class="content" 
+            scroll-y 
+            :show-scrollbar="false" 
+            @scroll="handleScroll" 
+            @touchstart="handleTouchStart"
+        >
             <view class="content-inner">
                 <WelcomePanel @action-click="handleWelcomeActionClick" />
                 
@@ -41,6 +47,8 @@
                         @finish="handleBubbleFinish"
                     />
                 </view>
+
+                <PromptTags @select="handlePromptSelect" />
             </view>
         </scroll-view>
 
@@ -76,6 +84,7 @@ import AgentSidebar from "../../components/modules/agent/AgentSidebar.vue";
 import Bubble from "../../components/modules/agent/Bubble.vue";
 import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
 import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
+import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import {chatAPI} from "../../API/LLM/test.js"
 
@@ -383,6 +392,11 @@ const handleWelcomeActionClick = (item) => {
 
 const handleBubbleFinish = () => {
     console.log("Bubble 打字完成", bubbleRef.value?.progress);
+};
+
+const handlePromptSelect = (prompt) => {
+    if (!prompt?.label) return;
+    senderText.value = prompt.label;
 };
 
 const handleAddAttachment = () => {

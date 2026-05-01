@@ -6,10 +6,10 @@ import NotFound from "@/views/NotFound/NotFound.vue";
 import ExamManage from "@/views/Exam/ExamManage.vue";
 import QuestiontManage from "@/views/Exam/QuestiontManage.vue";
 import QuestionAdd from "@/views/Exam/QuestionSingleAdd.vue";
-import ModelManage from "@/views/LLM/ModelManage.vue";
+import AgentManage from "@/views/LLM/AgentManage.vue";
 import QuestionTypeManage from "@/views/Exam/QuestionTypeManage.vue";
 import QuestionBatchAdd from "@/views/Exam/QuestionBatchAdd.vue";
-import LLMChat from "@/views/Chat/LLMChat.vue";
+import AgentChat from "@/views/Chat/AgentChat.vue";
 import consumerMessage from "../views/Consumer/ConsumerMessage.vue";
 import ConsumerManage from "@/views/Users/Consumer.vue";
 import ExamFileManage from "@/views/Exam/ExamFileManage.vue";
@@ -64,9 +64,9 @@ const routes = [
     component: QuestionBatchAdd,
   },
   {
-    path: "/model/modelmanage",
-    name: "ModelManage",
-    component: ModelManage,
+    path: "/agent/agentmanage",
+    name: "AgentManage",
+    component: AgentManage,
   },
   {
     path: "/exam/createExamType/:id",
@@ -74,9 +74,9 @@ const routes = [
     component: QuestionTypeManage,
   },
   {
-    path: "/model/chat",
-    name: "LLMChat",
-    component: LLMChat,
+    path: "/agent/chat",
+    name: "AgentChat",
+    component: AgentChat,
   },
   {
     path: "/consumer/message",

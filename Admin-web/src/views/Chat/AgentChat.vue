@@ -2,10 +2,10 @@
   <div class="container">
     <XWelcome
       v-show="!isSendValue"
-      title="欢迎使用AI对话~！"
-      :extra="`当前对话模型：${selectedModel || 'qwen-plus'}`"
+      title="欢迎配置测试 ~！"
+      :extra="`当前目标：${selectedAgent || '请选择 Agent'}`"
       :description="
-        modelOptions.find((option) => option.value === selectedModel)?.description || ''
+        agentOptions.find((option) => option.value === selectedAgent)?.description || ''
       "
     />
     <div :class="isSendValue ? 'active-sender' : 'default-sender'">
@@ -20,9 +20,9 @@
       >
         <template #sender-prefix>
           <ElSelect
-            placeholder="选择模型"
-            v-model="selectedModel"
-            :options="modelOptions"
+            placeholder="选择测试Agent"
+            v-model="selectedAgent"
+            :options="agentOptions"
             selectWith="160px"
           />
         </template>
@@ -55,40 +55,45 @@ import { useAppStore } from "@/stores";
 import { onMounted, ref } from "vue";
 import XWelcome from "@/components/Element-plus-x/XWelcome.vue";
 import XBubble from "@/components/Element-plus-x/XBubble.vue";
-import { testChatAPI, getChatModels } from "@/API/LLM/chatAPI";
+import { testChatAPI, getChatAgents } from "@/API/LLM/agentAPI";
 import ElSelect from "@/components/ReuseComponents/ElSelect.vue";
 import { useRoute } from "vue-router";
 import escconfig from "../../config/esc.config";
+import { ElMessage } from "element-plus";
 
-const appStore = useAppStore(); // Pinia应用状态管理
-const isSendValue = ref(false); // 是否发送消息
-const chatHistory = ref([]); // 聊天记录
-const editorRef = ref(); // 编辑器引用
-const isSenderloading = ref(false); // 发送按钮加载中状态Sender
-const selectedModel = ref(""); // 选择的模型value
-const modelOptions = ref([]); // 模型选项,列表
+const appStore = useAppStore();
+const isSendValue = ref(false); 
+const chatHistory = ref([]); 
+const editorRef = ref(); 
+const isSenderloading = ref(false); 
+const selectedAgent = ref(""); 
+const agentOptions = ref([]); 
 
-// 获取模型列表
-const FetchModeList = async () => {
+const FetchAgentList = async () => {
   try {
-    const response = await getChatModels();
+    const response = await getChatAgents();
     if (response.code === 200) {
-      modelOptions.value = response.data.map((item) => ({
-        value: item.modelValue,
-        label: item.modelName,
+      agentOptions.value = response.data.map((item) => ({
+        value: item.agentKey,
+        label: item.agentName,
         description: item.description,
       }));
     }
   } catch (error) {
-    console.error("Error fetching chat models:", error);
+    console.error("Error fetching chat agents:", error);
   }
 };
-// 处理用户发送消息
+
 const handleUserSend = async (data) => {
+  if(!selectedAgent.value) {
+    ElMessage.warning("请先选择一个 Agent 进行测试");
+    isSenderloading.value = false;
+    return;
+  }
   if (data) {
     chatHistory.value.push({ role: "user", content: data.text });
-    isSenderloading.value = true; // 开始加载
-    editorRef.value?.clearContent(); // 清空编辑器内容
+    isSenderloading.value = true;
+    editorRef.value?.clearContent();
     isSendValue.value = true;
 
     chatHistory.value.push({
@@ -99,12 +104,12 @@ const handleUserSend = async (data) => {
 
     try {
       const response = await testChatAPI(
-        chatHistory.value,
-        selectedModel.value ? selectedModel.value : "qwen-plus",
+        chatHistory.value.slice(0, -1), // 不带上“正在思考中”这条
+        selectedAgent.value
       );
       if (response.code === 200) {
         chatHistory.value[chatHistory.value.length - 1] = {
-          role: response.data.modelName,
+          role: response.data.modelName || 'AI响应',
           content: response.data.Aidata,
           isLoading: false,
         };
@@ -117,17 +122,17 @@ const handleUserSend = async (data) => {
         isLoading: false,
       };
     } finally {
-      isSenderloading.value = false; // 结束加载
+      isSenderloading.value = false;
     }
   }
 };
 
 onMounted(() => {
   const route = useRoute();
-  if (route.query.modelValue) {
-    selectedModel.value = route.query.modelValue;
+  if (route.query.agentKey) {
+    selectedAgent.value = route.query.agentKey;
   }
-  FetchModeList();
+  FetchAgentList();
 });
 </script>
 <style scoped>

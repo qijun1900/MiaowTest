@@ -21,6 +21,7 @@ const WebNewsRouter = require("./routes/user/NewsRouter"); // 引入用户端新
 const AdminExamRouter = require("./routes/admin/ExamRouter"); // 引入Admin考试路由模块
 const ConsumerExamRouter = require("./routes/user/ExamRouter"); // 引入用户端考试路由模块
 const AdminLLMRouter = require("./routes/admin/LLMRouter"); // 引入AdminLLM路由模块
+const AdminAgentRouter = require("./routes/admin/AgentRouter"); // 引入Admin Agent路由模块
 const ConsumerLLMRouter = require("./routes/user/LLMRouter"); // 引入用户端LLM路由模块
 const FunctionRouter = require("./routes/admin/FunctionRouter"); // 引入Admin功能路由模块
 const UniUserRouter = require("./routes/user/UserRouter"); // 引入用户端用户路由模块
@@ -127,6 +128,7 @@ app.use(UserRouter); //用户路由(admin)
 app.use(NewsRouter); //信息路由(admin)
 app.use(AdminExamRouter); //考试路由(admin)
 app.use(AdminLLMRouter); //llm路由(admin)
+app.use(AdminAgentRouter); //Agent路由(admin)
 app.use(FunctionRouter); //功能路由(admin)
 app.use(AdminConsumerRouter); //用户路由(admin)
 app.use(WordBooksRouter); //词书路由(admin)
