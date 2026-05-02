@@ -41,7 +41,11 @@ export function useAutoTabBar(keyboardHeight) {
 
     // 用户上下滑动内容时，唤出 TabBar
     const handleScroll = () => {
-        showTabBar();
+        // 取消在 scroll 事件中自动唤出 TabBar。
+        // 因为当 TabBar 隐藏/显示时，页面可视区域发生变化，
+        // 会触发 scroll-view 的重新计算和细微滚动（引发假 scroll 事件），
+        // 从而导致不断的“显示 -> 隐藏 -> 触发scroll -> 显示”的无限死循环弹跳。
+        // 用户的操作已经由 handleTouchStart 捕获并显示 TabBar 了，这里无需再做处理。
     };
 
     // 用户轻滑或点按页面时，唤出 TabBar 或顺延隐藏时间

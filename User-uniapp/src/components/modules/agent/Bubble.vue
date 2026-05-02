@@ -312,7 +312,10 @@ const renderHtml = computed(() => {
         return escapeHtml(renderedContent.value).replace(/\n/g, "<br />");
     }
     // Markdown / highlight / latex are handled by mp-html official plugins.
-    return renderedContent.value;
+    // 很多大模型返回的公式使用 \(...\) 或 \[...\]，将其转换为 mp-html 支持的 $...$ 和 $$...$$
+    return renderedContent.value
+        .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
+        .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
 });
 
 const shouldRenderMarkdown = computed(() => {
@@ -504,7 +507,7 @@ function escapeHtml(value) {
 }
 
 .bubble-row-end {
-    justify-content: flex-end;
+    justify-content: flex-start;
     flex-direction: row-reverse;
 }
 
