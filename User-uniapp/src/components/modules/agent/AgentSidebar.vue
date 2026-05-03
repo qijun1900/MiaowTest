@@ -191,7 +191,7 @@ const handleSelectChat = (chatId) => {
 
 const handleSettings = () => {
    uni.navigateTo({
-       url: "/pages/my/MySettingView.vue",
+       url: "/pages/my/MySettingView",
    });
 };
 </script>
