@@ -102,7 +102,7 @@ const handleModelSwitch = () => {
             
             if (typeof selectedModel === 'object') {
                 currentModel.value = selectedModel.label;
-                emit("model-change", selectedModel.label, selectedModel.value);
+                emit("model-change", selectedModel.label, selectedModel.value);//name和key都传出去，方便外层使用
             } else {
                 currentModel.value = selectedModel;
                 emit("model-change", selectedModel, selectedModel);

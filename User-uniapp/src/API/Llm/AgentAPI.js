@@ -21,14 +21,13 @@ export const fetchAgentList = (params) => {
  * @param {*} data 
  * @returns  
  */
-export const chatWithAgent = ({message,agentKey}) => {
+export const chatWithAgent = ({messages, agentKey}) => {
     try {
-        console.log("chatWithAgent 请求参数：", {message, agentKey});
         return http({
             url: "/uniappAPI/llm/agent/chat",
             method: "POST",
             data:{
-                message,
+                messages,
                 agentKey,
             }
         })

@@ -218,6 +218,11 @@ const handleModelChange = (modelName, modelKey) => {
     if (!modelName) return;
     currentModelName.value = modelName;
     currentModelKey.value = modelKey;
+    uni.showToast({ 
+        title: `切换到 ${modelName}`, 
+        icon: "none" ,
+        position: "top",
+    });
 };
 
 const handleNewChat = () => {
@@ -250,21 +255,27 @@ const handleAddAttachment = () => {
 
 const handleSenderSubmit = async ({ text }) => {
     if (!text) return;
-    
+
     // 添加用户消息
     messageList.value.push({ role: 'user', content: text, typing: false });
     senderText.value = "";
-    
-    // 预添加AI消息，初始时不用typing效果以免展示"正在思考..."
+
+    // 预添加AI消息占位
     const aiMessageIndex = messageList.value.length;
     messageList.value.push({ role: 'assistant', content: '...', typing: false });
 
     try {
-        const response = await chatWithAgent({ 
-            message: text,
-            agentKey: currentModelKey.value 
-            });
-            console.log("chatWithAgent 响应：", response);
+        // 传完整聊天历史（排除占位的AI消息），类似 Admin-web 的 chatHistory 方式
+        const messages = messageList.value.slice(0, aiMessageIndex).map(msg => ({
+            role: msg.role,
+            content: msg.content,
+        }));
+
+        const response = await chatWithAgent({
+            messages,
+            agentKey: currentModelKey.value,
+        });
+
         // 根据后端实际返回结构调整
         const replyText = response.data?.reply || response.reply || response.data || '收到回复';
         // 返回结果后开启打字效果并赋值完整回复
