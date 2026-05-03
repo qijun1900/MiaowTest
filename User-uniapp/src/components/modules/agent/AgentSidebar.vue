@@ -113,16 +113,7 @@ const touchDeltaX = ref(0);
 const touchDeltaY = ref(0);
 
 // 占位会话数据
-const chatList = ref([
-    { id: "1", title: "如何学习 Vue3？", time: "刚刚" },
-    { id: "2", title: "JavaScript 异步编程", time: "10分钟前" },
-    { id: "3", title: "数据库设计原则", time: "1小时前" },
-    { id: "4", title: "React vs Vue 对比", time: "昨天" },
-    { id: "5", title: "算法入门指南", time: "3天前" },
-    { id: "6", title: "CSS 响应式布局", time: "一周前" },
-    { id: "7", title: "Node.js 后端开发", time: "两周前" },
-    { id: "8", title: "TypeScript 类型系统", time: "一个月前" },
-]);
+const chatList = ref([]);
 
 const filteredChats = computed(() => {
     if (!searchText.value) return chatList.value;
