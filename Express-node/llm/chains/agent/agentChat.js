@@ -68,7 +68,7 @@ async function runAgentChain(
   });
 
   return {
-    Aidata: result, // 规范统一向前端输出字段
+    reply: result, // 规范统一向前端输出字段
     modelName: modelName,
   };
 }

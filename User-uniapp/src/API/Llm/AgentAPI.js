@@ -16,3 +16,24 @@ export const fetchAgentList = (params) => {
         throw error;
     }
 }
+/**
+ * @description: 与智能体对话
+ * @param {*} data 
+ * @returns  
+ */
+export const chatWithAgent = ({message,agentKey}) => {
+    try {
+        console.log("chatWithAgent 请求参数：", {message, agentKey});
+        return http({
+            url: "/uniappAPI/llm/agent/chat",
+            method: "POST",
+            data:{
+                message,
+                agentKey,
+            }
+        })
+    } catch (error) {
+        console.error("chatWithAgent 失败", error);
+        throw error;
+    }
+}

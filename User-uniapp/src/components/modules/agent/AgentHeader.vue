@@ -49,17 +49,17 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 
 const props = defineProps({
-    modelList: {
+    modelList: { //Agent列表，格式为[{ label: "Agent名称", value: "AgentKey" }]
         type: Array,
-        default: () => ["Sonnet 4.6", "DeepSeek R1", "Qwen Max"],
+        default: () => [""],
     },
     initialModel: {
         type: String,
-        default: "Sonnet 4.6",
+        default: "暂时无模型",
     },
 });
 
@@ -67,6 +67,10 @@ const emit = defineEmits(["menu-click", "new-chat", "model-change", "option-clic
 
 const currentModel = ref(props.initialModel);
 const showOptionsMenu = ref(false);
+
+watch(() => props.initialModel, (newVal) => {
+    currentModel.value = newVal;
+});
 
 const { navBarInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
@@ -86,15 +90,23 @@ const handleModelSwitch = () => {
         return;
     }
 
+    const itemNames = props.modelList.map(item => typeof item === 'object' ? item.label : item);
+
     uni.showActionSheet({
-        itemList: props.modelList,
+        itemList: itemNames,
         success: (result) => {
             const selectedModel = props.modelList[result.tapIndex];
             if (!selectedModel) {
                 return;
             }
-            currentModel.value = selectedModel;
-            emit("model-change", selectedModel);
+            
+            if (typeof selectedModel === 'object') {
+                currentModel.value = selectedModel.label;
+                emit("model-change", selectedModel.label, selectedModel.value);
+            } else {
+                currentModel.value = selectedModel;
+                emit("model-change", selectedModel, selectedModel);
+            }
         },
     });
 };

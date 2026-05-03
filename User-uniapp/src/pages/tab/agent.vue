@@ -7,6 +7,8 @@
             · .custom-navbar →  position:fixed，真正悬浮在顶部
         -->
         <AgentHeader
+            :model-list="modelList"
+            :initial-model="currentModelName"
             @menu-click="handleMenuClick"
             @new-chat="handleNewChat"
             @model-change="handleModelChange"
@@ -88,7 +90,7 @@ import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
 import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
 import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
-import {chatAPI} from "../../API/LLM/test.js"
+import {fetchAgentList, chatWithAgent} from "../../API/LLM/AgentAPI.js"
 
 // ─── 响应式状态 ────────────────────────────────────────────────────────────────
 const sidebarVisible = ref(false);
@@ -96,6 +98,28 @@ const senderText = ref("");
 const thinkingMode = ref(false);
 const showThinkingToggle = ref(true);
 const messageList = ref([]);
+const modelList = ref([{label: "Mio", value: "mio"}]);
+const currentModelKey = ref("mio");
+const currentModelName = ref("Mio");
+
+const loadAgentList = async () => {
+    try {
+        const res = await fetchAgentList();
+        const list = res?.data || [];
+        if (list.length) {
+            modelList.value = list.map((item) =>{
+                return {
+                    label: item.agentName,
+                    value: item.agentKey
+                };
+            });
+            currentModelName.value = list[0]?.agentName || "Mio";
+            currentModelKey.value = list[0]?.agentKey || "mio";
+        }
+    } catch (error) {
+        console.error("加载Agent列表失败：", error);
+    }
+};
 
 
 // ─── 键盘高度监听 ──────────────────────────────────────────────────────────────
@@ -122,6 +146,8 @@ const handleViewportResize = () => {
 };
 
 onMounted(() => {
+    loadAgentList();
+
     // 小程序 / App 使用官方 API
     // #ifdef MP-WEIXIN || APP-PLUS
     uni.onKeyboardHeightChange((res) => {
@@ -188,9 +214,10 @@ const handleMenuClick = () => {
     sidebarVisible.value = true;
 };
 
-const handleModelChange = (modelName) => {
+const handleModelChange = (modelName, modelKey) => {
     if (!modelName) return;
-    uni.showToast({ title: `已切换 ${modelName}`, icon: "none" });
+    currentModelName.value = modelName;
+    currentModelKey.value = modelKey;
 };
 
 const handleNewChat = () => {
@@ -221,7 +248,7 @@ const handleAddAttachment = () => {
     uni.showToast({ title: "添加附件", icon: "none" });
 };
 
-const handleSenderSubmit = async ({ text, thinking }) => {
+const handleSenderSubmit = async ({ text }) => {
     if (!text) return;
     
     // 添加用户消息
@@ -233,7 +260,11 @@ const handleSenderSubmit = async ({ text, thinking }) => {
     messageList.value.push({ role: 'assistant', content: '...', typing: false });
 
     try {
-        const response = await chatAPI(text);
+        const response = await chatWithAgent({ 
+            message: text,
+            agentKey: currentModelKey.value 
+            });
+            console.log("chatWithAgent 响应：", response);
         // 根据后端实际返回结构调整
         const replyText = response.data?.reply || response.reply || response.data || '收到回复';
         // 返回结果后开启打字效果并赋值完整回复

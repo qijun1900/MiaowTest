@@ -25,7 +25,7 @@ async function useDeepThink(message, modelName = "deepseek-r1", options = {}) {
 
   // 若传入了 reasoningEffort 且模型支持（OpenAI o 系列），注入配置
   if (options.reasoningEffort) {
-    model.reasoningEffort = options.reasoningEffort;
+    model.reasoningEffort = options.reasoningEffort; 
   }
 
   // 2. 构建提示模板 — 引导模型进行深度分析
