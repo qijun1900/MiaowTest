@@ -8,9 +8,10 @@ class ModelFactory {
    * 获取OpenAI或兼容的Chat模型
    * @param {string} modelName - 模型名称，默认 qwen-plus
    * @param {number} temperature - 温度值
+   * @param {boolean} [streaming] - 是否启用流式输出，启用后可通过 .stream() 逐 token 获取
    * @returns {ChatOpenAI} LLM实例
    */
-  static getModel(modelName = "qwen-plus", temperature = 0.7) {
+  static getModel(modelName = "qwen-plus", temperature = 0.7, streaming = true) {
     return new ChatOpenAI({
       apiKey: process.env.DASHSCOPE_API_KEY,
       configuration: {
@@ -20,6 +21,7 @@ class ModelFactory {
       },
       modelName: modelName,
       temperature: temperature,
+      streaming: streaming,
     });
   }
 }

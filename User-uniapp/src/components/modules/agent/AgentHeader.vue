@@ -32,10 +32,6 @@
                             <text class="option-text">Star</text>
                             <uni-icons type="star" size="18" color="#333"></uni-icons>
                         </view>
-                        <view class="option-item" @click="handleOption('add-to-home')">
-                            <text class="option-text">Add to home</text>
-                            <uni-icons type="home" size="18" color="#333"></uni-icons>
-                        </view>
                         <view class="option-item option-item-danger" @click="handleOption('delete')">
                             <text class="option-text">Delete</text>
                             <uni-icons type="trash" size="18" color="#ef4444"></uni-icons>
