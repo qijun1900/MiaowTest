@@ -24,7 +24,7 @@
             @touchstart="handleTouchStart"
         >
             <view class="content-inner">
-                <!-- <WelcomePanel @action-click="handleWelcomeActionClick" /> -->
+                <WelcomePanel :show="showWelcomePanel" @action-click="handleWelcomeActionClick" />
                 
                 <view style="padding: 24rpx;">
                     <!-- <ThoughtChain 
@@ -42,11 +42,12 @@
                         :key="index"
                         :content="msg.content"
                         :show-avatar="false"
-                        shape="corner"
-                        :variant="msg.role === 'user' ? 'solid' : 'shadow'"
+                        :shape="msg.role === 'user' ? 'corner' : undefined"
+                        :variant="msg.role === 'user' ? 'solid' : undefined"
                         :placement="msg.role === 'user' ? 'end' : 'start'"
-                        max-width="650rpx"
+                        :max-width="msg.role === 'user' ? '650rpx' : '100%'"
                         :is-markdown="true"
+                        :no-style="msg.role === 'assistant'"
                         :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
                         @finish="handleBubbleFinish(index)"
                     />
@@ -97,6 +98,7 @@ const sidebarVisible = ref(false);
 const senderText = ref("");
 const thinkingMode = ref(false);
 const showThinkingToggle = ref(true);
+const showWelcomePanel = ref(true);
 const messageList = ref([]);
 const modelList = ref([{label: "Mio", value: "mio"}]);
 const currentModelKey = ref("mio");
@@ -255,6 +257,8 @@ const handleAddAttachment = () => {
 
 const handleSenderSubmit = async ({ text }) => {
     if (!text) return;
+
+    showWelcomePanel.value = false;
 
     // 添加用户消息
     messageList.value.push({ role: 'user', content: text, typing: false });

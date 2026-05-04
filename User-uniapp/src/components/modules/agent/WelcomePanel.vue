@@ -1,5 +1,5 @@
 <template>
-    <view class="welcome-panel">
+    <view class="welcome-panel" v-if="show">
         <view class="welcome-copy">
             <text class="welcome-greeting">{{ dynamicGreeting }}</text>
             <text class="welcome-title">{{ title }}</text>
@@ -33,6 +33,10 @@ import { getGreetingInfo } from "@/util/greet";
 const userInfoStore = UserInfoStore();
 
 const props = defineProps({
+    show: {
+        type: Boolean,
+        default: true,
+    },
     title: {
         type: String,
         default: "需要我为你做些什么？",
