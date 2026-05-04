@@ -51,6 +51,14 @@
                         :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
                         @finish="handleBubbleFinish(index)"
                     />
+                    <AgentActionBar
+                        v-if="showActionBar"
+                        :content="lastAIMessage?.content || ''"
+                        :favorited="lastAIMessage?.favorited || false"
+                        @copy="handleActionCopy"
+                        @favorite="(liked) => handleActionFavorite(lastAIIndex, liked)"
+                        @regenerate="handleActionRegenerate"
+                    />
                 </view>
 
                 <!-- <PromptTags @select="handlePromptSelect" /> -->
@@ -90,6 +98,7 @@ import Bubble from "../../components/modules/agent/Bubble.vue";
 import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
 import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
 import PromptTags from "../../components/modules/agent/PromptTags.vue";
+import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import {fetchAgentList, chatWithAgent} from "../../API/LLM/AgentAPI.js"
 
@@ -103,6 +112,7 @@ const messageList = ref([]);
 const modelList = ref([{label: "Mio", value: "mio"}]);
 const currentModelKey = ref("mio");
 const currentModelName = ref("Mio");
+const currentConversationId = ref(null);
 
 const loadAgentList = async () => {
     try {
@@ -245,6 +255,43 @@ const handleBubbleFinish = (index) => {
         messageList.value[index].typing = false;
     }
 };
+const lastAIIndex = computed(() => {
+    for (let i = messageList.value.length - 1; i >= 0; i--) {
+        if (messageList.value[i].role === 'assistant') return i;
+    }
+    return -1;
+});
+
+const lastAIMessage = computed(() => {
+    const idx = lastAIIndex.value;
+    return idx >= 0 ? messageList.value[idx] : null;
+});
+
+const showActionBar = computed(() => {
+    const msg = lastAIMessage.value;
+    return msg && !msg.pending && !msg.typing;
+});
+
+const handleActionCopy = () => {
+    // copy is handled inside AgentActionBar via uni.setClipboardData
+};
+
+const handleActionFavorite = (index, liked) => {
+    if (messageList.value[index]) {
+        messageList.value[index].favorited = liked;
+    }
+};
+
+const handleActionRegenerate = () => {
+    const lastUserIndex = lastAIIndex.value - 1;
+    if (lastUserIndex < 0) return;
+    const userMsg = messageList.value[lastUserIndex];
+    if (!userMsg || userMsg.role !== 'user') return;
+
+    // Remove the last AI message and re-submit
+    messageList.value.splice(lastAIIndex.value, 1);
+    handleSenderSubmit({ text: userMsg.content });
+};
 
 const handlePromptSelect = (prompt) => {
     if (!prompt?.label) return;
@@ -266,26 +313,36 @@ const handleSenderSubmit = async ({ text }) => {
 
     // 预添加AI消息占位
     const aiMessageIndex = messageList.value.length;
-    messageList.value.push({ role: 'assistant', content: '...', typing: false });
+    messageList.value.push({ role: 'assistant', content: '...', typing: false, pending: true });
 
     try {
-        // 传完整聊天历史（排除占位的AI消息），类似 Admin-web 的 chatHistory 方式
-        const messages = messageList.value.slice(0, aiMessageIndex).map(msg => ({
-            role: msg.role,
-            content: msg.content,
-        }));
-
+        // 此时由于后端已经持久化了上下文历史，前端发最新问题与 conversationId 即可
         const response = await chatWithAgent({
-            messages,
+            message: text,
             agentKey: currentModelKey.value,
+            conversationId: currentConversationId.value,
         });
 
-        // 根据后端实际返回结构调整
-        const replyText = response.data?.reply || response.reply || response.data || '收到回复';
+        // 维持会话 ID
+        const resData = response.data || response;
+        if (resData.conversationId) {
+            currentConversationId.value = resData.conversationId;
+        }
+        console.log("聊天接口返回：", resData);
+
+        // 提取回复纯文本，适配多种嵌套结构，避免对象被当作字符串报错
+        const target = resData?.data || resData?.reply || resData;
+        let replyText = typeof target === 'object' ? target?.reply : target;
+        
+        // 如果依然不是字符串，兜底转换为字符串
+        replyText = typeof replyText === 'string' ? replyText : String(replyText || '收到回复');
+
         // 返回结果后开启打字效果并赋值完整回复
+        messageList.value[aiMessageIndex].pending = false;
         messageList.value[aiMessageIndex].typing = true;
         messageList.value[aiMessageIndex].content = replyText;
     } catch (error) {
+        messageList.value[aiMessageIndex].pending = false;
         messageList.value[aiMessageIndex].content = '请求失败，请稍后重试。';
         messageList.value[aiMessageIndex].typing = false;
         console.error("聊天请求失败：", error);
