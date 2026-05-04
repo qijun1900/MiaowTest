@@ -1,17 +1,21 @@
 <template>
     <view v-if="visible" class="action-bar">
         <view class="action-item" hover-class="action-item-active" @click="handleCopy">
-            <uni-icons type="copy" :size="iconSize" color="#8b8fa3" />
+            <!-- 官方 uni-icons 中没有专门的 copy，常用 paperclip 或 link 代替复制意图，后续可替换为切图 -->
+            <uni-icons type="link" :size="iconSize" color="#8b8fa3" />
         </view>
         <view class="action-item" hover-class="action-item-active" @click="handleFavorite">
             <uni-icons
                 :type="favorited ? 'star-filled' : 'star'"
                 :size="iconSize"
-                :color="favorited ? '#f59e0b' : '#8b8fa3'"
+                :color="favorited ? '#f5a623' : '#8b8fa3'"
             />
         </view>
         <view class="action-item" hover-class="action-item-active" @click="handleRegenerate">
             <uni-icons type="reload" :size="iconSize" color="#8b8fa3" />
+        </view>
+        <view class="action-item" hover-class="action-item-active">
+            <uni-icons type="more-filled" :size="iconSize" color="#8b8fa3" />
         </view>
     </view>
 </template>
@@ -61,24 +65,24 @@ const handleRegenerate = () => {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12rpx;
-    margin-top: 20rpx;
+    gap: 8rpx;
+    margin-top: 12rpx;
+    margin-left: 8rpx;
 }
 
 .action-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 60rpx;
-    height: 60rpx;
-    background: #ffffff;
-    border: 1rpx solid rgba(15, 23, 42, 0.08);
-    border-radius: 50%;
-    transition: all 0.15s ease;
+    width: 56rpx;
+    height: 56rpx;
+    background: transparent;
+    border-radius: 8rpx;
+    transition: all 0.2s ease;
 }
 
 .action-item-active {
-    background: #f0f2f5;
-    transform: scale(0.985);
+    background: rgba(15, 23, 42, 0.05); /* 淡淡的灰色背景 */
+    transform: scale(0.95);
 }
 </style>
