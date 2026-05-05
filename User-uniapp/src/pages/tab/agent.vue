@@ -39,7 +39,7 @@
                     /> -->
                 </view>
 
-                <view class="bubble-test-area">
+                <view class="bubble-test-area" v-if="messageList.length > 0">
                     <Bubble
                         v-for="(msg, index) in messageList"
                         :key="index"
@@ -87,6 +87,8 @@
         <!-- 侧边栏支持手势关闭  -->
         <AgentSidebar
             v-model:show="sidebarVisible"
+            :conversations="conversationList"
+            :current-chat-id="currentConversationId"
             @select-chat="handleSelectChat"
         />
     </view>
@@ -103,7 +105,7 @@ import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
 import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
-import {fetchAgentList, chatWithAgent} from "../../API/LLM/AgentAPI.js"
+import {fetchAgentList, chatWithAgent, fetchConversationList, fetchConversationMessages} from "../../API/LLM/AgentAPI.js"
 
 // ─── 响应式状态 ────────────────────────────────────────────────────────────────
 const sidebarVisible = ref(false);
@@ -116,6 +118,7 @@ const modelList = ref([{label: "Mio", value: "mio"}]);
 const currentModelKey = ref("mio");
 const currentModelName = ref("Mio");
 const currentConversationId = ref(null);
+const conversationList = ref([]);
 
 const loadAgentList = async () => {
     try {
@@ -136,6 +139,17 @@ const loadAgentList = async () => {
     }
 };
 
+const loadConversationList = async () => {
+    try {
+        const res = await fetchConversationList();
+        console.log("会话列表接口返回：", res);
+        if (res?.data) {
+            conversationList.value = res.data;
+        }
+    } catch (error) {
+        console.error("加载会话列表失败：", error);
+    }
+};
 
 // ─── 键盘高度监听 ──────────────────────────────────────────────────────────────
 const keyboardHeight = ref(0);
@@ -162,6 +176,7 @@ const handleViewportResize = () => {
 
 onMounted(() => {
     loadAgentList();
+    loadConversationList();
 
     // 小程序 / App 使用官方 API
     // #ifdef MP-WEIXIN || APP-PLUS
@@ -241,11 +256,32 @@ const handleModelChange = (modelName, modelKey) => {
 };
 
 const handleNewChat = () => {
-    uni.showToast({ title: "新建会话", icon: "none" });
+    currentConversationId.value = null;
+    messageList.value = [];
+    showWelcomePanel.value = true;
+    uni.showToast({ title: "已回到新会话", icon: "none" });
 };
 
-const handleSelectChat = (chatId) => {
-    uni.showToast({ title: `切换到会话 ${chatId}`, icon: "none" });
+const handleSelectChat = async (chatId) => {
+    currentConversationId.value = chatId;
+    sidebarVisible.value = false;
+    uni.showToast({ title: `正在加载会话...`, icon: "none" });
+    
+    try {
+        const res = await fetchConversationMessages(chatId);
+        if (res?.data) {
+            messageList.value = res.data.map(msg => ({
+                role: msg.role,
+                content: msg.content,
+                typing: false,
+                pending: false
+            }));
+            showWelcomePanel.value = false;
+        }
+    } catch (error) {
+        console.error("加载消息记录失败", error);
+        uni.showToast({ title: "加载历史消息失败", icon: "none" });
+    }
 };
 
 const handleWelcomeActionClick = (item) => {
@@ -344,6 +380,9 @@ const handleSenderSubmit = async ({ text }) => {
         messageList.value[aiMessageIndex].pending = false;
         messageList.value[aiMessageIndex].typing = true;
         messageList.value[aiMessageIndex].content = replyText;
+
+        // 对话结束后重新加载会话列表，使其更新为最新状态和带有新标题及消息预览
+        loadConversationList();
     } catch (error) {
         messageList.value[aiMessageIndex].pending = false;
         messageList.value[aiMessageIndex].content = '请求失败，请稍后重试。';

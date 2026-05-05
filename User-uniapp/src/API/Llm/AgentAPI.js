@@ -17,6 +17,39 @@ export const fetchAgentList = (params) => {
     }
 }
 /**
+ * @description: 获取用户会话列表
+ * @returns  
+ */
+export const fetchConversationList = () => {
+    try {
+        return http({
+            url: "/uniappAPI/llm/agent/conversations",
+            method: "GET",
+        });
+    } catch (error) {
+        console.error("fetchConversationList 失败", error);
+        throw error;
+    }
+}
+
+/**
+ * @description: 获取会话的历史消息列表
+ * @param {string} conversationId 会话ID
+ * @returns  
+ */
+export const fetchConversationMessages = (conversationId) => {
+    try {
+        return http({
+            url: `/uniappAPI/llm/agent/conversations/${conversationId}/messages`,
+            method: "GET",
+        });
+    } catch (error) {
+        console.error("fetchConversationMessages 失败", error);
+        throw error;
+    }
+}
+
+/**
  * @description: 与智能体对话
  * @param {*} data 
  * @returns  

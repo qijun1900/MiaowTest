@@ -42,21 +42,20 @@
                 </view>
             </view>
 
-            <!-- 会话列表 -->
             <scroll-view class="chat-list" scroll-y>
                 <view
                     class="chat-item"
-                    :class="{ 'chat-item-active': currentChatId === item.id }"
+                    :class="{ 'chat-item-active': currentChatId === item._id }"
                     v-for="item in filteredChats"
-                    :key="item.id"
-                    @click="handleSelectChat(item.id)"
+                    :key="item._id"
+                    @click="handleSelectChat(item._id)"
                 >
                     <view class="chat-item-icon">
                         <view class="chat-dot"></view>
                     </view>
                     <view class="chat-item-content">
                         <text class="chat-item-title">{{ item.title }}</text>
-                        <text class="chat-item-time">{{ item.time }}</text>
+                        <text class="chat-item-time">{{ formatTime(item.lastMessageAt || item.createTime) }}</text>
                     </view>
                 </view>
 
@@ -70,10 +69,11 @@
             <view class="sidebar-footer">
                 <view class="footer-user">
                     <view class="footer-avatar">
-                        <text class="footer-avatar-text">Q</text>
+                        <image v-if="avatar" :src="avatar" class="footer-avatar-img" mode="aspectFill" />
+                        <text v-else class="footer-avatar-text">{{ avatarText }}</text>
                     </view>
                     <view class="footer-user-meta">
-                        <text class="footer-user-name">qijun1900</text>
+                        <text class="footer-user-name">{{ nickname }}</text>
                     </view>
                 </view>
                 <view class="footer-settings" @click="handleSettings">
@@ -88,12 +88,21 @@
 <script setup>
 import { ref, computed, watch, nextTick } from "vue";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
+import { UserInfoStore } from "@/stores/modules/UserinfoStore";
 
 const props = defineProps({
     show: {
         type: Boolean,
         default: false,
     },
+    conversations: {
+        type: Array,
+        default: () => [],
+    },
+    currentChatId: {
+        type: [String, Number],
+        default: null
+    }
 });
 
 const emit = defineEmits(["update:show", "select-chat"]);
@@ -103,23 +112,38 @@ const { customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     rightPaddingExtra: 8,
 });
 
+const userInfoStore = UserInfoStore();
+
+const nickname = computed(() => userInfoStore.userInfo?.nickname || "用户");
+const avatar = computed(() => userInfoStore.userInfo?.avatar);
+const avatarText = computed(() => {
+    const name = userInfoStore.userInfo?.nickname;
+    return name ? name.charAt(0).toUpperCase() : "U";
+});
+
 const visible = ref(false);
 const animating = ref(false);
 const searchText = ref("");
-const currentChatId = ref("1");
 const touchStartX = ref(0);
 const touchStartY = ref(0);
 const touchDeltaX = ref(0);
 const touchDeltaY = ref(0);
 
-// 占位会话数据
-const chatList = ref([]);
+const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+    const date = new Date(timeStr);
+    const now = new Date();
+    if (date.toDateString() === now.toDateString()) {
+        return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    }
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+};
 
 const filteredChats = computed(() => {
-    if (!searchText.value) return chatList.value;
+    if (!searchText.value) return props.conversations;
     const keyword = searchText.value.toLowerCase();
-    return chatList.value.filter((item) =>
-        item.title.toLowerCase().includes(keyword),
+    return props.conversations.filter((item) =>
+        item.title && item.title.toLowerCase().includes(keyword),
     );
 });
 
@@ -184,7 +208,6 @@ const handlePanelTouchEnd = () => {
 };
 
 const handleSelectChat = (chatId) => {
-    currentChatId.value = chatId;
     emit("select-chat", chatId);
     handleClose();
 };
@@ -493,6 +516,13 @@ const handleSettings = () => {
     align-items: center;
     justify-content: center;
     box-shadow: 0 10rpx 24rpx rgba(17, 24, 39, 0.16);
+    overflow: hidden;
+}
+
+.footer-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
 }
 
 .footer-avatar-text {

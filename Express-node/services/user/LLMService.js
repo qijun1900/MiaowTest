@@ -87,6 +87,20 @@ const LLMService = {
             sort: 1,
             createTime: -1,
         });
+    },
+    getConversationList: async (uid) => {
+        return await AgentConversationModel.find({ Uid: uid, status: 1 })
+            .sort({ lastMessageAt: -1 })
+            .select("title lastMessagePreview lastMessageAt agentKey messageCount createTime _id");
+    },
+    getMessageList: async (uid, conversationId) => {
+        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+        if (!conv) {
+            throw new Error("会话不存在或无权限");
+        }
+        return await AgentMessageModel.find({ conversationId })
+            .sort({ sequence: 1 })
+            .select("role content contentType createTime");
     }
 };
 module.exports = LLMService;

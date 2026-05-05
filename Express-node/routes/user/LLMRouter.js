@@ -17,4 +17,20 @@ LLMRouter.get(
     LLMController.getAgentList
 ); 
 
+//获取用户的Agent对话列表
+LLMRouter.get(
+    "/uniappAPI/llm/agent/conversations",
+    JWT.verifyTokenMiddleware(),
+    requireUid,
+    LLMController.getConversationList
+);
+
+//获取具体会话的历史消息
+LLMRouter.get(
+    "/uniappAPI/llm/agent/conversations/:conversationId/messages",
+    JWT.verifyTokenMiddleware(),
+    requireUid,
+    LLMController.getConversationMessages
+);
+
 module.exports = LLMRouter;

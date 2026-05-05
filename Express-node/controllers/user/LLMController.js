@@ -37,6 +37,44 @@ const LLMController = {
       res.status(500).json({ success: false, error: "获取Agent列表失败" });
     }
   },
+
+  getConversationList: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      if (!uid) {
+        return res.status(401).send({ success: false, error: "未登录" });
+      }
+      const list = await LLMService.getConversationList(uid);
+      res.status(200).send({
+        success: true,
+        data: list
+      });
+    } catch (error) {
+      console.error("LLMController.getConversationList 错误", error);
+      res.status(500).send({ success: false, error: "获取会话列表失败" });
+    }
+  },
+
+  getConversationMessages: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const { conversationId } = req.params;
+      if (!uid) {
+        return res.status(401).send({ success: false, error: "未登录" });
+      }
+      if (!conversationId) {
+        return res.status(400).send({ success: false, error: "缺少参数" });
+      }
+      const messages = await LLMService.getMessageList(uid, conversationId);
+      res.status(200).send({
+        success: true,
+        data: messages
+      });
+    } catch (error) {
+      console.error("LLMController.getConversationMessages 错误", error);
+      res.status(500).send({ success: false, error: error.message || "获取消息列表失败" });
+    }
+  },
 };
 
 module.exports = LLMController;
