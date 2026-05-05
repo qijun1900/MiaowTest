@@ -1,5 +1,5 @@
 <template>
-    <view class="welcome-panel" v-if="show">
+    <view class="welcome-panel" :class="{ 'is-center': !actionItems || actionItems.length === 0 }" v-if="show">
         <view class="welcome-copy">
             <text class="welcome-greeting">{{ dynamicGreeting }}</text>
             <text class="welcome-title">{{ title }}</text>
@@ -83,6 +83,20 @@ const handleActionClick = (item) => {
     margin: 26rpx 24rpx 0;
     padding: 8rpx 0 18rpx;
     box-sizing: border-box;
+}
+
+.welcome-panel.is-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    margin: 0;
+}
+
+.welcome-panel.is-center .welcome-copy {
+    text-align: center;
+    margin-bottom: 0;
 }
 
 .welcome-copy {
