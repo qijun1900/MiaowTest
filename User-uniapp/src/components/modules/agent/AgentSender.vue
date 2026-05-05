@@ -19,7 +19,7 @@
                 </view>
 
                 <view
-                    v-if="showThinkingToggle"
+                    v-if="showThinkingToggle && isShowThingkingBut"
                     class="thinking-chip"
                     :class="{ 'thinking-chip-active': thinking }"
                     @click="toggleThinking"
@@ -56,6 +56,10 @@ const props = defineProps({
     placeholder: {
         type: String,
         default: "发消息或按住说话",
+    },
+    isShowThingkingBut: {
+        type: Boolean,
+        default: false,
     },
 });
 

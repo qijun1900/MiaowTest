@@ -24,7 +24,10 @@
             @touchstart="handleTouchStart"
         >
             <view class="content-inner">
-                <WelcomePanel :show="showWelcomePanel" @action-click="handleWelcomeActionClick" />
+                <WelcomePanel 
+                    :show="showWelcomePanel" 
+                    @action-click="handleWelcomeActionClick" 
+                />
                 
                 <view style="padding: 24rpx;">
                     <!-- <ThoughtChain 

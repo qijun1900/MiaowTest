@@ -5,22 +5,18 @@
             <text class="welcome-title">{{ title }}</text>
         </view>
 
-        <view class="welcome-actions">
-            <view
-                v-for="item in actionItems"
-                :key="item.key"
-                class="welcome-action"
-                @click="handleActionClick(item)"
-            >
-                <view
-                    class="action-icon"
-                    :class="`action-icon-${item.icon || item.key}`"
-                    :style="{ color: item.color }"
-                >
-                    <view class="icon-shape"></view>
+        <view class="welcome-actions" v-if="actionItems && actionItems.length > 0">
+            <slot name="actions">
+                <view v-for="item in actionItems" :key="item.key || item.title" class="welcome-action"
+                    @click="handleActionClick(item)">
+                    <slot name="action-item" :item="item">
+                        <view v-if="item.icon" class="action-icon">
+                            <image class="action-image" :src="item.icon" mode="aspectFit" />
+                        </view>
+                        <text class="action-title">{{ item.title }}</text>
+                    </slot>
                 </view>
-                <text class="action-title">{{ item.title }}</text>
-            </view>
+            </slot>
         </view>
     </view>
 </template>
@@ -41,27 +37,17 @@ const props = defineProps({
         type: String,
         default: "需要我为你做些什么？",
     },
-    actions: {
+    actions: { // { title: 'Action 1', icon: 'image', color: '#ff0000' }
         type: Array,
         default: () => [
             {
-                key: "create-image",
-                icon: "image",
-                title: "创建图片",
-                color: "#25b95f",
-            },
-            {
-                key: "analyze-data",
-                icon: "chart",
                 title: "分析数据",
-                color: "#6cc9dd",
+                icon: "https://miaowtest-test.oss-cn-beijing.aliyuncs.com/icon/%E4%BA%91%E4%B8%AD%E7%9A%84%E8%84%B8_1777991373.png", // 这里直接放图片地址
             },
             {
-                key: "make-plan",
-                icon: "plan",
-                title: "制定计划",
-                color: "#dcc82f",
-            },
+                title: "生成报告",
+                icon: "https://miaowtest-test.oss-cn-beijing.aliyuncs.com/icon/%E4%BA%B2%E5%90%BB%E7%9A%84%E7%8C%AB%E5%92%AA%E8%A1%A8%E6%83%85_1777993099.png",
+            }
         ],
     },
 });
@@ -74,7 +60,18 @@ const dynamicGreeting = computed(() => {
 
 const emit = defineEmits(["action-click"]);
 
-const actionItems = computed(() => props.actions || []);
+const actionItems = computed(() => {
+    const items = props.actions || [];
+    return items.map((item, index) => {
+        if (typeof item === 'string') {
+            return {
+                key: `action-${index}`,
+                title: item
+            };
+        }
+        return item;
+    });
+});
 
 const handleActionClick = (item) => {
     emit("action-click", item);
@@ -137,8 +134,8 @@ const handleActionClick = (item) => {
 }
 
 .action-icon {
-    width: 48rpx;
-    height: 48rpx;
+    width: 50rpx;
+    height: 50rpx;
     position: relative;
     display: flex;
     align-items: center;
@@ -146,10 +143,10 @@ const handleActionClick = (item) => {
     flex-shrink: 0;
 }
 
-.icon-shape,
-.icon-shape::before,
-.icon-shape::after {
-    box-sizing: border-box;
+.action-image {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .action-title {
@@ -158,138 +155,5 @@ const handleActionClick = (item) => {
     font-weight: 700;
     color: #8e9198;
     white-space: nowrap;
-}
-
-.action-icon-image .icon-shape {
-    width: 36rpx;
-    height: 32rpx;
-    border: 6rpx solid currentColor;
-    border-radius: 5rpx;
-    position: relative;
-}
-
-.action-icon-image .icon-shape::before {
-    content: "";
-    position: absolute;
-    left: 4rpx;
-    bottom: 2rpx;
-    width: 18rpx;
-    height: 18rpx;
-    border-left: 6rpx solid currentColor;
-    border-bottom: 6rpx solid currentColor;
-    transform: rotate(45deg);
-    transform-origin: center;
-}
-
-.action-icon-image .icon-shape::after {
-    content: "";
-    position: absolute;
-    right: -11rpx;
-    top: -13rpx;
-    width: 18rpx;
-    height: 18rpx;
-    border-top: 5rpx solid currentColor;
-    border-right: 5rpx solid currentColor;
-}
-
-.action-icon-chart .icon-shape {
-    width: 38rpx;
-    height: 38rpx;
-    border-left: 6rpx solid currentColor;
-    border-bottom: 6rpx solid currentColor;
-    border-radius: 3rpx;
-    position: relative;
-}
-
-.action-icon-chart .icon-shape::before,
-.action-icon-chart .icon-shape::after {
-    content: "";
-    position: absolute;
-    bottom: 3rpx;
-    width: 7rpx;
-    border-radius: 999rpx 999rpx 0 0;
-    background: currentColor;
-}
-
-.action-icon-chart .icon-shape::before {
-    left: 9rpx;
-    height: 34rpx;
-}
-
-.action-icon-chart .icon-shape::after {
-    left: 24rpx;
-    height: 24rpx;
-}
-
-.action-icon-write .icon-shape {
-    width: 40rpx;
-    height: 13rpx;
-    border: 6rpx solid currentColor;
-    border-left: 0;
-    border-radius: 0 999rpx 999rpx 0;
-    position: relative;
-    transform: rotate(-36deg);
-}
-
-.action-icon-write .icon-shape::before {
-    content: "";
-    position: absolute;
-    left: -17rpx;
-    top: -6rpx;
-    width: 0;
-    height: 0;
-    border-top: 12rpx solid transparent;
-    border-bottom: 12rpx solid transparent;
-    border-right: 16rpx solid currentColor;
-}
-
-.action-icon-write .icon-shape::after {
-    content: "";
-    position: absolute;
-    left: -39rpx;
-    top: -15rpx;
-    width: 20rpx;
-    height: 6rpx;
-    border-radius: 999rpx;
-    background: currentColor;
-    box-shadow: -18rpx 14rpx 0 currentColor;
-}
-
-.action-icon-plan .icon-shape {
-    width: 29rpx;
-    height: 29rpx;
-    border: 6rpx solid currentColor;
-    border-radius: 50%;
-    position: relative;
-}
-
-.action-icon-plan .icon-shape::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -17rpx;
-    width: 18rpx;
-    height: 13rpx;
-    border-radius: 0 0 6rpx 6rpx;
-    border: 5rpx solid currentColor;
-    border-top: 0;
-    transform: translateX(-50%);
-}
-
-.action-icon-plan .icon-shape::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: -20rpx;
-    width: 6rpx;
-    height: 6rpx;
-    border-radius: 50%;
-    background: currentColor;
-    transform: translateX(-50%);
-    box-shadow:
-        -19rpx 8rpx 0 currentColor,
-        19rpx 8rpx 0 currentColor,
-        -26rpx 27rpx 0 currentColor,
-        26rpx 27rpx 0 currentColor;
 }
 </style>
