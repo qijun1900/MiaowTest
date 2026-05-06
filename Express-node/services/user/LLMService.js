@@ -127,6 +127,21 @@ const LLMService = {
         );
         return { conversationId, title };
     },
+    deleteConversation: async (uid, conversationId) => {
+        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+        if (!conv) {
+            throw new Error("会话不存在或无权限");
+        }
+        await AgentConversationModel.updateOne(
+            { _id: conversationId },
+            { $set: { status: 2 } }
+        );
+        await AgentMessageModel.updateMany(
+            { conversationId },
+            { $set: { status: 2 } }
+        );
+        return { conversationId };
+    },
     getConversationList: async (uid) => {
         return await AgentConversationModel.find({ Uid: uid, status: 1 })
             .sort({ lastMessageAt: -1 })
@@ -137,7 +152,7 @@ const LLMService = {
         if (!conv) {
             throw new Error("会话不存在或无权限");
         }
-        return await AgentMessageModel.find({ conversationId })
+        return await AgentMessageModel.find({ conversationId, status: 1 })
             .sort({ sequence: 1 })
             .select("role content contentType createTime");
     }

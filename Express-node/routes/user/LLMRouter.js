@@ -33,6 +33,14 @@ LLMRouter.put(
     LLMController.renameConversation
 );
 
+//删除会话
+LLMRouter.delete(
+    "/uniappAPI/llm/agent/conversations/:conversationId",
+    JWT.verifyTokenMiddleware(),
+    requireUid,
+    LLMController.deleteConversation
+);
+
 //获取具体会话的历史消息
 LLMRouter.get(
     "/uniappAPI/llm/agent/conversations/:conversationId/messages",

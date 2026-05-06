@@ -112,7 +112,8 @@ import {
         chatWithAgent, 
         fetchConversationList, 
         fetchConversationMessages, 
-        renameConversation
+        renameConversation,
+        deleteConversation
     } from "../../API/LLM/AgentAPI.js"
 
 // ─── 响应式状态 ────────────────────────────────────────────────────────────────
@@ -259,7 +260,6 @@ const handleMenuClick = () => {
 };
 
 const handleOptionClick = (action) => {
-    console.log("点击了选项：", action);
     if (action === "rename") {
 	        uni.showModal({
 	            title: "重命名会话",
@@ -271,7 +271,11 @@ const handleOptionClick = (action) => {
 	                        await renameConversation(currentConversationId.value, res.content);
 	                        currentConversationTitle.value = res.content;
 	                        loadConversationList();
-	                        uni.showToast({ title: "重命名成功", icon: "success" });
+	                        uni.showToast({ 
+                                title: "重命名成功", 
+                                icon: "none",
+                                position: "top"
+                            });
 	                    } catch (error) {
 	                        uni.showToast({ title: "重命名失败", icon: "none" });
                             console.error("重命名会话失败：", error);
@@ -280,6 +284,33 @@ const handleOptionClick = (action) => {
 	            },
 	        });
 	    }
+if (action === "delete") {
+	    uni.showModal({
+	        title: "删除会话",
+	        content: "确定要删除该会话吗？删除后不可恢复。",
+	        confirmText: "删除",
+	        confirmColor: "#ef4444",
+	        success: async (res) => {
+	            if (res.confirm) {
+	                try {
+	                    const targetId = currentConversationId.value;
+	                    await deleteConversation(targetId);
+	                    if (currentConversationId.value === targetId) {
+	                        currentConversationId.value = null;
+	                        currentConversationTitle.value = "";
+	                        messageList.value = [];
+	                        showWelcomePanel.value = true;
+	                    }
+	                    loadConversationList();
+	                    uni.showToast({ title: "已删除", icon: "none", position: "top" });
+	                } catch (error) {
+	                    uni.showToast({ title: "删除失败", icon: "none" });
+	                    console.error("删除会话失败：", error);
+	                }
+	            }
+	        },
+	    });
+	}
 };
 
 const handleModelChange = (modelName, modelKey) => {

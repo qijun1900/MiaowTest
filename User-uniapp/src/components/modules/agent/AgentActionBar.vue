@@ -1,8 +1,10 @@
 <template>
     <view v-if="visible" class="action-bar">
         <view class="action-item" hover-class="action-item-active" @click="handleCopy">
-            <!-- 官方 uni-icons 中没有专门的 copy，常用 paperclip 或 link 代替复制意图，后续可替换为切图 -->
-            <uni-icons type="link" :size="iconSize" color="#8b8fa3" />
+            <up-icon 
+                name="file-text" 
+                :size="iconSize" 
+                color="#8b8fa3" />
         </view>
         <view class="action-item" hover-class="action-item-active" @click="handleFavorite">
             <uni-icons

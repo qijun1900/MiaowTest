@@ -106,6 +106,12 @@ const AgentMessageSchema = new mongoose.Schema({
     default: "",
     trim: true,
   },
+  status: {
+    // 消息状态：0 表示归档，1 表示活跃，2 表示已删除（随会话软删除级联）。
+    type: Number,
+    default: 1,
+    enum: [0, 1, 2],
+  },
   messageStatus: {
     // 消息生成状态：0 表示生成中，1 表示成功，2 表示失败。
     type: Number,

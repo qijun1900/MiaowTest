@@ -74,6 +74,24 @@ const LLMController = {
     }
   },
 
+  deleteConversation: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const { conversationId } = req.params;
+      if (!uid) {
+        return res.status(401).send({ success: false, error: "未登录" });
+      }
+      if (!conversationId) {
+        return res.status(400).send({ success: false, error: "缺少参数" });
+      }
+      const result = await LLMService.deleteConversation(uid, conversationId);
+      res.status(200).send({ success: true, data: result });
+    } catch (error) {
+      console.error("LLMController.deleteConversation 错误", error);
+      res.status(500).send({ success: false, error: error.message || "删除失败" });
+    }
+  },
+
   getConversationMessages: async (req, res) => {
     try {
       const { uid } = req.user;

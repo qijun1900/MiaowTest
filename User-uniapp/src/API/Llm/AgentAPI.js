@@ -89,3 +89,20 @@ export const renameConversation = (conversationId, title) => {
         throw error;
     }
 }
+
+/**
+ * @description: 删除会话（软删除）
+ * @param {string} conversationId 会话ID
+ * @returns
+ */
+export const deleteConversation = (conversationId) => {
+    try {
+        return http({
+            url: `/uniappAPI/llm/agent/conversations/${conversationId}`,
+            method: "DELETE",
+        });
+    } catch (error) {
+        console.error("deleteConversation 失败", error);
+        throw error;
+    }
+}
