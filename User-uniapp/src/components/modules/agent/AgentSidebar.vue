@@ -43,26 +43,32 @@
             </view>
 
             <scroll-view class="chat-list" scroll-y>
-                <view
-                    class="chat-item"
-                    :class="{ 'chat-item-active': currentChatId === item._id }"
-                    v-for="item in filteredChats"
-                    :key="item._id"
-                    @click="handleSelectChat(item._id)"
-                >
-                    <view class="chat-item-icon">
-                        <view class="chat-dot"></view>
+                <!-- 骨架屏加载 -->
+                <template v-if="loading">
+                    <view class="skeleton-item" v-for="i in 8" :key="i">
+                        <view class="skeleton-title"></view>
                     </view>
-                    <view class="chat-item-content">
-                        <text class="chat-item-title">{{ item.title }}</text>
-                        <text class="chat-item-time">{{ formatTime(item.lastMessageAt || item.createTime) }}</text>
+                </template>
+                
+                <!-- 实际列表 -->
+                <template v-else>
+                    <view
+                        class="chat-item"
+                        :class="{ 'chat-item-active': currentChatId === item._id }"
+                        v-for="item in filteredChats"
+                        :key="item._id"
+                        @click="handleSelectChat(item._id)"
+                    >
+                        <view class="chat-item-content">
+                            <text class="chat-item-title">{{ item.title }}</text>
+                        </view>
                     </view>
-                </view>
-
-                <!-- 空状态 -->
-                <view class="empty-state" v-if="filteredChats.length === 0">
-                    <text class="empty-text">暂无会话记录</text>
-                </view>
+    
+                    <!-- 空状态 -->
+                    <view class="empty-state" v-if="filteredChats.length === 0">
+                        <text class="empty-text">暂无会话记录</text>
+                    </view>
+                </template>
             </scroll-view>
 
             <!-- 底部功能区 -->
@@ -92,6 +98,10 @@ import { UserInfoStore } from "@/stores/modules/UserinfoStore";
 
 const props = defineProps({
     show: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
         type: Boolean,
         default: false,
     },
@@ -129,15 +139,6 @@ const touchStartY = ref(0);
 const touchDeltaX = ref(0);
 const touchDeltaY = ref(0);
 
-const formatTime = (timeStr) => {
-    if (!timeStr) return "";
-    const date = new Date(timeStr);
-    const now = new Date();
-    if (date.toDateString() === now.toDateString()) {
-        return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-    }
-    return `${date.getMonth() + 1}/${date.getDate()}`;
-};
 
 const filteredChats = computed(() => {
     if (!searchText.value) return props.conversations;
@@ -423,19 +424,28 @@ const handleSettings = () => {
 .chat-item {
     display: flex;
     align-items: center;
-    padding: 20rpx 16rpx;
+    padding: 32rpx 20rpx;
     gap: 16rpx;
-    border-radius: 16rpx;
-    margin-bottom: 4rpx;
-    transition: background 0.15s ease;
+    margin-bottom: 8rpx;
+    border-bottom: 1rpx solid rgba(15, 23, 42, 0.06);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.chat-item:last-child {
+    border-bottom: transparent;
 }
 
 .chat-item:active {
     background: rgba(15, 23, 42, 0.04);
+    border-radius: 12rpx;
 }
 
 .chat-item-active {
     background: rgba(102, 126, 234, 0.08);
+    border-radius: 12rpx;
+    border-bottom-color: transparent;
 }
 
 .chat-item-icon {
@@ -462,15 +472,18 @@ const handleSettings = () => {
     display: flex;
     flex-direction: column;
     gap: 4rpx;
+    overflow: hidden;
 }
 
 .chat-item-title {
-    font-size: 28rpx;
+    font-size: 32rpx;
     color: #2d2f36;
     font-weight: 500;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    display: block;
+    width: 100%;
 }
 
 .chat-item-time {

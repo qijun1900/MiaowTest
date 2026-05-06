@@ -1,7 +1,7 @@
 const AgentDefinitionModel = require("../../models/AgentDefinitionModel");
 const AgentConversationModel = require("../../models/AgentConversationModel");
 const AgentMessageModel = require("../../models/AgentMessageModel");
-const { runAgentChain } = require("../../llm/chains/agent/agentChat");
+const { runAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat");
 
 const LLMService = {
     ChatWithAgentAndSave: async ({uid, message: userMessage, agentKey, conversationId}) => {
@@ -13,19 +13,34 @@ const LLMService = {
         let convId = conversationId;
         let sequence = 0;
         if (!convId) {
+            let title = userMessage.substring(0, 20);
+            try {
+                const aiTitle = await generateConversationTitle(userMessage, agentConfig.defaultModel);
+                if (aiTitle) title = aiTitle;
+            } catch (e) {
+                // AI 标题生成失败时降级为字符串截断，不影响主流程
+            }
             const newConv = new AgentConversationModel({
                 Uid: uid,
                 agentKey,
-                title: userMessage.substring(0, 20),
+                title,
                 lastMessagePreview: userMessage.substring(0, 50),
-                messageCount: 0
+                messageCount: 0,
+                scene: agentConfig.agentKey || "default",
+                currentModel: agentConfig.defaultModel || "",
             });
             await newConv.save();
             convId = newConv._id;
         } else {
             await AgentConversationModel.updateOne(
                 { _id: convId },
-                { $set: { lastMessagePreview: userMessage.substring(0, 50), lastMessageAt: new Date() } }
+                { $set: 
+                    { 
+                        lastMessagePreview: userMessage.substring(0, 50), 
+                        lastMessageAt: new Date(), 
+                        currentModel: agentConfig.defaultModel || "" 
+                    } 
+                }
             );
             const lastMsg = await AgentMessageModel.findOne({ conversationId: convId }).sort({ sequence: -1 });
             sequence = lastMsg ? lastMsg.sequence + 1 : 0;
@@ -47,7 +62,11 @@ const LLMService = {
         const messages = historyDocs.map(doc => ({ role: doc.role, content: doc.content }));
 
         // 5. 将上下文投递给大模型 
-        const aiResponseContent = await runAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel);
+        const aiResponseContent = await runAgentChain(
+            messages, 
+            agentConfig.systemPrompt, 
+            agentConfig.defaultModel
+        );
         
         // 解析返回结果，如果是个对象则取出 reply
         const replyText = typeof aiResponseContent === 'object' && aiResponseContent !== null 

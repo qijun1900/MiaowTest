@@ -14,6 +14,21 @@ const agentPrompt = ChatPromptTemplate.fromMessages([
 ]);
 
 /**
+ * 根据用户的首条消息，调用 AI 自动生成简短会话标题。
+ * 失败时返回 undefined，由调用方降级为字符串截断。
+ */
+async function generateConversationTitle(userMessage, modelName = "qwen-plus") {
+  const model = ModelFactory.getModel(modelName, 0.3, false);
+  const prompt = ChatPromptTemplate.fromMessages([
+    ["system", "你是一个标题生成助手。请根据用户的提问，生成一个简短的会话标题（不超过20个字）。只返回标题文本，不要加引号或其他修饰。"],
+    ["human", "{input}"],
+  ]);
+  const chain = prompt.pipe(model).pipe(new StringOutputParser());
+  const title = await chain.invoke({ input: userMessage });
+  return title?.trim() || "";
+}
+
+/**
  * 运行 Agent 的 LCEL 执行链
  * @param {Array} rawMessages - 前端传来的原始对话记录 (包含 role 和 content)
  * @param {String} systemPrompt - 需要注入的 Agent 人设提示词
@@ -73,4 +88,4 @@ async function runAgentChain(
   };
 }
 
-module.exports = { runAgentChain };
+module.exports = { runAgentChain, generateConversationTitle };
