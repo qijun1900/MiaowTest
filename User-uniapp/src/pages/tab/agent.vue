@@ -107,7 +107,13 @@ import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
 import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
-import {fetchAgentList, chatWithAgent, fetchConversationList, fetchConversationMessages} from "../../API/LLM/AgentAPI.js"
+import {
+        fetchAgentList, 
+        chatWithAgent, 
+        fetchConversationList, 
+        fetchConversationMessages, 
+        renameConversation
+    } from "../../API/LLM/AgentAPI.js"
 
 // ─── 响应式状态 ────────────────────────────────────────────────────────────────
 const sidebarVisible = ref(false);
@@ -253,10 +259,27 @@ const handleMenuClick = () => {
 };
 
 const handleOptionClick = (action) => {
-    uni.showToast({
-        title: `点击了 ${action}`,
-        icon: 'none'
-    });
+    console.log("点击了选项：", action);
+    if (action === "rename") {
+	        uni.showModal({
+	            title: "重命名会话",
+	            editable: true,
+	            placeholderText: currentConversationTitle.value || "请输入新标题",
+	            success: async (res) => {
+	                if (res.confirm && res.content) {
+	                    try {
+	                        await renameConversation(currentConversationId.value, res.content);
+	                        currentConversationTitle.value = res.content;
+	                        loadConversationList();
+	                        uni.showToast({ title: "重命名成功", icon: "success" });
+	                    } catch (error) {
+	                        uni.showToast({ title: "重命名失败", icon: "none" });
+                            console.error("重命名会话失败：", error);
+	                    }
+	                }
+	            },
+	        });
+	    }
 };
 
 const handleModelChange = (modelName, modelKey) => {

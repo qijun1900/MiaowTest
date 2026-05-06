@@ -116,6 +116,17 @@ const LLMService = {
             createTime: -1,
         });
     },
+    renameConversation: async (uid, conversationId, title) => {
+        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+        if (!conv) {
+            throw new Error("会话不存在或无权限");
+        }
+        await AgentConversationModel.updateOne(
+            { _id: conversationId },
+            { $set: { title } }
+        );
+        return { conversationId, title };
+    },
     getConversationList: async (uid) => {
         return await AgentConversationModel.find({ Uid: uid, status: 1 })
             .sort({ lastMessageAt: -1 })

@@ -42,6 +42,21 @@
                 </view>
             </view>
 
+            <!-- 导航选项区 -->
+            <view class="main-nav-section">
+                <view class="nav-item" @click="handleNav('favorites')">
+                    <uni-icons type="star" size="22" color="#30323a"></uni-icons>
+                    <text class="nav-text">我的收藏</text>
+                </view>
+                <view class="nav-item" @click="handleNav('tasks')">
+                    <uni-icons type="list" size="22" color="#30323a"></uni-icons>
+                    <text class="nav-text">我的任务</text>
+                </view>
+            </view>
+
+            <view class="section-divider"></view>
+            <view class="section-header">最近</view>
+
             <scroll-view class="chat-list" scroll-y>
                 <!-- 骨架屏加载 -->
                 <template v-if="loading">
@@ -217,6 +232,13 @@ const handleSettings = () => {
    uni.navigateTo({
        url: "/pages/my/MySettingView",
    });
+};
+
+const handleNav = (target) => {
+    uni.showToast({
+        title: target === 'favorites' ? '开发中: 我的收藏' : '开发中: 我的任务',
+        icon: 'none'
+    });
 };
 </script>
 
@@ -413,6 +435,43 @@ const handleSettings = () => {
 .search-placeholder {
     color: #8b8fa3;
     font-size: 28rpx;
+}
+
+/* 主导航区 */
+.main-nav-section {
+    padding: 10rpx 32rpx;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 20rpx;
+    padding: 24rpx 12rpx;
+    border-radius: 12rpx;
+    transition: background 0.2s ease;
+}
+
+.nav-item:active {
+    background: rgba(15, 23, 42, 0.04);
+}
+
+.nav-text {
+    font-size: 32rpx;
+    color: #2d2f36;
+    font-weight: 500;
+}
+
+.section-divider {
+    height: 1rpx;
+    background: rgba(15, 23, 42, 0.06);
+    margin: 10rpx 44rpx;
+}
+
+.section-header {
+    padding: 20rpx 44rpx 10rpx;
+    font-size: 26rpx;
+    font-weight: 600;
+    color: #8b8fa3;
 }
 
 /* 会话列表 */

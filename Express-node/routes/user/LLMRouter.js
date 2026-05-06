@@ -25,6 +25,14 @@ LLMRouter.get(
     LLMController.getConversationList
 );
 
+//重命名会话标题
+LLMRouter.put(
+    "/uniappAPI/llm/agent/conversations/:conversationId/rename",
+    JWT.verifyTokenMiddleware(),
+    requireUid,
+    LLMController.renameConversation
+);
+
 //获取具体会话的历史消息
 LLMRouter.get(
     "/uniappAPI/llm/agent/conversations/:conversationId/messages",

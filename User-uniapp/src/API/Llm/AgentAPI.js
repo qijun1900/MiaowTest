@@ -70,3 +70,22 @@ export const chatWithAgent = ({message, agentKey, conversationId}) => {
         throw error;
     }
 }
+
+/**
+ * @description: 重命名会话标题
+ * @param {string} conversationId 会话ID
+ * @param {string} title 新标题
+ * @returns
+ */
+export const renameConversation = (conversationId, title) => {
+    try {
+        return http({
+            url: `/uniappAPI/llm/agent/conversations/${conversationId}/rename`,
+            method: "PUT",
+            data: { title },
+        });
+    } catch (error) {
+        console.error("renameConversation 失败", error);
+        throw error;
+    }
+}

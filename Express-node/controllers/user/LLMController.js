@@ -55,6 +55,25 @@ const LLMController = {
     }
   },
 
+  renameConversation: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const { conversationId } = req.params;
+      const { title } = req.body;
+      if (!uid) {
+        return res.status(401).send({ success: false, error: "未登录" });
+      }
+      if (!conversationId || !title) {
+        return res.status(400).send({ success: false, error: "缺少必要参数" });
+      }
+      const result = await LLMService.renameConversation(uid, conversationId, title);
+      res.status(200).send({ success: true, data: result });
+    } catch (error) {
+      console.error("LLMController.renameConversation 错误", error);
+      res.status(500).send({ success: false, error: error.message || "重命名失败" });
+    }
+  },
+
   getConversationMessages: async (req, res) => {
     try {
       const { uid } = req.user;
