@@ -292,10 +292,10 @@ const avatarIconSize = computed(() => {
 
 const htmlTagStyle = computed(() => ({
     // mp-html 通过 tag-style 控制富文本节点样式，避免 scoped CSS 穿透不稳定。
-    p: "margin:0 0 8px;line-height:1.7;",
-    div: "line-height:1.7;",
-    img: "max-width:100%;border-radius:8px;",
-    table: "border-collapse:collapse;max-width:100%;",
+    p: "margin: 8rpx 0; line-height: 1.7;",
+    div: "line-height: 1.7;",
+    img: "max-width: 100%; border-radius: 8px; margin: 8rpx 0;",
+    table: "border-collapse: collapse; max-width: 100%; margin: 8rpx 0;",
     th: "border:1px solid #e5e7eb;padding:6px;background:#f8fafc;",
     td: "border:1px solid #e5e7eb;padding:6px;",
     thead: "background:#f8fafc;",
@@ -499,7 +499,7 @@ function escapeHtml(value) {
     align-items: flex-start;
     width: 100%;
     box-sizing: border-box;
-    margin: 16rpx 0;
+    margin: 12rpx 0;
 }
 
 .bubble-row-start {
@@ -541,7 +541,7 @@ function escapeHtml(value) {
 
 .bubble-box {
     box-sizing: border-box;
-    padding: 20rpx 24rpx;
+    padding: 16rpx 24rpx;
     color: #202635;
     font-size: 28rpx;
     line-height: 1.7;
@@ -604,6 +604,15 @@ function escapeHtml(value) {
 .bubble-mp-html {
     font-size: 28rpx;
     line-height: 1.7;
+    display: block;
+}
+
+:deep(.bubble-mp-html > view > *:first-child) {
+    margin-top: 0 !important;
+}
+
+:deep(.bubble-mp-html > view > *:last-child) {
+    margin-bottom: 0 !important;
 }
 
 .bubble-typing-suffix {

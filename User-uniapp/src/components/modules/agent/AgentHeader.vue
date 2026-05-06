@@ -13,7 +13,7 @@
                 </view>
 
                 <view class="nav-right">
-                    <view class="more-trigger" @click.stop="toggleOptionsMenu">
+                    <view v-if="conversationTitle" class="more-trigger" @click.stop="toggleOptionsMenu">
                         <view class="more-dot"></view>
                         <view class="more-dot"></view>
                         <view class="more-dot"></view>
@@ -24,21 +24,26 @@
                     
                     <!-- 下拉菜单 -->
                     <view v-if="showOptionsMenu" class="options-dropdown" @click.stop>
+                        <view class="dropdown-header" v-if="conversationTitle">
+                            <text class="dropdown-title">{{ conversationTitle }}</text>
+                        </view>
+                        <view class="dropdown-divider" v-if="conversationTitle"></view>
+                        
                         <view class="option-item" @click="handleOption('rename')">
-                            <text class="option-text">Rename</text>
+                            <text class="option-text">重命名</text>
                             <uni-icons type="compose" size="18" color="#333"></uni-icons>
                         </view>
                         <view class="option-item" @click="handleOption('star')">
-                            <text class="option-text">Star</text>
+                            <text class="option-text">收藏</text>
                             <uni-icons type="star" size="18" color="#333"></uni-icons>
                         </view>
                         <view class="option-item option-item-danger" @click="handleOption('delete')">
-                            <text class="option-text">Delete</text>
+                            <text class="option-text">删除</text>
                             <uni-icons type="trash" size="18" color="#ef4444"></uni-icons>
                         </view>
                         <view class="dropdown-divider"></view>
                         <view class="option-item" @click="handleOption('new-chat')">
-                            <text class="option-text">New chat</text>
+                            <text class="option-text">新建会话</text>
                             <uni-icons type="plusempty" size="18" color="#333"></uni-icons>
                         </view>
                     </view>
@@ -61,6 +66,10 @@ const props = defineProps({
         type: String,
         default: "暂时无模型",
     },
+    conversationTitle: {
+        type: String,
+        default: "",
+    }
 });
 
 const emit = defineEmits(["menu-click", "new-chat", "model-change", "option-click"]);
@@ -271,6 +280,20 @@ const handleOption = (action) => {
     z-index: 101;
     display: flex;
     flex-direction: column;
+}
+
+.dropdown-header {
+    padding: 16rpx 30rpx 4rpx;
+}
+
+.dropdown-title {
+    font-size: 26rpx;
+    color: #8b8fa3;
+    font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .option-item {

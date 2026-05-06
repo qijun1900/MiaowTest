@@ -11,7 +11,7 @@ class ModelFactory {
    * @param {boolean} [streaming] - 是否启用流式输出，启用后可通过 .stream() 逐 token 获取
    * @returns {ChatOpenAI} LLM实例
    */
-  static getModel(modelName = "qwen-plus", temperature = 0.7, streaming = true) {
+  static getModel(modelName = "qwen-plus", temperature = 0.7, streaming = false) {
     return new ChatOpenAI({
       apiKey: process.env.DASHSCOPE_API_KEY,
       configuration: {

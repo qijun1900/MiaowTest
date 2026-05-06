@@ -9,9 +9,11 @@
         <AgentHeader
             :model-list="modelList"
             :initial-model="currentModelName"
+            :conversation-title="currentConversationTitle"
             @menu-click="handleMenuClick"
             @new-chat="handleNewChat"
             @model-change="handleModelChange"
+            @option-click="handleOptionClick"
             @touchstart="handleTouchStart"
         />
 
@@ -118,6 +120,7 @@ const modelList = ref([{label: "Mio", value: "mio"}]);
 const currentModelKey = ref("mio");
 const currentModelName = ref("Mio");
 const currentConversationId = ref(null);
+const currentConversationTitle = ref("");
 const conversationList = ref([]);
 
 const loadAgentList = async () => {
@@ -142,9 +145,14 @@ const loadAgentList = async () => {
 const loadConversationList = async () => {
     try {
         const res = await fetchConversationList();
-        console.log("会话列表接口返回：", res);
         if (res?.data) {
             conversationList.value = res.data;
+            if (currentConversationId.value) {
+                const chat = conversationList.value.find(c => c._id === currentConversationId.value);
+                if (chat) {
+                    currentConversationTitle.value = chat.title;
+                }
+            }
         }
     } catch (error) {
         console.error("加载会话列表失败：", error);
@@ -244,6 +252,13 @@ const handleMenuClick = () => {
     sidebarVisible.value = true;
 };
 
+const handleOptionClick = (action) => {
+    uni.showToast({
+        title: `点击了 ${action}`,
+        icon: 'none'
+    });
+};
+
 const handleModelChange = (modelName, modelKey) => {
     if (!modelName) return;
     currentModelName.value = modelName;
@@ -257,15 +272,25 @@ const handleModelChange = (modelName, modelKey) => {
 
 const handleNewChat = () => {
     currentConversationId.value = null;
+    currentConversationTitle.value = "";
     messageList.value = [];
     showWelcomePanel.value = true;
-    uni.showToast({ title: "已回到新会话", icon: "none" });
+    uni.showToast({ 
+        title: "已回到新会话", 
+        icon: "none" ,
+        position: "top",
+    });
 };
 
 const handleSelectChat = async (chatId) => {
     currentConversationId.value = chatId;
+    currentConversationTitle.value = conversationList.value.find(c => c._id === chatId)?.title || "";
     sidebarVisible.value = false;
-    uni.showToast({ title: `正在加载会话...`, icon: "none" });
+    uni.showToast({ 
+        title: `正在加载会话...`, 
+        icon: "none" ,
+        position: "bottom",
+    });
     
     try {
         const res = await fetchConversationMessages(chatId);

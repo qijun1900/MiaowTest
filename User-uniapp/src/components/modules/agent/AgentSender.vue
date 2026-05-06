@@ -14,7 +14,11 @@
 
         <view class="sender-tools">
             <view class="sender-tools-left">
-                <view class="attach-btn" @click="handleAddAttachment">
+                <view
+                    class="attach-btn"
+                    :class="{ 'attach-hidden': hasText }"
+                    @click="!hasText && handleAddAttachment()"
+                >
                     <view class="attach-plus"></view>
                 </view>
 
@@ -29,7 +33,11 @@
                 </view>
             </view>
 
-            <view v-if="hasText" class="send-btn" @click="submitCurrent">
+            <view
+                class="send-btn"
+                :class="{ 'send-hidden': !hasText }"
+                @click="hasText && submitCurrent()"
+            >
                 <uni-icons type="paperplane-filled" size="20" color="#ffffff">
                 </uni-icons>
             </view>
@@ -177,6 +185,10 @@ const handleAddAttachment = () => {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    transform: scale(1);
+    overflow: hidden;
 }
 
 .attach-btn {
@@ -184,9 +196,25 @@ const handleAddAttachment = () => {
     border: 1rpx solid rgba(15, 23, 42, 0.18);
 }
 
+.attach-hidden {
+    width: 0;
+    opacity: 0;
+    border-width: 0;
+    transform: scale(0.6);
+    pointer-events: none;
+    margin-right: -14rpx; /* 抵消 flex gap 避免留白 */
+}
+
 .send-btn {
     background: #2f6bff;
     box-shadow: 0 8rpx 18rpx rgba(47, 107, 255, 0.26);
+}
+
+.send-hidden {
+    width: 0;
+    opacity: 0;
+    transform: scale(0.6);
+    pointer-events: none;
 }
 
 .attach-plus {

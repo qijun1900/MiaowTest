@@ -418,7 +418,10 @@ const handleSettings = () => {
 /* 会话列表 */
 .chat-list {
     flex: 1;
+    height: 0;
+    min-height: 0;
     padding: 8rpx 24rpx;
+    box-sizing: border-box;
 }
 
 .chat-item {

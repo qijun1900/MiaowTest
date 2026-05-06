@@ -14,17 +14,20 @@ const agentPrompt = ChatPromptTemplate.fromMessages([
 ]);
 
 /**
- * 根据用户的首条消息，调用 AI 自动生成简短会话标题。
- * 失败时返回 undefined，由调用方降级为字符串截断。
+ * 根据用户提问和 AI 回答，综合生成简短会话标题。
+ * 失败时抛错，由调用方降级处理。
  */
-async function generateConversationTitle(userMessage, modelName = "qwen-plus") {
+async function generateConversationTitle(userMessage, aiResponse, modelName = "qwen-plus") {
   const model = ModelFactory.getModel(modelName, 0.3, false);
   const prompt = ChatPromptTemplate.fromMessages([
-    ["system", "你是一个标题生成助手。请根据用户的提问，生成一个简短的会话标题（不超过20个字）。只返回标题文本，不要加引号或其他修饰。"],
-    ["human", "{input}"],
+    ["system", "你是一个标题生成助手。请根据用户的提问和AI的回答，提炼出一个简短的会话标题（不超过20个字），概括本轮对话的核心主题。只返回标题文本，不要加引号或其他修饰。"],
+    ["human", "用户提问：{question}\n\nAI回答：{answer}"],
   ]);
   const chain = prompt.pipe(model).pipe(new StringOutputParser());
-  const title = await chain.invoke({ input: userMessage });
+  const title = await chain.invoke({
+    question: userMessage,
+    answer: typeof aiResponse === 'string' ? aiResponse : (aiResponse?.reply || JSON.stringify(aiResponse)),
+  });
   return title?.trim() || "";
 }
 
@@ -41,7 +44,7 @@ async function runAgentChain(
   modelName = "qwen-plus",
 ) {
   // 1. 通过统一工厂获取对应的模型实例
-  const model = ModelFactory.getModel(modelName);
+  const model = ModelFactory.getModel(modelName, 0.7, false);
 
   // 2. 解析和分割原始的消息对象，拆分为上下文(history)与最新一句输入(input)
   let input = "";

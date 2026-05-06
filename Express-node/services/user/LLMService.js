@@ -13,17 +13,10 @@ const LLMService = {
         let convId = conversationId;
         let sequence = 0;
         if (!convId) {
-            let title = userMessage.substring(0, 20);
-            try {
-                const aiTitle = await generateConversationTitle(userMessage, agentConfig.defaultModel);
-                if (aiTitle) title = aiTitle;
-            } catch (e) {
-                // AI 标题生成失败时降级为字符串截断，不影响主流程
-            }
             const newConv = new AgentConversationModel({
                 Uid: uid,
                 agentKey,
-                title,
+                title: userMessage.substring(0, 20),
                 lastMessagePreview: userMessage.substring(0, 50),
                 messageCount: 0,
                 scene: agentConfig.agentKey || "default",
@@ -86,13 +79,29 @@ const LLMService = {
                         : (agentConfig.defaultModel || "default")
         });
         
-        // 7. 更新会话统计
+        // 7. 新会话用 Q&A 综合生成标题（fire-and-forget，不阻塞响应）
+        if (!conversationId) {
+            generateConversationTitle(userMessage, replyText, agentConfig.defaultModel)
+                .then(aiTitle => {
+                    if (aiTitle) {
+                        return AgentConversationModel.updateOne(
+                            { _id: convId },
+                            { $set: { title: aiTitle } }
+                        );
+                    }
+                })
+                .catch(() => {
+                    // AI 标题生成失败时保持截断标题，不影响主流程
+                });
+        }
+
+        // 8. 更新会话统计
         await AgentConversationModel.updateOne(
             { _id: convId },
             { $inc: { messageCount: 2 } }
         );
 
-        // 8. 返回最新回复和绑定的会话ID
+        // 9. 返回最新回复和绑定的会话ID
         return {
             conversationId: convId,
             data: aiResponseContent
