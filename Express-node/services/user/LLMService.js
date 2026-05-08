@@ -3,6 +3,8 @@ const AgentConversationModel = require("../../models/AgentConversationModel");
 const AgentMessageModel = require("../../models/AgentMessageModel");
 const { runAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat");
 
+const HISTORY_MESSAGE_LIMIT = 20;
+
 const LLMService = {
     ChatWithAgentAndSave: async ({uid, message: userMessage, agentKey, conversationId}) => {
         // 1. 获取 Agent 配置
@@ -25,22 +27,24 @@ const LLMService = {
             await newConv.save();
             convId = newConv._id;
         } else {
-            await AgentConversationModel.updateOne(
-                { _id: convId },
-                { $set: 
-                    { 
-                        lastMessagePreview: userMessage.substring(0, 50), 
-                        lastMessageAt: new Date(), 
-                        currentModel: agentConfig.defaultModel || "" 
-                    } 
-                }
-            );
-            const lastMsg = await AgentMessageModel.findOne({ conversationId: convId }).sort({ sequence: -1 });
+            const [, lastMsg] = await Promise.all([
+                AgentConversationModel.updateOne(
+                    { _id: convId },
+                    { $set:
+                        {
+                            lastMessagePreview: userMessage.substring(0, 50),
+                            lastMessageAt: new Date(),
+                            currentModel: agentConfig.defaultModel || ""
+                        }
+                    }
+                ),
+                AgentMessageModel.findOne({ conversationId: convId }).sort({ sequence: -1 })
+            ]);
             sequence = lastMsg ? lastMsg.sequence + 1 : 0;
         }
 
-        // 3. 落库用户消息
-        await AgentMessageModel.create({
+        // 3. 并行：落库用户消息 + 拉取最近历史（限制条数，避免长对话上下文爆炸）
+        const userMsgPromise = AgentMessageModel.create({
             conversationId: convId,
             Uid: uid,
             agentKey,
@@ -50,9 +54,13 @@ const LLMService = {
             modelName: agentConfig.defaultModel || "default"
         });
 
-        // 4. 获取历史消息列表(为了注入上下文)
-        const historyDocs = await AgentMessageModel.find({ conversationId: convId }).sort({ sequence: 1 });
-        const messages = historyDocs.map(doc => ({ role: doc.role, content: doc.content }));
+        const historyPromise = AgentMessageModel.find({ conversationId: convId, status: 1 })
+            .sort({ sequence: -1 })
+            .limit(HISTORY_MESSAGE_LIMIT);
+
+        const [, historyDocs] = await Promise.all([userMsgPromise, historyPromise]);
+        // 恢复为正序，保证 LLM 上下文从旧到新排列
+        const messages = historyDocs.reverse().map(doc => ({ role: doc.role, content: doc.content }));
 
         // 5. 将上下文投递给大模型 
         const aiResponseContent = await runAgentChain(
@@ -147,14 +155,21 @@ const LLMService = {
             .sort({ lastMessageAt: -1 })
             .select("title lastMessagePreview lastMessageAt agentKey messageCount createTime _id");
     },
-    getMessageList: async (uid, conversationId) => {
+    getMessageList: async (uid, conversationId, { page = 1, limit = 50 } = {}) => {
         const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
         if (!conv) {
             throw new Error("会话不存在或无权限");
         }
-        return await AgentMessageModel.find({ conversationId, status: 1 })
-            .sort({ sequence: 1 })
-            .select("role content contentType createTime");
+        const skip = (page - 1) * limit;
+        const [messages, total] = await Promise.all([
+            AgentMessageModel.find({ conversationId, status: 1 })
+                .sort({ sequence: 1 })
+                .skip(skip)
+                .limit(limit)
+                .select("role content contentType createTime"),
+            AgentMessageModel.countDocuments({ conversationId, status: 1 })
+        ]);
+        return { messages, total, page, limit };
     }
 };
 module.exports = LLMService;

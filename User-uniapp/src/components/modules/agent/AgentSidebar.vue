@@ -69,7 +69,7 @@
                 <template v-else>
                     <view
                         class="chat-item"
-                        :class="{ 'chat-item-active': currentChatId === item._id }"
+                        :class="{ 'chat-item-active': currentChatId === item._id, 'chat-item-loading': loadingChatId === item._id }"
                         v-for="item in filteredChats"
                         :key="item._id"
                         @click="handleSelectChat(item._id)"
@@ -77,6 +77,7 @@
                         <view class="chat-item-content">
                             <text class="chat-item-title">{{ item.title }}</text>
                         </view>
+                        <view v-if="loadingChatId === item._id" class="chat-item-spinner"></view>
                     </view>
     
                     <!-- 空状态 -->
@@ -125,6 +126,10 @@ const props = defineProps({
         default: () => [],
     },
     currentChatId: {
+        type: [String, Number],
+        default: null
+    },
+    loadingChatId: {
         type: [String, Number],
         default: null
     }
@@ -546,6 +551,25 @@ const handleNav = (target) => {
     text-overflow: ellipsis;
     display: block;
     width: 100%;
+}
+
+.chat-item-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.chat-item-spinner {
+    width: 28rpx;
+    height: 28rpx;
+    border: 3rpx solid rgba(102, 126, 234, 0.2);
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: sidebar-spin 0.6s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes sidebar-spin {
+    to { transform: rotate(360deg); }
 }
 
 .chat-item-time {

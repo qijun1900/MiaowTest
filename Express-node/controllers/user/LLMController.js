@@ -96,16 +96,19 @@ const LLMController = {
     try {
       const { uid } = req.user;
       const { conversationId } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 50;
       if (!uid) {
         return res.status(401).send({ success: false, error: "未登录" });
       }
       if (!conversationId) {
         return res.status(400).send({ success: false, error: "缺少参数" });
       }
-      const messages = await LLMService.getMessageList(uid, conversationId);
+      const result = await LLMService.getMessageList(uid, conversationId, { page, limit });
       res.status(200).send({
         success: true,
-        data: messages
+        data: result.messages,
+        meta: { total: result.total, page: result.page, limit: result.limit }
       });
     } catch (error) {
       console.error("LLMController.getConversationMessages 错误", error);

@@ -91,6 +91,7 @@
             v-model:show="sidebarVisible"
             :conversations="conversationList"
             :current-chat-id="currentConversationId"
+            :loading-chat-id="loadingConversationId"
             @select-chat="handleSelectChat"
         />
     </view>
@@ -129,6 +130,8 @@ const currentModelName = ref("Mio");
 const currentConversationId = ref(null);
 const currentConversationTitle = ref("");
 const conversationList = ref([]);
+const loadingConversationId = ref(null);
+let chatRequestSeq = 0;
 
 const loadAgentList = async () => {
     try {
@@ -337,17 +340,18 @@ const handleNewChat = () => {
 };
 
 const handleSelectChat = async (chatId) => {
-    currentConversationId.value = chatId;
-    currentConversationTitle.value = conversationList.value.find(c => c._id === chatId)?.title || "";
+    // 递增请求序号以消除快速切换时的竞态条件
+    const requestSeq = ++chatRequestSeq;
+    loadingConversationId.value = chatId;
     sidebarVisible.value = false;
-    uni.showToast({ 
-        title: `正在加载会话...`, 
-        icon: "none" ,
-        position: "bottom",
-    });
-    
+
     try {
         const res = await fetchConversationMessages(chatId);
+        // 仅当请求序号仍为最新时才应用结果，防止旧请求覆盖新请求
+        if (requestSeq !== chatRequestSeq) return;
+
+        currentConversationId.value = chatId;
+        currentConversationTitle.value = conversationList.value.find(c => c._id === chatId)?.title || "";
         if (res?.data) {
             messageList.value = res.data.map(msg => ({
                 role: msg.role,
@@ -356,10 +360,18 @@ const handleSelectChat = async (chatId) => {
                 pending: false
             }));
             showWelcomePanel.value = false;
+        } else {
+            messageList.value = [];
+            showWelcomePanel.value = false;
         }
     } catch (error) {
+        if (requestSeq !== chatRequestSeq) return;
         console.error("加载消息记录失败", error);
         uni.showToast({ title: "加载历史消息失败", icon: "none" });
+    } finally {
+        if (requestSeq === chatRequestSeq) {
+            loadingConversationId.value = null;
+        }
     }
 };
 
