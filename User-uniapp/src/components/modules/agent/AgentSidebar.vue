@@ -44,8 +44,16 @@
 
             <!-- 导航选项区 -->
             <view class="main-nav-section">
-                <view class="nav-item" @click="handleNav('favorites')">
-                    <uni-icons type="star" size="22" color="#30323a"></uni-icons>
+                <view
+                    class="nav-item"
+                    :class="{ 'nav-item-active': activeFilter === 'favorites' }"
+                    @click="handleNav('favorites')"
+                >
+                    <uni-icons
+                        :type="activeFilter === 'favorites' ? 'star-filled' : 'star'"
+                        size="22"
+                        :color="activeFilter === 'favorites' ? '#f5a623' : '#30323a'"
+                    ></uni-icons>
                     <text class="nav-text">我的收藏</text>
                 </view>
                 <view class="nav-item" @click="handleNav('tasks')">
@@ -55,7 +63,7 @@
             </view>
 
             <view class="section-divider"></view>
-            <view class="section-header">最近</view>
+            <view class="section-header">{{ activeFilter === 'favorites' ? '我的收藏' : '最近' }}</view>
 
             <scroll-view class="chat-list" scroll-y>
                 <!-- 骨架屏加载 -->
@@ -74,15 +82,18 @@
                         :key="item._id"
                         @click="handleSelectChat(item._id)"
                     >
+                        <view v-if="item.isPinned" class="chat-item-star">
+                            <uni-icons type="star-filled" size="16" color="#f5a623"></uni-icons>
+                        </view>
                         <view class="chat-item-content">
                             <text class="chat-item-title">{{ item.title }}</text>
                         </view>
                         <view v-if="loadingChatId === item._id" class="chat-item-spinner"></view>
                     </view>
-    
+
                     <!-- 空状态 -->
                     <view class="empty-state" v-if="filteredChats.length === 0">
-                        <text class="empty-text">暂无会话记录</text>
+                        <text class="empty-text">{{ activeFilter === 'favorites' ? '暂无收藏会话' : '暂无会话记录' }}</text>
                     </view>
                 </template>
             </scroll-view>
@@ -135,7 +146,9 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(["update:show", "select-chat"]);
+const emit = defineEmits(["update:show", "select-chat", "filter-change"]);
+
+const activeFilter = ref("all"); // 'all' | 'favorites'
 
 const { customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
@@ -161,11 +174,17 @@ const touchDeltaY = ref(0);
 
 
 const filteredChats = computed(() => {
-    if (!searchText.value) return props.conversations;
-    const keyword = searchText.value.toLowerCase();
-    return props.conversations.filter((item) =>
-        item.title && item.title.toLowerCase().includes(keyword),
-    );
+    let list = props.conversations;
+    if (activeFilter.value === 'favorites') {
+        list = list.filter((item) => item.isPinned);
+    }
+    if (searchText.value) {
+        const keyword = searchText.value.toLowerCase();
+        list = list.filter((item) =>
+            item.title && item.title.toLowerCase().includes(keyword),
+        );
+    }
+    return list;
 });
 
 // 动画控制：先渲染 DOM，再触发动画
@@ -174,6 +193,11 @@ watch(
     (newVal) => {
         if (newVal) {
             visible.value = true;
+            // 每次打开侧边栏时重置过滤状态，与父组件默认列表保持一致
+            if (activeFilter.value !== 'all') {
+                activeFilter.value = 'all';
+                emit("filter-change", 'all');
+            }
             nextTick(() => {
                 animating.value = true;
             });
@@ -240,10 +264,15 @@ const handleSettings = () => {
 };
 
 const handleNav = (target) => {
-    uni.showToast({
-        title: target === 'favorites' ? '开发中: 我的收藏' : '开发中: 我的任务',
-        icon: 'none'
-    });
+    if (target === 'favorites') {
+        activeFilter.value = activeFilter.value === 'favorites' ? 'all' : 'favorites';
+        emit("filter-change", activeFilter.value);
+    } else {
+        uni.showToast({
+            title: '开发中: 我的任务',
+            icon: 'none'
+        });
+    }
 };
 </script>
 
@@ -460,6 +489,10 @@ const handleNav = (target) => {
     background: rgba(15, 23, 42, 0.04);
 }
 
+.nav-item-active {
+    background: rgba(102, 126, 234, 0.06);
+}
+
 .nav-text {
     font-size: 32rpx;
     color: #2d2f36;
@@ -532,6 +565,12 @@ const handleNav = (target) => {
 
 .chat-item-active .chat-dot {
     background: #667eea;
+}
+
+.chat-item-star {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 .chat-item-content {

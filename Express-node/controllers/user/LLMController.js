@@ -44,7 +44,8 @@ const LLMController = {
       if (!uid) {
         return res.status(401).send({ success: false, error: "未登录" });
       }
-      const list = await LLMService.getConversationList(uid);
+      const favoritesOnly = req.query.favorites === '1';
+      const list = await LLMService.getConversationList(uid, { favoritesOnly });
       res.status(200).send({
         success: true,
         data: list
@@ -113,6 +114,24 @@ const LLMController = {
     } catch (error) {
       console.error("LLMController.getConversationMessages 错误", error);
       res.status(500).send({ success: false, error: error.message || "获取消息列表失败" });
+    }
+  },
+
+  toggleFavorite: async (req, res) => {
+    try {
+      const { uid } = req.user;
+      const { conversationId } = req.params;
+      if (!uid) {
+        return res.status(401).send({ success: false, error: "未登录" });
+      }
+      if (!conversationId) {
+        return res.status(400).send({ success: false, error: "缺少参数" });
+      }
+      const result = await LLMService.toggleFavoriteConversation(uid, conversationId);
+      res.status(200).send({ success: true, data: result });
+    } catch (error) {
+      console.error("LLMController.toggleFavorite 错误", error);
+      res.status(500).send({ success: false, error: error.message || "操作失败" });
     }
   },
 };

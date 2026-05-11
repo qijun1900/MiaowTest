@@ -18,13 +18,15 @@ export const fetchAgentList = (params) => {
 }
 /**
  * @description: 获取用户会话列表
- * @returns  
+ * @param {object} params - 可选查询参数，如 { favorites: 1 }
+ * @returns
  */
-export const fetchConversationList = () => {
+export const fetchConversationList = (params) => {
     try {
         return http({
             url: "/uniappAPI/llm/agent/conversations",
             method: "GET",
+            params,
         });
     } catch (error) {
         console.error("fetchConversationList 失败", error);
@@ -103,6 +105,23 @@ export const deleteConversation = (conversationId) => {
         });
     } catch (error) {
         console.error("deleteConversation 失败", error);
+        throw error;
+    }
+}
+
+/**
+ * @description: 收藏/取消收藏会话
+ * @param {string} conversationId 会话ID
+ * @returns
+ */
+export const toggleFavoriteConversation = (conversationId) => {
+    try {
+        return http({
+            url: `/uniappAPI/llm/agent/conversations/${conversationId}/favorite`,
+            method: "PUT",
+        });
+    } catch (error) {
+        console.error("toggleFavoriteConversation 失败", error);
         throw error;
     }
 }

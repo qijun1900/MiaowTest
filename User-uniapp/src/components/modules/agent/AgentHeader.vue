@@ -34,8 +34,8 @@
                             <uni-icons type="compose" size="18" color="#333"></uni-icons>
                         </view>
                         <view class="option-item" @click="handleOption('star')">
-                            <text class="option-text">收藏</text>
-                            <uni-icons type="star" size="18" color="#333"></uni-icons>
+                            <text class="option-text">{{ favorited ? '取消收藏' : '收藏' }}</text>
+                            <uni-icons :type="favorited ? 'star-filled' : 'star'" size="18" :color="favorited ? '#f5a623' : '#333'"></uni-icons>
                         </view>
                         <view class="option-item option-item-danger" @click="handleOption('delete')">
                             <text class="option-text">删除</text>
@@ -69,6 +69,10 @@ const props = defineProps({
     conversationTitle: {
         type: String,
         default: "",
+    },
+    favorited: {
+        type: Boolean,
+        default: false,
     }
 });
 

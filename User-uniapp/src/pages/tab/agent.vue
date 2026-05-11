@@ -10,6 +10,7 @@
             :model-list="modelList"
             :initial-model="currentModelName"
             :conversation-title="currentConversationTitle"
+            :favorited="currentIsFavorited"
             @menu-click="handleMenuClick"
             @new-chat="handleNewChat"
             @model-change="handleModelChange"
@@ -93,6 +94,7 @@
             :current-chat-id="currentConversationId"
             :loading-chat-id="loadingConversationId"
             @select-chat="handleSelectChat"
+            @filter-change="handleSidebarFilterChange"
         />
     </view>
 </template>
@@ -109,12 +111,13 @@ import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import {
-        fetchAgentList, 
-        chatWithAgent, 
-        fetchConversationList, 
-        fetchConversationMessages, 
+        fetchAgentList,
+        chatWithAgent,
+        fetchConversationList,
+        fetchConversationMessages,
         renameConversation,
-        deleteConversation
+        deleteConversation,
+        toggleFavoriteConversation
     } from "../../API/LLM/AgentAPI.js"
 
 // ─── 响应式状态 ────────────────────────────────────────────────────────────────
@@ -132,6 +135,12 @@ const currentConversationTitle = ref("");
 const conversationList = ref([]);
 const loadingConversationId = ref(null);
 let chatRequestSeq = 0;
+
+const currentIsFavorited = computed(() => {
+    if (!currentConversationId.value) return false;
+    const conv = conversationList.value.find(c => c._id === currentConversationId.value);
+    return conv?.isPinned || false;
+});
 
 const loadAgentList = async () => {
     try {
@@ -152,9 +161,10 @@ const loadAgentList = async () => {
     }
 };
 
-const loadConversationList = async () => {
+const loadConversationList = async (favoritesOnly = false) => {
     try {
-        const res = await fetchConversationList();
+        const params = favoritesOnly ? { favorites: 1 } : {};
+        const res = await fetchConversationList(params);
         if (res?.data) {
             conversationList.value = res.data;
             if (currentConversationId.value) {
@@ -263,6 +273,10 @@ const handleMenuClick = () => {
 };
 
 const handleOptionClick = (action) => {
+    if (action === "star") {
+        handleToggleFavorite();
+        return;
+    }
     if (action === "rename") {
 	        uni.showModal({
 	            title: "重命名会话",
@@ -316,6 +330,29 @@ if (action === "delete") {
 	}
 };
 
+const handleToggleFavorite = async () => {
+    if (!currentConversationId.value) {
+        uni.showToast({ title: "请先选择一个会话", icon: "none" });
+        return;
+    }
+    try {
+        const res = await toggleFavoriteConversation(currentConversationId.value);
+        const data = res?.data || res;
+        if (data && data.isPinned !== undefined) {
+            const conv = conversationList.value.find(c => c._id === currentConversationId.value);
+            if (conv) conv.isPinned = data.isPinned;
+            uni.showToast({
+                title: data.isPinned ? "已收藏" : "已取消收藏",
+                icon: "none",
+                position: "top"
+            });
+        }
+    } catch (error) {
+        console.error("切换收藏失败：", error);
+        uni.showToast({ title: "操作失败", icon: "none" });
+    }
+};
+
 const handleModelChange = (modelName, modelKey) => {
     if (!modelName) return;
     currentModelName.value = modelName;
@@ -337,6 +374,10 @@ const handleNewChat = () => {
         icon: "none" ,
         position: "top",
     });
+};
+
+const handleSidebarFilterChange = (filter) => {
+    loadConversationList(filter === 'favorites');
 };
 
 const handleSelectChat = async (chatId) => {

@@ -150,10 +150,26 @@ const LLMService = {
         );
         return { conversationId };
     },
-    getConversationList: async (uid) => {
-        return await AgentConversationModel.find({ Uid: uid, status: 1 })
-            .sort({ lastMessageAt: -1 })
-            .select("title lastMessagePreview lastMessageAt agentKey messageCount createTime _id");
+    toggleFavoriteConversation: async (uid, conversationId) => {
+        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+        if (!conv) {
+            throw new Error("会话不存在或无权限");
+        }
+        const newPinned = !conv.isPinned;
+        await AgentConversationModel.updateOne(
+            { _id: conversationId },
+            { $set: { isPinned: newPinned } }
+        );
+        return { conversationId, isPinned: newPinned };
+    },
+    getConversationList: async (uid, { favoritesOnly = false } = {}) => {
+        const filter = { Uid: uid, status: 1 };
+        if (favoritesOnly) {
+            filter.isPinned = true;
+        }
+        return await AgentConversationModel.find(filter)
+            .sort({ isPinned: -1, lastMessageAt: -1 })
+            .select("title lastMessagePreview lastMessageAt agentKey messageCount createTime _id isPinned");
     },
     getMessageList: async (uid, conversationId, { page = 1, limit = 50 } = {}) => {
         const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });

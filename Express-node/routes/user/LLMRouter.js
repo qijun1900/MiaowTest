@@ -49,4 +49,12 @@ LLMRouter.get(
     LLMController.getConversationMessages
 );
 
+//收藏/取消收藏会话
+LLMRouter.put(
+    "/uniappAPI/llm/agent/conversations/:conversationId/favorite",
+    JWT.verifyTokenMiddleware(),
+    requireUid,
+    LLMController.toggleFavorite
+);
+
 module.exports = LLMRouter;
