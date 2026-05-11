@@ -40,14 +40,14 @@ const props = defineProps({
     actions: { // { title: 'Action 1', icon: 'image', color: '#ff0000' }
         type: Array,
         default: () => [
-            {
-                title: "分析数据",
-                icon: "https://miaowtest-test.oss-cn-beijing.aliyuncs.com/icon/%E4%BA%91%E4%B8%AD%E7%9A%84%E8%84%B8_1777991373.png", // 这里直接放图片地址
-            },
-            {
-                title: "生成报告",
-                icon: "https://miaowtest-test.oss-cn-beijing.aliyuncs.com/icon/%E4%BA%B2%E5%90%BB%E7%9A%84%E7%8C%AB%E5%92%AA%E8%A1%A8%E6%83%85_1777993099.png",
-            }
+            // {
+            //     title: "分析数据",
+            //     icon: "https://miaowtest-test.oss-cn-beijing.aliyuncs.com/icon/%E4%BA%91%E4%B8%AD%E7%9A%84%E8%84%B8_1777991373.png", // 这里直接放图片地址
+            // },
+            // {
+            //     title: "生成报告",
+            //     icon: "https://miaowtest-test.oss-cn-beijing.aliyuncs.com/icon/%E4%BA%B2%E5%90%BB%E7%9A%84%E7%8C%AB%E5%92%AA%E8%A1%A8%E6%83%85_1777993099.png",
+            // }
         ],
     },
 });

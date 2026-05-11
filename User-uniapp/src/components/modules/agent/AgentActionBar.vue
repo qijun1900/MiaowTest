@@ -1,22 +1,22 @@
 <template>
     <view v-if="visible" class="action-bar">
-        <view class="action-item" hover-class="action-item-active" @click="handleCopy">
+        <view v-if="actions.includes('copy')" class="action-item" hover-class="action-item-active" @click="handleCopy">
             <up-icon 
                 name="file-text" 
                 :size="iconSize" 
                 color="#8b8fa3" />
         </view>
-        <view class="action-item" hover-class="action-item-active" @click="handleFavorite">
+        <view v-if="actions.includes('favorite')" class="action-item" hover-class="action-item-active" @click="handleFavorite">
             <uni-icons
                 :type="favorited ? 'star-filled' : 'star'"
                 :size="iconSize"
                 :color="favorited ? '#f5a623' : '#8b8fa3'"
             />
         </view>
-        <view class="action-item" hover-class="action-item-active" @click="handleRegenerate">
+        <view v-if="actions.includes('regenerate')" class="action-item" hover-class="action-item-active" @click="handleRegenerate">
             <uni-icons type="reload" :size="iconSize" color="#8b8fa3" />
         </view>
-        <view class="action-item" hover-class="action-item-active">
+        <view v-if="actions.includes('more')" class="action-item" hover-class="action-item-active" @click="$emit('more')">
             <uni-icons type="more-filled" :size="iconSize" color="#8b8fa3" />
         </view>
     </view>
@@ -36,9 +36,13 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    actions: {
+        type: Array,
+        default: () => ['copy', 'favorite', 'regenerate', 'more']
+    }
 });
 
-const emit = defineEmits(["copy", "favorite", "regenerate"]);
+const emit = defineEmits(["copy", "favorite", "regenerate", "more"]);
 
 const iconSize = 20;
 

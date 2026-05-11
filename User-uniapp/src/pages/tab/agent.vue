@@ -61,6 +61,7 @@
                         v-if="showActionBar"
                         :content="lastAIMessage?.content || ''"
                         :favorited="lastAIMessage?.favorited || false"
+                        :actions="['copy', 'regenerate']"
                         @copy="handleActionCopy"
                         @favorite="(liked) => handleActionFavorite(lastAIIndex, liked)"
                         @regenerate="handleActionRegenerate"
