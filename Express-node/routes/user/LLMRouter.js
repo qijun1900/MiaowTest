@@ -10,7 +10,14 @@ LLMRouter.post(
     JWT.verifyTokenMiddleware(),
     requireUid, 
     LLMController.Chat
-); 
+);
+
+LLMRouter.post(
+    "/uniappAPI/llm/agent/chat/stream",
+    JWT.verifyTokenMiddleware(),
+    requireUid,
+    LLMController.ChatStream
+);
 //获取已发布Agent列表
 LLMRouter.get(
     "/uniappAPI/llm/agent/list",

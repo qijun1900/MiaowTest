@@ -458,7 +458,6 @@ const handleHtmlError = (event) => {
 watch(
     () => [props.content, props.typing, props.loading],
     () => {
-        // 监听三类会影响展示流程的输入：正文变化、打字配置变化、加载态变化。
         if (!alive.value) {
             alive.value = true;
         }

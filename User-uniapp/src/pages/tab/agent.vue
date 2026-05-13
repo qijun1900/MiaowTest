@@ -52,7 +52,7 @@
                         :variant="msg.role === 'user' ? 'solid' : undefined"
                         :placement="msg.role === 'user' ? 'end' : 'start'"
                         :max-width="msg.role === 'user' ? '650rpx' : '100%'"
-                        :is-markdown="true"
+                        :is-markdown="msg.isStreaming ? false : true"
                         :no-style="msg.role === 'assistant'"
                         :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
                         @finish="handleBubbleFinish(index)"
@@ -114,6 +114,7 @@ import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import {
         fetchAgentList,
         chatWithAgent,
+        chatWithAgentStream,
         fetchConversationList,
         fetchConversationMessages,
         renameConversation,
@@ -158,7 +159,7 @@ const loadAgentList = async () => {
             currentModelKey.value = list[0]?.agentKey || "mio";
         }
     } catch (error) {
-        console.error("加载Agent列表失败：", error);
+        console.error("加载Agent列表失败:", error.message);
     }
 };
 
@@ -176,7 +177,7 @@ const loadConversationList = async (favoritesOnly = false) => {
             }
         }
     } catch (error) {
-        console.error("加载会话列表失败：", error);
+        console.error("加载会话列表失败:", error.message);
     }
 };
 
@@ -296,7 +297,7 @@ const handleOptionClick = (action) => {
                             });
 	                    } catch (error) {
 	                        uni.showToast({ title: "重命名失败", icon: "none" });
-                            console.error("重命名会话失败：", error);
+                            console.error("重命名会话失败:", error.message);
 	                    }
 	                }
 	            },
@@ -323,7 +324,7 @@ if (action === "delete") {
 	                    uni.showToast({ title: "已删除", icon: "none", position: "top" });
 	                } catch (error) {
 	                    uni.showToast({ title: "删除失败", icon: "none" });
-	                    console.error("删除会话失败：", error);
+	                    console.error("删除会话失败:", error.message);
 	                }
 	            }
 	        },
@@ -349,7 +350,7 @@ const handleToggleFavorite = async () => {
             });
         }
     } catch (error) {
-        console.error("切换收藏失败：", error);
+        console.error("切换收藏失败:", error.message);
         uni.showToast({ title: "操作失败", icon: "none" });
     }
 };
@@ -399,7 +400,8 @@ const handleSelectChat = async (chatId) => {
                 role: msg.role,
                 content: msg.content,
                 typing: false,
-                pending: false
+                pending: false,
+                isStreaming: false
             }));
             showWelcomePanel.value = false;
         } else {
@@ -408,7 +410,7 @@ const handleSelectChat = async (chatId) => {
         }
     } catch (error) {
         if (requestSeq !== chatRequestSeq) return;
-        console.error("加载消息记录失败", error);
+        console.error("加载消息记录失败:", error.message);
         uni.showToast({ title: "加载历史消息失败", icon: "none" });
     } finally {
         if (requestSeq === chatRequestSeq) {
@@ -441,7 +443,7 @@ const lastAIMessage = computed(() => {
 
 const showActionBar = computed(() => {
     const msg = lastAIMessage.value;
-    return msg && !msg.pending && !msg.typing;
+    return msg && !msg.pending && !msg.typing && !msg.isStreaming;
 });
 
 const handleActionCopy = () => {
@@ -474,53 +476,71 @@ const handleAddAttachment = () => {
     uni.showToast({ title: "添加附件", icon: "none" });
 };
 
+/**
+ * 用户发送消息的主入口。
+ * 优先使用流式接口，若流式未开始则回退到普通接口，最终兜底显示错误。
+ *
+ * 关键：所有对 AI 消息的读写必须通过 messageList.value[index] 访问响应式代理，
+ * 不能用外部变量引用（push 前创建的对象是普通 JS 对象，不是 Vue 代理，修改不触发视图更新）。
+ */
 const handleSenderSubmit = async ({ text }) => {
     if (!text) return;
 
     showWelcomePanel.value = false;
-
-    // 添加用户消息
     messageList.value.push({ role: 'user', content: text, typing: false });
     senderText.value = "";
 
-    // 预添加AI消息占位
-    const aiMessageIndex = messageList.value.length;
-    messageList.value.push({ role: 'assistant', content: '...', typing: false, pending: true });
+    // 通过 messageList.value 访问，确保拿到的是 Vue 响应式代理
+    const aiIndex = messageList.value.length;
+    messageList.value.push({ role: 'assistant', content: '', typing: false, pending: true, isStreaming: true });
 
     try {
-        // 此时由于后端已经持久化了上下文历史，前端发最新问题与 conversationId 即可
-        const response = await chatWithAgent({
-            message: text,
-            agentKey: currentModelKey.value,
-            conversationId: currentConversationId.value,
-        });
-
-        // 维持会话 ID
-        const resData = response.data || response;
-        if (resData.conversationId) {
-            currentConversationId.value = resData.conversationId;
+        try {
+            // ── 流式对话 ──
+            await chatWithAgentStream({
+                message: text,
+                agentKey: currentModelKey.value,
+                conversationId: currentConversationId.value,
+                onStart: ({ conversationId }) => {
+                    if (conversationId) currentConversationId.value = conversationId;
+                    messageList.value[aiIndex].pending = false;
+                },
+                onMessage: (chunk) => {
+                    messageList.value[aiIndex].pending = false;
+                    messageList.value[aiIndex].content += chunk;
+                },
+                onDone: () => {
+                    messageList.value[aiIndex].pending = false;
+                    messageList.value[aiIndex].isStreaming = false;
+                },
+                onError: () => {},
+            });
+            messageList.value[aiIndex].pending = false;
+            messageList.value[aiIndex].isStreaming = false;
+        } catch {
+            // 流式失败：已有部分内容则保留，无内容则回退到普通接口
+            if (!messageList.value[aiIndex].content) {
+                const response = await chatWithAgent({
+                    message: text,
+                    agentKey: currentModelKey.value,
+                    conversationId: currentConversationId.value,
+                });
+                const resData = response.data || response;
+                if (resData.conversationId) currentConversationId.value = resData.conversationId;
+                const target = resData?.data || resData?.reply || resData;
+                let replyText = typeof target === 'object' ? target?.reply : target;
+                replyText = typeof replyText === 'string' ? replyText : String(replyText || '收到回复');
+                messageList.value[aiIndex].pending = false;
+                messageList.value[aiIndex].isStreaming = false;
+                messageList.value[aiIndex].typing = true;
+                messageList.value[aiIndex].content = replyText;
+            }
         }
-        console.log("聊天接口返回：", resData);
-
-        // 提取回复纯文本，适配多种嵌套结构，避免对象被当作字符串报错
-        const target = resData?.data || resData?.reply || resData;
-        let replyText = typeof target === 'object' ? target?.reply : target;
-        
-        // 如果依然不是字符串，兜底转换为字符串
-        replyText = typeof replyText === 'string' ? replyText : String(replyText || '收到回复');
-
-        // 返回结果后开启打字效果并赋值完整回复
-        messageList.value[aiMessageIndex].pending = false;
-        messageList.value[aiMessageIndex].typing = true;
-        messageList.value[aiMessageIndex].content = replyText;
-
-        // 对话结束后重新加载会话列表，使其更新为最新状态和带有新标题及消息预览
         loadConversationList();
     } catch (error) {
-        messageList.value[aiMessageIndex].pending = false;
-        messageList.value[aiMessageIndex].content = '请求失败，请稍后重试。';
-        messageList.value[aiMessageIndex].typing = false;
-        console.error("聊天请求失败：", error);
+        messageList.value[aiIndex].pending = false;
+        messageList.value[aiIndex].isStreaming = false;
+        messageList.value[aiIndex].content = '请求失败，请稍后重试。';
     }
 };
 </script>
@@ -582,5 +602,34 @@ const handleSenderSubmit = async ({ text }) => {
 /* 恢复内部元素的点击响应，因为外层使用 pointer-events: none */
 .sender-area :deep( .sender-shell ) {
     pointer-events: auto;
+}
+
+/* ── 流式渲染气泡（绕过 Bubble 组件，直接用 text 实时显示） ── */
+.streaming-bubble {
+    margin: 12rpx 0;
+    padding: 16rpx 24rpx;
+    background: #ffffff;
+    border: 1rpx solid rgba(15, 23, 42, 0.06);
+    border-radius: 8rpx 26rpx 26rpx;
+    max-width: 100%;
+}
+
+.streaming-text {
+    font-size: 28rpx;
+    line-height: 1.7;
+    color: #202635;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.streaming-cursor {
+    font-size: 28rpx;
+    color: #94a3b8;
+    animation: cursor-blink 0.8s infinite;
+}
+
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
 }
 </style>

@@ -150,6 +150,10 @@ async function startApplication() {
     // 创建 HTTP 服务器
     const server = http.createServer(app);
 
+    // 挂载 WebSocket 流式聊天服务
+    const { setupStreamChatWS } = require("../ws/streamChat");
+    setupStreamChatWS(server);
+
     // 云托管环境绑定到 0.0.0.0，本地环境支持灵活配置
     // 默认使用 0.0.0.0 以支持 localhost 和 127.0.0.1 访问
     const host = process.env.HOST || (isCloudRuntime ? "0.0.0.0" : "0.0.0.0");

@@ -1,127 +1,76 @@
+/**
+ * Agent 对话 API 模块。
+ * 职责：声明所有 Agent 相关的 HTTP/WebSocket 接口，不含业务逻辑。
+ *
+ * 依赖：
+ *   - util/platform.js      — 平台检测、URL 构建、请求头构建
+ *   - util/sseParser.js     — SSE 文本帧解析
+ *   - util/streamTransport.js — 跨平台流式传输层
+ *   - util/http.js          — uni-app 统一 HTTP 封装
+ */
+
 import { http } from "../../util/http";
-/**
- * @description: 获取智能体列表
- * @param {*} params 
- * @returns  
- */
-export const fetchAgentList = (params) => {
-    try {
-        return http({
-            url: "/uniappAPI/llm/agent/list",
-            method: "GET",
-            params,
-        });
-    } catch (error) {
-        console.error("fetchAgentList 失败", error);
-        throw error;
-    }
-}
-/**
- * @description: 获取用户会话列表
- * @param {object} params - 可选查询参数，如 { favorites: 1 }
- * @returns
- */
-export const fetchConversationList = (params) => {
-    try {
-        return http({
-            url: "/uniappAPI/llm/agent/conversations",
-            method: "GET",
-            params,
-        });
-    } catch (error) {
-        console.error("fetchConversationList 失败", error);
-        throw error;
-    }
-}
+import { streamRequest } from "../../util/streamTransport";
+
+// ─── 普通 API ────────────────────────────────────────────────────────────────
+
+/** 获取已发布 Agent 列表 */
+export const fetchAgentList = (params) =>
+    http({ url: "/uniappAPI/llm/agent/list", method: "GET", params });
+
+/** 获取用户会话列表，params 可传 { favorites: 1 } 筛选收藏 */
+export const fetchConversationList = (params) =>
+    http({ url: "/uniappAPI/llm/agent/conversations", method: "GET", params });
+
+/** 获取指定会话的历史消息 */
+export const fetchConversationMessages = (conversationId) =>
+    http({ url: `/uniappAPI/llm/agent/conversations/${conversationId}/messages`, method: "GET" });
+
+/** 非流式对话 */
+export const chatWithAgent = ({ message, agentKey, conversationId }) =>
+    http({ url: "/uniappAPI/llm/agent/chat", method: "POST", data: { message, agentKey, conversationId } });
+
+/** 重命名会话标题 */
+export const renameConversation = (conversationId, title) =>
+    http({ url: `/uniappAPI/llm/agent/conversations/${conversationId}/rename`, method: "PUT", data: { title } });
+
+/** 软删除会话 */
+export const deleteConversation = (conversationId) =>
+    http({ url: `/uniappAPI/llm/agent/conversations/${conversationId}`, method: "DELETE" });
+
+/** 切换会话收藏状态 */
+export const toggleFavoriteConversation = (conversationId) =>
+    http({ url: `/uniappAPI/llm/agent/conversations/${conversationId}/favorite`, method: "PUT" });
+
+// ─── 流式对话 ────────────────────────────────────────────────────────────────
 
 /**
- * @description: 获取会话的历史消息列表
- * @param {string} conversationId 会话ID
- * @returns  
+ * 流式对话接口。
+ * 底层根据运行平台自动选择传输方式（H5 SSE / 小程序 chunked / APP WebSocket），
+ * 调用方只需传入标准回调即可接收流式数据。
+ *
+ * @param {Object} params
+ * @param {string} params.message        - 用户消息
+ * @param {string} params.agentKey       - Agent 标识
+ * @param {string} params.conversationId - 会话 ID（新建时传 null）
+ * @param {Function} params.onStart      - 流开始，收到 conversationId
+ * @param {Function} params.onMessage    - 收到 token 片段
+ * @param {Function} params.onDone       - 流完成
+ * @param {Function} params.onError      - 发生错误
+ * @returns {Promise<void>}
  */
-export const fetchConversationMessages = (conversationId) => {
-    try {
-        return http({
-            url: `/uniappAPI/llm/agent/conversations/${conversationId}/messages`,
-            method: "GET",
-        });
-    } catch (error) {
-        console.error("fetchConversationMessages 失败", error);
-        throw error;
-    }
-}
-
-/**
- * @description: 与智能体对话
- * @param {*} data 
- * @returns  
- */
-export const chatWithAgent = ({message, agentKey, conversationId}) => {
-    try {
-        return http({
-            url: "/uniappAPI/llm/agent/chat",
-            method: "POST",
-            data:{
-                message,
-                agentKey,
-                conversationId,
-            }
-        })
-    } catch (error) {
-        console.error("chatWithAgent 失败", error);
-        throw error;
-    }
-}
-
-/**
- * @description: 重命名会话标题
- * @param {string} conversationId 会话ID
- * @param {string} title 新标题
- * @returns
- */
-export const renameConversation = (conversationId, title) => {
-    try {
-        return http({
-            url: `/uniappAPI/llm/agent/conversations/${conversationId}/rename`,
-            method: "PUT",
-            data: { title },
-        });
-    } catch (error) {
-        console.error("renameConversation 失败", error);
-        throw error;
-    }
-}
-
-/**
- * @description: 删除会话（软删除）
- * @param {string} conversationId 会话ID
- * @returns
- */
-export const deleteConversation = (conversationId) => {
-    try {
-        return http({
-            url: `/uniappAPI/llm/agent/conversations/${conversationId}`,
-            method: "DELETE",
-        });
-    } catch (error) {
-        console.error("deleteConversation 失败", error);
-        throw error;
-    }
-}
-
-/**
- * @description: 收藏/取消收藏会话
- * @param {string} conversationId 会话ID
- * @returns
- */
-export const toggleFavoriteConversation = (conversationId) => {
-    try {
-        return http({
-            url: `/uniappAPI/llm/agent/conversations/${conversationId}/favorite`,
-            method: "PUT",
-        });
-    } catch (error) {
-        console.error("toggleFavoriteConversation 失败", error);
-        throw error;
-    }
-}
+export const chatWithAgentStream = ({ 
+    message, 
+    agentKey, 
+    conversationId, 
+    onStart, 
+    onMessage, 
+    onDone, 
+    onError 
+}) => {
+    return streamRequest({
+        url: "/uniappAPI/llm/agent/chat/stream",
+        data: { message, agentKey, conversationId },
+        callbacks: { onStart, onMessage, onDone, onError },
+    });
+};

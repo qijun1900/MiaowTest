@@ -1,191 +1,238 @@
 const AgentDefinitionModel = require("../../models/AgentDefinitionModel");
 const AgentConversationModel = require("../../models/AgentConversationModel");
 const AgentMessageModel = require("../../models/AgentMessageModel");
-const { runAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat");
-
+const { runAgentChain, streamAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat")/** 每次送入 LLM 的历史消息上限，防止上下文过长 */
 const HISTORY_MESSAGE_LIMIT = 20;
 
+// ─── 内部共享方法 ────────────────────────────────────────────────────────────
+
+/**
+ * 查找已发布的 Agent 配置，不存在则抛错。
+ */
+async function getAgentConfig(agentKey) {
+  const config = await AgentDefinitionModel.findOne({ agentKey, isPublish: 1 });
+  if (!config) throw new Error("Agent不存在或未发布");
+  return config;
+}
+
+/**
+ * 确保会话存在：新建或更新已有会话，返回 { convId, sequence }。
+ * 新建时 sequence 从 0 开始；已有时从最后一条消息的 sequence + 1 继续。
+ */
+async function ensureConversation(convId, uid, agentKey, agentConfig, userMessage) {
+  if (!convId) {
+    const newConv = await AgentConversationModel.create({
+      Uid: uid,
+      agentKey,
+      title: userMessage.substring(0, 20),
+      lastMessagePreview: userMessage.substring(0, 50),
+      messageCount: 0,
+      scene: agentConfig.agentKey || "default",
+      currentModel: agentConfig.defaultModel || "",
+    });
+    return { convId: newConv._id, sequence: 0 };
+  }
+
+  const [, lastMsg] = await Promise.all([
+    AgentConversationModel.updateOne(
+      { _id: convId },
+      {
+        $set: {
+          lastMessagePreview: userMessage.substring(0, 50),
+          lastMessageAt: new Date(),
+          currentModel: agentConfig.defaultModel || "",
+        },
+      }
+    ),
+    AgentMessageModel.findOne({ conversationId: convId }).sort({ sequence: -1 }),
+  ]);
+
+  return { convId, sequence: lastMsg ? lastMsg.sequence + 1 : 0 };
+}
+
+/**
+ * 并行落库用户消息 + 拉取最近历史（限制条数）。
+ * 返回正序排列的历史消息数组（包含刚保存的用户消息）。
+ */
+async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence) {
+  const userMsgDoc = {
+    conversationId: convId,
+    Uid: uid,
+    agentKey,
+    sequence,
+    role: "user",
+    content: userMessage,
+    modelName: agentConfig.defaultModel || "default",
+  };
+
+  // 先落库用户消息，确保后续查询能读到
+  const savedMsg = await AgentMessageModel.create(userMsgDoc);
+
+  // 再查询历史（此时刚保存的用户消息一定在结果中）
+  const historyDocs = await AgentMessageModel.find({ conversationId: convId, status: 1 })
+    .sort({ sequence: -1 })
+    .limit(HISTORY_MESSAGE_LIMIT);
+
+  // 恢复正序（从旧到新），保证 LLM 上下文顺序正确
+  const messages = historyDocs.reverse().map((doc) => ({
+    role: doc.role,
+    content: doc.content,
+  }));
+
+  return { messages, savedSequence: savedMsg.sequence };
+}
+
+/**
+ * 落库 AI 回复消息。
+ */
+async function saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence) {
+  const replyText = typeof aiResponse === "object" && aiResponse !== null
+    ? (aiResponse.reply || JSON.stringify(aiResponse))
+    : aiResponse;
+
+  await AgentMessageModel.create({
+    conversationId: convId,
+    Uid: uid,
+    agentKey,
+    sequence,
+    role: "assistant",
+    content: replyText,
+    modelName: typeof aiResponse === "object" && aiResponse?.modelName
+      ? aiResponse.modelName
+      : (agentConfig.defaultModel || "default"),
+  });
+
+  return replyText;
+}
+
+/**
+ * 新会话时异步生成标题（fire-and-forget，不阻塞主流程）。
+ */
+function maybeGenerateTitle(isNew, userMessage, replyText, convId, modelName) {
+  if (!isNew) return;
+  generateConversationTitle(userMessage, replyText, modelName)
+    .then((aiTitle) => {
+      if (aiTitle) {
+        return AgentConversationModel.updateOne({ _id: convId }, { $set: { title: aiTitle } });
+      }
+    })
+    .catch(() => {});
+}
+
+// ─── 对外服务方法 ────────────────────────────────────────────────────────────
+
 const LLMService = {
-    ChatWithAgentAndSave: async ({uid, message: userMessage, agentKey, conversationId}) => {
-        // 1. 获取 Agent 配置
-        const agentConfig = await AgentDefinitionModel.findOne({ agentKey, isPublish: 1 });
-        if (!agentConfig) throw new Error("Agent不存在或未发布");
+  /**
+   * 非流式对话：用户发消息 → LLM 一次性返回完整回复 → 落库。
+   */
+  ChatWithAgentAndSave: async ({ uid, message: userMessage, agentKey, conversationId }) => {
+    const agentConfig = await getAgentConfig(agentKey);
+    const isNew = !conversationId;
+    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage);
+    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence);
 
-        // 2. 会话管理 (无则创建，有则更新)
-        let convId = conversationId;
-        let sequence = 0;
-        if (!convId) {
-            const newConv = new AgentConversationModel({
-                Uid: uid,
-                agentKey,
-                title: userMessage.substring(0, 20),
-                lastMessagePreview: userMessage.substring(0, 50),
-                messageCount: 0,
-                scene: agentConfig.agentKey || "default",
-                currentModel: agentConfig.defaultModel || "",
-            });
-            await newConv.save();
-            convId = newConv._id;
-        } else {
-            const [, lastMsg] = await Promise.all([
-                AgentConversationModel.updateOne(
-                    { _id: convId },
-                    { $set:
-                        {
-                            lastMessagePreview: userMessage.substring(0, 50),
-                            lastMessageAt: new Date(),
-                            currentModel: agentConfig.defaultModel || ""
-                        }
-                    }
-                ),
-                AgentMessageModel.findOne({ conversationId: convId }).sort({ sequence: -1 })
-            ]);
-            sequence = lastMsg ? lastMsg.sequence + 1 : 0;
-        }
+    const aiResponse = await runAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel);
+    const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
 
-        // 3. 并行：落库用户消息 + 拉取最近历史（限制条数，避免长对话上下文爆炸）
-        const userMsgPromise = AgentMessageModel.create({
-            conversationId: convId,
-            Uid: uid,
-            agentKey,
-            sequence: sequence++,
-            role: "user",
-            content: userMessage,
-            modelName: agentConfig.defaultModel || "default"
-        });
+    maybeGenerateTitle(isNew, userMessage, replyText, convId, agentConfig.defaultModel);
 
-        const historyPromise = AgentMessageModel.find({ conversationId: convId, status: 1 })
-            .sort({ sequence: -1 })
-            .limit(HISTORY_MESSAGE_LIMIT);
+    await AgentConversationModel.updateOne({ _id: convId }, { $inc: { messageCount: 2 } });
 
-        const [, historyDocs] = await Promise.all([userMsgPromise, historyPromise]);
-        // 恢复为正序，保证 LLM 上下文从旧到新排列
-        const messages = historyDocs.reverse().map(doc => ({ role: doc.role, content: doc.content }));
+    return { conversationId: convId, data: aiResponse };
+  },
 
-        // 5. 将上下文投递给大模型 
-        const aiResponseContent = await runAgentChain(
-            messages, 
-            agentConfig.systemPrompt, 
-            agentConfig.defaultModel
-        );
-        
-        // 解析返回结果，如果是个对象则取出 reply
-        const replyText = typeof aiResponseContent === 'object' && aiResponseContent !== null 
-                            ? (aiResponseContent.reply || JSON.stringify(aiResponseContent)) 
-                            : aiResponseContent;
+  /**
+   * 流式对话：用户发消息 → LLM 逐 token 回调 → 落库。
+   * onStart/onToken 由控制器注入，用于实时推送 SSE/WebSocket 事件。
+   */
+  ChatWithAgentAndSaveStream: async ({ uid, message: userMessage, agentKey, conversationId, onStart, onToken }) => {
+    const agentConfig = await getAgentConfig(agentKey);
+    const isNew = !conversationId;
+    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage);
 
-        // 6. 落库 AI 消息
-        await AgentMessageModel.create({
-            conversationId: convId,
-            Uid: uid,
-            agentKey,
-            sequence: sequence,
-            role: "assistant",
-            content: replyText,
-            modelName: typeof aiResponseContent === 'object' && aiResponseContent?.modelName 
-                        ? aiResponseContent.modelName 
-                        : (agentConfig.defaultModel || "default")
-        });
-        
-        // 7. 新会话用 Q&A 综合生成标题（fire-and-forget，不阻塞响应）
-        if (!conversationId) {
-            generateConversationTitle(userMessage, replyText, agentConfig.defaultModel)
-                .then(aiTitle => {
-                    if (aiTitle) {
-                        return AgentConversationModel.updateOne(
-                            { _id: convId },
-                            { $set: { title: aiTitle } }
-                        );
-                    }
-                })
-                .catch(() => {
-                    // AI 标题生成失败时保持截断标题，不影响主流程
-                });
-        }
+    // 通知前端：会话已创建/确认，可以开始接收流式数据
+    onStart?.({
+      conversationId: String(convId),
+      modelName: agentConfig.defaultModel || "default",
+    });
 
-        // 8. 更新会话统计
-        await AgentConversationModel.updateOne(
-            { _id: convId },
-            { $inc: { messageCount: 2 } }
-        );
+    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence);
 
-        // 9. 返回最新回复和绑定的会话ID
-        return {
-            conversationId: convId,
-            data: aiResponseContent
-        };
-    },
-    getChatAgents: async () => {
-        return await AgentDefinitionModel.find({ isPublish: 1 }, {
-            agentName: 1,
-            agentKey: 1,
-        }).sort({
-            sort: 1,
-            createTime: -1,
-        });
-    },
-    renameConversation: async (uid, conversationId, title) => {
-        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
-        if (!conv) {
-            throw new Error("会话不存在或无权限");
-        }
-        await AgentConversationModel.updateOne(
-            { _id: conversationId },
-            { $set: { title } }
-        );
-        return { conversationId, title };
-    },
-    deleteConversation: async (uid, conversationId) => {
-        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
-        if (!conv) {
-            throw new Error("会话不存在或无权限");
-        }
-        await AgentConversationModel.updateOne(
-            { _id: conversationId },
-            { $set: { status: 2 } }
-        );
-        await AgentMessageModel.updateMany(
-            { conversationId },
-            { $set: { status: 2 } }
-        );
-        return { conversationId };
-    },
-    toggleFavoriteConversation: async (uid, conversationId) => {
-        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
-        if (!conv) {
-            throw new Error("会话不存在或无权限");
-        }
-        const newPinned = !conv.isPinned;
-        await AgentConversationModel.updateOne(
-            { _id: conversationId },
-            { $set: { isPinned: newPinned } }
-        );
-        return { conversationId, isPinned: newPinned };
-    },
-    getConversationList: async (uid, { favoritesOnly = false } = {}) => {
-        const filter = { Uid: uid, status: 1 };
-        if (favoritesOnly) {
-            filter.isPinned = true;
-        }
-        return await AgentConversationModel.find(filter)
-            .sort({ isPinned: -1, lastMessageAt: -1 })
-            .select("title lastMessagePreview lastMessageAt agentKey messageCount createTime _id isPinned");
-    },
-    getMessageList: async (uid, conversationId, { page = 1, limit = 50 } = {}) => {
-        const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
-        if (!conv) {
-            throw new Error("会话不存在或无权限");
-        }
-        const skip = (page - 1) * limit;
-        const [messages, total] = await Promise.all([
-            AgentMessageModel.find({ conversationId, status: 1 })
-                .sort({ sequence: 1 })
-                .skip(skip)
-                .limit(limit)
-                .select("role content contentType createTime"),
-            AgentMessageModel.countDocuments({ conversationId, status: 1 })
-        ]);
-        return { messages, total, page, limit };
-    }
+    const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, { onToken });
+    const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
+
+    maybeGenerateTitle(isNew, userMessage, replyText, convId, agentConfig.defaultModel);
+
+    await AgentConversationModel.updateOne(
+      { _id: convId },
+      {
+        $set: { lastMessagePreview: replyText.substring(0, 50), lastMessageAt: new Date() },
+        $inc: { messageCount: 2 },
+      }
+    );
+
+    return { conversationId: convId, data: aiResponse };
+  },
+
+  // ─── 会话管理 ──────────────────────────────────────────────────────────────
+
+  /** 获取已发布的 Agent 列表 */
+  getChatAgents: async () => {
+    return AgentDefinitionModel.find({ isPublish: 1 }, { agentName: 1, agentKey: 1 })
+      .sort({ sort: 1, createTime: -1 });
+  },
+
+  /** 重命名会话标题（校验归属权） */
+  renameConversation: async (uid, conversationId, title) => {
+    const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+    if (!conv) throw new Error("会话不存在或无权限");
+    await AgentConversationModel.updateOne({ _id: conversationId }, { $set: { title } });
+    return { conversationId, title };
+  },
+
+  /** 软删除会话及其所有消息（status → 2） */
+  deleteConversation: async (uid, conversationId) => {
+    const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+    if (!conv) throw new Error("会话不存在或无权限");
+    await Promise.all([
+      AgentConversationModel.updateOne({ _id: conversationId }, { $set: { status: 2 } }),
+      AgentMessageModel.updateMany({ conversationId }, { $set: { status: 2 } }),
+    ]);
+    return { conversationId };
+  },
+
+  /** 切换会话收藏状态 */
+  toggleFavoriteConversation: async (uid, conversationId) => {
+    const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+    if (!conv) throw new Error("会话不存在或无权限");
+    const newPinned = !conv.isPinned;
+    await AgentConversationModel.updateOne({ _id: conversationId }, { $set: { isPinned: newPinned } });
+    return { conversationId, isPinned: newPinned };
+  },
+
+  /** 获取用户会话列表（支持收藏筛选） */
+  getConversationList: async (uid, { favoritesOnly = false } = {}) => {
+    const filter = { Uid: uid, status: 1 };
+    if (favoritesOnly) filter.isPinned = true;
+    return AgentConversationModel.find(filter)
+      .sort({ isPinned: -1, lastMessageAt: -1 })
+      .select("title lastMessagePreview lastMessageAt agentKey messageCount createTime _id isPinned");
+  },
+
+  /** 分页获取会话消息列表 */
+  getMessageList: async (uid, conversationId, { page = 1, limit = 50 } = {}) => {
+    const conv = await AgentConversationModel.findOne({ _id: conversationId, Uid: uid, status: 1 });
+    if (!conv) throw new Error("会话不存在或无权限");
+    const skip = (page - 1) * limit;
+    const [messages, total] = await Promise.all([
+      AgentMessageModel.find({ conversationId, status: 1 })
+        .sort({ sequence: 1 })
+        .skip(skip)
+        .limit(limit)
+        .select("role content contentType createTime"),
+      AgentMessageModel.countDocuments({ conversationId, status: 1 }),
+    ]);
+    return { messages, total, page, limit };
+  },
 };
 module.exports = LLMService;

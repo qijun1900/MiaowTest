@@ -6,15 +6,64 @@ const { StringOutputParser } = require("@langchain/core/output_parsers");
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const ModelFactory = require("../../models/factory");
 
-// 定义 Agent 人设注入与上下文记忆的提示词模板
+// Agent 对话提示词模板：系统人设 → 历史上下文 → 用户输入
 const agentPrompt = ChatPromptTemplate.fromMessages([
   ["system", "{systemPrompt}"],
   new MessagesPlaceholder("history"),
   ["human", "{input}"],
 ]);
 
+const DEFAULT_SYSTEM_PROMPT = "你是一个有用的AI对话助手。";
+
 /**
- * 根据用户提问和 AI 回答，综合生成简短会话标题。
+ * 解析原始消息数组，拆分为 LangChain 格式的 history 和最新用户 input。
+ *
+ * 策略：从后向前扫描找到最后一条 role=user 的消息作为 input，
+ * 其余非 system 消息按正序构建 LangChain HumanMessage/AIMessage 历史。
+ * 若未找到 user 消息，则从 history 末尾兜底提取。
+ *
+ * @param {Array<{role: string, content: string}>} rawMessages
+ * @returns {{ input: string, history: Array<HumanMessage|AIMessage> }}
+ */
+function parseMessages(rawMessages) {
+  let input = "";
+  const history = [];
+
+  // 从后向前定位最后一条用户消息作为本轮输入
+  let lastUserIdx = -1;
+  for (let i = rawMessages.length - 1; i >= 0; i--) {
+    if (rawMessages[i].role === "user") {
+      lastUserIdx = i;
+      break;
+    }
+  }
+
+  rawMessages.forEach((msg, index) => {
+    if (msg.role === "system") return;
+
+    if (index === lastUserIdx) {
+      input = msg.content;
+      return;
+    }
+
+    if (msg.role === "user") {
+      history.push(new HumanMessage(msg.content));
+    } else {
+      history.push(new AIMessage(msg.content || "正在思考中..."));
+    }
+  });
+
+  // 兜底：若未提取到 input（消息结构异常），从 history 末尾取出最后一条
+  if (!input && history.length > 0) {
+    const lastMsg = history.pop();
+    input = lastMsg.text || lastMsg.content;
+  }
+
+  return { input, history };
+}
+
+/**
+ * 根据用户提问和 AI 回答，调用 LLM 生成简短会话标题（不超过 20 字）。
  * 失败时抛错，由调用方降级处理。
  */
 async function generateConversationTitle(userMessage, aiResponse, modelName = "qwen-plus") {
@@ -26,69 +75,72 @@ async function generateConversationTitle(userMessage, aiResponse, modelName = "q
   const chain = prompt.pipe(model).pipe(new StringOutputParser());
   const title = await chain.invoke({
     question: userMessage,
-    answer: typeof aiResponse === 'string' ? aiResponse : (aiResponse?.reply || JSON.stringify(aiResponse)),
+    answer: typeof aiResponse === "string" ? aiResponse : (aiResponse?.reply || JSON.stringify(aiResponse)),
   });
   return title?.trim() || "";
 }
 
 /**
- * 运行 Agent 的 LCEL 执行链
- * @param {Array} rawMessages - 前端传来的原始对话记录 (包含 role 和 content)
- * @param {String} systemPrompt - 需要注入的 Agent 人设提示词
- * @param {String} modelName - Agent 指定的底层模型
- * @returns
+ * 非流式执行 Agent LCEL 链。
+ * 构建 模板→模型→字符串解析器 管道，一次性返回完整回复。
+ *
+ * @param {Array} rawMessages - 原始对话记录
+ * @param {string} systemPrompt - Agent 人设提示词
+ * @param {string} modelName - 底座模型名
+ * @returns {Promise<{reply: string, modelName: string}>}
  */
-async function runAgentChain(
-  rawMessages,
-  systemPrompt,
-  modelName = "qwen-plus",
-) {
-  // 1. 通过统一工厂获取对应的模型实例
+async function runAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus") {
   const model = ModelFactory.getModel(modelName, 0.7, false);
+  const { input, history } = parseMessages(rawMessages);
 
-  // 2. 解析和分割原始的消息对象，拆分为上下文(history)与最新一句输入(input)
-  let input = "";
-  const history = [];
-
-  rawMessages.forEach((msg, index) => {
-    // 过滤掉因为兼容旧代码混入其中的原生 system 提示词
-    if (msg.role === "system") return;
-
-    // 定位最后一条用户消息作为本次最新提问的 Input
-    if (index === rawMessages.length - 1 && msg.role === "user") {
-      input = msg.content;
-      return;
-    }
-
-    // 构建 LangChain Message 阵列，还原对话历史 Memory
-    if (msg.role === "user") {
-      history.push(new HumanMessage(msg.content));
-    } else {
-      // 除了 user 之外（如 AI助手, assistant 或底层模型名），皆视为系统历史回复
-      history.push(new AIMessage(msg.content || "正在思考中..."));
-    }
-  });
-
-  // 如果未能正确提取到用户 input（如消息结构突变），做安全兜底
-  if (!input && history.length > 0) {
-    const lastMsg = history.pop();
-    input = lastMsg.text || lastMsg.content;
-  }
-
-  // 3. 构建 Agent 逻辑链：模板 -> 底座模型 -> 字符串解析输出
   const chain = agentPrompt.pipe(model).pipe(new StringOutputParser());
-
-  // 4. 调用 Chain，传入变量填充变量占位符 {systemPrompt}, {history}, {input}
   const result = await chain.invoke({
-    systemPrompt: systemPrompt || "你是一个有用的AI对话助手。",
-    history: history,
+    systemPrompt: systemPrompt || DEFAULT_SYSTEM_PROMPT,
+    history,
     input: input || "你好",
   });
 
-  return {
-    reply: result, // 规范统一向前端输出字段
-    modelName: modelName,
-  };
+  return { reply: result, modelName };
 }
 
-module.exports = { runAgentChain, generateConversationTitle };
+/**
+ * 流式执行 Agent LCEL 链。
+ * 通过 model.stream() 逐 token 回调，实现实时流式输出。
+ *
+ * @param {Array} rawMessages - 原始对话记录
+ * @param {string} systemPrompt - Agent 人设提示词
+ * @param {string} modelName - 底座模型名
+ * @param {Object} options - 可选回调
+ * @param {Function} options.onToken - 每收到一个 token 时回调 (token: string) => void
+ * @returns {Promise<{reply: string, modelName: string}>}
+ */
+async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus", options = {}) {
+  console.log("[streamAgentChain] 开始, model:", modelName, "消息数:", rawMessages.length);
+  const model = ModelFactory.getModel(modelName, 0.7, true);
+  const { input, history } = parseMessages(rawMessages);
+
+  const messages = await agentPrompt.invoke({
+    systemPrompt: systemPrompt || DEFAULT_SYSTEM_PROMPT,
+    history,
+    input: input || "你好",
+  });
+
+  console.log("[streamAgentChain] 调用 model.stream...");
+  const stream = await model.stream(messages);
+  let reply = "";
+  let tokenCount = 0;
+
+  for await (const chunk of stream) {
+    const text = typeof chunk?.content === "string" ? chunk.content : "";
+    if (!text) continue;
+    reply += text;
+    tokenCount++;
+    console.log(`[streamAgentChain] token #${tokenCount}:`, text.substring(0, 20));
+    options.onToken?.(text);
+  }
+
+  console.log("[streamAgentChain] 完成, token数:", tokenCount, "总长度:", reply.length);
+  return { reply, modelName };
+}
+
+module.exports = { runAgentChain, streamAgentChain, generateConversationTitle };

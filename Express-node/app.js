@@ -44,8 +44,17 @@ app.set("trust proxy", 1);
 // 1. 基础安全头 (Helmet)
 app.use(helmet());
 
-// 2. 响应压缩
-app.use(compression());
+// 2. 响应压缩（跳过 SSE 流式响应，否则会缓冲事件导致前端无法实时接收）
+app.use(compression({
+  filter: (req, res) => {
+    // SSE 请求路径或 Accept 头包含 text/event-stream 时跳过压缩
+    if (req.path.includes("/stream")) return false;
+    if (req.headers.accept && req.headers.accept.includes("text/event-stream")) return false;
+    const contentType = res.getHeader("Content-Type");
+    if (contentType && contentType.includes("text/event-stream")) return false;
+    return compression.filter(req, res);
+  },
+}));
 
 // 3. 速率限制 (Rate Limiting) - 全局限制，每10分钟500次请求
 const limiter = rateLimit({
