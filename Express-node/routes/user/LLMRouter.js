@@ -11,20 +11,21 @@ LLMRouter.post(
     requireUid, 
     LLMController.Chat
 );
-
+//用户与大模型流式对话接口（SSE）
 LLMRouter.post(
     "/uniappAPI/llm/agent/chat/stream",
     JWT.verifyTokenMiddleware(),
     requireUid,
     LLMController.ChatStream
 );
+
 //获取已发布Agent列表
 LLMRouter.get(
     "/uniappAPI/llm/agent/list",
     LLMController.getAgentList
 ); 
 
-//获取用户的Agent对话列表
+//获取用户的Agent对话列表，搜索会话（按标题和消息预览模糊匹配）
 LLMRouter.get(
     "/uniappAPI/llm/agent/conversations",
     JWT.verifyTokenMiddleware(),
