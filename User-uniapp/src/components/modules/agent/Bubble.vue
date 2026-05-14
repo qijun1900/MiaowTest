@@ -606,11 +606,13 @@ function escapeHtml(value) {
     display: block;
 }
 
-:deep(.bubble-mp-html > view > *:first-child) {
+:deep(.bubble-mp-html > view > view:first-child),
+:deep(.bubble-mp-html > view > text:first-child) {
     margin-top: 0 !important;
 }
 
-:deep(.bubble-mp-html > view > *:last-child) {
+:deep(.bubble-mp-html > view > view:last-child),
+:deep(.bubble-mp-html > view > text:last-child) {
     margin-bottom: 0 !important;
 }
 
