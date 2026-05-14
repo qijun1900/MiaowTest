@@ -283,6 +283,17 @@
 			]
 		},
 		{
+			"root": "pages/agent",
+			"pages": [
+				{
+					"path": "ConversationSearchView",
+					"style": {
+						"navigationBarTitleText": "搜索会话"
+					}
+				}
+			]
+		},
+		{
 			"root": "pages/tools",
 			"pages": [
 				{

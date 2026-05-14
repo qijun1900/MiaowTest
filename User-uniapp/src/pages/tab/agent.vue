@@ -96,6 +96,7 @@
             :loading-chat-id="loadingConversationId"
             @select-chat="handleSelectChat"
             @new-chat="handleNewChat"
+            @search-click="handleSearchClick"
             @filter-change="handleSidebarFilterChange"
         />
     </view>
@@ -209,6 +210,9 @@ onMounted(() => {
     loadAgentList();
     loadConversationList();
 
+    // 监听搜索页选择的会话
+    uni.$on("agent-select-conversation", handleSelectChat);
+
     // 小程序 / App 使用官方 API
     // #ifdef MP-WEIXIN || APP-PLUS
     uni.onKeyboardHeightChange((res) => {
@@ -223,6 +227,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+    uni.$off("agent-select-conversation", handleSelectChat);
+
     // #ifdef MP-WEIXIN || APP-PLUS
     uni.offKeyboardHeightChange();
     // #endif
@@ -273,6 +279,11 @@ const senderAreaStyle = computed(() => ({
 // ─── 事件处理 ──────────────────────────────────────────────────────────────────
 const handleMenuClick = () => {
     sidebarVisible.value = true;
+};
+
+const handleSearchClick = () => {
+    sidebarVisible.value = false;
+    uni.navigateTo({ url: "/pages/agent/ConversationSearchView" });
 };
 
 const handleOptionClick = (action) => {

@@ -210,10 +210,15 @@ const LLMService = {
     return { conversationId, isPinned: newPinned };
   },
 
-  /** 获取用户会话列表（支持收藏筛选） */
-  getConversationList: async (uid, { favoritesOnly = false } = {}) => {
+  /** 获取用户会话列表（支持收藏筛选 + 关键字搜索） */
+  getConversationList: async (uid, { favoritesOnly = false, keyword = "" } = {}) => {
     const filter = { Uid: uid, status: 1 };
     if (favoritesOnly) filter.isPinned = true;
+    if (keyword) {
+      const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "i");
+      filter.$or = [{ title: regex }, { lastMessagePreview: regex }];
+    }
     return AgentConversationModel.find(filter)
       .sort({ isPinned: -1, lastMessageAt: -1 })
       .select("title lastMessagePreview lastMessageAt agentKey messageCount createTime _id isPinned");

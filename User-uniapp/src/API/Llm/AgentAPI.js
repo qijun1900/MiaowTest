@@ -22,6 +22,10 @@ export const fetchAgentList = (params) =>
 export const fetchConversationList = (params) =>
     http({ url: "/uniappAPI/llm/agent/conversations", method: "GET", params });
 
+/** 搜索会话（按标题和消息预览模糊匹配） */
+export const searchConversations = (keyword) =>
+    http({ url: "/uniappAPI/llm/agent/conversations", method: "GET", params: { keyword } });
+
 /** 获取指定会话的历史消息 */
 export const fetchConversationMessages = (conversationId) =>
     http({ url: `/uniappAPI/llm/agent/conversations/${conversationId}/messages`, method: "GET" });

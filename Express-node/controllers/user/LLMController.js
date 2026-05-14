@@ -109,7 +109,8 @@ const LLMController = {
       if (!uid) return res.status(401).send({ success: false, error: "未登录" });
 
       const favoritesOnly = req.query.favorites === "1";
-      const list = await LLMService.getConversationList(uid, { favoritesOnly });
+      const keyword = req.query.keyword || "";
+      const list = await LLMService.getConversationList(uid, { favoritesOnly, keyword });
       res.status(200).send({ success: true, data: list });
     } catch (error) {
       console.error("LLMController.getConversationList 错误:", error.message);

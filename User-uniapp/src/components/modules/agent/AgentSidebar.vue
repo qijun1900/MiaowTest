@@ -26,19 +26,12 @@
             </view>
 
             <!-- 搜索栏 -->
-            <view class="search-section">
+            <view class="search-section" @click="handleSearchClick">
                 <view class="search-bar">
                     <view class="search-icon-wrapper">
                         <view class="search-icon"></view>
                     </view>
-                    <input
-                        class="search-input"
-                        type="text"
-                        placeholder="搜索会话..."
-                        placeholder-class="search-placeholder"
-                        :adjust-position="false"
-                        v-model="searchText"
-                    />
+                    <text class="search-placeholder-text">搜索会话...</text>
                 </view>
             </view>
 
@@ -150,7 +143,7 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(["update:show", "select-chat", "filter-change", "new-chat"]);
+const emit = defineEmits(["update:show", "select-chat", "filter-change", "new-chat", "search-click"]);
 
 const activeFilter = ref("all"); // 'all' | 'favorites'
 
@@ -170,7 +163,6 @@ const avatarText = computed(() => {
 
 const visible = ref(false);
 const animating = ref(false);
-const searchText = ref("");
 const touchStartX = ref(0);
 const touchStartY = ref(0);
 const touchDeltaX = ref(0);
@@ -181,12 +173,6 @@ const filteredChats = computed(() => {
     let list = props.conversations;
     if (activeFilter.value === 'favorites') {
         list = list.filter((item) => item.isPinned);
-    }
-    if (searchText.value) {
-        const keyword = searchText.value.toLowerCase();
-        list = list.filter((item) =>
-            item.title && item.title.toLowerCase().includes(keyword),
-        );
     }
     return list;
 });
@@ -259,6 +245,10 @@ const handlePanelTouchEnd = () => {
 const handleSelectChat = (chatId) => {
     emit("select-chat", chatId);
     handleClose();
+};
+
+const handleSearchClick = () => {
+    emit("search-click");
 };
 
 const handleNewChat = () => {
@@ -467,17 +457,10 @@ const handleNav = (target) => {
     transform: rotate(45deg);
 }
 
-.search-input {
+.search-placeholder-text {
     flex: 1;
     font-size: 28rpx;
-    color: #2d2f36;
-    height: 64rpx;
-    line-height: 64rpx;
-}
-
-.search-placeholder {
     color: #8b8fa3;
-    font-size: 28rpx;
 }
 
 /* 主导航区 */
