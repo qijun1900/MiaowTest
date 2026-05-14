@@ -589,7 +589,7 @@ const handleSenderSubmit = async ({ text }) => {
 }
 
 .content-inner {
-    padding: 24rpx 0 160rpx;
+    padding: 24rpx 0 260rpx;
 }
 
 .bubble-test-area {
