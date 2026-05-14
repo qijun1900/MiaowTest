@@ -74,6 +74,20 @@
 				"disableScroll": false,
 				"navigationBarTextStyle": "black"
 			}
+		},
+		{
+			"path": "pages/tab/agent",
+			"style": {
+				"navigationBarTitleText": "Agent",
+				"navigationStyle": "custom",
+				"disableScroll": false,
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#F8FDFF",
+				"app-plus": {
+					"scrollIndicator": "none",
+					"softinputMode": "adjustResize"
+				}
+			}
 		}
 	],
 	"subPackages": [
@@ -269,6 +283,17 @@
 			]
 		},
 		{
+			"root": "pages/agent",
+			"pages": [
+				{
+					"path": "ConversationSearchView",
+					"style": {
+						"navigationBarTitleText": "搜索会话"
+					}
+				}
+			]
+		},
+		{
 			"root": "pages/tools",
 			"pages": [
 				{
@@ -392,6 +417,12 @@
 				"text": "考试",
 				"iconPath": "static/tabBar/exam.png",
 				"selectedIconPath": "static/tabBar/exam-active.png"
+			},
+			{
+				"pagePath": "pages/tab/agent",
+				"text": "Mio",
+				"iconPath": "static/tabBar/Agent.png",
+				"selectedIconPath": "static/tabBar/Agent.png"
 			},
 			{
 				"pagePath": "pages/tab/tools",

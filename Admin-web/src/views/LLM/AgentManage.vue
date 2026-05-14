@@ -7,17 +7,17 @@
           :filterConfig="[
             {
               type: 'input',
-              label: '模型名称',
-              placeholder: '请输入模型名称',
-              field: 'modelNameSearch', // 存储值的字段名,初始化时会清空
-              fields: ['modelName'], // 要搜索的字段
+              label: 'Agent名称',
+              placeholder: '请输入Agent名称',
+              field: 'agentNameSearch', 
+              fields: ['agentName'],
             },
             {
               type: 'input',
-              label: '模型值',
-              placeholder: '请输入模型值',
-              field: 'modelValueSearch',
-              fields: ['modelValue'], // 要搜索的字段,csID
+              label: '业务标识(Key)',
+              placeholder: '请输入Agent标识',
+              field: 'agentKeySearch',
+              fields: ['agentKey'],
             },
             {
               type: 'select',
@@ -26,14 +26,8 @@
               field: 'isPublishFilter',
               fields: ['isPublish'],
               options: [
-                {
-                  label: '未发布',
-                  value: 0,
-                },
-                {
-                  label: '已发布',
-                  value: 1,
-                },
+                { label: '未发布', value: 0 },
+                { label: '已发布', value: 1 },
               ],
             },
           ]"
@@ -46,13 +40,13 @@
         <div class="edit-btn">
           <el-row :gutter="20" type="flex" justify="space-between" align="middle">
             <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18" class="left-buttons">
-              <el-button type="success" plain @click="handleAdd">增加模型 </el-button>
+              <el-button type="success" plain @click="handleAdd">增加Agent </el-button>
               <Popconfirm title="您确定删除吗？" @confirm="handleDeleteMany">
                 <el-button
                   type="danger"
                   plain
                   :disabled="!selectedRows || selectedRows.length === 0"
-                  >删除模型
+                  >删除选中
                 </el-button>
               </Popconfirm>
             </el-col>
@@ -73,7 +67,7 @@
                     type="primary"
                     :icon="RefreshRight"
                     circle
-                    @click="handleRefreshModelData"
+                    @click="handleRefreshAgentData"
                   />
                 </template>
               </Tooltip>
@@ -94,22 +88,47 @@
       >
         <el-table-column type="selection" width="40" />
         <el-table-column type="index" label="序号" width="60" :index="(index) => index + 1" />
-        <el-table-column label="模型名称" width="200">
+        <el-table-column label="标识 (Key)" width="150" :show-overflow-tooltip="true">
           <template #default="scope">
-            {{ scope.row.modelName }}
+            {{ scope.row.agentKey }}
           </template>
         </el-table-column>
-        <el-table-column label="模型值" width="180">
+        <el-table-column label="名称" width="180">
           <template #default="scope">
-            {{ scope.row.modelValue }}
+            {{ scope.row.agentName }}
           </template>
         </el-table-column>
-        <el-table-column label="描述" width="280" :show-overflow-tooltip="true">
+        <el-table-column label="类型" width="120">
+          <template #default="scope">
+            <el-tag
+              :type="
+                scope.row.agentType === 'chat'
+                  ? 'success'
+                  : scope.row.agentType === 'workflow'
+                  ? 'info'
+                  : 'warning'
+              "
+            >
+              {{ scope.row.agentType }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="底座模型" width="150">
+          <template #default="scope">
+            {{ scope.row.defaultModel || '默认' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="描述" width="200" :show-overflow-tooltip="true">
           <template #default="scope">
             {{ scope.row.description || "无描述" }}
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="150">
+        <el-table-column label="排序" width="80" align="center">
+          <template #default="scope">
+            {{ scope.row.sort }}
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="150" align="center">
           <template #default="scope">
             <el-switch
               size="large"
@@ -124,26 +143,21 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" width="180">
+        <el-table-column label="操作" fixed="right" min-width="260">
           <template #default="scope">
-            {{ formatTime.getTime2(scope.row.createTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" fixed="right" min-width="360">
-          <template #default="scope">
-            <el-button type="primary" plain @click="handleEdit(scope.row)"> 编辑 </el-button>
+            <el-button type="primary" plain @click="handleEdit(scope.row)" size="small"> 编辑 </el-button>
             <Popconfirm title="您确定删除吗" @confirm="handleDeleteOne(scope.row)">
-              <el-button type="danger" plain> 删除 </el-button>
+              <el-button type="danger" plain size="small"> 删除 </el-button>
             </Popconfirm>
             <el-button
               type="success"
               plain
+              size="small"
               @click="handleChat(scope.row)"
-              :disabled="scope.row.isPublish === 0"
+              :disabled="scope.row.isPublish === 0 || scope.row.agentType !== 'chat'"
             >
-              立即对话
+              配置测试
             </el-button>
-            <el-button type="info" plain @click="handleMore(scope.row)"> 更多 </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -159,28 +173,63 @@
     </div>
     <div>
       <Dialog
-        :DilogTitle="isEditMode ? '编辑模型' : '新增模型'"
-        :DilogButContent="isEditMode ? '提交更改' : '添加模型'"
+        :DilogTitle="isEditMode ? '编辑 Agent' : '新增 Agent'"
+        :DilogButContent="isEditMode ? '提交更改' : '添加 Agent'"
         :draggable="true"
-        DilogWidth="700px"
+        DilogWidth="780px"
         v-model="dialogVisible"
         @dialog-confirm="handleConfirm"
       >
         <template #dialogcontent>
-          <el-form ref="FormRef" :model="Form" :rules="Formrules">
-            <el-form-item label="模型名称" prop="modelName">
-              <el-input v-model="Form.modelName" placeholder="请输入模型名称" />
+          <el-form ref="FormRef" :model="Form" :rules="Formrules" label-width="120px">
+            <el-form-item label="业务标识 (Key)" prop="agentKey">
+              <el-input v-model="Form.agentKey" placeholder="如 exam-tutor, 一旦使用请尽量保持稳定" :disabled="isEditMode"/>
             </el-form-item>
-            <el-form-item label="模型值" prop="modelValue">
-              <el-input v-model="Form.modelValue" placeholder="请输入模型值" />
+            <el-form-item label="Agent名称" prop="agentName">
+              <el-input v-model="Form.agentName" placeholder="显示用的模块或数字名称" />
             </el-form-item>
-            <el-form-item label="描述" prop="description">
+            <el-form-item label="Agent类型" prop="agentType">
+              <el-select v-model="Form.agentType" placeholder="请选择使用模式">
+                <el-option label="对话型 (Chat)" value="chat" />
+                <el-option label="工作流型 (Workflow)" value="workflow" />
+                <el-option label="工具型 (Tool)" value="tool" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="底座模型" prop="defaultModel">
+              <el-input v-model="Form.defaultModel" placeholder="（可留空），例如 qwen-plus" />
+            </el-form-item>
+            <el-form-item label="一句话描述" prop="description">
               <el-input
-                placeholder="请输入描述"
+                placeholder="简明扼要的说明"
                 v-model="Form.description"
-                :rows="3"
+                :rows="2"
                 type="textarea"
               />
+            </el-form-item>
+            <el-form-item label="系统提示词" prop="systemPrompt">
+              <el-input
+                placeholder="大模型的系统设定、回答边界等约束（仅在后端发起对话时使用）"
+                v-model="Form.systemPrompt"
+                :rows="5"
+                type="textarea"
+              />
+            </el-form-item>
+            <el-form-item label="排序值" prop="sort">
+               <el-input-number v-model="Form.sort" :min="0" :max="999" />
+            </el-form-item>
+            <el-form-item label="能力标签" prop="capabilities">
+               <el-select
+                  v-model="Form.capabilities"
+                  multiple
+                  filterable
+                  allow-create
+                  default-first-option
+                  placeholder="支持输入创建新的能力标签"
+                >
+                  <el-option label="对话 (chat)" value="chat" />
+                  <el-option label="文档检索 (rag)" value="rag" />
+                  <el-option label="工具调用 (tools)" value="tools" />
+                </el-select>
             </el-form-item>
           </el-form>
         </template>
@@ -196,17 +245,16 @@ import { useTableState } from "@/composables/State/useTableState";
 import { useTableActions } from "@/composables/Action/useTableActions";
 import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
 import { ref, reactive, defineAsyncComponent, onMounted } from "vue";
-import formatTime from "@/util/formatTime";
 import Pagination from "@/components/ReuseComponents/Pagination.vue";
 import { ElMessage } from "element-plus";
 import {
-  postAddModel,
-  getModelList,
-  updateModelPublishStatus,
-  postDeleteOneModel,
-  postDeleteManyModel,
-  postUpdateModel,
-} from "@/API/LLM/LLMAPI"; //api
+  postAddAgent,
+  getAgentList,
+  updateAgentPublishStatus,
+  postDeleteOneAgent,
+  postDeleteManyAgent,
+  postUpdateAgent,
+} from "@/API/LLM/agentAPI"; 
 import { useAppStore } from "@/stores";
 import RouterPush from "@/util/RouterPush";
 
@@ -218,64 +266,54 @@ const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTabl
 const { selectedRows, handleSelectionChange, handleDelete, handleRefresh } = useTableActions();
 
 const appStore = useAppStore();
-//tableData数据
 const tableData = ref([]);
-// 表格加载状态
 const tableLoading = ref(false);
-// 对话框状态
 const dialogVisible = ref(false);
-//表格分页器
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
-// 添加编辑状态
+
 const isEditMode = ref(false);
 const currentEditId = ref(null);
-//表单数据
+
 const Form = reactive({
-  modelName: "",
-  modelValue: "",
+  agentName: "",
+  agentKey: "",
+  agentType: "chat",
   description: "",
+  defaultModel: "",
+  systemPrompt: "",
+  capabilities: [],
   isPublish: 0,
+  sort: 0,
   creator: appStore.userInfo.username,
 });
-//FormRef表单引用
+
 const FormRef = ref();
-//表单验证规则
+
 const Formrules = reactive({
-  modelName: [
-    {
-      required: true,
-      message: "请输入模型名称",
-      trigger: "blur",
-    },
+  agentName: [
+    { required: true, message: "请输入名称", trigger: "blur" },
   ],
-  modelValue: [
-    {
-      required: true,
-      message: "请输入模型值",
-      trigger: "blur",
-    },
-  ],
-  description: [
-    {
-      required: true,
-      message: "请输入描述",
-      trigger: "blur",
-    },
+  agentKey: [
+    { required: true, message: "请输入业务标识", trigger: "blur" },
   ],
 });
-//重置表单
+
 const resetForm = () => {
-  Form.modelName = "";
-  Form.modelValue = "";
+  Form.agentName = "";
+  Form.agentKey = "";
+  Form.agentType = "chat";
   Form.description = "";
+  Form.defaultModel = "";
+  Form.systemPrompt = "";
+  Form.capabilities = [];
   Form.isPublish = 0;
+  Form.sort = 0;
   isEditMode.value = false;
   currentEditId.value = null;
 };
 
-//按下搜索按钮
 const handleOnSearch = (data) => {
   if (data.length === 0) {
     ElMessage.error("未搜索到该信息");
@@ -283,83 +321,88 @@ const handleOnSearch = (data) => {
     tableData.value = data;
   }
 };
-// 添加分页变化处理方法
+
 const handlePageChange = ({ page, size }) => {
   currentPage.value = page;
   pageSize.value = size;
-  handleRefreshModelData(); // 刷新数据，立即向后端请求新数据
+  handleRefreshAgentData(); 
 };
-//删除单个
+
 const handleDeleteOne = async (row) => {
-  await handleDelete(row, postDeleteOneModel);
-  handleRefreshModelData();
+  await handleDelete(row, postDeleteOneAgent);
+  handleRefreshAgentData();
 };
-//删除多个
+
 const handleDeleteMany = async () => {
-  await handleDelete(selectedRows.value, postDeleteManyModel);
-  handleRefreshModelData();
+  await handleDelete(selectedRows.value, postDeleteManyAgent);
+  handleRefreshAgentData();
 };
-// 处理发布状态变化
+
 const handlePublishChange = async (row) => {
   try {
-    const res = await updateModelPublishStatus(row._id, row.isPublish);
+    const res = await updateAgentPublishStatus(row._id, row.isPublish);
     if (res.code === 200) {
       ElMessage.success("状态更新成功");
     }
   } catch (error) {
     ElMessage.error("状态更新失败");
-    console.error(error);
+    console.error("状态更新失败:", error);
   }
 };
-// 添加编辑方法
+
 const handleEdit = (row) => {
   dialogVisible.value = true;
   isEditMode.value = true;
   currentEditId.value = row._id;
-  Form.modelName = row.modelName;
-  Form.modelValue = row.modelValue;
+  Form.agentName = row.agentName;
+  Form.agentKey = row.agentKey;
+  Form.agentType = row.agentType || 'chat';
   Form.description = row.description;
+  Form.defaultModel = row.defaultModel;
+  Form.systemPrompt = row.systemPrompt;
+  Form.capabilities = row.capabilities || [];
+  Form.sort = row.sort || 0;
 };
-//添加模型
+
 const handleAdd = () => {
   dialogVisible.value = true;
 };
-//跳转对话页面
+
 const handleChat = (row) => {
-  RouterPush("/model/chat", { modelValue: row.modelValue });
+  RouterPush("/agent/chat", { agentKey: row.agentKey });
 };
-//提交
+
 const handleConfirm = async () => {
   try {
     const submitData = { ...Form, _id: currentEditId.value };
+    const valid = await FormRef.value.validate();
+    if (!valid) {
+      ElMessage.error("请填写完整信息");
+      return;
+    }
     if (isEditMode.value) {
-      const res = await postUpdateModel(submitData);
+      const res = await postUpdateAgent(submitData);
       if (res.code === 200) {
-        ElMessage.success("模型更新成功");
+        ElMessage.success("Agent更新成功");
         dialogVisible.value = false;
         resetForm();
-        handleRefreshModelData(); // 刷新数据
+        handleRefreshAgentData(); 
       }
     } else {
-      const valid = await FormRef.value.validate();
-      if (!valid) {
-        ElMessage.error("请填写完整信息");
-        return;
-      }
-      const res = await postAddModel(submitData);
+      const res = await postAddAgent(submitData);
       if (res.code === 200) {
-        ElMessage.success("模型添加成功");
+        ElMessage.success("Agent添加成功");
         resetForm();
         dialogVisible.value = false;
-        handleRefreshModelData(); // 刷新数据
+        handleRefreshAgentData(); 
       }
     }
   } catch (error) {
     console.error("提交失败:", error);
   }
 };
-//获取列表+刷新
-const handleRefreshModelData = async () => {
+
+const handleRefreshAgentData = async () => {
   tableLoading.value = true;
   try {
     const res = await handleRefresh(
@@ -367,7 +410,7 @@ const handleRefreshModelData = async () => {
         page: currentPage.value,
         size: pageSize.value,
       },
-      getModelList,
+      getAgentList,
     );
     if (res.code === 200) {
       tableData.value = res.data.data;
@@ -380,7 +423,7 @@ const handleRefreshModelData = async () => {
   }
 };
 onMounted(() => {
-  handleRefreshModelData();
+  handleRefreshAgentData();
 });
 </script>
 <style scoped>
@@ -409,7 +452,6 @@ onMounted(() => {
   padding: 4px 0;
 }
 
-/* 响应式调整 */
 @media (max-width: 768px) {
   .left-buttons,
   .right-buttons {
@@ -418,10 +460,7 @@ onMounted(() => {
   }
 }
 
-.edit-table {
-  margin-top: 10px;
-}
-
+.edit-table { margin-top: 10px; }
 .pagination {
   margin-top: 15px;
   display: flex;
@@ -433,12 +472,10 @@ onMounted(() => {
   background-color: #f5f7fa !important;
 }
 
-/* 添加滑动过渡效果 */
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.3s ease-in-out;
 }
-
 .slide-up-enter-from,
 .slide-up-leave-to {
   transform: translateY(-20px);

@@ -79,10 +79,10 @@
           <el-icon><Cpu /></el-icon>
           <span>模型管理</span>
         </template>
-        <el-menu-item index="/model/modelmanage">模型管理</el-menu-item>
+        <el-menu-item index="/agent/agentmanage">Agent 管理</el-menu-item>
       </el-sub-menu>
 
-      <el-menu-item index="/model/chat">
+      <el-menu-item index="/agent/chat">
         <el-icon>
           <ChatLineRound />
         </el-icon>

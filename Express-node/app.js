@@ -21,6 +21,7 @@ const WebNewsRouter = require("./routes/user/NewsRouter"); // 引入用户端新
 const AdminExamRouter = require("./routes/admin/ExamRouter"); // 引入Admin考试路由模块
 const ConsumerExamRouter = require("./routes/user/ExamRouter"); // 引入用户端考试路由模块
 const AdminLLMRouter = require("./routes/admin/LLMRouter"); // 引入AdminLLM路由模块
+const AdminAgentRouter = require("./routes/admin/AgentRouter"); // 引入Admin Agent路由模块
 const ConsumerLLMRouter = require("./routes/user/LLMRouter"); // 引入用户端LLM路由模块
 const FunctionRouter = require("./routes/admin/FunctionRouter"); // 引入Admin功能路由模块
 const UniUserRouter = require("./routes/user/UserRouter"); // 引入用户端用户路由模块
@@ -43,8 +44,17 @@ app.set("trust proxy", 1);
 // 1. 基础安全头 (Helmet)
 app.use(helmet());
 
-// 2. 响应压缩
-app.use(compression());
+// 2. 响应压缩（跳过 SSE 流式响应，否则会缓冲事件导致前端无法实时接收）
+app.use(compression({
+  filter: (req, res) => {
+    // SSE 请求路径或 Accept 头包含 text/event-stream 时跳过压缩
+    if (req.path.includes("/stream")) return false;
+    if (req.headers.accept && req.headers.accept.includes("text/event-stream")) return false;
+    const contentType = res.getHeader("Content-Type");
+    if (contentType && contentType.includes("text/event-stream")) return false;
+    return compression.filter(req, res);
+  },
+}));
 
 // 3. 速率限制 (Rate Limiting) - 全局限制，每10分钟500次请求
 const limiter = rateLimit({
@@ -127,6 +137,7 @@ app.use(UserRouter); //用户路由(admin)
 app.use(NewsRouter); //信息路由(admin)
 app.use(AdminExamRouter); //考试路由(admin)
 app.use(AdminLLMRouter); //llm路由(admin)
+app.use(AdminAgentRouter); //Agent路由(admin)
 app.use(FunctionRouter); //功能路由(admin)
 app.use(AdminConsumerRouter); //用户路由(admin)
 app.use(WordBooksRouter); //词书路由(admin)

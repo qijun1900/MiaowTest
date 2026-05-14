@@ -131,7 +131,4 @@ UserRouter.post(
   UserController.editTodo,
 ); //编辑待办事项接口-
 
-//测试
-UserRouter.post("/uniappAPI/llm/chat", UserController.useLLMChat); //单次对话
-
 module.exports = UserRouter;

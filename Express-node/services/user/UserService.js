@@ -8,7 +8,7 @@ const FeedbackModel = require("../../models/ConsumerFeedbackModel");
 const QuestionNoteModel = require("../../models/QuestionNoteModel");
 const { getNextUserCount } = require("../../models/CounterModel"); // 引入计数器模型和函数
 const mongoose = require("mongoose");
-const chat = require("../../llm/admin/Chat/chat");
+
 const UserQuestionModel = require("../../models/UserQuestionModel");
 
 const UserService = {
@@ -883,20 +883,7 @@ const UserService = {
       console.error("getUserBankPracticeNote 失败", error);
     }
   },
-  useLLMChat: async ({ message, model }) => {
-    try {
-      // 调用 chatAPI 函数，传入 message 和 model 参数
-      return await chat.postUserSingleChat(message, model);
-    } catch (error) {
-      console.error("useLLMChat 失败", error);
-      return {
-        code: 500,
-        message: "调用失败",
-        error: error.message,
-        success: false,
-      };
-    }
-  },
+
   //设置今日待办事项
   setTodayTodos: async ({ uid, fulldate, todos_content }) => {
     try {

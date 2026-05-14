@@ -45,10 +45,10 @@ const displayText = computed(() => {
 });
 
 onMounted(() => {
-    // 每分钟刷新一次，保证跨时间段时问候语自动更新
+    // 每60分钟更新一次问候语，保持内容新鲜，同时避免过于频繁的更新导致性能问题。
     timer = setInterval(() => {
         tick.value = Date.now();
-    }, 60000);
+    },  60 * 60 * 1000);
 });
 
 onUnmounted(() => {

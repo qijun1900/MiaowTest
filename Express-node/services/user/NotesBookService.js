@@ -44,7 +44,9 @@ const normalizeNoteTags = (tags = []) => {
     if (typeof item === "string" || typeof item === "number") {
       rawTag = String(item).trim();
     } else if (item && typeof item === "object") {
-      rawTag = String(item.text ?? item.label ?? item.name ?? item.value ?? "").trim();
+      rawTag = String(
+        item.text ?? item.label ?? item.name ?? item.value ?? "",
+      ).trim();
     }
 
     if (!rawTag) continue;
@@ -362,10 +364,16 @@ const NotesBookService = {
   /**
    * 获取某个笔记本下的笔记列表
    */
-  getNotebookNotes: async ({ uid, bookId, page = 1, pageSize = 12, keyword = "" }) => {
+  getNotebookNotes: async ({
+    uid,
+    bookId,
+    page = 1,
+    pageSize = 12,
+    keyword = "",
+  }) => {
     try {
       const notebook = await NotesBookModel.findOne({ _id: bookId, Uid: uid })
-        .select({ _id: 1 })// 仅验证笔记本存在与权限，不返回其他字段
+        .select({ _id: 1 }) // 仅验证笔记本存在与权限，不返回其他字段
         .lean();
 
       if (!notebook) {
@@ -403,20 +411,17 @@ const NotesBookService = {
 
       const total = await NotesListModel.countDocuments(query);
 
-      const notes = await NotesListModel.find(
-        query,
-        {
-          _id: 1,
-          notesBookId: 1,
-          title: 1,
-          summary: 1,
-          tags: 1,
-          isPinned: 1,
-          updatedAt: 1,
-          createdAt: 1,
-          "content.text": 1,
-        },
-      )
+      const notes = await NotesListModel.find(query, {
+        _id: 1,
+        notesBookId: 1,
+        title: 1,
+        summary: 1,
+        tags: 1,
+        isPinned: 1,
+        updatedAt: 1,
+        createdAt: 1,
+        "content.text": 1,
+      })
         .sort({ isPinned: -1, updatedAt: -1 })
         .skip(skip)
         .limit(safePageSize)
@@ -478,19 +483,16 @@ const NotesBookService = {
         query.notesBookId = bookId;
       }
 
-      const note = await NotesListModel.findOne(
-        query,
-        {
-          _id: 1,
-          notesBookId: 1,
-          title: 1,
-          summary: 1,
-          tags: 1,
-          updatedAt: 1,
-          createdAt: 1,
-          "content.text": 1,
-        },
-      ).lean();
+      const note = await NotesListModel.findOne(query, {
+        _id: 1,
+        notesBookId: 1,
+        title: 1,
+        summary: 1,
+        tags: 1,
+        updatedAt: 1,
+        createdAt: 1,
+        "content.text": 1,
+      }).lean();
 
       if (!note) {
         return {
@@ -658,14 +660,11 @@ const NotesBookService = {
         typeof isPinned === "boolean" ? isPinned : !currentPinned;
 
       if (currentPinned !== nextPinned) {
-        await NotesListModel.updateOne(
-          query,
-          {
-            $set: {
-              isPinned: nextPinned,
-            },
+        await NotesListModel.updateOne(query, {
+          $set: {
+            isPinned: nextPinned,
           },
-        );
+        });
 
         await NotesBookModel.updateOne(
           { _id: bookId, Uid: uid },
