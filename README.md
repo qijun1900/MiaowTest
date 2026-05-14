@@ -16,6 +16,15 @@
   <img src="https://free.picui.cn/free/2026/04/18/69e3960545c05.jpg" alt="题喵喵微信小程序扫码体验" width="220">
 </p>
 
+## AI界面预览
+
+<p align="center">
+  <img src="https://img.cdn1.vip/i/6a05efeab1ddb_1778773994.webp" alt="预览图1" width="220">
+  <img src="https://img.cdn1.vip/i/6a05efec1a390_1778773996.webp" alt="预览图2" width="220">
+  <img src="https://img.cdn1.vip/i/6a05efed08a10_1778773997.webp" alt="预览图3" width="220">
+  <img src="https://img.cdn1.vip/i/6a05eff065c1c_1778774000.webp" alt="预览图4" width="220">
+</p>
+
 ## 项目概览
 
 题喵喵是一个面向学习与训练场景的全栈答题系统，采用前后端分离与多端统一架构。
