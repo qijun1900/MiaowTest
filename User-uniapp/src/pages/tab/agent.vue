@@ -95,6 +95,7 @@
             :current-chat-id="currentConversationId"
             :loading-chat-id="loadingConversationId"
             @select-chat="handleSelectChat"
+            @new-chat="handleNewChat"
             @filter-change="handleSidebarFilterChange"
         />
     </view>
@@ -541,6 +542,7 @@ const handleSenderSubmit = async ({ text }) => {
         messageList.value[aiIndex].pending = false;
         messageList.value[aiIndex].isStreaming = false;
         messageList.value[aiIndex].content = '请求失败，请稍后重试。';
+        console.error("对话请求失败:", error.message);
     }
 };
 </script>

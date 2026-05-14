@@ -158,7 +158,7 @@ function streamByWebSocket(data, emit, throwIfError) {
             try { parsed = JSON.parse(res.data); } catch { return; }
 
             const { event, data: payload } = parsed;
-            console.log(`[WS传输] onMessage #${++msgCount}: ${event}`, event === "message" ? `(len=${(payload?.content || "").length})` : "");
+            // console.log(`[WS传输] onMessage #${++msgCount}: ${event}`, event === "message" ? `(len=${(payload?.content || "").length})` : "");
 
             if (event === "start") emit("start", payload);
             if (event === "message") emit("message", payload);

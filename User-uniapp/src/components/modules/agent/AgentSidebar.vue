@@ -44,6 +44,10 @@
 
             <!-- 导航选项区 -->
             <view class="main-nav-section">
+                <view class="nav-item" @click="handleNewChat">
+                    <uni-icons type="plusempty" size="22" color="#30323a"></uni-icons>
+                    <text class="nav-text">开启新对话</text>
+                </view>
                 <view
                     class="nav-item"
                     :class="{ 'nav-item-active': activeFilter === 'favorites' }"
@@ -146,7 +150,7 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(["update:show", "select-chat", "filter-change"]);
+const emit = defineEmits(["update:show", "select-chat", "filter-change", "new-chat"]);
 
 const activeFilter = ref("all"); // 'all' | 'favorites'
 
@@ -254,6 +258,11 @@ const handlePanelTouchEnd = () => {
 
 const handleSelectChat = (chatId) => {
     emit("select-chat", chatId);
+    handleClose();
+};
+
+const handleNewChat = () => {
+    emit("new-chat");
     handleClose();
 };
 
@@ -492,6 +501,7 @@ const handleNav = (target) => {
 .nav-item-active {
     background: rgba(102, 126, 234, 0.06);
 }
+
 
 .nav-text {
     font-size: 32rpx;
