@@ -8,6 +8,7 @@ const staticDirs = [
   "/newsuploads/",
   "/productuploads/",
   "/wordsbookscoveruploads/",
+  "/appversionuploads/",
 ];
 
 /**

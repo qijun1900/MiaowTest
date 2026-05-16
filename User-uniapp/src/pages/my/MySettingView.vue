@@ -218,10 +218,18 @@ import { AppearanceStore } from "../../stores/modules/AppearanceStore";
 import { clearExamCache } from "../../util/cacheCleaner";
 import userAvatar from "../../components/core/userAvatar.vue";
 import logSDK from "../../util/logSDK";
+// #ifdef APP-PLUS
+import { checkForUpdate } from "../../util/checkUpdate";
+// #endif
 
 const userInfoStore = UserInfoStore();
 const appearanceStore = AppearanceStore();
-const appVersion = ref("1.3.7");
+// #ifdef APP-PLUS
+const appVersion = ref(plus.runtime.version);
+// #endif
+// #ifndef APP-PLUS
+const appVersion = ref("1.4.0");
+// #endif
 const cacheSize = ref("计算中...");
 const notificationEnabled = ref(true);
 const showThemePopup = ref(false);
@@ -314,9 +322,14 @@ const handleClearCache = () => {
     });
 };
 
-// 检查更新
-const handleCheckUpdate = () => {
+// 检查更新（手动触发，非静默模式）
+const handleCheckUpdate = async () => {
+    // #ifdef APP-PLUS
+    await checkForUpdate({ silent: false });
+    // #endif
+    // #ifndef APP-PLUS
     uni.showToast({ title: "当前已是最新版本", icon: "none" });
+    // #endif
 };
 
 // 用户协议

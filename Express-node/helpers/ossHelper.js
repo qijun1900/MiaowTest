@@ -242,6 +242,24 @@ async function migrateDirToOSS(localDir, ossDir) {
   }
 }
 
+/**
+ * 从 OSS 获取文件内容
+ * @param {string} ossFilePath - OSS 完整路径（含前缀）
+ * @returns {Promise<{content: Buffer, res: object}>}
+ */
+async function getFile(ossFilePath) {
+  return client.get(ossFilePath);
+}
+
+/**
+ * 从 OSS 获取文件流（适用于大文件）
+ * @param {string} ossFilePath - OSS 完整路径（含前缀）
+ * @returns {Promise<{stream: ReadableStream, res: object}>}
+ */
+async function getFileStream(ossFilePath) {
+  return client.getStream(ossFilePath);
+}
+
 module.exports = {
   uploadFile,
   uploadStream,
@@ -249,5 +267,7 @@ module.exports = {
   deleteFile,
   deleteFileByUrl,
   getFileUrl,
+  getFile,
+  getFileStream,
   migrateDirToOSS,
 };

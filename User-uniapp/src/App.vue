@@ -11,6 +11,9 @@
 ────────────────────────────────────────────────────────────────────────────── -->
 <script>
 import logSDK from "./util/logSDK";
+// #ifdef APP-PLUS
+import { checkForUpdate } from "./util/checkUpdate";
+// #endif
 
 export default {
     onLaunch: function () {
@@ -51,6 +54,12 @@ export default {
                 result: logSDK.results.SUCCESS,
             });
         }
+
+        // ── 启动时检查应用更新 ──────────────────────────────────────────
+        // 仅在 App 平台执行，H5 和小程序环境无需检查
+        // #ifdef APP-PLUS
+        checkForUpdate({ silent: true });
+        // #endif
     },
 
     onShow() {

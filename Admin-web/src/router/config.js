@@ -16,6 +16,7 @@ import ExamFileManage from "@/views/Exam/ExamFileManage.vue";
 import BooksManage from "@/views/WordBooks/BooksManage.vue";
 import FileList from "@/views/Resource/FileList.vue";
 import FileUpload from "@/views/Resource/FileUpload.vue";
+import AppVersionManage from "@/views/System/AppVersionManage.vue";
 
 const routes = [
   {
@@ -107,6 +108,11 @@ const routes = [
     path: "/resource/fileupload",
     name: "FileUpload",
     component: FileUpload,
+  },
+  {
+    path: "/system/appversion",
+    name: "AppVersionManage",
+    component: AppVersionManage,
   },
 ];
 export default routes;

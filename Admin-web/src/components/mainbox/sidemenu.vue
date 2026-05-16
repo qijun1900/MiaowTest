@@ -88,6 +88,14 @@
         </el-icon>
         <span>模型对话</span>
       </el-menu-item>
+
+      <el-sub-menu index="/system-manage">
+        <template #title>
+          <el-icon><Upload /></el-icon>
+          <span>系统管理</span>
+        </template>
+        <el-menu-item index="/system/appversion">版本管理</el-menu-item>
+      </el-sub-menu>
     </el-menu>
   </el-aside>
 </template>
@@ -104,6 +112,7 @@ import {
   ChatLineRound,
   ChatDotSquare,
   FolderOpened,
+  Upload,
 } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 

@@ -21,7 +21,7 @@ let cloudWakeupPromise = null;
 // 自动检测运行环境，支持H5和小程序和APP，自动添加客户端和平台标识
 
 // 检测当前运行环境
-const getPlatform = () => {
+export const getPlatform = () => {
   try {
     // 使用 uni.getAppBaseInfo 替代 uni.getSystemInfoSync
     const appBaseInfo = uni.getAppBaseInfo();
