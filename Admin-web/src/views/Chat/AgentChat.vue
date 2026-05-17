@@ -86,6 +86,7 @@ const FetchAgentList = async () => {
 };
 
 const handleUserSend = async (data) => {
+  console.log("[AgentChat] handleUserSend data:", data);
   if(!selectedAgent.value) {
     ElMessage.warning("请先选择一个 Agent 进行测试");
     isSenderloading.value = false;
@@ -111,7 +112,7 @@ const handleUserSend = async (data) => {
       if (response.code === 200) {
         chatHistory.value[chatHistory.value.length - 1] = {
           role: response.data.modelName || 'AI响应',
-          content: response.data.Aidata,
+          content: response.data.reply,
           isLoading: false,
         };
       }

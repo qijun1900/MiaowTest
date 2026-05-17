@@ -2,6 +2,7 @@ import { checkAppUpdate } from "../API/Application/UpdateAPI";
 import showModal from "./showModal";
 import { getPlatform } from "./http";
 import escconfig from "../config/esc.config";
+import { showProgress, showComplete, clear as clearNotification } from "./useNotification";
 
 /**
  * 后台下载并安装更新包（不阻塞用户操作）
@@ -14,32 +15,43 @@ function downloadAndInstall(versionId) {
   const url = `${base}/uniappAPI/AppVersion/download?id=${versionId}`;
 
   uni.showToast({ title: "开始下载更新包...", icon: "none", duration: 1500 });
+  showProgress("正在下载更新包", 0);
 
   const downloadTask = uni.downloadFile({
     url,
     success: (res) => {
       if (res.statusCode === 200) {
         if (uni.getSystemInfoSync().platform === "ios") {
+          clearNotification();
           plus.runtime.openURL(url);
         } else {
+          showComplete("下载完成", "正在安装...");
           plus.runtime.install(
             res.tempFilePath,
             { force: true },
-            () => plus.runtime.restart(),
-            (err) => uni.showToast({ title: "安装失败: " + err.message, icon: "none", duration: 3000 }),
+            () => {
+              clearNotification();
+              plus.runtime.restart();
+            },
+            (err) => {
+              clearNotification();
+              uni.showToast({ title: "安装失败: " + err.message, icon: "none", duration: 3000 });
+            },
           );
         }
       } else {
+        clearNotification();
         uni.showToast({ title: `下载失败(${res.statusCode})`, icon: "none" });
       }
     },
     fail: () => {
+      clearNotification();
       uni.showToast({ title: "下载失败，请检查网络", icon: "none" });
     },
   });
 
   downloadTask.onProgressUpdate((res) => {
-    console.log("[checkUpdate] 下载进度:", res.progress + "%");
+    showProgress("正在下载更新包", res.progress);
   });
 }
 

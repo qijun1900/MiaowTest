@@ -109,6 +109,8 @@ const closeCloseHeader = () => {
 // 提交方法
 const handleSubmit = () => {
   const content = getEditorContent();
+  console.log("[XEditorSender] handleSubmit content:", content);
+  console.log("[XEditorSender] senderRef:", senderRef.value);
   showHeader.value = false; // 关闭头部
   emit("user-submit", content);
 };
