@@ -5,12 +5,14 @@
     :title="props.DilogTitle"
     :width="props.DilogWidth"
     :top="props.top"
+    :close-on-click-modal="!props.dialogButDisabled"
+    :close-on-press-escape="!props.dialogButDisabled"
   >
     <slot name="dialogcontent"></slot>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="handleConfirm">
+        <el-button @click="dialogVisible = false" :disabled="props.dialogButDisabled"> 取消 </el-button>
+        <el-button type="primary" @click="handleConfirm" :disabled="props.dialogButDisabled">
           {{ props.DilogButContent }}
         </el-button>
       </div>
@@ -49,6 +51,11 @@ const props = defineProps({
     type: String,
     default: "15vh",
   },
+  dialogButDisabled: {
+    // 是否禁用按钮
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 同步父组件的 v-model 值
@@ -65,6 +72,5 @@ watch(dialogVisible, (val) => {
 // 点击确认按钮的逻辑
 const handleConfirm = () => {
   emit("dialogConfirm");
-  dialogVisible.value = false;
 };
 </script>

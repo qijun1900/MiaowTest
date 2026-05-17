@@ -134,9 +134,9 @@
         </el-table-column>
         <el-table-column label="操作" fixed="right" min-width="180">
           <template #default="scope">
-            <el-button type="primary" plain @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="primary" plain @click="handleEdit(scope.row)" :disabled="uploading">编辑</el-button>
             <Popconfirm title="您确定删除吗" @confirm="handleDeleteOne(scope.row)">
-              <el-button type="danger" plain>删除</el-button>
+              <el-button type="danger" plain :disabled="uploading">删除</el-button>
             </Popconfirm>
           </template>
         </el-table-column>
@@ -156,14 +156,29 @@
   <!-- 新增/编辑弹窗 -->
   <Dialog
     :DilogTitle="isEditMode ? '编辑版本' : '新增版本'"
-    :DilogButContent="isEditMode ? '提交更改' : '添加版本'"
+    :DilogButContent="uploading ? '上传中...' : (isEditMode ? '提交更改' : '添加版本')"
     DilogWidth="680px"
     :draggable="true"
     v-model="dialogVisible"
     @dialog-confirm="handleConfirm"
+    :dialogButDisabled="uploading"
   >
     <template #dialogcontent>
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top">
+      <!-- 上传进度 -->
+      <div v-if="uploading" class="upload-progress-container">
+        <el-progress
+          :percentage="uploadProgress"
+          :status="uploadStatus"
+          :stroke-width="10"
+          striped
+          striped-flow
+        />
+        <p class="upload-progress-text">
+          {{ uploadStatus === 'success' ? '上传完成！' : uploadStatus === 'exception' ? '上传失败' : '正在上传...' }}
+        </p>
+      </div>
+
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top" :disabled="uploading">
         <el-row :gutter="24">
           <el-col :span="12">
             <el-form-item label="版本名称" prop="versionName">
@@ -203,8 +218,9 @@
             :on-change="handleFileChange"
             :on-remove="handleFileRemove"
             :file-list="fileList"
+            :disabled="uploading"
           >
-            <el-button type="primary" plain>选择文件</el-button>
+            <el-button type="primary" plain :disabled="uploading">选择文件</el-button>
             <template #tip>
               <div class="el-upload__tip">支持 APK/IPA 文件，上传后将自动填写下载地址</div>
             </template>
@@ -258,6 +274,11 @@ const currentEditId = ref(null);
 const formRef = ref();
 const fileList = ref([]);
 
+// 上传状态
+const uploading = ref(false);
+const uploadProgress = ref(0);
+const uploadStatus = ref(""); // '' | 'uploading' | 'success' | 'exception'
+
 // 表单
 const formData = reactive({
   versionName: "",
@@ -298,6 +319,9 @@ const resetForm = () => {
   fileList.value = [];
   isEditMode.value = false;
   currentEditId.value = null;
+  uploading.value = false;
+  uploadProgress.value = 0;
+  uploadStatus.value = "";
 };
 
 // 搜索
@@ -334,30 +358,60 @@ const handleEdit = (row) => {
 
 // 提交
 const handleConfirm = async () => {
+  // 如果正在上传，直接返回
+  if (uploading.value) return;
+
   try {
     if (!isEditMode.value) {
       const valid = await formRef.value.validate();
       if (!valid) return;
     }
 
-    dialogVisible.value = false;
+    // 设置上传状态
+    uploading.value = true;
+    uploadProgress.value = 0;
+    uploadStatus.value = "uploading";
+
     const submitData = { ...formData, _id: currentEditId.value };
+
+    // 上传进度回调
+    const onUploadProgress = (progressEvent) => {
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      uploadProgress.value = percent;
+    };
 
     let res;
     if (isEditMode.value) {
-      res = await postEditVersion(submitData);
+      res = await postEditVersion(submitData, { onUploadProgress });
     } else {
-      res = await postAddVersion(submitData);
+      res = await postAddVersion(submitData, { onUploadProgress });
     }
 
     if (res?.ActionType === "OK") {
+      uploadStatus.value = "success";
+      uploadProgress.value = 100;
       ElMessage.success(isEditMode.value ? "版本修改成功" : "版本添加成功");
-      resetForm();
+
+      // 延迟关闭弹窗，让用户看到上传完成状态
+      setTimeout(() => {
+        dialogVisible.value = false;
+        resetForm();
+      }, 1000);
     }
     await handleRefreshData();
   } catch (error) {
+    uploadStatus.value = "exception";
     ElMessage.error(isEditMode.value ? "版本修改失败" : "版本添加失败");
     console.error(error);
+  } finally {
+    // 如果上传失败，延迟重置状态让用户看到错误
+    if (uploadStatus.value === "exception") {
+      setTimeout(() => {
+        uploading.value = false;
+        uploadProgress.value = 0;
+        uploadStatus.value = "";
+      }, 2000);
+    }
   }
 };
 
@@ -473,5 +527,19 @@ onMounted(() => {
 .slide-up-leave-to {
   transform: translateY(-20px);
   opacity: 0;
+}
+
+.upload-progress-container {
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+}
+
+.upload-progress-text {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 14px;
+  color: #606266;
 }
 </style>

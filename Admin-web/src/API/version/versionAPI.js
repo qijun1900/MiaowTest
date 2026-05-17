@@ -2,9 +2,9 @@ import axios from "axios";
 import upload from "@/util/upload";
 
 // 新增版本（含文件上传）
-export async function postAddVersion(data) {
+export async function postAddVersion(data, options = {}) {
   try {
-    const response = await upload("/adminapi/appversion/add", data);
+    const response = await upload("/adminapi/appversion/add", data, options);
     return response;
   } catch (error) {
     console.error("新增版本失败:", error);
@@ -27,9 +27,9 @@ export async function getVersionList(params) {
 }
 
 // 编辑版本（含文件上传）
-export async function postEditVersion(data) {
+export async function postEditVersion(data, options = {}) {
   try {
-    const response = await upload("/adminapi/appversion/edit", data);
+    const response = await upload("/adminapi/appversion/edit", data, options);
     return response;
   } catch (error) {
     console.error("编辑版本失败:", error);
