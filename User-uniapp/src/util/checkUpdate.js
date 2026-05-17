@@ -15,30 +15,25 @@ function downloadAndInstall(versionId) {
   const url = `${base}/uniappAPI/AppVersion/download?id=${versionId}`;
 
   uni.showToast({ title: "开始下载更新包...", icon: "none", duration: 1500 });
-  console.log("[checkUpdate] 调用 showProgress(0)");
   showProgress("正在下载更新包", 0);
 
   const downloadTask = uni.downloadFile({
     url,
     success: (res) => {
-      console.log("[checkUpdate] downloadFile success, statusCode:", res.statusCode);
       if (res.statusCode === 200) {
         if (uni.getSystemInfoSync().platform === "ios") {
           clearNotification();
           plus.runtime.openURL(url);
         } else {
-          console.log("[checkUpdate] 调用 showComplete");
           showComplete("下载完成", "正在安装...");
           plus.runtime.install(
             res.tempFilePath,
             { force: true },
             () => {
-              console.log("[checkUpdate] install 成功，重启中");
               clearNotification();
               plus.runtime.restart();
             },
             (err) => {
-              console.error("[checkUpdate] install 失败:", err);
               clearNotification();
               uni.showToast({ title: "安装失败: " + err.message, icon: "none", duration: 3000 });
             },
@@ -49,8 +44,7 @@ function downloadAndInstall(versionId) {
         uni.showToast({ title: `下载失败(${res.statusCode})`, icon: "none" });
       }
     },
-    fail: (err) => {
-      console.error("[checkUpdate] downloadFile fail:", err);
+    fail: () => {
       clearNotification();
       uni.showToast({ title: "下载失败，请检查网络", icon: "none" });
     },
@@ -58,11 +52,10 @@ function downloadAndInstall(versionId) {
 
   let lastNotifiedProgress = -1;
   downloadTask.onProgressUpdate((res) => {
-    console.log(`[checkUpdate] 下载进度: ${res.progress}%, status: ${res.state}`);
+    if (import.meta.env.DEV) console.log(`[checkUpdate] 下载进度: ${res.progress}%`);
     // 每变化 5% 才更新一次通知，避免频繁调用原生 API 阻塞 UI
     if (res.progress - lastNotifiedProgress >= 5 || res.progress === 100) {
       lastNotifiedProgress = res.progress;
-      console.log(`[checkUpdate] 调用 showProgress(${res.progress})`);
       showProgress("正在下载更新包", res.progress);
     }
   });
