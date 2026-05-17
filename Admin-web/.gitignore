@@ -28,3 +28,10 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# 环境变量文件（保留示例文件）
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
