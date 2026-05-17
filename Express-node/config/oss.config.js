@@ -9,4 +9,5 @@ module.exports = {
   secure: process.env.OSS_SECURE === "true", // 是否使用 HTTPS
   cdnDomain: process.env.OSS_CDN_DOMAIN || "", // CDN 域名（可选）
   prefix: process.env.OSS_PREFIX || "", // 文件存储前缀
+  timeout: parseInt(process.env.OSS_TIMEOUT, 10) || 300000, // 请求超时时间，默认 5 分钟（大文件上传需要更长超时）
 };
