@@ -9,6 +9,7 @@ export const useAppStore = defineStore(
     const userInfo = ref({}); //用户信息
     const examInfo = ref({}); //当前考试信息
     const currentQuestionTotal = ref(0); //当前题目总数
+    const isGetterRouter = ref(false); //路由是否已加载
 
     //action
     const actions = {
@@ -29,6 +30,9 @@ export const useAppStore = defineStore(
       changecurrentQuestionTotal(value) {
         currentQuestionTotal.value = value;
       },
+      changeGetterRouter(value) {
+        isGetterRouter.value = value;
+      },
     };
 
     return {
@@ -36,13 +40,13 @@ export const useAppStore = defineStore(
       userInfo,
       examInfo,
       currentQuestionTotal,
+      isGetterRouter,
       ...actions,
     };
   },
   {
     persist: {
-      persist: true,
-      paths: ["isCollapse", "userInfo"],
+      pick: ["isCollapse", "userInfo"],
     },
   },
 );

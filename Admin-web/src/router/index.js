@@ -3,7 +3,6 @@ import Login from "@/views/Login.vue";
 import Mainbox from "@/views/Mainbox.vue";
 import RoutesConfig from "./config";
 import { useAppStore } from "../stores/index";
-import store from "../stores/vuex";
 
 const routes = [
   {
@@ -32,7 +31,8 @@ router.beforeEach((to, from, next) => {
         path: "/login",
       });
     } else {
-      if (!store.state.isGetterRouter) {
+      const appStore = useAppStore();
+      if (!appStore.isGetterRouter) {
         router.removeRoute("mainbox");
         configrouter();
         next({
@@ -46,6 +46,7 @@ router.beforeEach((to, from, next) => {
 });
 
 const configrouter = () => {
+  const appStore = useAppStore();
   if (!router.hasRoute("mainbox")) {
     router.addRoute({
       path: "/mainbox",
@@ -56,7 +57,7 @@ const configrouter = () => {
   RoutesConfig.forEach((item) => {
     checkPermission(item) && router.addRoute("mainbox", item);
   });
-  store.commit("ChangesGetterRouter", true);
+  appStore.changeGetterRouter(true);
 };
 
 const checkPermission = (item) => {
