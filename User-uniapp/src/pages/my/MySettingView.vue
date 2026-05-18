@@ -20,7 +20,7 @@
             <view class="setting-item" @click="handleDarkMode">
                 <view class="setting-left">
                     <view class="setting-icon darkmode-icon">
-                        <up-icon name="eye-fill" size="18px" color="#2979ff"></up-icon>
+                        <up-icon name="eye-fill" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">深浅模式</text>
                 </view>
@@ -34,7 +34,7 @@
             <view class="setting-item" @click="showThemePopup = true">
                 <view class="setting-left">
                     <view class="setting-icon theme-icon">
-                        <up-icon name="star-fill" size="18px" color="#a066d6"></up-icon>
+                        <up-icon name="star-fill" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">主题</text>
                 </view>
@@ -51,7 +51,7 @@
             <view class="setting-item" @click="handleFontSize">
                 <view class="setting-left">
                     <view class="setting-icon fontsize-icon">
-                        <up-icon name="zh" size="18px" color="#19be6b"></up-icon>
+                        <up-icon name="zh" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">字号</text>
                 </view>
@@ -105,7 +105,7 @@
             <view class="setting-item" @click="handleAccountSecurity">
                 <view class="setting-left">
                     <view class="setting-icon safe-icon">
-                        <up-icon name="lock" size="18px" color="#2979ff"></up-icon>
+                        <up-icon name="lock" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">账号安全</text>
                 </view>
@@ -118,7 +118,7 @@
             <view class="setting-item">
                 <view class="setting-left">
                     <view class="setting-icon notify-icon">
-                        <up-icon name="bell" size="18px" color="#19be6b"></up-icon>
+                        <up-icon name="bell" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">消息通知</text>
                 </view>
@@ -137,7 +137,7 @@
             <view class="setting-item" @click="handleClearCache">
                 <view class="setting-left">
                     <view class="setting-icon clear-icon">
-                        <up-icon name="trash" size="18px" color="#fa3534"></up-icon>
+                        <up-icon name="trash" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">清除缓存</text>
                 </view>
@@ -151,7 +151,7 @@
             <view class="setting-item" @click="handleCheckUpdate">
                 <view class="setting-left">
                     <view class="setting-icon update-icon">
-                        <up-icon name="reload" size="18px" color="#ff9900"></up-icon>
+                        <up-icon name="reload" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">检查更新</text>
                 </view>
@@ -167,7 +167,7 @@
             <view class="setting-item" @click="handleUserAgreement">
                 <view class="setting-left">
                     <view class="setting-icon agreement-icon">
-                        <up-icon name="file-text" size="18px" color="#5cadff"></up-icon>
+                        <up-icon name="file-text" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">用户协议</text>
                 </view>
@@ -180,7 +180,7 @@
             <view class="setting-item" @click="handlePrivacyPolicy">
                 <view class="setting-left">
                     <view class="setting-icon privacy-icon">
-                        <up-icon name="eye" size="18px" color="#5cadff"></up-icon>
+                        <up-icon name="eye" size="18px" color="#999"></up-icon>
                     </view>
                     <text class="setting-label">隐私政策</text>
                 </view>
@@ -461,43 +461,43 @@ onMounted(() => {
 }
 
 .safe-icon {
-    background-color: #eef3ff;
+    background-color: #f5f5f5;
 }
 
 .notify-icon {
-    background-color: #e8f8f0;
+    background-color: #f5f5f5;
 }
 
 .clear-icon {
-    background-color: #fef0ef;
+    background-color: #f5f5f5;
 }
 
 .update-icon {
-    background-color: #fff7e6;
+    background-color: #f5f5f5;
 }
 
 .darkmode-icon {
-    background-color: #eef3ff;
+    background-color: #f5f5f5;
 }
 
 .theme-icon {
-    background-color: #f4eef9;
+    background-color: #f5f5f5;
 }
 
 .fontsize-icon {
-    background-color: #e8f8f0;
+    background-color: #f5f5f5;
 }
 
 .agreement-icon {
-    background-color: #eef3ff;
+    background-color: #f5f5f5;
 }
 
 .privacy-icon {
-    background-color: #eef3ff;
+    background-color: #f5f5f5;
 }
 
 .about-icon {
-    background-color: #f4f4f5;
+    background-color: #f5f5f5;
 }
 
 .setting-label {
