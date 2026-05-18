@@ -49,6 +49,8 @@
                     /> -->
                 </view>
 
+                <ChatSkeleton v-if="loadingConversationId" />
+
                 <view class="bubble-test-area" v-if="messageList.length > 0">
                     <Bubble
                         v-for="(msg, index) in messageList"
@@ -69,6 +71,7 @@
                             <AiThinking />
                         </template>
                     </Bubble>
+                    <view id="msg-mid"></view>
                     <view id="msg-bottom"></view>
                     <AgentActionBar
                         v-if="showActionBar"
@@ -128,6 +131,7 @@ import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
+import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
 import {
@@ -321,11 +325,22 @@ const senderAreaStyle = computed(() => ({
 }));
 
 // ─── 事件处理 ──────────────────────────────────────────────────────────────────
-const scrollToBottom = () => {
-    scrollToViewId.value = "";
-    setTimeout(() => {
-        scrollToViewId.value = "msg-bottom";
-    }, 100);
+const scrollToBottom = (smooth = false) => {
+    if (smooth) {
+        // 先滚到中间位置（慢），再滚到底部（快），模拟减速效果
+        scrollToViewId.value = "";
+        setTimeout(() => {
+            scrollToViewId.value = "msg-mid";
+            setTimeout(() => {
+                scrollToViewId.value = "msg-bottom";
+            }, 200);
+        }, 50);
+    } else {
+        scrollToViewId.value = "";
+        setTimeout(() => {
+            scrollToViewId.value = "msg-bottom";
+        }, 100);
+    }
 };
 
 const handleMenuClick = () => {
@@ -449,6 +464,8 @@ const handleSelectChat = async (chatId) => {
     // 递增请求序号以消除快速切换时的竞态条件
     const requestSeq = ++chatRequestSeq;
     loadingConversationId.value = chatId;
+    messageList.value = [];
+    showWelcomePanel.value = false;
     sidebarVisible.value = false;
 
     try {
@@ -468,7 +485,7 @@ const handleSelectChat = async (chatId) => {
                 isStreaming: false
             }));
             showWelcomePanel.value = false;
-            scrollToBottom();
+            scrollToBottom(true);
         } else {
             messageList.value = [];
             showWelcomePanel.value = false;
