@@ -19,11 +19,12 @@
         />
 
         <!-- 内容滚动区 -->
-        <scroll-view 
-            class="content" 
-            scroll-y 
-            :show-scrollbar="false" 
-            @scroll="handleScroll" 
+        <scroll-view
+            class="content"
+            scroll-y
+            :show-scrollbar="false"
+            :scroll-into-view="scrollToViewId"
+            @scroll="handleScroll"
             @touchstart="handleTouchStart"
         >
             <view class="content-inner">
@@ -45,7 +46,7 @@
                 <view class="bubble-test-area" v-if="messageList.length > 0">
                     <Bubble
                         v-for="(msg, index) in messageList"
-                        :key="index"
+                        :key="msg._msgId"
                         :content="msg.content"
                         :show-avatar="false"
                         :shape="msg.role === 'user' ? 'corner' : undefined"
@@ -57,6 +58,7 @@
                         :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
                         @finish="handleBubbleFinish(index)"
                     />
+                    <view id="msg-bottom"></view>
                     <AgentActionBar
                         v-if="showActionBar"
                         :content="lastAIMessage?.content || ''"
@@ -139,6 +141,8 @@ const currentConversationTitle = ref("");
 const conversationList = ref([]);
 const loadingConversationId = ref(null);
 let chatRequestSeq = 0;
+let msgIdSeq = 0;
+const scrollToViewId = ref("");
 
 const currentIsFavorited = computed(() => {
     if (!currentConversationId.value) return false;
@@ -277,6 +281,13 @@ const senderAreaStyle = computed(() => ({
 }));
 
 // ─── 事件处理 ──────────────────────────────────────────────────────────────────
+const scrollToBottom = () => {
+    scrollToViewId.value = "";
+    setTimeout(() => {
+        scrollToViewId.value = "msg-bottom";
+    }, 100);
+};
+
 const handleMenuClick = () => {
     sidebarVisible.value = true;
 };
@@ -409,6 +420,7 @@ const handleSelectChat = async (chatId) => {
         currentConversationTitle.value = conversationList.value.find(c => c._id === chatId)?.title || "";
         if (res?.data) {
             messageList.value = res.data.map(msg => ({
+                _msgId: `msg-${++msgIdSeq}`,
                 role: msg.role,
                 content: msg.content,
                 typing: false,
@@ -416,6 +428,7 @@ const handleSelectChat = async (chatId) => {
                 isStreaming: false
             }));
             showWelcomePanel.value = false;
+            scrollToBottom();
         } else {
             messageList.value = [];
             showWelcomePanel.value = false;
@@ -499,12 +512,13 @@ const handleSenderSubmit = async ({ text }) => {
     if (!text) return;
 
     showWelcomePanel.value = false;
-    messageList.value.push({ role: 'user', content: text, typing: false });
+    messageList.value.push({ _msgId: `msg-${++msgIdSeq}`, role: 'user', content: text, typing: false });
     senderText.value = "";
 
     // 通过 messageList.value 访问，确保拿到的是 Vue 响应式代理
     const aiIndex = messageList.value.length;
-    messageList.value.push({ role: 'assistant', content: '', typing: false, pending: true, isStreaming: true });
+    messageList.value.push({ _msgId: `msg-${++msgIdSeq}`, role: 'assistant', content: '', typing: false, pending: true, isStreaming: true });
+    scrollToBottom();
 
     try {
         try {
