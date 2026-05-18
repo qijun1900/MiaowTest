@@ -18,6 +18,11 @@
             @touchstart="handleTouchStart"
         />
 
+        <!-- 下拉刷新浮层 -->
+        <view v-if="isRefreshing" class="refresh-overlay">
+            <AiThinking />
+        </view>
+
         <!-- 内容滚动区 -->
         <scroll-view
             class="content"
@@ -25,7 +30,8 @@
             :show-scrollbar="false"
             :scroll-into-view="scrollToViewId"
             @scroll="handleScroll"
-            @touchstart="handleTouchStart"
+            @touchstart="onContentTouchStart"
+            @touchend="onContentTouchEnd"
         >
             <view class="content-inner">
                 <WelcomePanel 
@@ -121,6 +127,7 @@ import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
+import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
 import {
         fetchAgentList,
         chatWithAgent,
@@ -157,6 +164,25 @@ const currentIsFavorited = computed(() => {
 });
 
 const hasModels = computed(() => modelList.value.length > 0);
+
+const {
+    isRefreshing,
+    pullTouchStart: rawPullTouchStart,
+    pullTouchEnd,
+} = usePullToRefresh({
+    enabled: computed(() => showWelcomePanel.value && messageList.value.length === 0),
+    onRefresh: () => Promise.all([loadAgentList(), loadConversationList()]),
+});
+
+const onContentTouchStart = (e) => {
+    handleTouchStart(e);
+    rawPullTouchStart(e);
+};
+
+const onContentTouchEnd = (e) => {
+    handleTouchStart(e);
+    pullTouchEnd(e);
+};
 
 const loadAgentList = async () => {
     try {
@@ -592,6 +618,22 @@ const handleSenderSubmit = async ({ text }) => {
  * bottom 由 containerStyle 动态控制，键盘弹起时容器向上收缩至键盘顶部，
  * 不会在 sender 和键盘之间留下任何背景色空白。
  */
+/* ── 下拉刷新浮层 ── */
+.refresh-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 12rpx;
+    padding: 20rpx 0;
+    background: rgba(246, 247, 249, 0.95);
+}
+
 .container {
     position: fixed;
     top: 0;
