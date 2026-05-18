@@ -79,6 +79,7 @@
                         @favorite="(liked) => handleActionFavorite(lastAIIndex, liked)"
                         @regenerate="handleActionRegenerate"
                     />
+                    <AiDisclaimer v-if="showActionBar" />
                 </view>
 
                 <!-- <PromptTags @select="handlePromptSelect" /> -->
@@ -126,6 +127,7 @@ import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
 import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import AiThinking from "../../components/modules/agent/AiThinking.vue";
+import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
 import {
@@ -550,12 +552,24 @@ const handleSenderSubmit = async ({ text }) => {
     if (!text) return;
 
     showWelcomePanel.value = false;
-    messageList.value.push({ _msgId: `msg-${++msgIdSeq}`, role: 'user', content: text, typing: false });
+    messageList.value.push({
+        _msgId: `msg-${++msgIdSeq}`, 
+        role: 'user', 
+        content: text, 
+        typing: false 
+    });
     senderText.value = "";
 
     // 通过 messageList.value 访问，确保拿到的是 Vue 响应式代理
     const aiIndex = messageList.value.length;
-    messageList.value.push({ _msgId: `msg-${++msgIdSeq}`, role: 'assistant', content: '', typing: false, pending: true, isStreaming: true });
+    messageList.value.push({ 
+        _msgId: `msg-${++msgIdSeq}`, 
+        role: 'assistant', 
+        content: '', 
+        typing: false, 
+        pending: true, 
+        isStreaming: true 
+    });
     scrollToBottom();
 
     try {

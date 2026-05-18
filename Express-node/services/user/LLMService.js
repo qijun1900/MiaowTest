@@ -145,7 +145,13 @@ const LLMService = {
    * 流式对话：用户发消息 → LLM 逐 token 回调 → 落库。
    * onStart/onToken 由控制器注入，用于实时推送 SSE/WebSocket 事件。
    */
-  ChatWithAgentAndSaveStream: async ({ uid, message: userMessage, agentKey, conversationId, onStart, onToken }) => {
+  ChatWithAgentAndSaveStream: async ({ 
+    uid, 
+    message: userMessage, 
+    agentKey, conversationId, 
+    onStart, 
+    onToken 
+  }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
     const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage);
