@@ -8,7 +8,7 @@
         -->
         <AgentHeader
             :model-list="modelList"
-            :initial-model="currentModelName"
+            :initial-model="currentModelName || '暂无模型'"
             :conversation-title="currentConversationTitle"
             :favorited="currentIsFavorited"
             @menu-click="handleMenuClick"
@@ -55,9 +55,14 @@
                         :max-width="msg.role === 'user' ? '650rpx' : '100%'"
                         :is-markdown="msg.isStreaming ? false : true"
                         :no-style="msg.role === 'assistant'"
+                        :loading="msg.pending"
                         :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
                         @finish="handleBubbleFinish(index)"
-                    />
+                    >
+                        <template #loading>
+                            <AiThinking />
+                        </template>
+                    </Bubble>
                     <view id="msg-bottom"></view>
                     <AgentActionBar
                         v-if="showActionBar"
@@ -78,7 +83,7 @@
             当 container 的 bottom 随键盘上移时，sender 自然贴在容器底部，
             即键盘顶部，不会留下任何灰色空隙。
         -->
-        <view class="sender-area" :style="senderAreaStyle">
+        <view v-if="hasModels" class="sender-area" :style="senderAreaStyle">
             <AgentSender
                 v-model="senderText"
                 v-model:thinking="thinkingMode"
@@ -114,6 +119,7 @@ import WelcomePanel from "../../components/modules/agent/WelcomePanel.vue";
 import ThoughtChain from "../../components/modules/agent/ThoughtChain.vue";
 import PromptTags from "../../components/modules/agent/PromptTags.vue";
 import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
+import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import {
         fetchAgentList,
@@ -133,9 +139,9 @@ const thinkingMode = ref(false);
 const showThinkingToggle = ref(true);
 const showWelcomePanel = ref(true);
 const messageList = ref([]);
-const modelList = ref([{label: "Mio", value: "mio"}]);
-const currentModelKey = ref("mio");
-const currentModelName = ref("Mio");
+const modelList = ref([]);
+const currentModelKey = ref("");
+const currentModelName = ref("");
 const currentConversationId = ref(null);
 const currentConversationTitle = ref("");
 const conversationList = ref([]);
@@ -150,6 +156,8 @@ const currentIsFavorited = computed(() => {
     return conv?.isPinned || false;
 });
 
+const hasModels = computed(() => modelList.value.length > 0);
+
 const loadAgentList = async () => {
     try {
         const res = await fetchAgentList();
@@ -161,8 +169,12 @@ const loadAgentList = async () => {
                     value: item.agentKey
                 };
             });
-            currentModelName.value = list[0]?.agentName || "Mio";
-            currentModelKey.value = list[0]?.agentKey || "mio";
+            currentModelName.value = list[0]?.agentName || "";
+            currentModelKey.value = list[0]?.agentKey || "";
+        } else {
+            modelList.value = [];
+            currentModelName.value = "";
+            currentModelKey.value = "";
         }
     } catch (error) {
         console.error("加载Agent列表失败:", error.message);
@@ -529,10 +541,11 @@ const handleSenderSubmit = async ({ text }) => {
                 conversationId: currentConversationId.value,
                 onStart: ({ conversationId }) => {
                     if (conversationId) currentConversationId.value = conversationId;
-                    messageList.value[aiIndex].pending = false;
                 },
                 onMessage: (chunk) => {
-                    messageList.value[aiIndex].pending = false;
+                    if (messageList.value[aiIndex].pending) {
+                        messageList.value[aiIndex].pending = false;
+                    }
                     messageList.value[aiIndex].content += chunk;
                 },
                 onDone: () => {
