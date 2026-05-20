@@ -60,8 +60,14 @@
                 <uni-icons type="compose" size="13" color="#6366f1"></uni-icons>
                 <text class="markdown-mode-text">Markdown模式</text>
               </view>
-              <view class="markdown-switch-btn" @click="isMarkdownMode = false">
-                <text class="markdown-switch-text">切换富文本</text>
+              <view class="markdown-toolbar-right">
+                <view v-if="isAIPasted" class="clear-content-btn" @click="handleClearContent">
+                  <uni-icons type="trash" size="13" color="#ef4444"></uni-icons>
+                  <text class="clear-content-text">清除内容</text>
+                </view>
+                <view class="markdown-switch-btn" @click="isMarkdownMode = false">
+                  <text class="markdown-switch-text">切换富文本</text>
+                </view>
               </view>
             </view>
             <textarea
@@ -77,6 +83,10 @@
               <view class="paste-ai-btn" @click="handlePasteAIContent">
                 <uni-icons type="clipboard" size="14" color="#6366f1"></uni-icons>
                 <text class="paste-ai-text">粘贴AI内容</text>
+              </view>
+              <view v-if="isAIPasted" class="clear-content-btn" @click="handleClearContent">
+                <uni-icons type="trash" size="14" color="#ef4444"></uni-icons>
+                <text class="clear-content-text">清除内容</text>
               </view>
             </view>
             <sp-editor
@@ -175,6 +185,7 @@ const noteId = ref("");
 const EDITOR_IMAGE_MAX_SIZE = 10 * 1024 * 1024;
 const NOTEBOOK_CLOUD_PATH_PREFIX = "user/notebook";
 const pendingUploadedImageUrls = ref([]);
+const isAIPasted = ref(false);
 const isCleaningPendingUploads = ref(false);
 const defaultNoteTags = [
   "复习",
@@ -581,12 +592,38 @@ const handlePasteAIContent = async () => {
     // 在Markdown模式下直接设置content为纯文本
     noteContent.value = plainText;
     notePlainText.value = plainText;
+    isAIPasted.value = true;
 
     uni.showToast({ title: "已粘贴AI内容", icon: "success", position: "top" });
   } catch (error) {
     console.error("粘贴AI内容失败:", error);
     uni.showToast({ title: "读取剪贴板失败", icon: "none", position: "top" });
   }
+};
+
+// 一键清除编辑器内容
+const handleClearContent = () => {
+  uni.showModal({
+    title: "清除内容",
+    content: "确定要清除所有编辑内容吗？此操作不可撤销。",
+    confirmText: "清除",
+    confirmColor: "#ef4444",
+    success: ({ confirm }) => {
+      if (!confirm) return;
+
+      if (isMarkdownMode.value) {
+        noteContent.value = "";
+        notePlainText.value = "";
+      } else {
+        noteContent.value = "";
+        notePlainText.value = "";
+        setEditorContent("");
+      }
+      isAIPasted.value = false;
+
+      uni.showToast({ title: "内容已清除", icon: "success", position: "top" });
+    },
+  });
 };
 
 // Markdown文本输入同步
@@ -1109,6 +1146,8 @@ onUnload(() => {
 .editor-paste-bar {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 12rpx;
   padding: 8rpx 12rpx;
   border-bottom: 1rpx solid #e4e9f5;
   background: #f8faff;
@@ -1127,6 +1166,22 @@ onUnload(() => {
 .paste-ai-text {
   font-size: 22rpx;
   color: #6366f1;
+  font-weight: 500;
+}
+
+.clear-content-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 18rpx;
+  border-radius: 20rpx;
+  background: #fef2f2;
+  border: 1rpx solid #fecaca;
+}
+
+.clear-content-text {
+  font-size: 22rpx;
+  color: #ef4444;
   font-weight: 500;
 }
 
@@ -1158,6 +1213,12 @@ onUnload(() => {
   font-size: 22rpx;
   color: #6366f1;
   font-weight: 500;
+}
+
+.markdown-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .markdown-switch-btn {
