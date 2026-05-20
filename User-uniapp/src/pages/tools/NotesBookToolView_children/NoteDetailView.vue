@@ -83,10 +83,11 @@
 
                         <view class="divider"></view>
 
-                        <rich-text
-                            class="detail-rich"
-                            :nodes="detailHtml"
-                        ></rich-text>
+                        <ContentRenderer
+                            class="detail-render"
+                            :content="detailRenderContent"
+                            :is-markdown="detailState.isMarkdown"
+                        />
                     </view>
 
                     <view v-if="detailState.tags.length" class="tag-section">
@@ -112,6 +113,7 @@ import { onLoad, onShow } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import { buildNotePreviewHtml, stripHtml } from "../../../util/notePreview";
 import { normalizeNoteDetailData } from "../../../util/noteNormalize";
+import ContentRenderer from "../../../components/common/ContentRenderer.vue";
 import {
     getNotebookNoteDetailAPI,
     deleteNotebookNoteAPI,
@@ -129,6 +131,7 @@ const loadError = ref("");
 const detailState = ref({
     title: "未命名笔记",
     content: "",
+    isMarkdown: false,
     tags: [],
     dateText: "刚刚更新",
 });
@@ -142,9 +145,17 @@ const detailHtml = computed(() =>
     }),
 );
 
-const contentLength = computed(
-    () => stripHtml(detailState.value.content).length,
-);
+const detailRenderContent = computed(() => {
+    if (detailState.value.isMarkdown) {
+        return detailState.value.content;
+    }
+    return detailHtml.value;
+});
+
+const contentLength = computed(() => {
+    const raw = detailState.value.content || "";
+    return detailState.value.isMarkdown ? raw.length : stripHtml(raw).length;
+});
 
 const getDraftStorageKey = (currentNoteId) =>
     `note-editor-draft:${notesBookId.value}:${currentNoteId}`;
@@ -394,7 +405,7 @@ onShow(() => {
     background: #efe7de;
 }
 
-.detail-rich {
+.detail-render {
     font-size: 32rpx;
     color: #59515a;
     line-height: 1.85;

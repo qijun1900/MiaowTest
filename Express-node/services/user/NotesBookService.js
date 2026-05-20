@@ -492,6 +492,7 @@ const NotesBookService = {
         updatedAt: 1,
         createdAt: 1,
         "content.text": 1,
+        "content.isMarkdown": 1,
       }).lean();
 
       if (!note) {
@@ -511,6 +512,7 @@ const NotesBookService = {
           content: String(note?.content?.text || ""),
           summary: note.summary || "",
           tags: note.tags || [],
+          isMarkdown: Boolean(note?.content?.isMarkdown),
           updatedAt: note.updatedAt,
           createdAt: note.createdAt,
         },
@@ -524,7 +526,7 @@ const NotesBookService = {
   /**
    * 保存笔记（有id为更新，无id为新增）
    */
-  saveNotebookNote: async ({ uid, id, bookId, title, content, tags = [] }) => {
+  saveNotebookNote: async ({ uid, id, bookId, title, content, tags = [], isMarkdown = false }) => {
     try {
       const notebook = await NotesBookModel.findOne({ _id: bookId, Uid: uid })
         .select({ _id: 1 })
@@ -584,6 +586,7 @@ const NotesBookService = {
         note.tags = safeTags;
         // 仅更新正文文本，避免把 undefined 的嵌套对象回写触发 schema cast 错误
         note.set("content.text", safeContent);
+        note.set("content.isMarkdown", Boolean(isMarkdown));
 
         await note.save();
         await NotesBookModel.updateOne(
@@ -609,6 +612,7 @@ const NotesBookService = {
         tags: safeTags,
         content: {
           text: safeContent,
+          isMarkdown: Boolean(isMarkdown),
         },
       });
 

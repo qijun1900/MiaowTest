@@ -54,7 +54,31 @@
         <view class="title-divider"></view>
 
         <view v-if="editorMode === 'edit'" class="panel editor-panel">
-          <view class="note-editor-wrapper">
+          <view v-if="isMarkdownMode" class="markdown-edit-area">
+            <view class="markdown-toolbar">
+              <view class="markdown-mode-tag">
+                <uni-icons type="compose" size="13" color="#6366f1"></uni-icons>
+                <text class="markdown-mode-text">Markdown模式</text>
+              </view>
+              <view class="markdown-switch-btn" @click="isMarkdownMode = false">
+                <text class="markdown-switch-text">切换富文本</text>
+              </view>
+            </view>
+            <textarea
+              v-model="noteContent"
+              class="markdown-textarea"
+              placeholder="输入Markdown内容..."
+              :maxlength="-1"
+              @input="handleMarkdownInput"
+            />
+          </view>
+          <view v-else class="note-editor-wrapper">
+            <view class="editor-paste-bar">
+              <view class="paste-ai-btn" @click="handlePasteAIContent">
+                <uni-icons type="clipboard" size="14" color="#6366f1"></uni-icons>
+                <text class="paste-ai-text">粘贴AI内容</text>
+              </view>
+            </view>
             <sp-editor
               :placeholder="'开始记录...'"
               :toolbar-config="toolbarConfig"
@@ -67,7 +91,10 @@
         </view>
 
         <view v-else class="panel preview-panel">
-          <rich-text class="preview-rich" :nodes="previewHtml"></rich-text>
+          <ContentRenderer
+            :content="previewRenderContent"
+            :is-markdown="isMarkdownMode"
+          />
         </view>
 
         <view class="tag-selector-block">
@@ -101,6 +128,7 @@
 import { computed, ref } from "vue";
 import { onBackPress, onLoad, onUnload } from "@dcloudio/uni-app";
 import ImageCropper from "../../../components/common/ImageCropper.vue";
+import ContentRenderer from "../../../components/common/ContentRenderer.vue";
 import TagSelector from "../../../components/core/TagSelector.vue";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import {
@@ -137,6 +165,7 @@ const noteTitle = ref("");
 const noteContent = ref("");
 const notePlainText = ref("");
 const noteTags = ref([]);
+const isMarkdownMode = ref(false);
 const editorMode = ref("edit");
 const isBypassBackGuard = ref(false);
 const storageDraftKey = ref("note-editor-draft:default:new");
@@ -163,6 +192,7 @@ const initialSnapshot = ref({
   title: "",
   content: "",
   tags: [],
+  isMarkdown: false,
 });
 
 const isSameTagList = (left = [], right = []) => {
@@ -243,6 +273,7 @@ const hasUnsavedChanges = computed(() => {
   return (
     noteTitle.value !== initialSnapshot.value.title ||
     noteContent.value !== initialSnapshot.value.content ||
+    isMarkdownMode.value !== initialSnapshot.value.isMarkdown ||
     !isSameTagList(noteTags.value, initialSnapshot.value.tags)
   );
 });
@@ -255,6 +286,14 @@ const previewHtml = computed(() => {
   });
 });
 
+// Markdown模式下的预览内容（纯文本，由ContentRenderer处理渲染）
+const previewRenderContent = computed(() => {
+  if (isMarkdownMode.value) {
+    return noteContent.value;
+  }
+  return previewHtml.value;
+});
+
 // 以笔记本ID+笔记ID区分草稿，避免不同笔记互相覆盖
 const buildStorageKey = (options = {}) => {
   const bookId = options.bookId || options.notesBookId || "default";
@@ -262,12 +301,13 @@ const buildStorageKey = (options = {}) => {
   return `note-editor-draft:${bookId}:${noteId}`;
 };
 
-// 把当前内容记录为“已保存”基线
+// 把当前内容记录为”已保存”基线
 const applySnapshot = () => {
   initialSnapshot.value = {
     title: noteTitle.value,
     content: noteContent.value,
     tags: normalizeTagList(noteTags.value),
+    isMarkdown: isMarkdownMode.value,
   };
 };
 
@@ -384,14 +424,19 @@ const readDraftFromStorage = () => {
 // 将草稿数据应用到编辑器和快照
 const applyDraftData = (cached = {}) => {
   noteTitle.value = String(cached.title || "");
-  noteContent.value = normalizeToHtml(cached.content || "");
+  isMarkdownMode.value = Boolean(cached.isMarkdown);
+  noteContent.value = isMarkdownMode.value
+    ? String(cached.content || "")
+    : normalizeToHtml(cached.content || "");
   notePlainText.value = String(cached.text || stripHtml(noteContent.value));
   noteTags.value = normalizeTagList(cached.tags || []);
   pendingUploadedImageUrls.value = [];
   applySnapshot();
-  setTimeout(() => {
-    setEditorContent(noteContent.value);
-  }, 0);
+  if (!isMarkdownMode.value) {
+    setTimeout(() => {
+      setEditorContent(noteContent.value);
+    }, 0);
+  }
 };
 
 const loadDraftFromStorage = () => {
@@ -425,14 +470,19 @@ const loadNoteFromCloud = async () => {
     }
 
     noteTitle.value = String(res.data.title || "");
-    noteContent.value = normalizeToHtml(res.data.content || "");
+    isMarkdownMode.value = Boolean(res.data.isMarkdown);
+    noteContent.value = isMarkdownMode.value
+      ? String(res.data.content || "")
+      : normalizeToHtml(res.data.content || "");
     notePlainText.value = stripHtml(noteContent.value);
     noteTags.value = normalizeTagList(res?.data?.tags || []);
     pendingUploadedImageUrls.value = [];
     applySnapshot();
-    setTimeout(() => {
-      setEditorContent(noteContent.value);
-    }, 0);
+    if (!isMarkdownMode.value) {
+      setTimeout(() => {
+        setEditorContent(noteContent.value);
+      }, 0);
+    }
     return true;
   } catch (error) {
     console.error("加载云端笔记失败:", error);
@@ -498,6 +548,52 @@ const handleEditorInit = (ctx) => {
   setTimeout(() => {
     setEditorContent(noteContent.value);
   }, 100);
+};
+
+// 一键粘贴AI内容：从剪贴板读取文本，去除HTML标签后以纯文本插入编辑器
+const handlePasteAIContent = async () => {
+  try {
+    const clipRes = await new Promise((resolve, reject) => {
+      uni.getClipboardData({
+        success: resolve,
+        fail: reject,
+      });
+    });
+
+    const rawText = String(clipRes?.data || "").trim();
+    if (!rawText) {
+      uni.showToast({ title: "剪贴板为空", icon: "none", position: "top" });
+      return;
+    }
+
+    // 判断是否包含HTML标签，如果有则剥离标签保留纯文本
+    const hasHtml = /<[a-z][\s\S]*>/i.test(rawText);
+    const plainText = hasHtml ? stripHtml(rawText) : rawText;
+
+    if (!plainText) {
+      uni.showToast({ title: "剪贴板无可粘贴内容", icon: "none", position: "top" });
+      return;
+    }
+
+    // 切换到Markdown模式
+    isMarkdownMode.value = true;
+
+    // 在Markdown模式下直接设置content为纯文本
+    noteContent.value = plainText;
+    notePlainText.value = plainText;
+
+    uni.showToast({ title: "已粘贴AI内容", icon: "success", position: "top" });
+  } catch (error) {
+    console.error("粘贴AI内容失败:", error);
+    uni.showToast({ title: "读取剪贴板失败", icon: "none", position: "top" });
+  }
+};
+
+// Markdown文本输入同步
+const handleMarkdownInput = (e) => {
+  const value = String(e?.detail?.value || e || "");
+  noteContent.value = value;
+  notePlainText.value = value;
 };
 
 // 编辑器输入事件：同步 html 与纯文本
@@ -650,6 +746,7 @@ const persistDraft = (extraPayload = {}) => {
     content: noteContent.value,
     text: notePlainText.value,
     tags: normalizeTagList(noteTags.value),
+    isMarkdown: isMarkdownMode.value,
     updatedAt: Date.now(),
     pendingCloudSync: false,
     ...extraPayload,
@@ -660,7 +757,10 @@ const persistDraft = (extraPayload = {}) => {
 
 // 保存入口：先校验，再落本地草稿并更新快照
 const handleSave = async () => {
-  await syncContentFromEditor();
+  // Markdown模式下textarea的v-model已自动同步，只需从富文本编辑器拉取
+  if (!isMarkdownMode.value) {
+    await syncContentFromEditor();
+  }
 
   const title = String(noteTitle.value || "").trim();
   const contentText = String(notePlainText.value || "").trim();
@@ -700,6 +800,7 @@ const handleSave = async () => {
       title,
       content: noteContent.value,
       tags,
+      isMarkdown: isMarkdownMode.value,
     });
 
     if (res.code !== 200) {
@@ -1003,5 +1104,82 @@ onUnload(() => {
   font-size: 16px;
   color: #4f576b;
   line-height: 1.75;
+}
+
+.editor-paste-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8rpx 12rpx;
+  border-bottom: 1rpx solid #e4e9f5;
+  background: #f8faff;
+}
+
+.paste-ai-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 18rpx;
+  border-radius: 20rpx;
+  background: #eef2ff;
+  border: 1rpx solid #c7d2fe;
+}
+
+.paste-ai-text {
+  font-size: 22rpx;
+  color: #6366f1;
+  font-weight: 500;
+}
+
+.markdown-edit-area {
+  display: flex;
+  flex-direction: column;
+  min-height: 1000rpx;
+}
+
+.markdown-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10rpx 16rpx;
+  border-bottom: 1rpx solid #e4e9f5;
+  background: #f8faff;
+}
+
+.markdown-mode-tag {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 16rpx;
+  background: #eef2ff;
+}
+
+.markdown-mode-text {
+  font-size: 22rpx;
+  color: #6366f1;
+  font-weight: 500;
+}
+
+.markdown-switch-btn {
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+  background: #f1f5f9;
+}
+
+.markdown-switch-text {
+  font-size: 22rpx;
+  color: #64748b;
+}
+
+.markdown-textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 20rpx 16rpx;
+  font-size: 30rpx;
+  color: #4f576b;
+  line-height: 1.75;
+  box-sizing: border-box;
+  background: transparent;
 }
 </style>

@@ -57,6 +57,11 @@ const NotesListSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    isMarkdown: {
+      // 内容是否为Markdown格式（影响预览渲染方式）
+      type: Boolean,
+      default: false,
+    },
     AIIntegrationInfo: {
       // AI生成/改写相关信息（如使用的模型、参数等）
       model: String,

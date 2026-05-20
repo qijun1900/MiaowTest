@@ -311,6 +311,7 @@ const NotesBookController = {
       const title = String(req.body.title || "");
       const content = String(req.body.content || "");
       const tags = req.body.tags;
+      const isMarkdown = Boolean(req.body.isMarkdown);
 
       if (!isValidObjectId(bookId)) {
         return res.status(200).send({
@@ -333,6 +334,7 @@ const NotesBookController = {
         title,
         content,
         tags,
+        isMarkdown,
       });
 
       if (!result.success) {

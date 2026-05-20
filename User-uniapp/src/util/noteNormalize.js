@@ -92,7 +92,10 @@ export const normalizeNoteListItem = (item = {}) => {
 
 export const normalizeNoteDetailData = (data = {}) => {
   const title = String(data.title || "").trim() || "未命名笔记";
-  const content = normalizeToHtml(data.content || data.summary || data.plainText || "");
+  const isMarkdown = Boolean(data.isMarkdown);
+  const content = isMarkdown
+    ? String(data.content || "")
+    : normalizeToHtml(data.content || data.summary || data.plainText || "");
   const tags = normalizeTagList(data.tags || []);
   const timeValue =
     data.updatedAt || data.updated_at || data.createTime || data.createdAt;
@@ -100,6 +103,7 @@ export const normalizeNoteDetailData = (data = {}) => {
   return {
     title,
     content,
+    isMarkdown,
     tags,
     dateText: timeValue ? formatTime.getRelativeTime(timeValue) : "刚刚更新",
   };
