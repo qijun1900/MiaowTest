@@ -189,6 +189,7 @@
         <dragButton
             v-if="
                 questionStore.UserShowSettings.showHelper &&
+                !popupShow &&
                 !iSopenNotePopupShow
             "
             :isDock="true"
