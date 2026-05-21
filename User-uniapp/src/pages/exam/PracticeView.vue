@@ -297,6 +297,7 @@ const navBarHeight = ref(0); // 导航栏高度
 const safeAreaBottom = ref(0); // 底部安全区域高度
 const currentIndex = ref(0); // 当前显示项的索引
 const visibleIndexes = ref([0, 1, 2]); // 当前可见的三个项目索引
+const isRevertingSwipe = ref(false); // 是否正在回退边界滑动，避免触发正常切题逻辑
 const ObjectiveAnswerStore = useObjectiveAnswerStore(); // 客观题答案Store
 const SubjectiveAnswerStore = useSubjectiveAnswerStore(); // 主观题答案Store
 const refreshKey = ref(0); // 用于触发子组件刷新
@@ -575,6 +576,11 @@ onLoad((options) => {
 
 // 监听当前索引变化
 watch(currentIndex, (newIndex, oldIndex) => {
+    if (isRevertingSwipe.value) {
+        // 边界回退时只更新当前问题ID，不执行正常切题逻辑
+        updateCurrentQuestionId();
+        return;
+    }
     // 处理滑动方向变化
     handleDirectionChange(newIndex, oldIndex);
     // 更新当前问题ID
@@ -610,11 +616,79 @@ const handleSendMode = (value) => {
     currentMode.value = value; // 更新当前选中的模式
 };
 
+// 回退边界滑动，避免 circular swiper 展示旧缓存题目
+const revertBoundarySwipe = (
+    targetIndex,
+    originIndex,
+    questionIndex,
+    title,
+) => {
+    // 先把目标 slot 临时改成当前题，避免滑过去时看到旧缓存题
+    const newVisibleIndexes = [...visibleIndexes.value];
+    newVisibleIndexes[targetIndex] = questionIndex;
+    visibleIndexes.value = newVisibleIndexes;
+
+    isRevertingSwipe.value = true;
+    currentIndex.value = targetIndex;
+
+    uni.showToast({
+        title,
+        icon: "none",
+        duration: 1000,
+        position: "top",
+    });
+
+    // 再把 swiper 拉回原来的 slot
+    setTimeout(() => {
+        currentIndex.value = originIndex;
+        updateCurrentQuestionId();
+
+        setTimeout(() => {
+            isRevertingSwipe.value = false;
+        }, 0);
+    }, 80);
+};
+
 // 处理轮播切换事件
 const handleSwiperChange = (event) => {
+    const newIndex = event.detail.current;
+    const oldIndex = currentIndex.value;
+
+    if (newIndex === oldIndex) return;
+
+    // 判断滑动方向：true为左滑，false为右滑
+    const isLeftSwipe =
+        (newIndex > oldIndex && !(newIndex === 2 && oldIndex === 0)) ||
+        (newIndex === 0 && oldIndex === 2);
+
+    const currentQuestionIndex = visibleIndexes.value[oldIndex];
+    const totalQuestions = questionStore.UserChooseQuestion.length;
+
+    // 最后一题继续左滑时，阻止 circular swiper 跑到旧缓存 slot
+    if (isLeftSwipe && currentQuestionIndex >= totalQuestions - 1) {
+        revertBoundarySwipe(
+            newIndex,
+            oldIndex,
+            currentQuestionIndex,
+            "已经是最后一题",
+        );
+        return;
+    }
+
+    // 第一题继续右滑时，阻止 circular swiper 跑到旧缓存 slot
+    if (!isLeftSwipe && currentQuestionIndex <= 0) {
+        revertBoundarySwipe(
+            newIndex,
+            oldIndex,
+            currentQuestionIndex,
+            "已经是第一题",
+        );
+        return;
+    }
+
     // 延迟更新索引，避免与swiper动画冲突
     setTimeout(() => {
-        currentIndex.value = event.detail.current;
+        currentIndex.value = newIndex;
     }, 60);
 };
 
