@@ -116,13 +116,14 @@
         </view>
         <!-- 添加按钮 -->
         <dragButton
-            :show="popupShow === false"
+            :show="popupShow === false && showAddButton"
             :isDock="true"
             :existTabBar="true"
             iconType="plusempty"
             :bottomOffset="100"
             :popMenu="false"
             @btnClick="handleBtnClick"
+            @btnRemove="handleHelperRemove"
         />
         <!-- 弹窗 -->
         <uviewPopup
@@ -234,6 +235,7 @@ import ThemeLoading from "../../components/core/ThemeLoading.vue";
 const initialDate = ref(getTodayDate()); // 初始日期设置为今天
 const dotDates = ref([]); // 下方显示圆点的日期，挂载时候获取
 const popupShow = ref(false);
+const showAddButton = ref(true); // 是否显示添加悬浮按钮
 const selectedDate = ref(""); // 选中的日期
 const TodayTODOList = ref([]); // 代办列表
 const todoForm = ref({
@@ -273,6 +275,10 @@ const handleChange = (e) => {
 
 const handleBtnClick = () => {
     popupShow.value = true;
+};
+
+const handleHelperRemove = () => {
+    showAddButton.value = false;
 };
 
 // 表单事件处理
