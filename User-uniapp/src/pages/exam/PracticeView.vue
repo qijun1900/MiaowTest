@@ -654,13 +654,9 @@ const handleLeftSwipe = () => {
             // 更新下一个位置的题目索引
             newVisibleIndexes[nextSwiperIndex] = nextListIndex;
 
-            // 更新visibleIndexes
+            // 更新visibleIndexes，itemIndex 变化后 Vue 会自动销毁/重建该 slot 的组件
+            // 无需额外 refreshKey++，否则当前显示的题目也会被强制重建导致闪烁
             visibleIndexes.value = newVisibleIndexes;
-
-            // 延迟触发组件重新渲染，确保动画完成
-            setTimeout(() => {
-                refreshKey.value++;
-            }, 50);
         }
     } else {
         // 到达列表末尾，使用更平滑的提示
@@ -668,6 +664,7 @@ const handleLeftSwipe = () => {
             title: "已经是最后一题",
             icon: "none",
             duration: 1000,
+            position: "top",
         });
     }
 };
@@ -695,13 +692,9 @@ const handleRightSwipe = () => {
             // 更新上一个位置的题目索引
             newVisibleIndexes[prevSwiperIndex] = prevListIndex;
 
-            // 更新visibleIndexes
+            // 更新visibleIndexes，itemIndex 变化后 Vue 会自动销毁/重建该 slot 的组件
+            // 无需额外 refreshKey++，否则当前显示的题目也会被强制重建导致闪烁
             visibleIndexes.value = newVisibleIndexes;
-
-            // 延迟触发组件重新渲染，确保动画完成
-            setTimeout(() => {
-                refreshKey.value++;
-            }, 50);
         }
     } else {
         // 到达列表开头，使用更平滑的提示
@@ -709,6 +702,7 @@ const handleRightSwipe = () => {
             title: "已经是第一题",
             icon: "none",
             duration: 1000,
+            position: "top",
         });
     }
 };

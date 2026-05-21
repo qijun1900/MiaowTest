@@ -38,9 +38,7 @@
                 <view class="question-content">
                     <view class="question-number">第{{ index + 1 }}题</view>
                     <view class="question-stem">
-                        <rich-text
-                            :nodes="question.questionData.stem"
-                        ></rich-text>
+                        <ContentRenderer :content="question.questionData.stem" />
                     </view>
                     <!-- 选择题选项 -->
                     <view
@@ -118,6 +116,7 @@ import formatInfo from "../../../util/formatInfo";
 import formatTime from "../../../util/formatTime";
 import ThemeLoading from "../../core/ThemeLoading.vue";
 import SubjectFilter from "../../core/Filter.vue";
+import ContentRenderer from "../../common/ContentRenderer.vue";
 import { useQuestionStore } from "../../../stores/modules/QuestionStore";
 import { useObjectiveAnswerStore } from "../../../stores/modules/ObjectiveAnswerStore";
 import { useSubjectiveAnswerStore } from "../../../stores/modules/SubjectiveAnswerStore";

@@ -38,9 +38,7 @@
                 <view class="question-content">
                     <view class="question-number">第{{ index + 1 }}题</view>
                     <view class="question-stem">
-                        <rich-text
-                            :nodes="question.questionData.stem"
-                        ></rich-text>
+                        <ContentRenderer :content="question.questionData.stem" />
                     </view>
                     <!-- 选择题选项 -->
                     <view
@@ -168,6 +166,7 @@ import { useObjectiveAnswerStore } from "../../stores/modules/ObjectiveAnswerSto
 import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerStore";
 import uviewPopup from "../../components/core/uviewPopup.vue";
 import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue";
+import ContentRenderer from "../../components/common/ContentRenderer.vue";
 
 const objectiveAnswerStore = useObjectiveAnswerStore();
 const subjectiveAnswerStore = useSubjectiveAnswerStore();

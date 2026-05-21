@@ -329,6 +329,7 @@ const fetchWrongBooks = async () => {
         uni.showToast({
             title: "获取错题本失败",
             icon: "error",
+            position: "bottom",
         });
         console.error("获取错题本失败:", error);
     } finally {

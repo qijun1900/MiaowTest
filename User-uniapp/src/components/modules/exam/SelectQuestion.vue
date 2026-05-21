@@ -1,15 +1,11 @@
 <template>
     <view class="question-container">
         <view class="question-header">
-            <view class="question-top-row">
-                <text class="question-index">{{ props.questionIndex }}.</text>
-                <text class="question-lable">{{
-                    question.isMultiple === 1 ? "多选" : "单选"
-                }}</text>
-            </view>
-            <view class="question-stem">
-                <rich-text :nodes="question.stem"></rich-text>
-            </view>
+            <text class="question-index">{{ props.questionIndex }}.</text>
+            <text class="question-lable">{{
+                question.isMultiple === 1 ? "多选" : "单选"
+            }}</text>
+            <ContentRenderer class="question-stem" :content="question.stem" style="display: inline;" />
         </view>
         <view
             v-for="(option, index) in question.options"
@@ -97,6 +93,7 @@ import { useObjectiveAnswerStore } from "../../../stores/modules/ObjectiveAnswer
 import { useQuestionStore } from "../../../stores/modules/QuestionStore";
 import uniTransition from "@dcloudio/uni-ui/lib/uni-transition/uni-transition.vue";
 import AnalysisCom from "@/components/modules/exam/Analysiscom.vue";
+import ContentRenderer from "@/components/common/ContentRenderer.vue";
 
 const props = defineProps({
     question: {
@@ -240,28 +237,32 @@ const submitMultiAnswer = () => {
     padding: 16.5rpx 20rpx;
 }
 
+.question-header {
+    overflow: hidden;
+}
 .question-index {
-    font-size: 28rpx;
+    font-size: 32rpx;
     font-weight: bold;
     color: #333;
+    float: left;
+    margin-top: 12rpx;
 }
 .question-lable {
     margin-left: 12rpx;
     margin-right: 12rpx;
     background-color: #0d82ff;
     color: #fafafa;
-    padding: 4rpx 12rpx;
+    padding: 6rpx 14rpx;
     border-radius: 8rpx;
-    font-size: 20rpx;
-    display: inline-block;
-}
-.question-top-row {
-    float: inline-start;
+    font-size: 24rpx;
+    float: left;
+    margin-top: 14rpx;
 }
 .question-stem {
-    font-size: 34rpx; /**34rpx为最小题干字体，小于该字体，微信小程序题目题干第二行前面将出现空白 */
+    font-size: 34rpx;
     color: #000000;
     font-weight: 572;
+    display: inline;
 }
 .option-container {
     margin-top: 23rpx;

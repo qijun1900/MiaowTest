@@ -2,7 +2,7 @@
     <view class="question-content-display">
         <!-- 富文本内容 -->
         <view v-if="content.text" class="content-text">
-            <rich-text :nodes="content.text"></rich-text>
+            <ContentRenderer :content="content.text" />
         </view>
 
         <!-- 图片列表 -->
@@ -152,6 +152,7 @@
 <script setup>
 import { ref, reactive } from "vue";
 import ImageCropper from "../../common/ImageCropper.vue";
+import ContentRenderer from "../../common/ContentRenderer.vue";
 import { cloudFileToHttpUrl } from "../../../util/cloudFileUrl";
 
 const props = defineProps({

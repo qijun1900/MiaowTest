@@ -1,20 +1,14 @@
 <template>
   <MpHtml
-    v-if="isMarkdown"
-    class="note-md-render"
+    class="content-renderer"
     :content="content"
-    :markdown="true"
+    :markdown="isMarkdown"
     :tag-style="mergedTagStyle"
     :selectable="selectable"
     :preview-img="previewImg"
     :show-img-menu="showImgMenu"
     :scroll-table="scrollTable"
   />
-  <rich-text
-    v-else
-    class="note-rich-render"
-    :nodes="content"
-  ></rich-text>
 </template>
 
 <script setup>
@@ -73,14 +67,7 @@ const mergedTagStyle = computed(() => ({
 </script>
 
 <style scoped>
-.note-md-render {
-  font-size: 32rpx;
-  line-height: 1.8;
-  color: #4f576b;
-  display: block;
-}
-
-.note-rich-render {
+.content-renderer {
   font-size: 32rpx;
   line-height: 1.8;
   color: #4f576b;

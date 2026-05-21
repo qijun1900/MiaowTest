@@ -320,6 +320,7 @@ const fetchNotebooks = async () => {
         uni.showToast({
             title: "获取笔记本失败",
             icon: "none",
+            position: "bottom",
         });
         console.error("获取笔记本失败:", error);
     } finally {

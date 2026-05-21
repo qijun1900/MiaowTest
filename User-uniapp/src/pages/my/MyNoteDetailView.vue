@@ -27,7 +27,7 @@
                 <view class="question-content">
                     <view class="question-number">第{{ index + 1 }}题</view>
                     <view class="question-stem">
-                        <rich-text :nodes="question.stem"></rich-text>
+                        <ContentRenderer :content="question.stem" />
                     </view>
                     <!-- 选择题选项 -->
                     <view
@@ -58,10 +58,10 @@
                         </view>
                     </view>
                     <view class="note-body">
-                        <rich-text
-                            :nodes="question.note.content"
+                        <ContentRenderer
+                            :content="question.note.content"
                             class="note-text"
-                        ></rich-text>
+                        />
                     </view>
                 </view>
 
@@ -179,6 +179,7 @@ import { useQuestionStore } from "../../stores/modules/QuestionStore";
 import { useObjectiveAnswerStore } from "../../stores/modules/ObjectiveAnswerStore";
 import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerStore";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
+import ContentRenderer from "../../components/common/ContentRenderer.vue";
 
 const QuestionStore = useQuestionStore();
 const objectiveAnswerStore = useObjectiveAnswerStore();

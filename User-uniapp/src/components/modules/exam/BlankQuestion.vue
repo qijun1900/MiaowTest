@@ -1,13 +1,9 @@
 <template>
     <view class="question-container">
         <view class="question-header">
-            <view class="question-top-row">
-                <text class="question-index">{{ props.questionIndex }}.</text>
-                <text class="question-lable">填空题</text>
-            </view>
-            <view class="question-stem">
-                <rich-text :nodes="question.stem"></rich-text>
-            </view>
+            <text class="question-index">{{ props.questionIndex }}.</text>
+            <text class="question-lable">填空题</text>
+            <ContentRenderer class="question-stem" :content="question.stem" style="display: inline;" />
         </view>
         <!-- 根据options数组长度动态渲染多个输入框 -->
         <view
@@ -104,6 +100,7 @@
 import { ref, watch, computed, onMounted } from "vue";
 import { useSubjectiveAnswerStore } from "@/stores/modules/SubjectiveAnswerStore";
 import AnalysisCom from "@/components/modules/exam/Analysiscom.vue";
+import ContentRenderer from "@/components/common/ContentRenderer.vue";
 
 const subjectiveAnswerStore = useSubjectiveAnswerStore(); // 初始化 store
 const props = defineProps({
@@ -188,28 +185,32 @@ onMounted(() => {
     padding: 14rpx 20rpx;
 }
 
+.question-header {
+    overflow: hidden;
+}
 .question-index {
-    font-size: 28rpx;
+    font-size: 32rpx;
     font-weight: bold;
     color: #333;
+    float: left;
+    margin-top: 12rpx;
 }
 .question-lable {
     margin-left: 12rpx;
     margin-right: 12rpx;
     background-color: #0d82ff;
     color: #fafafa;
-    padding: 4rpx 12rpx;
+    padding: 6rpx 14rpx;
     border-radius: 8rpx;
-    font-size: 20rpx;
-    display: inline-block;
-}
-.question-top-row {
-    float: inline-start;
+    font-size: 24rpx;
+    float: left;
+    margin-top: 14rpx;
 }
 .question-stem {
     font-size: 34rpx;
     color: #000000;
     font-weight: 572;
+    display: inline;
 }
 .input-container {
     margin-top: 30rpx;

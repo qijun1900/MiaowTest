@@ -104,7 +104,7 @@
                 <view class="question-content">
                     <!-- 题干 -->
                     <view class="question-stem">
-                        <rich-text :nodes="question.stem"></rich-text>
+                        <ContentRenderer :content="question.stem" />
                     </view>
 
                     <!-- 选择题选项显示 -->
@@ -242,11 +242,9 @@
                             </view>
                             <!-- 简答题正确答案 -->
                             <view v-if="question.Type === 4">
-                                <view class="answer-item"
-                                    ><rich-text
-                                        :nodes="question.content"
-                                    ></rich-text
-                                ></view>
+                                <view class="answer-item">
+                                    <ContentRenderer :content="question.content" />
+                                </view>
                             </view>
                         </view>
                     </view>
@@ -329,6 +327,7 @@ import {
     deleteFavoriteQuestionAPI,
 } from "../../API/Exam/QuestionAPI";
 import formatInfo from "../../util/formatInfo";
+import ContentRenderer from "../../components/common/ContentRenderer.vue";
 
 // Store 实例
 const questionStore = useQuestionStore(); // 获取问题数据

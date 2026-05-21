@@ -1,19 +1,9 @@
 <template>
     <view class="question-container">
         <view class="question-header">
-            <view class="question-top-row">
-                <text class="question-index">{{ props.questionIndex }}.</text>
-                <text class="question-lable">简答题</text>
-            </view>
-            <view class="question-stem">
-                <!-- <text v-if="!enableWordQuery || !processedStem" @longpress="handleLongPress">{{ question.stem }}</text>
-                <view v-else class="word-container" @longpress="handleLongPress">
-                    <text v-for="(word, index) in processedStem" :key="index" class="word-item"
-                        @tap="handleWordClick(word)"
-                        :class="{ 'word-highlight': selectedWord === word }">{{ word }}</text>
-                </view> -->
-                <rich-text :nodes="question.stem"></rich-text>
-            </view>
+            <text class="question-index">{{ props.questionIndex }}.</text>
+            <text class="question-lable">简答题</text>
+            <ContentRenderer class="question-stem" :content="question.stem" style="display: inline;" />
         </view>
         <view class="input-container" v-show="props.currentMode === 0">
             <view class="input-label">
@@ -49,7 +39,7 @@
             <view class="question-answer-container" key="answer">
                 <view class="answer-label">答案：</view>
                 <view class="answer-content">
-                    <rich-text :nodes="question.content"></rich-text>
+                    <ContentRenderer :content="question.content" />
                 </view>
             </view>
         </uni-transition>
@@ -95,6 +85,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useSubjectiveAnswerStore } from "@/stores/modules/SubjectiveAnswerStore";
 import AnalysisCom from "@/components/modules/exam/Analysiscom.vue";
+import ContentRenderer from "@/components/common/ContentRenderer.vue";
 
 const subjectiveAnswerStore = useSubjectiveAnswerStore(); // 初始化 store
 const props = defineProps({
@@ -343,10 +334,16 @@ onMounted(() => {
     padding: 14rpx 20rpx;
 }
 
+.question-header {
+    overflow: hidden;
+}
+
 .question-index {
-    font-size: 28rpx;
+    font-size: 32rpx;
     font-weight: bold;
     color: #333;
+    float: left;
+    margin-top: 12rpx;
 }
 
 .question-lable {
@@ -354,20 +351,18 @@ onMounted(() => {
     margin-right: 12rpx;
     background-color: #0d82ff;
     color: #fafafa;
-    padding: 4rpx 12rpx;
+    padding: 6rpx 14rpx;
     border-radius: 8rpx;
-    font-size: 20rpx;
-    display: inline-block;
-}
-
-.question-top-row {
-    float: inline-start;
+    font-size: 24rpx;
+    float: left;
+    margin-top: 14rpx;
 }
 
 .question-stem {
     font-size: 34rpx;
     color: #000000;
     font-weight: 572;
+    display: inline;
 }
 
 .word-container {

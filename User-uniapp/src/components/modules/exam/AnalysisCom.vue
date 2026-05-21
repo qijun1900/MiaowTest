@@ -11,24 +11,22 @@
                 ></uni-icons>
             </view>
             <view class="question-explanation-content">
-                <up-markdown
+                <ContentRenderer
                     :content="analysis"
+                    :is-markdown="true"
                     v-if="analysis && analysis !== ''"
-                ></up-markdown>
+                />
                 <text v-else>暂无解析</text>
             </view>
-            <view class="AI-warning" v-if="isAIanswer">
-                <up-icon name="error" color="#f4ae2c" size="15px"></up-icon>
-                <text class="AI-warning-lable"
-                    >本解析由 AI 生成，内容仅供参考，请仔细甄别!</text
-                >
-            </view>
+            <AiDisclaimer v-if="isAIanswer" style="padding-top: 16rpx;" />
         </view>
     </uni-transition>
 </template>
 
 <script setup>
 import { computed } from "vue";
+import ContentRenderer from "@/components/common/ContentRenderer.vue";
+import AiDisclaimer from "@/components/modules/agent/AiDisclaimer.vue";
 const props = defineProps({
     analysis: {
         type: String,
@@ -67,14 +65,5 @@ const analysis = computed(() => {
     font-size: 26rpx;
     color: #303030;
     font-weight: 538;
-}
-.AI-warning {
-    display: flex;
-    align-items: center;
-}
-.AI-warning-lable {
-    font-size: 24rpx;
-    color: #898989;
-    font-weight: 580;
 }
 </style>
