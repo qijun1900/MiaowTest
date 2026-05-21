@@ -211,6 +211,7 @@
                 },
             ]"
             @menuItemClick="handleMenuClick"
+            @btnRemove="handleHelperRemove"
         />
         <!-- 笔记弹窗 -->
         <uviewPopup
@@ -349,6 +350,10 @@ const toolbarConfig = ref({
     iconSize: "18px",
     iconColumns: 10,
 });
+
+const handleHelperRemove = () => {
+    questionStore.setUserShowSettings({ showHelper: false });
+};
 
 const handleBtnClick = async () => {
     const loginResult = await checkLogin();
