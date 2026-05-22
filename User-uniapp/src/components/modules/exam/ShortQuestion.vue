@@ -343,7 +343,7 @@ onMounted(() => {
     font-weight: bold;
     color: #333;
     float: left;
-    margin-top: 12rpx;
+    margin-top: 16rpx;
 }
 
 .question-lable {
@@ -355,7 +355,7 @@ onMounted(() => {
     border-radius: 8rpx;
     font-size: 24rpx;
     float: left;
-    margin-top: 14rpx;
+    margin-top: 16rpx;
 }
 
 .question-stem {
@@ -398,7 +398,7 @@ onMounted(() => {
     color: #3797ff;
     font-weight: 572;
     margin-left: 13rpx;
-    margin-top: 10rpx;
+    margin-top: 16rpx;
 }
 
 .input-textarea {

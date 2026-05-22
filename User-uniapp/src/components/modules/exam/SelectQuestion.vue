@@ -245,7 +245,7 @@ const submitMultiAnswer = () => {
     font-weight: bold;
     color: #333;
     float: left;
-    margin-top: 12rpx;
+    margin-top: 16rpx;
 }
 .question-lable {
     margin-left: 12rpx;
@@ -256,7 +256,7 @@ const submitMultiAnswer = () => {
     border-radius: 8rpx;
     font-size: 24rpx;
     float: left;
-    margin-top: 14rpx;
+    margin-top: 16rpx;
 }
 .question-stem {
     font-size: 34rpx;
