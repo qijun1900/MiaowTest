@@ -73,6 +73,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    uploading: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits([
@@ -85,7 +89,8 @@ const emit = defineEmits([
 ]);
 
 const hasText = computed(() => (props.modelValue || "").trim().length > 0);
-const canSubmit = computed(() => hasText.value || (props.pendingImages && props.pendingImages.length > 0));
+const hasImages = computed(() => props.pendingImages && props.pendingImages.length > 0);
+const canSubmit = computed(() => !props.uploading && (hasText.value || hasImages.value));
 
 const handleFocus = (event) => {
     emit("focus", event);

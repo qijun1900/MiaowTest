@@ -18,17 +18,24 @@ const DEFAULT_SYSTEM_PROMPT = "你是一个有用的AI对话助手。";
 /** DashScope 内容安全拦截的友好提示 */
 const CONTENT_MODERATION_REPLY = "抱歉，您发送的内容触发了平台内容安全审核，请更换图片或修改文字后重试。";
 
+const IMAGE_DOWNLOAD_FAIL_REPLY = "抱歉，图片处理失败，请重新上传图片后再试。";
+
 /**
- * 检测是否为 DashScope 内容审核错误。
+ * 检测是否为 DashScope 内容审核或图片下载错误。
  */
 function isContentModerationError(error) {
   const msg = error?.message || error?.toString() || "";
   return msg.includes("DataInspectionFailed") || msg.includes("inappropriate content");
 }
 
+function isImageDownloadError(error) {
+  const msg = error?.message || error?.toString() || "";
+  return msg.includes("Failed to download multimodal content");
+}
+
 /**
  * 构建用户消息内容：纯文本或含图片的多模态内容数组。
- * 当 images 非空时，生成 LangChain 多模态格式供视觉模型使用。
+ * 直接使用图片 URL，由 DashScope 视觉模型自行下载。
  */
 function buildUserContent(text, images) {
   if (!images || images.length === 0) {
@@ -38,10 +45,15 @@ function buildUserContent(text, images) {
   if (text) {
     parts.push({ type: "text", text });
   }
-  images.forEach((url) => {
-    parts.push({ type: "image_url", image_url: { url } });
+  images.forEach((img) => {
+    const url = typeof img === "string" ? img : img?.url;
+    if (url) {
+      console.log("[buildUserContent] 图片URL:", url);
+      parts.push({ type: "image_url", image_url: { url } });
+    }
   });
-  return parts;
+  if (parts.length === 0) return text || "";
+  return parts.length === 1 && parts[0].type === "text" ? text : parts;
 }
 
 /**
@@ -55,7 +67,7 @@ function buildUserContent(text, images) {
  * 视觉模型可直接解析图片，非视觉模型会忽略 image_url 部分。
  *
  * @param {Array<{role: string, content: string, ext?: object}>} rawMessages
- * @returns {{ input: string|Array, history: Array<HumanMessage|AIMessage>, hasImages: boolean }}
+ * @returns {Promise<{ input: string|Array, history: Array<HumanMessage|AIMessage>, hasImages: boolean }>}
  */
 function parseMessages(rawMessages) {
   let input = "";
@@ -77,8 +89,9 @@ function parseMessages(rawMessages) {
     console.log("[parseMessages] 最后用户消息 ext:", JSON.stringify(lastMsg.ext || {}));
   }
 
-  rawMessages.forEach((msg, index) => {
-    if (msg.role === "system") return;
+  for (let index = 0; index < rawMessages.length; index++) {
+    const msg = rawMessages[index];
+    if (msg.role === "system") continue;
 
     if (index === lastUserIdx) {
       const images = msg.ext?.images;
@@ -89,7 +102,7 @@ function parseMessages(rawMessages) {
       } else {
         input = msg.content;
       }
-      return;
+      continue;
     }
 
     if (msg.role === "user") {
@@ -104,7 +117,7 @@ function parseMessages(rawMessages) {
     } else {
       history.push(new AIMessage(msg.content || "正在思考中..."));
     }
-  });
+  }
 
   // 兜底：若未提取到 input（消息结构异常），从 history 末尾取出最后一条
   if (!input && history.length > 0) {
@@ -173,6 +186,10 @@ async function runAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus")
       console.warn("[runAgentChain] 内容审核拦截:", error.message);
       return { reply: CONTENT_MODERATION_REPLY, modelName };
     }
+    if (isImageDownloadError(error)) {
+      console.warn("[runAgentChain] 图片下载失败:", error.message);
+      return { reply: IMAGE_DOWNLOAD_FAIL_REPLY, modelName };
+    }
     throw error;
   }
 }
@@ -233,6 +250,11 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
       console.warn("[streamAgentChain] 内容审核拦截:", error.message);
       options.onToken?.(CONTENT_MODERATION_REPLY);
       return { reply: CONTENT_MODERATION_REPLY, modelName };
+    }
+    if (isImageDownloadError(error)) {
+      console.warn("[streamAgentChain] 图片下载失败:", error.message);
+      options.onToken?.(IMAGE_DOWNLOAD_FAIL_REPLY);
+      return { reply: IMAGE_DOWNLOAD_FAIL_REPLY, modelName };
     }
     throw error;
   }

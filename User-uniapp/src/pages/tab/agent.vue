@@ -99,6 +99,7 @@
                 v-model="senderText"
                 v-model:thinking="thinkingMode"
                 :pending-images="pendingImages"
+                :uploading="isUploading"
                 :show-thinking-toggle="showThinkingToggle"
                 @add-attachment="handleAddAttachment"
                 @submit="handleSenderSubmit"
@@ -106,12 +107,13 @@
                 @blur="handleSenderBlur"
             >
                 <template #images>
-                    <ChatImageUploader
+                    <AgentUploader
                         v-if="pendingImages.length > 0"
                         mode="editable"
                         :images="pendingImages"
                         @add="handleUploaderAdd"
                         @remove="(idx) => removePendingImage(idx)"
+                        @retry="(idx) => retryImage(idx)"
                     />
                 </template>
             </AgentSender>
@@ -144,8 +146,8 @@ import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
-import ChatImageUploader from "../../components/common/ChatImageUploader.vue";
-import { useImageUpload } from "../../composables/useImageUpload.js";
+import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
+import { useAgentImages } from "../../composables/useAgentImages.js";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
 import {
@@ -178,12 +180,15 @@ let msgIdSeq = 0;
 const scrollToViewId = ref("");
 
 const {
-    imageList: pendingImages,
-    addImage: chooseImage,
+    images: pendingImages,
+    isUploading,
+    canSend,
+    addImages,
     removeImage: removePendingImage,
-    clearImages: clearPendingImages,
-    uploadAllImages,
-} = useImageUpload({ skipCrop: true, maxCount: 9, cloudPathPrefix: "user/agent_chat", uploadFormData: { biz: "chat" } });
+    retryImage,
+    clearAll: clearPendingImages,
+    getUploadedUrls,
+} = useAgentImages({ maxCount: 9, cloudPathPrefix: "user/agent_chat", uploadFormData: { biz: "chat" } });
 
 const currentIsFavorited = computed(() => {
     if (!currentConversationId.value) return false;
@@ -579,11 +584,11 @@ const handlePromptSelect = (prompt) => {
 };
 
 const handleAddAttachment = () => {
-    chooseImage();
+    addImages();
 };
 
 const handleUploaderAdd = (remaining) => {
-    chooseImage(remaining);
+    addImages(remaining);
 };
 
 /**
@@ -593,43 +598,24 @@ const handleUploaderAdd = (remaining) => {
  * 关键：所有对 AI 消息的读写必须通过 messageList.value[index] 访问响应式代理，
  * 不能用外部变量引用（push 前创建的对象是普通 JS 对象，不是 Vue 代理，修改不触发视图更新）。
  */
-const handleSenderSubmit = async ({ text, images: pendingImgs }) => {
+const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     const hasText = text && text.trim().length > 0;
-    const hasImages = pendingImgs && pendingImgs.length > 0;
+    // 重新生成时使用已有图片 URL，否则使用已上传的图片
+    const imageUrls = existingImages?.length ? existingImages : getUploadedUrls();
+    const hasImages = imageUrls.length > 0;
     if (!hasText && !hasImages) return;
+    if (isUploading.value) {
+        uni.showToast({ title: "图片正在上传中，请稍候", icon: "none" });
+        return;
+    }
 
     showWelcomePanel.value = false;
-
-    // 上传待发送图片
-    let uploadedImageUrls = [];
-    if (hasImages) {
-        uni.showLoading({ title: `上传图片中 0/${pendingImgs.length}`, mask: true });
-        try {
-            const results = await uploadAllImages();
-            uploadedImageUrls = results
-                .map((img) => (typeof img === "string" ? img : img?.url))
-                .filter(Boolean);
-            uni.hideLoading();
-            if (uploadedImageUrls.length === 0) {
-                uni.showToast({ title: "图片上传失败，请重试", icon: "none" });
-                return;
-            }
-            if (uploadedImageUrls.length < pendingImgs.length) {
-                uni.showToast({ title: `${pendingImgs.length - uploadedImageUrls.length}张图片上传失败`, icon: "none" });
-            }
-        } catch (err) {
-            uni.hideLoading();
-            console.error("图片上传失败:", err);
-            uni.showToast({ title: "图片上传失败，请重试", icon: "none" });
-            return;
-        }
-    }
 
     messageList.value.push({
         _msgId: `msg-${++msgIdSeq}`,
         role: 'user',
         content: text || '',
-        images: uploadedImageUrls,
+        images: imageUrls,
         typing: false,
     });
     senderText.value = "";
@@ -647,7 +633,7 @@ const handleSenderSubmit = async ({ text, images: pendingImgs }) => {
     });
     scrollToBottom();
 
-    const sendImages = uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined;
+    const sendImages = hasImages ? imageUrls : undefined;
 
     try {
         try {

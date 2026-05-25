@@ -1,26 +1,40 @@
 <template>
-    <view class="chat-image-uploader" :class="{ 'chat-image-uploader-readonly': mode === 'readonly' }">
+    <view class="agent-uploader" :class="{ 'agent-uploader-readonly': mode === 'readonly' }">
         <view
             v-for="(img, index) in images"
-            :key="getImageUrl(img) + index"
+            :key="img.id || index"
             class="image-item"
         >
             <image
-                :src="getImageUrl(img)"
+                :src="getItemSrc(img)"
                 mode="aspectFill"
                 class="preview-image"
                 @click="handlePreview(index)"
                 @error="handleError(index)"
             />
+
+            <!-- 上传中遮罩 -->
+            <view v-if="img.status === 'uploading'" class="status-overlay">
+                <view class="uploading-spinner" />
+            </view>
+
+            <!-- 上传失败遮罩 -->
+            <view v-if="img.status === 'failed'" class="status-overlay status-failed" @click.stop="$emit('retry', index)">
+                <uni-icons type="refresh" size="22" color="#ffffff" />
+                <text class="failed-text">重试</text>
+            </view>
+
+            <!-- 删除按钮 -->
             <view
                 v-if="mode === 'editable'"
                 class="delete-btn"
-                @click.stop="handleRemove(index)"
+                @click.stop="$emit('remove', index)"
             >
                 <uni-icons type="close" size="12" color="#ffffff" />
             </view>
         </view>
 
+        <!-- 添加按钮 -->
         <view
             v-if="mode === 'editable' && images.length < maxCount"
             class="add-btn"
@@ -35,7 +49,7 @@
 </template>
 
 <script setup>
-import { cloudFileToHttpUrl } from "../../util/cloudFileUrl";
+import { cloudFileToHttpUrl } from "../../../util/cloudFileUrl";
 
 const props = defineProps({
     mode: {
@@ -53,12 +67,17 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["add", "remove", "preview"]);
+const emit = defineEmits(["add", "remove", "retry", "preview"]);
 
-const getImageUrl = (img) => {
+const getItemSrc = (img) => {
     if (!img) return "";
-    const url = typeof img === "object" && img.url ? img.url : img;
-    return cloudFileToHttpUrl(url);
+    if (img.status === "uploaded" && img.url) {
+        return cloudFileToHttpUrl(img.url);
+    }
+    if (img.localPath) {
+        return img.localPath;
+    }
+    return cloudFileToHttpUrl(typeof img === "string" ? img : img?.url || "");
 };
 
 const handleAdd = () => {
@@ -70,21 +89,13 @@ const handleAdd = () => {
     emit("add", remaining);
 };
 
-const handleRemove = (index) => {
-    uni.showModal({
-        title: "提示",
-        content: "确定删除这张图片吗？",
-        success: (res) => {
-            if (res.confirm) {
-                emit("remove", index);
-            }
-        },
-    });
-};
-
 const handlePreview = (index) => {
     const urls = props.images
-        .map((img) => getImageUrl(img))
+        .map((img) => {
+            if (img.status === "uploaded" && img.url) return cloudFileToHttpUrl(img.url);
+            if (img.localPath) return img.localPath;
+            return cloudFileToHttpUrl(typeof img === "string" ? img : img?.url || "");
+        })
         .filter(Boolean);
     if (!urls.length) return;
     uni.previewImage({ urls, current: urls[index] || urls[0] });
@@ -92,12 +103,12 @@ const handlePreview = (index) => {
 };
 
 const handleError = (index) => {
-    console.warn(`[ChatImageUploader] 图片加载失败, index: ${index}`);
+    console.warn(`[AgentUploader] 图片加载失败, index: ${index}`);
 };
 </script>
 
 <style scoped>
-.chat-image-uploader {
+.agent-uploader {
     display: flex;
     flex-wrap: wrap;
     gap: 16rpx;
@@ -116,6 +127,39 @@ const handleError = (index) => {
 .preview-image {
     width: 100%;
     height: 100%;
+}
+
+.status-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.uploading-spinner {
+    width: 36rpx;
+    height: 36rpx;
+    border: 4rpx solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.status-failed {
+    background: rgba(220, 53, 69, 0.6);
+}
+
+.failed-text {
+    font-size: 20rpx;
+    color: #ffffff;
+    margin-top: 4rpx;
 }
 
 .delete-btn {
@@ -168,7 +212,7 @@ const handleError = (index) => {
     height: 28rpx;
 }
 
-.chat-image-uploader-readonly .image-item {
+.agent-uploader-readonly .image-item {
     width: 180rpx;
     height: 180rpx;
 }

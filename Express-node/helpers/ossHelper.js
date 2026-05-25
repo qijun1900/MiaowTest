@@ -79,9 +79,13 @@ async function uploadBuffer(buffer, ossFilePath) {
   try {
     // 添加存储前缀
     const fullOssPath = ossConfig.prefix + ossFilePath;
+    console.log("[uploadBuffer] ossConfig.prefix:", JSON.stringify(ossConfig.prefix));
+    console.log("[uploadBuffer] ossFilePath:", ossFilePath);
+    console.log("[uploadBuffer] fullOssPath:", fullOssPath);
 
     // 上传 Buffer
     const result = await client.put(fullOssPath, buffer);
+    console.log("[uploadBuffer] 上传成功, result.url:", result.url);
 
     // 生成文件访问 URL
     let fileUrl;
@@ -93,6 +97,7 @@ async function uploadBuffer(buffer, ossFilePath) {
       fileUrl = `https://${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com/${fullOssPath}`;
     }
 
+    console.log("[uploadBuffer] 返回URL:", fileUrl);
     return fileUrl;
   } catch (error) {
     console.error("OSS 上传 Buffer 失败:", error);
@@ -260,6 +265,39 @@ async function getFileStream(ossFilePath) {
   return client.getStream(ossFilePath);
 }
 
+/**
+ * 从完整 URL 提取 OSS 对象路径。
+ */
+function extractOssPath(fileUrl) {
+  let ossPath = fileUrl;
+  if (ossConfig.cdnDomain) {
+    const cdnHost = `https://${ossConfig.cdnDomain}/`;
+    if (ossPath.startsWith(cdnHost)) {
+      ossPath = ossPath.replace(cdnHost, "");
+    }
+  }
+  const ossHost = `https://${ossConfig.bucket}.${ossConfig.region}.aliyuncs.com/`;
+  if (ossPath.startsWith(ossHost)) {
+    ossPath = ossPath.replace(ossHost, "");
+  }
+  return ossPath;
+}
+
+/**
+ * 生成 OSS 文件的签名 URL（临时访问，适用于第三方服务下载私有文件）。
+ * @param {string} fileUrl - OSS 文件完整 URL
+ * @param {number} expires - 过期时间（秒），默认 600（10 分钟）
+ * @returns {string} - 签名 URL
+ */
+function getSignedUrl(fileUrl, expires = 600) {
+  const ossPath = extractOssPath(fileUrl);
+  console.log("[getSignedUrl] 原始URL:", fileUrl);
+  console.log("[getSignedUrl] 提取路径:", ossPath);
+  const signed = client.signatureUrl(ossPath, { expires });
+  console.log("[getSignedUrl] 签名URL:", signed.substring(0, 120) + "...");
+  return signed;
+}
+
 module.exports = {
   uploadFile,
   uploadStream,
@@ -269,5 +307,6 @@ module.exports = {
   getFileUrl,
   getFile,
   getFileStream,
+  getSignedUrl,
   migrateDirToOSS,
 };

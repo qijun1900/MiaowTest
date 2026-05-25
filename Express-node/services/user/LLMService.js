@@ -67,8 +67,12 @@ async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig
   };
   if (images && images.length > 0) {
     userMsgDoc.contentType = "image";
-    userMsgDoc.ext = { images };
-    console.log("[saveUserMessage] 存储图片消息, 图片数:", images.length);
+    // 统一存储为纯 URL 字符串，兼容前端传入对象或字符串
+    const imageUrls = images.map((img) => (typeof img === "string" ? img : img?.url)).filter(Boolean);
+    if (imageUrls.length > 0) {
+      userMsgDoc.ext = { images: imageUrls };
+      console.log("[saveUserMessage] 存储图片消息, 图片数:", imageUrls.length);
+    }
   }
 
   // 先落库用户消息，确保后续查询能读到
