@@ -40,6 +40,9 @@ const IMAGE_BIZ_CONFIG = {
   notebook: {
     folderPrefix: "user/notebook",
   },
+  chat: {
+    folderPrefix: "user/agent_chat",
+  },
 };
 
 const resolveBiz = (req) => {

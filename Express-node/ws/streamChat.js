@@ -73,8 +73,8 @@ function setupStreamChatWS(server) {
 
       if (msg.type !== "chat") return;
 
-      const { message, agentKey, conversationId } = msg;
-      if (!message || !agentKey) {
+      const { message, agentKey, conversationId, images } = msg;
+      if ((!message && (!images || !images.length)) || !agentKey) {
         ws.send(JSON.stringify({ event: "error", data: { message: "缺少必要参数" } }));
         return;
       }
@@ -93,6 +93,7 @@ function setupStreamChatWS(server) {
           message,
           agentKey,
           conversationId,
+          images,
           onStart: (payload) => sendEvent("start", payload),
           onToken: (content) => sendEvent("message", { content }),
         });

@@ -153,20 +153,28 @@ export function useImageUpload(options = {}) {
   // 裁剪器状态
   const cropperVisible = ref(false);
   const pendingCropImage = ref("");
+  const skipCropOnAdd = options.skipCrop || false;
+  const maxSelectCount = options.maxCount || 1;
 
   /**
-   * 选择图片 → 打开裁剪器
+   * 选择图片 → 打开裁剪器（skipCrop 模式下直接检查大小入队）
+   * @param {number} [remaining] - 剩余可选数量（由外部 ChatImageUploader 传入）
    */
-  const addImage = () => {
+  const addImage = (remaining) => {
+    const count = remaining != null ? Math.min(remaining, maxSelectCount) : maxSelectCount;
     uni.chooseImage({
-      count: 1,
+      count,
       sizeType: ["compressed"],
       sourceType: ["album", "camera"],
       success: (res) => {
-        const tempFilePath = res.tempFilePaths[0];
-        // 先展示裁剪器，让用户选择截取区域或使用原图
-        pendingCropImage.value = tempFilePath;
-        cropperVisible.value = true;
+        res.tempFilePaths.forEach((tempFilePath) => {
+          if (skipCropOnAdd) {
+            checkFileSize(tempFilePath);
+          } else {
+            pendingCropImage.value = tempFilePath;
+            cropperVisible.value = true;
+          }
+        });
       },
       fail: (err) => {
         console.error("选择图片失败:", err);

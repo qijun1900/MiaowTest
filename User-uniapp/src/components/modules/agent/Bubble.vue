@@ -38,6 +38,17 @@
         <view class="bubble-stack" :style="{ maxWidth }">
             <slot name="header"></slot>
 
+            <view v-if="images && images.length > 0" class="bubble-images">
+                <image
+                    v-for="(img, idx) in images"
+                    :key="idx"
+                    :src="getBubbleImageUrl(img)"
+                    mode="aspectFill"
+                    class="bubble-image-item"
+                    @click="previewBubbleImage(idx)"
+                />
+            </view>
+
             <view
                 class="bubble-box"
                 :class="[
@@ -201,6 +212,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    images: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits([
@@ -221,10 +236,24 @@ const emit = defineEmits([
 ]);
 
 const slots = useSlots();
-// destroy() 不直接卸载父组件，只让内部根节点 v-if=false，符合 ref 方法“主动销毁”的语义。
+
+const getBubbleImageUrl = (img) => {
+    if (!img) return '';
+    return typeof img === 'object' && img.url ? img.url : img;
+};
+
+const previewBubbleImage = (index) => {
+    const urls = (props.images || [])
+        .map((img) => getBubbleImageUrl(img))
+        .filter(Boolean);
+    if (!urls.length) return;
+    uni.previewImage({ urls, current: urls[index] || urls[0] });
+};
+
+// destroy() 不直接卸载父组件，只让内部根节点 v-if=false，符合 ref 方法”主动销毁”的语义。
 const alive = ref(true);
 // 组件实际正在渲染的内容。普通模式等于 content，打字模式下是 content 的前 N 个字符。
-const renderedContent = ref("");
+const renderedContent = ref('');
 const isTyping = ref(false);
 // 打字进度百分比，范围 0-100，便于父组件做进度 UI 或调试展示。
 const progress = ref(0);
@@ -586,6 +615,20 @@ function escapeHtml(value) {
 .bubble-shadow {
     border: 1rpx solid rgba(15, 23, 42, 0.04);
     box-shadow: 0 10rpx 26rpx rgba(15, 23, 42, 0.1);
+}
+
+.bubble-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12rpx;
+    margin-bottom: 12rpx;
+}
+
+.bubble-image-item {
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: 12rpx;
+    background: #f0f2f5;
 }
 
 .bubble-no-style {

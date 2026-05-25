@@ -56,6 +56,7 @@
                         v-for="(msg, index) in messageList"
                         :key="msg._msgId"
                         :content="msg.content"
+                        :images="msg.images || []"
                         :show-avatar="false"
                         :shape="msg.role === 'user' ? 'corner' : undefined"
                         :variant="msg.role === 'user' ? 'solid' : undefined"
@@ -97,12 +98,23 @@
             <AgentSender
                 v-model="senderText"
                 v-model:thinking="thinkingMode"
+                :pending-images="pendingImages"
                 :show-thinking-toggle="showThinkingToggle"
                 @add-attachment="handleAddAttachment"
                 @submit="handleSenderSubmit"
                 @focus="handleSenderFocus"
                 @blur="handleSenderBlur"
-            />
+            >
+                <template #images>
+                    <ChatImageUploader
+                        v-if="pendingImages.length > 0"
+                        mode="editable"
+                        :images="pendingImages"
+                        @add="handleUploaderAdd"
+                        @remove="(idx) => removePendingImage(idx)"
+                    />
+                </template>
+            </AgentSender>
         </view>
 
         <!-- 侧边栏支持手势关闭  -->
@@ -132,6 +144,8 @@ import AgentActionBar from "../../components/modules/agent/AgentActionBar.vue";
 import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
+import ChatImageUploader from "../../components/common/ChatImageUploader.vue";
+import { useImageUpload } from "../../composables/useImageUpload.js";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
 import {
@@ -162,6 +176,14 @@ const loadingConversationId = ref(null);
 let chatRequestSeq = 0;
 let msgIdSeq = 0;
 const scrollToViewId = ref("");
+
+const {
+    imageList: pendingImages,
+    addImage: chooseImage,
+    removeImage: removePendingImage,
+    clearImages: clearPendingImages,
+    uploadAllImages,
+} = useImageUpload({ skipCrop: true, maxCount: 9, cloudPathPrefix: "user/agent_chat", uploadFormData: { biz: "chat" } });
 
 const currentIsFavorited = computed(() => {
     if (!currentConversationId.value) return false;
@@ -448,6 +470,7 @@ const handleNewChat = () => {
     currentConversationId.value = null;
     currentConversationTitle.value = "";
     messageList.value = [];
+    clearPendingImages();
     showWelcomePanel.value = true;
     uni.showToast({ 
         title: "已回到新会话", 
@@ -480,6 +503,7 @@ const handleSelectChat = async (chatId) => {
                 _msgId: `msg-${++msgIdSeq}`,
                 role: msg.role,
                 content: msg.content,
+                images: msg.ext?.images || [],
                 typing: false,
                 pending: false,
                 isStreaming: false
@@ -546,7 +570,7 @@ const handleActionRegenerate = () => {
 
     // Remove the last AI message and re-submit
     messageList.value.splice(lastAIIndex.value, 1);
-    handleSenderSubmit({ text: userMsg.content });
+    handleSenderSubmit({ text: userMsg.content, images: userMsg.images || [] });
 };
 
 const handlePromptSelect = (prompt) => {
@@ -555,7 +579,11 @@ const handlePromptSelect = (prompt) => {
 };
 
 const handleAddAttachment = () => {
-    uni.showToast({ title: "添加附件", icon: "none" });
+    chooseImage();
+};
+
+const handleUploaderAdd = (remaining) => {
+    chooseImage(remaining);
 };
 
 /**
@@ -565,37 +593,70 @@ const handleAddAttachment = () => {
  * 关键：所有对 AI 消息的读写必须通过 messageList.value[index] 访问响应式代理，
  * 不能用外部变量引用（push 前创建的对象是普通 JS 对象，不是 Vue 代理，修改不触发视图更新）。
  */
-const handleSenderSubmit = async ({ text }) => {
-    if (!text) return;
+const handleSenderSubmit = async ({ text, images: pendingImgs }) => {
+    const hasText = text && text.trim().length > 0;
+    const hasImages = pendingImgs && pendingImgs.length > 0;
+    if (!hasText && !hasImages) return;
 
     showWelcomePanel.value = false;
+
+    // 上传待发送图片
+    let uploadedImageUrls = [];
+    if (hasImages) {
+        uni.showLoading({ title: `上传图片中 0/${pendingImgs.length}`, mask: true });
+        try {
+            const results = await uploadAllImages();
+            uploadedImageUrls = results
+                .map((img) => (typeof img === "string" ? img : img?.url))
+                .filter(Boolean);
+            uni.hideLoading();
+            if (uploadedImageUrls.length === 0) {
+                uni.showToast({ title: "图片上传失败，请重试", icon: "none" });
+                return;
+            }
+            if (uploadedImageUrls.length < pendingImgs.length) {
+                uni.showToast({ title: `${pendingImgs.length - uploadedImageUrls.length}张图片上传失败`, icon: "none" });
+            }
+        } catch (err) {
+            uni.hideLoading();
+            console.error("图片上传失败:", err);
+            uni.showToast({ title: "图片上传失败，请重试", icon: "none" });
+            return;
+        }
+    }
+
     messageList.value.push({
-        _msgId: `msg-${++msgIdSeq}`, 
-        role: 'user', 
-        content: text, 
-        typing: false 
+        _msgId: `msg-${++msgIdSeq}`,
+        role: 'user',
+        content: text || '',
+        images: uploadedImageUrls,
+        typing: false,
     });
     senderText.value = "";
+    clearPendingImages();
 
     // 通过 messageList.value 访问，确保拿到的是 Vue 响应式代理
     const aiIndex = messageList.value.length;
-    messageList.value.push({ 
-        _msgId: `msg-${++msgIdSeq}`, 
-        role: 'assistant', 
-        content: '', 
-        typing: false, 
-        pending: true, 
-        isStreaming: true 
+    messageList.value.push({
+        _msgId: `msg-${++msgIdSeq}`,
+        role: 'assistant',
+        content: '',
+        typing: false,
+        pending: true,
+        isStreaming: true,
     });
     scrollToBottom();
+
+    const sendImages = uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined;
 
     try {
         try {
             // ── 流式对话 ──
             await chatWithAgentStream({
-                message: text,
+                message: text || '',
                 agentKey: currentModelKey.value,
                 conversationId: currentConversationId.value,
+                images: sendImages,
                 onStart: ({ conversationId }) => {
                     if (conversationId) currentConversationId.value = conversationId;
                 },
@@ -617,9 +678,10 @@ const handleSenderSubmit = async ({ text }) => {
             // 流式失败：已有部分内容则保留，无内容则回退到普通接口
             if (!messageList.value[aiIndex].content) {
                 const response = await chatWithAgent({
-                    message: text,
+                    message: text || '',
                     agentKey: currentModelKey.value,
                     conversationId: currentConversationId.value,
+                    images: sendImages,
                 });
                 const resData = response.data || response;
                 if (resData.conversationId) currentConversationId.value = resData.conversationId;

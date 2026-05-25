@@ -19,13 +19,14 @@ async function getAgentConfig(agentKey) {
  * 确保会话存在：新建或更新已有会话，返回 { convId, sequence }。
  * 新建时 sequence 从 0 开始；已有时从最后一条消息的 sequence + 1 继续。
  */
-async function ensureConversation(convId, uid, agentKey, agentConfig, userMessage) {
+async function ensureConversation(convId, uid, agentKey, agentConfig, userMessage, images) {
+  const displayText = userMessage || (images?.length ? "[图片消息]" : "");
   if (!convId) {
     const newConv = await AgentConversationModel.create({
       Uid: uid,
       agentKey,
-      title: userMessage.substring(0, 20),
-      lastMessagePreview: userMessage.substring(0, 50),
+      title: displayText.substring(0, 20) || "[图片消息]",
+      lastMessagePreview: displayText.substring(0, 50) || "[图片消息]",
       messageCount: 0,
       scene: agentConfig.agentKey || "default",
       currentModel: agentConfig.defaultModel || "",
@@ -38,7 +39,7 @@ async function ensureConversation(convId, uid, agentKey, agentConfig, userMessag
       { _id: convId },
       {
         $set: {
-          lastMessagePreview: userMessage.substring(0, 50),
+          lastMessagePreview: displayText.substring(0, 50) || "[图片消息]",
           lastMessageAt: new Date(),
           currentModel: agentConfig.defaultModel || "",
         },
@@ -54,16 +55,21 @@ async function ensureConversation(convId, uid, agentKey, agentConfig, userMessag
  * 并行落库用户消息 + 拉取最近历史（限制条数）。
  * 返回正序排列的历史消息数组（包含刚保存的用户消息）。
  */
-async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence) {
+async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images) {
   const userMsgDoc = {
     conversationId: convId,
     Uid: uid,
     agentKey,
     sequence,
     role: "user",
-    content: userMessage,
+    content: userMessage || "",
     modelName: agentConfig.defaultModel || "default",
   };
+  if (images && images.length > 0) {
+    userMsgDoc.contentType = "image";
+    userMsgDoc.ext = { images };
+    console.log("[saveUserMessage] 存储图片消息, 图片数:", images.length);
+  }
 
   // 先落库用户消息，确保后续查询能读到
   const savedMsg = await AgentMessageModel.create(userMsgDoc);
@@ -77,7 +83,9 @@ async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig
   const messages = historyDocs.reverse().map((doc) => ({
     role: doc.role,
     content: doc.content,
+    ext: doc.ext || {},
   }));
+  console.log("[saveUserMessage] 历史消息数:", messages.length, "含图片消息数:", messages.filter(m => m.ext?.images?.length).length);
 
   return { messages, savedSequence: savedMsg.sequence };
 }
@@ -125,16 +133,16 @@ const LLMService = {
   /**
    * 非流式对话：用户发消息 → LLM 一次性返回完整回复 → 落库。
    */
-  ChatWithAgentAndSave: async ({ uid, message: userMessage, agentKey, conversationId }) => {
+  ChatWithAgentAndSave: async ({ uid, message: userMessage, agentKey, conversationId, images }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
-    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage);
-    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence);
+    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images);
+    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images);
 
     const aiResponse = await runAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel);
     const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
 
-    maybeGenerateTitle(isNew, userMessage, replyText, convId, agentConfig.defaultModel);
+    maybeGenerateTitle(isNew, userMessage || "[图片消息]", replyText, convId, agentConfig.defaultModel);
 
     await AgentConversationModel.updateOne({ _id: convId }, { $inc: { messageCount: 2 } });
 
@@ -145,16 +153,17 @@ const LLMService = {
    * 流式对话：用户发消息 → LLM 逐 token 回调 → 落库。
    * onStart/onToken 由控制器注入，用于实时推送 SSE/WebSocket 事件。
    */
-  ChatWithAgentAndSaveStream: async ({ 
-    uid, 
-    message: userMessage, 
-    agentKey, conversationId, 
-    onStart, 
-    onToken 
+  ChatWithAgentAndSaveStream: async ({
+    uid,
+    message: userMessage,
+    agentKey, conversationId,
+    images,
+    onStart,
+    onToken
   }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
-    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage);
+    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images);
 
     // 通知前端：会话已创建/确认，可以开始接收流式数据
     onStart?.({
@@ -162,12 +171,12 @@ const LLMService = {
       modelName: agentConfig.defaultModel || "default",
     });
 
-    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence);
+    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images);
 
     const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, { onToken });
     const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
 
-    maybeGenerateTitle(isNew, userMessage, replyText, convId, agentConfig.defaultModel);
+    maybeGenerateTitle(isNew, userMessage || "[图片消息]", replyText, convId, agentConfig.defaultModel);
 
     await AgentConversationModel.updateOne(
       { _id: convId },
@@ -240,7 +249,7 @@ const LLMService = {
         .sort({ sequence: 1 })
         .skip(skip)
         .limit(limit)
-        .select("role content contentType createTime"),
+        .select("role content contentType ext createTime"),
       AgentMessageModel.countDocuments({ conversationId, status: 1 }),
     ]);
     return { messages, total, page, limit };

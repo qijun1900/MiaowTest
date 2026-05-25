@@ -1,5 +1,6 @@
 <template>
     <view class="sender-shell">
+        <slot name="images"></slot>
         <input
             class="sender-input"
             :value="modelValue"
@@ -16,8 +17,7 @@
             <view class="sender-tools-left">
                 <view
                     class="attach-btn"
-                    :class="{ 'attach-hidden': hasText }"
-                    @click="!hasText && handleAddAttachment()"
+                    @click="handleAddAttachment()"
                 >
                     <view class="attach-plus"></view>
                 </view>
@@ -35,8 +35,8 @@
 
             <view
                 class="send-btn"
-                :class="{ 'send-hidden': !hasText }"
-                @click="hasText && submitCurrent()"
+                :class="{ 'send-hidden': !canSubmit }"
+                @click="canSubmit && submitCurrent()"
             >
                 <uni-icons type="paperplane-filled" size="20" color="#ffffff">
                 </uni-icons>
@@ -69,6 +69,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    pendingImages: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits([
@@ -81,6 +85,7 @@ const emit = defineEmits([
 ]);
 
 const hasText = computed(() => (props.modelValue || "").trim().length > 0);
+const canSubmit = computed(() => hasText.value || (props.pendingImages && props.pendingImages.length > 0));
 
 const handleFocus = (event) => {
     emit("focus", event);
@@ -98,6 +103,7 @@ const submitCurrent = () => {
     emit("submit", {
         text: (props.modelValue || "").trim(),
         thinking: props.thinking,
+        images: props.pendingImages || [],
     });
 };
 
