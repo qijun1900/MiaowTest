@@ -60,6 +60,13 @@ const AgentDefinitionSchema = new mongoose.Schema({
     default: 1,
     enum: [0, 1],
   },
+  isMultimodal: {
+    // 是否为多模态模型：0 表示仅支持文本，1 表示支持图片等多模态输入。
+    // 前端依据此字段决定是否展示图片上传入口。
+    type: Number,
+    default: 0,
+    enum: [0, 1],
+  },
   sort: {
     // 列表排序值，数字越小越靠前，便于后台人工调整展示顺序。
     type: Number,

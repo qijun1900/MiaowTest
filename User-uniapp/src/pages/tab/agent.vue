@@ -101,6 +101,7 @@
                 :pending-images="pendingImages"
                 :uploading="isUploading"
                 :show-thinking-toggle="showThinkingToggle"
+                :show-attachment="isCurrentMultimodal"
                 @add-attachment="handleAddAttachment"
                 @submit="handleSenderSubmit"
                 @focus="handleSenderFocus"
@@ -198,6 +199,11 @@ const currentIsFavorited = computed(() => {
 
 const hasModels = computed(() => modelList.value.length > 0);
 
+const isCurrentMultimodal = computed(() => {
+    const cur = modelList.value.find((m) => m.value === currentModelKey.value);
+    return !!cur?.isMultimodal;
+});
+
 const {
     isRefreshing,
     pullTouchStart: rawPullTouchStart,
@@ -225,7 +231,8 @@ const loadAgentList = async () => {
             modelList.value = list.map((item) =>{
                 return {
                     label: item.agentName,
-                    value: item.agentKey
+                    value: item.agentKey,
+                    isMultimodal: item.isMultimodal === 1
                 };
             });
             currentModelName.value = list[0]?.agentName || "";

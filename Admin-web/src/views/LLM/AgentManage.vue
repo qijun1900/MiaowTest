@@ -198,6 +198,15 @@
             <el-form-item label="底座模型" prop="defaultModel">
               <el-input v-model="Form.defaultModel" placeholder="（可留空），例如 qwen-plus" />
             </el-form-item>
+            <el-form-item label="多模态模型" prop="isMultimodal">
+              <el-switch
+                v-model="Form.isMultimodal"
+                :active-value="1"
+                :inactive-value="0"
+                active-text="支持图片输入"
+                inactive-text="仅文本"
+              />
+            </el-form-item>
             <el-form-item label="一句话描述" prop="description">
               <el-input
                 placeholder="简明扼要的说明"
@@ -285,6 +294,7 @@ const Form = reactive({
   systemPrompt: "",
   capabilities: [],
   isPublish: 0,
+  isMultimodal: 0,
   sort: 0,
   creator: appStore.userInfo.username,
 });
@@ -309,6 +319,7 @@ const resetForm = () => {
   Form.systemPrompt = "";
   Form.capabilities = [];
   Form.isPublish = 0;
+  Form.isMultimodal = 0;
   Form.sort = 0;
   isEditMode.value = false;
   currentEditId.value = null;
@@ -361,6 +372,7 @@ const handleEdit = (row) => {
   Form.defaultModel = row.defaultModel;
   Form.systemPrompt = row.systemPrompt;
   Form.capabilities = row.capabilities || [];
+  Form.isMultimodal = row.isMultimodal || 0;
   Form.sort = row.sort || 0;
 };
 

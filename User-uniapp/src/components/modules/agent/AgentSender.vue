@@ -16,6 +16,7 @@
         <view class="sender-tools">
             <view class="sender-tools-left">
                 <view
+                    v-if="showAttachment"
                     class="attach-btn"
                     @click="handleAddAttachment()"
                 >
@@ -74,6 +75,10 @@ const props = defineProps({
         default: () => [],
     },
     uploading: {
+        type: Boolean,
+        default: false,
+    },
+    showAttachment: {
         type: Boolean,
         default: false,
     },

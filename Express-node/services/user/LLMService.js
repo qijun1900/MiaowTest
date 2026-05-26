@@ -197,8 +197,10 @@ const LLMService = {
 
   /** 获取已发布的 Agent 列表 */
   getChatAgents: async () => {
-    return AgentDefinitionModel.find({ isPublish: 1 }, { agentName: 1, agentKey: 1 })
-      .sort({ sort: 1, createTime: -1 });
+    return AgentDefinitionModel.find(
+      { isPublish: 1 },
+      { agentName: 1, agentKey: 1, isMultimodal: 1 }
+    ).sort({ sort: 1, createTime: -1 });
   },
 
   /** 重命名会话标题（校验归属权） */
