@@ -81,7 +81,16 @@ function setupStreamChatWS(server) {
 
       // 向客户端发送事件，自动检查连接状态
       const sendEvent = (event, data) => {
-        console.log(`[WS] >>> ${event}`, event === "message" ? `(token)` : JSON.stringify(data).substring(0, 80));
+        if (event === "message") {
+          const content = data?.content || "";
+          if (!content) {
+            console.warn("[WS] empty token chunk");
+          } else {
+            console.log(`[WS] >>> message (${content.length} chars)`);
+          }
+        } else {
+          console.log(`[WS] >>> ${event}`, JSON.stringify(data).substring(0, 80));
+        }
         if (ws.readyState === ws.OPEN) {
           ws.send(JSON.stringify({ event, data }));
         }

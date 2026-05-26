@@ -34,6 +34,64 @@ function isImageDownloadError(error) {
 }
 
 /**
+ * 字符级 token 估算（DashScope 未返回 usage 时兜底）。
+ * 中文/CJK 字符按 1 token，ASCII 按 4 字符 1 token，足以满足成本统计粗略需求。
+ */
+function estimateTokens(text) {
+  if (!text) return 0;
+  const str = typeof text === "string" ? text : JSON.stringify(text);
+  const cjkCount = (str.match(/[一-鿿㐀-䶿]/g) || []).length;
+  const otherLen = str.length - cjkCount;
+  return Math.max(1, Math.ceil(cjkCount + otherLen / 4));
+}
+
+/**
+ * 把 history + input + system 估算成 prompt tokens。
+ * 用于 LLM 未在响应中返回 usage_metadata 时的兜底统计。
+ */
+function estimatePromptTokens(systemPrompt, history, input) {
+  let total = estimateTokens(systemPrompt || "");
+  for (const msg of history || []) {
+    total += estimateTokens(msg?.content);
+  }
+  if (Array.isArray(input)) {
+    for (const part of input) {
+      if (part?.type === "text") total += estimateTokens(part.text);
+      if (part?.type === "image_url") total += 256; // 图片走视觉模型，按常见经验值粗估
+    }
+  } else {
+    total += estimateTokens(input);
+  }
+  return total;
+}
+
+/**
+ * 从 LangChain 返回值中提取 usage。
+ * 兼容 OpenAI/DashScope 两套字段：usage_metadata（v0.2+ 标准）与 response_metadata.tokenUsage（旧版）。
+ */
+function extractUsage(result) {
+  const meta = result?.usage_metadata;
+  if (meta && (meta.input_tokens || meta.output_tokens || meta.total_tokens)) {
+    return {
+      promptTokens: Number(meta.input_tokens || 0),
+      completionTokens: Number(meta.output_tokens || 0),
+      totalTokens: Number(meta.total_tokens || (meta.input_tokens || 0) + (meta.output_tokens || 0)),
+    };
+  }
+  const legacy = result?.response_metadata?.tokenUsage || result?.response_metadata?.usage;
+  if (legacy) {
+    const p = Number(legacy.promptTokens || legacy.prompt_tokens || 0);
+    const c = Number(legacy.completionTokens || legacy.completion_tokens || 0);
+    return {
+      promptTokens: p,
+      completionTokens: c,
+      totalTokens: Number(legacy.totalTokens || legacy.total_tokens || p + c),
+    };
+  }
+  return null;
+}
+
+/**
  * 构建用户消息内容：纯文本或含图片的多模态内容数组。
  * 直接使用图片 URL，由 DashScope 视觉模型自行下载。
  */
@@ -159,36 +217,39 @@ async function runAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus")
   const model = ModelFactory.getModel(modelName, 0.7, false);
   const { input, history, hasImages } = parseMessages(rawMessages);
 
-  try {
-    if (hasImages) {
-      // 多模态模式：直接构建消息数组，绕过模板（模板不支持 content 数组）
-      const { SystemMessage } = require("@langchain/core/messages");
-      const messages = [
-        new SystemMessage(systemPrompt || DEFAULT_SYSTEM_PROMPT),
+  const { SystemMessage } = require("@langchain/core/messages");
+  const sysPrompt = systemPrompt || DEFAULT_SYSTEM_PROMPT;
+  const messages = hasImages
+    ? [
+        new SystemMessage(sysPrompt),
         ...history,
         new HumanMessage({ content: Array.isArray(input) ? input : [{ type: "text", text: input || "你好" }] }),
+      ]
+    : [
+        new SystemMessage(sysPrompt),
+        ...history,
+        new HumanMessage(input || "你好"),
       ];
-      const result = await model.invoke(messages);
-      const text = typeof result?.content === "string" ? result.content : JSON.stringify(result.content);
-      return { reply: text, modelName };
-    }
 
-    const chain = agentPrompt.pipe(model).pipe(new StringOutputParser());
-    const result = await chain.invoke({
-      systemPrompt: systemPrompt || DEFAULT_SYSTEM_PROMPT,
-      history,
-      input: input || "你好",
-    });
-
-    return { reply: result, modelName };
+  try {
+    const result = await model.invoke(messages);
+    const text = typeof result?.content === "string" ? result.content : JSON.stringify(result.content);
+    const usage = extractUsage(result) || {
+      promptTokens: estimatePromptTokens(sysPrompt, history, input),
+      completionTokens: estimateTokens(text),
+      totalTokens: 0,
+      estimated: true,
+    };
+    if (!usage.totalTokens) usage.totalTokens = usage.promptTokens + usage.completionTokens;
+    return { reply: text, modelName, usage };
   } catch (error) {
     if (isContentModerationError(error)) {
       console.warn("[runAgentChain] 内容审核拦截:", error.message);
-      return { reply: CONTENT_MODERATION_REPLY, modelName };
+      return { reply: CONTENT_MODERATION_REPLY, modelName, usage: null };
     }
     if (isImageDownloadError(error)) {
       console.warn("[runAgentChain] 图片下载失败:", error.message);
-      return { reply: IMAGE_DOWNLOAD_FAIL_REPLY, modelName };
+      return { reply: IMAGE_DOWNLOAD_FAIL_REPLY, modelName, usage: null };
     }
     throw error;
   }
@@ -210,51 +271,61 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
   const model = ModelFactory.getModel(modelName, 0.7, true);
   const { input, history, hasImages } = parseMessages(rawMessages);
 
-  let messages;
-  if (hasImages) {
-    // 多模态模式：直接构建消息数组
-    const { SystemMessage } = require("@langchain/core/messages");
-    messages = [
-      new SystemMessage(systemPrompt || DEFAULT_SYSTEM_PROMPT),
-      ...history,
-      new HumanMessage({ content: Array.isArray(input) ? input : [{ type: "text", text: input || "你好" }] }),
-    ];
-    console.log("[streamAgentChain] 多模态模式, 图片消息");
-  } else {
-    messages = await agentPrompt.invoke({
-      systemPrompt: systemPrompt || DEFAULT_SYSTEM_PROMPT,
-      history,
-      input: input || "你好",
-    });
-  }
+  const { SystemMessage } = require("@langchain/core/messages");
+  const sysPrompt = systemPrompt || DEFAULT_SYSTEM_PROMPT;
+  const messages = hasImages
+    ? [
+        new SystemMessage(sysPrompt),
+        ...history,
+        new HumanMessage({ content: Array.isArray(input) ? input : [{ type: "text", text: input || "你好" }] }),
+      ]
+    : [
+        new SystemMessage(sysPrompt),
+        ...history,
+        new HumanMessage(input || "你好"),
+      ];
 
   console.log("[streamAgentChain] 调用 model.stream...");
   try {
     const stream = await model.stream(messages);
     let reply = "";
     let tokenCount = 0;
+    let usage = null;
 
     for await (const chunk of stream) {
       const text = typeof chunk?.content === "string" ? chunk.content : "";
-      if (!text) continue;
-      reply += text;
-      tokenCount++;
-      console.log(`[streamAgentChain] token #${tokenCount}:`, text.substring(0, 20));
-      options.onToken?.(text);
+      if (text) {
+        reply += text;
+        tokenCount++;
+        options.onToken?.(text);
+      }
+      // 流式 chunk 中通常只有最后一帧带 usage_metadata（需 streamUsage:true）
+      const chunkUsage = extractUsage(chunk);
+      if (chunkUsage) usage = chunkUsage;
     }
 
-    console.log("[streamAgentChain] 完成, token数:", tokenCount, "总长度:", reply.length);
-    return { reply, modelName };
+    if (!usage) {
+      usage = {
+        promptTokens: estimatePromptTokens(sysPrompt, history, input),
+        completionTokens: estimateTokens(reply),
+        totalTokens: 0,
+        estimated: true,
+      };
+      usage.totalTokens = usage.promptTokens + usage.completionTokens;
+    }
+
+    console.log("[streamAgentChain] 完成, token数:", tokenCount, "总长度:", reply.length, "usage:", usage);
+    return { reply, modelName, usage };
   } catch (error) {
     if (isContentModerationError(error)) {
       console.warn("[streamAgentChain] 内容审核拦截:", error.message);
       options.onToken?.(CONTENT_MODERATION_REPLY);
-      return { reply: CONTENT_MODERATION_REPLY, modelName };
+      return { reply: CONTENT_MODERATION_REPLY, modelName, usage: null };
     }
     if (isImageDownloadError(error)) {
       console.warn("[streamAgentChain] 图片下载失败:", error.message);
       options.onToken?.(IMAGE_DOWNLOAD_FAIL_REPLY);
-      return { reply: IMAGE_DOWNLOAD_FAIL_REPLY, modelName };
+      return { reply: IMAGE_DOWNLOAD_FAIL_REPLY, modelName, usage: null };
     }
     throw error;
   }

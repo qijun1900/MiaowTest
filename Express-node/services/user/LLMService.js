@@ -95,12 +95,17 @@ async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig
 }
 
 /**
- * 落库 AI 回复消息。
+ * 落库 AI 回复消息，同时把 token 使用量写入消息和累加到会话总量。
  */
 async function saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence) {
   const replyText = typeof aiResponse === "object" && aiResponse !== null
     ? (aiResponse.reply || JSON.stringify(aiResponse))
     : aiResponse;
+
+  const usage = (typeof aiResponse === "object" && aiResponse?.usage) || null;
+  const promptTokens = Number(usage?.promptTokens || 0);
+  const completionTokens = Number(usage?.completionTokens || 0);
+  const totalTokens = Number(usage?.totalTokens || promptTokens + completionTokens);
 
   await AgentMessageModel.create({
     conversationId: convId,
@@ -112,7 +117,24 @@ async function saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, seque
     modelName: typeof aiResponse === "object" && aiResponse?.modelName
       ? aiResponse.modelName
       : (agentConfig.defaultModel || "default"),
+    promptTokens,
+    completionTokens,
+    totalTokens,
+    ext: usage?.estimated ? { tokensEstimated: true } : {},
   });
+
+  if (totalTokens > 0) {
+    await AgentConversationModel.updateOne(
+      { _id: convId },
+      {
+        $inc: {
+          totalPromptTokens: promptTokens,
+          totalCompletionTokens: completionTokens,
+          totalTokens,
+        },
+      }
+    );
+  }
 
   return replyText;
 }

@@ -22,6 +22,9 @@ class ModelFactory {
       modelName: modelName,
       temperature: temperature,
       streaming: streaming,
+      // 让流式响应在最后一帧带 usage_metadata，便于精确统计 token 消耗（DashScope OpenAI 兼容协议支持）
+      streamUsage: true,
+      modelKwargs: streaming ? { stream_options: { include_usage: true } } : {},
     });
   }
 }
