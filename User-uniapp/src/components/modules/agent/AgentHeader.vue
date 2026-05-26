@@ -1,5 +1,7 @@
 <template>
     <view class="top-wrapper" :style="topWrapperStyle">
+        <!-- 导航栏底沿向下的渐变模糊带：让内容滚到导航栏下方时呈现淡出/磨砂效果 -->
+        <view class="header-fade-mask" :style="fadeMaskStyle"></view>
         <view class="custom-navbar" :style="customNavbarStyle">
             <view class="nav-row" :style="navRowStyle">
                 <view class="nav-left" @click="handleMenuClick">
@@ -94,6 +96,10 @@ const topWrapperStyle = computed(() => ({
     height: `${navBarInfo.value.totalHeight}px`,
 }));
 
+const fadeMaskStyle = computed(() => ({
+    top: `${navBarInfo.value.totalHeight}px`,
+}));
+
 const handleMenuClick = () => {
     emit("menu-click");
 };
@@ -161,9 +167,27 @@ const handleOption = (action) => {
     left: 0;
     right: 0;
     z-index: 100;
-    background: #f6f7f9;
-    border-bottom: 1rpx solid rgba(15, 23, 42, 0.08);
+    /* 半透明背景 + 毛玻璃滤镜：在支持 backdrop-filter 的环境下让下方内容直接模糊 */
+    background: rgba(246, 247, 249, 0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
     box-sizing: border-box;
+}
+
+/* 导航栏底部渐变模糊带 —— 即便宿主不支持 backdrop-filter，也能营造清晰→模糊的过渡视觉 */
+.header-fade-mask {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 32rpx;
+    z-index: 99;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        rgba(246, 247, 249, 0.95) 0%,
+        rgba(246, 247, 249, 0.6) 45%,
+        rgba(246, 247, 249, 0) 100%
+    );
 }
 
 .nav-row {
