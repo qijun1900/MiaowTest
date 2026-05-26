@@ -52,28 +52,39 @@
                 <ChatSkeleton v-if="loadingConversationId" />
 
                 <view class="bubble-test-area" v-if="messageList.length > 0">
-                    <Bubble
+                    <view
                         v-for="(msg, index) in messageList"
                         :key="msg._msgId"
-                        :content="msg.content"
-                        :images="msg.images || []"
-                        :show-avatar="false"
-                        :shape="msg.role === 'user' ? 'corner' : undefined"
-                        :variant="msg.role === 'user' ? 'solid' : undefined"
-                        :placement="msg.role === 'user' ? 'end' : 'start'"
-                        :max-width="msg.role === 'user' ? '650rpx' : '100%'"
-                        :is-markdown="msg.isStreaming ? false : true"
-                        :no-style="msg.role === 'assistant'"
-                        :loading="msg.pending"
-                        :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
-                        @finish="handleBubbleFinish(index)"
+                        :id="msg._msgId"
+                        class="msg-anchor"
                     >
-                        <template #loading>
-                            <AiThinking />
-                        </template>
-                    </Bubble>
+                        <Bubble
+                            :content="msg.content"
+                            :images="msg.images || []"
+                            :show-avatar="false"
+                            :shape="msg.role === 'user' ? 'corner' : undefined"
+                            :variant="msg.role === 'user' ? 'solid' : undefined"
+                            :placement="msg.role === 'user' ? 'end' : 'start'"
+                            :max-width="msg.role === 'user' ? '650rpx' : '100%'"
+                            :is-markdown="msg.isStreaming ? false : true"
+                            :no-style="msg.role === 'assistant'"
+                            :loading="msg.pending"
+                            :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
+                            @finish="handleBubbleFinish(index)"
+                        >
+                            <template #loading>
+                                <AiThinking />
+                            </template>
+                        </Bubble>
+                    </view>
                     <view id="msg-mid"></view>
                     <view id="msg-bottom"></view>
+                    <!--
+                        滚动占位：仅当 AI 正在生成（pending / streaming）时启用。
+                        作用是让用户的新消息能被 scroll-into-view 顶到头部下沿；
+                        AI 生成结束后自动移除，避免最后一条消息下方出现整屏白屏。
+                    -->
+                    <view v-if="showScrollSpacer" class="scroll-spacer" :style="spacerStyle"></view>
                     <AgentActionBar
                         v-if="showActionBar"
                         :content="lastAIMessage?.content || ''"
@@ -183,7 +194,6 @@ const scrollToViewId = ref("");
 const {
     images: pendingImages,
     isUploading,
-    canSend,
     addImages,
     removeImage: removePendingImage,
     retryImage,
@@ -292,6 +302,9 @@ onMounted(() => {
     loadAgentList();
     loadConversationList();
 
+    // 测量 scroll-view 真实高度，用于动态计算底部占位
+    setTimeout(measureScrollViewHeight, 100);
+
     // 监听搜索页选择的会话
     uni.$on("agent-select-conversation", handleSelectChat);
 
@@ -359,6 +372,18 @@ const senderAreaStyle = computed(() => ({
 }));
 
 // ─── 事件处理 ──────────────────────────────────────────────────────────────────
+/**
+ * 把指定消息滚到 scroll-view 顶部（紧贴头部下沿）。
+ * 通过先清空再赋值，强制 scroll-into-view 触发，即便重复目标也能再次滚动。
+ */
+const scrollToMessage = (msgId) => {
+    if (!msgId) return;
+    scrollToViewId.value = "";
+    setTimeout(() => {
+        scrollToViewId.value = msgId;
+    }, 50);
+};
+
 const scrollToBottom = (smooth = false) => {
     if (smooth) {
         // 先滚到中间位置（慢），再滚到底部（快），模拟减速效果
@@ -564,6 +589,48 @@ const showActionBar = computed(() => {
     return msg && !msg.pending && !msg.typing && !msg.isStreaming;
 });
 
+/**
+ * 是否渲染底部滚动占位：仅在 AI 回复尚未完成时启用。
+ * 这样既能保证新发送的用户消息可以被 scroll-into-view 顶到头部下方，
+ * 又不会在对话结束后留下整屏白屏可滑动区域。
+ */
+const showScrollSpacer = computed(() => {
+    const last = messageList.value[messageList.value.length - 1];
+    return !!(last && last.role === 'assistant' && (last.pending || last.isStreaming));
+});
+
+/**
+ * scroll-view 的真实可视高度（px）。
+ * 在 onMounted 时通过 createSelectorQuery 测量一次，用于精确计算底部占位，
+ * 避免使用 100vh 时溢出 scroll-view 自身高度而产生整屏白屏可滚动区。
+ */
+const scrollViewHeightPx = ref(0);
+
+const measureScrollViewHeight = () => {
+    const query = uni.createSelectorQuery();
+    query.select(".content").boundingClientRect((rect) => {
+        if (rect?.height) scrollViewHeightPx.value = rect.height;
+    }).exec();
+};
+
+/**
+ * 占位高度（px）动态计算：
+ * 目标 = scroll-view 高度 − AI 气泡当前估算高度，
+ * 保证用户消息能顶到头部下沿、且下方剩余空间正好一屏；
+ * 当 AI 内容增长到能填满一屏时占位归 0，从源头杜绝整屏白屏可下滑。
+ */
+const spacerStyle = computed(() => {
+    if (!showScrollSpacer.value || !scrollViewHeightPx.value) return { height: '0px' };
+    const ai = lastAIMessage.value;
+    const chars = (ai?.content || '').length;
+    const estimatedLineHeightPx = 25;
+    const charsPerLine = 20;
+    const lines = chars === 0 ? 1 : Math.ceil(chars / charsPerLine);
+    const estimatedAIHeightPx = 40 + lines * estimatedLineHeightPx;
+    const target = Math.max(0, scrollViewHeightPx.value - estimatedAIHeightPx);
+    return { height: `${target}px` };
+});
+
 const handleActionCopy = () => {
     // copy is handled inside AgentActionBar via uni.setClipboardData
 };
@@ -618,8 +685,9 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
 
     showWelcomePanel.value = false;
 
+    const userMsgId = `msg-${++msgIdSeq}`;
     messageList.value.push({
-        _msgId: `msg-${++msgIdSeq}`,
+        _msgId: userMsgId,
         role: 'user',
         content: text || '',
         images: imageUrls,
@@ -638,7 +706,9 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
         pending: true,
         isStreaming: true,
     });
-    scrollToBottom();
+    // 将刚发出的用户消息滚到 scroll-view 顶部（紧贴头部下沿），
+    // 让 AI 回复在其下方逐字流出，符合主流聊天产品体验
+    scrollToMessage(userMsgId);
 
     const sendImages = hasImages ? imageUrls : undefined;
 
@@ -744,11 +814,35 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
 }
 
 .content-inner {
-    padding: 24rpx 0 260rpx;
+    /* 底部留白让最后一条消息不被悬浮的 sender 输入栏遮住；顶部不留白，间距交给 msg-anchor 统一控制 */
+    padding: 0 0 260rpx;
 }
 
 .bubble-test-area {
     padding: 24rpx;
+}
+
+/*
+ * 每条消息的可定位容器：
+ *  · :id 用作 scroll-into-view 目标
+ *  · padding-top 形成"头部下沿 → 消息"以及"消息 → 消息"之间统一的间距，
+ *    保证新消息被滚到 scroll-view 顶部时与头部之间的留白和后续消息间距完全一致。
+ */
+.msg-anchor {
+    padding-top: 8rpx;
+}
+
+.msg-anchor:first-child {
+    padding-top: 0;
+}
+
+/*
+ * 底部滚动占位：高度 ≈ 一屏，保证最后一条用户消息总能被 scroll-into-view 滚到 scroll-view 顶部，
+ * 而不是因为后面没内容只能停在末尾。AI 回复增长时占位被自然挤压，不会影响视觉。
+ */
+.scroll-spacer {
+    /* 实际高度由 :style="spacerStyle" 动态注入，根据 AI 内容长度自适应收缩 */
+    width: 100%;
 }
 
 /*
