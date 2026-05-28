@@ -105,7 +105,7 @@
             当 container 的 bottom 随键盘上移时，sender 自然贴在容器底部，
             即键盘顶部，不会留下任何灰色空隙。
         -->
-        <view v-if="hasModels" class="sender-area" :style="senderAreaStyle">
+        <view v-if="hasModels && isLoggedIn" class="sender-area" :style="senderAreaStyle">
             <AgentSender
                 v-model="senderText"
                 v-model:thinking="thinkingMode"
@@ -162,6 +162,7 @@ import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
 import { useAgentImages } from "../../composables/useAgentImages.js";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
+import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import {
         fetchAgentList,
         chatWithAgent,
@@ -174,6 +175,8 @@ import {
     } from "../../API/LLM/AgentAPI.js"
 
 // ─── 响应式状态 ────────────────────────────────────────────────────────────────
+const userInfoStore = UserInfoStore();
+const isLoggedIn = computed(() => userInfoStore.isLoggedIn);
 const sidebarVisible = ref(false);
 const senderText = ref("");
 const thinkingMode = ref(false);
@@ -258,6 +261,10 @@ const loadAgentList = async () => {
 };
 
 const loadConversationList = async (favoritesOnly = false) => {
+    if (!isLoggedIn.value) {
+        conversationList.value = [];
+        return;
+    }
     try {
         const params = favoritesOnly ? { favorites: 1 } : {};
         const res = await fetchConversationList(params);
@@ -673,6 +680,10 @@ const handleUploaderAdd = (remaining) => {
  * 不能用外部变量引用（push 前创建的对象是普通 JS 对象，不是 Vue 代理，修改不触发视图更新）。
  */
 const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
+    if (!isLoggedIn.value) {
+        uni.showToast({ title: "请先登录", icon: "none" });
+        return;
+    }
     const hasText = text && text.trim().length > 0;
     // 重新生成时使用已有图片 URL，否则使用已上传的图片
     const imageUrls = existingImages?.length ? existingImages : getUploadedUrls();

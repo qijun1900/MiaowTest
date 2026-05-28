@@ -1,23 +1,40 @@
 <template>
-    <view class="welcome-panel" :class="{ 'is-center': !actionItems || actionItems.length === 0 }" v-if="show">
-        <view class="welcome-copy">
-            <text class="welcome-greeting">{{ dynamicGreeting }}</text>
-            <text class="welcome-title">{{ title }}</text>
+    <view class="welcome-panel" :class="{ 'is-center': !isLoggedIn || !actionItems || actionItems.length === 0 }" v-if="show">
+        <!-- 未登录提示 -->
+        <view v-if="!isLoggedIn" class="welcome-login">
+            <text class="welcome-greeting">欢迎使用题喵喵 AI</text>
+            <text class="welcome-title">登录后即可开始对话</text>
+            <view class="feature-list">
+                <view class="feature-card" v-for="item in guestFeatures" :key="item">
+                    <text class="feature-card-text">{{ item }}</text>
+                </view>
+            </view>
+            <view class="login-action-btn" @click="goLogin">
+                <text class="login-action-text">前往登录</text>
+            </view>
         </view>
 
-        <view class="welcome-actions" v-if="actionItems && actionItems.length > 0">
-            <slot name="actions">
-                <view v-for="item in actionItems" :key="item.key || item.title" class="welcome-action"
-                    @click="handleActionClick(item)">
-                    <slot name="action-item" :item="item">
-                        <view v-if="item.icon" class="action-icon">
-                            <image class="action-image" :src="item.icon" mode="aspectFit" />
-                        </view>
-                        <text class="action-title">{{ item.title }}</text>
-                    </slot>
-                </view>
-            </slot>
-        </view>
+        <!-- 已登录正常欢迎 -->
+        <template v-else>
+            <view class="welcome-copy">
+                <text class="welcome-greeting">{{ dynamicGreeting }}</text>
+                <text class="welcome-title">{{ title }}</text>
+            </view>
+
+            <view class="welcome-actions" v-if="actionItems && actionItems.length > 0">
+                <slot name="actions">
+                    <view v-for="item in actionItems" :key="item.key || item.title" class="welcome-action"
+                        @click="handleActionClick(item)">
+                        <slot name="action-item" :item="item">
+                            <view v-if="item.icon" class="action-icon">
+                                <image class="action-image" :src="item.icon" mode="aspectFit" />
+                            </view>
+                            <text class="action-title">{{ item.title }}</text>
+                        </slot>
+                    </view>
+                </slot>
+            </view>
+        </template>
     </view>
 </template>
 
@@ -27,6 +44,13 @@ import { UserInfoStore } from "@/stores/modules/UserinfoStore";
 import { getGreetingInfo } from "@/util/greet";
 
 const userInfoStore = UserInfoStore();
+const isLoggedIn = computed(() => userInfoStore.isLoggedIn);
+
+const guestFeatures = ["会话管理", "题目创建", "错题添加"];
+
+const goLogin = () => {
+    uni.navigateTo({ url: "/pages/my/UserLoginView" });
+};
 
 const props = defineProps({
     show: {
@@ -169,5 +193,69 @@ const handleActionClick = (item) => {
     font-weight: 700;
     color: #8e9198;
     white-space: nowrap;
+}
+
+.welcome-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+}
+
+.feature-list {
+    margin-top: 32rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 28rpx;
+    align-items: center;
+}
+
+.feature-card {
+    min-width: 288rpx;
+    height: 84rpx;
+    padding: 0 40rpx;
+    border-radius: 999rpx;
+    background: #ffffff;
+    border: 1rpx solid #edf0f4;
+    box-shadow: 0 4rpx 12rpx rgba(17, 24, 39, 0.035);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.feature-card-text {
+    font-size: 30rpx;
+    line-height: 1;
+    font-weight: 700;
+    color: #8e9198;
+    white-space: nowrap;
+}
+
+.login-action-btn {
+    margin-top: 56rpx;
+    width: 500rpx;
+    height: 112rpx;
+    background: #ffffff;
+    border: 1rpx solid #edf0f4;
+    border-radius: 999rpx;
+    box-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.login-action-btn:active {
+    transform: scale(0.985);
+    background: #fafbfc;
+}
+
+.login-action-text {
+    font-size: 38rpx;
+    font-weight: 700;
+    color: #313644;
 }
 </style>
