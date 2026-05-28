@@ -114,6 +114,20 @@
                 </view>
             </view>
 
+            <!-- 账号绑定 -->
+            <view class="setting-item" @click="handleAccountBind">
+                <view class="setting-left">
+                    <view class="setting-icon bind-icon">
+                        <up-icon name="link" size="18px" color="#999"></up-icon>
+                    </view>
+                    <text class="setting-label">账号绑定</text>
+                </view>
+                <view class="setting-right">
+                    <text class="setting-value">{{ bindStatusText }}</text>
+                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                </view>
+            </view>
+
             <!-- 消息通知 -->
             <view class="setting-item">
                 <view class="setting-left">
@@ -212,12 +226,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import { AppearanceStore } from "../../stores/modules/AppearanceStore";
 import { clearExamCache } from "../../util/cacheCleaner";
 import userAvatar from "../../components/core/userAvatar.vue";
+import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import logSDK from "../../util/logSDK";
+// #ifdef MP-WEIXIN
+import { wechatBind } from "../../util/wechatLogin";
+// #endif
 // #ifdef APP-PLUS
 import { checkForUpdate } from "../../util/checkUpdate";
 // #endif
@@ -233,6 +251,36 @@ const appVersion = ref("1.4.0");
 const cacheSize = ref("计算中...");
 const notificationEnabled = ref(true);
 const showThemePopup = ref(false);
+
+// 绑定状态
+const bindStatus = ref({
+    isEmailBound: false,
+    isWechatBound: false,
+});
+
+// 绑定状态文案
+const bindStatusText = computed(() => {
+    const { isEmailBound, isWechatBound } = bindStatus.value;
+    if (isEmailBound && isWechatBound) return "邮箱、微信";
+    if (isEmailBound) return "邮箱";
+    if (isWechatBound) return "微信";
+    return "未绑定";
+});
+
+// 查询绑定状态
+const fetchBindStatus = async () => {
+    try {
+        const response = await checkUserBind();
+        if (response.code === 200) {
+            bindStatus.value = {
+                isEmailBound: !!response.data.isEmailBound,
+                isWechatBound: !!response.data.isWechatBound,
+            };
+        }
+    } catch (e) {
+        console.error("获取绑定状态失败:", e);
+    }
+};
 
 // 计算缓存大小
 const calcCacheSize = () => {
@@ -258,6 +306,11 @@ const goToUserInfo = () => {
 // 账号安全
 const handleAccountSecurity = () => {
     uni.showToast({ title: "功能开发中", icon: "none" });
+};
+
+// 账号绑定：跳转个人信息页（个人信息页已有完整的邮箱/微信绑定 UI）
+const handleAccountBind = () => {
+    uni.navigateTo({ url: "/pages/my/UserInfoView" });
 };
 
 // 消息通知开关
@@ -375,6 +428,7 @@ const handleLogout = () => {
 onMounted(() => {
     calcCacheSize();
     appearanceStore.initAppearance();
+    fetchBindStatus();
     const savedNotification = uni.getStorageSync("notification_enabled");
     if (savedNotification !== "") {
         notificationEnabled.value = savedNotification;
@@ -497,6 +551,10 @@ onMounted(() => {
 }
 
 .about-icon {
+    background-color: #f5f5f5;
+}
+
+.bind-icon {
     background-color: #f5f5f5;
 }
 

@@ -37,11 +37,16 @@ const isLoggedIn = computed(() => userInfoStore.isLoggedIn);
 const userInfo = computed(() => userInfoStore.userInfo);
 
 const displayText = computed(() => {
+    const greet = greetingInfo.value.text;
     if (!isLoggedIn.value) {
-        return `亲爱的用户，${greetingInfo.value.text}`;
+        return `亲爱的用户，${greet}`;
     }
 
-    return userInfo.value?.nickname + `，${greetingInfo.value.text}` || `第${userInfo.value?.userCount || 0}位哈基米` + `，${greetingInfo.value.text}`;
+    const nickname = (userInfo.value?.nickname || "").trim();
+    if (nickname) {
+        return `${nickname}，${greet}`;
+    }
+    return `第${userInfo.value?.userCount || 0}位哈基米，${greet}`;
 });
 
 onMounted(() => {

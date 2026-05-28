@@ -61,12 +61,17 @@ UserRouter.post(
   "/uniappAPI/User/BindAccount",
   JWT.verifyTokenMiddleware(),
   UserController.BindAccount,
-); //用户绑定账号接口(wx)
+); //当前账号绑定邮箱（用于微信用户补绑邮箱）
+UserRouter.post(
+  "/uniappAPI/User/BindWechat",
+  JWT.verifyTokenMiddleware(),
+  UserController.BindWechat,
+); //当前账号绑定微信（用于邮箱用户补绑微信）
 UserRouter.get(
   "/uniappAPI/User/checkUserBind",
   JWT.verifyTokenMiddleware(),
   UserController.checkUserBind,
-); //用户检测是否绑定账号接口(wx)
+); //查询当前账号的绑定状态（邮箱 / 微信）
 UserRouter.post(
   "/uniappAPI/Feedback/submitFeedback",
   JWT.optionalTokenMiddleware(),

@@ -1,4 +1,4 @@
-import { Userlogin } from "../API/My/UserLoginAPI";
+import { Userlogin, BindWechat } from "../API/My/UserLoginAPI";
 import { UserInfoStore } from "../stores/modules/UserinfoStore";
 import logSDK from "./logSDK";
 
@@ -107,3 +107,60 @@ export const wechatLogin = async (options = {}) => {
 };
 
 export default wechatLogin;
+
+/**
+ * 已登录态下绑定微信：调 uni.login 拿 code → BindWechat → 提示结果
+ * 当前账号始终保留，若 openid 已属于另一账号则后端会把对方数据合并过来。
+ * 仅在支持微信原生登录的平台（mp-weixin / 集成微信SDK的App）调用。
+ *
+ * @param {{ onSuccess?: Function, onError?: Function }} options
+ * @returns {Promise<Object>} 后端响应
+ */
+export const wechatBind = async (options = {}) => {
+  const { onSuccess, onError } = options;
+
+  try {
+    const loginData = await new Promise((resolve, reject) => {
+      uni.login({
+        provider: "weixin",
+        success: (data) => resolve(data),
+        fail: (err) => reject(err),
+      });
+    });
+
+    if (!loginData?.code) {
+      throw new Error("未获取到微信登录凭证");
+    }
+
+    const response = await BindWechat(loginData.code);
+
+    if (response.code === 200) {
+      uni.showToast({ title: "微信绑定成功", icon: "success" });
+      logSDK.track("AUTH_BIND_WECHAT", {
+        result: logSDK.results.SUCCESS,
+      });
+      if (typeof onSuccess === "function") onSuccess(response);
+      return response;
+    }
+
+    const errorMessage = response.message || "绑定失败，请重试";
+    uni.showToast({ title: errorMessage, icon: "none", duration: 2500 });
+    logSDK.track("AUTH_BIND_WECHAT", {
+      result: logSDK.results.FAIL,
+      errorCode: String(response.code || ""),
+      errorMessage,
+    });
+    if (typeof onError === "function") onError(response);
+    return response;
+  } catch (error) {
+    console.error("绑定微信失败", error);
+    const errorMessage = error?.message || "绑定失败，请重试";
+    uni.showToast({ title: errorMessage, icon: "none" });
+    logSDK.track("AUTH_BIND_WECHAT", {
+      result: logSDK.results.FAIL,
+      errorMessage,
+    });
+    if (typeof onError === "function") onError(error);
+    throw error;
+  }
+};

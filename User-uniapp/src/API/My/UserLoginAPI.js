@@ -46,15 +46,14 @@ export const Userlogin = async (message, code) => {
 };
 
 /**
- * 用户账号注册(h5/wx)
- * @param  {string} account - 用户账号
- * @param  {string} uid - 用户UID（可选）
- * @param  {string} verifyCode - 验证码
+ * 用户邮箱注册（与微信完全解耦，无需 uid）
+ * 成功后后端返回 token + userInfo，前端可直接进入登录态。
+ * @param  {string} account - 邮箱
+ * @param  {string} verifyCode - 邮箱验证码
  * @param  {string} password - 密码
- * @returns {Promise} 返回注册用户信息响应
- *
+ * @returns {Promise} 返回注册响应
  */
-export const UserRegister = async ({ account, uid, verifyCode, password }) => {
+export const UserRegister = async ({ account, verifyCode, password }) => {
   try {
     if (!account || !verifyCode || !password) {
       throw new Error("缺少必要参数");
@@ -64,7 +63,6 @@ export const UserRegister = async ({ account, uid, verifyCode, password }) => {
       method: "POST",
       data: {
         account,
-        uid,
         verifyCode,
         password,
       },
@@ -128,14 +126,14 @@ export const ResetPassword = async ({ account, verifyCode, password }) => {
 };
 
 /**
- * 微信用户绑定账号
- * @param  {string} account - 用户账号
- * @param  {string} uid - 用户UID（可选）
- * @param  {string} verifyCode - 验证码
+ * 当前账号绑定邮箱（已登录态）
+ * 服务端从 JWT 取当前账号；当前账号始终保留，若邮箱已被占用则把对方数据合并过来。
+ * @param  {string} account - 邮箱
+ * @param  {string} verifyCode - 邮箱验证码
  * @param  {string} password - 密码
  * @returns {Promise} 返回绑定结果
  */
-export const BindAccount = async ({ account, uid, verifyCode, password }) => {
+export const BindAccount = async ({ account, verifyCode, password }) => {
   try {
     if (!account || !verifyCode || !password) {
       throw new Error("缺少必要参数");
@@ -145,13 +143,34 @@ export const BindAccount = async ({ account, uid, verifyCode, password }) => {
       method: "POST",
       data: {
         account,
-        uid,
         verifyCode,
         password,
       },
     });
   } catch (error) {
     console.error("BindAccount 失败", error);
+    throw error;
+  }
+};
+
+/**
+ * 当前账号绑定微信（已登录态）
+ * 调用 wx.login 拿到 code 后传入；当前账号始终保留，若 openid 已属于另一账号则把对方数据合并过来。
+ * @param {string} code - wx.login 返回的临时凭证
+ * @returns {Promise} 返回绑定结果
+ */
+export const BindWechat = async (code) => {
+  try {
+    if (!code) {
+      throw new Error("缺少微信登录凭证");
+    }
+    return await http({
+      url: "/uniappAPI/User/BindWechat",
+      method: "POST",
+      data: { code },
+    });
+  } catch (error) {
+    console.error("BindWechat 失败", error);
     throw error;
   }
 };

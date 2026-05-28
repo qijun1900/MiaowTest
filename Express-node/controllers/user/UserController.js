@@ -80,12 +80,11 @@ const UserController = {
   },
   UserRegister: async (req, res) => {
     try {
-      const { account, verifyCode, password, uid } = req.body;
+      const { account, verifyCode, password } = req.body;
       const result = await UserService.UserRegister(
         account,
         verifyCode,
         password,
-        uid || null,
       );
       if (result.success) {
         res.status(200).send({
@@ -513,6 +512,27 @@ const UserController = {
       }
     } catch (error) {
       console.error("BindAccount 失败", error);
+      res.status(200).send({
+        code: 500,
+        ActionType: "ERROR",
+        message: "服务器错误",
+      });
+    }
+  },
+  // 绑定微信：当前登录用户 + wxCode → 把 openid 挂到当前账号；若 openid 已属另一账号则合并
+  BindWechat: async (req, res) => {
+    try {
+      const { code } = req.body;
+      const { uid } = req.user;
+      const result = await UserService.BindWechat({ uid, code });
+      res.status(200).send({
+        code: result.code,
+        ActionType: result.success ? "OK" : "ERROR",
+        message: result.message,
+        data: result.data || {},
+      });
+    } catch (error) {
+      console.error("BindWechat 失败", error);
       res.status(200).send({
         code: 500,
         ActionType: "ERROR",

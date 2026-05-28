@@ -28,9 +28,9 @@
             @click="handleUserinfo"
         />
 
-        <!-- 功能列表 -->
-        <view class="function-list">
-            <CustomNavbar :items="CustomNavbarList" @nav-click="handleClick" />
+        <!-- Core Nav -->
+        <view>
+            <myNavbar />
         </view>
 
         <!-- 热力图 -->
@@ -88,9 +88,8 @@ import { ref, computed, onMounted } from "vue";
 import { onShow, onPullDownRefresh } from "@dcloudio/uni-app";
 import uviewOverlay from "../../components/core/uviewOverlay.vue";
 import { wechatLogin } from "../../util/wechatLogin";
+import myNavbar from "../../components/modules/my/myNavbar.vue";
 import navBarHeightUtil from "../../util/navBarHeight.js";
-import CustomNavbar from "../../components/core/CustomNavbar.vue";
-import { clearExamCache } from "../../util/cacheCleaner.js";
 import showShareMenu from "../../util/wechatShare.js";
 import { reportLoginStatus } from "../../API/My/UserLoginAPI";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
@@ -99,33 +98,11 @@ import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
 import UserActivityHeatmap from "../../components/modules/my/UserActivityHeatmap.vue";
 
 const LoginOverlayShow = ref(false);
-const AuthorOverlayShow = ref(false);
 const agreed = ref(false);
 const navBarInfo = ref({});
 const activityHeatmapRef = ref(null);
-const CustomNavbarList = ref([
-    {
-        title: "清除缓存",
-        icon: "/static/navMy/c-my-clear.png",
-        path: "/pages/my/MyFavoriteView",
-    },
-    {
-        title: "问题反馈",
-        icon: "/static/navMy/c-my-feedback.png",
-        path: "/pages/my/MyWrongView",
-    },
-    {
-        title: "我的设置",
-        icon: "/static/navMy/c-my-setting.png",
-        path: "pages/my/MySettingView",
-    },
-    {
-        title: "我的消息",
-        icon: "/static/navMy/c-my-message.png",
-        path: "/pages/my/MyMessageView",
-    },
-]);
 // 处理导航栏点击事件
+
 const goSetting = () => {
     uni.navigateTo({
         url: "/pages/my/MySettingView",
@@ -152,30 +129,6 @@ const headerRowStyle = computed(() => {
         paddingRight: "24rpx",
     };
 });
-const handleClick = (item) => {
-    if (item.title === "清除缓存") {
-        if (clearExamCache().isClear) {
-            uni.showToast({
-                title: "清除成功",
-                icon: "success",
-            });
-        }
-    } else if (item.title === "问题反馈") {
-        uni.navigateTo({
-            url: "/pages/public/feedbackview",
-        });
-    } else if (item.title === "开发作者") {
-        AuthorOverlayShow.value = true;
-    } else if (item.title === "我的设置") {
-        uni.navigateTo({
-            url: "/pages/my/MySettingView",
-        });
-    } else if (item.title === "我的消息") {
-        uni.navigateTo({
-            url: "/pages/my/MyMessageView",
-        });
-    }
-};
 
 //用户信息
 const handleUserinfo = ({ isLoggedIn }) => {

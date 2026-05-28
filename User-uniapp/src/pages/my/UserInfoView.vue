@@ -55,40 +55,43 @@
                 </view>
             </view>
 
-            <!-- #ifdef MP-WEIXIN -->
-            <view class="info-item" @click="handleUserRsgister">
-                <view class="info-label">{{
-                    accountBindStatus ? "已绑定账号" : "尚未绑定账号"
-                }}</view>
+            <!-- 邮箱绑定状态 -->
+            <view class="info-item" @click="handleBindEmail">
+                <view class="info-label">邮箱账号</view>
                 <view class="info-value">
                     <text class="openid-text">{{
-                        accountBindStatus
-                            ? userInfoStore.userInfo?.username
-                            : "立即绑定账号"
+                        bindStatus.isEmailBound
+                            ? bindStatus.email
+                            : "未绑定"
                     }}</text>
                     <up-icon
-                        v-if="!accountBindStatus"
-                        name="arrow-right"
-                        size="14px"
+                        v-if="bindStatus.isEmailBound"
+                        name="checkmark-circle"
+                        size="18px"
+                        color="#07c160"
                     ></up-icon>
-                    <up-icon v-else name="file-text" size="18px"></up-icon>
+                    <up-icon v-else name="arrow-right" size="14px"></up-icon>
                 </view>
             </view>
-            <!-- #endif -->
-            <!-- #ifndef MP-WEIXIN -->
-            <view
-                class="info-item"
-                @click="handleCopy(userInfoStore.userInfo?.username)"
-            >
-                <view class="info-label">当前账号</view>
+
+            <!-- 微信绑定状态 -->
+            <view class="info-item" @click="handleBindWechat">
+                <view class="info-label">微信账号</view>
                 <view class="info-value">
                     <text class="openid-text">{{
-                        userInfoStore.userInfo?.username
+                        bindStatus.isWechatBound
+                            ? "已绑定"
+                            : "未绑定"
                     }}</text>
-                    <up-icon name="file-text" size="18px"></up-icon>
+                    <up-icon
+                        v-if="bindStatus.isWechatBound"
+                        name="checkmark-circle"
+                        size="18px"
+                        color="#07c160"
+                    ></up-icon>
+                    <up-icon v-else name="arrow-right" size="14px"></up-icon>
                 </view>
             </view>
-            <!-- #endif -->
         </view>
         <!-- 退出登录按钮 -->
         <view class="logout-section">
@@ -100,32 +103,45 @@
 <script setup>
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import handleCopy from "../../util/copy";
-import { updateUserInfo, checkUserBind } from "../../API/My/UserInfoUpdateAPI"; //checkUserBind
+import { updateUserInfo, checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import { onMounted, ref } from "vue";
 import userAvatar from "../../components/core/userAvatar.vue";
 import { httpUpload } from "../../util/http";
 import escconfig from "../../config/esc.config";
 import logSDK from "../../util/logSDK";
+// #ifdef MP-WEIXIN
+import { wechatBind } from "../../util/wechatLogin";
+// #endif
 
-const accountBindStatus = ref(false); // 账号绑定状态
+const bindStatus = ref({
+    isEmailBound: false,
+    isWechatBound: false,
+    email: "",
+});
+const accountBindStatus = ref(false); // 兼容旧逻辑（已废弃，保留不移除以免影响其他绑定跳转）
 const userInfoStore = UserInfoStore();
 const genderMap = {
-    // 性别映射表
     0: "保密",
     1: "男",
     2: "女",
 };
 
-// 账号绑定状态计算属性，使用API来获取
+// 查询绑定状态（邮箱 / 微信分开）
 const CheckaccountBindStatus = async () => {
     try {
         const response = await checkUserBind();
         if (response.code === 200) {
-            accountBindStatus.value = response.data.isBind;
+            const { isEmailBound, isWechatBound, email } = response.data;
+            bindStatus.value = {
+                isEmailBound: !!isEmailBound,
+                isWechatBound: !!isWechatBound,
+                email: email || "",
+            };
+            accountBindStatus.value =
+                bindStatus.value.isEmailBound || bindStatus.value.isWechatBound;
         }
     } catch (e) {
         console.error("获取账号绑定状态失败:", e);
-        return false;
     }
 };
 
@@ -217,15 +233,37 @@ const handleEditGender = () => {
     });
 };
 
-// 处理账号绑定
-const handleUserRsgister = () => {
-    if (!accountBindStatus.value) {
-        uni.navigateTo({
-            url: "/pages/my/UserRegisterView?isBind=true",
-        });
-    } else {
-        handleCopy(userInfoStore.userInfo?.username);
+// 邮箱绑定：未绑定时跳转绑定页；已绑定时显示邮箱（支持复制）
+const handleBindEmail = () => {
+    if (bindStatus.value.isEmailBound) {
+        handleCopy(bindStatus.value.email);
+        return;
     }
+    uni.navigateTo({
+        url: "/pages/my/UserRegisterView?isBind=true",
+    });
+};
+
+// 微信绑定：仅微信小程序可用，调用 wechatBind 工具
+const handleBindWechat = () => {
+    if (bindStatus.value.isWechatBound) {
+        uni.showToast({ title: "微信已绑定", icon: "success" });
+        return;
+    }
+    // #ifdef MP-WEIXIN
+    wechatBind({
+        onSuccess: () => {
+            CheckaccountBindStatus();
+        },
+    });
+    // #endif
+    // #ifndef MP-WEIXIN
+    uni.showToast({
+        title: "请在微信小程序内绑定",
+        icon: "none",
+        duration: 2000,
+    });
+    // #endif
 };
 
 // 复制 openid

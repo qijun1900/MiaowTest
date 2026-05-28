@@ -2,6 +2,7 @@ const wxAuth = require("../../MiddleWares/wxAuth");
 const JWT = require("../../MiddleWares/jwt");
 const bcrypt = require("bcryptjs");
 const { verifyCode } = require("../../helpers/emailHelper");
+const { mergeUserData } = require("../../helpers/accountMergeHelper");
 const ConsumerModel = require("../../models/ConsumerModel");
 const ExamModel = require("../../models/ExamModel");
 const FeedbackModel = require("../../models/ConsumerFeedbackModel");
@@ -71,9 +72,12 @@ const UserService = {
       };
     }
   },
-  UserRegister: async (account, inputCode, password, uid) => {
+  /**
+   * 邮箱 + 密码注册（与微信完全解耦）
+   * 不再接受 uid 参数；如需绑定微信请走 BindWechat 接口
+   */
+  UserRegister: async (account, inputCode, password) => {
     try {
-      // 1. 校验验证码
       const codeResult = verifyCode(account, inputCode);
       if (!codeResult.valid) {
         return {
@@ -83,13 +87,10 @@ const UserService = {
         };
       }
 
-      // 2. 检查邮箱是否已注册
       const existingUser = await ConsumerModel.findOne({
         $or: [{ username: account }, { email: account }],
       });
-
-      if (existingUser && !uid) {
-        // 纯邮箱注册时，邮箱已存在则拒绝
+      if (existingUser) {
         return {
           code: 409,
           success: false,
@@ -97,39 +98,7 @@ const UserService = {
         };
       }
 
-      // 3. 对密码进行哈希加密
       const hashedPassword = await bcrypt.hash(password, 10);
-
-      // 4. 如果携带了 uid（App/微信端已有匿名用户），直接更新该用户的邮箱和密码
-      if (uid) {
-        const wechatUser = await ConsumerModel.findById(uid);
-        if (wechatUser) {
-          // 若邮箱已被其他账号占用，合并数据后删除旧账号
-          if (existingUser && existingUser._id.toString() !== uid) {
-            if (existingUser.favoriteExams?.length > 0) {
-              wechatUser.favoriteExams = [
-                ...new Set([
-                  ...(wechatUser.favoriteExams || []),
-                  ...existingUser.favoriteExams,
-                ]),
-              ];
-            }
-            await ConsumerModel.deleteOne({ _id: existingUser._id });
-          }
-          wechatUser.username = account;
-          wechatUser.email = account;
-          wechatUser.password = hashedPassword;
-          await wechatUser.save();
-          return {
-            code: 200,
-            success: true,
-            message: "注册并绑定成功",
-            data: { userCount: wechatUser.userCount },
-          };
-        }
-      }
-
-      // 5. 普通邮箱注册：创建新用户
       const userCount = await getNextUserCount();
       const newUser = new ConsumerModel({
         username: account,
@@ -140,11 +109,24 @@ const UserService = {
       });
       await newUser.save();
 
+      // 注册后即下发 token，前端可直接进入"是否绑定微信"流程
+      const token = JWT.generate({ uid: newUser._id }, "7d");
+
       return {
         code: 200,
         success: true,
         message: "注册成功",
-        data: { userCount },
+        data: {
+          token,
+          userInfo: {
+            uid: newUser._id,
+            nickname: newUser.nickname || "",
+            avatar: newUser.avatar || "",
+            gender: newUser.gender || 0,
+            username: newUser.username || "",
+            userCount: newUser.userCount,
+          },
+        },
       };
     } catch (error) {
       console.error("UserRegister 失败", error);
@@ -499,70 +481,47 @@ const UserService = {
       };
     }
   },
-  BindAccount: async ({ uid, account, password, verifyCode }) => {
+  /**
+   * 微信用户在已登录态下绑定一个邮箱账号。
+   * - 当前登录的（微信）账号始终保留为主账号
+   * - 若邮箱已被另一个账号占用，则把该账号所有数据合并到当前账号后删除
+   * - 校验邮箱验证码，确保该邮箱的所有权
+   */
+  BindAccount: async ({ uid, account, password, verifyCode: inputCode }) => {
     try {
-      // 首先检查微信用户是否存在
-      const wechatUser = await ConsumerModel.findOne({ _id: uid });
-
-      if (!wechatUser) {
-        return {
-          code: 404,
-          message: "微信用户不存在",
-          success: false,
-        };
+      const currentUser = await ConsumerModel.findById(uid);
+      if (!currentUser) {
+        return { code: 404, message: "当前用户不存在", success: false };
       }
 
-      // 检查账号是否已被其他用户绑定
+      const codeResult = verifyCode(account, inputCode);
+      if (!codeResult.valid) {
+        return { code: 400, success: false, message: codeResult.message };
+      }
+
       const existingUser = await ConsumerModel.findOne({
         $or: [{ username: account }, { email: account }],
       });
 
-      if (existingUser) {
-        // 如果是同一个用户，直接更新信息，即换绑账号
-        if (existingUser._id.toString() === uid) {
-          wechatUser.username = account;
-          wechatUser.email = account;
-          wechatUser.password = await bcrypt.hash(password, 10);
-          await wechatUser.save();
-          return {
-            code: 200,
-            message: "账号绑定成功",
-            success: true,
-          };
-        }
-
-        // 如果是不同用户，需要将非微信用户的数据转移到微信用户，然后删除非微信用户，并绑定账号和密码
-        //  转移收藏的考试
-        if (
-          existingUser.favoriteExams &&
-          existingUser.favoriteExams.length > 0
-        ) {
-          // 合并收藏的考试，去重
-          const mergedFavorites = [
-            ...new Set([
-              ...(wechatUser.favoriteExams || []),
-              ...existingUser.favoriteExams,
-            ]),
-          ];
-          wechatUser.favoriteExams = mergedFavorites;
-        }
-
-        // 删除非微信用户
-        await ConsumerModel.deleteOne({ _id: existingUser._id });
+      if (existingUser && existingUser._id.toString() !== String(uid)) {
+        // 邮箱被另一个账号占用：把对方所有数据合并进当前账号
+        await mergeUserData(existingUser._id, currentUser._id);
+        // 合并后重新拉取，避免使用过期的 currentUser
+        const refreshed = await ConsumerModel.findById(uid);
+        refreshed.username = account;
+        refreshed.email = account;
+        refreshed.password = await bcrypt.hash(password, 10);
+        await refreshed.save();
+        return { code: 200, message: "账号绑定成功", success: true };
       }
 
-      // 更新微信用户信息，绑定账号和密码
-      wechatUser.username = account;
-      wechatUser.email = account; // 将账号同时作为邮箱
-      wechatUser.password = await bcrypt.hash(password, 10);
+      // 邮箱未被占用，或就是自己 → 直接挂到当前账号
+      currentUser.username = account;
+      currentUser.email = account;
+      currentUser.password = await bcrypt.hash(password, 10);
+      await currentUser.save();
 
-      await wechatUser.save();
-
-      return {
-        code: 200,
-        message: "账号绑定成功",
-        success: true,
-      };
+      return { code: 200, message: "账号绑定成功", success: true };
     } catch (error) {
       console.error("BindAccount 失败", error);
       return {
@@ -573,9 +532,64 @@ const UserService = {
       };
     }
   },
+
+  /**
+   * 当前登录用户绑定微信
+   * - 当前登录账号保留为主账号
+   * - 拿到 wxCode → openid；若 openid 已属于另一账号，则把该账号数据合并过来
+   */
+  BindWechat: async ({ uid, code }) => {
+    try {
+      if (!code) {
+        return { code: 400, success: false, message: "缺少微信登录凭证" };
+      }
+      const currentUser = await ConsumerModel.findById(uid);
+      if (!currentUser) {
+        return { code: 404, success: false, message: "当前用户不存在" };
+      }
+      if (currentUser.openid) {
+        return {
+          code: 409,
+          success: false,
+          message: "当前账号已绑定微信，请勿重复绑定",
+        };
+      }
+
+      const { openid, session_key } = await wxAuth.wxAuth(code);
+      if (!openid) {
+        return { code: 502, success: false, message: "获取微信身份失败" };
+      }
+
+      const wechatUser = await ConsumerModel.findOne({ openid });
+
+      if (wechatUser && wechatUser._id.toString() !== String(uid)) {
+        // openid 已属于另一个账号：把数据合并到当前账号
+        await mergeUserData(wechatUser._id, currentUser._id);
+      }
+
+      const refreshed = await ConsumerModel.findById(uid);
+      refreshed.openid = openid;
+      refreshed.session_key = session_key;
+      await refreshed.save();
+
+      return {
+        code: 200,
+        success: true,
+        message: "微信绑定成功",
+        data: { openid: refreshed.openid },
+      };
+    } catch (error) {
+      console.error("BindWechat 失败", error);
+      return {
+        code: 500,
+        success: false,
+        message: "绑定微信失败，请稍后重试",
+        error: error.message,
+      };
+    }
+  },
   checkUserBind: async (uid) => {
     try {
-      //检查用户是否绑定账号
       const user = await ConsumerModel.findOne({ _id: uid });
       if (!user) {
         return {
@@ -584,12 +598,17 @@ const UserService = {
           success: false,
         };
       }
-      const isBind = user.username && user.password;
+      const isEmailBound = !!(user.username && user.password);
+      const isWechatBound = !!user.openid;
       return {
         code: 200,
         success: true,
         data: {
-          isBind: !!isBind,
+          // 兼容旧字段：只要任一身份已绑定即为 true
+          isBind: isEmailBound || isWechatBound,
+          isEmailBound,
+          isWechatBound,
+          email: user.email || "",
         },
       };
     } catch (error) {

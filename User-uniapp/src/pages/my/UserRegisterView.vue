@@ -20,10 +20,8 @@
                     ></u-icon>
                 </view>
             </view>
-            <text class="title">{{ bindMode ? "绑定账号" : "注册账户" }}</text>
-            <text class="subtitle">{{
-                bindMode ? "请输入您的账号完成绑定" : "请输入您的邮箱完成注册"
-            }}</text>
+            <text class="title">注册账户</text>
+            <text class="subtitle">使用邮箱完成注册，注册后可在"我的"页绑定微信</text>
         </view>
 
         <view class="login-form">
@@ -37,28 +35,6 @@
                         prefixIconStyle="font-size: 22px;color: #909399"
                         clearable
                     ></u-input>
-                </u-form-item>
-
-                <!-- UID输入 -->
-                <u-form-item prop="uid">
-                    <view class="uid-wrapper">
-                        <view class="uid-input-wrap">
-                            <u-input
-                                v-model="formData.uid"
-                                placeholder="请输入用户UID"
-                                prefixIcon="account"
-                                prefixIconStyle="font-size: 22px;color: #909399"
-                                clearable
-                            ></u-input>
-                        </view>
-                        <u-button
-                            text="获取UID"
-                            size="small"
-                            type="primary"
-                            class="uid-btn"
-                            @click="handleGetUid"
-                        ></u-button>
-                    </view>
                 </u-form-item>
 
                 <!-- 验证码输入 -->
@@ -106,21 +82,18 @@
                     ></u-input>
                 </u-form-item>
 
-                <u-button
-                    type="primary"
+                <view
                     class="login-btn"
-                    :disabled="!canSubmit"
-                    @click="handleLogin"
+                    :class="{ 'login-btn--disabled': !canSubmit }"
+                    @click="handleRegister"
                 >
                     <u-icon
                         name="arrow-rightward"
                         color="#ffffff"
                         size="18"
                     ></u-icon>
-                    <text class="btn-text">{{
-                        bindMode ? "立即绑定" : "立即注册"
-                    }}</text>
-                </u-button>
+                    <text class="btn-text">立即注册</text>
+                </view>
 
                 <view class="register-link">
                     <text>已有账号？</text>
@@ -170,30 +143,25 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
 import {
     UserRegister,
-    BindAccount,
     sendEmailVerifyCode,
 } from "../../API/My/UserLoginAPI";
+import { wechatBind } from "../../util/wechatLogin";
 import navBarHeightUtil from "../../util/navBarHeight";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import logSDK from "../../util/logSDK";
 
-// 绑定模式状态
-const bindMode = ref(false);
 const showPassword = ref(true);
 const showConfirmPassword = ref(true);
 const agreed = ref(false);
 const navBarInfo = ref(0);
-const isAppPlatform = ref(false);
 const userInfoStore = UserInfoStore();
 
 // 表单数据
 const formData = reactive({
     email: "",
-    uid: "",
     verifyCode: "",
     password: "",
     confirmPassword: "",
@@ -215,8 +183,8 @@ const captchaConfig = reactive({
 const captchaQuestion = computed(() => `${captchaConfig.num1} + ${captchaConfig.num2} = ?`);
 
 const generateCaptcha = () => {
-    captchaConfig.num1 = Math.floor(Math.random() * 10) + 1; // 1-10
-    captchaConfig.num2 = Math.floor(Math.random() * 10) + 1; // 1-10
+    captchaConfig.num1 = Math.floor(Math.random() * 10) + 1;
+    captchaConfig.num2 = Math.floor(Math.random() * 10) + 1;
     captchaConfig.answer = '';
 };
 
@@ -236,7 +204,6 @@ const closeCaptcha = () => {
 const verifyCaptcha = () => {
     const expected = captchaConfig.num1 + captchaConfig.num2;
     if (parseInt(captchaConfig.answer) === expected) {
-        // 验证通过
         closeCaptcha();
         sendVerifyCode();
     } else {
@@ -246,8 +213,8 @@ const verifyCaptcha = () => {
             duration: 2000,
             position: "bottom"
         });
-        generateCaptcha(); // 错误后重新生成新题目
-        captchaConfig.answer = ''; // 清空输入
+        generateCaptcha();
+        captchaConfig.answer = '';
     }
 };
 
@@ -265,13 +232,10 @@ const verifyBtnText = computed(() => {
     return "获取验证码";
 });
 
-const isUidRequired = computed(() => isAppPlatform.value);
-
 // 是否可以提交表单
 const canSubmit = computed(() => {
     return (
         formData.email &&
-        (!isUidRequired.value || formData.uid.trim()) &&
         formData.verifyCode &&
         formData.password &&
         formData.confirmPassword
@@ -285,127 +249,6 @@ const goToLogin = () => {
     });
 };
 
-const getLocalUid = () => {
-    // 优先从当前用户状态读取
-    if (userInfoStore.userInfo?.uid) {
-        return String(userInfoStore.userInfo.uid).trim();
-    }
-
-    // 兜底从本地持久化读取
-    const cachedUserInfo = uni.getStorageSync("userinfo");
-    let parsedUserInfo = cachedUserInfo;
-
-    if (typeof cachedUserInfo === "string") {
-        try {
-            parsedUserInfo = JSON.parse(cachedUserInfo);
-        } catch {
-            parsedUserInfo = null;
-        }
-    }
-
-    const uid = parsedUserInfo?.uid || parsedUserInfo?.userInfo?.uid;
-    return uid ? String(uid).trim() : "";
-};
-
-// 获取UID（按平台处理）
-const handleGetUid = async () => {
-    try {
-        const platform = uni.getSystemInfoSync().uniPlatform;
-        if (platform === "mp-weixin") {
-            const localUid = getLocalUid();
-            if (!localUid) {
-                uni.showToast({
-                    title: "本地未找到UID，请先登录后重试",
-                    icon: "none",
-                    duration: 2000,
-                });
-                return;
-            }
-            formData.uid = localUid;
-            uni.showToast({
-                title: "已从本地填入UID",
-                icon: "success",
-                duration: 1500,
-            });
-            return;
-        }
-
-        if (platform === "app") {
-            uni.showModal({
-                title: "前往微信获取UID",
-                content:
-                    "将为你拉起微信，请在微信小程序中搜索“题喵喵”获取UID。",
-                confirmText: "去微信",
-                success: (res) => {
-                    if (!res.confirm) return;
-
-                    uni.setClipboardData({
-                        data: "题喵喵",
-                        success: () => {
-                            uni.showToast({
-                                title: "已复制“题喵喵”到剪贴板",
-                                icon: "none",
-                                duration: 1800,
-                            });
-                        },
-                    });
-
-                    if (
-                        typeof plus !== "undefined" &&
-                        plus.runtime &&
-                        typeof plus.runtime.launchApplication === "function"
-                    ) {
-                        plus.runtime.launchApplication(
-                            { pname: "com.tencent.mm" },
-                            () => {
-                                uni.showToast({
-                                    title: "未检测到微信客户端",
-                                    icon: "none",
-                                    duration: 2000,
-                                });
-                            },
-                        );
-                    } else {
-                        uni.showToast({
-                            title: "当前环境不支持拉起微信",
-                            icon: "none",
-                            duration: 2000,
-                        });
-                    }
-                },
-            });
-            return;
-        }
-
-        // 其他平台兜底：从剪贴板读取
-        const res = await uni.getClipboardData();
-        const uid = (res?.data || "").toString().trim();
-
-        if (!uid) {
-            uni.showToast({
-                title: "剪贴板为空，请先复制UID",
-                icon: "none",
-                duration: 2000,
-            });
-            return;
-        }
-
-        formData.uid = uid;
-        uni.showToast({
-            title: "UID已填入",
-            icon: "success",
-            duration: 1500,
-        });
-    } catch (error) {
-        console.error("获取UID失败:", error);
-        uni.showToast({
-            title: "获取失败，请手动输入",
-            icon: "none",
-            duration: 2000,
-        });
-    }
-};
-
 // 发送验证码
 const sendVerifyCode = async () => {
     if (isCountingDown.value || !isEmailValid.value) {
@@ -413,8 +256,8 @@ const sendVerifyCode = async () => {
     }
 
     try {
-        uni.showLoading({ 
-            title: "发送中...", mask: true 
+        uni.showLoading({
+            title: "发送中...", mask: true
         });
 
         const result = await sendEmailVerifyCode(formData.email, "register");
@@ -429,19 +272,16 @@ const sendVerifyCode = async () => {
                 position: "bottom",
             });
             startCountdown();
-            // 埋点：发送验证码成功
             logSDK.track("AUTH_LOGIN_SEND_VERIFY_CODE", {
                 result: logSDK.results.SUCCESS,
             });
         } else {
-            // 频率限制或其他业务错误
             uni.showToast({
                 title: result.message || "发送失败，请重试",
                 icon: "none",
                 duration: 3000,
                 position: "bottom",
             });
-            // 埋点：发送验证码业务失败（服务端返回非 200）
             logSDK.track("AUTH_LOGIN_SEND_VERIFY_CODE", {
                 result: logSDK.results.FAIL,
                 errorCode: String(result.code || ""),
@@ -460,8 +300,66 @@ const sendVerifyCode = async () => {
     }
 };
 
-// 处理注册/绑定
-const handleLogin = async () => {
+// 注册成功后调用 wx.login 拿 code，再请求后端绑定微信
+const bindWechatAfterRegister = async () => {
+    // 仅微信小程序支持 wx.login，App 端目前不在此处提供原生微信授权
+    // #ifdef MP-WEIXIN
+    try {
+        await wechatBind();
+    } catch (e) {
+        console.error("BindWechat 异常:", e);
+    }
+    // #endif
+    // #ifndef MP-WEIXIN
+    uni.showToast({
+        title: "请在微信小程序内完成绑定",
+        icon: "none",
+        duration: 2500,
+    });
+    // #endif
+};
+
+// 注册成功后弹窗：是否立即绑定微信
+const promptBindWechat = () => {
+    return new Promise((resolve) => {
+        // #ifdef MP-WEIXIN
+        uni.showModal({
+            title: "绑定微信",
+            content: "绑定后可使用微信一键登录，下次无需输入账号密码。",
+            confirmText: "立即绑定",
+            cancelText: "稍后再说",
+            success: (res) => {
+                if (res.confirm) {
+                    bindWechatAfterRegister();
+                }
+                resolve();
+            },
+            fail: () => resolve(),
+        });
+        // #endif
+        // #ifndef MP-WEIXIN
+        // App / H5 端：注册完成后直接进入主页面，可在"我的"页随时绑定
+        uni.showModal({
+            title: "注册成功",
+            showCancel: false,
+            confirmText: "知道了",
+            success: () => resolve(),
+            fail: () => resolve(),
+        });
+        // #endif
+    });
+};
+
+// 处理注册
+const handleRegister = async () => {
+    if (!canSubmit.value) {
+        uni.showToast({
+            title: "请填写完整信息",
+            icon: "none",
+            duration: 2000,
+        });
+        return;
+    }
     if (!agreed.value) {
         uni.showToast({
             title: "请先阅读并同意用户协议和隐私政策",
@@ -472,23 +370,6 @@ const handleLogin = async () => {
     }
 
     try {
-        if (!canSubmit.value) {
-            uni.showToast({
-                title: "请填写完整信息",
-                icon: "none",
-                duration: 2000,
-            });
-            throw new Error("表单填写不完整");
-        }
-
-        if (isUidRequired.value && !formData.uid.trim()) {
-            uni.showToast({
-                title: "App端请先填写UID",
-                icon: "none",
-                duration: 2000,
-            });
-            throw new Error("App端UID必填");
-        }
 
         if (formData.password !== formData.confirmPassword) {
             await new Promise((resolve) => {
@@ -506,71 +387,69 @@ const handleLogin = async () => {
             throw new Error("密码不一致");
         }
 
-        let result;
-        if (bindMode.value) {
-            result = await BindAccount({
-                account: formData.email,
-                uid: formData.uid,
-                verifyCode: formData.verifyCode,
-                password: formData.password,
-            });
-        } else {
-            result = await UserRegister({
-                account: formData.email,
-                uid: formData.uid,
-                verifyCode: formData.verifyCode,
-                password: formData.password,
-            });
-        }
+        const result = await UserRegister({
+            account: formData.email,
+            verifyCode: formData.verifyCode,
+            password: formData.password,
+        });
 
         if (result.code === 200) {
+            // 后端注册成功后已下发 token + userInfo，直接进入登录态
+            if (result.data?.token) {
+                uni.setStorageSync("token", result.data.token);
+            }
+            if (result.data?.userInfo) {
+                userInfoStore.setUserInfo(result.data.userInfo);
+            }
+
             uni.showToast({
-                title: result.message,
+                title: result.message || "注册成功",
                 icon: "success",
-                duration: 2000,
+                duration: 1500,
             });
 
-            // 埋点：注册 / 绑定账号成功
             logSDK.track("AUTH_REGISTER", {
                 result: logSDK.results.SUCCESS,
-                metadata: { mode: bindMode.value ? "bind" : "register" },
+                metadata: { mode: "register" },
             });
 
-            if (bindMode.value) {
-                setTimeout(() => {
+            // 短暂延时确保 toast 可见，再弹绑定微信引导
+            setTimeout(async () => {
+                await promptBindWechat();
+                // 不论是否绑定，都返回上一页（通常是登录页或"我的"）
+                const pages = getCurrentPages();
+                if (pages.length > 1) {
                     uni.navigateBack();
-                }, 1500);
-            } else {
-                setTimeout(() => {
-                    uni.navigateTo({ url: "/pages/my/UserLoginView" });
-                }, 1500);
-            }
+                } else {
+                    uni.switchTab({ url: "/pages/my/MyView" });
+                }
+            }, 1200);
         } else {
-            // 埋点：注册 / 绑定账号业务失败（服务端返回非 200）
             logSDK.track("AUTH_REGISTER", {
                 result: logSDK.results.FAIL,
                 errorCode: String(result.code || ""),
                 errorMessage: result.message || "注册失败，请稍后重试",
-                metadata: { mode: bindMode.value ? "bind" : "register" },
+                metadata: { mode: "register" },
+            });
+            uni.showToast({
+                title: result.message || "注册失败",
+                icon: "none",
+                duration: 2500,
             });
         }
     } catch (error) {
-        console.error(bindMode.value ? "绑定异常:" : "注册异常:", error);
+        console.error("注册异常:", error);
         const errorMsg = error.message || "网络异常，请稍后重试";
         uni.showToast({
             title: errorMsg,
             icon: "none",
             duration: 2000,
         });
-        // 埋点：注册 / 绑定账号异常（表单校验失败或网络错误）
-        // 注意：表单校验类错误（密码不一致、字段缺失）也会走到此处，
-        //       通过 errorMessage 区分具体原因。
         logSDK.track("AUTH_REGISTER", {
             result: logSDK.results.FAIL,
             errorMessage: errorMsg,
-            metadata: { mode: bindMode.value ? "bind" : "register" },
+            metadata: { mode: "register" },
         });
-        throw error;
     }
 };
 
@@ -609,15 +488,6 @@ const showPrivacyPolicy = () => {
         url: "/pages/public/PrivacyPolicyView",
     });
 };
-
-onLoad((options) => {
-    if (options.isBind === "true") {
-        bindMode.value = true;
-    }
-
-    const platform = uni.getSystemInfoSync().uniPlatform;
-    isAppPlatform.value = platform === "app";
-});
 
 onMounted(() => {
     const info = navBarHeightUtil.getNavBarInfo();
@@ -772,23 +642,6 @@ onUnmounted(() => {
         }
     }
 
-    .uid-wrapper {
-        display: flex;
-        align-items: center;
-        width: 100%;
-
-        .uid-input-wrap {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .uid-btn {
-            margin-left: 20rpx;
-            flex-shrink: 0;
-            width: 200rpx;
-        }
-    }
-
     .login-btn {
         width: 100%;
         height: 90rpx;
@@ -804,6 +657,11 @@ onUnmounted(() => {
             color: #ffffff;
             font-size: 32rpx;
             font-weight: bold;
+        }
+
+        &--disabled {
+            opacity: 0.5;
+            pointer-events: none;
         }
     }
 
