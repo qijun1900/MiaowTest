@@ -239,6 +239,63 @@ const UserService = {
       };
     }
   },
+  // 重置密码（忘记密码）
+  ResetPassword: async (account, inputCode, newPassword) => {
+    try {
+      if (!account || !inputCode || !newPassword) {
+        return {
+          code: 400,
+          success: false,
+          message: "缺少必要参数",
+        };
+      }
+
+      if (typeof newPassword !== "string" || newPassword.length < 6) {
+        return {
+          code: 400,
+          success: false,
+          message: "密码长度至少为 6 位",
+        };
+      }
+
+      const user = await ConsumerModel.findOne({
+        $or: [{ username: account }, { email: account }],
+      });
+
+      if (!user) {
+        return {
+          code: 404,
+          success: false,
+          message: "账号尚未注册",
+        };
+      }
+
+      const codeResult = verifyCode(account, inputCode);
+      if (!codeResult.valid) {
+        return {
+          code: 400,
+          success: false,
+          message: codeResult.message,
+        };
+      }
+
+      user.password = await bcrypt.hash(newPassword, 10);
+      await user.save();
+
+      return {
+        code: 200,
+        success: true,
+        message: "密码重置成功",
+      };
+    } catch (error) {
+      console.error("ResetPassword 失败", error);
+      return {
+        code: 500,
+        success: false,
+        message: "密码重置失败，请稍后重试",
+      };
+    }
+  },
   // 更新用户信息
   updateUserInfo: async ({ uid, nickname, avatar, gender }) => {
     try {

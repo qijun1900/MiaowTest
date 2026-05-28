@@ -231,6 +231,13 @@
 					}
 				},
 				{
+					"path": "UserForgetPasswordView",
+					"style": {
+						"navigationBarTitleText": "忘记密码",
+						"scrollIndicator": "none"
+					}
+				},
+				{
 					"path": "MyFavoriteView",
 					"style": {
 						"navigationBarTitleText": "我的收藏",

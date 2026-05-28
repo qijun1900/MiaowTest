@@ -417,7 +417,7 @@ const sendVerifyCode = async () => {
             title: "发送中...", mask: true 
         });
 
-        const result = await sendEmailVerifyCode(formData.email);
+        const result = await sendEmailVerifyCode(formData.email, "register");
 
         uni.hideLoading();
 

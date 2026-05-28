@@ -58,7 +58,7 @@
                     <u-checkbox-group v-model="rememberMe">
                         <u-checkbox :name="true" label="记住我"></u-checkbox>
                     </u-checkbox-group>
-                    <text class="forget-pwd">忘记密码？</text>
+                    <text class="forget-pwd" @click="goToForgetPassword">忘记密码？</text>
                 </view>
 
                 <u-button type="primary" class="login-btn" @click="handleLogin">
@@ -355,6 +355,13 @@ const goToRegister = async () => {
         url: "/pages/my/UserRegisterView",
     });
     // #endif
+};
+
+// 跳转忘记密码
+const goToForgetPassword = () => {
+    uni.navigateTo({
+        url: "/pages/my/UserForgetPasswordView",
+    });
 };
 
 // 用户服务协议

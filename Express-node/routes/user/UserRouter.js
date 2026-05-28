@@ -14,6 +14,10 @@ UserRouter.post(
   UserController.UserAccountLogin,
 ); //用户账号登录接口
 UserRouter.post(
+  "/uniappAPI/User/ResetPassword",
+  UserController.ResetPassword,
+); //用户忘记密码 / 重置密码接口
+UserRouter.post(
   "/uniappAPI/User/reportLoginStatus",
   JWT.verifyTokenMiddleware(),
   UserController.reportLoginStatus,

@@ -3,9 +3,10 @@ import { http } from "../../util/http.js";
 /**
  * 发送邮箱验证码
  * @param {string} email - 目标邮箱地址
+ * @param {"register"|"reset"} [type="register"] - 业务类型，决定邮件文案
  * @returns {Promise} 返回发送结果
  */
-export const sendEmailVerifyCode = async (email) => {
+export const sendEmailVerifyCode = async (email, type = "register") => {
   try {
     if (!email) {
       throw new Error("请输入邮箱地址");
@@ -13,7 +14,7 @@ export const sendEmailVerifyCode = async (email) => {
     return await http({
       url: "/uniappAPI/User/sendVerifyCode",
       method: "POST",
-      data: { email },
+      data: { email, type },
     });
   } catch (error) {
     console.error("sendEmailVerifyCode 失败", error);
@@ -95,6 +96,33 @@ export const UserAccountLogin = async ({ account, password }) => {
     });
   } catch (error) {
     console.error("UserAccountLogin 失败", error);
+    throw error;
+  }
+};
+
+/**
+ * 重置密码（忘记密码）
+ * @param  {string} account - 用户账号 / 邮箱
+ * @param  {string} verifyCode - 邮箱验证码
+ * @param  {string} password - 新密码
+ * @returns {Promise} 返回重置结果
+ */
+export const ResetPassword = async ({ account, verifyCode, password }) => {
+  try {
+    if (!account || !verifyCode || !password) {
+      throw new Error("缺少必要参数");
+    }
+    return await http({
+      url: "/uniappAPI/User/ResetPassword",
+      method: "POST",
+      data: {
+        account,
+        verifyCode,
+        password,
+      },
+    });
+  } catch (error) {
+    console.error("ResetPassword 失败", error);
     throw error;
   }
 };

@@ -165,63 +165,120 @@ function createTransporter() {
   return nodemailer.createTransport(transportOptions);
 }
 
+// 邮件模板按业务类型差异化呈现
+const EMAIL_TEMPLATES = {
+  register: {
+    badge: "注册验证",
+    accent: "#3c9cff",
+    accentSoft: "#ecf5ff",
+    title: "欢迎加入",
+    intro: (appName) =>
+      `感谢您选择 <strong style="color:#303133;">${appName}</strong>，请使用以下验证码完成账号注册：`,
+    tips: [
+      "验证码有效期 <strong>10 分钟</strong>，请尽快完成注册。",
+      "完成注册即代表您同意我们的服务条款与隐私政策。",
+      "请勿将验证码告知任何人，工作人员不会主动索取。",
+    ],
+    footer: "如非本人操作，请忽略此邮件，无需做任何处理。",
+  },
+  reset: {
+    badge: "安全验证",
+    accent: "#f56c6c",
+    accentSoft: "#fef0f0",
+    title: "找回密码",
+    intro: (appName) =>
+      `您正在重置 <strong style="color:#303133;">${appName}</strong> 账号的登录密码，请使用以下验证码完成身份验证：`,
+    tips: [
+      "验证码有效期 <strong>10 分钟</strong>，请尽快完成操作。",
+      "重置密码后，所有已登录设备将被强制下线。",
+      "请勿将验证码告知任何人，工作人员不会主动索取。",
+    ],
+    footer:
+      "如果这不是您本人操作，您的账号可能存在安全风险，建议尽快登录修改密码。",
+  },
+};
+
 /**
  * 构建验证码邮件 HTML 正文
  * @param {string} code 6 位验证码
+ * @param {"register"|"reset"} type 业务类型
  * @returns {string}
  */
-function buildEmailHtml(code) {
+function buildEmailHtml(code, type = "register") {
+  const tpl = EMAIL_TEMPLATES[type] || EMAIL_TEMPLATES.register;
   const appName = process.env.APP_NAME || "答题系统";
   const year = new Date().getFullYear();
+
+  const tipsHtml = tpl.tips
+    .map(
+      (tip) =>
+        `<tr><td style="padding:4px 0;color:#606266;font-size:13px;line-height:1.7;">· ${tip}</td></tr>`,
+    )
+    .join("");
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f5f7fa;font-family:Arial,'Microsoft YaHei',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;background:#f5f7fa;">
     <tr>
       <td align="center">
         <table width="560" cellpadding="0" cellspacing="0"
-               style="background:#fff;border-radius:12px;overflow:hidden;
-                      box-shadow:0 2px 12px rgba(0,0,0,.08);">
-          <!-- 顶部色带 -->
+               style="background:#ffffff;border:1px solid #ebeef5;border-radius:8px;overflow:hidden;">
+          <!-- 顶部标识条（左侧色块 + 应用名） -->
           <tr>
-            <td style="background:linear-gradient(135deg,#3c9cff,#6e54c8);
-                        padding:28px 32px;">
-              <h2 style="margin:0;color:#fff;font-size:22px;font-weight:600;">
-                ${appName} · 邮箱验证
-              </h2>
+            <td style="padding:24px 32px;border-bottom:1px solid #ebeef5;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align:middle;">
+                    <span style="display:inline-block;width:4px;height:18px;background:${tpl.accent};vertical-align:middle;margin-right:10px;border-radius:2px;"></span>
+                    <span style="font-size:16px;font-weight:600;color:#303133;vertical-align:middle;">${appName}</span>
+                  </td>
+                  <td align="right" style="vertical-align:middle;">
+                    <span style="display:inline-block;padding:4px 10px;background:${tpl.accentSoft};color:${tpl.accent};font-size:12px;border-radius:4px;">
+                      ${tpl.badge}
+                    </span>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <!-- 正文 -->
           <tr>
-            <td style="padding:36px 32px 28px;">
-              <p style="margin:0 0 16px;color:#333;font-size:15px;line-height:1.6;">您好，</p>
-              <p style="margin:0 0 28px;color:#333;font-size:15px;line-height:1.6;">
-                您正在注册 <strong>${appName}</strong> 账号，请使用以下验证码完成验证：
+            <td style="padding:36px 32px 8px;">
+              <h2 style="margin:0 0 18px;color:#303133;font-size:20px;font-weight:600;">
+                ${tpl.title}
+              </h2>
+              <p style="margin:0 0 28px;color:#606266;font-size:14px;line-height:1.7;">
+                ${tpl.intro(appName)}
               </p>
-              <!-- 验证码卡片 -->
+              <!-- 验证码区域 -->
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
                 <tr>
                   <td align="center"
-                      style="background:#f0f7ff;border-radius:10px;padding:24px 0;">
-                    <span style="font-size:42px;font-weight:700;color:#3c9cff;
-                                 letter-spacing:12px;font-family:'Courier New',monospace;">
+                      style="background:${tpl.accentSoft};border:1px dashed ${tpl.accent};border-radius:6px;padding:22px 0;">
+                    <div style="color:#909399;font-size:12px;margin-bottom:8px;">您的验证码</div>
+                    <span style="font-size:36px;font-weight:700;color:${tpl.accent};
+                                 letter-spacing:10px;font-family:Consolas,'Courier New',monospace;">
                       ${code}
                     </span>
                   </td>
                 </tr>
               </table>
-              <p style="margin:0 0 10px;color:#666;font-size:14px;line-height:1.6;">
-                ⏱ 验证码有效期 <strong>10 分钟</strong>，请尽快完成验证。
+              <!-- 提示列表 -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                ${tipsHtml}
+              </table>
+            </td>
+          </tr>
+          <!-- 页脚 -->
+          <tr>
+            <td style="padding:20px 32px 28px;border-top:1px solid #ebeef5;background:#fafafa;">
+              <p style="margin:0 0 6px;color:#909399;font-size:12px;line-height:1.6;">
+                ${tpl.footer}
               </p>
-              <p style="margin:0 0 28px;color:#666;font-size:14px;line-height:1.6;">
-                🔒 请勿将验证码告知任何人，${appName} 工作人员不会主动索取。
-              </p>
-              <hr style="border:none;border-top:1px solid #eee;margin-bottom:20px;">
-              <p style="margin:0;color:#bbb;font-size:12px;line-height:1.6;">
-                如非本人操作，请忽略此邮件，您的账号安全不受影响。<br>
-                © ${year} ${appName}
+              <p style="margin:0;color:#c0c4cc;font-size:12px;line-height:1.6;">
+                此邮件由系统自动发送，请勿直接回复。&copy; ${year} ${appName}
               </p>
             </td>
           </tr>
@@ -240,9 +297,11 @@ function buildEmailHtml(code) {
 /**
  * 发送邮箱验证码
  * @param {string} email 目标邮箱地址
+ * @param {"register"|"reset"} type 业务类型，决定邮件主题与正文文案
  * @returns {Promise<{ success: boolean, message: string }>}
  */
-async function sendVerifyCode(email) {
+async function sendVerifyCode(email, type = "register") {
+  const safeType = type === "reset" ? "reset" : "register";
   if (!email || typeof email !== "string") {
     return { success: false, message: "邮箱地址不能为空" };
   }
@@ -289,14 +348,19 @@ async function sendVerifyCode(email) {
     const transporter = createTransporter();
     const appName = process.env.APP_NAME || "答题系统";
     const senderName = process.env.EMAIL_SENDER_NAME || appName;
+    const subjectPrefix = safeType === "reset" ? "找回密码验证码" : "注册验证码";
+    const textIntro =
+      safeType === "reset"
+        ? `您正在重置 ${appName} 账号密码`
+        : `您正在注册 ${appName} 账号`;
 
     await transporter.sendMail({
       from: `"${senderName}" <${process.env.EMAIL_USER}>`,
       to: emailLower,
-      subject: `【${appName}】邮箱验证码：${code}`,
-      html: buildEmailHtml(code),
+      subject: `【${appName}】${subjectPrefix}：${code}`,
+      html: buildEmailHtml(code, safeType),
       // 纯文本降级，兼容不支持 HTML 的邮件客户端
-      text: `您的 ${appName} 验证码是：${code}，有效期 10 分钟，请勿泄露。`,
+      text: `${textIntro}，验证码是：${code}，有效期 10 分钟，请勿泄露。`,
     });
 
     console.log(`[emailHelper] 验证码已发送 → ${emailLower}`);

@@ -55,7 +55,7 @@ const UserController = {
   // 发送邮箱验证码
   sendVerifyCode: async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, type } = req.body;
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return res.status(200).send({
           code: 400,
@@ -63,7 +63,7 @@ const UserController = {
           message: "请输入有效的邮箱地址",
         });
       }
-      const result = await sendVerifyCodeEmail(email);
+      const result = await sendVerifyCodeEmail(email, type);
       res.status(200).send({
         code: result.success ? 200 : 429,
         ActionType: result.success ? "OK" : "ERROR",
@@ -107,6 +107,31 @@ const UserController = {
         code: 500,
         ActionType: "ERROR",
         message: "注册失败，请稍后重试",
+      });
+    }
+  },
+  // 重置密码（忘记密码）
+  ResetPassword: async (req, res) => {
+    try {
+      const { account, verifyCode, password } = req.body;
+      const result = await UserService.ResetPassword(
+        account,
+        verifyCode,
+        password,
+      );
+      res.status(200).send({
+        code: result.code,
+        ActionType: result.success ? "OK" : "ERROR",
+        success: result.success,
+        message: result.message,
+      });
+    } catch (error) {
+      console.error("ResetPassword 失败", error);
+      res.status(200).send({
+        code: 500,
+        ActionType: "ERROR",
+        success: false,
+        message: "密码重置失败，请稍后重试",
       });
     }
   },
