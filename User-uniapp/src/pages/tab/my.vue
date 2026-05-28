@@ -1,9 +1,24 @@
 <template>
     <view class="container">
-        <GreetingBanner
-            :statusBarHeight="navBarInfo.statusBarHeight || 0"
-            :topInset="8"
-        />
+        <view class="header-row" :style="headerRowStyle">
+            <GreetingBanner
+                class="header-greeting"
+                :statusBarHeight="0"
+                :topInset="0"
+            />
+            <view
+                class="header-setting"
+                hover-class="header-setting--active"
+                :hover-stay-time="80"
+                @click="goSetting"
+            >
+                <image
+                    class="header-setting__icon"
+                    src="/static/navMy/c-my-setting.png"
+                    mode="aspectFit"
+                />
+            </view>
+        </view>
 
         <!-- 用户信息区域 - 美化版 -->
         <UserInfoCard
@@ -12,13 +27,6 @@
             :showStatusBar="true"
             @click="handleUserinfo"
         />
-
-        <!-- Core Nav -->
-        <view>
-            <myNavbar />
-        </view>
-
-        <ThemeDivider text="更多功能" />
 
         <!-- 功能列表 -->
         <view class="function-list">
@@ -76,12 +84,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { onShow, onPullDownRefresh } from "@dcloudio/uni-app";
 import uviewOverlay from "../../components/core/uviewOverlay.vue";
 import { wechatLogin } from "../../util/wechatLogin";
-import myNavbar from "../../components/modules/my/myNavbar.vue";
-import ThemeDivider from "../../components/core/ThemeDivider.vue";
 import navBarHeightUtil from "../../util/navBarHeight.js";
 import CustomNavbar from "../../components/core/CustomNavbar.vue";
 import { clearExamCache } from "../../util/cacheCleaner.js";
@@ -120,6 +126,32 @@ const CustomNavbarList = ref([
     },
 ]);
 // 处理导航栏点击事件
+const goSetting = () => {
+    uni.navigateTo({
+        url: "/pages/my/MySettingView",
+    });
+};
+
+const headerRowStyle = computed(() => {
+    const info = navBarInfo.value || {};
+    const statusBarHeight = info.statusBarHeight || 0;
+    const rect = info.menuButtonRect;
+    // #ifdef MP-WEIXIN
+    if (rect && rect.top && rect.height) {
+        const sys = uni.getWindowInfo();
+        const rightReserve = Math.max(sys.windowWidth - rect.left + 8, 0);
+        return {
+            marginTop: `${rect.top}px`,
+            minHeight: `${rect.height}px`,
+            paddingRight: `${rightReserve}px`,
+        };
+    }
+    // #endif
+    return {
+        marginTop: `${statusBarHeight + 8}px`,
+        paddingRight: "24rpx",
+    };
+});
 const handleClick = (item) => {
     if (item.title === "清除缓存") {
         if (clearExamCache().isClear) {
@@ -332,5 +364,39 @@ onShow(() => {
 
 .function-list {
     margin-bottom: 20rpx;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16rpx;
+    padding: 0 8rpx 0 0;
+    box-sizing: border-box;
+}
+
+.header-greeting {
+    flex: 1;
+    min-width: 0;
+}
+
+.header-setting {
+    flex-shrink: 0;
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.header-setting--active {
+    background: rgba(24, 53, 88, 0.08);
+}
+
+.header-setting__icon {
+    width: 44rpx;
+    height: 44rpx;
 }
 </style>
