@@ -1,12 +1,18 @@
 <template>
     <view class="container">
         <!-- 用户信息卡片 -->
-        <view class="profile-card" @click="goToUserInfo">
+        <view class="profile-card" @click="handleProfileCardClick">
             <view class="profile-left">
                 <userAvatar :width="100" :height="100" :showOnline="false" />
                 <view class="profile-info">
-                    <text class="profile-name">{{ userInfoStore.userInfo?.nickname || "未设置昵称" }}</text>
-                    <text class="profile-uid">UID: {{ userInfoStore.userInfo?.uid || "--" }}</text>
+                    <template v-if="isLoggedIn">
+                        <text class="profile-name">{{ userInfoStore.userInfo?.nickname || "未设置昵称" }}</text>
+                        <text class="profile-uid">UID: {{ userInfoStore.userInfo?.uid || "--" }}</text>
+                    </template>
+                    <template v-else>
+                        <text class="profile-name">点击登录</text>
+                        <text class="profile-uid">登录后享受完整功能</text>
+                    </template>
                 </view>
             </view>
             <up-icon name="arrow-right" size="14px" color="#999"></up-icon>
@@ -101,8 +107,8 @@
 
         <!-- 设置列表 -->
         <view class="settings-group">
-            <!-- 账号安全 -->
-            <view class="setting-item" @click="handleAccountSecurity">
+            <!-- 账号安全（登录后可见） -->
+            <view v-if="isLoggedIn" class="setting-item" @click="handleAccountSecurity">
                 <view class="setting-left">
                     <view class="setting-icon safe-icon">
                         <up-icon name="lock" size="18px" color="#999"></up-icon>
@@ -114,8 +120,8 @@
                 </view>
             </view>
 
-            <!-- 账号绑定 -->
-            <view class="setting-item" @click="handleAccountBind">
+            <!-- 账号绑定（登录后可见） -->
+            <view v-if="isLoggedIn" class="setting-item" @click="handleAccountBind">
                 <view class="setting-left">
                     <view class="setting-icon bind-icon">
                         <up-icon name="link" size="18px" color="#999"></up-icon>
@@ -218,8 +224,8 @@
             </view>
         </view>
 
-        <!-- 退出登录 -->
-        <view class="logout-section">
+        <!-- 退出登录（登录后可见） -->
+        <view v-if="isLoggedIn" class="logout-section">
             <view class="logout-btn" @click="handleLogout">退出登录</view>
         </view>
     </view>
@@ -298,9 +304,16 @@ const calcCacheSize = () => {
     }
 };
 
-// 跳转个人资料
-const goToUserInfo = () => {
-    uni.navigateTo({ url: "/pages/my/UserInfoView" });
+// 登录状态
+const isLoggedIn = computed(() => userInfoStore.isLoggedIn);
+
+// 点击个人资料卡片
+const handleProfileCardClick = () => {
+    if (isLoggedIn.value) {
+        uni.navigateTo({ url: "/pages/my/UserInfoView" });
+    } else {
+        uni.navigateTo({ url: "/pages/my/UserLoginView" });
+    }
 };
 
 // 账号安全
@@ -428,7 +441,9 @@ const handleLogout = () => {
 onMounted(() => {
     calcCacheSize();
     appearanceStore.initAppearance();
-    fetchBindStatus();
+    if (isLoggedIn.value) {
+        fetchBindStatus();
+    }
     const savedNotification = uni.getStorageSync("notification_enabled");
     if (savedNotification !== "") {
         notificationEnabled.value = savedNotification;
