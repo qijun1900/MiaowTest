@@ -15,7 +15,7 @@
                     </template>
                 </view>
             </view>
-            <up-icon name="arrow-right" size="14px" color="#999"></up-icon>
+            <t-icon name="chevron-right" size="14px" color="#999"></t-icon>
         </view>
 
         <!-- 外观设置 -->
@@ -26,13 +26,13 @@
             <view class="setting-item" @click="handleDarkMode">
                 <view class="setting-left">
                     <view class="setting-icon darkmode-icon">
-                        <up-icon name="eye-fill" size="18px" color="#999"></up-icon>
+                        <t-icon name="browse" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">深浅模式</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ appearanceStore.getDarkModeText() }}</text>
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
 
@@ -40,7 +40,7 @@
             <view class="setting-item" @click="showThemePopup = true">
                 <view class="setting-left">
                     <view class="setting-icon theme-icon">
-                        <up-icon name="star-fill" size="18px" color="#999"></up-icon>
+                        <t-icon name="star-filled" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">主题</text>
                 </view>
@@ -49,7 +49,7 @@
                         class="theme-color-dot"
                         :style="{ backgroundColor: appearanceStore.themeColor }"
                     ></view>
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
 
@@ -57,23 +57,22 @@
             <view class="setting-item" @click="handleFontSize">
                 <view class="setting-left">
                     <view class="setting-icon fontsize-icon">
-                        <up-icon name="zh" size="18px" color="#999"></up-icon>
+                        <t-icon name="translate" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">字号</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ appearanceStore.fontSizeOptions[appearanceStore.fontSizeIndex] }}</text>
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
         </view>
 
         <!-- 主题色选择弹窗 -->
-        <up-popup
-            :show="showThemePopup"
-            mode="bottom"
-            round="16"
-            @close="showThemePopup = false"
+        <t-popup
+            :visible="showThemePopup"
+            placement="bottom"
+            @visible-change="(visible) => { if (!visible) showThemePopup = false }"
         >
             <view class="theme-picker">
                 <view class="theme-picker-title">选择主题色</view>
@@ -89,12 +88,12 @@
                             :class="{ active: appearanceStore.themeColor === item.color }"
                             :style="{ backgroundColor: item.color }"
                         >
-                            <up-icon
+                            <t-icon
                                 v-if="appearanceStore.themeColor === item.color"
-                                name="checkmark"
+                                name="check"
                                 size="16px"
                                 color="#fff"
-                            ></up-icon>
+                            ></t-icon>
                         </view>
                         <text class="theme-color-name">{{ item.name }}</text>
                     </view>
@@ -103,7 +102,7 @@
                     <text>取消</text>
                 </view>
             </view>
-        </up-popup>
+        </t-popup>
 
         <!-- 设置列表 -->
         <view class="settings-group">
@@ -111,12 +110,12 @@
             <view v-if="isLoggedIn" class="setting-item" @click="handleAccountSecurity">
                 <view class="setting-left">
                     <view class="setting-icon safe-icon">
-                        <up-icon name="lock" size="18px" color="#999"></up-icon>
+                        <t-icon name="lock-on" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">账号安全</text>
                 </view>
                 <view class="setting-right">
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
 
@@ -124,13 +123,13 @@
             <view v-if="isLoggedIn" class="setting-item" @click="handleAccountBind">
                 <view class="setting-left">
                     <view class="setting-icon bind-icon">
-                        <up-icon name="link" size="18px" color="#999"></up-icon>
+                        <t-icon name="link" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">账号绑定</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ bindStatusText }}</text>
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
 
@@ -138,18 +137,16 @@
             <view class="setting-item">
                 <view class="setting-left">
                     <view class="setting-icon notify-icon">
-                        <up-icon name="bell" size="18px" color="#999"></up-icon>
+                        <t-icon name="notification" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">消息通知</text>
                 </view>
                 <view class="setting-right">
-                    <up-switch
-                        v-model="notificationEnabled"
-                        :activeValue="true"
-                        :inactiveValue="false"
-                        size="22"
-                        @change="handleNotificationChange"
-                    ></up-switch>
+                    <t-switch
+                        :value="notificationEnabled"
+                        :custom-value="[true, false]"
+                        @change="(e) => handleNotificationChange(e.value)"
+                    ></t-switch>
                 </view>
             </view>
 
@@ -157,13 +154,13 @@
             <view class="setting-item" @click="handleClearCache">
                 <view class="setting-left">
                     <view class="setting-icon clear-icon">
-                        <up-icon name="trash" size="18px" color="#999"></up-icon>
+                        <t-icon name="delete" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">清除缓存</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ cacheSize }}</text>
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
 
@@ -171,13 +168,13 @@
             <view class="setting-item" @click="handleCheckUpdate">
                 <view class="setting-left">
                     <view class="setting-icon update-icon">
-                        <up-icon name="reload" size="18px" color="#999"></up-icon>
+                        <t-icon name="refresh" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">检查更新</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">v{{ appVersion }}</text>
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
         </view>
@@ -187,12 +184,12 @@
             <view class="setting-item" @click="handleUserAgreement">
                 <view class="setting-left">
                     <view class="setting-icon agreement-icon">
-                        <up-icon name="file-text" size="18px" color="#999"></up-icon>
+                        <t-icon name="file" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">用户协议</text>
                 </view>
                 <view class="setting-right">
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
 
@@ -200,12 +197,12 @@
             <view class="setting-item" @click="handlePrivacyPolicy">
                 <view class="setting-left">
                     <view class="setting-icon privacy-icon">
-                        <up-icon name="eye" size="18px" color="#999"></up-icon>
+                        <t-icon name="browse" size="18px" color="#999"></t-icon>
                     </view>
                     <text class="setting-label">隐私政策</text>
                 </view>
                 <view class="setting-right">
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
 
@@ -213,13 +210,13 @@
             <view class="setting-item" @click="handleAbout">
                 <view class="setting-left">
                     <view class="setting-icon about-icon">
-                        <up-icon name="info-circle" size="18px" color="#80848f"></up-icon>
+                        <t-icon name="info-circle" size="18px" color="#80848f"></t-icon>
                     </view>
                     <text class="setting-label">关于我们</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">v{{ appVersion }}</text>
-                    <up-icon name="arrow-right" size="14px" color="#ccc"></up-icon>
+                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
                 </view>
             </view>
         </view>

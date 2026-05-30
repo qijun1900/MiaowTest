@@ -1,7 +1,6 @@
 <template>
-    <up-overlay
-        :show="props.show"
-        @update:show="emit('update:show', $event)"
+    <t-overlay
+        :visible="props.show"
         @click="handleClose"
     >
         <view class="warp">
@@ -9,22 +8,17 @@
                 <slot name="overlaycontent"></slot>
             </view>
         </view>
-    </up-overlay>
+    </t-overlay>
 </template>
 <script setup>
-import { defineProps, defineEmits } from "vue";
-// 定义组件属性
 const props = defineProps({
-    // 控制弹窗显示
     show: {
         type: Boolean,
         default: false,
     },
 });
 
-// 定义事件
 const emit = defineEmits(["update:show"]);
-// 处理关闭事件
 const handleClose = () => {
     emit("update:show", false);
 };

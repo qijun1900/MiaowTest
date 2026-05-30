@@ -4,10 +4,8 @@
 		"custom": {
 			// uni-ui 规则如下配置
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
-			// uView 规则如下配置
-			"^u--(.*)": "uview-plus/components/u-$1/u-$1.vue",
-			"^up-(.*)": "uview-plus/components/u-$1/u-$1.vue",
-			"^u-([^-].*)": "uview-plus/components/u-$1/u-$1.vue"
+			// TDesign 规则如下配置
+			"^t-(.*)": "@tdesign/uniapp/$1/$1.vue"
 		}
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
@@ -146,7 +144,8 @@
 				{
 					"path": "subjectdetailview",
 					"style": {
-						"navigationBarTitleText": "考试详情"
+						"navigationBarTitleText": "考试详情",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -160,19 +159,22 @@
 					"style": {
 						"navigationBarTitleText": "练习",
 						"navigationStyle": "custom",
-						"navigationBarTextStyle": "black" // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
+						"navigationBarTextStyle": "black", // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "PracticeInGameSettingsView",
 					"style": {
-						"navigationBarTitleText": "练习设置"
+						"navigationBarTitleText": "练习设置",
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "PracticeResultsView",
 					"style": {
-						"navigationBarTitleText": "练习结果"
+						"navigationBarTitleText": "练习结果",
+						"scrollIndicator": "none"
 					}
 				},
 				{
@@ -186,20 +188,21 @@
 					"path": "UserBankView",
 					"style": {
 						"navigationBarTitleText": "题库详情",
-						"disableScroll": true // 禁止页面滚动
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "WrongQuestionView",
 					"style": {
-						"navigationBarTitleText": "我的错题"
+						"navigationBarTitleText": "我的错题",
+						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "ExamDiskView",
 					"style": {
 						"navigationBarTitleText": "资料详情",
-						"disableScroll": true
+						"scrollIndicator": "none"
 					}
 				}
 			]
@@ -219,6 +222,7 @@
 					"path": "UserRegisterView",
 					"style": {
 						"navigationBarTitleText": "注册",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -234,6 +238,7 @@
 					"path": "UserForgetPasswordView",
 					"style": {
 						"navigationBarTitleText": "忘记密码",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},

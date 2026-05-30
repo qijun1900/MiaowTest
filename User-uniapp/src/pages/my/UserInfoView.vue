@@ -6,7 +6,7 @@
                 <userAvatar :width="160" :height="160" :showOnline="false" />
             </view>
             <view class="edit-avatar-btn">
-                <up-icon name="edit-pen" size="16px"></up-icon>
+                <t-icon name="edit" size="16px"></t-icon>
                 <text>更换头像</text>
             </view>
         </view>
@@ -17,7 +17,7 @@
                 <view class="info-label">昵称</view>
                 <view class="info-value">
                     <text>{{ userInfoStore.userInfo?.nickname || " " }}</text>
-                    <up-icon name="arrow-right" size="14px"></up-icon>
+                    <t-icon name="chevron-right" size="14px"></t-icon>
                 </view>
             </view>
 
@@ -27,7 +27,7 @@
                     <text>{{
                         getGenderText(userInfoStore.userInfo?.gender)
                     }}</text>
-                    <up-icon name="arrow-right" size="14px"></up-icon>
+                    <t-icon name="chevron-right" size="14px"></t-icon>
                 </view>
             </view>
 
@@ -37,21 +37,21 @@
                     <text class="openid-text">{{
                         userInfoStore.userInfo?.uid
                     }}</text>
-                    <up-icon name="file-text" size="18px"></up-icon>
+                    <t-icon name="file" size="18px"></t-icon>
                 </view>
             </view>
 
             <view class="info-item" @click="handleUserAgreeMent">
                 <view class="info-label">用户协议</view>
                 <view class="info-value">
-                    <up-icon name="arrow-right" size="18px"></up-icon>
+                    <t-icon name="chevron-right" size="18px"></t-icon>
                 </view>
             </view>
 
             <view class="info-item" @click="handlePolicy">
                 <view class="info-label">隐私政策</view>
                 <view class="info-value">
-                    <up-icon name="arrow-right" size="18px"></up-icon>
+                    <t-icon name="chevron-right" size="18px"></t-icon>
                 </view>
             </view>
 
@@ -64,13 +64,13 @@
                             ? bindStatus.email
                             : "未绑定"
                     }}</text>
-                    <up-icon
+                    <t-icon
                         v-if="bindStatus.isEmailBound"
-                        name="checkmark-circle"
+                        name="check-circle"
                         size="18px"
                         color="#07c160"
-                    ></up-icon>
-                    <up-icon v-else name="arrow-right" size="14px"></up-icon>
+                    ></t-icon>
+                    <t-icon v-else name="chevron-right" size="14px"></t-icon>
                 </view>
             </view>
 
@@ -83,13 +83,13 @@
                             ? "已绑定"
                             : "未绑定"
                     }}</text>
-                    <up-icon
+                    <t-icon
                         v-if="bindStatus.isWechatBound"
-                        name="checkmark-circle"
+                        name="check-circle"
                         size="18px"
                         color="#07c160"
-                    ></up-icon>
-                    <up-icon v-else name="arrow-right" size="14px"></up-icon>
+                    ></t-icon>
+                    <t-icon v-else name="chevron-right" size="14px"></t-icon>
                 </view>
             </view>
         </view>

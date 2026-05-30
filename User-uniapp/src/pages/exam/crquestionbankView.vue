@@ -1,7 +1,7 @@
 <template>
     <!-- 自定义 添加返回按钮 -->
     <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
-        <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
+        <t-icon name="arrow-left" color="#3c9cff" size="24"></t-icon>
         <text class="back-text">返回</text>
     </view>
     <view class="container">
@@ -23,20 +23,20 @@
                     <text class="input-title">题库名称</text>
                 </view>
                 <view class="input-container">
-                    <u-input
+                    <t-input
                         class="name-input"
-                        v-model="questionBankName"
+                        :value="questionBankName"
                         placeholder="请输入题库名称（2-20个字符）"
                         maxlength="20"
-                        border="false"
-                        @input="validateName"
+                        borderless
+                        @change="validateName"
                     >
                         <template #suffix>
                             <text class="input-counter"
                                 >{{ questionBankName.length }}/20</text
                             >
                         </template>
-                    </u-input>
+                    </t-input>
                 </view>
                 <view class="input-tips" v-if="nameError">
                     <uni-icons
@@ -231,7 +231,8 @@ const isNameValid = computed(() => {
 });
 
 // 名称验证函数
-const validateName = () => {
+const validateName = (e) => {
+    questionBankName.value = e.value;
     const name = questionBankName.value.trim();
 
     if (name.length === 0) {
@@ -452,7 +453,7 @@ onMounted(async () => {
 .name-input {
     width: 100%;
 
-    :deep(.u-input) {
+    :deep(.t-input) {
         height: 72rpx;
         padding: 0 28rpx;
         background: #f8f9fa;

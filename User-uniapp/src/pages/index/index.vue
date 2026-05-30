@@ -34,7 +34,7 @@
         <view class="my-question-bank">
             <view class="header-section">
                 <view class="hot-exam-title">
-                    <uviewSubsection
+                    <Subsection
                         :list="list"
                         @updateCurrent="handleSendMode"
                         :current="currentMode"
@@ -73,7 +73,7 @@ import UserQuestionBank from "../../components/modules/index/UserQuestionBank.vu
 import { getNoticeInfo, getIndexBanner } from "../../API/Index/AnnouncementAPI";
 import escconfig from "../../config/esc.config";
 import uniSearch from "../../components/core/uniSearch.vue";
-import uviewSubsection from "../../components/core/uviewSubsection.vue";
+import Subsection from "../../components/core/Subsection.vue";
 import UserExamFavorite from "../../components/modules/index/UserExamFavorite.vue";
 import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import BackToTop from "../../components/core/BackToTop.vue";

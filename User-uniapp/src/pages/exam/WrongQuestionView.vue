@@ -24,7 +24,7 @@
         <view class="filter-section">
             <view class="filter-item">
                 <text class="filter-label">题目类型：</text>
-                <uviewSubsection
+                <Subsection
                     :list="questionTypeList"
                     :current="currentTypeIndex"
                     @updateCurrent="handleTypeChange"
@@ -38,8 +38,8 @@
 
         <!-- 加载状态 -->
         <view class="loading-container" v-if="isLoading">
-            <up-loading-icon mode="spinner" color="#007aff" size="40rpx">
-            </up-loading-icon>
+            <t-loading theme="spinner" size="40rpx" style="color: #007aff">
+            </t-loading>
             <text class="loading-text">正在加载错题...</text>
         </view>
 
@@ -59,35 +59,35 @@
                         }}</text>
                     </view>
                     <view class="question-actions">
-                        <up-button
+                        <t-button
                             :icon="
-                                isCollected(question._id) ? 'star-fill' : 'star'
+                                isCollected(question._id) ? 'star-filled' : 'star'
                             "
-                            :type="
-                                isCollected(question._id) ? 'warning' : 'info'
+                            :theme="
+                                isCollected(question._id) ? 'warning' : 'default'
                             "
-                            :plain="!isCollected(question._id)"
-                            size="mini"
-                            shape="circle"
+                            :variant="isCollected(question._id) ? 'base' : 'outline'"
+                            size="small"
+                            shape="round"
                             @click="toggleCollect(question)"
                             :loading="collectLoading[question._id]"
                         >
                             {{ isCollected(question._id) ? "已收藏" : "收藏" }}
-                        </up-button>
-                        <up-button
+                        </t-button>
+                        <t-button
                             :icon="
                                 isInWrongBook(question._id)
-                                    ? 'checkmark-circle-fill'
-                                    : 'plus-circle'
+                                    ? 'check-circle-filled'
+                                    : 'add-circle'
                             "
-                            :type="
+                            :theme="
                                 isInWrongBook(question._id)
                                     ? 'success'
                                     : 'primary'
                             "
-                            :plain="!isInWrongBook(question._id)"
-                            size="mini"
-                            shape="circle"
+                            :variant="isInWrongBook(question._id) ? 'base' : 'outline'"
+                            size="small"
+                            shape="round"
                             @click="toggleWrongBook(question)"
                             :loading="wrongBookLoading[question._id]"
                         >
@@ -96,7 +96,7 @@
                                     ? "已加入"
                                     : "错题本"
                             }}
-                        </up-button>
+                        </t-button>
                     </view>
                 </view>
 
@@ -257,25 +257,24 @@
                             </uni-icons>
                         </view>
                         <view class="analysis-content">
-                            <up-markdown
-                                :content="question.analysis"
+                            <view
+                                class="markdown-content"
                                 v-if="
                                     question.analysis &&
                                     question.analysis !== ''
                                 "
-                            >
-                            </up-markdown>
+                            >{{ question.analysis }}</view>
                             <text v-else class="no-analysis">暂无解析</text>
                         </view>
                         <view
                             class="ai-warning"
                             v-if="question.isAIanswer === 1"
                         >
-                            <up-icon
-                                name="error"
+                            <t-icon
+                                name="error-circle"
                                 color="#f4ae2c"
                                 size="15px"
-                            ></up-icon>
+                            ></t-icon>
                             <text class="ai-warning-text"
                                 >本解析由 AI
                                 生成，内容仅供参考，请仔细甄别！</text
@@ -297,14 +296,14 @@
             </view>
             <text class="empty-title">暂无错题</text>
             <text class="empty-description">继续练习，提升答题水平吧！</text>
-            <up-button
-                type="primary"
-                shape="circle"
+            <t-button
+                theme="primary"
+                shape="round"
                 @click="goToPractice"
                 style="margin-top: 40rpx"
             >
                 去练习
-            </up-button>
+            </t-button>
         </view>
         <BackToTop ref="backToTopRef" position="bottom-right" />
     </view>
@@ -316,7 +315,7 @@ import { onPageScroll } from "@dcloudio/uni-app";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";
 import { useObjectiveAnswerStore } from "../../stores/modules/ObjectiveAnswerStore";
 import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerStore";
-import uviewSubsection from "../../components/core/uviewSubsection.vue";
+import Subsection from "../../components/core/Subsection.vue";
 import BackToTop from "../../components/core/BackToTop.vue";
 import SelectOptionsPreview from "../../components/modules/exam/SelectOptionsPreview.vue";
 import JudgeOptionsPreview from "../../components/modules/exam/JudgeOptionsPreview.vue";
@@ -863,6 +862,14 @@ onPageScroll((e) => {
     color: #555555;
     line-height: 1.7;
     margin-bottom: 15rpx;
+}
+
+.markdown-content {
+    font-size: 28rpx;
+    color: #555555;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 .no-analysis {

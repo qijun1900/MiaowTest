@@ -23,11 +23,11 @@
                 </view>
             </view>
         </view>
-        <up-divider
-            text="没有更多了"
+        <t-divider
+            content="没有更多了"
             :dashed="true"
-            textPosition="center"
-        ></up-divider>
+            align="center"
+        ></t-divider>
     </view>
 </template>
 <script setup>

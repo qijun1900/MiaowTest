@@ -37,7 +37,7 @@
         <UserActivityHeatmap ref="activityHeatmapRef" />
 
         <!-- 登录显示 -->
-        <uviewOverlay v-model:show="LoginOverlayShow">
+        <tOverlay v-model:show="LoginOverlayShow">
             <template #overlaycontent>
                 <view class="rect">
                     <view class="overlay-header">
@@ -47,21 +47,23 @@
                         >
                     </view>
                     <view class="login-but">
+                        <t-button
+                            variant="outline"
+                            @click="handleCancelLogin"
+                            >暂不登录</t-button
+                        >
                         <!-- #ifndef MP-WEIXIN -->
-                        <up-button
-                            type="primary"
-                            icon="fingerprint"
+                        <t-button
+                            theme="primary"
                             @click="handleUseAccountLogin"
-                            >账号登录</up-button
+                            >账号登录</t-button
                         >
                         <!-- #endif -->
                         <!-- #ifdef MP-WEIXIN -->
-                        <up-button
-                            color="#09B83E"
-                            type="success"
-                            icon="weixin-fill"
+                        <t-button
+                            style="background-color: #09B83E; color: #fff;"
                             @click="handleUseWXLogin"
-                            >微信登录</up-button
+                            >微信登录</t-button
                         >
                         <!-- #endif -->
                     </view>
@@ -72,21 +74,16 @@
                             @showPrivacyPolicy="showPrivacyPolicy"
                         />
                     </view>
-                    <view class="login-cancel">
-                        <up-button @click="handleCancelLogin"
-                            >暂不登录</up-button
-                        >
-                    </view>
                 </view>
             </template>
-        </uviewOverlay>
+        </tOverlay>
     </view>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { onShow, onPullDownRefresh } from "@dcloudio/uni-app";
-import uviewOverlay from "../../components/core/uviewOverlay.vue";
+import tOverlay from "../../components/core/tOverlay.vue";
 import { wechatLogin } from "../../util/wechatLogin";
 import myNavbar from "../../components/modules/my/myNavbar.vue";
 import navBarHeightUtil from "../../util/navBarHeight.js";
@@ -97,8 +94,9 @@ import UserInfoCard from "../../components/modules/my/UserInfoCard.vue";
 import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
 import UserActivityHeatmap from "../../components/modules/my/UserActivityHeatmap.vue";
 
+const AGREED_KEY = "user_agreed_policy";
 const LoginOverlayShow = ref(false);
-const agreed = ref(false);
+const agreed = ref(uni.getStorageSync(AGREED_KEY) || false);
 const navBarInfo = ref({});
 const activityHeatmapRef = ref(null);
 // 处理导航栏点击事件
@@ -237,7 +235,12 @@ onMounted(() => {
     //#endif
 });
 
+watch(agreed, (val) => {
+    uni.setStorageSync(AGREED_KEY, val);
+});
+
 onShow(() => {
+    agreed.value = uni.getStorageSync(AGREED_KEY) || false;
     reportLoginStatusIfNeeded();
 });
 </script>
@@ -271,7 +274,6 @@ onShow(() => {
 
 .rect {
     width: 600rpx;
-    height: 380rpx;
     background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
     border-radius: 20rpx;
     box-shadow:
@@ -280,6 +282,7 @@ onShow(() => {
     border: 1px solid rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    padding: 20rpx 0;
 }
 .overlay-header {
     display: flex;
@@ -299,20 +302,15 @@ onShow(() => {
     margin-bottom: 10rpx;
 }
 .login-but {
-    display: flex; /* 使用flex布局 */
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    gap: 20rpx; /* 添加按钮之间的间距 */
-    padding: 10rpx 20rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20rpx;
+    padding: 10rpx 30rpx;
 }
 
-/* 按钮点击效果 */
-.login-but .u-button:active {
-    transform: scale(0.98); /* 点击缩放效果 */
-    transition: transform 0.2s ease;
-}
-.login-cancel {
-    padding: 15rpx 30rpx;
+.login-but > .t-button {
+    flex: 1;
 }
 
 .function-list {

@@ -132,7 +132,7 @@ export default {
       this.setContent(this.content)
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this._hook('onDetached')
   },
   methods: {

@@ -80,7 +80,7 @@
 
         <!-- 切换刷题/资料 -->
         <view class="divider-container">
-            <uviewSubsection
+            <Subsection
                 :list="list"
                 @updateCurrent="handleSendMode"
                 :current="currentMode"
@@ -145,14 +145,14 @@
                         此科目为个人上传不具备查看权限
                     </text>
 
-                    <up-button
-                        type="primary"
+                    <t-button
+                        theme="primary"
                         class="auth-button"
-                        shape="circle"
+                        shape="round"
                         @click="handleAuth"
                     >
                         申请访问
-                    </up-button>
+                    </t-button>
                 </view>
             </view>
         </view>
@@ -239,17 +239,19 @@
 
         <!-- 自定义底部 -->
         <view class="bottom">
-            <up-button
-                type="primary"
+            <t-button
+                theme="primary"
                 class="bottom-button"
-                :icon="isFavorited ? 'star-fill' : 'star'"
-                :plain="!isFavorited"
+                :icon="isFavorited ? 'star-filled' : 'star'"
+                :variant="isFavorited ? 'base' : 'outline'"
                 @click="handleFavoriteExam"
-                shape="circle"
-                :iconColor="isFavorited ? '#F7BA2A' : '#409EFF'"
+                shape="round"
+                size="large"
+                block
+                :icon-props="{ style: { color: isFavorited ? '#F7BA2A' : '#409EFF' } }"
             >
                 {{ isFavorited ? "已收藏" : "收藏考试" }}
-            </up-button>
+            </t-button>
         </view>
     </view>
 </template>
@@ -271,7 +273,7 @@ import {
     getExamFavorites,
 } from "../../API/My/FavoriteAPI";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
-import uviewSubsection from "../../components/core/uviewSubsection.vue";
+import Subsection from "../../components/core/Subsection.vue";
 import checkLogin from "../../util/checkLogin";
 
 const examInfo = ref({});

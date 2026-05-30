@@ -1,9 +1,9 @@
 <template>
     <view v-if="visible" class="action-bar">
         <view v-if="actions.includes('copy')" class="action-item" hover-class="action-item-active" @click="handleCopy">
-            <up-icon 
-                name="file-text" 
-                :size="iconSize" 
+            <t-icon
+                name="file"
+                :size="iconSize"
                 color="#8b8fa3" />
         </view>
         <view v-if="actions.includes('favorite')" class="action-item" hover-class="action-item-active" @click="handleFavorite">

@@ -2,7 +2,7 @@
     <view class="login-container">
         <!-- 自定义 添加返回按钮 -->
         <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
-            <u-icon name="arrow-left" color="#3c9cff" size="24"></u-icon>
+            <t-icon name="chevron-left" color="#3c9cff" size="24"></t-icon>
             <text class="back-text">返回</text>
         </view>
 
@@ -19,11 +19,11 @@
                     mode="aspectFit"
                 ></image>
                 <view class="logo-bg">
-                    <u-icon
-                        name="account-fill"
+                    <t-icon
+                        name="user"
                         color="#ffffff"
                         size="40"
-                    ></u-icon>
+                    ></t-icon>
                 </view>
             </view>
             <text class="title">用户登录</text>
@@ -31,57 +31,54 @@
         </view>
 
         <view class="login-form">
-            <u-form :model="formData" ref="uForm">
-                <u-form-item prop="email">
-                    <u-input
-                        v-model="formData.email"
-                        placeholder="请输入邮箱"
-                        prefixIcon="email"
-                        prefixIconStyle="font-size: 22px;color: #909399"
-                        clearable
-                    ></u-input>
-                </u-form-item>
+            <view class="form-item-wrapper">
+                <t-input
+                    :value="formData.email"
+                    placeholder="请输入邮箱"
+                    prefix-icon="mail"
+                    clearable
+                    @change="(e) => formData.email = e.value"
+                ></t-input>
+            </view>
 
-                <u-form-item prop="password">
-                    <u-input
-                        v-model="formData.password"
-                        placeholder="请输入密码"
-                        prefixIcon="lock"
-                        prefixIconStyle="font-size: 22px;color: #909399"
-                        :password="showPassword"
-                        :suffixIconStyle="`font-size: 22px;color: #909399`"
-                        @clickSuffixIcon="showPassword = !showPassword"
-                    ></u-input>
-                </u-form-item>
+            <view class="form-item-wrapper">
+                <t-input
+                    :value="formData.password"
+                    placeholder="请输入密码"
+                    prefix-icon="lock-on"
+                    :type="showPassword ? 'password' : 'text'"
+                    :suffix-icon="formData.password ? (showPassword ? 'browse' : 'browse-off') : ''"
+                    @click="(e) => { if (e.trigger === 'suffix-icon') showPassword = !showPassword }"
+                    @change="(e) => formData.password = e.value"
+                ></t-input>
+            </view>
 
-                <view class="form-options">
-                    <u-checkbox-group v-model="rememberMe">
-                        <u-checkbox :name="true" label="记住我"></u-checkbox>
-                    </u-checkbox-group>
-                    <text class="forget-pwd" @click="goToForgetPassword">忘记密码？</text>
-                </view>
+            <view class="form-options">
+                <t-checkbox-group :value="rememberMe" @change="(e) => rememberMe = e.value">
+                    <t-checkbox :value="true" label="记住我"></t-checkbox>
+                </t-checkbox-group>
+                <text class="forget-pwd" @click="goToForgetPassword">忘记密码？</text>
+            </view>
 
-                <u-button type="primary" class="login-btn" @click="handleLogin">
-                    <u-icon
-                        name="arrow-rightward"
-                        color="#ffffff"
-                        size="18"
-                    ></u-icon>
-                    <text class="btn-text">登录</text>
-                </u-button>
+            <t-button
+                theme="primary"
+                size="large"
+                block
+                class="login-btn"
+                @click="handleLogin"
+            >登录</t-button>
 
-                <view class="register-link">
-                    <text>还没有账号？</text>
-                    <text class="link-text" @click="goToRegister"
-                        >立即注册</text
-                    >
-                    <u-icon
-                        name="arrow-rightward"
-                        color="#3c9cff"
-                        size="14"
-                    ></u-icon>
-                </view>
-            </u-form>
+            <view class="register-link">
+                <text>还没有账号？</text>
+                <text class="link-text" @click="goToRegister"
+                    >立即注册</text
+                >
+                <t-icon
+                    name="chevron-right"
+                    color="#3c9cff"
+                    size="14"
+                ></t-icon>
+            </view>
         </view>
 
         <!-- 底部提示 - 使用通用组件 -->
@@ -99,21 +96,23 @@
             </view>
             <view class="wechat-login-container">
                 <view class="wechat-login-btn" @click="handleUseWXLogin">
-                    <u-icon
-                        name="weixin-fill"
+                    <t-icon
+                        name="logo-wechat"
                         color="#ffffff"
                         size="40"
-                    ></u-icon>
+                    ></t-icon>
                 </view>
                 <text class="wechat-login-text">微信一键登录</text>
             </view>
         </view>
         <!-- #endif -->
+
+        <t-message ref="t-message" />
     </view>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, watch } from "vue";
+import { ref, reactive, onMounted, computed, watch, getCurrentInstance } from "vue";
 import { UserAccountLogin } from "../../API/My/UserLoginAPI";
 import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
@@ -121,10 +120,17 @@ import { wechatLogin } from "../../util/wechatLogin";
 import navBarHeightUtil from "../../util/navBarHeight";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import logSDK from "../../util/logSDK";
+import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/showMessage";
 
+const instance = getCurrentInstance();
+const AGREED_KEY = "user_agreed_policy";
 const showPassword = ref(true);
 const rememberMe = ref([]);
-const agreed = ref(false);
+const agreed = ref(uni.getStorageSync(AGREED_KEY) || false);
+
+watch(agreed, (val) => {
+    uni.setStorageSync(AGREED_KEY, val);
+});
 const userInfoStore = UserInfoStore();
 const navBarInfo = ref(0); // 导航栏高度信息
 const REMEMBER_LOGIN_KEY = "user_login_remember_info";
@@ -177,12 +183,7 @@ const goBack = () => {
 
 const handleLogin = async () => {
     if (!agreed.value) {
-        uni.showToast({
-            title: "请先阅读并同意用户协议和隐私政策",
-            icon: "none",
-            duration: 2000,
-            position: "bottom",
-        });
+        showWarning("请先阅读并同意用户协议和隐私政策");
         return;
     }
     try {
@@ -193,11 +194,7 @@ const handleLogin = async () => {
 
         // 处理登录成功的情况
         if (response.code === 200 && response.success) {
-            uni.showToast({
-                title: "登录成功",
-                icon: "success",
-                duration: 2000,
-            });
+            showSuccess("登录成功");
             uni.setStorageSync("token", response.data.token); // 存储 Token
             userInfoStore.setUserInfo(response.data.userInfo); // 存储用户信息
             persistRememberLogin();
@@ -241,11 +238,7 @@ const handleLogin = async () => {
             });
         } else if (response.code === 401) {
             // 密码或账号错误
-            uni.showToast({
-                title: response.message || "密码或账号错误",
-                icon: "none",
-                duration: 2000,
-            });
+            showError(response.message || "密码或账号错误");
             // 埋点：密码或账号错误
             logSDK.track("AUTH_LOGIN", {
                 result: logSDK.results.FAIL,
@@ -255,11 +248,7 @@ const handleLogin = async () => {
             });
         } else {
             // 其他错误
-            uni.showToast({
-                title: response.message || "登录失败，请稍后重试",
-                icon: "none",
-                duration: 2000,
-            });
+            showError(response.message || "登录失败，请稍后重试");
             // 埋点：其他业务错误
             logSDK.track("AUTH_LOGIN", {
                 result: logSDK.results.FAIL,
@@ -270,11 +259,7 @@ const handleLogin = async () => {
         }
     } catch (error) {
         // 网络错误或其他异常
-        uni.showToast({
-            title: error.message || "网络异常，请稍后重试",
-            icon: "none",
-            duration: 2000,
-        });
+        showError(error.message || "网络异常，请稍后重试");
         // 埋点：网络异常或未知错误
         logSDK.track("AUTH_LOGIN", {
             result: logSDK.results.FAIL,
@@ -287,21 +272,14 @@ const handleLogin = async () => {
 // 微信登录方法 - 使用工具函数
 const handleUseWXLogin = async () => {
     if (!agreed.value) {
-        uni.showToast({
-            title: "请先阅读并同意用户协议和隐私政策",
-            icon: "none",
-            duration: 2000,
-        });
+        showWarning("请先阅读并同意用户协议和隐私政策");
         return;
     }
     try {
         await wechatLogin();
     } catch (error) {
         console.error("微信登录失败", error);
-        uni.showToast({
-            title: "微信登录失败",
-            icon: "none",
-        });
+        showError("微信登录失败");
     }
 };
 
@@ -320,11 +298,7 @@ const goToRegister = async () => {
     }
 
     if (!token) {
-        uni.showToast({
-            title: "请先完成微信登录",
-            icon: "none",
-            duration: 2000,
-        });
+        showWarning("请先完成微信登录");
         return;
     }
 
@@ -337,11 +311,7 @@ const goToRegister = async () => {
             return;
         }
     } catch {
-        uni.showToast({
-            title: "绑定状态校验失败，请稍后重试",
-            icon: "none",
-            duration: 2000,
-        });
+        showError("绑定状态校验失败，请稍后重试");
         return;
     }
 
@@ -383,6 +353,7 @@ onMounted(() => {
     const info = navBarHeightUtil.getNavBarInfo();
     navBarInfo.value = info.totalHeight;
     loadRememberedLogin();
+    setMessageInstance(instance.proxy);
 });
 
 watch(
@@ -521,11 +492,15 @@ watch(
     position: relative;
     z-index: 1;
 
+    .form-item-wrapper {
+        margin-bottom: 24rpx;
+    }
+
     .form-options {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 30rpx 0;
+        margin: 20rpx 0 30rpx;
 
         .forget-pwd {
             color: #3c9cff;
@@ -534,21 +509,7 @@ watch(
     }
 
     .login-btn {
-        width: 100%;
-        height: 90rpx;
-        margin-top: 30rpx;
-        background-color: #3c9cff;
-        border-radius: 45rpx;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10rpx;
-
-        .btn-text {
-            color: #ffffff;
-            font-size: 32rpx;
-            font-weight: bold;
-        }
+        margin-top: 10rpx;
     }
 
     .register-link {

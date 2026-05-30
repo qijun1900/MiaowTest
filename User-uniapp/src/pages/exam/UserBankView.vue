@@ -149,7 +149,7 @@
 
         <!-- 弹出层 -->
         <view>
-            <uviewPopup v-model:show="settingpopupShow" title="练习设置">
+            <tPopup v-model:show="settingpopupShow" title="练习设置">
                 <template #popupcontent>
                     <PracticeSettings
                         v-if="settingpopupShow"
@@ -171,7 +171,7 @@
                         </button>
                     </view>
                 </template>
-            </uviewPopup>
+            </tPopup>
         </view>
     </view>
 </template>
@@ -184,7 +184,7 @@ import { getUserBankQuestionList } from "../../API/Exam/QuestionAPI";
 import Empty from "../../components/core/Empty.vue";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";
-import uviewPopup from "../../components/core/uviewPopup.vue";
+import tPopup from "../../components/core/tPopup.vue";
 import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue";
 import useSwipe from "../../composables/useSwipe.js"; // 导入封装的滑动删除方法
 import { deleteQuestionAPI } from "../../API/Exam/QuestionAPI";

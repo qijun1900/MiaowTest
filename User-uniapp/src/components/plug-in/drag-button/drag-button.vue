@@ -149,9 +149,11 @@
 			},
 		},
 		data() {
+			const sys = uni.getSystemInfoSync();
+			const initWidth = 50; // 100upx ≈ 50px
 			return {
-				top:0,
-				left:0,
+				top: sys.windowHeight - initWidth - 160,
+				left: sys.windowWidth - initWidth - 10,
 				width: 0,
 				height: 0,
 				offsetWidth: 0,

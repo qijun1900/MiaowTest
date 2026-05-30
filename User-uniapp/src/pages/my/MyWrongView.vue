@@ -117,7 +117,7 @@
         </view>
         <!-- 弹出层 -->
         <view>
-            <uviewPopup v-model:show="settingpopupShow" title="练习设置">
+            <tPopup v-model:show="settingpopupShow" title="练习设置">
                 <template #popupcontent>
                     <PracticeSettings
                         v-if="settingpopupShow"
@@ -144,7 +144,7 @@
                         </button>
                     </view>
                 </template>
-            </uviewPopup>
+            </tPopup>
         </view>
     </view>
 </template>
@@ -164,7 +164,7 @@ import { onPageScroll } from "@dcloudio/uni-app";
 import BackToTop from "../../components/core/BackToTop.vue";
 import { useObjectiveAnswerStore } from "../../stores/modules/ObjectiveAnswerStore";
 import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerStore";
-import uviewPopup from "../../components/core/uviewPopup.vue";
+import tPopup from "../../components/core/tPopup.vue";
 import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue";
 import ContentRenderer from "../../components/common/ContentRenderer.vue";
 

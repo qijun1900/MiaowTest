@@ -5,22 +5,22 @@
                 <view class="setting-item">
                     <text class="label">立即显示答案：</text>
                     <view class="switch-wrapper">
-                        <up-switch
+                        <t-switch
                             v-model="localIsShowAnswer"
                             size="20"
                             @change="handleShowAnswerChange"
                         >
-                        </up-switch>
+                        </t-switch>
                     </view>
                 </view>
                 <view class="setting-item">
                     <text class="label">开启刷题助手：</text>
                     <view class="switch-wrapper">
-                        <up-switch
+                        <t-switch
                             v-model="localIsShowHelper"
                             size="20"
                             @change="handleShowHelperChange"
-                        ></up-switch>
+                        ></t-switch>
                     </view>
                 </view>
             </view>

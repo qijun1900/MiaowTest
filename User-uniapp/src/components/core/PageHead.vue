@@ -102,14 +102,13 @@ defineExpose({
     left: 0;
     right: 0;
     z-index: 1000;
-    // 根据规范，使用匹配的多段式渐变色，确保无缝过渡
     background: linear-gradient(
-        135deg,
-        #e0f2ff 0%,
-        #e8f4ff 25%,
-        #f0f8ff 50%,
-        #f8fcff 75%,
-        #fcfeff 100%
+        180deg,
+        #e6f3ff 0%,
+        #f0f8ff 25%,
+        #f5faff 50%,
+        #fafcff 75%,
+        #ffffff 100%
     );
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);

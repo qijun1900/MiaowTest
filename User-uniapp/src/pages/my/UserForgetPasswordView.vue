@@ -1,5 +1,11 @@
 <template>
     <view class="login-container">
+        <!-- 自定义 返回按钮 -->
+        <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
+            <t-icon name="chevron-left" color="#3c9cff" size="24"></t-icon>
+            <text class="back-text">返回</text>
+        </view>
+
         <!-- 装饰性背景元素 -->
         <view class="bg-decoration top-left"></view>
         <view class="bg-decoration top-right"></view>
@@ -13,11 +19,11 @@
                     mode="aspectFit"
                 ></image>
                 <view class="logo-bg">
-                    <u-icon
-                        name="lock"
+                    <t-icon
+                        name="lock-on"
                         color="#ffffff"
                         size="40"
-                    ></u-icon>
+                    ></t-icon>
                 </view>
             </view>
             <text class="title">忘记密码</text>
@@ -25,87 +31,80 @@
         </view>
 
         <view class="login-form">
-            <u-form :model="formData" ref="uForm">
-                <!-- 邮箱输入 -->
-                <u-form-item prop="email">
-                    <u-input
-                        v-model="formData.email"
-                        placeholder="请输入注册邮箱"
-                        prefixIcon="email"
-                        prefixIconStyle="font-size: 22px;color: #909399"
-                        clearable
-                    ></u-input>
-                </u-form-item>
+            <view class="form-item-wrapper">
+                <t-input
+                    :value="formData.email"
+                    placeholder="请输入注册邮箱"
+                    prefix-icon="mail"
+                    clearable
+                    @change="(e) => formData.email = e.value"
+                ></t-input>
+            </view>
 
-                <!-- 验证码输入 -->
-                <u-form-item prop="verifyCode">
-                    <view class="verify-wrapper">
-                        <view class="verify-input-wrap">
-                            <u-input
-                                v-model="formData.verifyCode"
-                                placeholder="请输入验证码"
-                                prefixIcon="attach"
-                                prefixIconStyle="font-size: 22px;color: #909399"
-                                maxlength="6"
-                            ></u-input>
-                        </view>
-                        <u-button
-                            :text="verifyBtnText"
-                            size="small"
-                            type="primary"
-                            class="verify-btn"
-                            :disabled="isCountingDown || !isEmailValid"
-                            @click="openCaptcha"
-                        ></u-button>
+            <view class="form-item-wrapper">
+                <view class="verify-wrapper">
+                    <view class="verify-input-wrap">
+                        <t-input
+                            :value="formData.verifyCode"
+                            placeholder="请输入验证码"
+                            prefix-icon="attach"
+                            maxlength="6"
+                            @change="(e) => formData.verifyCode = e.value"
+                        ></t-input>
                     </view>
-                </u-form-item>
-
-                <!-- 新密码 -->
-                <u-form-item prop="password">
-                    <u-input
-                        v-model="formData.password"
-                        placeholder="请设置新密码（至少 6 位）"
-                        prefixIcon="lock-open"
-                        prefixIconStyle="font-size: 22px;color: #909399"
-                        :password="showPassword"
-                    ></u-input>
-                </u-form-item>
-
-                <!-- 确认新密码 -->
-                <u-form-item prop="confirmPassword">
-                    <u-input
-                        v-model="formData.confirmPassword"
-                        placeholder="请再次确认新密码"
-                        prefixIcon="lock"
-                        prefixIconStyle="font-size: 22px;color: #909399"
-                        :password="showConfirmPassword"
-                    ></u-input>
-                </u-form-item>
-
-                <u-button
-                    type="primary"
-                    class="login-btn"
-                    :disabled="!canSubmit"
-                    @click="handleReset"
-                >
-                    <u-icon
-                        name="checkmark"
-                        color="#ffffff"
-                        size="18"
-                    ></u-icon>
-                    <text class="btn-text">确认重置</text>
-                </u-button>
-
-                <view class="register-link">
-                    <text>想起密码了？</text>
-                    <text class="link-text" @click="goToLogin">去登录</text>
-                    <u-icon
-                        name="arrow-rightward"
-                        color="#3c9cff"
-                        size="14"
-                    ></u-icon>
+                    <t-button
+                        :content="verifyBtnText"
+                        size="small"
+                        theme="primary"
+                        class="verify-btn"
+                        :disabled="isCountingDown || !isEmailValid"
+                        @click="openCaptcha"
+                    ></t-button>
                 </view>
-            </u-form>
+            </view>
+
+            <view class="form-item-wrapper">
+                <t-input
+                    :value="formData.password"
+                    placeholder="请设置新密码（至少 6 位）"
+                    prefix-icon="lock-on"
+                    :type="showPassword ? 'password' : 'text'"
+                    :suffix-icon="formData.password ? (showPassword ? 'browse' : 'browse-off') : ''"
+                    @click="(e) => { if (e.trigger === 'suffix-icon') showPassword = !showPassword }"
+                    @change="(e) => formData.password = e.value"
+                ></t-input>
+            </view>
+
+            <view class="form-item-wrapper">
+                <t-input
+                    :value="formData.confirmPassword"
+                    placeholder="请再次确认新密码"
+                    prefix-icon="lock-on"
+                    :type="showConfirmPassword ? 'password' : 'text'"
+                    :suffix-icon="formData.confirmPassword ? (showConfirmPassword ? 'browse' : 'browse-off') : ''"
+                    @click="(e) => { if (e.trigger === 'suffix-icon') showConfirmPassword = !showConfirmPassword }"
+                    @change="(e) => formData.confirmPassword = e.value"
+                ></t-input>
+            </view>
+
+            <t-button
+                theme="primary"
+                size="large"
+                block
+                class="login-btn"
+                :disabled="!canSubmit"
+                @click="handleReset"
+            >确认重置</t-button>
+
+            <view class="register-link">
+                <text>想起密码了？</text>
+                <text class="link-text" @click="goToLogin">去登录</text>
+                <t-icon
+                    name="chevron-right"
+                    color="#3c9cff"
+                    size="14"
+                ></t-icon>
+            </view>
         </view>
 
         <!-- 人机验证弹窗 -->
@@ -116,15 +115,15 @@
                 <view class="captcha-subtitle">请完成下方计算以继续发送验证码</view>
                 <view class="captcha-question">{{ captchaQuestion }}</view>
                 <view class="captcha-input-wrap">
-                    <u-input
-                        v-model="captchaConfig.answer"
+                    <t-input
+                        :value="captchaConfig.answer"
                         placeholder="请输入结果"
                         type="number"
-                        border="surround"
                         clearable
-                        focus
-                        @confirm="verifyCaptcha"
-                    ></u-input>
+                        :focus="true"
+                        @enter="verifyCaptcha"
+                        @change="(e) => captchaConfig.answer = e.value"
+                    ></t-input>
                 </view>
                 <view class="captcha-btns">
                     <view class="captcha-btn cancel" @click="closeCaptcha">取消</view>
@@ -132,18 +131,38 @@
                 </view>
             </view>
         </view>
+
+        <t-message ref="t-message" />
     </view>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onUnmounted } from "vue";
+import { ref, reactive, computed, onMounted, onUnmounted, getCurrentInstance } from "vue";
 import {
     ResetPassword,
     sendEmailVerifyCode,
 } from "../../API/My/UserLoginAPI";
+import navBarHeightUtil from "../../util/navBarHeight";
+import { setMessageInstance, showSuccess, showError } from "../../util/showMessage";
 
+const instance = getCurrentInstance();
 const showPassword = ref(true);
 const showConfirmPassword = ref(true);
+const navBarInfo = ref(0);
+
+// 计算返回按钮的top位置
+const backBtnTop = computed(() => {
+    return navBarInfo.value ? navBarInfo.value + "rpx" : "75rpx";
+});
+
+// 返回上一页
+const goBack = () => {
+    uni.navigateBack({
+        fail: () => {
+            uni.switchTab({ url: "/pages/tab/my" });
+        }
+    });
+};
 
 const formData = reactive({
     email: "",
@@ -209,12 +228,7 @@ const verifyCaptcha = () => {
         closeCaptcha();
         sendVerifyCode();
     } else {
-        uni.showToast({
-            title: "验证码错误，请重新计算",
-            icon: "none",
-            duration: 2000,
-            position: "bottom",
-        });
+        showError("验证码错误，请重新计算");
         generateCaptcha();
         captchaConfig.answer = "";
     }
@@ -231,49 +245,26 @@ const sendVerifyCode = async () => {
         uni.hideLoading();
 
         if (result.code === 200) {
-            uni.showToast({
-                title: "验证码已发送，请查收邮件",
-                icon: "success",
-                duration: 2500,
-                position: "bottom",
-            });
+            showSuccess("验证码已发送，请查收邮件");
             startCountdown();
         } else {
-            uni.showToast({
-                title: result.message || "发送失败，请重试",
-                icon: "none",
-                duration: 3000,
-                position: "bottom",
-            });
+            showError(result.message || "发送失败，请重试");
         }
     } catch (error) {
         console.error("验证码发送失败:", error);
         uni.hideLoading();
-        uni.showToast({
-            title: "网络异常，请稍后重试",
-            icon: "none",
-            duration: 2000,
-            position: "bottom",
-        });
+        showError("网络异常，请稍后重试");
     }
 };
 
 const handleReset = async () => {
     if (!canSubmit.value) {
-        uni.showToast({
-            title: "请填写完整信息",
-            icon: "none",
-            duration: 2000,
-        });
+        showError("请填写完整信息");
         return;
     }
 
     if (formData.password.length < 6) {
-        uni.showToast({
-            title: "密码长度至少为 6 位",
-            icon: "none",
-            duration: 2000,
-        });
+        showError("密码长度至少为 6 位");
         return;
     }
 
@@ -301,31 +292,18 @@ const handleReset = async () => {
         });
 
         if (result.code === 200) {
-            uni.showToast({
-                title: result.message || "重置成功",
-                duration: 2000,
-                position: "bottom",
-            });
+            showSuccess(result.message || "重置成功");
             setTimeout(() => {
                 uni.redirectTo({
                     url: "/pages/my/UserLoginView",
                 });
             }, 1500);
         } else {
-            uni.showToast({
-                title: result.message || "重置失败，请稍后重试",
-                icon: "none",
-                duration: 2500,
-                position: "bottom",
-            });
+            showError(result.message || "重置失败，请稍后重试");
         }
     } catch (error) {
         console.error("重置密码失败:", error);
-        uni.showToast({
-            title: error.message || "网络异常，请稍后重试",
-            icon: "none",
-            duration: 2000,
-        });
+        showError(error.message || "网络异常，请稍后重试");
     }
 };
 
@@ -352,6 +330,12 @@ const goToLogin = () => {
     uni.navigateBack();
 };
 
+onMounted(() => {
+    const info = navBarHeightUtil.getNavBarInfo();
+    navBarInfo.value = info.totalHeight;
+    setMessageInstance(instance.proxy);
+});
+
 onUnmounted(() => {
     stopCountdown();
 });
@@ -366,6 +350,24 @@ onUnmounted(() => {
     flex-direction: column;
     position: relative;
     overflow: hidden;
+
+    // 返回按钮样式
+    .back-btn {
+        position: absolute;
+        left: 20rpx;
+        display: flex;
+        align-items: center;
+        gap: 10rpx;
+        z-index: 10;
+        padding: 10rpx 20rpx;
+        border-radius: 20rpx;
+        background-color: rgba(255, 255, 255, 0.8);
+
+        .back-text {
+            font-size: 28rpx;
+            color: #3c9cff;
+        }
+    }
 
     .bg-decoration {
         position: absolute;
@@ -414,7 +416,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 24rpx;
+    margin-top: 60rpx;
     margin-bottom: 60rpx;
     position: relative;
     z-index: 1;
@@ -466,6 +468,10 @@ onUnmounted(() => {
     position: relative;
     z-index: 1;
 
+    .form-item-wrapper {
+        margin-bottom: 24rpx;
+    }
+
     .verify-wrapper {
         display: flex;
         align-items: center;
@@ -484,21 +490,7 @@ onUnmounted(() => {
     }
 
     .login-btn {
-        width: 100%;
-        height: 90rpx;
-        margin-top: 30rpx;
-        background-color: #3c9cff;
-        border-radius: 45rpx;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10rpx;
-
-        .btn-text {
-            color: #ffffff;
-            font-size: 32rpx;
-            font-weight: bold;
-        }
+        margin-top: 10rpx;
     }
 
     .register-link {

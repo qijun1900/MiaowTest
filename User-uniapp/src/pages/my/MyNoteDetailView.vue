@@ -96,7 +96,7 @@
                 </view>
             </view>
             <!-- 笔记弹窗 -->
-            <uviewPopup
+            <tPopup
                 v-model:show="iSopenNotePopupShow"
                 :closeable="false"
                 :round="30"
@@ -132,30 +132,29 @@
                             >
                         </view>
                         <view class="note-button-container">
-                            <up-button
-                                :plain="true"
-                                :hairline="true"
-                                type="info"
+                            <t-button
+                                variant="outline"
+                                theme="default"
                                 @click="handleCancelNote"
                                 size="small"
-                                shape="circle"
+                                shape="round"
                             >
                                 取消
-                            </up-button>
-                            <up-button
+                            </t-button>
+                            <t-button
                                 :loading="isSavingNote"
                                 :disabled="!noteContent.trim()"
-                                type="primary"
+                                theme="primary"
                                 @click="handleSaveNote"
                                 size="small"
-                                shape="circle"
+                                shape="round"
                             >
                                 保存
-                            </up-button>
+                            </t-button>
                         </view>
                     </view>
                 </template>
-            </uviewPopup>
+            </tPopup>
             <BackToTop ref="backToTopRef" position="bottom-right" />
         </view>
     </view>
@@ -163,7 +162,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import uviewPopup from "../../components/core/uviewPopup.vue";
+import tPopup from "../../components/core/tPopup.vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getNoteListByExamIdAPI } from "../../API/My/UserNoteAPI";
 import {

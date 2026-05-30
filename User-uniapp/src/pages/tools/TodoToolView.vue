@@ -18,7 +18,7 @@
                 v-else-if="TodayTODOList.length === 0"
                 class="empty-container"
             >
-                <up-icon name="calendar" size="80" color="#007aff"></up-icon>
+                <t-icon name="calendar" size="80" color="#007aff"></t-icon>
                 <text class="empty-title">暂无待办事项</text>
                 <text class="empty-desc">点击下方 + 按钮创建新的待办事项</text>
             </view>
@@ -41,12 +41,12 @@
                                 ></view>
                             </view>
                         </view>
-                        <up-icon
-                            name="reload"
+                        <t-icon
+                            name="refresh"
                             size="24"
                             color="#007aff"
                             @click="refreshTodos"
-                        ></up-icon>
+                        ></t-icon>
                     </view>
                 </view>
 
@@ -57,11 +57,11 @@
                     "
                     class="congratulations"
                 >
-                    <up-icon
-                        name="checkmark-circle-fill"
+                    <t-icon
+                        name="check-circle-filled"
                         size="40"
                         color="#4CAF50"
-                    ></up-icon>
+                    ></t-icon>
                     <text class="congratulations-text"
                         >🎉 恭喜！今日待办事项全部完成！</text
                     >
@@ -74,12 +74,12 @@
                     :class="{ completed: todo.isCompleted }"
                 >
                     <view class="todo-checkbox" @click="toggleTodo(todo)">
-                        <up-icon
+                        <t-icon
                             v-if="todo.isCompleted"
-                            name="checkmark-circle-fill"
+                            name="check-circle-filled"
                             size="28"
                             color="#4CAF50"
-                        ></up-icon>
+                        ></t-icon>
                         <view v-else class="todo-checkbox-circle"></view>
                     </view>
 
@@ -96,20 +96,20 @@
                     </view>
 
                     <view class="todo-actions">
-                        <up-icon
-                            name="edit-pen"
+                        <t-icon
+                            name="edit"
                             size="20"
                             color="#007aff"
                             @click="editTodo(todo)"
                         >
-                        </up-icon>
-                        <up-icon
-                            name="trash"
+                        </t-icon>
+                        <t-icon
+                            name="delete"
                             size="20"
                             color="#ff4757"
                             @click="deleteTodo(todo)"
                         >
-                        </up-icon>
+                        </t-icon>
                     </view>
                 </view>
             </view>
@@ -126,7 +126,7 @@
             @btnRemove="handleHelperRemove"
         />
         <!-- 弹窗 -->
-        <uviewPopup
+        <tPopup
             :closeable="false"
             v-model:show="popupShow"
             :title="(isEditing ? '编辑' : '新建') + selectedDate + '-TODO'"
@@ -138,11 +138,11 @@
                         <!-- 代办标题输入 -->
                         <view class="form-item">
                             <view class="head-title-container">
-                                <up-icon
-                                    name="edit-pen"
+                                <t-icon
+                                    name="edit"
                                     color="#007aff"
                                     size="25"
-                                ></up-icon>
+                                ></t-icon>
                                 <text class="form-label">代办标题</text>
                             </view>
 
@@ -162,11 +162,11 @@
                         <!-- 代办描述 -->
                         <view class="form-item">
                             <view class="head-title-container">
-                                <up-icon
-                                    name="order"
+                                <t-icon
+                                    name="view-list"
                                     color="#007aff"
                                     size="25"
-                                ></up-icon>
+                                ></t-icon>
                                 <text class="form-label"> 详细描述</text>
                             </view>
                             <textarea
@@ -187,16 +187,16 @@
 
                         <!-- 操作按钮区域 -->
                         <view class="action-buttons">
-                            <up-button
+                            <t-button
                                 class="action-btn cancel-btn"
-                                :plain="true"
+                                variant="outline"
                                 @click="handleCancel"
                             >
                                 取消
-                            </up-button>
-                            <up-button
+                            </t-button>
+                            <t-button
                                 class="action-btn save-btn"
-                                type="primary"
+                                theme="primary"
                                 :loading="isSaving"
                                 @click="handleSave"
                             >
@@ -207,12 +207,12 @@
                                           ? "更新"
                                           : "保存"
                                 }}
-                            </up-button>
+                            </t-button>
                         </view>
                     </view>
                 </view>
             </template>
-        </uviewPopup>
+        </tPopup>
     </view>
 </template>
 
@@ -221,7 +221,7 @@ import lxCalendar from "../../components/lx-calendar/lx-calendar.vue";
 import { ref, onMounted, watch, computed } from "vue";
 import getTodayDate from "../../util/getTodayDate";
 import dragButton from "../../components/plug-in/drag-button/drag-button.vue";
-import uviewPopup from "../../components/core/uviewPopup.vue";
+import tPopup from "../../components/core/tPopup.vue";
 import {
     setTodayTodosAPI,
     getDotDatesAPI,
@@ -566,12 +566,12 @@ onMounted(() => {
     gap: 20rpx;
 }
 
-.header-actions .u-icon {
+.header-actions .t-icon {
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.header-actions .u-icon:hover {
+.header-actions .t-icon:hover {
     transform: rotate(180deg);
 }
 
@@ -712,12 +712,12 @@ onMounted(() => {
     margin-left: 20rpx;
 }
 
-.todo-actions .u-icon {
+.todo-actions .t-icon {
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.todo-actions .u-icon:hover {
+.todo-actions .t-icon:hover {
     transform: scale(1.1);
 }
 

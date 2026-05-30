@@ -1,8 +1,10 @@
 import { createSSRApp } from "vue";
 import App from "./App.vue";
-import uviewPlus from "uview-plus";
 //导入piania
 import pinia from "./stores/index";
+//tdesign组件项目地址 Link:https://tdesign.tencent.com/uniapp
+//uni-ui组件地址 Link:https://uniapp.dcloud.io/quickstart
+
 
 // 兼容部分 App 运行环境不支持 Array/String.prototype.at 的情况
 if (!Array.prototype.at) {
@@ -39,8 +41,6 @@ export function createApp() {
 
   //注册pinia
   app.use(pinia);
-  //注册uview-plus
-  app.use(uviewPlus);
   return {
     app,
   };

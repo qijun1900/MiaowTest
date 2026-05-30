@@ -1,21 +1,18 @@
 <template>
     <view class="container">
-        <!-- uView自定义导航栏 -->
-        <u-navbar bgColor="#F8F8F8" :autoBack="true">
-            <template #center>
-                <UviewSubsection
+        <!-- TDesign自定义导航栏 -->
+        <t-navbar left-arrow :fixed="false" custom-style="background: #F8F8F8">
+            <template #title>
+                <Subsection
                     :list="list"
                     class="subsection-wrapper"
                     @updateCurrent="handleSendMode"
                 />
             </template>
-        </u-navbar>
+        </t-navbar>
         <!-- 页面内容 -->
         <view
             class="content"
-            :style="{
-                paddingTop: navBarHeight + 'px',
-            }"
         >
             <UserQuestionFavorite v-if="currentMode === 0" />
             <UserExamFavorite v-if="currentMode === 1" />
@@ -27,7 +24,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import navBarHeightUtil from "../../util/navBarHeight";
-import UviewSubsection from "../../components/core/uviewSubsection.vue";
+import Subsection from "../../components/core/Subsection.vue";
 import UserQuestionFavorite from "../../components/modules/my/UserQuestionFavorite.vue";
 import UserExamFavorite from "../../components/modules/index/UserExamFavorite.vue";
 import BackToTop from "../../components/core/BackToTop.vue";
@@ -58,7 +55,7 @@ onPageScroll((e) => {
 </script>
 <style scoped>
 .subsection-wrapper {
-    width: 40%; /* 控制分段控制器的宽度 */
-    margin: 0 auto; /* 居中显示 */
+    width: 75%;
+    margin: 0 auto;
 }
 </style>

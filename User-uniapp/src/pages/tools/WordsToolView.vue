@@ -1,17 +1,17 @@
 <template>
     <view class="container">
-        <!-- uView自定义导航栏 -->
-        <u-navbar bgColor="#F8F8F8" :autoBack="true">
-            <template #center>
-                <UviewSubsection
+        <!-- TDesign自定义导航栏 -->
+        <t-navbar left-arrow :fixed="false" custom-style="background: #F8F8F8">
+            <template #title>
+                <Subsection
                     :list="list"
                     class="subsection-wrapper"
                     @updateCurrent="handleSendMode"
                 />
             </template>
-        </u-navbar>
+        </t-navbar>
         <!-- 页面内容 -->
-        <view class="content" :style="{ paddingTop: navBarHeight + 'px' }">
+        <view class="content">
             <wordRemberView v-if="currentMode === 0" />
             <wordBooksView v-if="currentMode === 1" />
         </view>
@@ -20,7 +20,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import navBarHeightUtil from "../../util/navBarHeight";
-import UviewSubsection from "../../components/core/uviewSubsection.vue";
+import Subsection from "../../components/core/Subsection.vue";
 import wordBooksView from "./WordsToolView_children/wordBooksView.vue";
 import wordRemberView from "./WordsToolView_children/wordRemberView.vue";
 
@@ -40,7 +40,7 @@ onMounted(() => {
 
 <style scoped>
 .subsection-wrapper {
-    width: 40%; /* 控制分段控制器的宽度 */
-    margin: 0 auto; /* 居中显示 */
+    width: 75%;
+    margin: 0 auto;
 }
 </style>

@@ -27,7 +27,7 @@
                 </view>
                 <!-- VIP皇冠挂件（如果在登录且VIP状态） -->
                 <view class="vip-crown" v-if="isLoggedIn && showVip">
-                    <up-icon name="level" color="#FFE14C" size="14px"></up-icon>
+                    <t-icon name="diamond" color="#FFE14C" size="14px"></t-icon>
                 </view>
             </view>
 
@@ -75,11 +75,11 @@
             <!-- 极简箭头指示器 -->
             <view class="arrow-indicator">
                 <view class="arrow-circle">
-                    <up-icon
-                        name="arrow-right"
+                    <t-icon
+                        name="chevron-right"
                         size="14px"
                         color="#fff"
-                    ></up-icon>
+                    ></t-icon>
                 </view>
             </view>
         </view>

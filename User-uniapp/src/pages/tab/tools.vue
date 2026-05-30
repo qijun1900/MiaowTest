@@ -142,7 +142,7 @@ onMounted(() => {
     min-height: 100vh;
     height: 100vh;
     overflow-y: auto;
-    background: linear-gradient(to bottom, #deeeff 0%, #ffffff 100%);
+    background: linear-gradient(180deg, #e6f3ff 0%, #f0f8ff 25%, #f5faff 50%, #fafcff 75%, #ffffff 100%);
     position: relative;
 }
 </style>

@@ -69,12 +69,12 @@
 
             <!-- 回到顶部组件 -->
             <BackToTop ref="backToTopRef" position="bottom-right" />
-            <up-divider
-                text="已经到底了"
+            <t-divider
+                content="已经到底了"
                 :dashed="true"
                 v-if="examSubjects.length > 0 && !loading"
             >
-            </up-divider>
+            </t-divider>
         </view>
     </view>
 </template>

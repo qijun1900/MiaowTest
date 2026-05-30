@@ -97,7 +97,7 @@
             </view>
         </view>
         <!-- 弹窗 -->
-        <uviewPopup
+        <tPopup
             v-model:show="popupShow"
             title="创建错题本"
             :closeable="true"
@@ -213,14 +213,14 @@
                     </view>
                 </view>
             </template>
-        </uviewPopup>
+        </tPopup>
     </view>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
-import uviewPopup from "../../components/core/uviewPopup.vue";
+import tPopup from "../../components/core/tPopup.vue";
 import {
     createWrongBookAPI,
     getWrongBooksAPI,

@@ -49,7 +49,7 @@
                 mode-class="fade"
                 :duration="300"
             >
-                <up-button
+                <t-button
                     v-if="
                         props.question.isMultiple === 1 &&
                         !showAnswerComputed &&
@@ -57,12 +57,13 @@
                         selectedOptions.length > 0
                     "
                     @click="submitMultiAnswer"
-                    type="primary"
-                    text="核验答案"
-                    shape="circle"
-                    icon="checkmark-circle-fill"
-                >
-                </up-button>
+                    theme="primary"
+                    icon="check-circle-filled"
+                    content="核验答案"
+                    shape="round"
+                    size="large"
+                    block
+                />
             </uni-transition>
         </view>
         <!-- 答案 -->

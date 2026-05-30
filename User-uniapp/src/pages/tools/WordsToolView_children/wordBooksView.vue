@@ -75,17 +75,16 @@
                             <text>{{ book.words || book.wordCount }}词</text>
                         </view>
                         <view class="book-tags">
-                            <up-tag
+                            <t-tag
                                 v-for="(tag, tagIndex) in book.tags"
                                 :key="tagIndex"
-                                :text="tag"
-                                plain
-                                size="mini"
-                                type="warning"
-                                plainFill
+                                :content="tag"
+                                variant="outline"
+                                size="small"
+                                theme="warning"
                                 style="margin-right: 12rpx"
                             >
-                            </up-tag>
+                            </t-tag>
                         </view>
                     </view>
                     <view class="book-action">
@@ -93,11 +92,11 @@
                             class="view-words-btn"
                             @click="viewAllWords(book)"
                         >
-                            <up-icon
-                                name="eye"
+                            <t-icon
+                                name="browse"
                                 size="32rpx"
                                 color="#ffffff"
-                            ></up-icon>
+                            ></t-icon>
                             <text class="btn-text">查看单词</text>
                         </view>
                     </view>
@@ -137,7 +136,7 @@
         />
     </view>
     <!-- 底部弹出框 -->
-    <uviewPopup v-model:show="popupShow" title="创建新词书" :closeable="false">
+    <tPopup v-model:show="popupShow" title="创建新词书" :closeable="false">
         <template #popupcontent>
             <view class="popup-content">
                 <view class="form-item">
@@ -209,7 +208,7 @@
                 </view>
             </view>
         </template>
-    </uviewPopup>
+    </tPopup>
 </template>
 <script setup>
 import { onMounted, ref, computed } from "vue";
@@ -221,7 +220,7 @@ import {
 import ThemeLoading from "../../../components/core/ThemeLoading.vue";
 import navBarHeightUtil from "../../../util/navBarHeight";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
-import uviewPopup from "../../../components/core/uviewPopup.vue";
+import tPopup from "../../../components/core/tPopup.vue";
 import { checkWordRember } from "../../../API/Vocabulary/WordRemberAPI";
 import { getResourceList } from "../../../API/Resource/FetchAPI";
 import escconfig from "../../../config/esc.config";

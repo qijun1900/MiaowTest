@@ -149,7 +149,7 @@
         />
         <!-- 设置弹窗 -->
     </view>
-    <uviewPopup v-model:show="popupShow" title="设置" :closeable="true">
+    <tPopup v-model:show="popupShow" title="设置" :closeable="true">
         <template #popupcontent>
             <view class="popup-content">
                 <view class="setting-item">
@@ -178,7 +178,7 @@
                 </view>
             </view>
         </template>
-    </uviewPopup>
+    </tPopup>
 </template>
 
 <script setup>
@@ -189,7 +189,7 @@ import { WordBookListAPI } from "../../../API/Vocabulary/WordBooksAPI";
 import highlightWord from "../../../util/highlightWord.js";
 import { playWordPronunciation } from "../../../API/Vocabulary/WordAPI.js";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
-import uviewPopup from "../../../components/core/uviewPopup.vue";
+import tPopup from "../../../components/core/tPopup.vue";
 // 搜索文本
 const searchText = ref("");
 //  当前选中的分类

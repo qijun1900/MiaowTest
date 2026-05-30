@@ -110,7 +110,7 @@
             </view>
         </view>
 
-        <uviewPopup
+        <tPopup
             v-model:show="popupShow"
             title="创建笔记本"
             :closeable="true"
@@ -204,14 +204,14 @@
                     </view>
                 </view>
             </template>
-        </uviewPopup>
+        </tPopup>
     </view>
 </template>
 
 <script setup>
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
-import uviewPopup from "../../components/core/uviewPopup.vue";
+import tPopup from "../../components/core/tPopup.vue";
 import {
     createNotebookAPI,
     getNotebooksAPI,

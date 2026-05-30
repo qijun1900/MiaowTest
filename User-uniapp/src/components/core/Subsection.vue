@@ -1,21 +1,29 @@
 <template>
     <view class="subsection-wrapper">
-        <up-subsection
-            :list="props.list"
-            :mode="props.mode"
-            :current="current"
-            @change="handleSubsectionChange"
-            :activeColor="props.activeColor"
-            :inactiveColor="props.inactiveColor"
-            :bgColor="props.bgColor"
-            :fontSize="props.fontSize"
+        <view
+            class="subsection"
+            :style="{ backgroundColor: props.bgColor, fontSize: props.fontSize + 'px' }"
         >
-        </up-subsection>
+            <view
+                v-for="(item, index) in props.list"
+                :key="index"
+                class="subsection-item"
+                :class="{ active: currentActive === index }"
+                :style="{
+                    color: currentActive === index ? '#ffffff' : props.inactiveColor,
+                    backgroundColor: currentActive === index ? props.activeColor : 'transparent',
+                }"
+                @click="handleClick(index)"
+            >
+                <text>{{ typeof item === 'string' ? item : item.name }}</text>
+            </view>
+        </view>
     </view>
 </template>
 
 <script setup>
-// 定义props
+import { ref, computed, watch } from "vue";
+
 const props = defineProps({
     list: {
         type: Array,
@@ -23,7 +31,7 @@ const props = defineProps({
     },
     current: {
         type: Number,
-        default: 0,
+        default: undefined,
     },
     mode: {
         type: String,
@@ -47,11 +55,25 @@ const props = defineProps({
     },
 });
 
-// 定义emit
 const emit = defineEmits(["updateCurrent"]);
 
-// 处理切换事件
-const handleSubsectionChange = (index) => {
+const activeIndex = ref(props.current ?? 0);
+
+watch(
+    () => props.current,
+    (val) => {
+        if (val !== undefined) activeIndex.value = val;
+    },
+);
+
+const currentActive = computed(() =>
+    props.current !== undefined ? props.current : activeIndex.value,
+);
+
+const handleClick = (index) => {
+    if (currentActive.value === index) return;
+    activeIndex.value = index;
+    uni.vibrateShort({ type: "light" });
     emit("updateCurrent", index);
 };
 </script>
@@ -59,5 +81,31 @@ const handleSubsectionChange = (index) => {
 <style scoped>
 .subsection-wrapper {
     width: 100%;
+}
+
+.subsection {
+    display: flex;
+    border-radius: 12rpx;
+    padding: 4rpx;
+    gap: 4rpx;
+    background-color: #eeeeef;
+}
+
+.subsection-item {
+    flex: 1;
+    text-align: center;
+    padding: 10rpx 6rpx;
+    border-radius: 10rpx;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 24rpx;
+    line-height: 1.4;
+}
+
+.subsection-item.active {
+    font-weight: 600;
+    box-shadow: 0 2rpx 6rpx rgba(60, 156, 255, 0.3);
 }
 </style>

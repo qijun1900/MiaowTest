@@ -5,14 +5,7 @@
         </view>
         <view class="accuracy">
             <view class="accuracy-circle">
-                <up-count-to
-                    color="#ffffff"
-                    :startVal="0"
-                    :endVal="accuracyRate"
-                    :fontSize="40"
-                    :decimals="1"
-                    :bold="true"
-                />
+                <text class="accuracy-number">{{ accuracyRate }}</text>
                 <text class="accuracy-text">正确率</text>
             </view>
         </view>
@@ -52,35 +45,36 @@
             </AnswerSheet>
         </view>
         <view class="bottom-action-container">
-            <up-button
-                :plain="true"
-                :hairline="true"
-                type="primary"
-                shape="circle"
+            <t-button
+                variant="outline"
+                theme="primary"
+                shape="round"
+                size="large"
+                block
                 @click="exportToPDF"
             >
                 导出为PDF
-            </up-button>
-            <up-button
+            </t-button>
+            <t-button
                 v-if="!isUserBank"
-                :plain="true"
-                :hairline="true"
-                type="error"
-                shape="circle"
+                theme="danger"
+                shape="round"
+                size="large"
+                block
                 @click="viewWrongQuestions"
             >
                 查看错题
-            </up-button>
-            <up-button
+            </t-button>
+            <t-button
                 v-else
-                :plain="true"
-                :hairline="true"
-                type="error"
-                shape="circle"
+                theme="danger"
+                shape="round"
+                size="large"
+                block
                 @click="handleBack"
             >
                 返回题库
-            </up-button>
+            </t-button>
         </view>
     </view>
 </template>
@@ -188,6 +182,12 @@ const handleBack = () => {
     filter: blur(15rpx);
 }
 
+.accuracy-number {
+    font-size: 40rpx;
+    color: #ffffff;
+    font-weight: bold;
+}
+
 .accuracy-text {
     font-size: 28rpx;
     color: rgba(255, 255, 255, 0.9);
@@ -262,7 +262,6 @@ const handleBack = () => {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 100rpx;
     background: linear-gradient(
         to top,
         rgba(255, 255, 255, 0.98) 0%,
@@ -271,11 +270,10 @@ const handleBack = () => {
     backdrop-filter: blur(10rpx);
     border-top: 1rpx solid rgba(0, 0, 0, 0.05);
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30rpx;
-    padding: 0 30rpx;
-    /* 适配安全区域 */
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16rpx;
+    padding: 20rpx 30rpx;
     padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
 }
 </style>

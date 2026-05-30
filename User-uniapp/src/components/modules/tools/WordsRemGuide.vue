@@ -34,17 +34,16 @@
                             <view class="book-info">
                                 <text class="book-name">{{ book.title }}</text>
                                 <view class="book-tags">
-                                    <up-tag
+                                    <t-tag
                                         v-for="(tag, tagIndex) in book.tags"
                                         :key="tagIndex"
-                                        :text="tag"
-                                        plain
-                                        size="mini"
-                                        type="warning"
-                                        plainFill
+                                        :content="tag"
+                                        variant="outline"
+                                        size="small"
+                                        theme="warning"
                                         style="margin-right: 12rpx"
                                     >
-                                    </up-tag>
+                                    </t-tag>
                                 </view>
                                 <view class="book-count">
                                     <uni-icons
@@ -175,23 +174,25 @@
         </transition>
 
         <view class="bottom">
-            <up-button
+            <t-button
                 @click="goToStep2"
                 v-if="currentStep === 1"
-                type="primary"
+                theme="primary"
                 :disabled="selectedBook === null"
-                :plain="selectedBook === null ? true : false"
-                :icon="selectedBook === null ? '' : 'checkmark'"
+                :variant="selectedBook === null ? 'outline' : 'base'"
             >
+                <template #icon v-if="selectedBook !== null">
+                    <t-icon name="check" />
+                </template>
                 {{ "下一步" }}
-            </up-button>
+            </t-button>
             <view v-if="currentStep === 2" class="step2-buttons">
-                <up-button @click="goToStep1" type="primary">
-                    {{ " 上一步" }}
-                </up-button>
-                <up-button @click="confirmSettings" type="primary">
+                <t-button @click="goToStep1" theme="primary">
+                    {{ "上一步" }}
+                </t-button>
+                <t-button @click="confirmSettings" theme="primary">
                     {{ "确认设置" }}
-                </up-button>
+                </t-button>
             </view>
         </view>
     </view>
@@ -838,21 +839,21 @@ onMounted(() => {
     }
 }
 
-.step2-buttons .up-button {
+.step2-buttons .t-button {
     flex: 1;
     margin: 0 10rpx;
     transition: all 0.3s ease;
 }
 
-.step2-buttons .up-button:active {
+.step2-buttons .t-button:active {
     transform: scale(0.95);
 }
 
-.bottom .up-button {
+.bottom .t-button {
     transition: all 0.3s ease;
 }
 
-.bottom .up-button:active {
+.bottom .t-button:active {
     transform: scale(0.95);
 }
 </style>

@@ -1,23 +1,22 @@
 <template>
-    <up-divider
-        :text="props.text"
-        :textPosition="props.textPosition"
-        textColor="#007AFF"
-        lineColor="#86bbf5"
+    <t-divider
+        :content="props.text"
+        :align="props.textPosition"
+        :custom-style="{ color: '#007AFF', borderColor: '#86bbf5' }"
     >
-    </up-divider>
+    </t-divider>
 </template>
 <script setup>
 const props = defineProps({
     text: {
-        // ±êÌâÎÄ×Ö
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         type: String,
-        default: "ÎÄ×ÖÎÄ×Ö",
+        default: "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",
     },
     textPosition: {
-        // ÎÄ×ÖÎ»ÖÃ
+        // ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
         type: String,
-        default: "left", // ¿ÉÑ¡Öµ£ºleft¡¢right
+        default: "left", // ï¿½ï¿½Ñ¡Öµï¿½ï¿½leftï¿½ï¿½right
     },
 });
 </script>

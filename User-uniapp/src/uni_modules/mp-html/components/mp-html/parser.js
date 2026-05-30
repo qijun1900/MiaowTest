@@ -805,7 +805,7 @@ Parser.prototype.popNode = function () {
 
   if (node.name === 'a' || node.name === 'ad'
     // #ifdef H5 || APP-PLUS
-    || node.name === 'iframe' // eslint-disable-line
+    || node.name === 'iframe'  
     // #endif
   ) {
     this.expose()
@@ -1107,10 +1107,10 @@ Parser.prototype.popNode = function () {
   const flex = parent && ((parent.attrs.style || '').includes('flex') || (parent.attrs.style || '').includes('grid'))
     // #ifdef MP-WEIXIN
     // 检查基础库版本 virtualHost 是否可用
-    && !(node.c && wx.getNFCAdapter) // eslint-disable-line
+    && !(node.c && wx.getNFCAdapter)  
     // #endif
     // #ifndef MP-WEIXIN || MP-QQ || MP-BAIDU || MP-TOUTIAO
-    && !node.c // eslint-disable-line
+    && !node.c  
   // #endif
   if (flex) {
     node.f = ';max-width:100%'

@@ -1,21 +1,21 @@
 <template>
     <view>
-        <!-- uView自定义导航栏 -->
-        <u-navbar bgColor="#F8F8F8" :autoBack="true" @leftClick="leftClick">
-            <template #center>
-                <UviewSubsection
+        <!-- TDesign自定义导航栏 -->
+        <t-navbar left-arrow :fixed="true" custom-style="background: #F8F8F8" @go-back="leftClick">
+            <template #title>
+                <Subsection
                     :list="list"
                     class="subsection-wrapper"
                     @updateCurrent="handleSendMode"
                 />
             </template>
-        </u-navbar>
+        </t-navbar>
         <!-- 页面内容 -->
         <view
             class="content"
             :style="{
                 paddingTop: navBarHeight + 'px',
-                height: `calc(100vh - ${Math.max(navBarHeight, 44)}px - ${safeAreaBottom}px)`,
+                height: `calc(100vh - ${safeAreaBottom}px)`,
                 minHeight: '300px',
             }"
         >
@@ -85,83 +85,80 @@
             </swiper>
             <uni-transition :show="isEndQuestion" mode="fade">
                 <view class="but-container">
-                    <up-button
+                    <t-button
                         @click="handleSubmitAnswer"
-                        type="primary"
-                        shape="circle"
-                        icon="checkbox-mark"
-                        :plain="true"
-                        :hairline="false"
+                        theme="primary"
+                        shape="round"
+                        icon="check"
+                        size="large"
+                        block
                     >
                         提交答案
-                    </up-button>
+                    </t-button>
                 </view>
             </uni-transition>
         </view>
         <!-- 自定义底部 -->
         <view class="bottom">
-            <up-tabbar
-                :border="true"
+            <t-tab-bar
+                bordered
                 :fixed="true"
                 :placeholder="true"
-                :safeAreaInsetBottom="true"
-                backgroundColor="#f2f2f2"
-                zIndex="10"
+                :safe-area-inset-bottom="true"
+                value="check"
+                @change="handleTabBarChange"
             >
-                <up-tabbar-item
-                    :text="String(correctCount)"
-                    icon="/static/other/right.png"
+                <t-tab-bar-item
+                    value="correct"
+                    :icon="correctIconConfig"
                     v-if="
                         questionStore.UserShowSettings.showAnswer &&
                         currentMode === 0
                     "
-                ></up-tabbar-item>
-                <up-tabbar-item
-                    :text="String(incorrectCount)"
-                    icon="/static/other/error.png"
+                >{{ correctCount }}</t-tab-bar-item>
+                <t-tab-bar-item
+                    value="incorrect"
+                    :icon="incorrectIconConfig"
                     v-if="
                         questionStore.UserShowSettings.showAnswer &&
                         currentMode === 0
                     "
-                ></up-tabbar-item>
-                <up-tabbar-item
-                    :text="String(accuracyRate)"
-                    icon="/static/other/percent.png"
+                >{{ incorrectCount }}</t-tab-bar-item>
+                <t-tab-bar-item
+                    value="accuracy"
+                    :icon="percentIconConfig"
                     v-if="
                         questionStore.UserShowSettings.showAnswer &&
                         currentMode === 0
                     "
-                ></up-tabbar-item>
-                <up-tabbar-item
-                    text="答题卡"
-                    icon="list-dot"
-                    @click="handleCheck"
-                ></up-tabbar-item>
-            </up-tabbar>
+                >{{ accuracyRate }}</t-tab-bar-item>
+                <t-tab-bar-item
+                    value="check"
+                    icon="view-list"
+                >答题卡</t-tab-bar-item>
+            </t-tab-bar>
         </view>
         <!-- 答题卡  -->
-        <uviewPopup v-model:show="popupShow" :round="30" title="答题卡">
+        <tPopup v-model:show="popupShow" :round="30" title="答题卡" :overlay="false">
             <template #popupcontent>
                 <view class="popup-container">
                     <view class="popup-but-container">
-                        <up-button
-                            :plain="true"
-                            :hairline="true"
-                            type="primary"
+                        <t-button
+                            variant="outline"
+                            theme="primary"
                             @click="handleCleanAnswer"
-                            shape="circle"
+                            shape="round"
                         >
                             清空本次记录
-                        </up-button>
-                        <up-button
-                            :plain="true"
-                            :hairline="true"
-                            type="primary"
+                        </t-button>
+                        <t-button
+                            variant="outline"
+                            theme="primary"
                             @click="handleSubmitAnswer"
-                            shape="circle"
+                            shape="round"
                         >
                             查看练习成绩
-                        </up-button>
+                        </t-button>
                     </view>
                     <!-- 添加支持手势滑动的容器 -->
                     <scroll-view
@@ -184,7 +181,7 @@
                     </scroll-view>
                 </view>
             </template>
-        </uviewPopup>
+        </tPopup>
         <!-- 答题助手 -->
         <dragButton
             v-if="
@@ -214,7 +211,7 @@
             @btnRemove="handleHelperRemove"
         />
         <!-- 笔记弹窗 -->
-        <uviewPopup
+        <tPopup
             v-model:show="iSopenNotePopupShow"
             :closeable="false"
             :round="30"
@@ -239,44 +236,43 @@
                         >
                     </view>
                     <view class="note-button-container">
-                        <up-button
-                            :plain="true"
-                            :hairline="true"
-                            type="info"
+                        <t-button
+                            variant="outline"
+                            theme="default"
                             @click="handleCancelNote"
                             size="small"
-                            shape="circle"
+                            shape="round"
                         >
                             取消
-                        </up-button>
-                        <up-button
+                        </t-button>
+                        <t-button
                             :loading="isSavingNote"
                             :disabled="!noteContent.trim()"
-                            type="primary"
+                            theme="primary"
                             @click="handleSaveNote"
                             size="small"
-                            shape="circle"
+                            shape="round"
                         >
                             保存
-                        </up-button>
+                        </t-button>
                     </view>
                 </view>
             </template>
-        </uviewPopup>
+        </tPopup>
     </view>
 </template>
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";
-import UviewSubsection from "../../components/core/uviewSubsection.vue";
+import Subsection from "../../components/core/Subsection.vue";
 import SelectQuestion from "../../components/modules/exam/SelectQuestion.vue"; //Type=1
 import BlankQuestion from "../../components/modules/exam/BlankQuestion.vue"; //Type=2
 import JudgeQuestion from "../../components/modules/exam/JudgeQuestion.vue"; //Type=3
 import ShortQuestion from "../../components/modules/exam/ShortQuestion.vue"; //Type=4
 import { useObjectiveAnswerStore } from "../../stores/modules/ObjectiveAnswerStore";
 import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerStore";
-import uviewPopup from "../../components/core/uviewPopup.vue";
+import tPopup from "../../components/core/tPopup.vue";
 import AnswerSheet from "../../components/modules/exam/AnswerSheet.vue";
 import { useStatisticsStore } from "../../stores/modules/StatisticsStore";
 import { storeToRefs } from "pinia"; // 从Pinia导入storeToRefs
@@ -294,6 +290,11 @@ import formatTime from "../../util/formatTime";
 
 const questionStore = useQuestionStore(); // 问题Store,存储问题和用户设置
 const list = ref(["答题模式", "学习模式"]); // 添加subsection需要的数据
+
+// TabBar 图标配置（自定义图片图标，直接传路径字符串）
+const correctIconConfig = '/static/other/right.png';
+const incorrectIconConfig = '/static/other/error.png';
+const percentIconConfig = '/static/other/percent.png';
 const currentMode = ref(0); // 当前选中的模式，0表示答题模式，1表示学习模式
 const navBarHeight = ref(0); // 导航栏高度
 const safeAreaBottom = ref(0); // 底部安全区域高度
@@ -798,6 +799,13 @@ const handleCheck = () => {
     popupShow.value = true;
 };
 
+// TabBar 切换处理
+const handleTabBarChange = (e) => {
+    if (e.value === 'check') {
+        handleCheck();
+    }
+};
+
 // 处理答题卡点击
 const handleQuestionCardClick = (index) => {
     // 计算点击的题目与当前题目的差值
@@ -959,9 +967,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* TDesign tab-bar 自定义背景色 */
+.bottom :deep(.t-tab-bar) {
+    --td-tab-bar-bg-color: #f2f2f2;
+}
+
 .subsection-wrapper {
-    width: 40%; /* 控制分段控制器的宽度 */
-    margin: 0 auto; /* 居中显示 */
+    width: 70%;
+    margin: 0 auto;
 }
 
 /* 新增内容区域高度和滚动 */
@@ -1000,9 +1013,9 @@ onMounted(() => {
 .but-container {
     z-index: 100;
     position: fixed;
-    bottom: 200rpx;
-    width: 90%;
-    left: 6%;
+    bottom: 180rpx;
+    left: 30rpx;
+    right: 30rpx;
 }
 .popup-container {
     padding: 0px 5rpx;

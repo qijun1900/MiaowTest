@@ -17,26 +17,28 @@
                 <text>空{{ index + 1 }}</text>
             </view>
             <view class="input-textarea">
-                <up-textarea
-                    v-model="userinput[index]"
+                <t-textarea
+                    :value="userinput[index]"
+                    @change="(val) => { userinput[index] = val }"
                     :placeholder="'请在此处输入空' + (index + 1) + '的答案'"
-                    autoHeight
-                    :height="48"
+                    autosize
                 >
-                </up-textarea>
+                </t-textarea>
             </view>
         </view>
         <!-- 查看答案 -->
         <view class="check-container">
-            <up-button
+            <t-button
                 v-if="props.currentMode === 0"
                 @click="isShowAnswer = !isShowAnswer"
-                type="primary"
-                :text="showAnswerComputed ? '隐藏答案' : '显示答案'"
-                shape="circle"
-                :icon="showAnswerComputed ? 'eye-off' : 'eye-fill'"
+                theme="primary"
+                shape="round"
+                size="large"
+                block
+                :icon="showAnswerComputed ? 'browse-off' : 'browse'"
+                :content="showAnswerComputed ? '隐藏答案' : '显示答案'"
             >
-            </up-button>
+            </t-button>
         </view>
         <!-- 答案 -->
         <uni-transition name="fade" mode="out-in" :show="showAnswerComputed">
@@ -67,24 +69,30 @@
             :show="showAnswerComputed && props.currentMode === 0"
         >
             <view class="user-judgment-container" key="judgment">
-                <up-button
-                    icon="close-circle-fill"
-                    type="primary"
-                    :plain="true"
-                    text="答错了"
-                    shape="circle"
+                <t-button
+                    theme="primary"
+                    variant="outline"
+                    content="答错了"
+                    shape="round"
                     class="user-judgment-but"
                     @click="handleSelfEvaluation(false)"
-                ></up-button>
-                <up-button
-                    icon="checkmark-circle-fill"
-                    type="primary"
-                    :plain="true"
-                    text="答对了"
-                    shape="circle"
+                >
+                    <template #icon>
+                        <t-icon name="close-circle-filled" />
+                    </template>
+                </t-button>
+                <t-button
+                    theme="primary"
+                    variant="outline"
+                    content="答对了"
+                    shape="round"
                     class="user-judgment-but"
                     @click="handleSelfEvaluation(true)"
-                ></up-button>
+                >
+                    <template #icon>
+                        <t-icon name="check-circle-filled" />
+                    </template>
+                </t-button>
             </view>
         </uni-transition>
         <!-- 解析 -->
