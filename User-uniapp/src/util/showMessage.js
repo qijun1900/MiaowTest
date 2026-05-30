@@ -10,7 +10,7 @@ function show(content, theme = "info", duration = 3000) {
     if (!_context) return;
     Message[theme]({
         context: _context,
-        offset: ["180rpx", "32rpx"],
+        offset: ["100rpx", "32rpx"],
         duration,
         content,
         icon: true,

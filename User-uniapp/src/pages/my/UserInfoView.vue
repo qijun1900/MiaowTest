@@ -37,7 +37,7 @@
                     <text class="openid-text">{{
                         userInfoStore.userInfo?.uid
                     }}</text>
-                    <t-icon name="file" size="18px"></t-icon>
+                    <t-icon name="copy" size="18px"></t-icon>
                 </view>
             </view>
 
@@ -97,6 +97,8 @@
         <view class="logout-section">
             <view class="logout-btn" @click="handleLogout">退出登录</view>
         </view>
+
+        <t-message ref="t-message" />
     </view>
 </template>
 
@@ -104,7 +106,8 @@
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import handleCopy from "../../util/copy";
 import { updateUserInfo, checkUserBind } from "../../API/My/UserInfoUpdateAPI";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, getCurrentInstance } from "vue";
+import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/showMessage";
 import userAvatar from "../../components/core/userAvatar.vue";
 import { httpUpload } from "../../util/http";
 import escconfig from "../../config/esc.config";
@@ -113,6 +116,7 @@ import logSDK from "../../util/logSDK";
 import { wechatBind } from "../../util/wechatLogin";
 // #endif
 
+const instance = getCurrentInstance();
 const bindStatus = ref({
     isEmailBound: false,
     isWechatBound: false,
@@ -172,7 +176,7 @@ const handleEditAvatar = () => {
                     });
                     if (data.code === 200) {
                         // 旧云存储头像由后端 uploadCloudAvatar 统一删除（支持 OSS 和 cloud:// ）
-                        uni.showToast({ title: data.message, icon: "success" });
+                        showSuccess(data.message);
                         updateUserData({ avatar: data.data.avatar }, "头像");
                     }
                 } else {
@@ -185,10 +189,7 @@ const handleEditAvatar = () => {
                         success: ({ data }) => {
                             const parsedData = JSON.parse(data);
                             if (parsedData.code === 200) {
-                                uni.showToast({
-                                    title: parsedData.message,
-                                    icon: "success",
-                                });
+                                showSuccess(parsedData.message);
                                 updateUserData(
                                     { avatar: parsedData.data.url },
                                     "头像",
@@ -199,7 +200,7 @@ const handleEditAvatar = () => {
                 }
             } catch (err) {
                 console.error("头像上传失败:", err);
-                uni.showToast({ title: "头像上传失败", icon: "none" });
+                showError("头像上传失败");
             }
         },
     });
@@ -247,7 +248,7 @@ const handleBindEmail = () => {
 // 微信绑定：仅微信小程序可用，调用 wechatBind 工具
 const handleBindWechat = () => {
     if (bindStatus.value.isWechatBound) {
-        uni.showToast({ title: "微信已绑定", icon: "success" });
+        showSuccess("微信已绑定");
         return;
     }
     // #ifdef MP-WEIXIN
@@ -258,11 +259,7 @@ const handleBindWechat = () => {
     });
     // #endif
     // #ifndef MP-WEIXIN
-    uni.showToast({
-        title: "请在微信小程序内绑定",
-        icon: "none",
-        duration: 2000,
-    });
+    showWarning("请在微信小程序内绑定");
     // #endif
 };
 
@@ -285,23 +282,14 @@ const updateUserData = async (userData, fieldName) => {
 
         if (response.code === 200) {
             userInfoStore.setUserInfo(response.data);
-            uni.showToast({
-                title: "修改成功",
-                icon: "success",
-            });
+            showSuccess("修改成功");
             return true;
         } else {
-            uni.showToast({
-                title: response.message || "修改失败",
-                icon: "none",
-            });
+            showError(response.message || "修改失败");
             return false;
         }
     } catch (error) {
-        uni.showToast({
-            title: "网络错误，请稍后重试",
-            icon: "none",
-        });
+        showError("网络错误，请稍后重试");
         console.error(`更新${fieldName}失败:`, error);
         return false;
     }
@@ -319,10 +307,7 @@ const handleLogout = () => {
 
                 userInfoStore.clearUserInfo(); // 清除Pinia用户信息
                 uni.removeStorageSync("token"); // 清除 token
-                uni.showToast({
-                    title: "已退出登录",
-                    icon: "success",
-                });
+                showSuccess("已退出登录");
 
                 // 埋点：主动退出登录，bizId 记录是哪个用户退出
                 logSDK.track("AUTH_LOGOUT", {
@@ -350,6 +335,7 @@ const handlePolicy = () => {
     });
 };
 onMounted(() => {
+    setMessageInstance(instance.proxy);
     CheckaccountBindStatus();
 });
 </script>

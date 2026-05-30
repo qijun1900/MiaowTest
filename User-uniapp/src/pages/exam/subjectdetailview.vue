@@ -242,13 +242,12 @@
             <t-button
                 theme="primary"
                 class="bottom-button"
-                :icon="isFavorited ? 'star-filled' : 'star'"
-                :variant="isFavorited ? 'base' : 'outline'"
+                :class="{ 'bottom-button--favorited': isFavorited }"
+                :icon="isFavorited ? { name: 'star-filled', color: '#F7BA2A' } : 'star'"
                 @click="handleFavoriteExam"
                 shape="round"
                 size="large"
                 block
-                :icon-props="{ style: { color: isFavorited ? '#F7BA2A' : '#409EFF' } }"
             >
                 {{ isFavorited ? "已收藏" : "收藏考试" }}
             </t-button>
@@ -746,5 +745,15 @@ const handleAuth = () => {
     padding: 0 30rpx;
     box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
     z-index: 100;
+}
+
+.bottom-button--favorited :deep(.t-button) {
+    background-color: #F7BA2A !important;
+    border-color: #F7BA2A !important;
+    color: #ffffff !important;
+}
+
+.bottom-button--favorited :deep(.t-icon) {
+    color: #ffffff !important;
 }
 </style>

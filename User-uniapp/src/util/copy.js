@@ -1,21 +1,65 @@
+import { showSuccess, showError } from "./showMessage";
+
 const handleCopy = (text) => {
-    // 使用 uni-app 的剪贴板 API
+    // #ifdef MP-WEIXIN
+    wx.setClipboardData({
+        data: text,
+        hideToast: true,
+        success: function () {
+            showSuccess("复制成功");
+        },
+        fail: function (err) {
+            console.error("复制失败", err);
+            showError("复制失败");
+        },
+    });
+    // #endif
+
+    // #ifdef H5
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(
+            () => showSuccess("复制成功"),
+            (err) => {
+                console.error("复制失败", err);
+                showError("复制失败");
+            },
+        );
+    } else {
+        fallbackCopy(text);
+    }
+    // #endif
+
+    // #ifdef APP-PLUS
     uni.setClipboardData({
         data: text,
         success: function () {
-            uni.showToast({
-                title: '复制成功',
-                icon: 'success'
-            });
+            uni.hideToast();
+            showSuccess("复制成功");
         },
         fail: function (err) {
-            console.error('复制失败', err);
-            uni.showToast({
-                title: '复制失败',
-                icon: 'none'
-            });
-        }
+            console.error("复制失败", err);
+            showError("复制失败");
+        },
     });
+    // #endif
 };
+
+// H5 降级方案
+function fallbackCopy(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand("copy");
+        showSuccess("复制成功");
+    } catch (err) {
+        console.error("复制失败", err);
+        showError("复制失败");
+    }
+    document.body.removeChild(textarea);
+}
 
 export default handleCopy;
