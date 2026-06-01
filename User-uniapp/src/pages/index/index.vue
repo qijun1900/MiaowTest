@@ -151,7 +151,7 @@ onMounted(() => {
 </script>
 <style scoped lang="scss">
 .search-container {
-    background-color: $uni-bg-color-primary; // 背景颜色
+    background-color: #f5f7fa;
     position: sticky; // 固定定位
     top: 0; // 距离顶部的距离
     z-index: 100; // 层级

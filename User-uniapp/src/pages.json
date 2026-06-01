@@ -12,9 +12,9 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "题喵喵",
-				"navigationBarTextStyle": "white",
-				"navigationBarBackgroundColor": "#007AFF",
+				"navigationBarTitleText": "",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#f5f7fa",
 				"enablePullDownRefresh": true,
 				"app-plus": {
 					"scrollIndicator": "none",
