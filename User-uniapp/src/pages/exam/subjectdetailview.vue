@@ -243,7 +243,7 @@
                 theme="primary"
                 class="bottom-button"
                 :class="{ 'bottom-button--favorited': isFavorited }"
-                :icon="isFavorited ? { name: 'star-filled', color: '#F7BA2A' } : 'star'"
+                :icon="isFavorited ? 'star-filled' : 'star'"
                 @click="handleFavoriteExam"
                 shape="round"
                 size="large"
@@ -737,23 +737,19 @@ const handleAuth = () => {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 100rpx;
+    height: calc(100rpx + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
     background-color: #ffffff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 30rpx;
+    padding-left: 30rpx;
+    padding-right: 30rpx;
     box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
     z-index: 100;
 }
 
-.bottom-button--favorited :deep(.t-button) {
-    background-color: #F7BA2A !important;
-    border-color: #F7BA2A !important;
-    color: #ffffff !important;
-}
-
-.bottom-button--favorited :deep(.t-icon) {
-    color: #ffffff !important;
+.bottom-button--favorited :deep(.t-button__icon .t-icon-base) {
+    color: #F7BA2A !important;
 }
 </style>
