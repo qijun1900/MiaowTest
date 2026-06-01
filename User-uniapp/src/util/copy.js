@@ -4,14 +4,6 @@ const handleCopy = (text) => {
     // #ifdef MP-WEIXIN
     wx.setClipboardData({
         data: text,
-        hideToast: true,
-        success: function () {
-            showSuccess("复制成功");
-        },
-        fail: function (err) {
-            console.error("复制失败", err);
-            showError("复制失败");
-        },
     });
     // #endif
 
@@ -32,8 +24,8 @@ const handleCopy = (text) => {
     // #ifdef APP-PLUS
     uni.setClipboardData({
         data: text,
+        showToast: false,
         success: function () {
-            uni.hideToast();
             showSuccess("复制成功");
         },
         fail: function (err) {
