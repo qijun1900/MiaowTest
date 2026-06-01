@@ -1,5 +1,5 @@
 <template>
-    <view class="greeting-banner" :style="bannerStyle">
+    <view class="greeting-banner">
         <text class="greeting-title">{{ displayText }}</text>
     </view>
 </template>
@@ -9,24 +9,9 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { getGreetingInfo } from "../../../util/greet";
 import { UserInfoStore } from "../../../stores/modules/UserinfoStore";
 
-const props = defineProps({
-    statusBarHeight: {
-        type: Number,
-        default: 0,
-    },
-    topInset: {
-        type: Number,
-        default: 8,
-    },
-});
-
 const tick = ref(Date.now());
 let timer = null;
 const userInfoStore = UserInfoStore();
-
-const bannerStyle = computed(() => ({
-    marginTop: `${(props.statusBarHeight || 0) + (props.topInset || 0)}px`,
-}));
 
 const greetingInfo = computed(() => {
     tick.value;
@@ -66,9 +51,6 @@ onUnmounted(() => {
 
 <style scoped>
 .greeting-banner {
-    position: relative;
-    z-index: 10000;
-    margin: 0 24rpx 8rpx 24rpx;
     padding: 8rpx 0;
 }
 

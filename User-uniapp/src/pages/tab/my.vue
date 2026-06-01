@@ -1,30 +1,32 @@
 <template>
     <view class="container">
-        <view class="header-row" :style="headerRowStyle">
-            <GreetingBanner
-                class="header-greeting"
-                :statusBarHeight="0"
-                :topInset="0"
-            />
-            <view
-                class="header-setting"
-                hover-class="header-setting--active"
-                :hover-stay-time="80"
-                @click="goSetting"
-            >
-                <image
-                    class="header-setting__icon"
-                    src="/static/navMy/c-my-setting.png"
-                    mode="aspectFit"
-                />
+        <!-- 固定头部：问候语 + 设置按钮 -->
+        <view class="header-fixed" :style="customNavbarStyle">
+            <view class="header-row" :style="navRowStyle">
+                <GreetingBanner class="header-greeting" />
+                <view
+                    class="header-setting"
+                    hover-class="header-setting--active"
+                    :hover-stay-time="80"
+                    @click="goSetting"
+                >
+                    <image
+                        class="header-setting__icon"
+                        src="/static/navMy/c-my-setting.png"
+                        mode="aspectFit"
+                    />
+                </view>
             </view>
         </view>
 
-        <!-- 用户信息区域 - 美化版 -->
+        <!-- 头部占位，防止内容被固定头部遮挡 -->
+        <view :style="{ height: customNavbarStyle.height }"></view>
+
+        <!-- 用户信息区域 -->
         <UserInfoCard
             :marginTop="'8rpx'"
             :showVip="false"
-            :showStatusBar="true"
+            :showStatusBar="false"
             @click="handleUserinfo"
         />
 
@@ -36,7 +38,7 @@
         <!-- 热力图 -->
         <UserActivityHeatmap ref="activityHeatmapRef" />
 
-        <!-- 登录显示 -->
+        <!-- 登录弹窗 -->
         <tOverlay v-model:show="LoginOverlayShow">
             <template #overlaycontent>
                 <view class="rect">
@@ -81,61 +83,36 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, watch } from "vue";
 import { onShow, onPullDownRefresh } from "@dcloudio/uni-app";
 import tOverlay from "../../components/core/tOverlay.vue";
 import { wechatLogin } from "../../util/wechatLogin";
 import myNavbar from "../../components/modules/my/myNavbar.vue";
-import navBarHeightUtil from "../../util/navBarHeight.js";
 import showShareMenu from "../../util/wechatShare.js";
 import { reportLoginStatus } from "../../API/My/UserLoginAPI";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import UserInfoCard from "../../components/modules/my/UserInfoCard.vue";
 import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
 import UserActivityHeatmap from "../../components/modules/my/UserActivityHeatmap.vue";
+import { useNavBarSafeArea } from "../../composables/useNavBarSafeArea.js";
+
+const { customNavbarStyle, navRowStyle, refreshLayoutInfo } =
+    useNavBarSafeArea({ reserveMenuButtonRight: true });
 
 const AGREED_KEY = "user_agreed_policy";
 const LoginOverlayShow = ref(false);
 const agreed = ref(uni.getStorageSync(AGREED_KEY) || false);
-const navBarInfo = ref({});
 const activityHeatmapRef = ref(null);
-// 处理导航栏点击事件
 
 const goSetting = () => {
-    uni.navigateTo({
-        url: "/pages/my/MySettingView",
-    });
+    uni.navigateTo({ url: "/pages/my/MySettingView" });
 };
 
-const headerRowStyle = computed(() => {
-    const info = navBarInfo.value || {};
-    const statusBarHeight = info.statusBarHeight || 0;
-    const rect = info.menuButtonRect;
-    // #ifdef MP-WEIXIN
-    if (rect && rect.top && rect.height) {
-        const sys = uni.getWindowInfo();
-        const rightReserve = Math.max(sys.windowWidth - rect.left + 8, 0);
-        return {
-            marginTop: `${rect.top}px`,
-            minHeight: `${rect.height}px`,
-            paddingRight: `${rightReserve}px`,
-        };
-    }
-    // #endif
-    return {
-        marginTop: `${statusBarHeight + 8}px`,
-        paddingRight: "24rpx",
-    };
-});
-
-//用户信息
 const handleUserinfo = ({ isLoggedIn }) => {
     if (!isLoggedIn) {
         LoginOverlayShow.value = true;
     } else {
-        uni.navigateTo({
-            url: "/pages/my/UserInfoView",
-        });
+        uni.navigateTo({ url: "/pages/my/UserInfoView" });
     }
 };
 
@@ -144,7 +121,6 @@ const handleCancelLogin = () => {
     agreed.value = false;
 };
 
-// 微信程序端登录 - 使用工具函数
 const handleUseWXLogin = async () => {
     if (!agreed.value) {
         uni.showToast({
@@ -159,20 +135,15 @@ const handleUseWXLogin = async () => {
     try {
         await wechatLogin({
             onSuccess: () => {
-                // 登录成功后关闭弹窗
                 LoginOverlayShow.value = false;
             },
         });
     } catch (error) {
         console.error("微信登录失败", error);
-        uni.showToast({
-            title: "微信登录失败",
-            icon: "none",
-        });
+        uni.showToast({ title: "微信登录失败", icon: "none" });
     }
 };
 
-// 处理账号登录 h5端和小程序端
 const handleUseAccountLogin = () => {
     if (!agreed.value) {
         uni.showToast({
@@ -184,29 +155,20 @@ const handleUseAccountLogin = () => {
         return;
     }
     LoginOverlayShow.value = false;
-    uni.navigateTo({
-        url: "/pages/my/UserLoginView",
-    });
+    uni.navigateTo({ url: "/pages/my/UserLoginView" });
 };
 
-// 用户服务协议
 const showUserAgreement = () => {
-    uni.navigateTo({
-        url: "/pages/public/UserAgreementView",
-    });
+    uni.navigateTo({ url: "/pages/public/UserAgreementView" });
 };
 
-// 显示隐私政策
 const showPrivacyPolicy = () => {
-    uni.navigateTo({
-        url: "/pages/public/PrivacyPolicyView",
-    });
+    uni.navigateTo({ url: "/pages/public/PrivacyPolicyView" });
 };
 
 const reportLoginStatusIfNeeded = async () => {
     const token = uni.getStorageSync("token");
     if (!token) return;
-
     try {
         await reportLoginStatus();
     } catch (error) {
@@ -214,10 +176,9 @@ const reportLoginStatusIfNeeded = async () => {
     }
 };
 
-// 下拉刷新页面状态
 onPullDownRefresh(async () => {
     try {
-        navBarInfo.value = navBarHeightUtil.getNavBarInfo();
+        refreshLayoutInfo();
         await reportLoginStatusIfNeeded();
         if (activityHeatmapRef.value?.refresh) {
             await activityHeatmapRef.value.refresh();
@@ -227,14 +188,6 @@ onPullDownRefresh(async () => {
     }
 });
 
-// 获取导航栏高度信息
-onMounted(() => {
-    navBarInfo.value = navBarHeightUtil.getNavBarInfo();
-    //#ifdef MP-WEIXIN
-    showShareMenu();
-    //#endif
-});
-
 watch(agreed, (val) => {
     uni.setStorageSync(AGREED_KEY, val);
 });
@@ -242,17 +195,16 @@ watch(agreed, (val) => {
 onShow(() => {
     agreed.value = uni.getStorageSync(AGREED_KEY) || false;
     reportLoginStatusIfNeeded();
+    // #ifdef MP-WEIXIN
+    showShareMenu();
+    // #endif
 });
 </script>
 
 <style scoped>
 .container {
     min-height: 100vh;
-    height: 100vh; /* 设置固定高度 */
-    overflow-y: auto; /* 内容超出时自动滚动 */
     overflow-x: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
     background: linear-gradient(
         180deg,
         #e6f3ff 0%,
@@ -260,61 +212,25 @@ onShow(() => {
         #f5faff 50%,
         #fafcff 75%,
         #ffffff 100%
-    ); /* 优雅的淡蓝色到白色渐变 */
-    padding: 0 15rpx 0 15rpx;
-    position: relative;
-
+    );
+    padding: 0 15rpx;
 }
 
-.container::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
-}
-
-.rect {
-    width: 600rpx;
-    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
-    border-radius: 20rpx;
-    box-shadow:
-        0 16rpx 48rpx rgba(198, 226, 255, 0.15),
-        0 4rpx 16rpx rgba(198, 226, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 20rpx 0;
-}
-.overlay-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 15rpx 30rpx;
-}
-.overlay-title {
-    font-size: 32rpx;
-    font-weight: 580;
-    color: #333333;
-}
-.login-tips {
-    font-size: 26rpx;
-    color: #999999;
-    margin-bottom: 10rpx;
-}
-.login-but {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20rpx;
-    padding: 10rpx 30rpx;
-}
-
-.login-but > .t-button {
-    flex: 1;
-}
-
-.function-list {
-    margin-bottom: 20rpx;
+/* 固定头部 */
+.header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: linear-gradient(
+        180deg,
+        #e6f3ff 0%,
+        #f0f8ff 80%,
+        rgba(240, 248, 255, 0) 100%
+    );
+    padding: 0 8rpx 0 0;
+    box-sizing: border-box;
 }
 
 .header-row {
@@ -322,13 +238,12 @@ onShow(() => {
     align-items: center;
     justify-content: space-between;
     gap: 16rpx;
-    padding: 0 8rpx 0 0;
-    box-sizing: border-box;
 }
 
 .header-greeting {
     flex: 1;
     min-width: 0;
+    padding-left: 24rpx;
 }
 
 .header-setting {
@@ -349,5 +264,49 @@ onShow(() => {
 .header-setting__icon {
     width: 44rpx;
     height: 44rpx;
+}
+
+/* 登录弹窗 */
+.rect {
+    width: 600rpx;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+    border-radius: 20rpx;
+    box-shadow:
+        0 16rpx 48rpx rgba(198, 226, 255, 0.15),
+        0 4rpx 16rpx rgba(198, 226, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    padding: 20rpx 0;
+}
+
+.overlay-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15rpx 30rpx;
+}
+
+.overlay-title {
+    font-size: 32rpx;
+    font-weight: 580;
+    color: #333333;
+}
+
+.login-tips {
+    font-size: 26rpx;
+    color: #999999;
+    margin-bottom: 10rpx;
+}
+
+.login-but {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20rpx;
+    padding: 10rpx 30rpx;
+}
+
+.login-but > .t-button {
+    flex: 1;
 }
 </style>

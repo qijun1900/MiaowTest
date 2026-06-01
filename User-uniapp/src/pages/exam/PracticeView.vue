@@ -1,7 +1,11 @@
 <template>
     <view>
         <!-- TDesign自定义导航栏 -->
-        <t-navbar left-arrow :fixed="true" custom-style="background: #F8F8F8" @go-back="leftClick">
+        <t-navbar 
+            left-arrow 
+            :fixed="true" 
+            custom-style="background: #F8F8F8" 
+            @go-back="leftClick">
             <template #title>
                 <Subsection
                     :list="list"

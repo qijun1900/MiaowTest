@@ -135,7 +135,6 @@ const handleClick = () => {
     background: #ffffff;
     box-shadow: 0 20rpx 40rpx -12rpx rgba(66, 133, 244, 0.15),
         0 8rpx 16rpx -8rpx rgba(66, 133, 244, 0.08); /* 高级弥散阴影 */
-    z-index: 10000;
     /* 移除 overflow: hidden 允许头像突破卡片上方 */
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     border: 1px solid rgba(255, 255, 255, 0.8);
