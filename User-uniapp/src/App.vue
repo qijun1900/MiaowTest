@@ -126,7 +126,8 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+@import './static/theme.css';
 /* ── 全局公共样式 ──────────────────────────────────────────────────────────── */
 
 /* 提升模态框层级，确保 uni-modal 始终覆盖在其他元素之上 */
