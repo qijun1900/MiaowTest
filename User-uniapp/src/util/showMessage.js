@@ -7,7 +7,11 @@ export function setMessageInstance(context) {
 }
 
 function show(content, theme = "info", duration = 3000) {
-    if (!_context) return;
+    if (!_context) {
+        const iconMap = { success: "success", error: "error", warning: "none", info: "none" };
+        uni.showToast({ title: content, icon: iconMap[theme] || "none", duration });
+        return;
+    }
     Message[theme]({
         context: _context,
         offset: ["100rpx", "32rpx"],
