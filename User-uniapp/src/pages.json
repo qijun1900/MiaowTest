@@ -89,16 +89,6 @@
 		}
 	],
 	"subPackages": [
-		{
-			"root": "pages/test",
-			"pages": [
-				{
-					"path": "translateTest",
-					"style": {
-						"navigationBarTitleText": "翻译测试"
-					}
-				}
-			]
 		},
 		{
 			"root": "pages/public",
