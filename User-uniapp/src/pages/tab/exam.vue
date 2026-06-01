@@ -228,7 +228,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .container {
     min-height: 100vh;
-    background-color: #f8f8f8;
+    background-color: #f5f7fa;
 }
 
 // 内容区域样式

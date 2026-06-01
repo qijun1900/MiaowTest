@@ -102,17 +102,7 @@ defineExpose({
     left: 0;
     right: 0;
     z-index: 1000;
-    background: linear-gradient(
-        180deg,
-        #e6f3ff 0%,
-        #f0f8ff 25%,
-        #f5faff 50%,
-        #fafcff 75%,
-        #ffffff 100%
-    );
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 0.5px solid rgba(255, 255, 255, 0.3);
+    background-color: #f5f7fa;
 }
 
 .navbar-content {

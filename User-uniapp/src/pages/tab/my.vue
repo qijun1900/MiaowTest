@@ -205,14 +205,7 @@ onShow(() => {
 .container {
     min-height: 100vh;
     overflow-x: hidden;
-    background: linear-gradient(
-        180deg,
-        #e6f3ff 0%,
-        #f0f8ff 25%,
-        #f5faff 50%,
-        #fafcff 75%,
-        #ffffff 100%
-    );
+    background-color: #f5f7fa;
     padding: 0 15rpx;
 }
 
@@ -223,12 +216,7 @@ onShow(() => {
     left: 0;
     right: 0;
     z-index: 100;
-    background: linear-gradient(
-        180deg,
-        #e6f3ff 0%,
-        #f0f8ff 80%,
-        rgba(240, 248, 255, 0) 100%
-    );
+    background-color: #f5f7fa;
     padding: 0 8rpx 0 0;
     box-sizing: border-box;
 }
