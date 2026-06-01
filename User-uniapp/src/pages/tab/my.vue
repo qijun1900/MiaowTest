@@ -216,9 +216,28 @@ onShow(() => {
     left: 0;
     right: 0;
     z-index: 100;
-    background-color: #f5f7fa;
+    background-color: rgba(245, 247, 250, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     padding: 0 8rpx 0 0;
     box-sizing: border-box;
+}
+
+.header-fixed::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -40rpx;
+    height: 40rpx;
+    background: linear-gradient(
+        to bottom,
+        rgba(245, 247, 250, 0.6) 0%,
+        rgba(245, 247, 250, 0) 100%
+    );
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    pointer-events: none;
 }
 
 .header-row {
