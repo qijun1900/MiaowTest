@@ -4,6 +4,8 @@
 		"custom": {
 			// uni-ui 规则如下配置
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+			// TDesign Chat 组件(需放在通用 TDesign 规则之前优先匹配)
+			"^t-(chat-.*|attachments)$": "@tdesign/uniapp-chat/$1/$1.vue",
 			// TDesign 规则如下配置
 			"^t-(.*)": "@tdesign/uniapp/$1/$1.vue"
 		}
