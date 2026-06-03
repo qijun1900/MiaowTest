@@ -565,6 +565,16 @@ function escapeHtml(value) {
 .bubble-stack {
     min-width: 0;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.bubble-row-end .bubble-stack {
+    align-items: flex-end;
+}
+
+.bubble-row-start .bubble-stack {
+    align-items: flex-start;
 }
 
 .bubble-box {
@@ -574,6 +584,8 @@ function escapeHtml(value) {
     font-size: 28rpx;
     line-height: 1.7;
     word-break: break-word;
+    width: fit-content;
+    max-width: 100%;
 }
 
 .bubble-box-start {
@@ -622,6 +634,8 @@ function escapeHtml(value) {
     flex-wrap: wrap;
     gap: 12rpx;
     margin-bottom: 12rpx;
+    width: fit-content;
+    max-width: 100%;
 }
 
 .bubble-image-item {
