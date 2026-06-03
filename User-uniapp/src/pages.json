@@ -89,7 +89,6 @@
 		}
 	],
 	"subPackages": [
-		},
 		{
 			"root": "pages/public",
 			"pages": [
