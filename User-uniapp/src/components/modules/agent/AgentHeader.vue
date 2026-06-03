@@ -30,28 +30,62 @@
                             <text class="dropdown-title">{{ conversationTitle }}</text>
                         </view>
                         <view class="dropdown-divider" v-if="conversationTitle"></view>
-                        
+
                         <view class="option-item" @click="handleOption('rename')">
                             <text class="option-text">重命名</text>
-                            <uni-icons type="compose" size="18" color="#333"></uni-icons>
+                            <t-icon name="edit-1" size="36rpx" color="#333"></t-icon>
                         </view>
                         <view class="option-item" @click="handleOption('star')">
                             <text class="option-text">{{ favorited ? '取消收藏' : '收藏' }}</text>
-                            <uni-icons :type="favorited ? 'star-filled' : 'star'" size="18" :color="favorited ? '#f5a623' : '#333'"></uni-icons>
+                            <t-icon :name="favorited ? 'star-filled' : 'star'" size="36rpx" :color="favorited ? '#f5a623' : '#333'"></t-icon>
                         </view>
                         <view class="option-item option-item-danger" @click="handleOption('delete')">
                             <text class="option-text">删除</text>
-                            <uni-icons type="trash" size="18" color="#ef4444"></uni-icons>
+                            <t-icon name="delete" size="36rpx" color="#ef4444"></t-icon>
                         </view>
                         <view class="dropdown-divider"></view>
                         <view class="option-item" @click="handleOption('new-chat')">
                             <text class="option-text">新建会话</text>
-                            <uni-icons type="plusempty" size="18" color="#333"></uni-icons>
+                            <t-icon name="add" size="36rpx" color="#333"></t-icon>
                         </view>
                     </view>
                 </view>
             </view>
         </view>
+
+        <!-- 模型选择底部弹窗（TDesign Popup） -->
+        <t-popup
+            :visible="showModelSheet"
+            placement="bottom"
+            :close-on-overlay-click="true"
+            @visible-change="handlePopupVisibleChange"
+        >
+            <view class="model-sheet">
+                <view class="model-sheet-handle"></view>
+                <view class="model-sheet-title">选择模型</view>
+                <scroll-view class="model-sheet-list" scroll-y :show-scrollbar="false">
+                    <view
+                        v-for="(item, idx) in normalizedModelList"
+                        :key="item.value || idx"
+                        class="model-sheet-item"
+                        :class="{ 'model-sheet-item-active': item.label === currentModel }"
+                        @click="handleSelectModel(item)"
+                    >
+                        <view class="model-sheet-item-main">
+                            <text class="model-sheet-item-label">{{ item.label }}</text>
+                            <text v-if="item.isMultimodal" class="model-sheet-item-tag">多模态</text>
+                        </view>
+                        <t-icon
+                            v-if="item.label === currentModel"
+                            name="check"
+                            size="40rpx"
+                            color="#1f2937"
+                        ></t-icon>
+                    </view>
+                </scroll-view>
+                <view class="model-sheet-cancel" @click="closeModelSheet">取消</view>
+            </view>
+        </t-popup>
     </view>
 </template>
 
@@ -78,10 +112,23 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(["menu-click", "new-chat", "model-change", "option-click"]);
+const emit = defineEmits([
+    "menu-click",
+    "new-chat",
+    "model-change",
+    "option-click",
+    "model-sheet-toggle",
+]);
 
 const currentModel = ref(props.initialModel);
 const showOptionsMenu = ref(false);
+const showModelSheet = ref(false);
+
+const normalizedModelList = computed(() =>
+    (props.modelList || []).map((item) =>
+        typeof item === 'object' ? item : { label: item, value: item }
+    )
+);
 
 watch(() => props.initialModel, (newVal) => {
     currentModel.value = newVal;
@@ -105,29 +152,30 @@ const handleMenuClick = () => {
 };
 
 const handleModelSwitch = () => {
-    if (!props.modelList?.length) {
+    if (!normalizedModelList.value.length) {
         return;
     }
+    showModelSheet.value = true;
+    emit("model-sheet-toggle", true);
+};
 
-    const itemNames = props.modelList.map(item => typeof item === 'object' ? item.label : item);
+const closeModelSheet = () => {
+    showModelSheet.value = false;
+    emit("model-sheet-toggle", false);
+};
 
-    uni.showActionSheet({
-        itemList: itemNames,
-        success: (result) => {
-            const selectedModel = props.modelList[result.tapIndex];
-            if (!selectedModel) {
-                return;
-            }
-            
-            if (typeof selectedModel === 'object') {
-                currentModel.value = selectedModel.label;
-                emit("model-change", selectedModel.label, selectedModel.value);//name和key都传出去，方便外层使用
-            } else {
-                currentModel.value = selectedModel;
-                emit("model-change", selectedModel, selectedModel);
-            }
-        },
-    });
+// t-popup 关闭时（点击遮罩 / 关闭按钮）会触发 visible-change
+const handlePopupVisibleChange = ({ visible }) => {
+    if (!visible && showModelSheet.value) {
+        showModelSheet.value = false;
+        emit("model-sheet-toggle", false);
+    }
+};
+
+const handleSelectModel = (item) => {
+    currentModel.value = item.label;
+    emit("model-change", item.label, item.value);
+    closeModelSheet();
 };
 
 const handleNewChat = () => {
@@ -348,5 +396,110 @@ const handleOption = (action) => {
     height: 1rpx;
     background-color: #f0f0f0;
     margin: 8rpx 0;
+}
+
+/* ── 模型选择底部弹窗（内嵌于 t-popup） ── */
+/* 简洁白风格：纯白背景、细灰分隔、低饱和度强调色 */
+.model-sheet {
+    width: 100%;
+    background: #ffffff;
+    padding: 16rpx 0 calc(16rpx + env(safe-area-inset-bottom));
+    max-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.model-sheet-handle {
+    width: 64rpx;
+    height: 6rpx;
+    background: #e5e7eb;
+    border-radius: 999rpx;
+    margin: 0 auto 16rpx;
+}
+
+.model-sheet-title {
+    font-size: 30rpx;
+    font-weight: 500;
+    color: #1f2937;
+    text-align: center;
+    padding: 8rpx 0 20rpx;
+}
+
+.model-sheet-list {
+    max-height: 56vh;
+    box-sizing: border-box;
+}
+
+.model-sheet-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 26rpx 28rpx;
+    margin: 0 24rpx 8rpx;
+    border-radius: 16rpx;
+    background: #ffffff;
+    border: 1rpx solid #eef0f3;
+    box-sizing: border-box;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.model-sheet-item:active {
+    background: #f7f8fa;
+}
+
+.model-sheet-item-active {
+    background: #ffffff;
+    border-color: #1f2937;
+}
+
+.model-sheet-item-main {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    flex: 1;
+    min-width: 0;
+    padding-right: 16rpx;
+}
+
+.model-sheet-item-label {
+    font-size: 30rpx;
+    color: #1f2937;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.model-sheet-item-active .model-sheet-item-label {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.model-sheet-item-tag {
+    font-size: 22rpx;
+    color: #6b7280;
+    background: transparent;
+    border: 1rpx solid #e5e7eb;
+    padding: 2rpx 12rpx;
+    border-radius: 6rpx;
+    flex-shrink: 0;
+    line-height: 1.5;
+}
+
+.model-sheet-cancel {
+    margin: 12rpx 24rpx 0;
+    padding: 26rpx 0;
+    text-align: center;
+    background: #ffffff;
+    border: 1rpx solid #eef0f3;
+    border-radius: 16rpx;
+    font-size: 30rpx;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.model-sheet-cancel:active {
+    background: #f7f8fa;
 }
 </style>

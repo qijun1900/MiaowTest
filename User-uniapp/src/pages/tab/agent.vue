@@ -15,6 +15,7 @@
             @new-chat="handleNewChat"
             @model-change="handleModelChange"
             @option-click="handleOptionClick"
+            @model-sheet-toggle="handleModelSheetToggle"
             @touchstart="handleTouchStart"
         />
 
@@ -105,8 +106,14 @@
             当 container 的 bottom 随键盘上移时，sender 自然贴在容器底部，
             即键盘顶部，不会留下任何灰色空隙。
         -->
-        <view v-if="hasModels && isLoggedIn" class="sender-area" :style="senderAreaStyle">
+        <view
+            v-if="hasModels && isLoggedIn"
+            class="sender-area"
+            :class="{ 'sender-area-hidden': modelSheetVisible }"
+            :style="senderAreaStyle"
+        >
             <AgentSender
+                placeholder="在此处输入内容..."
                 v-model="senderText"
                 v-model:thinking="thinkingMode"
                 :pending-images="pendingImages"
@@ -178,6 +185,7 @@ import {
 const userInfoStore = UserInfoStore();
 const isLoggedIn = computed(() => userInfoStore.isLoggedIn);
 const sidebarVisible = ref(false);
+const modelSheetVisible = ref(false);
 const senderText = ref("");
 const thinkingMode = ref(false);
 const showThinkingToggle = ref(true);
@@ -411,6 +419,10 @@ const scrollToBottom = (smooth = false) => {
 
 const handleMenuClick = () => {
     sidebarVisible.value = true;
+};
+
+const handleModelSheetToggle = (visible) => {
+    modelSheetVisible.value = visible;
 };
 
 const handleSearchClick = () => {
@@ -870,6 +882,16 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     background: transparent;
     pointer-events: none; /* 让空白区域透传点击 */
     /* padding-bottom 由 :style 绑定（senderAreaStyle）动态注入 */
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0.32, 1), opacity 0.22s ease;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* 模型选择弹窗打开时，输入栏向下滑出并淡出 */
+.sender-area-hidden {
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* 恢复内部元素的点击响应，因为外层使用 pointer-events: none */
