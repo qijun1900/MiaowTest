@@ -69,8 +69,8 @@ const bankInfo = ref(null);
 const questionCount = ref(1);
 const isRandom = ref(false);
 const isOptionRandom = ref(false);
-const isShowAnswer = ref(true);
-const isShowHelper = ref(true);
+const isShowAnswer = ref(QuestionStore.UserShowSettings.showAnswer);
+const isShowHelper = ref(QuestionStore.UserShowSettings.showHelper);
 
 onLoad((options) => {
     if (options.data) {

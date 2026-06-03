@@ -15,7 +15,7 @@
             </view>
 
             <!-- 内容区域 -->
-            <view class="popup-content" @touchmove.prevent.stop>
+            <view class="popup-content">
                 <slot name="popupcontent"></slot>
             </view>
         </view>

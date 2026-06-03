@@ -18,7 +18,7 @@
 
         <view class="setting-item">
             <text class="setting-label">题目乱序</text>
-            <t-switch v-model="localIsRandom" size="small" />
+            <t-switch :value="localIsRandom" @change="(e) => { localIsRandom = e.value }" size="small" />
         </view>
 
         <view class="setting-item">
@@ -26,12 +26,12 @@
                 <text class="setting-label">选项乱序</text>
                 <text class="label-tip">选择题有效</text>
             </view>
-            <t-switch v-model="localIsOptionRandom" size="small" />
+            <t-switch :value="localIsOptionRandom" @change="(e) => { localIsOptionRandom = e.value }" size="small" />
         </view>
 
         <view class="setting-item">
             <text class="setting-label">显示答案</text>
-            <t-switch v-model="localIsShowAnswer" size="small" />
+            <t-switch :value="localIsShowAnswer" @change="(e) => { localIsShowAnswer = e.value }" size="small" />
         </view>
 
         <view class="setting-item">
@@ -40,7 +40,8 @@
                 <text v-if="disableHelper" class="label-tip error">{{ helpertip }}</text>
             </view>
             <t-switch
-                v-model="localIsShowHelper"
+                :value="localIsShowHelper"
+                @change="(e) => { localIsShowHelper = e.value }"
                 size="small"
                 :disabled="disableHelper"
             />

@@ -198,8 +198,8 @@ const settingpopupShow = ref(false); // 弹出层状态
 const questionCount = ref(1);
 const isRandom = ref(false); // 默认不乱序
 const isOptionRandom = ref(false); // 默认选项不乱序
-const isShowAnswer = ref(true); //是否立即显示答案
-const isShowHelper = ref(true); //是否显示Helper
+const isShowAnswer = ref(QuestionStore.UserShowSettings.showAnswer); //是否立即显示答案
+const isShowHelper = ref(QuestionStore.UserShowSettings.showHelper); //是否显示Helper
 
 // 滑动删除相关状态与方法（使用封装的 composable）
 const {

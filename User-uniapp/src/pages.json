@@ -153,13 +153,6 @@
 					}
 				},
 				{
-					"path": "PracticeInGameSettingsView",
-					"style": {
-						"navigationBarTitleText": "练习设置",
-						"scrollIndicator": "none"
-					}
-				},
-				{
 					"path": "PracticeResultsView",
 					"style": {
 						"navigationBarTitleText": "练习结果",

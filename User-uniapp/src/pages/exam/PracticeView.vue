@@ -220,6 +220,7 @@
             :closeable="false"
             :round="30"
             :closeOnClickOverlay="false"
+            :overlay="false"
             title="添加题目笔记"
         >
             <template #popupcontent>
@@ -465,7 +466,7 @@ const handleMenuClick = async (item) => {
     if (item.value === 0) {
         // 打开设置
         uni.navigateTo({
-            url: `/pages/exam/PracticeInGameSettingsView`,
+            url: `/pages/my/MySettingView`,
         });
     }
 };

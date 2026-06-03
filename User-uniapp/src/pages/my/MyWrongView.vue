@@ -181,8 +181,8 @@ const bankInfo = ref(null); // 题库信息
 const questionCount = ref(1);
 const isRandom = ref(false); // 默认不乱序
 const isOptionRandom = ref(false); // 默认选项不乱序
-const isShowAnswer = ref(false); //是否立即显示答案
-const isShowHelper = ref(false);
+const isShowAnswer = ref(QuestionStore.UserShowSettings.showAnswer); //是否立即显示答案
+const isShowHelper = ref(QuestionStore.UserShowSettings.showHelper);
 
 // 获取科目列表
 const subjectList = computed(() => {
