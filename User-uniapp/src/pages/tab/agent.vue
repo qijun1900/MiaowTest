@@ -902,25 +902,81 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
 /* ── 流式渲染气泡（绕过 Bubble 组件，直接用 text 实时显示） ── */
 .streaming-bubble {
     margin: 12rpx 0;
-    padding: 16rpx 24rpx;
+    padding: 18rpx 26rpx;
     background: #ffffff;
     border: 1rpx solid rgba(15, 23, 42, 0.06);
     border-radius: 8rpx 26rpx 26rpx;
     max-width: 100%;
 }
 
+/* Claude AI 风格字体：把 App 端可用的具体字体名放最前面 */
 .streaming-text {
-    font-size: 28rpx;
-    line-height: 1.7;
-    color: #202635;
+    font-family: -apple-system, BlinkMacSystemFont, "Söhne", "SF Pro Text",
+        "SF Pro Display", "Segoe UI", "Roboto", "Helvetica Neue",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+        "Source Han Sans SC", "Noto Sans CJK SC", "Noto Sans SC",
+        "WenQuanYi Micro Hei", system-ui, sans-serif;
+    font-size: 30rpx;
+    line-height: 1.72;
+    letter-spacing: 0.2rpx;
+    font-weight: 400;
+    color: #1f2328;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     word-break: break-word;
     white-space: pre-wrap;
 }
 
 .streaming-cursor {
-    font-size: 28rpx;
+    font-family: inherit;
+    font-size: 30rpx;
     color: #94a3b8;
     animation: cursor-blink 0.8s infinite;
+}
+
+/* App 端使用 @font-face 注入的 Inter + Noto Sans SC，与气泡组件保持一致 */
+/* #ifdef APP-PLUS */
+.streaming-text,
+.streaming-cursor {
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
+        "Helvetica Neue", "Roboto", "Microsoft YaHei", sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+/* #endif */
+
+/* 小屏稍紧凑 */
+@media screen and (max-width: 360px) {
+    .streaming-bubble {
+        padding: 16rpx 22rpx;
+    }
+    .streaming-text,
+    .streaming-cursor {
+        font-size: 28rpx;
+        line-height: 1.68;
+    }
+}
+
+/* 平板/桌面端用 px 单位避免 rpx 在大屏被放大成大字号 */
+@media screen and (min-width: 768px) {
+    .streaming-bubble {
+        padding: 12px 18px;
+    }
+    .streaming-text,
+    .streaming-cursor {
+        font-size: 16px;
+        line-height: 1.7;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .streaming-text,
+    .streaming-cursor {
+        font-size: 16.5px;
+        line-height: 1.72;
+    }
 }
 
 @keyframes cursor-blink {

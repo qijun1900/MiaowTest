@@ -577,12 +577,31 @@ function escapeHtml(value) {
     align-items: flex-start;
 }
 
+/* Claude AI 风格字体栈
+ * 关键改动：把 App 端真正可用的具体字体名放在最前面：
+ *   - iOS / macOS: -apple-system / BlinkMacSystemFont → SF Pro；中文落到 PingFang SC
+ *   - Android: Roboto + Noto Sans CJK SC（Android 6+ 系统字体，避免落到默认衬线）
+ *   - Windows: Segoe UI + 微软雅黑
+ * Söhne / system-ui 留作 Web/Mac 上的首选项。
+ */
 .bubble-box {
     box-sizing: border-box;
-    padding: 16rpx 24rpx;
-    color: #202635;
-    font-size: 28rpx;
-    line-height: 1.7;
+    padding: 18rpx 26rpx;
+    color: #1f2328;
+    font-family: -apple-system, BlinkMacSystemFont, "Söhne", "SF Pro Text",
+        "SF Pro Display", "Segoe UI", "Roboto", "Helvetica Neue",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+        "Source Han Sans SC", "Noto Sans CJK SC", "Noto Sans SC",
+        "WenQuanYi Micro Hei", system-ui, sans-serif;
+    font-size: 30rpx;
+    line-height: 1.72;
+    letter-spacing: 0.2rpx;
+    font-weight: 400;
+    /* font-feature-settings: 开启 Söhne / SF / Inter 都支持的现代排版特性 */
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     word-break: break-word;
     width: fit-content;
     max-width: 100%;
@@ -658,8 +677,12 @@ function escapeHtml(value) {
 }
 
 .bubble-mp-html {
-    font-size: 28rpx;
-    line-height: 1.7;
+    font-family: inherit;
+    font-size: 30rpx;
+    line-height: 1.72;
+    letter-spacing: 0.2rpx;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
     display: block;
 }
 
@@ -716,4 +739,56 @@ function escapeHtml(value) {
         transform: translateY(-6rpx);
     }
 }
+
+/* 多设备字号微调：小屏稍紧凑、平板/大屏稍放大，保持阅读舒适度 */
+/* H5 / App 端按屏幕物理宽度判断；小程序中 rpx 已按 750 基线自动缩放，此处主要服务 H5。 */
+@media screen and (max-width: 360px) {
+    .bubble-box {
+        font-size: 28rpx;
+        padding: 16rpx 22rpx;
+        line-height: 1.68;
+    }
+    .bubble-mp-html {
+        font-size: 28rpx;
+        line-height: 1.68;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .bubble-box {
+        font-size: 16px;
+        padding: 12px 18px;
+        line-height: 1.7;
+    }
+    .bubble-mp-html {
+        font-size: 16px;
+        line-height: 1.7;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .bubble-box {
+        font-size: 16.5px;
+        line-height: 1.72;
+    }
+    .bubble-mp-html {
+        font-size: 16.5px;
+        line-height: 1.72;
+    }
+}
+
+/* ───────── App 端字体优化 ─────────
+ * App 端通过 @font-face + uni.loadFontFace 注入了 Inter + Noto Sans SC，
+ * 让 iOS / Android 看到完全一致的 Claude 风格字体。
+ * 拉丁字符走 Inter；中文落到 Noto Sans SC；缺字时再回退到系统字体。
+ */
+/* #ifdef APP-PLUS */
+.bubble-box,
+.bubble-mp-html {
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
+        "Helvetica Neue", "Roboto", "Microsoft YaHei", sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+/* #endif */
 </style>
