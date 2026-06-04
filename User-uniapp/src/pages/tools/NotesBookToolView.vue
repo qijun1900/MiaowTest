@@ -323,7 +323,7 @@ const handleSubmit = async () => {
 
 const handleOpenNotesList = (item) => {
     uni.navigateTo({
-        url: `/pages/tools/NotesBookToolView_children/NotesListView?id=${item._id}`,
+        url: `/pages/tools/NotesBookToolView_children/NotesListView?id=${item._id}&title=${encodeURIComponent(item.title)}`,
     });
 };
 

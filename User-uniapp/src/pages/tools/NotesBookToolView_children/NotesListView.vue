@@ -1,6 +1,20 @@
 <template>
-  <view class="container">
-    <view class="fixed-header">
+  <view class="container" :style="{ paddingTop: navBarInfo.totalHeight + 'px' }">
+    <view class="top-wrapper" :style="{ height: navBarInfo.totalHeight + 'px', paddingTop: navBarInfo.statusBarHeight + 'px' }">
+      <view class="nav-row" :style="{ height: navBarInfo.navBarHeight + 'px' }">
+        <view class="nav-left" @click="handleBack">
+          <t-icon name="chevron-left" size="44rpx" color="#403a40"></t-icon>
+        </view>
+        <text class="nav-title">{{ bookTitle || '笔记列表' }}</text>
+        <view class="nav-right">
+          <view class="nav-action" @click="handleFloatingAddNote">
+            <t-icon name="add" size="40rpx" color="#c89b73"></t-icon>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="fixed-header" :style="{ top: navBarInfo.totalHeight + 'px' }">
       <view class="search-wrap">
         <view class="search-box">
           <uni-icons type="search" size="18" color="#9aa5bc"></uni-icons>
@@ -183,7 +197,13 @@
 <script setup>
 import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onReachBottom, onShow, onUnload } from "@dcloudio/uni-app";
+import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
+
+const { navBarInfo } = useNavBarSafeArea({
+    reserveMenuButtonRight: true,
+    rightPaddingExtra: 8,
+});
 import { normalizeNoteListItem } from "../../../util/noteNormalize";
 import {
   getNotebookNotesAPI,
@@ -199,6 +219,7 @@ const hasMore = ref(true);
 const currentPage = ref(1);
 const totalNotes = ref(0);
 const notesBookId = ref("");
+const bookTitle = ref("");
 const notes = ref([]);
 const pinningNoteIds = ref([]);
 const isGridView = ref(false);
@@ -404,6 +425,10 @@ const handleCheckNote = (item) => {
   });
 };
 
+const handleBack = () => {
+  uni.navigateBack();
+};
+
 const handleFloatingAddNote = () => {
   if (!notesBookId.value) {
     uni.showToast({
@@ -420,6 +445,9 @@ const handleFloatingAddNote = () => {
 
 onLoad((options = {}) => {
   notesBookId.value = String(options.id || options.bookId || "").trim();
+  if (options.title) {
+    bookTitle.value = decodeURIComponent(options.title);
+  }
   resetAndFetchNotes();
 });
 
@@ -457,6 +485,70 @@ onUnload(() => {
   box-sizing: border-box;
   padding: 22rpx 16rpx calc(32rpx + env(safe-area-inset-bottom));
   background: #fff9f2;
+}
+
+.top-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #fff9f2;
+  border-bottom: 1rpx solid #e8ddd1;
+  box-shadow: 0 4rpx 18rpx rgba(132, 112, 95, 0.08);
+  box-sizing: border-box;
+  padding-left: 18rpx;
+  padding-right: 18rpx;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nav-left {
+  width: 80rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 34rpx;
+  color: #403a40;
+  font-weight: 700;
+  padding: 0 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-right {
+  width: 80rpx;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nav-action {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  border: 2rpx solid #e8ddd1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(208, 168, 131, 0.15);
+}
+
+.nav-action:active {
+  transform: scale(0.93);
 }
 
 .fixed-header {

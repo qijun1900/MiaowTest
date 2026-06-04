@@ -357,6 +357,7 @@
 					"path": "WrongBookToolView_children/WrongQuestionListView",
 					"style": {
 						"navigationBarTitleText": "错题列表",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -370,6 +371,7 @@
 					"path": "NotesBookToolView_children/NotesListView",
 					"style": {
 						"navigationBarTitleText": "笔记列表",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},

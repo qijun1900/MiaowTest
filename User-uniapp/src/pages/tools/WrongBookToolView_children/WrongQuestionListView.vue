@@ -1,9 +1,20 @@
 <template>
-    <view class="container">
+    <view class="container" :style="{ paddingTop: navBarInfo.totalHeight + 'px' }">
+        <view class="top-wrapper" :style="{ height: navBarInfo.totalHeight + 'px', paddingTop: navBarInfo.statusBarHeight + 'px' }">
+            <view class="nav-row" :style="{ height: navBarInfo.navBarHeight + 'px' }">
+                <view class="nav-left" @click="handleBack">
+                    <t-icon name="chevron-left" size="44rpx" color="#3d2a1a"></t-icon>
+                </view>
+                <text class="nav-title">{{ WrongbookTitle || '错题列表' }}</text>
+                <view class="nav-right"></view>
+            </view>
+        </view>
+
         <!-- 固定头部区域 -->
         <view
             class="fixed-header"
             :class="{ 'header-hidden': !isHeaderVisible }"
+            :style="{ top: navBarInfo.totalHeight + 'px' }"
         >
             <!-- 搜索栏 -->
             <view class="search-section">
@@ -441,6 +452,7 @@
 import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 import { useAutoHideHeader } from "../../../composables/useAutoHideHeader.js";
+import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
 import SelectOptionsPreview from "../../../components/modules/exam/SelectOptionsPreview.vue";
 import JudgeOptionsPreview from "../../../components/modules/exam/JudgeOptionsPreview.vue";
@@ -458,11 +470,20 @@ import {
 } from "../../../composables/useImageUpload.js";
 import formatTime from "../../../util/formatTime";
 
+const { navBarInfo } = useNavBarSafeArea({
+    reserveMenuButtonRight: true,
+    rightPaddingExtra: 8,
+});
+
 const WrongbookId = ref("");
 const WrongbookTitle = ref("");
 const searchKeyword = ref("");
 const activeTab = ref("all");
 const isShowdragButton = ref(true);
+
+const handleBack = () => {
+    uni.navigateBack();
+};
 
 // 固定头部自动隐藏（3 秒无滚动隐藏，滚动时显示）
 // handlePageScroll 必须在页面 <script setup> 中通过 onPageScroll() 直接注册
@@ -1032,9 +1053,54 @@ onBeforeUnmount(() => {
     padding-top: 0;
 }
 
+.top-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: #fff9f2;
+    border-bottom: 1rpx solid #ffe8d6;
+    box-shadow: 0 4rpx 18rpx rgba(255, 149, 85, 0.06);
+    box-sizing: border-box;
+    padding-left: 18rpx;
+    padding-right: 18rpx;
+}
+
+.nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.nav-left {
+    width: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: 34rpx;
+    color: #3d2a1a;
+    font-weight: 700;
+    padding: 0 12rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-right {
+    width: 80rpx;
+    flex-shrink: 0;
+}
+
 .fixed-header {
     position: sticky;
-    top: 0;
     background: #fff9f2;
     z-index: 100;
     padding-bottom: 16rpx;
