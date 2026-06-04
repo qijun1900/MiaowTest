@@ -181,7 +181,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onReachBottom, onShow, onUnload } from "@dcloudio/uni-app";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
 import { normalizeNoteListItem } from "../../../util/noteNormalize";
@@ -420,14 +420,27 @@ const handleFloatingAddNote = () => {
 
 onLoad((options = {}) => {
   notesBookId.value = String(options.id || options.bookId || "").trim();
+  resetAndFetchNotes();
 });
 
 onShow(() => {
-  resetAndFetchNotes();
+  if (!notes.value.length && !isLoading.value) {
+    resetAndFetchNotes();
+  }
 });
 
 onReachBottom(() => {
   fetchNotes({ append: true });
+});
+
+const handleRefreshEvent = () => {
+  resetAndFetchNotes();
+};
+
+uni.$on("notesBook:refresh", handleRefreshEvent);
+
+onBeforeUnmount(() => {
+  uni.$off("notesBook:refresh", handleRefreshEvent);
 });
 
 onUnload(() => {

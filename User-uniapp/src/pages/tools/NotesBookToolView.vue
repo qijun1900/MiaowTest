@@ -209,8 +209,8 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { computed, onBeforeUnmount, ref } from "vue";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import tPopup from "../../components/core/tPopup.vue";
 import {
     createNotebookAPI,
@@ -382,9 +382,25 @@ const handleOpenNotesList = (item) => {
     });
 };
 
+onLoad(() => {
+    fetchNotebooks();
+});
+
 onShow(() => {
     cardThemes.value = getRandomNotebookCardThemes();
+    if (!notebookList.value.length && !loading.value) {
+        fetchNotebooks();
+    }
+});
+
+const handleRefreshEvent = () => {
     fetchNotebooks();
+};
+
+uni.$on("notesBook:refresh", handleRefreshEvent);
+
+onBeforeUnmount(() => {
+    uni.$off("notesBook:refresh", handleRefreshEvent);
 });
 </script>
 

@@ -192,6 +192,7 @@ const handleSubmit = async () => {
             throw new Error(res.message || "修改失败");
         }
 
+        uni.$emit("notesBook:refresh");
         uni.showToast({
             title: "修改成功",
             icon: "success",
@@ -228,6 +229,7 @@ const handleDelete = () => {
                 const res = await deleteNotebookAPI(bookId.value);
 
                 if (res.code === 200) {
+                    uni.$emit("notesBook:refresh");
                     uni.showToast({
                         title: "删除成功",
                         icon: "success",

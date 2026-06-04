@@ -109,7 +109,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import { buildNotePreviewHtml, stripHtml } from "../../../util/notePreview";
 import { normalizeNoteDetailData } from "../../../util/noteNormalize";
@@ -240,6 +240,7 @@ const handleDelete = () => {
                 }
 
                 uni.removeStorageSync(getDraftStorageKey(noteId.value));
+                uni.$emit("notesBook:refresh");
                 uni.showToast({
                     title: "删除成功",
                     icon: "success",
@@ -273,17 +274,16 @@ onLoad((options = {}) => {
             icon: "none",
             position: "top",
         });
+        return;
     }
-});
 
-onShow(() => {
     fetchNoteDetail();
 });
 </script>
 
 <style scoped>
 .note-detail-page {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     background: #fff9f2;

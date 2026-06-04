@@ -857,6 +857,7 @@ const handleSave = async () => {
     clearDraftFromStorage();
     applySnapshot();
     await cleanupPendingUploadedImages({ forceAll: false });
+    uni.$emit("notesBook:refresh");
     uni.showToast({
       title: "云端保存成功",
       icon: "success",
