@@ -25,13 +25,6 @@ const TOOLS_ORDER_STORAGE_KEY = "tools:list:order";
 // 工具列表配置
 const defaultToolsList = [
     {
-        title: "计时器",
-        desc: "精确计时，支持倒计时和正计时模式",
-        icon: "/static/tools/tools-timer.png",
-        path: "/pages/tools/TimerToolView",
-        needLogin: false,
-    },
-    {
         title: "TODO",
         desc: "记录待办事项，管理学习任务，制定学习计划",
         icon: "/static/tools/tools-todo.png",

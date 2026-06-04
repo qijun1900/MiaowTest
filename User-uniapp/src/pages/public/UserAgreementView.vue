@@ -28,7 +28,7 @@
                     • 错题管理：收集错题，帮助针对性复习
                 </text>
                 <text class="section-content">
-                    • 学习工具：提供计时器、笔记等学习辅助工具
+                    • 学习工具：提供笔记等学习辅助工具
                 </text>
                 <text class="section-content">
                     • 自定义题库：支持用户创建和管理自定义题库

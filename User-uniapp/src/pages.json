@@ -292,15 +292,7 @@
 		{
 			"root": "pages/tools",
 			"pages": [
-				{
-					"path": "TimerToolView",
-					"style": {
-						"navigationBarTitleText": "计时器",
-						"disableScroll": false,
-						"navigationBarTextStyle": "black"
-					}
-				},
-				{
+					{
 					"path": "TodoToolView",
 					"style": {
 						"navigationBarTitleText": "TODO"
