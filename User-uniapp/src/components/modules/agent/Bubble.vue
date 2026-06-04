@@ -57,6 +57,7 @@
                     noStyle ? 'bubble-no-style' : '',
                     placement === 'end' ? 'bubble-box-end' : 'bubble-box-start',
                 ]"
+                @longpress="handleLongPress"
             >
                 <slot v-if="loading" name="loading">
                     <view class="bubble-loading">
@@ -99,6 +100,45 @@
             </view>
 
             <slot name="footer"></slot>
+        </view>
+
+        <!-- 长按下拉菜单 -->
+        <view v-if="showActionMenu" class="bubble-action-mask" @click.stop="closeActionMenu" @touchmove.stop.prevent></view>
+        <view
+            v-if="showActionMenu"
+            class="bubble-action-dropdown"
+            :class="placement === 'end' ? 'bubble-action-dropdown-end' : 'bubble-action-dropdown-start'"
+            @click.stop
+        >
+            <view class="bubble-action-item" @click="handleActionCopy">
+                <text class="bubble-action-text">复制内容</text>
+                <uni-icons type="copy" size="18" color="#333"></uni-icons>
+            </view>
+            <view class="bubble-action-divider"></view>
+            <view class="bubble-action-item" @click="handleActionSelect">
+                <text class="bubble-action-text">选择文本</text>
+                <uni-icons type="compose" size="18" color="#333"></uni-icons>
+            </view>
+        </view>
+
+        <!-- 选择文本全屏视图 -->
+        <view v-if="showSelectView" class="bubble-select-overlay" @click.stop="closeSelectView">
+            <view class="bubble-select-card" @click.stop @touchmove.stop>
+                <view class="bubble-select-header">
+                    <text class="bubble-select-title">选择文本</text>
+                    <view class="bubble-select-close" @click="closeSelectView">
+                        <uni-icons type="closeempty" size="20" color="#64748b"></uni-icons>
+                    </view>
+                </view>
+                <scroll-view class="bubble-select-body" scroll-y :show-scrollbar="false">
+                    <text class="bubble-select-text" selectable user-select>{{ content }}</text>
+                </scroll-view>
+                <view class="bubble-select-footer">
+                    <view class="bubble-select-btn" @click="handleActionCopy">
+                        <text>全部复制</text>
+                    </view>
+                </view>
+            </view>
         </view>
     </view>
 </template>
@@ -236,6 +276,48 @@ const emit = defineEmits([
 ]);
 
 const slots = useSlots();
+
+const showActionMenu = ref(false);
+const showSelectView = ref(false);
+
+const handleLongPress = () => {
+    if (props.loading) return;
+    if (!props.content) return;
+    if (props.placement !== 'end') return;
+    showActionMenu.value = true;
+};
+
+const closeActionMenu = () => {
+    showActionMenu.value = false;
+};
+
+const closeSelectView = () => {
+    showSelectView.value = false;
+};
+
+const handleActionCopy = () => {
+    const text = props.content || '';
+    if (!text) {
+        closeActionMenu();
+        return;
+    }
+    uni.setClipboardData({
+        data: text,
+        success: () => {
+            uni.showToast({ title: '已复制', icon: 'none', position: 'top' });
+        },
+        fail: () => {
+            uni.showToast({ title: '复制失败', icon: 'none' });
+        },
+    });
+    closeActionMenu();
+    closeSelectView();
+};
+
+const handleActionSelect = () => {
+    closeActionMenu();
+    showSelectView.value = true;
+};
 
 const getBubbleImageUrl = (img) => {
     if (!img) return '';
@@ -528,6 +610,7 @@ function escapeHtml(value) {
     width: 100%;
     box-sizing: border-box;
     margin: 12rpx 0;
+    position: relative;
 }
 
 .bubble-row-start {
@@ -791,4 +874,148 @@ function escapeHtml(value) {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 /* #endif */
+
+/* ───────── 长按下拉菜单 ───────── */
+.bubble-action-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 998;
+    background: transparent;
+}
+
+.bubble-action-dropdown {
+    position: absolute;
+    top: 100%;
+    margin-top: 10rpx;
+    min-width: 280rpx;
+    background: #ffffff;
+    border-radius: 16rpx;
+    padding: 10rpx 0;
+    box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.18);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+}
+
+.bubble-action-dropdown-start {
+    left: 0;
+}
+
+.bubble-action-dropdown-end {
+    right: 0;
+}
+
+.bubble-action-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22rpx 28rpx;
+}
+
+.bubble-action-item:active {
+    background-color: #f7f8f9;
+}
+
+.bubble-action-text {
+    font-size: 28rpx;
+    color: #333;
+}
+
+.bubble-action-divider {
+    height: 1rpx;
+    background-color: #f0f0f0;
+    margin: 4rpx 0;
+}
+
+/* ───────── 选择文本全屏视图 ───────── */
+.bubble-select-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60rpx 40rpx;
+    box-sizing: border-box;
+}
+
+.bubble-select-card {
+    width: 100%;
+    max-width: 680rpx;
+    max-height: 80vh;
+    background: #ffffff;
+    border-radius: 20rpx;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.3);
+}
+
+.bubble-select-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24rpx 30rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+}
+
+.bubble-select-title {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.bubble-select-close {
+    width: 56rpx;
+    height: 56rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bubble-select-body {
+    flex: 1;
+    padding: 24rpx 30rpx;
+    box-sizing: border-box;
+    min-height: 200rpx;
+}
+
+.bubble-select-text {
+    font-size: 30rpx;
+    line-height: 1.7;
+    color: #1f2328;
+    word-break: break-word;
+    white-space: pre-wrap;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.bubble-select-footer {
+    padding: 20rpx 30rpx calc(20rpx + env(safe-area-inset-bottom));
+    border-top: 1rpx solid #f0f0f0;
+}
+
+.bubble-select-btn {
+    padding: 22rpx 0;
+    text-align: center;
+    background: #1f2937;
+    color: #ffffff;
+    border-radius: 12rpx;
+    font-size: 28rpx;
+}
+
+.bubble-select-btn:active {
+    opacity: 0.85;
+}
+
+.bubble-select-btn text {
+    color: #ffffff;
+}
 </style>
