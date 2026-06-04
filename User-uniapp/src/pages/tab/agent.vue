@@ -641,6 +641,9 @@ const measureScrollViewHeight = () => {
 const spacerStyle = computed(() => {
     if (!showScrollSpacer.value || !scrollViewHeightPx.value) return { height: '0px' };
     const ai = lastAIMessage.value;
+    // pending 且无内容时：AiThinking 已经在用户消息下方贴着展示，
+    // 不需要再加占位，否则会让 AiThinking 下方多出一整屏空白可滚动区。
+    if (ai?.pending && !ai?.content) return { height: '0px' };
     const chars = (ai?.content || '').length;
     const estimatedLineHeightPx = 25;
     const charsPerLine = 20;
@@ -702,7 +705,11 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     const hasImages = imageUrls.length > 0;
     if (!hasText && !hasImages) return;
     if (isUploading.value) {
-        uni.showToast({ title: "图片正在上传中，请稍候", icon: "none" });
+        uni.showToast({ 
+            title: "图片正在上传中，请稍候", 
+            icon: "none" ,
+            postion: "top",
+        });
         return;
     }
 
