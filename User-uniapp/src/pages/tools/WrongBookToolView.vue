@@ -218,8 +218,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onBeforeUnmount, ref } from "vue";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import tPopup from "../../components/core/tPopup.vue";
 import {
     createWrongBookAPI,
@@ -351,8 +351,24 @@ const handleOpenQuestionList = (book) => {
     });
 };
 
-onShow(() => {
+onLoad(() => {
     fetchWrongBooks();
+});
+
+onShow(() => {
+    if (!wrongBooks.value.length && !loading.value) {
+        fetchWrongBooks();
+    }
+});
+
+const handleRefreshEvent = () => {
+    fetchWrongBooks();
+};
+
+uni.$on("wrongBook:refresh", handleRefreshEvent);
+
+onBeforeUnmount(() => {
+    uni.$off("wrongBook:refresh", handleRefreshEvent);
 });
 </script>
 

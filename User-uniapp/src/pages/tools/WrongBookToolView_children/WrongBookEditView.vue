@@ -258,6 +258,7 @@ const handleSubmit = async () => {
             color: formData.value.color,
         });
 
+        uni.$emit("wrongBook:refresh");
         uni.showToast({
             title: "修改成功",
             icon: "success",
@@ -289,6 +290,7 @@ const handleDelete = () => {
                     const res = await deleteWrongBookAPI(bookId.value);
 
                     if (res.code === 200) {
+                        uni.$emit("wrongBook:refresh");
                         uni.showToast({
                             title: "删除成功",
                             icon: "success",

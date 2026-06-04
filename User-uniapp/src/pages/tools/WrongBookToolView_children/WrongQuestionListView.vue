@@ -438,7 +438,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 import { useAutoHideHeader } from "../../../composables/useAutoHideHeader.js";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
@@ -998,11 +998,14 @@ onLoad(async (options) => {
     if (options.title) {
         WrongbookTitle.value = decodeURIComponent(options.title);
     }
+
+    if (WrongbookId.value) {
+        resetAndFetchQuestions();
+    }
 });
 
 onShow(() => {
-    // 页面显示时刷新列表（从添加页面返回时会触发）
-    if (WrongbookId.value) {
+    if (!questionList.value.length && !loading.value && WrongbookId.value) {
         resetAndFetchQuestions();
     }
     // 头部显示重置由 useAutoHideHeader 内部的 onShow 钩子自动处理
@@ -1010,6 +1013,16 @@ onShow(() => {
 
 onReachBottom(() => {
     fetchWrongQuestions({ append: true });
+});
+
+const handleRefreshEvent = () => {
+    resetAndFetchQuestions();
+};
+
+uni.$on("wrongBook:refresh", handleRefreshEvent);
+
+onBeforeUnmount(() => {
+    uni.$off("wrongBook:refresh", handleRefreshEvent);
 });
 </script>
 <style scoped>

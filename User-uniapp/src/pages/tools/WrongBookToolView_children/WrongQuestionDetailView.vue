@@ -234,6 +234,7 @@ const handleQuestionSubmit = async (questionData) => {
         }
 
         if (res.code === 200) {
+            uni.$emit("wrongBook:refresh");
             uni.showToast({
                 title: isEditMode.value ? "更新成功" : "添加成功",
                 icon: "success",
