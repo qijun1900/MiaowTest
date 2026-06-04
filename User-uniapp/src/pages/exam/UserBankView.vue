@@ -149,7 +149,7 @@
 
         <!-- 弹出层 -->
         <view>
-            <tPopup v-model:show="settingpopupShow" title="练习设置">
+            <tPopup v-model:show="settingpopupShow" title="练习设置" :overlay="false">
                 <template #popupcontent>
                     <PracticeSettings
                         v-if="settingpopupShow"

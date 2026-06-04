@@ -136,7 +136,7 @@
         />
     </view>
     <!-- 底部弹出框 -->
-    <tPopup v-model:show="popupShow" title="创建新词书" :closeable="false">
+    <tPopup v-model:show="popupShow" title="创建新词书" :closeable="false" :overlay="false">
         <template #popupcontent>
             <view class="popup-content">
                 <view class="form-item">

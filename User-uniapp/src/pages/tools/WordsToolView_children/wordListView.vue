@@ -149,7 +149,7 @@
         />
         <!-- 设置弹窗 -->
     </view>
-    <tPopup v-model:show="popupShow" title="设置" :closeable="true">
+    <tPopup v-model:show="popupShow" title="设置" :closeable="true" :overlay="false">
         <template #popupcontent>
             <view class="popup-content">
                 <view class="setting-item">

@@ -101,6 +101,7 @@
                 :closeable="false"
                 :round="30"
                 :closeOnClickOverlay="true"
+                :overlay="false"
                 title="修改题目笔记"
             >
                 <template #popupcontent>
