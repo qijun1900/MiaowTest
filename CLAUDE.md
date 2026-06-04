@@ -65,6 +65,16 @@ bin/www (entry, DB connect, server start)
     → User-facing routes at /uniappAPI/... (no auth wall)
     → adminAuth middleware (JWT check for all /adminapi/*)
     → Admin routes at /adminapi/...
+    → WebSocket upgrade at /ws/llm/agent/chat/stream (token auth via query param)
+```
+
+### Database Initialization
+
+Before first run, initialize the database:
+
+```bash
+cd Express-node
+node script/init-database.js
 ```
 
 ### Route Conventions
@@ -74,6 +84,27 @@ bin/www (entry, DB connect, server start)
 - **Health check**: `GET /health` returns DB status, env, timestamp
 - Admin routes are gated by `adminAuth` middleware (JWT verification with token refresh). The login route `/adminapi/user/login` is exempted.
 - User routes optionally use `JWT.verifyTokenMiddleware()` or `JWT.optionalTokenMiddleware()` per-route.
+
+### Error Handling Pattern
+
+Admin and user controllers use **different** error handling strategies:
+
+- **User controllers** (`controllers/user/`): Each handler wraps logic in try-catch and returns `{ success: false, error: "..." }` with appropriate HTTP status.
+- **Admin controllers** (`controllers/admin/`): No try-catch — errors propagate to the global error handler in `app.js:157`, which returns `{ errCode: "-1", errInfo: err.message }`.
+
+When adding new admin endpoints, be aware that unhandled promise rejections will be caught by the global handler, not by the controller.
+
+### Streaming Endpoints
+
+Three streaming transports for LLM chat:
+
+| Transport | Endpoint | Protocol |
+|-----------|----------|----------|
+| SSE | `POST /uniappAPI/llm/agent/chat/stream` | `text/event-stream` |
+| WebSocket | `GET /ws/llm/agent/chat/stream?token=<jwt>` | `ws://` upgrade |
+| Non-streaming | `POST /uniappAPI/llm/agent/chat` | Standard JSON |
+
+WebSocket auth uses JWT from query param (not header), validated in `ws/streamChat.js`.
 
 ### Three-Layer Backend Pattern
 
@@ -101,12 +132,23 @@ routes/admin/ExamRouter.js
 
 LangChain-based, configured in `config/llm.config.js` (DashScope by default, OpenAI-compatible).
 
-- `llm/chains/` — conversation chains (chat, deepThink, agent chat)
-- `llm/agents/` — agent workflows with tool support
-- `llm/models/factory.js` — model factory
+- `llm/models/factory.js` — `ModelFactory.getModel()` creates ChatOpenAI instances (reads `DASHSCOPE_API_KEY` from env, **no startup validation**)
+- `llm/chains/conversational/chat.js` — single-turn chain (stateless)
+- `llm/chains/conversational/deepThink.js` — reasoning model chain (DeepSeek-R1, think/answer separation)
+- `llm/chains/agent/agentChat.js` — multi-turn agent chain with history, streaming, auto title generation
+- `llm/admin/ModelApp/` — DashScope Bailian app integration (question analysis / AI import)
 - `llm/prompts/` — system prompts and templates
-- `llm/loaders/` — document loaders (PDF, web, database)
-- `llm/vectorstores/` — embeddings and retrievers
+
+**Chat flow** (user-facing):
+```
+Request → LLMController → LLMService.ChatWithAgentAndSave()
+  → ensureConversation()       — auto-create/update conversation
+  → saveUserMessage()          — persist user message
+  → fetchHistory()             — load last 20 messages
+  → streamAgentChain()         — LangChain streaming inference
+  → saveAIReply()              — persist AI reply
+  → maybeGenerateTitle()       — async title generation (fire-and-forget)
+```
 
 ### Admin-Web State Management
 
@@ -142,8 +184,8 @@ Upload flow: Admin-web uploads via `/adminapi/user/upload` → `uploadHelper.js`
 
 ## Key Patterns
 
-- Admin API responses follow `{ errCode, errInfo, data }` shape
-- User API responses follow `{ code, message, data }` shape
+- Admin API responses follow `{ errCode, errInfo, data }` shape (some admin controllers also use `{ code, ActionType, data }`)
+- User API responses follow `{ success, data, error }` shape (LLMController) or `{ code, message, data }` shape (other user controllers)
 - JWT tokens: short-lived, refreshed on each admin request (returned in `Authorization` response header)
 - The admin frontend's axios response interceptor persists refreshed tokens from response headers
 - Mongoose models use collection names prefixed by domain (e.g., exams, users, agent_conversations)
