@@ -67,7 +67,7 @@
                             :variant="msg.role === 'user' ? 'solid' : undefined"
                             :placement="msg.role === 'user' ? 'end' : 'start'"
                             :max-width="msg.role === 'user' ? '650rpx' : '100%'"
-                            :is-markdown="msg.isStreaming ? false : true"
+                            :is-markdown="msg.role === 'assistant'"
                             :no-style="msg.role === 'assistant'"
                             :loading="msg.pending"
                             :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
@@ -735,6 +735,24 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
 
     const sendImages = hasImages ? imageUrls : undefined;
 
+    // 流式缓冲：按行/句提交，避免每个 token 都触发 mp-html 重渲染
+    let streamBuffer = '';
+    let lastFlushAt = 0;
+    const FLUSH_INTERVAL_MS = 120; // 兜底节流：即使没有标点也至少这个间隔刷新一次
+    const FLUSH_BOUNDARY = /[\n。！？；?!;]|```/;
+    const flushBuffer = (force = false) => {
+        if (!streamBuffer) return;
+        if (!force) {
+            const now = Date.now();
+            const hasBoundary = FLUSH_BOUNDARY.test(streamBuffer);
+            const timeUp = now - lastFlushAt >= FLUSH_INTERVAL_MS;
+            if (!hasBoundary && !timeUp) return;
+        }
+        messageList.value[aiIndex].content += streamBuffer;
+        streamBuffer = '';
+        lastFlushAt = Date.now();
+    };
+
     try {
         try {
             // ── 流式对话 ──
@@ -750,9 +768,11 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
                     if (messageList.value[aiIndex].pending) {
                         messageList.value[aiIndex].pending = false;
                     }
-                    messageList.value[aiIndex].content += chunk;
+                    streamBuffer += chunk;
+                    flushBuffer();
                 },
                 onDone: () => {
+                    flushBuffer(true);
                     messageList.value[aiIndex].pending = false;
                     messageList.value[aiIndex].isStreaming = false;
                 },
@@ -762,6 +782,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
             messageList.value[aiIndex].isStreaming = false;
         } catch {
             // 流式失败：已有部分内容则保留，无内容则回退到普通接口
+            flushBuffer(true);
             if (!messageList.value[aiIndex].content) {
                 const response = await chatWithAgent({
                     message: text || '',
