@@ -1,6 +1,26 @@
 <template>
-    <view class="container">
-        <view class="hero">
+    <view class="page" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
+        <view class="top-wrapper">
+            <view class="custom-navbar" :style="customNavbarStyle">
+                <view class="nav-row" :style="navRowStyle">
+                    <view class="nav-left" @click="handleBack">
+                        <t-icon name="chevron-left" size="44rpx" color="#1f2a1f"></t-icon>
+                    </view>
+
+                    <text class="nav-title">喵喵错题本</text>
+
+                    <view class="nav-right">
+                        <view class="nav-action" @click="handleCreateBook">
+                            <t-icon name="add" size="40rpx" color="#3fa24b"></t-icon>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+
+        <scroll-view class="main-scroll" scroll-y>
+            <view class="container">
+                <view class="hero">
             <view class="hero-left">
                 <view class="section-header">
                     <view class="section-dot"></view>
@@ -95,12 +115,15 @@
                     <view class="create-text">新建错题本</view>
                 </view>
             </view>
-        </view>
-        <!-- 弹窗 -->
+            </view>
+            </view>
+        </scroll-view>
+
         <tPopup
             v-model:show="popupShow"
             title="创建错题本"
             :closeable="true"
+            :overlay="false"
             @close="handleClosePopup"
         >
             <template #popupcontent>
@@ -221,6 +244,7 @@
 import { onBeforeUnmount, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import tPopup from "../../components/core/tPopup.vue";
+import { useNavBarSafeArea } from "../../composables/useNavBarSafeArea";
 import {
     createWrongBookAPI,
     getWrongBooksAPI,
@@ -230,6 +254,11 @@ import {
     wrongBookColors,
     generateDisplayColorList,
 } from "../../util/cardThemes";
+
+const { safeAreaInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
+    reserveMenuButtonRight: true,
+    rightPaddingExtra: 8,
+});
 
 const popupShow = ref(false);
 
@@ -253,6 +282,10 @@ const submitting = ref(false);
 const displayColorOptions = ref([...wrongBookColors]);
 
 // 创建新错题本
+const handleBack = () => {
+    uni.navigateBack();
+};
+
 const handleCreateBook = () => {
     const { randomColor, displayColors } = generateDisplayColorList();
     // 设置显示的颜色列表（随机颜色在最前面）
@@ -373,8 +406,79 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff9f2;
+}
+
+.top-wrapper {
+    background: #fff9f2;
+    border-bottom: 1rpx solid #dfe7df;
+    box-shadow: 0 4rpx 18rpx rgba(86, 118, 86, 0.08);
+    z-index: 30;
+}
+
+.custom-navbar {
+    padding-left: 18rpx;
+    padding-right: 18rpx;
+    box-sizing: border-box;
+}
+
+.nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.nav-left {
+    width: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: 34rpx;
+    color: #1f2a1f;
+    font-weight: 700;
+    padding: 0 12rpx;
+}
+
+.nav-right {
+    width: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav-action {
+    width: 60rpx;
+    height: 60rpx;
+    border-radius: 30rpx;
+    border: 2rpx solid #dfe7df;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4rpx 12rpx rgba(63, 162, 75, 0.1);
+}
+
+.nav-action:active {
+    transform: scale(0.93);
+}
+
+.main-scroll {
+    flex: 1;
+    min-height: 0;
+}
+
 .container {
-    min-height: 100vh;
     background: #fff9f2;
     padding: 30rpx 20rpx;
 }

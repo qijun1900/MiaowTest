@@ -329,6 +329,7 @@
 					"path": "NotesBookToolView",
 					"style": {
 						"navigationBarTitleText": "笔记本",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -342,6 +343,7 @@
 					"path": "WrongBookToolView",
 					"style": {
 						"navigationBarTitleText": "喵喵错题本",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},

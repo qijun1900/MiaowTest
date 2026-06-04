@@ -8,7 +8,7 @@
         :z-index="9999"
         :close-btn="closeable"
     >
-        <view class="answer-sheet-popup" @touchmove.prevent.stop>
+        <view class="answer-sheet-popup">
             <!-- 标题区域 -->
             <view class="popup-header" v-if="title">
                 <text class="popup-title">{{ title }}</text>
