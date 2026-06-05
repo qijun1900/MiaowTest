@@ -1,15 +1,5 @@
 <template>
     <view class="content">
-        <view class="search-container">
-            <navigator
-                url="/pages/public/searchview"
-                hover-class="none"
-                animation-type="pop-in"
-                animation-duration="300"
-            >
-                <uniSearch placeholder="搜索考试科目~" />
-            </navigator>
-        </view>
         <view class="card-container">
             <view class="noticbar">
                 <uniNoticeBar :noticeData="noticeData" />
@@ -72,7 +62,6 @@ import HotExamContainer from "../../components/modules/index/HotExamContainer.vu
 import UserQuestionBank from "../../components/modules/index/UserQuestionBank.vue";
 import { getNoticeInfo, getIndexBanner } from "../../API/Index/AnnouncementAPI";
 import escconfig from "../../config/esc.config";
-import uniSearch from "../../components/core/uniSearch.vue";
 import Subsection from "../../components/core/Subsection.vue";
 import UserExamFavorite from "../../components/modules/index/UserExamFavorite.vue";
 import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
@@ -150,13 +139,6 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
-.search-container {
-    background-color: #f5f7fa;
-    position: sticky; // 固定定位
-    top: 0; // 距离顶部的距离
-    z-index: 100; // 层级
-}
-
 .card-container {
     margin-top: 20rpx;
     border-radius: 20rpx;
