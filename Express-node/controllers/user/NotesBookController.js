@@ -312,6 +312,8 @@ const NotesBookController = {
       const content = String(req.body.content || "");
       const tags = req.body.tags;
       const isMarkdown = Boolean(req.body.isMarkdown);
+      const isAIgenerated = Boolean(req.body.isAIgenerated);
+      const AIIntegrationInfo = req.body.AIIntegrationInfo || {};
 
       if (!isValidObjectId(bookId)) {
         return res.status(200).send({
@@ -335,6 +337,8 @@ const NotesBookController = {
         content,
         tags,
         isMarkdown,
+        isAIgenerated,
+        AIIntegrationInfo,
       });
 
       if (!result.success) {

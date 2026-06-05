@@ -8,7 +8,7 @@
         :z-index="9999"
         :close-btn="closeable"
     >
-        <view class="answer-sheet-popup">
+        <view class="answer-sheet-popup" :style="bgColor ? { backgroundColor: bgColor } : {}">
             <!-- 标题区域 -->
             <view class="popup-header" v-if="title">
                 <text class="popup-title">{{ title }}</text>
@@ -51,6 +51,10 @@ const props = defineProps({
     overlay: {
         type: Boolean,
         default: true,
+    },
+    bgColor: {
+        type: String,
+        default: "",
     },
 });
 

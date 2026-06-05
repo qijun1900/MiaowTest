@@ -52,7 +52,7 @@ const NotesListSchema = new mongoose.Schema({
         },
       },
     ],
-    isAIgengrated: {
+    isAIgenerated: {
       // 是否经过AI生成/改写
       type: Boolean,
       default: false,

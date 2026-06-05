@@ -133,7 +133,7 @@ export async function getNotebookNoteDetailAPI({ id, bookId }) {
 /**
  * @description 保存笔记（新建/更新）
  */
-export async function saveNotebookNoteAPI({ id, bookId, title, content, tags, isMarkdown }) {
+export async function saveNotebookNoteAPI({ id, bookId, title, content, tags, isMarkdown, isAIgenerated, AIIntegrationInfo }) {
   try {
     return await http({
       url: "/uniappAPI/tools/notebook/saveNotebookNote",
@@ -145,6 +145,8 @@ export async function saveNotebookNoteAPI({ id, bookId, title, content, tags, is
         content,
         tags,
         isMarkdown,
+        isAIgenerated,
+        AIIntegrationInfo,
       },
     });
   } catch (error) {

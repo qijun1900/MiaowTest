@@ -9,6 +9,14 @@
         >
             <template #prefix>
                 <view
+                    v-if="actions.includes('save-note')"
+                    class="custom-action-item"
+                    hover-class="custom-action-item-active"
+                    @click="handleSaveNote"
+                >
+                    <t-icon name="edit-1" :size="iconSize" color="#8b8fa3" />
+                </view>
+                <view
                     v-if="actions.includes('favorite')"
                     class="custom-action-item"
                     hover-class="custom-action-item-active"
@@ -51,7 +59,7 @@ const props = defineProps({
     },
     actions: {
         type: Array,
-        default: () => ["copy", "favorite", "regenerate", "more"],
+        default: () => ["copy", "favorite", "regenerate", "more", "good", "bad", "share", "save-note"],
     },
     placement: {
         type: String,
@@ -72,6 +80,7 @@ const emit = defineEmits([
     "bad",
     "share",
     "actions",
+    "save-note",
 ]);
 
 const iconSize = 20;
@@ -126,6 +135,10 @@ const handleFavorite = () => {
 
 const handleMore = () => {
     emit("more");
+};
+
+const handleSaveNote = () => {
+    emit("save-note", props.content);
 };
 </script>
 

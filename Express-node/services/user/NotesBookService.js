@@ -526,7 +526,7 @@ const NotesBookService = {
   /**
    * 保存笔记（有id为更新，无id为新增）
    */
-  saveNotebookNote: async ({ uid, id, bookId, title, content, tags = [], isMarkdown = false }) => {
+  saveNotebookNote: async ({ uid, id, bookId, title, content, tags = [], isMarkdown = false, isAIgenerated = false, AIIntegrationInfo = {} }) => {
     try {
       const notebook = await NotesBookModel.findOne({ _id: bookId, Uid: uid })
         .select({ _id: 1 })
@@ -587,6 +587,10 @@ const NotesBookService = {
         // 仅更新正文文本，避免把 undefined 的嵌套对象回写触发 schema cast 错误
         note.set("content.text", safeContent);
         note.set("content.isMarkdown", Boolean(isMarkdown));
+        note.set("content.isAIgenerated", Boolean(isAIgenerated));
+        if (AIIntegrationInfo && typeof AIIntegrationInfo === 'object' && Object.keys(AIIntegrationInfo).length) {
+          note.set("content.AIIntegrationInfo", AIIntegrationInfo);
+        }
 
         await note.save();
         await NotesBookModel.updateOne(
@@ -613,6 +617,10 @@ const NotesBookService = {
         content: {
           text: safeContent,
           isMarkdown: Boolean(isMarkdown),
+          isAIgenerated: Boolean(isAIgenerated),
+          ...(AIIntegrationInfo && typeof AIIntegrationInfo === 'object' && Object.keys(AIIntegrationInfo).length
+            ? { AIIntegrationInfo }
+            : {}),
         },
       });
 

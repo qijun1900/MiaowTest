@@ -90,10 +90,11 @@
                         v-if="showActionBar"
                         :content="lastAIMessage?.content || ''"
                         :favorited="lastAIMessage?.favorited || false"
-                        :actions="['copy', 'regenerate']"
+                        :actions="['copy', 'regenerate', 'save-note']"
                         @copy="handleActionCopy"
                         @favorite="(liked) => handleActionFavorite(lastAIIndex, liked)"
                         @regenerate="handleActionRegenerate"
+                        @save-note="handleOpenNotebookPicker"
                     />
                     <AiDisclaimer v-if="showActionBar" />
                 </view>
@@ -138,6 +139,69 @@
             </AgentSender>
         </view>
 
+        <!-- 自定义遮罩：tPopup 的 overlay 在 fixed 容器内会阻断交互，改用独立 view -->
+        <view
+            v-if="notebookPickerVisible"
+            class="notebook-overlay"
+            @click="handleClosePicker"
+        />
+        <!-- 保存到笔记本 选择弹窗 — 必须在 .container 最外层以避免 overflow:hidden 裁剪 -->
+        <tPopup
+            v-model:show="notebookPickerVisible"
+            title="保存到笔记本"
+            :closeable="true"
+            :overlay="false"
+            bg-color="#ffffff"
+            @close="handleClosePicker"
+        >
+            <template #popupcontent>
+                <view class="notebook-picker">
+                    <view v-if="notebookLoading" class="picker-state">
+                        <view class="spinner-circle"></view>
+                        <text class="picker-state-text">加载笔记本…</text>
+                    </view>
+                    <view
+                        v-else-if="!notebookList.length"
+                        class="picker-state"
+                    >
+                        <text class="picker-state-text">还没有笔记本，去笔记本工具创建一个吧～</text>
+                    </view>
+                    <scroll-view
+                        v-else
+                        scroll-y
+                        class="notebook-scroll"
+                        :show-scrollbar="false"
+                    >
+                        <view
+                            v-for="book in notebookList"
+                            :key="book._id"
+                            class="notebook-item"
+                            :class="{ 'notebook-item-saving': savingBookId === book._id }"
+                            hover-class="notebook-item-active"
+                            @click="handlePickNotebook(book)"
+                        >
+                            <view class="notebook-icon">
+                                <t-icon name="book" size="20" color="#999" />
+                            </view>
+                            <view class="notebook-info">
+                                <text class="notebook-title">{{ book.title }}</text>
+                                <text class="notebook-meta">{{ book.noteCount || 0 }} 篇笔记</text>
+                            </view>
+                            <view v-if="savingBookId === book._id" class="notebook-saving">
+                                <view class="spinner-circle-small"></view>
+                            </view>
+                            <view v-else-if="savedBookId === book._id" class="notebook-saved">
+                                <t-icon name="check-circle-filled" size="22" color="#22c55e" />
+                            </view>
+                            <view v-else class="notebook-arrow">
+                                <t-icon name="chevron-right" size="20" color="#cbd5e1" />
+                            </view>
+                        </view>
+                    </scroll-view>
+                </view>
+            </template>
+        </tPopup>
+
         <!-- 侧边栏支持手势关闭  -->
         <AgentSidebar
             v-model:show="sidebarVisible"
@@ -166,6 +230,8 @@ import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
+import tPopup from "../../components/core/tPopup.vue";
+import { getNotebooksAPI, saveNotebookNoteAPI } from "../../API/Tools/NotesBookAPI.js";
 import { useAgentImages } from "../../composables/useAgentImages.js";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
@@ -201,6 +267,15 @@ const loadingConversationId = ref(null);
 let chatRequestSeq = 0;
 let msgIdSeq = 0;
 const scrollToViewId = ref("");
+
+// ─── 保存到笔记本 ──────────────────────────────────────────────────────────────
+const notebookPickerVisible = ref(false);
+const notebookLoading = ref(false);
+const notebookList = ref([]);
+const savingBookId = ref("");
+const savedBookId = ref("");
+const pendingNoteContent = ref("");
+const pendingNoteUserText = ref("");
 
 const {
     images: pendingImages,
@@ -679,6 +754,104 @@ const handlePromptSelect = (prompt) => {
     senderText.value = prompt.label;
 };
 
+// ─── 保存到笔记本：打开选择弹窗 → 选择 → 保存 ──────────────────────────────
+const handleOpenNotebookPicker = async (content) => {
+    if (!isLoggedIn.value) {
+        uni.showToast({ title: "请先登录", icon: "none" });
+        return;
+    }
+    const safeContent = String(content || "").trim();
+    if (!safeContent) {
+        uni.showToast({ title: "暂无可保存的内容", icon: "none" });
+        return;
+    }
+    pendingNoteContent.value = safeContent;
+    // 取最后一句用户消息用于生成标题
+    const lastUserMsg = [...messageList.value]
+        .reverse()
+        .find((m) => m.role === 'user');
+    pendingNoteUserText.value = String(lastUserMsg?.content || "").trim();
+    savingBookId.value = "";
+    savedBookId.value = "";
+    notebookPickerVisible.value = true;
+    notebookLoading.value = true;
+    try {
+        const res = await getNotebooksAPI();
+        notebookList.value = Array.isArray(res?.data) ? res.data : [];
+    } catch (error) {
+        console.error("获取笔记本列表失败:", error.message);
+        uni.showToast({ title: "加载笔记本失败", icon: "none" });
+        notebookList.value = [];
+    } finally {
+        notebookLoading.value = false;
+    }
+};
+
+const handleClosePicker = () => {
+    if (savingBookId.value) return; // 保存中不允许关闭
+    savedBookId.value = "";
+    pendingNoteContent.value = "";
+    pendingNoteUserText.value = "";
+};
+
+const buildNoteTitle = () => {
+    // 取用户消息首行纯文本
+    const userText = String(pendingNoteUserText.value || "")
+        .split("\n")
+        .map((line) =>
+            line
+                .replace(/^#{1,6}\s+/, "")
+                .replace(/^\s*[-*+]\s+/, "")
+                .replace(/^\s*\d+\.\s+/, "")
+                .replace(/^\s*>\s+/, "")
+                .replace(/[*_~`]+/g, "")
+                .trim()
+        )
+        .find((line) => line.length > 0) || "AI 对话笔记";
+    // 追加日期：YYYY-MM-DD
+    const now = new Date();
+    const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    return `${userText.slice(0, 20)} ${date}`;
+};
+
+const handlePickNotebook = async (book) => {
+    if (!book?._id || savingBookId.value) return;
+    savingBookId.value = book._id;
+    try {
+        const title = buildNoteTitle();
+        await saveNotebookNoteAPI({
+            bookId: book._id,
+            title,
+            content: pendingNoteContent.value,
+            tags: ["AI对话"],
+            isMarkdown: true,
+            isAIgenerated: true,
+            AIIntegrationInfo: {
+                model: currentModelName.value || undefined,
+                source: "agent_chat",
+            },
+        });
+        savedBookId.value = book._id;
+        uni.showToast({
+            title: `已保存到《${book.title}》`,
+            icon: "none",
+            position: "top",
+        });
+        // 短暂展示成功状态后自动关闭弹窗
+        setTimeout(() => {
+            notebookPickerVisible.value = false;
+            savedBookId.value = "";
+            pendingNoteContent.value = "";
+            pendingNoteUserText.value = "";
+        }, 700);
+    } catch (error) {
+        console.error("保存到笔记本失败:", error.message);
+        uni.showToast({ title: "保存失败，请重试", icon: "none" });
+    } finally {
+        savingBookId.value = "";
+    }
+};
+
 const handleAddAttachment = () => {
     addImages();
 };
@@ -1010,5 +1183,139 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
 @keyframes cursor-blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+}
+
+/* ── 保存到笔记本 弹窗 ─────────────────────────────────────────── */
+.notebook-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9998;
+}
+
+.notebook-picker {
+    width: 100%;
+    min-height: 240rpx;
+    padding: 0 0 24rpx;
+    background: #ffffff;
+}
+
+.picker-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60rpx 0;
+    gap: 18rpx;
+}
+
+.picker-state-text {
+    font-size: 26rpx;
+    color: #999;
+}
+
+.notebook-scroll {
+    max-height: 50vh;
+}
+
+.notebook-item {
+    display: flex;
+    align-items: center;
+    padding: 28rpx 32rpx;
+    background: #ffffff;
+    border-bottom: 1rpx solid #f2f2f2;
+    transition: background 0.15s ease;
+}
+
+.notebook-item:last-child {
+    border-bottom: none;
+}
+
+.notebook-item-active {
+    background: #f7f7f7;
+}
+
+.notebook-item-saving {
+    background: #fafafa;
+}
+
+.notebook-icon {
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 12rpx;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 24rpx;
+    flex-shrink: 0;
+}
+
+.notebook-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+
+.notebook-title {
+    font-size: 30rpx;
+    color: #333;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notebook-meta {
+    font-size: 22rpx;
+    color: #94a3b8;
+    margin-top: 6rpx;
+}
+
+.notebook-arrow,
+.notebook-saved,
+.notebook-saving {
+    margin-left: 12rpx;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notebook-saved {
+    animation: pop-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop-in {
+    0% { transform: scale(0.4); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.spinner-circle {
+    width: 48rpx;
+    height: 48rpx;
+    border: 4rpx solid #e5e7eb;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.spinner-circle-small {
+    width: 32rpx;
+    height: 32rpx;
+    border: 3rpx solid #e5e7eb;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 </style>
