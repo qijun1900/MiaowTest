@@ -156,9 +156,14 @@
         >
             <template #popupcontent>
                 <view class="notebook-picker">
-                    <view v-if="notebookLoading" class="picker-state">
-                        <view class="spinner-circle"></view>
-                        <text class="picker-state-text">加载笔记本…</text>
+                    <view v-if="notebookLoading" class="skeleton-list">
+                        <view v-for="i in 4" :key="i" class="skeleton-item">
+                            <view class="skeleton-avatar"></view>
+                            <view class="skeleton-lines">
+                                <view class="skeleton-line skeleton-line-title"></view>
+                                <view class="skeleton-line skeleton-line-meta"></view>
+                            </view>
+                        </view>
                     </view>
                     <view
                         v-else-if="!notebookList.length"
@@ -1217,6 +1222,55 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     color: #999;
 }
 
+/* 骨架屏 */
+.skeleton-list {
+    padding: 16rpx 0;
+}
+
+.skeleton-item {
+    display: flex;
+    align-items: center;
+    padding: 28rpx 32rpx;
+}
+
+.skeleton-avatar {
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 12rpx;
+    background: #f0f0f0;
+    margin-right: 24rpx;
+    flex-shrink: 0;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14rpx;
+}
+
+.skeleton-line {
+    height: 24rpx;
+    border-radius: 6rpx;
+    background: #f0f0f0;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-line-title {
+    width: 55%;
+}
+
+.skeleton-line-meta {
+    width: 30%;
+    height: 20rpx;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
 .notebook-scroll {
     max-height: 50vh;
 }
@@ -1297,20 +1351,11 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     100% { transform: scale(1); opacity: 1; }
 }
 
-.spinner-circle {
-    width: 48rpx;
-    height: 48rpx;
-    border: 4rpx solid #e5e7eb;
-    border-top-color: #2563eb;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
 .spinner-circle-small {
     width: 32rpx;
     height: 32rpx;
     border: 3rpx solid #e5e7eb;
-    border-top-color: #2563eb;
+    border-top-color: #999;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
