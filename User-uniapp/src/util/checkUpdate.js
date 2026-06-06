@@ -1,8 +1,24 @@
 import { checkAppUpdate } from "../API/Application/UpdateAPI";
-import showModal from "./showModal";
 import { getPlatform } from "./http";
 import escconfig from "../config/esc.config";
 import { showProgress, showComplete, clear as clearNotification } from "./useNotification";
+
+/**
+ * 通过自定义弹窗获取用户确认（非原生弹窗）
+ * @param {Object} options
+ * @returns {Promise<{confirm: boolean}>}
+ */
+function showCustomModal(options) {
+    const id = `update_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    return new Promise((resolve) => {
+        const handler = (res) => {
+            uni.$off(`updateModalResult:${id}`, handler);
+            resolve(res);
+        };
+        uni.$on(`updateModalResult:${id}`, handler);
+        uni.$emit("showUpdateModal", { ...options, id });
+    });
+}
 
 /**
  * 后台下载并安装更新包（不阻塞用户操作）
@@ -103,7 +119,7 @@ export async function checkForUpdate({ silent = true } = {}) {
     const content = `当前版本: v${currentVersionName}\n最新版本: v${latestVersion.versionName}\n\n更新内容:\n${changelog}`;
 
     // 显示更新弹窗
-    const modalRes = await showModal({
+    const modalRes = await showCustomModal({
       title: "发现新版本",
       content,
       confirmText: "立即更新",

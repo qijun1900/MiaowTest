@@ -78,24 +78,7 @@
 
                 <!-- 例句 -->
                 <view class="word-example-row">
-                    <text class="word-example">"</text>
-                    <text
-                        :user-select="true"
-                        v-for="(
-                            part, partIndex
-                        ) in highlightWord.formatExampleSentence(
-                            word.sentence,
-                            word.headWord,
-                        )"
-                        :key="partIndex"
-                        :class="[
-                            'word-example',
-                            { 'word-highlight': part.highlight },
-                        ]"
-                    >
-                        {{ part.text }}
-                    </text>
-                    <text class="word-example">"</text>
+                    <text class="word-example" :user-select="true">"{{ word.sentence }}"</text>
                 </view>
 
                 <!-- 标签组 -->
@@ -186,7 +169,7 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import uniSearch from "../../../components/core/uniSearch.vue";
 import { WordBookListAPI } from "../../../API/Vocabulary/WordBooksAPI";
-import highlightWord from "../../../util/highlightWord.js";
+
 import { playWordPronunciation } from "../../../API/Vocabulary/WordAPI.js";
 import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
 import tPopup from "../../../components/core/tPopup.vue";

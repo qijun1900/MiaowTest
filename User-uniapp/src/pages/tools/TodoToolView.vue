@@ -220,7 +220,7 @@
 <script setup>
 import lxCalendar from "../../components/lx-calendar/lx-calendar.vue";
 import { ref, onMounted, watch, computed } from "vue";
-import getTodayDate from "../../util/getTodayDate";
+import formatTime from "../../util/formatTime";
 import dragButton from "../../components/plug-in/drag-button/drag-button.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import {
@@ -233,7 +233,7 @@ import {
 } from "../../API/Tools/TodosAPI";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
 
-const initialDate = ref(getTodayDate()); // 初始日期设置为今天
+const initialDate = ref(formatTime.getTodayDate()); // 初始日期设置为今天
 const dotDates = ref([]); // 下方显示圆点的日期，挂载时候获取
 const popupShow = ref(false);
 const showAddButton = ref(true); // 是否显示添加悬浮按钮
