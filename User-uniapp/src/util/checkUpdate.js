@@ -2,23 +2,7 @@ import { checkAppUpdate } from "../API/Application/UpdateAPI";
 import { getPlatform } from "./http";
 import escconfig from "../config/esc.config";
 import { showProgress, showComplete, clear as clearNotification } from "./useNotification";
-
-/**
- * 通过自定义弹窗获取用户确认（非原生弹窗）
- * @param {Object} options
- * @returns {Promise<{confirm: boolean}>}
- */
-function showCustomModal(options) {
-    const id = `update_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    return new Promise((resolve) => {
-        const handler = (res) => {
-            uni.$off(`updateModalResult:${id}`, handler);
-            resolve(res);
-        };
-        uni.$on(`updateModalResult:${id}`, handler);
-        uni.$emit("showUpdateModal", { ...options, id });
-    });
-}
+import { showUpdateDialog } from "./updateDialogState";
 
 /**
  * 后台下载并安装更新包（不阻塞用户操作）
@@ -69,7 +53,6 @@ function downloadAndInstall(versionId) {
   let lastNotifiedProgress = -1;
   downloadTask.onProgressUpdate((res) => {
     if (import.meta.env.DEV) console.log(`[checkUpdate] 下载进度: ${res.progress}%`);
-    // 每变化 5% 才更新一次通知，避免频繁调用原生 API 阻塞 UI
     if (res.progress - lastNotifiedProgress >= 5 || res.progress === 100) {
       lastNotifiedProgress = res.progress;
       showProgress("正在下载更新包", res.progress);
@@ -84,42 +67,34 @@ function downloadAndInstall(versionId) {
  * @returns {Promise<boolean>} 是否有更新
  */
 export async function checkForUpdate({ silent = true } = {}) {
-  // 仅 App 平台检查更新
   if (getPlatform() !== "app") return false;
 
   try {
     const currentVersionCode = plus.runtime.versionCode;
     const currentVersionName = plus.runtime.version;
-    const platform = uni.getSystemInfoSync().platform; // "android" 或 "ios"
+    const platform = uni.getSystemInfoSync().platform;
 
-    // 调用检查更新 API
     const result = await checkAppUpdate(platform, currentVersionCode);
     if (!result || !result.data) return false;
 
     const { hasUpdate, latestVersion } = result.data;
 
-    // 无更新
     if (!hasUpdate) {
-      if (!silent) {
-        uni.showToast({ title: "当前已是最新版本", icon: "none" });
-      }
+      if (!silent) uni.showToast({ title: "当前已是最新版本", icon: "none" });
       return false;
     }
 
     const isForce = latestVersion.forceUpdate;
 
-    // 非强制更新：检查用户是否已跳过此版本
     if (!isForce) {
       const skippedCode = uni.getStorageSync("skipUpdateVersionCode");
       if (skippedCode === currentVersionCode) return false;
     }
 
-    // 构建更新日志内容
     const changelog = latestVersion.changelog || "发现新版本，建议立即更新";
     const content = `当前版本: v${currentVersionName}\n最新版本: v${latestVersion.versionName}\n\n更新内容:\n${changelog}`;
 
-    // 显示更新弹窗
-    const modalRes = await showCustomModal({
+    const modalRes = await showUpdateDialog({
       title: "发现新版本",
       content,
       confirmText: "立即更新",
@@ -128,20 +103,15 @@ export async function checkForUpdate({ silent = true } = {}) {
     });
 
     if (modalRes.confirm) {
-      // 用户确认更新 → 后台下载安装
       downloadAndInstall(latestVersion._id);
     } else if (!isForce) {
-      // 用户跳过可选更新 → 记录跳过状态
       uni.setStorageSync("skipUpdateVersionCode", currentVersionCode);
     }
 
     return true;
   } catch (error) {
-    // 静默模式下不提示错误，避免阻塞启动
-    if (!silent) {
-      uni.showToast({ title: "检查更新失败", icon: "none" });
-    }
-    console.error("checkForUpdate error:", error);
+    console.error("[checkUpdate] 检查更新异常:", error.message);
+    if (!silent) uni.showToast({ title: "检查更新失败", icon: "none" });
     return false;
   }
 }

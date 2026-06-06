@@ -1,9 +1,3 @@
-<template>
-    <!-- #ifdef APP-PLUS -->
-    <UpdateDialog />
-    <!-- #endif -->
-</template>
-
 <!-- ─────────────────────────────────────────────────────────────────────────────
   App.vue — 应用根组件 / 日志 SDK 宿主接入层
 
@@ -19,15 +13,9 @@
 import logSDK from "./util/logSDK";
 // #ifdef APP-PLUS
 import { checkForUpdate } from "./util/checkUpdate";
-import UpdateDialog from "./components/core/UpdateDialog.vue";
 // #endif
 
 export default {
-    components: {
-        // #ifdef APP-PLUS
-        UpdateDialog,
-        // #endif
-    },
     onLaunch: function () {
         // ── 微信云托管初始化 ──────────────────────────────────────────────────────
         // 仅在微信小程序环境下执行（条件编译），初始化微信云开发能力。
