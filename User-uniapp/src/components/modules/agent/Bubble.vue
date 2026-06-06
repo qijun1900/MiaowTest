@@ -647,6 +647,8 @@ function escapeHtml(value) {
 
 .bubble-stack {
     min-width: 0;
+    overflow: hidden;
+    max-width: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -686,6 +688,8 @@ function escapeHtml(value) {
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     word-break: break-word;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     width: fit-content;
     max-width: 100%;
 }

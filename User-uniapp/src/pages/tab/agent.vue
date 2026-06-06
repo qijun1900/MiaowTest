@@ -1084,6 +1084,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
 
 .bubble-test-area {
     padding: 24rpx;
+    overflow-x: hidden;
 }
 
 /*

@@ -30,8 +30,7 @@ Latex.prototype.onParse = function (node, vm) {
               children.push({
                 name: 'span',
                 attrs: {},
-                l: 'T',
-                f: 'display:inline-block',
+                f: 'display:inline-block;max-width:100%;overflow-x:auto;',
                 children: nodes
               })
             } else {
@@ -42,7 +41,7 @@ Latex.prototype.onParse = function (node, vm) {
               children.push({
                 name: 'div',
                 attrs: {
-                  style: 'text-align:center'
+                  style: 'text-align:center;max-width:100%;overflow-x:auto;'
                 },
                 children: nodes
               })

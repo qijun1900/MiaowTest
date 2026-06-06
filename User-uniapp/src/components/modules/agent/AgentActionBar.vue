@@ -9,14 +9,6 @@
         >
             <template #prefix>
                 <view
-                    v-if="actions.includes('save-note')"
-                    class="custom-action-item"
-                    hover-class="custom-action-item-active"
-                    @click="handleSaveNote"
-                >
-                    <t-icon name="edit-1" :size="iconSize" color="#8b8fa3" />
-                </view>
-                <view
                     v-if="actions.includes('favorite')"
                     class="custom-action-item"
                     hover-class="custom-action-item-active"
@@ -34,7 +26,15 @@
                     hover-class="custom-action-item-active"
                     @click="handleMore"
                 >
-                    <t-icon name="more" :size="iconSize" color="#8b8fa3" />
+                    <t-icon name="more" :size="iconSize" />
+                </view>
+                <view
+                    v-if="actions.includes('save-note')"
+                    class="custom-action-item"
+                    hover-class="custom-action-item-active"
+                    @click="handleSaveNote"
+                >
+                    <t-icon name="bookmark" :size="iconSize" />
                 </view>
             </template>
         </t-chat-actionbar>
