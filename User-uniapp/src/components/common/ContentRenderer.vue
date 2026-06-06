@@ -1,7 +1,7 @@
 <template>
   <MpHtml
     class="content-renderer"
-    :content="content"
+    :content="renderContent"
     :markdown="isMarkdown"
     :tag-style="mergedTagStyle"
     :selectable="selectable"
@@ -44,6 +44,14 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+});
+
+const renderContent = computed(() => {
+  if (!props.isMarkdown) return props.content;
+  // 将大模型返回的 \(...\) 和 \[...\] 转换为 mp-html LaTeX 插件可识别的 $...$ 和 $$...$$
+  return props.content
+    .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
+    .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
 });
 
 const defaultTagStyle = {
