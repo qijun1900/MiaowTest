@@ -14,7 +14,7 @@ function show(content, theme = "info", duration = 3000) {
     }
     Message[theme]({
         context: _context,
-        offset: ["100rpx", "32rpx"],
+        offset: ["160rpx", "32rpx"],
         duration,
         content,
         icon: true,

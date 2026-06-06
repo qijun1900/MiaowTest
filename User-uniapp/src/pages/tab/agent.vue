@@ -218,6 +218,12 @@
             @search-click="handleSearchClick"
             @filter-change="handleSidebarFilterChange"
         />
+        <!-- 自定义通知条：TMessage link 在小程序不可用，改用独立 view -->
+        <view v-if="toastVisible" class="note-toast" @click="handleToastClick">
+            <t-icon name="check-circle-filled" size="20" color="#22c55e" />
+            <text class="note-toast-text">{{ toastText }}</text>
+            <text class="note-toast-link">查看笔记</text>
+        </view>
     </view>
 </template>
 
@@ -272,12 +278,16 @@ const loadingConversationId = ref(null);
 let chatRequestSeq = 0;
 let msgIdSeq = 0;
 const scrollToViewId = ref("");
+let _toastTimer = null;
+let _toastCallback = null;
 
 // ─── 保存到笔记本 ──────────────────────────────────────────────────────────────
 const notebookPickerVisible = ref(false);
 const notebookLoading = ref(false);
 const notebookList = ref([]);
 const savingBookId = ref("");
+const toastVisible = ref(false);
+const toastText = ref("");
 const savedBookId = ref("");
 const pendingNoteContent = ref("");
 const pendingNoteUserText = ref("");
@@ -792,6 +802,24 @@ const handleOpenNotebookPicker = async (content) => {
     }
 };
 
+const showNoteToast = (text, callback) => {
+    toastText.value = text;
+    _toastCallback = callback;
+    toastVisible.value = true;
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => {
+        toastVisible.value = false;
+        _toastCallback = null;
+    }, 4000);
+};
+
+const handleToastClick = () => {
+    if (_toastCallback) _toastCallback();
+    toastVisible.value = false;
+    clearTimeout(_toastTimer);
+    _toastCallback = null;
+};
+
 const handleClosePicker = () => {
     if (savingBookId.value) return; // 保存中不允许关闭
     savedBookId.value = "";
@@ -824,7 +852,7 @@ const handlePickNotebook = async (book) => {
     savingBookId.value = book._id;
     try {
         const title = buildNoteTitle();
-        await saveNotebookNoteAPI({
+        const res = await saveNotebookNoteAPI({
             bookId: book._id,
             title,
             content: pendingNoteContent.value,
@@ -837,10 +865,17 @@ const handlePickNotebook = async (book) => {
             },
         });
         savedBookId.value = book._id;
-        uni.showToast({
-            title: `已保存到《${book.title}》`,
-            icon: "none",
-            position: "top",
+        const noteId = res?.data?.id || "";
+        showNoteToast(`已保存到《${book.title}》`, () => {
+            if (noteId) {
+                uni.navigateTo({
+                    url: `/pages/tools/NotesBookToolView_children/NoteDetailView?bookId=${book._id}&id=${noteId}`,
+                });
+            } else {
+                uni.navigateTo({
+                    url: `/pages/tools/NotesBookToolView_children/NotesListView?id=${book._id}&title=${encodeURIComponent(book.title)}`,
+                });
+            }
         });
         // 短暂展示成功状态后自动关闭弹窗
         setTimeout(() => {
@@ -1152,6 +1187,44 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 /* #endif */
+
+/* ── 保存成功通知条 ─────────────────────────────────────── */
+.note-toast {
+    position: fixed;
+    top: 160rpx;
+    left: 24rpx;
+    right: 24rpx;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    padding: 24rpx 28rpx;
+    background: #ffffff;
+    border-radius: 16rpx;
+    box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+    animation: toast-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.note-toast-text {
+    flex: 1;
+    font-size: 28rpx;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.note-toast-link {
+    font-size: 28rpx;
+    color: #2563eb;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+@keyframes toast-slide-in {
+    from { transform: translateY(-40rpx); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
 
 /* 小屏稍紧凑 */
 @media screen and (max-width: 360px) {
