@@ -1,7 +1,7 @@
 <template>
     <view class="container">
         <!-- 提示 -->
-        <Tips text="左滑即可对题库进行删除操作" :duration="10000" type="info" />
+        <Tips v-if="questionBanks && questionBanks.length > 0" text="左滑即可对题库进行删除操作" :duration="10000" type="info" />
 
         <!-- 加载状态 -->
         <ThemeLoading v-if="isLoading" text="正在加载题库..." />

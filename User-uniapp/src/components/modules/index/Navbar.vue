@@ -47,7 +47,16 @@ const navItems = ref([
 // 处理导航项点击事件
 const handleNavClick = (item) => {
     if (item.title === "开源地址") {
-        handleCopy("https://github.com/qijun1900/MiaowTest");
+        const url = "https://github.com/qijun1900/MiaowTest";
+        // #ifdef APP-PLUS
+        plus.runtime.openURL(url);
+        // #endif
+        // #ifdef H5
+        window.open(url, "_blank");
+        // #endif
+        // #ifdef MP-WEIXIN
+        handleCopy(url);
+        // #endif
         return;
     }
     if (item.title === "所有考试") {
