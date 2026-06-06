@@ -676,7 +676,7 @@ function escapeHtml(value) {
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
         "Source Han Sans SC", "Noto Sans CJK SC", "Noto Sans SC",
         "WenQuanYi Micro Hei", system-ui, sans-serif;
-    font-size: 30rpx;
+    font-size: 34rpx;
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-weight: 400;
@@ -761,7 +761,7 @@ function escapeHtml(value) {
 
 .bubble-mp-html {
     font-family: inherit;
-    font-size: 30rpx;
+    font-size: 34rpx;
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
@@ -827,35 +827,35 @@ function escapeHtml(value) {
 /* H5 / App 端按屏幕物理宽度判断；小程序中 rpx 已按 750 基线自动缩放，此处主要服务 H5。 */
 @media screen and (max-width: 360px) {
     .bubble-box {
-        font-size: 28rpx;
+        font-size: 32rpx;
         padding: 16rpx 22rpx;
         line-height: 1.68;
     }
     .bubble-mp-html {
-        font-size: 28rpx;
+        font-size: 32rpx;
         line-height: 1.68;
     }
 }
 
 @media screen and (min-width: 768px) {
     .bubble-box {
-        font-size: 16px;
+        font-size: 18px;
         padding: 12px 18px;
         line-height: 1.7;
     }
     .bubble-mp-html {
-        font-size: 16px;
+        font-size: 18px;
         line-height: 1.7;
     }
 }
 
 @media screen and (min-width: 1024px) {
     .bubble-box {
-        font-size: 16.5px;
+        font-size: 18.5px;
         line-height: 1.72;
     }
     .bubble-mp-html {
-        font-size: 16.5px;
+        font-size: 18.5px;
         line-height: 1.72;
     }
 }
@@ -967,7 +967,7 @@ function escapeHtml(value) {
 }
 
 .bubble-select-title {
-    font-size: 30rpx;
+    font-size: 34rpx;
     font-weight: 600;
     color: #1f2937;
 }
@@ -988,7 +988,7 @@ function escapeHtml(value) {
 }
 
 .bubble-select-text {
-    font-size: 30rpx;
+    font-size: 34rpx;
     line-height: 1.7;
     color: #1f2328;
     word-break: break-word;
