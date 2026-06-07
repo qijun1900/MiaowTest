@@ -135,6 +135,13 @@
                         @remove="(idx) => removePendingImage(idx)"
                         @retry="(idx) => retryImage(idx)"
                     />
+                    <AgentAttachments
+                        ref="attachmentsRef"
+                        v-model="pendingAttachments"
+                        accept="all"
+                        :max-count="9"
+                        @upload-error="handleAttachmentUploadError"
+                    />
                 </template>
             </AgentSender>
         </view>
@@ -241,6 +248,7 @@ import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
+import AgentAttachments from "../../components/modules/agent/AgentAttachments.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import { getNotebooksAPI, saveNotebookNoteAPI } from "../../API/Tools/NotesBookAPI.js";
 import { useAgentImages } from "../../composables/useAgentImages.js";
@@ -291,6 +299,14 @@ const toastText = ref("");
 const savedBookId = ref("");
 const pendingNoteContent = ref("");
 const pendingNoteUserText = ref("");
+
+// ─── 附件（t-attachments 多文件类型） ──────────────────────────────────────
+const attachmentsRef = ref(null);
+const pendingAttachments = ref([]);
+
+const handleAttachmentUploadError = ({ error }) => {
+    uni.showToast({ title: error?.message || "附件上传失败", icon: "none" });
+};
 
 const {
     images: pendingImages,
