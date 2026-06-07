@@ -678,7 +678,7 @@ function escapeHtml(value) {
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
         "Source Han Sans SC", "Noto Sans CJK SC", "Noto Sans SC",
         "WenQuanYi Micro Hei", system-ui, sans-serif;
-    font-size: 34rpx;
+    font-size: 32rpx;
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-weight: 400;
@@ -765,7 +765,7 @@ function escapeHtml(value) {
 
 .bubble-mp-html {
     font-family: inherit;
-    font-size: 34rpx;
+    font-size: 32rpx;
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;

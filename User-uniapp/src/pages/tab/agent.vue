@@ -476,6 +476,10 @@ const senderAreaStyle = computed(() => ({
             : "calc(14rpx + env(safe-area-inset-bottom))",
 }));
 
+const triggerVibrate = () => {
+    uni.vibrateShort({ type: 'light', fail: () => {} });
+};
+
 // ─── 事件处理 ──────────────────────────────────────────────────────────────────
 /**
  * 把指定消息滚到 scroll-view 顶部（紧贴头部下沿）。
@@ -938,6 +942,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     });
     senderText.value = "";
     clearPendingImages();
+    triggerVibrate();
 
     // 通过 messageList.value 访问，确保拿到的是 Vue 响应式代理
     const aiIndex = messageList.value.length;
@@ -995,6 +1000,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
                     flushBuffer(true);
                     messageList.value[aiIndex].pending = false;
                     messageList.value[aiIndex].isStreaming = false;
+                    triggerVibrate();
                 },
                 onError: () => {},
             });
@@ -1019,6 +1025,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
                 messageList.value[aiIndex].isStreaming = false;
                 messageList.value[aiIndex].typing = true;
                 messageList.value[aiIndex].content = replyText;
+                triggerVibrate();
             }
         }
         loadConversationList();
