@@ -31,13 +31,6 @@ const defaultToolsList = [
         path: "/pages/tools/TodoToolView",
         needLogin: true,
     },
-    // {
-    //   title: '喵喵单词',
-    //   desc: '单词记忆工具，帮助你快速学习单词',
-    //   icon: '/static/tools/tools-words.png',
-    //   path: '/pages/tools/WordsToolView',
-    //   needLogin: true
-    // },
     {
         title: "喵喵错题本",
         desc: "错题记录工具，帮助你快速记录和管理错题",

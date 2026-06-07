@@ -292,29 +292,10 @@
 		{
 			"root": "pages/tools",
 			"pages": [
-					{
+				{
 					"path": "TodoToolView",
 					"style": {
 						"navigationBarTitleText": "TODO"
-					}
-				},
-				{
-					"path": "WordsToolView",
-					"style": {
-						"navigationBarTitleText": "喵喵单词",
-						"navigationStyle": "custom" //自定义导航栏
-					}
-				},
-				{
-					"path": "WordsToolView_children/wordSettingView",
-					"style": {
-						"navigationBarTitleText": "单词设置"
-					}
-				},
-				{
-					"path": "WordsToolView_children/wordListView",
-					"style": {
-						"navigationBarTitleText": "单词列表"
 					}
 				},
 				{

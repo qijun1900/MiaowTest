@@ -11,8 +11,6 @@ function loadOwnedDataModels() {
     { Model: require("../models/QuestionNoteModel"), fk: "Uid" },
     { Model: require("../models/UserTodosModel"), fk: "Uid" },
     { Model: require("../models/UserQuestionModel"), fk: "Uid" },
-    { Model: require("../models/UserWordBookModel"), fk: "Uid" },
-    { Model: require("../models/ConsumerWordModel"), fk: "uid" },
     { Model: require("../models/ConsumerFeedbackModel"), fk: "uid" },
     { Model: require("../models/UserActionLogModel"), fk: "uid" },
     { Model: require("../models/UserActivityEventModel"), fk: "uid" },

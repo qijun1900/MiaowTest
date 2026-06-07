@@ -13,7 +13,6 @@ import AgentChat from "@/views/Chat/AgentChat.vue";
 import consumerMessage from "../views/Consumer/ConsumerMessage.vue";
 import ConsumerManage from "@/views/Users/Consumer.vue";
 import ExamFileManage from "@/views/Exam/ExamFileManage.vue";
-import BooksManage from "@/views/WordBooks/BooksManage.vue";
 import FileList from "@/views/Resource/FileList.vue";
 import FileUpload from "@/views/Resource/FileUpload.vue";
 import AppVersionManage from "@/views/System/AppVersionManage.vue";
@@ -93,11 +92,6 @@ const routes = [
     path: "/exam/examfilemanage/:id",
     name: "ExamFileManage",
     component: ExamFileManage,
-  },
-  {
-    path: "/learn/wordbooks",
-    name: "BooksManage",
-    component: BooksManage,
   },
   {
     path: "/resource/filelist",

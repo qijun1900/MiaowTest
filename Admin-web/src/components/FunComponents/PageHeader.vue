@@ -137,7 +137,6 @@ const titleMap = [
   { pattern: /^\/agent\/agentmanage$/, title: "Agent管理" },
   { pattern: /^\/agent\/chat$/, title: "Agent对话测试" },
   { pattern: /^\/consumer\/message$/, title: "用户意见" },
-  { pattern: /^\/learn\/wordbooks$/, title: "词书管理" },
   { pattern: /^\/exam\/questionlist\//, title: "题目列表" },
   { pattern: /^\/exam\/questionadd\//, title: "添加题目" },
   { pattern: /^\/exam\/batchadd\//, title: "批量添加" },
@@ -145,7 +144,6 @@ const titleMap = [
   { pattern: /^\/exam\/examfilemanage\//, title: "考试资料管理" },
   { pattern: /^\/resource\/fileupload$/, title: "资源上传" },
   { pattern: /^\/resource\/filelist$/, title: "资源列表" },
-  { pattern: /^\/learn\/wordbooks$/, title: "词书管理" },
 ];
 
 const Title = computed(() => {
