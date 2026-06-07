@@ -248,7 +248,6 @@ import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
-import AgentAttachments from "../../components/modules/agent/AgentAttachments.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import { getNotebooksAPI, saveNotebookNoteAPI } from "../../API/Tools/NotesBookAPI.js";
 import { useAgentImages } from "../../composables/useAgentImages.js";
