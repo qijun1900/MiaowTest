@@ -1,27 +1,36 @@
 <template>
     <view class="container">
-        <!-- 搜索栏 -->
-        <view class="search-header">
-            <view class="search-bar">
-                <view class="search-icon-wrapper">
-                    <view class="search-icon"></view>
+        <!-- 自定义导航栏 -->
+        <view class="custom-navbar" :style="{ paddingTop: statusBarHeight + 'px' }">
+            <view class="navbar-content">
+                <view class="navbar-left" @click="handleBack">
+                    <t-icon name="chevron-left" size="48rpx" color="#2d2f36" />
                 </view>
-                <input
-                    class="search-input"
-                    type="text"
-                    placeholder="搜索会话..."
-                    placeholder-class="search-placeholder"
-                    :focus="true"
-                    :adjust-position="false"
-                    v-model="keyword"
-                    @input="handleInput"
-                />
-                <view v-if="keyword" class="clear-btn" @click="handleClear">
-                    <uni-icons type="clear" size="20" color="#c0c4cc"></uni-icons>
+                <view class="navbar-center">
+                    <view class="nav-search-bar">
+                        <t-icon name="search" size="32rpx" color="#8b8fa3" />
+                        <input
+                            class="nav-search-input"
+                            type="text"
+                            placeholder="搜索会话..."
+                            placeholder-class="nav-search-placeholder"
+                            :focus="true"
+                            :adjust-position="false"
+                            v-model="keyword"
+                            @input="handleInput"
+                        />
+                        <t-icon
+                            v-if="keyword"
+                            name="close-circle-filled"
+                            size="32rpx"
+                            color="#c0c4cc"
+                            @click="handleClear"
+                        />
+                    </view>
                 </view>
-            </view>
-            <view class="cancel-btn" @click="handleCancel">
-                <text class="cancel-text">取消</text>
+                <view class="navbar-right" @click="handleCancel">
+                    <text class="cancel-text">取消</text>
+                </view>
             </view>
         </view>
 
@@ -38,7 +47,6 @@
 
         <!-- 会话列表 -->
         <scroll-view class="result-list" scroll-y v-else>
-            <!-- 搜索中提示 -->
             <view class="searching-bar" v-if="searching">
                 <view class="searching-bar-inner"></view>
             </view>
@@ -48,9 +56,21 @@
                 v-for="item in displayList"
                 :key="item._id"
                 @click="handleSelect(item)"
+                @longpress="handleLongPress(item)"
+                @touchstart="onItemTouchStart"
+                @touchmove="onItemTouchMove"
+                @touchend="onItemTouchEnd"
             >
-                <view class="result-icon">
-                    <uni-icons type="chat" size="20" color="#8b8fa3"></uni-icons>
+                <view v-if="isSelectionMode" class="item-checkbox" @click.stop="toggleSelect(item._id)">
+                    <t-icon
+                        :name="selectedIds.has(item._id) ? 'check-circle-filled' : 'circle'"
+                        size="44rpx"
+                        :color="selectedIds.has(item._id) ? '#0052d9' : '#c0c4cc'"
+                    />
+                </view>
+
+                <view v-if="!isSelectionMode" class="result-icon">
+                    <t-icon name="chat" size="40rpx" color="#8b8fa3" />
                 </view>
                 <view class="result-content">
                     <view class="result-title">
@@ -66,25 +86,59 @@
                 <text class="result-time">{{ formatTime(item.lastMessageAt) }}</text>
             </view>
 
-            <!-- 搜索无结果 -->
             <view class="empty-state" v-if="searched && keyword && displayList.length === 0">
-                <uni-icons type="search" size="48" color="#dcdfe6"></uni-icons>
+                <t-icon name="search" size="80rpx" color="#dcdfe6" />
                 <text class="empty-text">未找到相关会话</text>
             </view>
 
-            <!-- 列表为空 -->
             <view class="empty-state" v-if="!keyword && !pageLoading && displayList.length === 0">
-                <uni-icons type="chat" size="48" color="#dcdfe6"></uni-icons>
+                <t-icon name="chat" size="80rpx" color="#dcdfe6" />
                 <text class="empty-text">暂无会话记录</text>
             </view>
         </scroll-view>
+
+        <!-- 底部删除操作栏 -->
+        <view v-if="isSelectionMode" class="bottom-action-bar" :style="{ paddingBottom: (safeAreaBottom + 12) + 'px' }">
+            <view class="action-bar-left">
+                <text class="action-bar-count">{{ selectedIds.size }} 项已选</text>
+            </view>
+            <view class="action-bar-right">
+                <view
+                        class="action-delete-btn"
+                        :class="{ 'action-delete-disabled': selectedIds.size === 0 || deleting }"
+                        @click="handleDeleteTap"
+                    >
+                        <t-icon name="delete" size="32rpx" color="#ffffff" />
+                        <text class="action-delete-text">{{ deleting ? '删除中...' : '删除' }}</text>
+                    </view>
+            </view>
+        </view>
+
+        <!-- 删除确认弹窗 -->
+        <t-dialog
+            :visible="showDeleteDialog"
+            title="确认删除"
+            :content="`确定删除选中的 ${selectedIds.size} 个会话吗？删除后无法恢复。`"
+            confirm-btn="删除"
+            :cancel-btn="{ content: '取消', variant: 'outline' }"
+            @confirm="handleConfirmDelete"
+            @cancel="showDeleteDialog = false"
+            @close="showDeleteDialog = false"
+        />
     </view>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { fetchConversationList, searchConversations } from "../../API/LLM/AgentAPI.js";
+import { fetchConversationList, searchConversations, deleteConversation } from "../../API/LLM/AgentAPI.js";
+import formatTimeUtil from "../../util/formatTime.js";
 
+// --- 状态栏高度适配 ---
+const systemInfo = uni.getSystemInfoSync();
+const statusBarHeight = systemInfo.statusBarHeight || 0;
+const safeAreaBottom = systemInfo.safeAreaInsets?.bottom ?? 0;
+
+// --- 搜索逻辑 ---
 const keyword = ref("");
 const conversationList = ref([]);
 const searchResults = ref([]);
@@ -94,10 +148,40 @@ const searched = ref(false);
 let debounceTimer = null;
 let searchSeq = 0;
 
-const displayList = computed(() => {
-    return keyword.value.trim() ? searchResults.value : conversationList.value;
-});
+const displayList = computed(() =>
+    keyword.value.trim() ? searchResults.value : conversationList.value
+);
 
+// --- 多选逻辑 ---
+const isSelectionMode = ref(false);
+const selectedIds = ref(new Set());
+const showDeleteDialog = ref(false);
+const deleting = ref(false);
+
+const enterSelectionMode = (id) => {
+    selectedIds.value = new Set([id]);
+    isSelectionMode.value = true;
+};
+
+const exitSelectionMode = () => {
+    isSelectionMode.value = false;
+    selectedIds.value = new Set();
+};
+
+const toggleSelect = (id) => {
+    const next = new Set(selectedIds.value);
+    if (next.has(id)) {
+        next.delete(id);
+    } else {
+        next.add(id);
+    }
+    selectedIds.value = next;
+    if (next.size === 0) {
+        isSelectionMode.value = false;
+    }
+};
+
+// --- 数据加载 ---
 const loadConversationList = async () => {
     try {
         const res = await fetchConversationList();
@@ -113,6 +197,7 @@ onMounted(() => {
     loadConversationList();
 });
 
+// --- 搜索交互 ---
 const handleInput = () => {
     clearTimeout(debounceTimer);
     if (!keyword.value.trim()) {
@@ -132,8 +217,20 @@ const handleClear = () => {
     clearTimeout(debounceTimer);
 };
 
-const handleCancel = () => {
+const handleBack = () => {
+    if (isSelectionMode.value) {
+        exitSelectionMode();
+        return;
+    }
     uni.navigateBack();
+};
+
+const handleCancel = () => {
+    if (isSelectionMode.value) {
+        exitSelectionMode();
+    } else {
+        uni.navigateBack();
+    }
 };
 
 const doSearch = async (kw) => {
@@ -155,10 +252,76 @@ const doSearch = async (kw) => {
     }
 };
 
+// --- 列表交互 ---
 const handleSelect = (item) => {
+    if (isSelectionMode.value) {
+        toggleSelect(item._id);
+        return;
+    }
     uni.$emit("agent-select-conversation", item._id);
     uni.navigateBack();
 };
+
+// --- 触摸跟踪（防止滑动时误触发长按）---
+let touchStartX = 0;
+let touchStartY = 0;
+let touchMoved = false;
+
+const onItemTouchStart = (e) => {
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchMoved = false;
+};
+
+const onItemTouchMove = (e) => {
+    const touch = e.touches[0];
+    const dx = Math.abs(touch.clientX - touchStartX);
+    const dy = Math.abs(touch.clientY - touchStartY);
+    if (dx > 10 || dy > 10) {
+        touchMoved = true;
+    }
+};
+
+const onItemTouchEnd = () => {};
+
+const handleLongPress = (item) => {
+    if (touchMoved || isSelectionMode.value) return;
+    uni.vibrateShort({ type: "medium" });
+    enterSelectionMode(item._id);
+};
+
+// --- 删除 ---
+const handleDeleteTap = () => {
+    if (selectedIds.value.size === 0 || deleting.value) return;
+    showDeleteDialog.value = true;
+};
+
+const handleConfirmDelete = async () => {
+    deleting.value = true;
+    try {
+        const ids = [...selectedIds.value];
+        await Promise.all(ids.map((id) => deleteConversation(id)));
+        conversationList.value = conversationList.value.filter(
+            (item) => !ids.includes(item._id)
+        );
+        searchResults.value = searchResults.value.filter(
+            (item) => !ids.includes(item._id)
+        );
+        exitSelectionMode();
+        uni.$emit("agent-refresh-conversations");
+        uni.showToast({ title: "删除成功", icon: "none" ,position: "top"});
+    } catch (error) {
+        uni.showToast({ title: "删除失败", icon: "none" ,position: "top"});
+        console.error("批量删除会话失败:", error.message);
+    } finally {
+        deleting.value = false;
+        showDeleteDialog.value = false;
+    }
+};
+
+// --- 工具函数 ---
+const formatTime = formatTimeUtil.formatChatTime;
 
 const highlightText = (text, kw) => {
     if (!kw || !text) return [{ text: text || "", isMatch: false }];
@@ -181,24 +344,6 @@ const highlightText = (text, kw) => {
     return result;
 };
 
-const formatTime = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) {
-        const h = date.getHours().toString().padStart(2, "0");
-        const m = date.getMinutes().toString().padStart(2, "0");
-        return `${h}:${m}`;
-    }
-    if (diffDays === 1) return "昨天";
-    if (diffDays < 7) return `${diffDays}天前`;
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    return `${month}-${day}`;
-};
-
 onUnmounted(() => {
     clearTimeout(debounceTimer);
 });
@@ -212,83 +357,127 @@ onUnmounted(() => {
     flex-direction: column;
 }
 
-/* 搜索栏 */
-.search-header {
-    display: flex;
-    align-items: center;
-    padding: 16rpx 24rpx;
-    gap: 16rpx;
+/* 自定义导航栏 */
+.custom-navbar {
     background: #ffffff;
     border-bottom: 1rpx solid rgba(15, 23, 42, 0.06);
+    flex-shrink: 0;
 }
 
-.search-bar {
-    flex: 1;
-    height: 72rpx;
-    border-radius: 36rpx;
-    background: #f2f3f5;
+.navbar-content {
     display: flex;
     align-items: center;
-    padding: 0 24rpx;
+    height: 88rpx;
+    padding: 0 16rpx;
     gap: 12rpx;
 }
 
-.search-icon-wrapper {
-    width: 32rpx;
-    height: 32rpx;
+.navbar-left {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 64rpx;
+    height: 64rpx;
+    flex-shrink: 0;
 }
 
-.search-icon {
-    width: 18rpx;
-    height: 18rpx;
-    border: 3rpx solid #8b8fa3;
-    border-radius: 50%;
-    position: relative;
-}
-
-.search-icon::after {
-    content: "";
-    position: absolute;
-    right: -5rpx;
-    bottom: -5rpx;
-    width: 10rpx;
-    height: 3rpx;
-    background: #8b8fa3;
-    border-radius: 3rpx;
-    transform: rotate(45deg);
-}
-
-.search-input {
+.navbar-center {
     flex: 1;
-    font-size: 30rpx;
-    color: #2d2f36;
-    height: 72rpx;
-    line-height: 72rpx;
+    min-width: 0;
 }
 
-.search-placeholder {
-    color: #8b8fa3;
-    font-size: 30rpx;
-}
-
-.clear-btn {
+.navbar-right {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4rpx;
-}
-
-.cancel-btn {
-    padding: 8rpx 0;
+    padding: 0 16rpx;
     flex-shrink: 0;
 }
 
 .cancel-text {
-    font-size: 30rpx;
+    font-size: 28rpx;
     color: #2d2f36;
+    white-space: nowrap;
+}
+
+/* 搜索框 */
+.nav-search-bar {
+    display: flex;
+    align-items: center;
+    height: 64rpx;
+    border-radius: 32rpx;
+    background: #f2f3f5;
+    padding: 0 20rpx;
+    gap: 10rpx;
+}
+
+.nav-search-input {
+    flex: 1;
+    font-size: 28rpx;
+    color: #2d2f36;
+    height: 64rpx;
+    line-height: 64rpx;
+}
+
+.nav-search-placeholder {
+    color: #8b8fa3;
+    font-size: 28rpx;
+}
+
+/* 底部操作栏 */
+.bottom-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20rpx 32rpx 12rpx;
+    background: #ffffff;
+    border-top: 1rpx solid rgba(15, 23, 42, 0.08);
+    flex-shrink: 0;
+}
+
+.action-bar-left {
+    display: flex;
+    align-items: center;
+}
+
+.action-bar-count {
+    font-size: 28rpx;
+    color: #2d2f36;
+    font-weight: 500;
+}
+
+.action-bar-right {
+    display: flex;
+    align-items: center;
+}
+
+.action-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
+    height: 72rpx;
+    padding: 0 40rpx;
+    border-radius: 36rpx;
+    background: linear-gradient(135deg, #e34d59, #c92a2a);
+}
+
+.action-delete-btn:active {
+    opacity: 0.85;
+}
+
+.action-delete-disabled {
+    opacity: 0.4;
+}
+
+.action-delete-disabled:active {
+    opacity: 0.4;
+}
+
+.action-delete-text {
+    font-size: 28rpx;
+    color: #ffffff;
+    font-weight: 500;
 }
 
 /* 骨架屏 */
@@ -381,6 +570,14 @@ onUnmounted(() => {
     background: rgba(15, 23, 42, 0.03);
 }
 
+.item-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 4rpx;
+}
+
 .result-icon {
     width: 44rpx;
     height: 44rpx;
@@ -440,5 +637,4 @@ onUnmounted(() => {
     font-size: 28rpx;
     color: #8b8fa3;
 }
-
 </style>

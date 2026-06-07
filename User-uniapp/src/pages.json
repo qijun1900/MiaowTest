@@ -284,7 +284,8 @@
 				{
 					"path": "ConversationSearchView",
 					"style": {
-						"navigationBarTitleText": "搜索会话"
+						"navigationBarTitleText": "搜索会话",
+						"navigationStyle": "custom"
 					}
 				}
 			]

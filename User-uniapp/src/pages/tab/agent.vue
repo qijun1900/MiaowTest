@@ -427,6 +427,8 @@ onMounted(() => {
 
     // 监听搜索页选择的会话
     uni.$on("agent-select-conversation", handleSelectChat);
+    // 监听会话删除后刷新列表
+    uni.$on("agent-refresh-conversations", () => loadConversationList());
 
     // 小程序 / App 使用官方 API
     // #ifdef MP-WEIXIN || APP-PLUS
@@ -443,6 +445,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     uni.$off("agent-select-conversation", handleSelectChat);
+    uni.$off("agent-refresh-conversations");
 
     // #ifdef MP-WEIXIN || APP-PLUS
     uni.offKeyboardHeightChange();

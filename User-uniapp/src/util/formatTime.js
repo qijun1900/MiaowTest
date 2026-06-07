@@ -26,6 +26,24 @@ const formatTime = {
         }
         if (diff < 48 * 60 * 60 * 1000) return "昨天"
         return `${Math.floor(diff / (24 * 60 * 60 * 1000))}天前`
+    },
+    /** 会话列表时间：今天显示 HH:mm，昨天显示"昨天"，7天内"N天前"，否则 MM-DD */
+    formatChatTime:(dateStr)=>{
+        if (!dateStr) return ""
+        const date = new Date(dateStr)
+        const now = new Date()
+        const diffMs = now - date
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+        if (diffDays === 0) {
+            const h = date.getHours().toString().padStart(2, "0")
+            const m = date.getMinutes().toString().padStart(2, "0")
+            return `${h}:${m}`
+        }
+        if (diffDays === 1) return "昨天"
+        if (diffDays < 7) return `${diffDays}天前`
+        const month = (date.getMonth() + 1).toString().padStart(2, "0")
+        const day = date.getDate().toString().padStart(2, "0")
+        return `${month}-${day}`
     }
 }
 
