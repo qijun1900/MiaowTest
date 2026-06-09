@@ -4,6 +4,10 @@ const AgentMessageModel = require("../../models/AgentMessageModel");
 const { runAgentChain, streamAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat")/** 每次送入 LLM 的历史消息上限，防止上下文过长 */
 const HISTORY_MESSAGE_LIMIT = 20;
 
+function isImageUrl(url) {
+  return /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(String(url || ""));
+}
+
 // ─── 内部共享方法 ────────────────────────────────────────────────────────────
 
 /**
@@ -19,14 +23,16 @@ async function getAgentConfig(agentKey) {
  * 确保会话存在：新建或更新已有会话，返回 { convId, sequence }。
  * 新建时 sequence 从 0 开始；已有时从最后一条消息的 sequence + 1 继续。
  */
-async function ensureConversation(convId, uid, agentKey, agentConfig, userMessage, images) {
-  const displayText = userMessage || (images?.length ? "[图片消息]" : "");
+async function ensureConversation(convId, uid, agentKey, agentConfig, userMessage, images, files) {
+  const displayText = userMessage
+    || (images?.length ? "[附件消息]" : "")
+    || (files?.length ? "[文件消息]" : "");
   if (!convId) {
     const newConv = await AgentConversationModel.create({
       Uid: uid,
       agentKey,
-      title: displayText.substring(0, 20) || "[图片消息]",
-      lastMessagePreview: displayText.substring(0, 50) || "[图片消息]",
+      title: displayText.substring(0, 20) || "[附件消息]",
+      lastMessagePreview: displayText.substring(0, 50) || "[附件消息]",
       messageCount: 0,
       scene: agentConfig.agentKey || "default",
       currentModel: agentConfig.defaultModel || "",
@@ -39,7 +45,7 @@ async function ensureConversation(convId, uid, agentKey, agentConfig, userMessag
       { _id: convId },
       {
         $set: {
-          lastMessagePreview: displayText.substring(0, 50) || "[图片消息]",
+          lastMessagePreview: displayText.substring(0, 50) || "[附件消息]",
           lastMessageAt: new Date(),
           currentModel: agentConfig.defaultModel || "",
         },
@@ -55,7 +61,7 @@ async function ensureConversation(convId, uid, agentKey, agentConfig, userMessag
  * 并行落库用户消息 + 拉取最近历史（限制条数）。
  * 返回正序排列的历史消息数组（包含刚保存的用户消息）。
  */
-async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images) {
+async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images, files) {
   const userMsgDoc = {
     conversationId: convId,
     Uid: uid,
@@ -65,14 +71,41 @@ async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig
     content: userMessage || "",
     modelName: agentConfig.defaultModel || "default",
   };
-  if (images && images.length > 0) {
+
+  const ext = {};
+  const incomingImageUrls = (images || [])
+    .map((img) => (typeof img === "string" ? img : img?.url))
+    .filter(Boolean);
+  const imageUrls = incomingImageUrls.filter(isImageUrl);
+  const nonImageFromImages = incomingImageUrls
+    .filter((url) => !isImageUrl(url))
+    .map((url) => ({ url, name: "" }));
+
+  if (imageUrls.length > 0) {
+    ext.images = imageUrls;
     userMsgDoc.contentType = "image";
-    // 统一存储为纯 URL 字符串，兼容前端传入对象或字符串
-    const imageUrls = images.map((img) => (typeof img === "string" ? img : img?.url)).filter(Boolean);
-    if (imageUrls.length > 0) {
-      userMsgDoc.ext = { images: imageUrls };
-      console.log("[saveUserMessage] 存储图片消息, 图片数:", imageUrls.length);
+    console.log("[saveUserMessage] 存储图片消息, 图片数:", imageUrls.length);
+  }
+
+  const allFiles = [...(files || []), ...nonImageFromImages];
+  if (allFiles.length > 0) {
+    // files 保留 {url, name} 结构，方便后端解析时拿到原始文件名
+    const seenFileUrls = new Set();
+    const fileItems = allFiles
+      .map((f) => (typeof f === "string" ? { url: f, name: "" } : { url: f?.url, name: f?.name || "" }))
+      .filter((f) => {
+        if (!f.url || isImageUrl(f.url) || seenFileUrls.has(f.url)) return false;
+        seenFileUrls.add(f.url);
+        return true;
+      });
+    if (fileItems.length > 0) {
+      ext.files = fileItems;
+      if (!userMsgDoc.contentType) userMsgDoc.contentType = "text";
+      console.log("[saveUserMessage] 存储文件消息, 文件数:", fileItems.length);
     }
+  }
+  if (Object.keys(ext).length > 0) {
+    userMsgDoc.ext = ext;
   }
 
   // 先落库用户消息，确保后续查询能读到
@@ -159,16 +192,16 @@ const LLMService = {
   /**
    * 非流式对话：用户发消息 → LLM 一次性返回完整回复 → 落库。
    */
-  ChatWithAgentAndSave: async ({ uid, message: userMessage, agentKey, conversationId, images }) => {
+  ChatWithAgentAndSave: async ({ uid, message: userMessage, agentKey, conversationId, images, files }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
-    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images);
-    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images);
+    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images, files);
+    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images, files);
 
     const aiResponse = await runAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel);
     const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
 
-    maybeGenerateTitle(isNew, userMessage || "[图片消息]", replyText, convId, agentConfig.defaultModel);
+    maybeGenerateTitle(isNew, userMessage || "[附件消息]", replyText, convId, agentConfig.defaultModel);
 
     await AgentConversationModel.updateOne({ _id: convId }, { $inc: { messageCount: 2 } });
 
@@ -184,12 +217,13 @@ const LLMService = {
     message: userMessage,
     agentKey, conversationId,
     images,
+    files,
     onStart,
     onToken
   }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
-    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images);
+    const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images, files);
 
     // 通知前端：会话已创建/确认，可以开始接收流式数据
     onStart?.({
@@ -197,12 +231,12 @@ const LLMService = {
       modelName: agentConfig.defaultModel || "default",
     });
 
-    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images);
+    const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images, files);
 
     const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, { onToken });
     const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
 
-    maybeGenerateTitle(isNew, userMessage || "[图片消息]", replyText, convId, agentConfig.defaultModel);
+    maybeGenerateTitle(isNew, userMessage || "[附件消息]", replyText, convId, agentConfig.defaultModel);
 
     await AgentConversationModel.updateOne(
       { _id: convId },

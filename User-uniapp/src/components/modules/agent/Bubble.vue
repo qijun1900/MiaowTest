@@ -38,15 +38,29 @@
         <view class="bubble-stack" :style="{ maxWidth }">
             <slot name="header"></slot>
 
-            <view v-if="images && images.length > 0" class="bubble-images">
+            <view v-if="displayImages.length > 0" class="bubble-images">
                 <image
-                    v-for="(img, idx) in images"
+                    v-for="(img, idx) in displayImages"
                     :key="idx"
                     :src="getBubbleImageUrl(img)"
                     mode="aspectFill"
                     class="bubble-image-item"
                     @click="previewBubbleImage(idx)"
                 />
+            </view>
+
+            <view v-if="files && files.length > 0" class="bubble-files">
+                <view
+                    v-for="(file, idx) in files"
+                    :key="idx"
+                    class="bubble-file-item"
+                    @click="handleFileClick(file)"
+                >
+                    <view class="bubble-file-icon">
+                        <uni-icons type="paperclip" size="18" color="#64748b" />
+                    </view>
+                    <text class="bubble-file-name">{{ getFileName(file, idx) }}</text>
+                </view>
             </view>
 
             <view
@@ -256,6 +270,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    files: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits([
@@ -324,12 +342,37 @@ const getBubbleImageUrl = (img) => {
     return typeof img === 'object' && img.url ? img.url : img;
 };
 
+const isImageUrlLike = (img) => {
+    const url = String(getBubbleImageUrl(img) || '').toLowerCase().split('?')[0];
+    if (!url) return false;
+    return /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(url);
+};
+
+const displayImages = computed(() => (props.images || []).filter(isImageUrlLike));
+
 const previewBubbleImage = (index) => {
-    const urls = (props.images || [])
+    const urls = displayImages.value
         .map((img) => getBubbleImageUrl(img))
         .filter(Boolean);
     if (!urls.length) return;
     uni.previewImage({ urls, current: urls[index] || urls[0] });
+};
+
+const getFileName = (file, index) => {
+    if (typeof file === 'object' && file?.name) return file.name;
+    const url = typeof file === 'object' ? file?.url : file;
+    const name = String(url || '').split('?')[0].split('/').pop();
+    return name || `附件${index + 1}`;
+};
+
+const handleFileClick = (file) => {
+    const url = typeof file === 'object' ? file?.url : file;
+    if (!url) return;
+    uni.setClipboardData({
+        data: url,
+        success: () => uni.showToast({ title: '文件链接已复制', icon: 'none' ,position: 'top'}),
+        fail: () => uni.showToast({ title: '复制失败', icon: 'none' }),
+    });
 };
 
 // destroy() 不直接卸载父组件，只让内部根节点 v-if=false，符合 ref 方法”主动销毁”的语义。
@@ -749,6 +792,45 @@ function escapeHtml(value) {
     height: 180rpx;
     border-radius: 12rpx;
     background: #f0f2f5;
+}
+
+.bubble-files {
+    display: flex;
+    flex-direction: column;
+    gap: 10rpx;
+    margin-bottom: 12rpx;
+    max-width: 520rpx;
+}
+
+.bubble-file-item {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    padding: 16rpx 18rpx;
+    border-radius: 16rpx;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1rpx solid rgba(148, 163, 184, 0.22);
+}
+
+.bubble-file-icon {
+    width: 42rpx;
+    height: 42rpx;
+    border-radius: 12rpx;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bubble-file-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 26rpx;
+    color: #334155;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .bubble-no-style {

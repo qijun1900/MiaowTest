@@ -5,6 +5,7 @@ const {
 const { StringOutputParser } = require("@langchain/core/output_parsers");
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const ModelFactory = require("../../models/factory");
+const { buildAttachmentContext } = require("../../../helpers/fileParser");
 
 // Agent 对话提示词模板：系统人设 → 历史上下文 → 用户输入（纯文本模式）
 const agentPrompt = ChatPromptTemplate.fromMessages([
@@ -105,9 +106,11 @@ function buildUserContent(text, images) {
   }
   images.forEach((img) => {
     const url = typeof img === "string" ? img : img?.url;
-    if (url) {
+    if (url && /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(url)) {
       console.log("[buildUserContent] 图片URL:", url);
       parts.push({ type: "image_url", image_url: { url } });
+    } else if (url) {
+      console.warn("[buildUserContent] 跳过非图片URL:", url);
     }
   });
   if (parts.length === 0) return text || "";
@@ -127,7 +130,7 @@ function buildUserContent(text, images) {
  * @param {Array<{role: string, content: string, ext?: object}>} rawMessages
  * @returns {Promise<{ input: string|Array, history: Array<HumanMessage|AIMessage>, hasImages: boolean }>}
  */
-function parseMessages(rawMessages) {
+async function parseMessages(rawMessages) {
   let input = "";
   let hasImages = false;
   const history = [];
@@ -153,12 +156,26 @@ function parseMessages(rawMessages) {
 
     if (index === lastUserIdx) {
       const images = msg.ext?.images;
+      const files = msg.ext?.files;
+
+      // 文档附件：在 Node 端解析为文本后拼到用户消息前
+      let attachmentBlock = "";
+      if (Array.isArray(files) && files.length > 0) {
+        const ctx = await buildAttachmentContext(files);
+        attachmentBlock = ctx.block;
+        console.log("[parseMessages] 文档附件数:", files.length, "解析字符:", attachmentBlock.length);
+      }
+
+      const composedText = attachmentBlock
+        ? `${attachmentBlock}用户问题：${msg.content || "（未输入文字，请基于上述附件内容回复）"}`
+        : msg.content;
+
       if (images && images.length > 0) {
         hasImages = true;
-        input = buildUserContent(msg.content, images);
+        input = buildUserContent(composedText, images);
         console.log("[parseMessages] 多模态输入, 图片数:", images.length);
       } else {
-        input = msg.content;
+        input = composedText;
       }
       continue;
     }
@@ -215,7 +232,7 @@ async function generateConversationTitle(userMessage, aiResponse, modelName = "q
  */
 async function runAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus") {
   const model = ModelFactory.getModel(modelName, 0.7, false);
-  const { input, history, hasImages } = parseMessages(rawMessages);
+  const { input, history, hasImages } = await parseMessages(rawMessages);
 
   const { SystemMessage } = require("@langchain/core/messages");
   const sysPrompt = systemPrompt || DEFAULT_SYSTEM_PROMPT;
@@ -269,7 +286,7 @@ async function runAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus")
 async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus", options = {}) {
   console.log("[streamAgentChain] 开始, model:", modelName, "消息数:", rawMessages.length);
   const model = ModelFactory.getModel(modelName, 0.7, true);
-  const { input, history, hasImages } = parseMessages(rawMessages);
+  const { input, history, hasImages } = await parseMessages(rawMessages);
 
   const { SystemMessage } = require("@langchain/core/messages");
   const sysPrompt = systemPrompt || DEFAULT_SYSTEM_PROMPT;

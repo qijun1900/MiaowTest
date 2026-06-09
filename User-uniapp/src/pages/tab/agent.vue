@@ -62,6 +62,7 @@
                         <Bubble
                             :content="msg.content"
                             :images="msg.images || []"
+                            :files="msg.files || []"
                             :show-avatar="false"
                             :shape="msg.role === 'user' ? 'corner' : undefined"
                             :variant="msg.role === 'user' ? 'solid' : undefined"
@@ -117,7 +118,7 @@
                 placeholder="在此处输入内容..."
                 v-model="senderText"
                 v-model:thinking="thinkingMode"
-                :pending-images="pendingImages"
+                :pending-images="pendingAttachments"
                 :uploading="isUploading"
                 :show-thinking-toggle="showThinkingToggle"
                 :show-attachment="isCurrentMultimodal"
@@ -128,19 +129,14 @@
             >
                 <template #images>
                     <AgentUploader
-                        v-if="pendingImages.length > 0"
+                        ref="uploaderRef"
                         mode="editable"
-                        :images="pendingImages"
-                        @add="handleUploaderAdd"
-                        @remove="(idx) => removePendingImage(idx)"
-                        @retry="(idx) => retryImage(idx)"
-                    />
-                    <AgentAttachments
-                        ref="attachmentsRef"
-                        v-model="pendingAttachments"
-                        accept="all"
+                        :images="pendingAttachments"
                         :max-count="9"
-                        @upload-error="handleAttachmentUploadError"
+                        @remove="(idx) => removePendingAttachment(idx)"
+                        @retry="(idx) => retryAttachment(idx)"
+                        @files-chosen="handleFilesChosen"
+                        @warning="handleUploaderWarning"
                     />
                 </template>
             </AgentSender>
@@ -225,6 +221,19 @@
             @search-click="handleSearchClick"
             @filter-change="handleSidebarFilterChange"
         />
+        <!-- 删除会话确认弹窗 -->
+        <t-dialog
+            :visible="deleteDialogVisible"
+            title="删除会话"
+            content="确定要删除该会话吗？删除后不可恢复。"
+            :confirm-btn="{ content: '删除', theme: 'danger', variant: 'text' }"
+            :cancel-btn="{ content: '取消', variant: 'text' }"
+            class="simple-delete-dialog"
+            @confirm="handleConfirmDeleteConversation"
+            @cancel="deleteDialogVisible = false"
+            @close="deleteDialogVisible = false"
+        />
+
         <!-- 自定义通知条：TMessage link 在小程序不可用，改用独立 view -->
         <view v-if="toastVisible" class="note-toast" @click="handleToastClick">
             <t-icon name="check-circle-filled" size="20" color="#22c55e" />
@@ -250,7 +259,7 @@ import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import { getNotebooksAPI, saveNotebookNoteAPI } from "../../API/Tools/NotesBookAPI.js";
-import { useAgentImages } from "../../composables/useAgentImages.js";
+import { useAgentAttachments } from "../../composables/useAgentAttachments.js";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
 import { usePullToRefresh } from "../../composables/usePullToRefresh.js";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
@@ -290,6 +299,8 @@ let _toastCallback = null;
 
 // ─── 保存到笔记本 ──────────────────────────────────────────────────────────────
 const notebookPickerVisible = ref(false);
+const deleteDialogVisible = ref(false);
+const pendingDeleteConversationId = ref(null);
 const notebookLoading = ref(false);
 const notebookList = ref([]);
 const savingBookId = ref("");
@@ -299,23 +310,30 @@ const savedBookId = ref("");
 const pendingNoteContent = ref("");
 const pendingNoteUserText = ref("");
 
-// ─── 附件（t-attachments 多文件类型） ──────────────────────────────────────
-const attachmentsRef = ref(null);
-const pendingAttachments = ref([]);
-
-const handleAttachmentUploadError = ({ error }) => {
-    uni.showToast({ title: error?.message || "附件上传失败", icon: "none" });
-};
+// ─── 附件上传组件引用 ────────────────────────────────────────────────────
+const uploaderRef = ref(null);
 
 const {
-    images: pendingImages,
+    attachments: pendingAttachments,
     isUploading,
-    addImages,
-    removeImage: removePendingImage,
-    retryImage,
-    clearAll: clearPendingImages,
-    getUploadedUrls,
-} = useAgentImages({ maxCount: 9, cloudPathPrefix: "user/agent_chat", uploadFormData: { biz: "chat" } });
+    addFromChosenFiles,
+    removeAttachment: removePendingAttachment,
+    retryAttachment,
+    clearAll: clearPendingAttachments,
+    getUploadedImages,
+    getUploadedFiles,
+} = useAgentAttachments({ maxCount: 9, cloudPathPrefix: "user/agent_chat", uploadFormData: { biz: "chat" } });
+
+const handleFilesChosen = (files) => {
+    addFromChosenFiles(files);
+};
+
+const handleUploaderWarning = (err) => {
+    const msg = err?.data?.errMsg || err?.errMsg || err?.message || "选择文件失败";
+    if (!/cancel/i.test(msg)) {
+        uni.showToast({ title: msg, icon: "none" });
+    }
+};
 
 const currentIsFavorited = computed(() => {
     if (!currentConversationId.value) return false;
@@ -572,32 +590,35 @@ const handleOptionClick = (action) => {
 	        });
 	    }
 if (action === "delete") {
-	    uni.showModal({
-	        title: "删除会话",
-	        content: "确定要删除该会话吗？删除后不可恢复。",
-	        confirmText: "删除",
-	        confirmColor: "#ef4444",
-	        success: async (res) => {
-	            if (res.confirm) {
-	                try {
-	                    const targetId = currentConversationId.value;
-	                    await deleteConversation(targetId);
-	                    if (currentConversationId.value === targetId) {
-	                        currentConversationId.value = null;
-	                        currentConversationTitle.value = "";
-	                        messageList.value = [];
-	                        showWelcomePanel.value = true;
-	                    }
-	                    loadConversationList();
-	                    uni.showToast({ title: "已删除", icon: "none", position: "top" });
-	                } catch (error) {
-	                    uni.showToast({ title: "删除失败", icon: "none" });
-	                    console.error("删除会话失败:", error.message);
-	                }
-	            }
-	        },
-	    });
-	}
+        if (!currentConversationId.value) {
+            uni.showToast({ title: "请先选择一个会话", icon: "none" });
+            return;
+        }
+        pendingDeleteConversationId.value = currentConversationId.value;
+        deleteDialogVisible.value = true;
+    }
+};
+
+const handleConfirmDeleteConversation = async () => {
+    const targetId = pendingDeleteConversationId.value;
+    deleteDialogVisible.value = false;
+    if (!targetId) return;
+    try {
+        await deleteConversation(targetId);
+        if (currentConversationId.value === targetId) {
+            currentConversationId.value = null;
+            currentConversationTitle.value = "";
+            messageList.value = [];
+            showWelcomePanel.value = true;
+        }
+        loadConversationList();
+        uni.showToast({ title: "已删除", icon: "none", position: "top" });
+    } catch (error) {
+        uni.showToast({ title: "删除失败", icon: "none" });
+        console.error("删除会话失败:", error.message);
+    } finally {
+        pendingDeleteConversationId.value = null;
+    }
 };
 
 const handleToggleFavorite = async () => {
@@ -638,7 +659,7 @@ const handleNewChat = () => {
     currentConversationId.value = null;
     currentConversationTitle.value = "";
     messageList.value = [];
-    clearPendingImages();
+    clearPendingAttachments();
     showWelcomePanel.value = true;
     uni.showToast({ 
         title: "已回到新会话", 
@@ -672,6 +693,7 @@ const handleSelectChat = async (chatId) => {
                 role: msg.role,
                 content: msg.content,
                 images: msg.ext?.images || [],
+                files: msg.ext?.files || [],
                 typing: false,
                 pending: false,
                 isStreaming: false
@@ -783,7 +805,11 @@ const handleActionRegenerate = () => {
 
     // Remove the last AI message and re-submit
     messageList.value.splice(lastAIIndex.value, 1);
-    handleSenderSubmit({ text: userMsg.content, images: userMsg.images || [] });
+    handleSenderSubmit({
+        text: userMsg.content,
+        images: userMsg.images || [],
+        files: userMsg.files || [],
+    });
 };
 
 const handlePromptSelect = (prompt) => {
@@ -915,11 +941,18 @@ const handlePickNotebook = async (book) => {
 };
 
 const handleAddAttachment = () => {
-    addImages();
-};
-
-const handleUploaderAdd = (remaining) => {
-    addImages(remaining);
+    if (pendingAttachments.value.length >= 9) {
+        uni.showToast({ title: "最多上传9个附件", icon: "none" });
+        return;
+    }
+    uni.showActionSheet({
+        itemList: ["图片", "文件"],
+        success: ({ tapIndex }) => {
+            if (tapIndex === 0) uploaderRef.value?.pickImage();
+            else if (tapIndex === 1) uploaderRef.value?.pickFile();
+        },
+        fail: () => {},
+    });
 };
 
 /**
@@ -929,16 +962,18 @@ const handleUploaderAdd = (remaining) => {
  * 关键：所有对 AI 消息的读写必须通过 messageList.value[index] 访问响应式代理，
  * 不能用外部变量引用（push 前创建的对象是普通 JS 对象，不是 Vue 代理，修改不触发视图更新）。
  */
-const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
+const handleSenderSubmit = async ({ text, images: existingImages, files: existingFiles } = {}) => {
     if (!isLoggedIn.value) {
         uni.showToast({ title: "请先登录", icon: "none" });
         return;
     }
     const hasText = text && text.trim().length > 0;
-    // 重新生成时使用已有图片 URL，否则使用已上传的图片
-    const imageUrls = existingImages?.length ? existingImages : getUploadedUrls();
+    // 重新生成时使用历史消息已有的图片/文件，否则使用本轮已上传的
+    const imageUrls = existingImages?.length ? existingImages : getUploadedImages();
+    const fileItems = existingFiles?.length ? existingFiles : getUploadedFiles();
     const hasImages = imageUrls.length > 0;
-    if (!hasText && !hasImages) return;
+    const hasFiles = fileItems.length > 0;
+    if (!hasText && !hasImages && !hasFiles) return;
     if (isUploading.value) {
         uni.showToast({ 
             title: "图片正在上传中，请稍候", 
@@ -956,10 +991,11 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
         role: 'user',
         content: text || '',
         images: imageUrls,
+        files: fileItems,
         typing: false,
     });
     senderText.value = "";
-    clearPendingImages();
+    clearPendingAttachments();
     triggerVibrate();
 
     // 通过 messageList.value 访问，确保拿到的是 Vue 响应式代理
@@ -977,6 +1013,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
     scrollToMessage(userMsgId);
 
     const sendImages = hasImages ? imageUrls : undefined;
+    const sendFiles = hasFiles ? fileItems : undefined;
 
     // 流式缓冲：按行/句提交，避免每个 token 都触发 mp-html 重渲染
     let streamBuffer = '';
@@ -1004,6 +1041,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
                 agentKey: currentModelKey.value,
                 conversationId: currentConversationId.value,
                 images: sendImages,
+                files: sendFiles,
                 onStart: ({ conversationId }) => {
                     if (conversationId) currentConversationId.value = conversationId;
                 },
@@ -1033,6 +1071,7 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
                     agentKey: currentModelKey.value,
                     conversationId: currentConversationId.value,
                     images: sendImages,
+                    files: sendFiles,
                 });
                 const resData = response.data || response;
                 if (resData.conversationId) currentConversationId.value = resData.conversationId;
@@ -1287,6 +1326,14 @@ const handleSenderSubmit = async ({ text, images: existingImages } = {}) => {
 @keyframes cursor-blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+}
+
+/* ── 删除会话 简约白色弹窗 ─────────────────────────────────────── */
+.simple-delete-dialog {
+    --td-dialog-border-radius: 24rpx;
+    --td-dialog-title-color: #1f2328;
+    --td-dialog-content-color: #6b7280;
+    --td-dialog-width: 600rpx;
 }
 
 /* ── 保存到笔记本 弹窗 ─────────────────────────────────────────── */

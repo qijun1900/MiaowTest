@@ -38,13 +38,13 @@ const LLMController = {
   Chat: async (req, res) => {
     try {
       const uid = extractUid(req);
-      const { message, agentKey, conversationId, images } = req.body;
+      const { message, agentKey, conversationId, images, files } = req.body;
 
-      if ((!message && (!images || !images.length)) || !agentKey) {
+      if ((!message && (!images || !images.length) && (!files || !files.length)) || !agentKey) {
         return res.status(400).send({ success: false, error: "缺少必要参数" });
       }
 
-      const response = await LLMService.ChatWithAgentAndSave({ uid, message, agentKey, conversationId, images });
+      const response = await LLMService.ChatWithAgentAndSave({ uid, message, agentKey, conversationId, images, files });
       res.status(200).send({ success: true, data: response });
     } catch (error) {
       console.error("LLMController.Chat 错误:", error.message);
@@ -61,9 +61,9 @@ const LLMController = {
 
     try {
       const uid = extractUid(req);
-      const { message, agentKey, conversationId, images } = req.body;
+      const { message, agentKey, conversationId, images, files } = req.body;
 
-      if ((!message && (!images || !images.length)) || !agentKey) {
+      if ((!message && (!images || !images.length) && (!files || !files.length)) || !agentKey) {
         return res.status(400).send({ success: false, error: "缺少必要参数" });
       }
 
@@ -76,6 +76,7 @@ const LLMController = {
         agentKey,
         conversationId,
         images,
+        files,
         onStart: (payload) => sendEvent("start", payload),
         onToken: (content) => sendEvent("message", { content }),
       });
