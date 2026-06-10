@@ -147,7 +147,14 @@ async function parseMessages(rawMessages) {
   console.log("[parseMessages] 消息数:", rawMessages.length, "lastUserIdx:", lastUserIdx);
   if (lastUserIdx >= 0) {
     const lastMsg = rawMessages[lastUserIdx];
-    console.log("[parseMessages] 最后用户消息 ext:", JSON.stringify(lastMsg.ext || {}));
+    // 仅打印附件元信息（文件名/图片数），避免把完整 parsedBlock 文档正文输出到日志
+    const ext = lastMsg.ext || {};
+    const summary = {
+      images: Array.isArray(ext.images) ? ext.images.length : 0,
+      files: Array.isArray(ext.files) ? ext.files.map((f) => f?.name || f?.url || "").filter(Boolean) : [],
+      parsedBlockChars: ext.parsedBlock ? ext.parsedBlock.length : 0,
+    };
+    console.log("[parseMessages] 最后用户消息 ext 摘要:", JSON.stringify(summary));
   }
 
   for (let index = 0; index < rawMessages.length; index++) {
