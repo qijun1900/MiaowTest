@@ -1,7 +1,8 @@
 const AgentDefinitionModel = require("../../models/AgentDefinitionModel");
 const AgentConversationModel = require("../../models/AgentConversationModel");
 const AgentMessageModel = require("../../models/AgentMessageModel");
-const { runAgentChain, streamAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat")/** 每次送入 LLM 的历史消息上限，防止上下文过长 */
+const { runAgentChain, streamAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat");
+const { buildAttachmentContext } = require("../../helpers/fileParser")/** 每次送入 LLM 的历史消息上限，防止上下文过长 */
 const HISTORY_MESSAGE_LIMIT = 20;
 
 function isImageUrl(url) {
@@ -102,6 +103,17 @@ async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig
       ext.files = fileItems;
       if (!userMsgDoc.contentType) userMsgDoc.contentType = "text";
       console.log("[saveUserMessage] 存储文件消息, 文件数:", fileItems.length);
+
+      // 落库时一次性解析,后续历史轮直接读 ext.parsedBlock,不重复下载
+      try {
+        const ctx = await buildAttachmentContext(fileItems);
+        if (ctx.block) {
+          ext.parsedBlock = ctx.block;
+          console.log("[saveUserMessage] 文档已解析并缓存, 字符数:", ctx.block.length);
+        }
+      } catch (err) {
+        console.warn("[saveUserMessage] 文档解析失败,跳过缓存:", err.message);
+      }
     }
   }
   if (Object.keys(ext).length > 0) {
@@ -117,6 +129,7 @@ async function saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig
     .limit(HISTORY_MESSAGE_LIMIT);
 
   // 恢复正序（从旧到新），保证 LLM 上下文顺序正确
+  // ext 透传 parsedBlock，让历史轮的文档解析结果也能进入 LLM 上下文
   const messages = historyDocs.reverse().map((doc) => ({
     role: doc.role,
     content: doc.content,

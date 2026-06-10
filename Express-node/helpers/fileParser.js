@@ -10,8 +10,15 @@
 
 const path = require("path");
 
-const PER_FILE_CHAR_LIMIT = 12000; // 单文件最多取多少字符（≈ 6k token）
-const TOTAL_CHAR_LIMIT = 30000;    // 单轮所有附件合计字符上限
+/**
+ * 字符上限说明（针对 qwen-plus/max 128k context 调优）：
+ *  · 中文 1 字 ≈ 1 token，英文 4 字 ≈ 1 token，按中文最坏估算
+ *  · 留出系统提示 + 历史消息 + 输出空间约 30k tokens
+ *  · 单文件 80k 字符 ≈ 60k tokens，单轮合计 100k 字符 ≈ 80k tokens
+ *  · 支持通过环境变量覆盖，便于按模型调整
+ */
+const PER_FILE_CHAR_LIMIT = Number(process.env.LLM_FILE_CHAR_LIMIT) || 80000;
+const TOTAL_CHAR_LIMIT = Number(process.env.LLM_TOTAL_CHAR_LIMIT) || 100000;
 
 /** 根据 URL/文件名推断文件类型 */
 function inferFileExt(input) {
@@ -20,14 +27,49 @@ function inferFileExt(input) {
   return ext || "";
 }
 
-/** 拉取远程文件为 Buffer */
+const FETCH_TIMEOUT_MS = Number(process.env.LLM_FILE_FETCH_TIMEOUT) || 30000;
+const MAX_DOWNLOAD_BYTES = Number(process.env.LLM_FILE_MAX_BYTES) || 50 * 1024 * 1024; // 50 MB
+
+/** 拉取远程文件为 Buffer，带超时和大小保护 */
 async function fetchBuffer(url) {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`下载文件失败 status=${res.status}`);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) {
+      throw new Error(`下载文件失败 status=${res.status}`);
+    }
+    const contentLength = Number(res.headers.get("content-length") || 0);
+    if (contentLength && contentLength > MAX_DOWNLOAD_BYTES) {
+      throw new Error(`文件过大 ${(contentLength / 1024 / 1024).toFixed(1)}MB，超过 ${MAX_DOWNLOAD_BYTES / 1024 / 1024}MB 上限`);
+    }
+    const arrBuf = await res.arrayBuffer();
+    if (arrBuf.byteLength > MAX_DOWNLOAD_BYTES) {
+      throw new Error(`文件过大 ${(arrBuf.byteLength / 1024 / 1024).toFixed(1)}MB，超过上限`);
+    }
+    return Buffer.from(arrBuf);
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error(`下载文件超时（${FETCH_TIMEOUT_MS / 1000}s）`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
   }
-  const arrBuf = await res.arrayBuffer();
-  return Buffer.from(arrBuf);
+}
+
+/**
+ * 文本规范化：压缩多余空白行和重复空格，节省 token 占用。
+ * PDF/DOCX 提取出来常带大量空行，能压掉 20%~40% 字符。
+ */
+function normalizeText(text) {
+  if (!text) return "";
+  return String(text)
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")     // 行尾空白
+    .replace(/\n{3,}/g, "\n\n")     // 连续空行压成 1 个
+    .replace(/[ \t]{2,}/g, " ")     // 多空格压成 1 个
+    .trim();
 }
 
 /** 文本截断（保留头部，超长在末尾追加省略提示） */
@@ -37,12 +79,36 @@ function truncate(text, limit = PER_FILE_CHAR_LIMIT) {
   return text.slice(0, limit) + `\n\n[...文件过长，已截断，剩余 ${text.length - limit} 字符未展示]`;
 }
 
+const TEXT_PARSER = async (buf) => buf.toString("utf8");
+
 const PARSERS = {
-  txt: async (buf) => buf.toString("utf8"),
-  md: async (buf) => buf.toString("utf8"),
-  log: async (buf) => buf.toString("utf8"),
-  json: async (buf) => buf.toString("utf8"),
-  csv: async (buf) => buf.toString("utf8"),
+  txt: TEXT_PARSER,
+  md: TEXT_PARSER,
+  markdown: TEXT_PARSER,
+  log: TEXT_PARSER,
+  json: TEXT_PARSER,
+  csv: TEXT_PARSER,
+  tsv: TEXT_PARSER,
+  xml: TEXT_PARSER,
+  html: TEXT_PARSER,
+  htm: TEXT_PARSER,
+  yaml: TEXT_PARSER,
+  yml: TEXT_PARSER,
+  ini: TEXT_PARSER,
+  conf: TEXT_PARSER,
+  js: TEXT_PARSER,
+  ts: TEXT_PARSER,
+  jsx: TEXT_PARSER,
+  tsx: TEXT_PARSER,
+  py: TEXT_PARSER,
+  java: TEXT_PARSER,
+  go: TEXT_PARSER,
+  rs: TEXT_PARSER,
+  c: TEXT_PARSER,
+  cpp: TEXT_PARSER,
+  h: TEXT_PARSER,
+  sql: TEXT_PARSER,
+  sh: TEXT_PARSER,
   docx: async (buf) => {
     const mammoth = require("mammoth");
     const result = await mammoth.extractRawText({ buffer: buf });
@@ -62,6 +128,17 @@ const PARSERS = {
     }
     throw new Error("pdf-parse 模块导出格式不支持");
   },
+  xlsx: async (buf) => {
+    const XLSX = require("xlsx");
+    const wb = XLSX.read(buf, { type: "buffer" });
+    const parts = [];
+    for (const sheetName of wb.SheetNames) {
+      const csv = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]);
+      if (csv && csv.trim()) parts.push(`## Sheet: ${sheetName}\n${csv}`);
+    }
+    return parts.join("\n\n");
+  },
+  xls: async (buf) => PARSERS.xlsx(buf),
 };
 
 /**
@@ -83,7 +160,9 @@ async function parseOneFile(fileLike) {
   try {
     const buf = await fetchBuffer(url);
     const raw = await parser(buf);
-    const text = truncate(String(raw || "").trim());
+    const normalized = normalizeText(raw);
+    const text = truncate(normalized);
+    console.log(`[fileParser] ${name} 原始 ${String(raw || "").length} → 规范化 ${normalized.length} → 截断 ${text.length}`);
     return { name, ext, text };
   } catch (err) {
     console.warn(`[fileParser] 解析失败 ${name}:`, err.message);

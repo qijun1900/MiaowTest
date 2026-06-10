@@ -158,12 +158,12 @@ async function parseMessages(rawMessages) {
       const images = msg.ext?.images;
       const files = msg.ext?.files;
 
-      // 文档附件：在 Node 端解析为文本后拼到用户消息前
-      let attachmentBlock = "";
-      if (Array.isArray(files) && files.length > 0) {
+      // 文档附件：优先使用落库时缓存的 parsedBlock，缺失时回落到实时解析
+      let attachmentBlock = msg.ext?.parsedBlock || "";
+      if (!attachmentBlock && Array.isArray(files) && files.length > 0) {
         const ctx = await buildAttachmentContext(files);
         attachmentBlock = ctx.block;
-        console.log("[parseMessages] 文档附件数:", files.length, "解析字符:", attachmentBlock.length);
+        console.log("[parseMessages] 当前轮实时解析附件数:", files.length, "字符:", attachmentBlock.length);
       }
 
       const composedText = attachmentBlock
@@ -183,11 +183,16 @@ async function parseMessages(rawMessages) {
     if (msg.role === "user") {
       // 历史消息中的图片也使用多模态格式
       const histImages = msg.ext?.images;
+      const histParsedBlock = msg.ext?.parsedBlock || "";
+      const histText = histParsedBlock
+        ? `${histParsedBlock}用户问题：${msg.content || "（未输入文字）"}`
+        : msg.content;
+
       if (histImages && histImages.length > 0) {
         hasImages = true;
-        history.push(new HumanMessage({ content: buildUserContent(msg.content, histImages) }));
+        history.push(new HumanMessage({ content: buildUserContent(histText, histImages) }));
       } else {
-        history.push(new HumanMessage(msg.content));
+        history.push(new HumanMessage(histText));
       }
     } else {
       history.push(new AIMessage(msg.content || "正在思考中..."));
