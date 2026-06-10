@@ -121,7 +121,7 @@
                 :pending-images="pendingAttachments"
                 :uploading="isUploading"
                 :show-thinking-toggle="showThinkingToggle"
-                :show-attachment="isCurrentMultimodal"
+                :show-attachment="true"
                 @add-attachment="handleAddAttachment"
                 @submit="handleSenderSubmit"
                 @focus="handleSenderFocus"
@@ -234,6 +234,31 @@
             @close="deleteDialogVisible = false"
         />
 
+        <!-- 重命名会话弹窗 -->
+        <t-dialog
+            :visible="renameDialogVisible"
+            title="重命名会话"
+            :confirm-btn="{ content: '确定', variant: 'text' }"
+            :cancel-btn="{ content: '取消', variant: 'text' }"
+            destroy-on-close
+            class="simple-rename-dialog"
+            @confirm="handleConfirmRename"
+            @cancel="renameDialogVisible = false"
+            @close="renameDialogVisible = false"
+        >
+            <template #content>
+                <view class="rename-input-wrap">
+                    <t-input
+                        v-model:value="renameInputValue"
+                        placeholder="请输入新标题"
+                        :clearable="true"
+                        :autofocus="renameDialogVisible"
+                        borderless
+                    />
+                </view>
+            </template>
+        </t-dialog>
+
         <!-- 自定义通知条：TMessage link 在小程序不可用，改用独立 view -->
         <view v-if="toastVisible" class="note-toast" @click="handleToastClick">
             <t-icon name="check-circle-filled" size="20" color="#22c55e" />
@@ -301,6 +326,8 @@ let _toastCallback = null;
 const notebookPickerVisible = ref(false);
 const deleteDialogVisible = ref(false);
 const pendingDeleteConversationId = ref(null);
+const renameDialogVisible = ref(false);
+const renameInputValue = ref("");
 const notebookLoading = ref(false);
 const notebookList = ref([]);
 const savingBookId = ref("");
@@ -566,29 +593,10 @@ const handleOptionClick = (action) => {
         return;
     }
     if (action === "rename") {
-	        uni.showModal({
-	            title: "重命名会话",
-	            editable: true,
-	            placeholderText: currentConversationTitle.value || "请输入新标题",
-	            success: async (res) => {
-	                if (res.confirm && res.content) {
-	                    try {
-	                        await renameConversation(currentConversationId.value, res.content);
-	                        currentConversationTitle.value = res.content;
-	                        loadConversationList();
-	                        uni.showToast({ 
-                                title: "重命名成功", 
-                                icon: "none",
-                                position: "top"
-                            });
-	                    } catch (error) {
-	                        uni.showToast({ title: "重命名失败", icon: "none" });
-                            console.error("重命名会话失败:", error.message);
-	                    }
-	                }
-	            },
-	        });
-	    }
+        renameInputValue.value = currentConversationTitle.value || "";
+        renameDialogVisible.value = true;
+        return;
+    }
 if (action === "delete") {
         if (!currentConversationId.value) {
             uni.showToast({ title: "请先选择一个会话", icon: "none" });
@@ -621,6 +629,24 @@ const handleConfirmDeleteConversation = async () => {
     }
 };
 
+const handleConfirmRename = async () => {
+    const newTitle = renameInputValue.value.trim();
+    if (!newTitle) {
+        uni.showToast({ title: "标题不能为空", icon: "none" });
+        return;
+    }
+    renameDialogVisible.value = false;
+    try {
+        await renameConversation(currentConversationId.value, newTitle);
+        currentConversationTitle.value = newTitle;
+        loadConversationList();
+        uni.showToast({ title: "重命名成功", icon: "none", position: "top" });
+    } catch (error) {
+        uni.showToast({ title: "重命名失败", icon: "none" });
+        console.error("重命名会话失败:", error.message);
+    }
+};
+
 const handleToggleFavorite = async () => {
     if (!currentConversationId.value) {
         uni.showToast({ title: "请先选择一个会话", icon: "none" });
@@ -648,8 +674,21 @@ const handleModelChange = (modelName, modelKey) => {
     if (!modelName) return;
     currentModelName.value = modelName;
     currentModelKey.value = modelKey;
-    uni.showToast({ 
-        title: `切换到 ${modelName}`, 
+
+    // 切换到非多模态模型时，移除已选的图片附件（保留文档）
+    if (!isCurrentMultimodal.value && pendingAttachments.value.length > 0) {
+        const imgUrls = new Set(getUploadedImages());
+        for (let i = pendingAttachments.value.length - 1; i >= 0; i--) {
+            const a = pendingAttachments.value[i];
+            const looksLikeImage = a.fileType === "image"
+                || String(a.mimeType || "").startsWith("image/")
+                || imgUrls.has(a.url);
+            if (looksLikeImage) removePendingAttachment(i);
+        }
+    }
+
+    uni.showToast({
+        title: `切换到 ${modelName}`,
         icon: "none" ,
         position: "top",
     });
@@ -943,6 +982,11 @@ const handlePickNotebook = async (book) => {
 const handleAddAttachment = () => {
     if (pendingAttachments.value.length >= 9) {
         uni.showToast({ title: "最多上传9个附件", icon: "none" });
+        return;
+    }
+    // 非多模态模型：禁用图片上传，直接打开文件选择器
+    if (!isCurrentMultimodal.value) {
+        uploaderRef.value?.pickFile();
         return;
     }
     uni.showActionSheet({
@@ -1334,6 +1378,31 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     --td-dialog-title-color: #1f2328;
     --td-dialog-content-color: #6b7280;
     --td-dialog-width: 600rpx;
+}
+
+/* ── 重命名弹窗 ────────────────────────────────────────────────── */
+.simple-rename-dialog {
+    --td-dialog-border-radius: 24rpx;
+    --td-dialog-title-color: #1f2328;
+    --td-dialog-content-color: #6b7280;
+    --td-dialog-width: 600rpx;
+}
+
+.rename-input-wrap {
+    margin-top: 16rpx;
+    background: #f6f7f9;
+    border-radius: 16rpx;
+    overflow: hidden;
+    border: 1.5rpx solid rgba(15, 23, 42, 0.07);
+}
+
+.rename-input-wrap :deep(.t-input) {
+    background: transparent;
+    padding: 4rpx 8rpx;
+}
+
+.rename-input-wrap :deep(.t-input__wrap) {
+    background: transparent;
 }
 
 /* ── 保存到笔记本 弹窗 ─────────────────────────────────────────── */
