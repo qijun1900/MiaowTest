@@ -53,13 +53,15 @@
                 <view
                     v-for="(file, idx) in files"
                     :key="idx"
-                    class="bubble-file-item"
-                    @click="handleFileClick(file)"
+                    class="bubble-file-card"
                 >
-                    <view class="bubble-file-icon">
-                        <uni-icons type="paperclip" size="18" color="#64748b" />
+                    <view class="bubble-file-icon-wrap" :style="{ background: getFileMeta(file, idx).bg }">
+                        <t-icon :name="getFileMeta(file, idx).icon" size="22" :color="getFileMeta(file, idx).color" />
                     </view>
-                    <text class="bubble-file-name">{{ getFileName(file, idx) }}</text>
+                    <view class="bubble-file-info">
+                        <text class="bubble-file-name">{{ getFileName(file, idx) }}</text>
+                        <text class="bubble-file-ext">{{ getFileMeta(file, idx).label }}</text>
+                    </view>
                 </view>
             </view>
 
@@ -365,14 +367,29 @@ const getFileName = (file, index) => {
     return name || `附件${index + 1}`;
 };
 
-const handleFileClick = (file) => {
-    const url = typeof file === 'object' ? file?.url : file;
-    if (!url) return;
-    uni.setClipboardData({
-        data: url,
-        success: () => uni.showToast({ title: '文件链接已复制', icon: 'none' ,position: 'top'}),
-        fail: () => uni.showToast({ title: '复制失败', icon: 'none' }),
-    });
+const FILE_TYPE_MAP = {
+    image: { icon: 'file-image',      color: '#10b981', bg: '#ecfdf5', label: '图片' },
+    video: { icon: 'file-1',          color: '#8b5cf6', bg: '#f5f3ff', label: '视频' },
+    pdf:   { icon: 'file-pdf',        color: '#ef4444', bg: '#fef2f2', label: 'PDF'  },
+    doc:   { icon: 'file-word',       color: '#2563eb', bg: '#eff6ff', label: 'Word' },
+    ppt:   { icon: 'file-powerpoint', color: '#f97316', bg: '#fff7ed', label: 'PPT'  },
+    excel: { icon: 'file-excel',      color: '#16a34a', bg: '#f0fdf4', label: 'Excel'},
+    md:    { icon: 'file-markdown',   color: '#475569', bg: '#f1f5f9', label: 'MD'   },
+    txt:   { icon: 'file-1',          color: '#64748b', bg: '#f8fafc', label: '文本' },
+    file:  { icon: 'file-attachment', color: '#64748b', bg: '#f1f5f9', label: '文件' },
+};
+
+const getFileMeta = (file, idx) => {
+    const name = getFileName(file, idx).toLowerCase().split('?')[0];
+    if (/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/.test(name)) return FILE_TYPE_MAP.image;
+    if (/\.(mp4|mov|avi|m4v|webm)$/.test(name))          return FILE_TYPE_MAP.video;
+    if (/\.pdf$/.test(name))                              return FILE_TYPE_MAP.pdf;
+    if (/\.(doc|docx)$/.test(name))                       return FILE_TYPE_MAP.doc;
+    if (/\.(ppt|pptx)$/.test(name))                       return FILE_TYPE_MAP.ppt;
+    if (/\.(xls|xlsx|csv)$/.test(name))                   return FILE_TYPE_MAP.excel;
+    if (/\.md$/.test(name))                               return FILE_TYPE_MAP.md;
+    if (/\.(txt|log)$/.test(name))                        return FILE_TYPE_MAP.txt;
+    return FILE_TYPE_MAP.file;
 };
 
 // destroy() 不直接卸载父组件，只让内部根节点 v-if=false，符合 ref 方法”主动销毁”的语义。
@@ -797,40 +814,51 @@ function escapeHtml(value) {
 .bubble-files {
     display: flex;
     flex-direction: column;
-    gap: 10rpx;
+    gap: 12rpx;
     margin-bottom: 12rpx;
-    max-width: 520rpx;
+    max-width: 560rpx;
 }
 
-.bubble-file-item {
+.bubble-file-card {
     display: flex;
     align-items: center;
-    gap: 12rpx;
-    padding: 16rpx 18rpx;
-    border-radius: 16rpx;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1rpx solid rgba(148, 163, 184, 0.22);
+    gap: 18rpx;
+    padding: 18rpx 20rpx;
+    border-radius: 18rpx;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1rpx solid rgba(148, 163, 184, 0.16);
 }
 
-.bubble-file-icon {
-    width: 42rpx;
-    height: 42rpx;
-    border-radius: 12rpx;
-    background: #f1f5f9;
+.bubble-file-icon-wrap {
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 16rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.bubble-file-name {
+.bubble-file-info {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+}
+
+.bubble-file-name {
     font-size: 26rpx;
-    color: #334155;
+    color: #1f2328;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.bubble-file-ext {
+    font-size: 22rpx;
+    color: #94a3b8;
 }
 
 .bubble-no-style {
