@@ -5,7 +5,7 @@
         :placement="props.mode === 'bottom' ? 'bottom' : props.mode === 'top' ? 'top' : 'center'"
         :close-on-overlay-click="closeOnClickOverlay"
         :show-overlay="overlay"
-        :z-index="9999"
+        :z-index="11500"
         :close-btn="closeable"
     >
         <view class="answer-sheet-popup" :style="bgColor ? { backgroundColor: bgColor } : {}">

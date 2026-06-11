@@ -130,7 +130,7 @@
             :closeable="false"
             v-model:show="popupShow"
             :title="(isEditing ? '编辑' : '新建') + selectedDate + '-TODO'"
-            :overlay="false"
+            :overlay="true"
         >
             <template #popupcontent>
                 <view class="popup-container">

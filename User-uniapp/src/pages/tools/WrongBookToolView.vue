@@ -123,7 +123,7 @@
             v-model:show="popupShow"
             title="创建错题本"
             :closeable="true"
-            :overlay="false"
+            :overlay="true"
             @close="handleClosePopup"
         >
             <template #popupcontent>

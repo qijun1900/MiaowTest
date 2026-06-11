@@ -106,7 +106,7 @@
             v-model:show="popupShow"
             title="创建笔记本"
             :closeable="true"
-            :overlay="false"
+            :overlay="true"
             @close="handleClosePopup"
         >
             <template #popupcontent>
