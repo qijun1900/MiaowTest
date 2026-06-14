@@ -130,7 +130,7 @@
                             </view>
                         </view>
                         <view class="arrow-container">
-                            <uni-icons type="forward" size="16" color="#409EFF">
+                            <uni-icons type="forward" size="16" color="var(--app-brand)">
                             </uni-icons>
                         </view>
                     </view>
@@ -190,7 +190,7 @@
                             </view>
                         </view>
                         <view class="arrow-container">
-                            <uni-icons type="forward" size="16" color="#409EFF">
+                            <uni-icons type="forward" size="16" color="var(--app-brand)">
                             </uni-icons>
                         </view>
                     </view>
@@ -597,14 +597,14 @@ const handleAuth = () => {
 }
 
 .subject-type-item {
-    background: linear-gradient(to right, #ffffff, #f0f6ff);
+    background: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 26rpx 24rpx;
-    box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.08);
+    box-shadow: var(--app-shadow-card);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-left: 5rpx solid #007bff;
+    border-left: 5rpx solid var(--app-brand);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -612,7 +612,7 @@ const handleAuth = () => {
 
 .subject-type-item:active {
     transform: scale(0.98);
-    box-shadow: 0 2rpx 6rpx rgba(0, 122, 255, 0.12);
+    box-shadow: var(--app-shadow-card);
 }
 
 .subject-type-item::before {
@@ -624,9 +624,10 @@ const handleAuth = () => {
     height: 100%;
     background: radial-gradient(
         circle at top right,
-        rgba(0, 122, 255, 0.05),
+        var(--app-brand-light),
         transparent 70%
     );
+    opacity: 0.5;
     z-index: 0;
 }
 

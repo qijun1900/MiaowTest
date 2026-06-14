@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 练习信息 -->
         <view class="info-section">
@@ -53,12 +54,14 @@
             />
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";
 import { onLoad } from "@dcloudio/uni-app";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue";
 
 const QuestionStore = useQuestionStore();
