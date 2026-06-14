@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="view">
         <view class="container">
             <view class="head">
@@ -125,6 +126,7 @@
             </view>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -133,6 +135,7 @@ import { ref } from "vue";
 import formatTime from "../../util/formatTime";
 import { getExamTitleNetUrlAPI } from "../../API/Exam/ExamAPI";
 import copy from "../../util/copy";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 
 const title = ref("");
 const titleid = ref(null);
@@ -212,7 +215,7 @@ const copyLink = async () => {
 <style scoped>
 .view {
     min-height: 100vh;
-    background-color: #f5f7fa;
+    background-color: var(--app-bg-secondary);
     padding: 20rpx;
 }
 
@@ -229,11 +232,11 @@ const copyLink = async () => {
 .head-title {
     font-size: 36rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .platform-name {
-    color: #007aff;
+    color: var(--app-brand);
     font-weight: bold;
     margin-left: 2rpx;
     margin-right: 5rpx;
@@ -244,7 +247,7 @@ const copyLink = async () => {
 }
 
 .content-card {
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 40rpx;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
@@ -261,13 +264,13 @@ const copyLink = async () => {
 }
 
 .label {
-    color: #666;
+    color: var(--app-text-secondary);
     width: 160rpx;
     flex-shrink: 0;
 }
 
 .value {
-    color: #333;
+    color: var(--app-text-primary);
     flex: 1;
     word-break: break-all;
 }
@@ -304,8 +307,8 @@ const copyLink = async () => {
 }
 
 .primary {
-    background-color: #007aff;
-    color: #fff;
+    background-color: var(--app-brand);
+    color: var(--app-bg-container);
 }
 
 .primary:active {
@@ -357,9 +360,9 @@ const copyLink = async () => {
 }
 
 .secondary {
-    background-color: #fff;
-    color: #007aff;
-    border: 2rpx solid #007aff;
+    background-color: var(--app-bg-container);
+    color: var(--app-brand);
+    border: 2rpx solid var(--app-brand);
 }
 
 .footer {
@@ -367,7 +370,7 @@ const copyLink = async () => {
 }
 
 .tips {
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 30rpx;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
@@ -386,12 +389,12 @@ const copyLink = async () => {
 
 .tip-text {
     margin-left: 16rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     line-height: 1.5;
 }
 
 .tip-text.success {
-    color: #4caf50;
+    color: var(--app-success);
 }
 
 /* 响应式调整 */

@@ -38,7 +38,7 @@
 
         <!-- 加载状态 -->
         <view class="loading-container" v-if="isLoading">
-            <t-loading theme="spinner" size="40rpx" style="color: #007aff">
+            <t-loading theme="spinner" size="40rpx" style="color: var(--app-brand)">
             </t-loading>
             <text class="loading-text">正在加载错题...</text>
         </view>
@@ -580,7 +580,7 @@ onPageScroll((e) => {
 <style scoped lang="scss">
 .wrong-question-container {
     padding: 20rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     min-height: 100vh;
 }
 
@@ -591,7 +591,7 @@ onPageScroll((e) => {
 
 .stats-card {
     display: flex;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 30rpx;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
@@ -611,25 +611,25 @@ onPageScroll((e) => {
         top: 20%;
         height: 60%;
         width: 1rpx;
-        background-color: #e9ecef;
+        background-color: var(--app-border);
     }
 }
 
 .stats-number {
     font-size: 48rpx;
     font-weight: bold;
-    color: #007aff;
+    color: var(--app-brand);
     margin-bottom: 10rpx;
 }
 
 .stats-label {
     font-size: 26rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
 }
 
 /* 筛选区域 */
 .filter-section {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 30rpx;
     margin-bottom: 30rpx;
@@ -644,7 +644,7 @@ onPageScroll((e) => {
 
 .filter-label {
     font-size: 28rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 500;
 }
 
@@ -660,12 +660,12 @@ onPageScroll((e) => {
 .loading-text {
     margin-top: 20rpx;
     font-size: 28rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 /* 题目卡片 */
 .question-card {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     margin-bottom: 30rpx;
     overflow: hidden;
@@ -677,7 +677,7 @@ onPageScroll((e) => {
     justify-content: space-between;
     align-items: center;
     padding: 30rpx;
-    border-bottom: 1rpx solid #f0f0f0;
+    border-bottom: 1rpx solid var(--app-bg-secondary);
 }
 
 .question-info {
@@ -689,12 +689,12 @@ onPageScroll((e) => {
 .question-index {
     font-size: 28rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 .question-type {
-    background-color: #007aff;
-    color: #ffffff;
+    background-color: var(--app-brand);
+    color: var(--app-bg-container);
     padding: 6rpx 16rpx;
     border-radius: 20rpx;
     font-size: 22rpx;
@@ -712,7 +712,7 @@ onPageScroll((e) => {
 
 .question-stem {
     font-size: 32rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.6;
     margin-bottom: 30rpx;
@@ -736,7 +736,7 @@ onPageScroll((e) => {
 .title-text {
     font-size: 28rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 /* 填空题答案样式 */
@@ -745,14 +745,14 @@ onPageScroll((e) => {
     align-items: flex-start;
     margin-bottom: 15rpx;
     padding: 20rpx 10rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
 }
 
 .blank-index {
     font-size: 26rpx;
     font-weight: bold;
-    color: #007aff;
+    color: var(--app-brand);
     min-width: 80rpx;
     margin-right: 15rpx;
 }
@@ -760,7 +760,7 @@ onPageScroll((e) => {
 .blank-answer {
     flex: 1;
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.6;
     word-break: break-all;
 }
@@ -769,13 +769,13 @@ onPageScroll((e) => {
 .essay-answer-item {
     margin-bottom: 15rpx;
     padding: 25rpx 10rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
 }
 
 .essay-answer {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.8;
     word-break: break-all;
     white-space: pre-wrap;
@@ -795,7 +795,7 @@ onPageScroll((e) => {
 .answer-label {
     font-size: 28rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-bottom: 15rpx;
     display: block;
 }
@@ -804,27 +804,27 @@ onPageScroll((e) => {
     border-radius: 12rpx;
     padding: 20rpx 5rpx;
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.6;
 
     &.error-answer {
-        background-color: #ffeaea;
+        background-color: var(--app-danger-light);
         border: 1rpx solid #ffcdd2;
-        color: #d32f2f;
+        color: var(--app-danger);
         font-weight: 500;
     }
 
     &.correct-answer {
-        background-color: #e8f5e9;
+        background-color: var(--app-success-light);
         border: 1rpx solid #c8e6c9;
-        color: #2e7d32;
+        color: var(--app-success);
         font-weight: 500;
     }
 }
 
 .answer-item {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.6;
     margin-bottom: 10rpx;
 
@@ -840,7 +840,7 @@ onPageScroll((e) => {
 
 /* 解析区域 */
 .analysis-section {
-    border-top: 1rpx solid #f0f0f0;
+    border-top: 1rpx solid var(--app-bg-secondary);
     padding-top: 30rpx;
 }
 
@@ -854,31 +854,31 @@ onPageScroll((e) => {
 .analysis-label {
     font-size: 28rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 .analysis-content {
     font-size: 28rpx;
-    color: #555555;
+    color: var(--app-text-secondary);
     line-height: 1.7;
     margin-bottom: 15rpx;
 }
 
 .markdown-content {
     font-size: 28rpx;
-    color: #555555;
+    color: var(--app-text-secondary);
     line-height: 1.7;
     white-space: pre-wrap;
     word-break: break-all;
 }
 
 .no-analysis {
-    color: #999999;
+    color: var(--app-text-secondary);
     font-style: italic;
 }
 
 .no-answer {
-    color: #999999;
+    color: var(--app-text-secondary);
     font-style: italic;
     font-size: 28rpx;
 }
@@ -916,13 +916,13 @@ onPageScroll((e) => {
 .empty-title {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-bottom: 15rpx;
 }
 
 .empty-description {
     font-size: 28rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     line-height: 1.5;
 }
 </style>

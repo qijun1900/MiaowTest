@@ -129,7 +129,7 @@ const handleStart = () => {
 <style scoped>
 .container {
     padding: 24rpx;
-    background-color: #f5f9ff;
+    background-color: var(--app-brand-light);
     min-height: 100vh;
 }
 
@@ -137,13 +137,13 @@ const handleStart = () => {
     display: block;
     font-size: 28rpx;
     font-weight: 600;
-    color: #999;
+    color: var(--app-text-secondary);
     padding: 0 8rpx 16rpx;
 }
 
 .info-card,
 .settings-card {
-    background: #fff;
+    background: var(--app-bg-container);
     border-radius: 12rpx;
     padding: 8rpx 24rpx;
     box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
@@ -158,7 +158,7 @@ const handleStart = () => {
     align-items: center;
     justify-content: space-between;
     padding: 28rpx 0;
-    border-bottom: 1rpx solid #f0f0f0;
+    border-bottom: 1rpx solid var(--app-bg-secondary);
 }
 
 .info-item.last {
@@ -167,13 +167,13 @@ const handleStart = () => {
 
 .info-label {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     flex-shrink: 0;
 }
 
 .info-value {
     font-size: 30rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     text-align: right;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -183,7 +183,7 @@ const handleStart = () => {
 
 .amount-text {
     font-weight: 600;
-    color: #3c9cff;
+    color: var(--app-brand);
 }
 
 .settings-section {

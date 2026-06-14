@@ -18,28 +18,6 @@
       </view>
     </view>
 
-    <view class="palette-bar">
-      <view class="palette-list">
-        <view
-          v-for="palette in paletteOptions"
-          :key="palette.key"
-          class="palette-item"
-          :class="{ 'palette-item-active': selectedPalette === palette.key }"
-          @click="selectedPalette = palette.key"
-        >
-          <view class="palette-preview">
-            <view
-              v-for="(color, colorIndex) in palette.colors"
-              :key="`${palette.key}_${colorIndex}`"
-              class="palette-dot"
-              :style="{ backgroundColor: color }"
-            />
-          </view>
-          <text class="palette-name">{{ palette.label }}</text>
-        </view>
-      </view>
-    </view>
-
     <view v-if="!isLoggedIn" class="empty-state">
       <text>登录后可查看你的活动热力图，并支持点击查看每日明细。</text>
     </view>
@@ -122,7 +100,7 @@
         <text class="legend-text">更少</text>
         <view class="legend-colors">
           <view
-            v-for="(color, idx) in selectedPaletteColors"
+            v-for="(color, idx) in paletteColors"
             :key="`legend_${idx}`"
             class="legend-dot"
             :style="{ backgroundColor: color }"
@@ -186,7 +164,6 @@ let heatmapRequestSeq = 0;
 const HEATMAP_MOTION_DURATION_MS = 220;
 // 默认展示最近 1 个月。
 const selectedMonths = ref(3);
-const selectedPalette = ref("green");
 const selectedDate = ref("");
 
 const heatmap = ref({
@@ -225,48 +202,11 @@ const monthOptions = [
   { label: "12个月", value: 12 },
 ];
 
-const paletteOptions = [
-  {
-    key: "green",
-    label: "默认绿",
-    colors: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
-  },
-  {
-    key: "blue",
-    label: "清新蓝",
-    colors: ["#ebedf0", "#b7d8ff", "#6caeff", "#397ddf", "#2053a3"],
-  },
-  {
-    key: "orange",
-    label: "暖日橙",
-    colors: ["#ebedf0", "#ffdca8", "#ffb65b", "#f58a24", "#b95a05"],
-  },
-  {
-    key: "teal",
-    label: "湖水青",
-    colors: ["#ebedf0", "#b2efe4", "#6edac7", "#36ac95", "#1f6d5f"],
-  },
-  {
-    key: "rose",
-    label: "玫瑰粉",
-    colors: ["#ebedf0", "#f5c8dc", "#ec92b8", "#d96091", "#a63864"],
-  },
-  {
-    key: "slate",
-    label: "深空灰",
-    colors: ["#ebedf0", "#d6dee8", "#a9bbcc", "#6f88a1", "#40566f"],
-  },
-
-];
+const paletteColors = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"];
 
 const weekdayLabels = ["周一", "", "周三", "", "周五", "", "周日"];
 
 const isLoggedIn = computed(() => Boolean(userInfoStore.isLoggedIn));
-
-const selectedPaletteColors = computed(() => {
-  const target = paletteOptions.find((item) => item.key === selectedPalette.value);
-  return target ? target.colors : paletteOptions[0].colors;
-});
 
 const selectedSummary = computed(() => {
   const summary = dayDetail.value?.summary || {};
@@ -410,7 +350,7 @@ function getCellColor(day) {
   }
 
   const level = Math.max(0, Math.min(4, Number(day.level) || 0));
-  return selectedPaletteColors.value[level];
+  return paletteColors[level];
 }
 
 function formatClock(value) {
@@ -600,53 +540,6 @@ watch(
   color: var(--app-brand);
   background: var(--app-brand-light);
   border-color: var(--app-brand);
-}
-
-.palette-bar {
-  margin-top: 22rpx;
-}
-
-.palette-title {
-  font-size: 24rpx;
-  color: #5f6d86;
-}
-
-.palette-list {
-  margin-top: 12rpx;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-}
-
-.palette-item {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 10rpx 12rpx;
-  border-radius: 14rpx;
-  border: 1px solid var(--app-border);
-  background: var(--app-bg-container);
-}
-
-.palette-item-active {
-  border-color: var(--app-brand);
-  box-shadow: 0 0 0 2rpx var(--app-brand-light);
-}
-
-.palette-preview {
-  display: flex;
-  gap: 4rpx;
-}
-
-.palette-dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-}
-
-.palette-name {
-  font-size: 22rpx;
-  color: var(--app-text-secondary);
 }
 
 .empty-state {

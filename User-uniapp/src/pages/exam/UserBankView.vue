@@ -349,7 +349,7 @@ onShow(() => {
     display: flex;
     flex-direction: column;
     height: calc(100vh - 50px);
-    background-color: #f5f9ff;
+    background-color: var(--app-brand-light);
     padding-bottom: calc(60rpx + constant(safe-area-inset-bottom));
     padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
 }
@@ -359,7 +359,7 @@ onShow(() => {
     display: flex;
     align-items: center;
     padding: 30rpx;
-    background-color: #e6f2ff;
+    background-color: var(--app-brand-light);
     border-radius: 0 0 20rpx 20rpx;
     margin-bottom: 20rpx;
 }
@@ -371,7 +371,7 @@ onShow(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #b3d9ff;
+    background-color: var(--app-brand-light);
     border-radius: 20rpx;
 }
 
@@ -387,7 +387,7 @@ onShow(() => {
 .bank-name {
     font-size: 36rpx;
     font-weight: bold;
-    color: #1a5fb4;
+    color: var(--app-brand);
     margin-bottom: 15rpx;
 }
 
@@ -412,7 +412,7 @@ onShow(() => {
 
 .meta-text {
     font-size: 26rpx;
-    color: #666;
+    color: var(--app-text-secondary);
 }
 
 /* 题目列表 */
@@ -421,7 +421,7 @@ onShow(() => {
     display: flex;
     flex-direction: column;
     margin: 0 15rpx;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     overflow: hidden;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
@@ -433,13 +433,13 @@ onShow(() => {
     align-items: center;
     justify-content: space-between;
     padding: 20rpx 30rpx;
-    border-bottom: 1rpx solid #e6f2ff;
+    border-bottom: 1rpx solid var(--app-brand-light);
 }
 
 .list-title {
     font-size: 32rpx;
     font-weight: bold;
-    color: #1a5fb4;
+    color: var(--app-brand);
 }
 
 /* 刷新按钮 */
@@ -450,7 +450,7 @@ onShow(() => {
     align-items: center;
     justify-content: center;
     background-color: transparent;
-    border: 2rpx solid #4d94ff;
+    border: 2rpx solid var(--app-brand);
     border-radius: 50%;
     padding: 0;
     margin: 0;
@@ -458,7 +458,7 @@ onShow(() => {
 }
 
 .refresh-btn:active {
-    background-color: #f0f7ff;
+    background-color: var(--app-brand-light);
     transform: rotate(360deg);
 }
 
@@ -476,15 +476,15 @@ onShow(() => {
 .question-item-wrapper {
     position: relative;
     overflow: hidden;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
 }
 
 .question-item {
     display: flex;
     align-items: center;
     padding: 25rpx 20rpx;
-    border-bottom: 1rpx solid #f0f7ff;
-    background-color: #fff;
+    border-bottom: 1rpx solid var(--app-brand-light);
+    background-color: var(--app-bg-container);
     transition: transform 0.3s ease;
     position: relative;
     z-index: 2;
@@ -495,13 +495,13 @@ onShow(() => {
 }
 
 .question-item:active {
-    background-color: #fafcff;
+    background-color: var(--app-brand-light);
 }
 
 .question-number {
     width: 100rpx;
     font-size: 28rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     text-align: center;
 }
 
@@ -511,13 +511,13 @@ onShow(() => {
 
 .question-type {
     font-size: 22rpx;
-    color: #4d94ff;
+    color: var(--app-brand);
     margin-bottom: 8rpx;
 }
 
 .question-title {
     font-size: 31rpx;
-    color: #333;
+    color: var(--app-text-primary);
     line-height: 1.5;
 }
 
@@ -545,7 +545,7 @@ onShow(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ff4757;
+    background-color: var(--app-danger);
     transform: translateX(100%);
     transition: transform 0.3s ease;
     z-index: 1;
@@ -581,8 +581,8 @@ onShow(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f0f7ff;
-    border: 2rpx solid #4d94ff;
+    background-color: var(--app-brand-light);
+    border: 2rpx solid var(--app-brand);
     border-radius: 28rpx;
     padding: 0 8rpx;
     margin: 0;
@@ -592,7 +592,7 @@ onShow(() => {
 }
 
 .edit-btn:active {
-    background-color: #e6f2ff;
+    background-color: var(--app-brand-light);
     transform: scale(0.98);
     box-shadow: 0 1rpx 4rpx rgba(77, 148, 255, 0.2);
 }
@@ -608,8 +608,8 @@ onShow(() => {
     padding: 20rpx 30rpx;
     padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
     padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-    background-color: #f5f9ff;
-    border-top: 1rpx solid #e6f2ff;
+    background-color: var(--app-brand-light);
+    border-top: 1rpx solid var(--app-brand-light);
     box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
     z-index: 999;
     margin: 0;
@@ -622,8 +622,8 @@ onShow(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #4d94ff;
-    color: #fff;
+    background-color: var(--app-brand);
+    color: var(--app-bg-container);
     font-size: 28rpx;
     border-radius: 40rpx;
     border: none;
@@ -632,7 +632,7 @@ onShow(() => {
 }
 
 .add-question-btn:active {
-    background-color: #3d7fd9;
+    background-color: var(--app-brand-hover);
     opacity: 0.8;
 }
 
@@ -643,17 +643,17 @@ onShow(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #fff;
-    color: #4d94ff;
+    background-color: var(--app-bg-container);
+    color: var(--app-brand);
     font-size: 28rpx;
     border-radius: 40rpx;
-    border: 2rpx solid #4d94ff;
+    border: 2rpx solid var(--app-brand);
     box-shadow: 0 4rpx 12rpx rgba(77, 148, 255, 0.15);
     transition: all 0.3s ease;
 }
 
 .practice-btn:active {
-    background-color: #f0f7ff;
+    background-color: var(--app-brand-light);
     opacity: 0.8;
 }
 

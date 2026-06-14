@@ -387,12 +387,12 @@ onMounted(async () => {
 
     .back-text {
         font-size: 28rpx;
-        color: #3c9cff;
+        color: var(--app-brand);
     }
 }
 .container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f9ff 0%, #e6f2ff 100%);
+    background: linear-gradient(135deg, var(--app-brand-light) 0%, #e6f2ff 100%);
     padding: 100rpx 30rpx 30rpx 30rpx;
     position: relative;
     overflow: hidden;
@@ -408,7 +408,7 @@ onMounted(async () => {
     display: block;
     font-size: 44rpx;
     font-weight: bold;
-    color: #2979ff;
+    color: var(--app-brand);
     margin-bottom: 16rpx;
     line-height: 1.3;
 }
@@ -416,7 +416,7 @@ onMounted(async () => {
 .page-subtitle {
     display: block;
     font-size: 26rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     line-height: 1.5;
 }
 
@@ -425,7 +425,7 @@ onMounted(async () => {
 }
 
 .input-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    background: linear-gradient(135deg, var(--app-bg-container) 0%, #f8fbff 100%);
     border-radius: 20rpx;
     padding: 32rpx 28rpx;
     box-shadow: 0 6rpx 24rpx rgba(41, 121, 255, 0.1);
@@ -442,7 +442,7 @@ onMounted(async () => {
 .input-title {
     font-size: 30rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .input-container {
@@ -456,21 +456,21 @@ onMounted(async () => {
     :deep(.t-input) {
         height: 72rpx;
         padding: 0 28rpx;
-        background: #f8f9fa;
+        background: var(--app-bg-secondary);
         border: 2rpx solid #e9ecef;
         border-radius: 12rpx;
         font-size: 28rpx;
-        color: #333;
+        color: var(--app-text-primary);
         transition: all 0.3s ease;
 
         &:focus {
-            border-color: #2979ff;
-            background: #ffffff;
+            border-color: var(--app-brand);
+            background: var(--app-bg-container);
             box-shadow: 0 0 0 3rpx rgba(41, 121, 255, 0.1);
         }
 
         &::placeholder {
-            color: #999;
+            color: var(--app-text-secondary);
             font-size: 26rpx;
         }
     }
@@ -478,7 +478,7 @@ onMounted(async () => {
 
 .input-counter {
     font-size: 22rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     background: rgba(255, 255, 255, 0.8);
     padding: 4rpx 8rpx;
     border-radius: 6rpx;
@@ -493,12 +493,12 @@ onMounted(async () => {
 
 .error-text {
     font-size: 22rpx;
-    color: #ff4d4f;
+    color: var(--app-danger);
 }
 
 .success-text {
     font-size: 22rpx;
-    color: #4cd964;
+    color: var(--app-success);
 }
 
 .import-options {
@@ -528,7 +528,7 @@ onMounted(async () => {
 
 .disabled-text {
     font-size: 26rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     font-weight: bold;
     background: rgba(255, 255, 255, 0.8);
     padding: 12rpx 24rpx;
@@ -539,7 +539,7 @@ onMounted(async () => {
 .option-card {
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    background: linear-gradient(135deg, var(--app-bg-container) 0%, #f8fbff 100%);
     border-radius: 20rpx;
     padding: 32rpx 28rpx;
     margin-bottom: 24rpx;
@@ -563,7 +563,7 @@ onMounted(async () => {
 .card-icon {
     width: 72rpx;
     height: 72rpx;
-    background: linear-gradient(135deg, #2979ff 0%, #4dabf5 100%);
+    background: linear-gradient(135deg, var(--app-brand) 0%, #4dabf5 100%);
     border-radius: 18rpx;
     display: flex;
     align-items: center;
@@ -582,7 +582,7 @@ onMounted(async () => {
     display: block;
     font-size: 30rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
     margin-bottom: 6rpx;
     line-height: 1.3;
 }
@@ -590,12 +590,12 @@ onMounted(async () => {
 .option-desc {
     display: block;
     font-size: 24rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     line-height: 1.4;
 }
 
 .card-arrow {
-    color: #007aff;
+    color: var(--app-brand);
     flex-shrink: 0;
     margin-left: 16rpx;
 }
@@ -612,7 +612,7 @@ onMounted(async () => {
 .feature-title {
     font-size: 28rpx;
     font-weight: bold;
-    color: #2979ff;
+    color: var(--app-brand);
     margin-bottom: 24rpx;
     text-align: center;
 }
@@ -631,7 +631,7 @@ onMounted(async () => {
 
 .feature-text {
     font-size: 26rpx;
-    color: #606060;
+    color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
 }

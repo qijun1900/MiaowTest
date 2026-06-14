@@ -140,7 +140,7 @@ const handleBack = () => {
 <style scoped>
 .container {
     padding: 10rpx 20rpx;
-    background-color: #f8f8f8;
+    background-color: var(--app-bg-secondary);
     height: 100vh;
     /* 为底部固定按钮留出空间 */
     padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
@@ -184,7 +184,7 @@ const handleBack = () => {
 
 .accuracy-number {
     font-size: 40rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: bold;
 }
 
@@ -195,7 +195,7 @@ const handleBack = () => {
 }
 
 .data-container {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 30rpx;
     margin: 20rpx 0;
@@ -209,7 +209,7 @@ const handleBack = () => {
 .data-title .data-label {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 .data-content {
@@ -227,11 +227,11 @@ const handleBack = () => {
     border-radius: 12rpx;
     transition: all 0.3s ease;
     flex: 1; /* 每个项目占据相等的空间 */
-    background-color: #f9f9f9;
+    background-color: var(--app-bg-secondary);
 }
 
 .data-item:active {
-    background-color: #f0f0f0;
+    background-color: var(--app-bg-secondary);
     transform: scale(0.98);
 }
 
@@ -244,16 +244,16 @@ const handleBack = () => {
 .data-value {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-bottom: 5rpx;
 }
 
 .data-label {
     font-size: 26rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
 }
 .answer-sheet-container {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 30rpx;
 }

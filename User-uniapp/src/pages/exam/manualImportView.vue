@@ -127,7 +127,7 @@ onLoad((option) => {
 <style scoped>
 .container {
     min-height: 100vh;
-    background-color: #fbfbfb;
+    background-color: var(--app-bg-container);
 }
 
 .content {

@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 顶部卡片式布局 -->
         <view class="exam-detail-card">
@@ -253,6 +254,7 @@
             </t-button>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -272,6 +274,7 @@ import {
     getExamFavorites,
 } from "../../API/My/FavoriteAPI";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import Subsection from "../../components/core/Subsection.vue";
 import checkLogin from "../../util/checkLogin";
 
@@ -456,7 +459,7 @@ const handleAuth = () => {
 <style scoped>
 .container {
     padding: 0rpx 12rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -465,7 +468,7 @@ const handleAuth = () => {
 .exam-detail {
     display: flex;
     flex-direction: row;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 12rpx;
     padding: 12rpx;
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
@@ -496,7 +499,7 @@ const handleAuth = () => {
     display: flex;
     align-items: center;
     padding: 8rpx 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--app-bg-secondary);
 }
 
 .info-item:last-child {
@@ -512,14 +515,14 @@ const handleAuth = () => {
 
 .info-title {
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-right: 5rpx;
     font-size: 25rpx;
     flex-shrink: 0;
 }
 
 .info-content {
-    color: #666666;
+    color: var(--app-text-secondary);
     font-size: 26rpx;
     flex: 1;
     word-break: break-all;
@@ -542,13 +545,13 @@ const handleAuth = () => {
 
 .empty-tip {
     margin: 20rpx 0 18rpx 0;
-    color: #888;
+    color: var(--app-text-secondary);
     font-size: 26rpx;
     text-align: center;
 }
 
 .empty-tip-action {
-    color: #1b89ff;
+    color: var(--app-brand);
     font-weight: bold;
     margin: 0 6rpx;
 }
@@ -558,7 +561,7 @@ const handleAuth = () => {
     width: 260rpx;
     height: 72rpx;
     background: linear-gradient(90deg, #409eff 0%, #1b89ff 100%);
-    color: #fff;
+    color: var(--app-bg-container);
     border: none;
     border-radius: 36rpx;
     font-size: 28rpx;
@@ -642,12 +645,12 @@ const handleAuth = () => {
 .subject-type-name {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     flex: 1;
 }
 
 .question-badge {
-    background-color: #1b89ff;
+    background-color: var(--app-brand);
     border-radius: 30rpx;
     padding: 5rpx 16rpx;
     margin-left: 16rpx;
@@ -659,7 +662,7 @@ const handleAuth = () => {
 }
 
 .question-count {
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-size: 24rpx;
     font-weight: 700;
 }
@@ -697,21 +700,21 @@ const handleAuth = () => {
 }
 
 .auth-title {
-    color: #ff6b6b;
+    color: var(--app-danger);
     font-size: 32rpx;
     font-weight: bold;
     margin-top: 10rpx;
 }
 
 .auth-desc {
-    color: #666666;
+    color: var(--app-text-secondary);
     font-size: 26rpx;
     line-height: 40rpx;
     margin-bottom: 10rpx;
 }
 
 .auth-note {
-    color: #333333;
+    color: var(--app-text-primary);
     font-size: 28rpx;
     font-weight: bold;
     align-self: flex-start;
@@ -719,7 +722,7 @@ const handleAuth = () => {
 }
 
 .auth-info {
-    color: #555555;
+    color: var(--app-text-primary);
     font-size: 24rpx;
     line-height: 36rpx;
     align-self: flex-start;
@@ -739,7 +742,7 @@ const handleAuth = () => {
     right: 0;
     height: calc(100rpx + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     display: flex;
     justify-content: space-between;
     align-items: center;
