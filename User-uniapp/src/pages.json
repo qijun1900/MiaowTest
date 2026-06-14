@@ -371,12 +371,12 @@
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"navigationBarBackgroundColor": "#f5f7fa",
+		"backgroundColor": "#f5f7fa"
 	},
 	"tabBar": {
 		"color": "#666666",
-		"selectedColor": "#007AFF",
+		"selectedColor": "#666666",
 		"backgroundColor": "#F8F8F8",
 		"borderStyle": "black",
 		"list": [
