@@ -202,6 +202,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, computed, onMounted } from "vue";
 import { AddUserBank } from "../../API/Exam/ExamAPI";
 import navBarHeightUtil from "../../util/navBarHeight";

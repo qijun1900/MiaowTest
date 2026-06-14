@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <view class="exam-list">
             <ThemeLoading v-if="loading" text="正在加载笔记..." />
@@ -36,9 +37,11 @@
             </view>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, onMounted } from "vue";
 import escconfig from "../../config/esc.config";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
@@ -94,7 +97,7 @@ onMounted(() => {
 }
 
 .subject-item {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 12rpx;
     padding: 29rpx;
     margin-bottom: 15rpx;
@@ -136,30 +139,30 @@ onMounted(() => {
 .subject-name {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .note-count {
     font-size: 24rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
 }
 
 .update-time {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 .subject-arrow {
     font-size: 32rpx;
-    color: #007aff;
+    color: var(--app-brand);
     font-weight: bold;
     margin-left: 20rpx;
 }
 
 .note-count {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     margin-top: 5rpx;
 }
 
@@ -170,14 +173,14 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     padding: 80rpx 40rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 12rpx;
     margin-top: 50rpx;
 }
 
 .empty-desc {
     font-size: 26rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     text-align: center;
 }
 </style>

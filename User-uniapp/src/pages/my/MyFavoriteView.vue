@@ -1,7 +1,8 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- TDesign自定义导航栏 -->
-        <t-navbar left-arrow :fixed="false" custom-style="background: #F8F8F8">
+        <t-navbar left-arrow :fixed="false" custom-style="background: var(--app-bg-page)">
             <template #title>
                 <Subsection
                     :list="list"
@@ -20,8 +21,10 @@
 
         <BackToTop ref="backToTopRef" position="bottom-right" />
     </view>
+    </ThemeProvider>
 </template>
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, onMounted } from "vue";
 import navBarHeightUtil from "../../util/navBarHeight";
 import Subsection from "../../components/core/Subsection.vue";

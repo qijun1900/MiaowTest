@@ -1,8 +1,9 @@
 <template>
+    <ThemeProvider>
     <view class="login-container">
         <!-- 自定义 添加返回按钮 -->
         <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
-            <t-icon name="chevron-left" color="#3c9cff" size="24"></t-icon>
+            <t-icon name="chevron-left" color="var(--app-brand)" size="24"></t-icon>
             <text class="back-text">返回</text>
         </view>
 
@@ -75,7 +76,7 @@
                 >
                 <t-icon
                     name="chevron-right"
-                    color="#3c9cff"
+                    color="var(--app-brand)"
                     size="14"
                 ></t-icon>
             </view>
@@ -109,6 +110,7 @@
 
         <t-message ref="t-message" />
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -118,6 +120,7 @@ import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import { wechatLogin } from "../../util/wechatLogin";
 import navBarHeightUtil from "../../util/navBarHeight";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import logSDK from "../../util/logSDK";
 import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/showMessage";
@@ -367,7 +370,7 @@ watch(
 <style lang="scss" scoped>
 .login-container {
     min-height: 100vh;
-    background-color: #f5f9ff;
+    background-color: var(--app-brand-light);
     padding: 40rpx;
     display: flex;
     flex-direction: column;
@@ -388,7 +391,7 @@ watch(
 
         .back-text {
             font-size: 28rpx;
-            color: #3c9cff;
+            color: var(--app-brand);
         }
     }
 
@@ -462,7 +465,7 @@ watch(
             right: -10rpx;
             width: 60rpx;
             height: 60rpx;
-            background-color: #3c9cff;
+            background-color: var(--app-brand);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -474,18 +477,18 @@ watch(
     .title {
         font-size: 44rpx;
         font-weight: bold;
-        color: #3c9cff;
+        color: var(--app-brand);
         margin-bottom: 10rpx;
     }
 
     .subtitle {
         font-size: 28rpx;
-        color: #909193;
+        color: var(--app-text-secondary);
     }
 }
 
 .login-form {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 40rpx;
     box-shadow: 0 8rpx 30rpx rgba(60, 156, 255, 0.1);
@@ -503,7 +506,7 @@ watch(
         margin: 20rpx 0 30rpx;
 
         .forget-pwd {
-            color: #3c9cff;
+            color: var(--app-brand);
             font-size: 28rpx;
         }
     }
@@ -516,14 +519,14 @@ watch(
         text-align: center;
         margin-top: 40rpx;
         font-size: 28rpx;
-        color: #909193;
+        color: var(--app-text-secondary);
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 6rpx;
 
         .link-text {
-            color: #3c9cff;
+            color: var(--app-brand);
         }
     }
 }
@@ -550,13 +553,13 @@ watch(
             left: 0;
             right: 0;
             height: 1px;
-            background-color: #e5e5e5;
+            background-color: var(--app-bg-secondary);
         }
 
         .divider-text {
             font-size: 26rpx;
-            color: #909193;
-            background-color: #f5f9ff;
+            color: var(--app-text-secondary);
+            background-color: var(--app-brand-light);
             padding: 0 20rpx;
             position: relative;
             z-index: 1;
@@ -590,7 +593,7 @@ watch(
 
     .wechat-login-text {
         font-size: 26rpx;
-        color: #666666;
+        color: var(--app-text-secondary);
         margin-top: 5rpx;
     }
 }

@@ -21,13 +21,10 @@
                     @touchmove="handleTouchMove($event, index)"
                     @touchend="handleTouchEnd($event, index)"
                 >
-                    <!-- 左边静态图片 -->
-                    <image
-                        class="bank-image"
-                        src="/static/other/my-questionbank.png"
-                        mode="aspectFill"
-                    >
-                    </image>
+                    <!-- 左边图标 -->
+                    <view class="bank-image">
+                        <t-icon name="book" size="40px" color="var(--app-brand)" />
+                    </view>
 
                     <!-- 右边题库信息 -->
                     <view class="bank-info">
@@ -71,11 +68,9 @@
 
         <!-- 空状态显示 -->
         <view v-else class="empty-state">
-            <image
-                class="empty-image"
-                src="/static/other/my-questionbank.png"
-                mode="aspectFit"
-            ></image>
+            <view class="empty-image">
+                <t-icon name="book" size="60px" color="var(--app-text-placeholder)" />
+            </view>
             <text class="empty-text">暂无题库</text>
             <text class="empty-desc">快去创建你的第一个题库吧！</text>
         </view>
@@ -202,6 +197,9 @@ onMounted(async () => {
     margin-right: 28rpx;
     flex-shrink: 0;
     background: var(--app-brand-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bank-info {
@@ -309,6 +307,9 @@ onMounted(async () => {
     height: 120rpx;
     margin-bottom: 30rpx;
     opacity: 0.65;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .empty-text {

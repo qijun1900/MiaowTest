@@ -18,7 +18,7 @@
                 <view class="question-header">
                     <view
                         class="subject-tag"
-                        :style="{ backgroundColor: '#1e6bff' }"
+                        :style="{ backgroundColor: 'var(--app-brand)' }"
                     >
                         {{ question.examName }}
                     </view>
@@ -67,10 +67,7 @@
                 <!-- 收藏时间和操作 -->
                 <view class="question-footer">
                     <view class="favorite-time">
-                        <image
-                            src="/static/other/time.png"
-                            class="info-icon"
-                        ></image>
+                        <t-icon name="time" size="16px" color="var(--app-text-placeholder)" />
                         <text
                             >收藏于
                             {{ formatTime.getTime2(question.createTime) }}</text
@@ -265,7 +262,7 @@ onMounted(() => {
 <style scoped>
 .question-favorite-container {
     padding: 8rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     min-height: 100vh;
 }
 
@@ -278,14 +275,14 @@ onMounted(() => {
 
 .question-item {
     padding: 30rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 
 .question-item:active {
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
 }
 
 .question-header {
@@ -300,7 +297,7 @@ onMounted(() => {
     padding: 6rpx 16rpx;
     border-radius: 16rpx;
     font-size: 24rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
     min-width: 100rpx;
     text-align: center;
@@ -315,15 +312,15 @@ onMounted(() => {
 }
 
 .type-all {
-    color: #1e6bff;
-    border-color: #1e6bff;
-    background-color: #eaf2ff;
+    color: var(--app-brand);
+    border-color: var(--app-brand);
+    background-color: var(--app-brand-light);
 }
 
 .type-unknown {
-    color: #64748b;
-    border-color: #64748b;
-    background-color: #f1f5f9;
+    color: var(--app-text-secondary);
+    border-color: var(--app-text-secondary);
+    background-color: var(--app-bg-secondary);
 }
 
 .favorite-status {
@@ -341,14 +338,14 @@ onMounted(() => {
 
 .question-number {
     font-size: 26rpx;
-    color: #4a90e2;
+    color: var(--app-brand);
     font-weight: 600;
     margin-bottom: 12rpx;
 }
 
 .question-stem {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.6;
     margin-bottom: 30rpx;
@@ -357,7 +354,7 @@ onMounted(() => {
 .options-container {
     margin-top: 20rpx;
     padding: 20rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
 }
 
@@ -373,7 +370,7 @@ onMounted(() => {
 
 .option-label {
     font-size: 28rpx;
-    color: #4a90e2;
+    color: var(--app-brand);
     font-weight: 600;
     margin-right: 16rpx;
     min-width: 40rpx;
@@ -381,7 +378,7 @@ onMounted(() => {
 
 .option-text {
     font-size: 28rpx;
-    color: #34495e;
+    color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
 }
@@ -398,15 +395,9 @@ onMounted(() => {
     display: flex;
     align-items: center;
     font-size: 24rpx;
-    color: #95a5a6;
+    color: var(--app-text-secondary);
 }
 
-.info-icon {
-    width: 33rpx;
-    height: 33rpx;
-    margin-right: 10rpx;
-    flex-shrink: 0;
-}
 
 .question-actions {
     display: flex;
@@ -424,7 +415,7 @@ onMounted(() => {
 
 .practice-btn {
     background: linear-gradient(135deg, #61abff, #49a4ff);
-    color: #ffffff;
+    color: var(--app-bg-container);
 }
 
 .practice-btn:active {
@@ -433,14 +424,14 @@ onMounted(() => {
 }
 
 .remove-btn {
-    background-color: #ffffff;
-    color: #e74c3c;
-    border: 2rpx solid #e74c3c;
+    background-color: var(--app-bg-container);
+    color: var(--app-danger);
+    border: 2rpx solid var(--app-danger);
 }
 
 .remove-btn:active {
-    background-color: #e74c3c;
-    color: #ffffff;
+    background-color: var(--app-danger);
+    color: var(--app-bg-container);
     transform: scale(0.95);
 }
 
@@ -461,14 +452,14 @@ onMounted(() => {
 
 .empty-text {
     font-size: 32rpx;
-    color: #7f8c8d;
+    color: var(--app-text-secondary);
     margin-bottom: 16rpx;
     font-weight: 500;
 }
 
 .empty-subtext {
     font-size: 28rpx;
-    color: #95a5a6;
+    color: var(--app-text-secondary);
 }
 
 /* 响应式设计 */

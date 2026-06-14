@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 消息列表区域 -->
         <view class="message-list">
@@ -6,9 +7,11 @@
             <Empty description="暂无消息" />
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref } from "vue";
 import Empty from "../../components/core/Empty.vue";
 
@@ -28,7 +31,7 @@ loadMessages();
 <style scoped>
 .container {
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
 }
 .message-list {
     padding: 20px;

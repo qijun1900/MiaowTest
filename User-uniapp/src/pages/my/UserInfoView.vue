@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 用户头像区域 -->
         <view class="avatar-section" @click="handleEditAvatar">
@@ -100,9 +101,11 @@
 
         <t-message ref="t-message" />
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import handleCopy from "../../util/copy";
 import { updateUserInfo, checkUserBind } from "../../API/My/UserInfoUpdateAPI";
@@ -343,7 +346,7 @@ onMounted(() => {
 <style scoped>
 .container {
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     padding: 20rpx;
 }
 
@@ -351,7 +354,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 40rpx 30rpx;
     margin-bottom: 20rpx;
@@ -366,7 +369,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     font-size: 28rpx;
-    color: #2979ff;
+    color: var(--app-brand);
 }
 
 .edit-avatar-btn text {
@@ -374,7 +377,7 @@ onMounted(() => {
 }
 
 .info-list {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     margin-bottom: 20rpx;
     box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
@@ -385,7 +388,7 @@ onMounted(() => {
     align-items: center;
     justify-content: space-between;
     padding: 30rpx;
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 1rpx solid var(--app-bg-secondary);
 }
 
 .info-item:last-child {
@@ -394,14 +397,14 @@ onMounted(() => {
 
 .info-label {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 .info-value {
     display: flex;
     align-items: center;
     font-size: 28rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
 }
 
 .info-value text {
@@ -410,7 +413,7 @@ onMounted(() => {
 
 .openid-text {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 .logout-section {
@@ -418,13 +421,13 @@ onMounted(() => {
 }
 
 .logout-btn {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     height: 100rpx;
     line-height: 100rpx;
     text-align: center;
     font-size: 32rpx;
-    color: #ff4d4f;
+    color: var(--app-danger);
     box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 </style>

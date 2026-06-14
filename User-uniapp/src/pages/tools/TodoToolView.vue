@@ -218,6 +218,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import lxCalendar from "../../components/lx-calendar/lx-calendar.vue";
 import { ref, onMounted, watch, computed } from "vue";
 import formatTime from "../../util/formatTime";

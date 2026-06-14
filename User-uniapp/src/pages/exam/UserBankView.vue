@@ -3,29 +3,19 @@
         <!-- 题库信息头部 -->
         <view class="bank-header">
             <view class="bank-icon">
-                <image
-                    src="/static/other/my-questionbank.png"
-                    mode="aspectFit"
-                    class="icon-image"
-                ></image>
+                <t-icon name="book" size="40px" color="var(--app-brand)" />
             </view>
             <view class="bank-info">
                 <view class="bank-name">{{ bankData.bankName }}</view>
                 <view class="bank-meta">
                     <view class="meta-item">
-                        <image
-                            src="/static/other/count.png"
-                            class="info-icon"
-                        ></image>
+                        <t-icon name="layers" size="16px" color="var(--app-text-secondary)" />
                         <text class="meta-text"
                             >{{ bankData.questionCount }}题</text
                         >
                     </view>
                     <view class="meta-item">
-                        <image
-                            src="/static/other/open-time.png"
-                            class="info-icon"
-                        ></image>
+                        <t-icon name="time" size="16px" color="var(--app-text-secondary)" />
                         <text class="meta-text">{{
                             formatTime.getTime2(bankData.createTime)
                         }}</text>
@@ -176,6 +166,7 @@
     </view>
 </template>
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ref, onMounted } from "vue";
 import ThemDivider from "../../components/core/ThemeDivider.vue";
@@ -375,10 +366,6 @@ onShow(() => {
     border-radius: 20rpx;
 }
 
-.icon-image {
-    width: 80rpx;
-    height: 80rpx;
-}
 
 .bank-info {
     flex: 1;
@@ -403,12 +390,6 @@ onShow(() => {
     margin-bottom: 10rpx;
 }
 
-.info-icon {
-    width: 33rpx;
-    height: 33rpx;
-    margin-right: 10rpx;
-    flex-shrink: 0;
-}
 
 .meta-text {
     font-size: 26rpx;

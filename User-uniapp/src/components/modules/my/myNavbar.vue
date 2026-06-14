@@ -10,7 +10,7 @@
                 @click="handleNavClick(item)"
             >
                 <view class="nav-icon-wrapper" :class="'icon-bg-' + index">
-                    <image class="nav-icon" :src="item.icon" mode="aspectFit" />
+                    <t-icon :name="item.iconName" size="24px" color="#ffffff" />
                 </view>
                 <text class="nav-title">{{ item.title }}</text>
             </view>
@@ -26,22 +26,22 @@ import checkLogin from "../../../util/checkLogin";
 const navItems = ref([
     {
         title: "我的收藏",
-        icon: "/static/navMy/my-fav.png",
+        iconName: "star",
         path: "/pages/my/MyFavoriteView",
     },
     {
         title: "我的错题",
-        icon: "/static/navMy/my-wro.png",
+        iconName: "error-circle",
         path: "/pages/my/MyWrongView",
     },
     {
         title: "我的笔记",
-        icon: "/static/navMy/my-note.png",
+        iconName: "edit",
         path: "/pages/my/MyNoteView",
     },
     {
         title: "我的题库",
-        icon: "/static/other/my-questionbank.png",
+        iconName: "book",
         path: "/pages/my/UserQuestionBankView",
     },
 ]);
@@ -105,11 +105,6 @@ const handleNavClick = async (item) => {
     transition: box-shadow 0.3s ease;
 }
 
-.nav-icon {
-    width: 48rpx;
-    height: 48rpx;
-    filter: brightness(0) invert(1); /* 确保图标为纯白色 */
-}
 
 .nav-title {
     font-size: 26rpx;
@@ -149,11 +144,6 @@ const handleNavClick = async (item) => {
         width: 80rpx;
         height: 80rpx;
         border-radius: 28rpx;
-    }
-
-    .nav-icon {
-        width: 40rpx;
-        height: 40rpx;
     }
 
     .nav-title {

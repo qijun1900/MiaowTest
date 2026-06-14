@@ -72,6 +72,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref } from "vue";
 import { submitFeedbackAPI } from "../../API/public/FeedbackAPI";
 import { onLoad } from "@dcloudio/uni-app";

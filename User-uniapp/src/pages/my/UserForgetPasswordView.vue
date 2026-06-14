@@ -1,8 +1,9 @@
 <template>
+    <ThemeProvider>
     <view class="login-container">
         <!-- 自定义 返回按钮 -->
         <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
-            <t-icon name="chevron-left" color="#3c9cff" size="24"></t-icon>
+            <t-icon name="chevron-left" color="var(--app-brand)" size="24"></t-icon>
             <text class="back-text">返回</text>
         </view>
 
@@ -101,7 +102,7 @@
                 <text class="link-text" @click="goToLogin">去登录</text>
                 <t-icon
                     name="chevron-right"
-                    color="#3c9cff"
+                    color="var(--app-brand)"
                     size="14"
                 ></t-icon>
             </view>
@@ -134,10 +135,12 @@
 
         <t-message ref="t-message" />
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, getCurrentInstance } from "vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import {
     ResetPassword,
     sendEmailVerifyCode,
@@ -344,7 +347,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .login-container {
     min-height: 100vh;
-    background-color: #f5f9ff;
+    background-color: var(--app-brand-light);
     padding: 12rpx 40rpx 40rpx;
     display: flex;
     flex-direction: column;
@@ -365,7 +368,7 @@ onUnmounted(() => {
 
         .back-text {
             font-size: 28rpx;
-            color: #3c9cff;
+            color: var(--app-brand);
         }
     }
 
@@ -438,7 +441,7 @@ onUnmounted(() => {
             right: -10rpx;
             width: 60rpx;
             height: 60rpx;
-            background-color: #3c9cff;
+            background-color: var(--app-brand);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -450,18 +453,18 @@ onUnmounted(() => {
     .title {
         font-size: 44rpx;
         font-weight: bold;
-        color: #3c9cff;
+        color: var(--app-brand);
         margin-bottom: 10rpx;
     }
 
     .subtitle {
         font-size: 28rpx;
-        color: #909193;
+        color: var(--app-text-secondary);
     }
 }
 
 .login-form {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 40rpx;
     box-shadow: 0 8rpx 30rpx rgba(60, 156, 255, 0.1);
@@ -497,14 +500,14 @@ onUnmounted(() => {
         text-align: center;
         margin-top: 40rpx;
         font-size: 28rpx;
-        color: #909193;
+        color: var(--app-text-secondary);
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 6rpx;
 
         .link-text {
-            color: #3c9cff;
+            color: var(--app-brand);
         }
     }
 }
@@ -532,7 +535,7 @@ onUnmounted(() => {
 
     .captcha-content {
         width: 80%;
-        background-color: #fff;
+        background-color: var(--app-bg-container);
         border-radius: 20rpx;
         padding: 40rpx 40rpx 20rpx;
         display: flex;
@@ -543,13 +546,13 @@ onUnmounted(() => {
         .captcha-title {
             font-size: 34rpx;
             font-weight: bold;
-            color: #333;
+            color: var(--app-text-primary);
             margin-bottom: 10rpx;
         }
 
         .captcha-subtitle {
             font-size: 26rpx;
-            color: #909399;
+            color: var(--app-text-secondary);
             margin-bottom: 30rpx;
             text-align: center;
         }
@@ -557,9 +560,9 @@ onUnmounted(() => {
         .captcha-question {
             font-size: 40rpx;
             font-weight: bold;
-            color: #3c9cff;
+            color: var(--app-brand);
             margin: 20rpx 0 30rpx;
-            background: #f5f9ff;
+            background: var(--app-brand-light);
             padding: 20rpx 40rpx;
             border-radius: 12rpx;
             letter-spacing: 2rpx;
@@ -583,16 +586,16 @@ onUnmounted(() => {
                 transition: background-color 0.2s;
 
                 &:active {
-                    background-color: #f5f5f5;
+                    background-color: var(--app-bg-secondary);
                 }
 
                 &.cancel {
-                    color: #909399;
+                    color: var(--app-text-secondary);
                     border-right: 1rpx solid #eee;
                 }
 
                 &.confirm {
-                    color: #3c9cff;
+                    color: var(--app-brand);
                     font-weight: bold;
                 }
             }

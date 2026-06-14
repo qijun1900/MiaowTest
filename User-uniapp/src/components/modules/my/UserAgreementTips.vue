@@ -66,13 +66,13 @@ const showPrivacyPolicy = () => {
             height: 34rpx;
             border-radius: 6rpx;
             border: 2rpx solid #c0c4cc;
-            background-color: #fff;
+            background-color: var(--app-bg-container);
             margin-right: 10rpx;
             position: relative;
 
             &.checked {
-                background-color: #3c9cff;
-                border-color: #3c9cff;
+                background-color: var(--app-brand);
+                border-color: var(--app-brand);
 
                 &::after {
                     content: "";
@@ -81,8 +81,8 @@ const showPrivacyPolicy = () => {
                     top: 3rpx;
                     width: 10rpx;
                     height: 18rpx;
-                    border-right: 3rpx solid #fff;
-                    border-bottom: 3rpx solid #fff;
+                    border-right: 3rpx solid var(--app-bg-container);
+                    border-bottom: 3rpx solid var(--app-bg-container);
                     transform: rotate(45deg);
                 }
             }
@@ -90,12 +90,12 @@ const showPrivacyPolicy = () => {
 
         .tips-text {
             font-size: 24rpx;
-            color: #909193;
+            color: var(--app-text-secondary);
         }
 
         .tips-link {
             font-size: 24rpx;
-            color: #3c9cff;
+            color: var(--app-brand);
             margin: 0 4rpx;
         }
     }

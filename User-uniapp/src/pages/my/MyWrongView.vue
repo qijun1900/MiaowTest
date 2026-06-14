@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="question-wrong-container">
         <ThemeLoading v-if="loading" text="正在加载错题..." />
         <!-- 科目筛选 -->
@@ -18,7 +19,7 @@
                 <view class="question-header">
                     <view
                         class="subject-tag"
-                        :style="{ backgroundColor: '#e74c3c' }"
+                        :style="{ backgroundColor: 'var(--app-danger)' }"
                     >
                         {{ question.examName }}
                     </view>
@@ -67,10 +68,7 @@
                 <!-- 错题时间和操作 -->
                 <view class="question-footer">
                     <view class="wrong-time">
-                        <image
-                            src="/static/other/time.png"
-                            class="info-icon"
-                        ></image>
+                        <t-icon name="time" size="16px" color="var(--app-text-placeholder)" />
                         <text
                             >错题记录于
                             {{ formatTime.getTime2(question.createTime) }}</text
@@ -138,7 +136,7 @@
                             <uni-icons
                                 type="arrow-right"
                                 size="20"
-                                color="#4d94ff"
+                                color="var(--app-brand)"
                             ></uni-icons>
                             <text class="btn-text">开始练习</text>
                         </button>
@@ -147,8 +145,10 @@
             </tPopup>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, onMounted, computed, watch } from "vue";
 import {
     getUserWrongQuestionListAPI,
@@ -387,7 +387,7 @@ onMounted(() => {
 .question-wrong-container {
     padding: 8rpx;
     padding-bottom: 120rpx; /* 增加底部内边距，避免被底部按钮遮挡 */
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     min-height: 100vh;
 }
 
@@ -401,14 +401,14 @@ onMounted(() => {
 
 .question-item {
     padding: 30rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 
 .question-item:active {
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
 }
 
 .question-header {
@@ -423,7 +423,7 @@ onMounted(() => {
     padding: 6rpx 16rpx;
     border-radius: 16rpx;
     font-size: 24rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
     min-width: 100rpx;
     text-align: center;
@@ -438,15 +438,15 @@ onMounted(() => {
 }
 
 .type-all {
-    color: #e74c3c;
-    border-color: #e74c3c;
-    background-color: #fdf2f2;
+    color: var(--app-danger);
+    border-color: var(--app-danger);
+    background-color: var(--app-danger-light);
 }
 
 .type-unknown {
-    color: #64748b;
-    border-color: #64748b;
-    background-color: #f1f5f9;
+    color: var(--app-text-secondary);
+    border-color: var(--app-text-secondary);
+    background-color: var(--app-bg-secondary);
 }
 
 .wrong-status {
@@ -455,7 +455,7 @@ onMounted(() => {
 
 .wrong-icon {
     font-size: 32rpx;
-    color: #e74c3c;
+    color: var(--app-danger);
 }
 
 .question-content {
@@ -464,14 +464,14 @@ onMounted(() => {
 
 .question-number {
     font-size: 26rpx;
-    color: #4a90e2;
+    color: var(--app-brand);
     font-weight: 600;
     margin-bottom: 12rpx;
 }
 
 .question-stem {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.6;
     margin-bottom: 30rpx;
@@ -480,7 +480,7 @@ onMounted(() => {
 .options-container {
     margin-top: 20rpx;
     padding: 20rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
 }
 
@@ -496,7 +496,7 @@ onMounted(() => {
 
 .option-label {
     font-size: 28rpx;
-    color: #4a90e2;
+    color: var(--app-brand);
     font-weight: 600;
     margin-right: 16rpx;
     min-width: 40rpx;
@@ -504,7 +504,7 @@ onMounted(() => {
 
 .option-text {
     font-size: 28rpx;
-    color: #34495e;
+    color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
 }
@@ -521,15 +521,9 @@ onMounted(() => {
     display: flex;
     align-items: center;
     font-size: 24rpx;
-    color: #95a5a6;
+    color: var(--app-text-secondary);
 }
 
-.info-icon {
-    width: 33rpx;
-    height: 33rpx;
-    margin-right: 10rpx;
-    flex-shrink: 0;
-}
 
 .question-actions {
     display: flex;
@@ -547,7 +541,7 @@ onMounted(() => {
 
 .practice-btn {
     background: linear-gradient(135deg, #61abff, #49a4ff);
-    color: #ffffff;
+    color: var(--app-bg-container);
 }
 
 .practice-btn:active {
@@ -556,14 +550,14 @@ onMounted(() => {
 }
 
 .remove-btn {
-    background-color: #ffffff;
-    color: #e74c3c;
-    border: 2rpx solid #e74c3c;
+    background-color: var(--app-bg-container);
+    color: var(--app-danger);
+    border: 2rpx solid var(--app-danger);
 }
 
 .remove-btn:active {
-    background-color: #e74c3c;
-    color: #ffffff;
+    background-color: var(--app-danger);
+    color: var(--app-bg-container);
     transform: scale(0.95);
 }
 
@@ -584,14 +578,14 @@ onMounted(() => {
 
 .empty-text {
     font-size: 32rpx;
-    color: #7f8c8d;
+    color: var(--app-text-secondary);
     margin-bottom: 16rpx;
     font-weight: 500;
 }
 
 .empty-subtext {
     font-size: 28rpx;
-    color: #95a5a6;
+    color: var(--app-text-secondary);
 }
 
 /* 底部练习按钮样式 */
@@ -616,7 +610,7 @@ onMounted(() => {
     width: 100%;
     height: 80rpx;
     background: linear-gradient(135deg, #6bb6ff, #4a9fe8);
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-size: 30rpx;
     font-weight: 500;
     border-radius: 40rpx;
@@ -662,17 +656,17 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #fff;
-    color: #4d94ff;
+    background-color: var(--app-bg-container);
+    color: var(--app-brand);
     font-size: 28rpx;
     border-radius: 40rpx;
-    border: 2rpx solid #4d94ff;
+    border: 2rpx solid var(--app-brand);
     box-shadow: 0 4rpx 12rpx rgba(77, 148, 255, 0.15);
     transition: all 0.3s ease;
 }
 
 .practice-btn:active {
-    background-color: #f0f7ff;
+    background-color: var(--app-brand-light);
     opacity: 0.8;
 }
 

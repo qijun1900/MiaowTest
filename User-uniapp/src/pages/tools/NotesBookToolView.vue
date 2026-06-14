@@ -176,6 +176,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import tPopup from "../../components/core/tPopup.vue";

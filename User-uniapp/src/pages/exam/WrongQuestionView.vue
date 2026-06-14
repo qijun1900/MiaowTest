@@ -310,6 +310,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, computed, onMounted, reactive } from "vue";
 import { onPageScroll } from "@dcloudio/uni-app";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";

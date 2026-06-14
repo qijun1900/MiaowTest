@@ -172,6 +172,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../../components/core/ThemeProvider.vue";
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import {

@@ -108,6 +108,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../../components/core/ThemeProvider.vue";
 import { computed, ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";

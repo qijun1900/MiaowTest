@@ -78,6 +78,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, onMounted } from "vue";
 import uniSearch from "../../components/core/uniSearch.vue";
 import { getExamSubjects } from "../../API/Exam/ExamAPI";

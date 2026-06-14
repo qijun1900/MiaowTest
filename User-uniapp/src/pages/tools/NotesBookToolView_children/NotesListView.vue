@@ -195,6 +195,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../../components/core/ThemeProvider.vue";
 import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onReachBottom, onShow, onUnload } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";

@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <view class="question-list">
             <!-- Loading -->
@@ -68,10 +69,7 @@
                 <!-- 笔记时间和操作 -->
                 <view class="question-footer">
                     <view class="favorite-time">
-                        <image
-                            src="/static/other/time.png"
-                            class="info-icon"
-                        ></image>
+                        <t-icon name="time" size="16px" color="var(--app-text-placeholder)" />
                         <text
                             >更新时间
                             {{
@@ -159,9 +157,11 @@
             <BackToTop ref="backToTopRef" position="bottom-right" />
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, onMounted } from "vue";
 import tPopup from "../../components/core/tPopup.vue";
 import { onLoad } from "@dcloudio/uni-app";
@@ -500,7 +500,7 @@ onMounted(() => {
 <style scoped>
 .container {
     padding: 8rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     min-height: 100vh;
 }
 
@@ -513,14 +513,14 @@ onMounted(() => {
 
 .question-item {
     padding: 30rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 
 .question-item:active {
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
 }
 
 .question-header {
@@ -540,9 +540,9 @@ onMounted(() => {
 }
 
 .type-all {
-    color: #1e6bff;
-    border-color: #1e6bff;
-    background-color: #eaf2ff;
+    color: var(--app-brand);
+    border-color: var(--app-brand);
+    background-color: var(--app-brand-light);
 }
 
 .favorite-status {
@@ -560,14 +560,14 @@ onMounted(() => {
 
 .question-number {
     font-size: 26rpx;
-    color: #4a90e2;
+    color: var(--app-brand);
     font-weight: 600;
     margin-bottom: 12rpx;
 }
 
 .question-stem {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.6;
     margin-bottom: 30rpx;
@@ -576,7 +576,7 @@ onMounted(() => {
 .options-container {
     margin-top: 20rpx;
     padding: 20rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
 }
 
@@ -592,7 +592,7 @@ onMounted(() => {
 
 .option-label {
     font-size: 28rpx;
-    color: #4a90e2;
+    color: var(--app-brand);
     font-weight: 600;
     margin-right: 16rpx;
     min-width: 40rpx;
@@ -600,7 +600,7 @@ onMounted(() => {
 
 .option-text {
     font-size: 28rpx;
-    color: #34495e;
+    color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
 }
@@ -610,12 +610,12 @@ onMounted(() => {
     margin: 24rpx 0;
     border-radius: 16rpx;
     overflow: hidden;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .note-header {
-    background: linear-gradient(135deg, #f0f7ff, #e6f0ff);
+    background: linear-gradient(135deg, var(--app-brand-light), #e6f0ff);
     padding: 16rpx 24rpx;
 }
 
@@ -624,7 +624,7 @@ onMounted(() => {
     align-items: center;
     font-size: 28rpx;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--app-text-primary);
 }
 
 .note-icon {
@@ -634,14 +634,14 @@ onMounted(() => {
 
 .note-body {
     padding: 24rpx;
-    background-color: #fafbfc;
+    background-color: var(--app-bg-container);
     border-radius: 0 0 16rpx 16rpx;
 }
 
 .note-text {
     font-size: 28rpx;
     line-height: 1.8;
-    color: #34495e;
+    color: var(--app-text-primary);
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -658,15 +658,9 @@ onMounted(() => {
     display: flex;
     align-items: center;
     font-size: 24rpx;
-    color: #95a5a6;
+    color: var(--app-text-secondary);
 }
 
-.info-icon {
-    width: 33rpx;
-    height: 33rpx;
-    margin-right: 10rpx;
-    flex-shrink: 0;
-}
 
 .question-actions {
     display: flex;
@@ -696,7 +690,7 @@ onMounted(() => {
 /* 编辑按钮样式 */
 .edit-btn {
     background: linear-gradient(135deg, #ff9a56, #ff7e3d);
-    color: #ffffff;
+    color: var(--app-bg-container);
     animation: pulse 3s infinite;
 }
 
@@ -741,7 +735,7 @@ onMounted(() => {
 /* 练习按钮样式 */
 .practice-btn {
     background: linear-gradient(135deg, #61abff, #49a4ff);
-    color: #ffffff;
+    color: var(--app-bg-container);
 }
 
 .practice-btn::before {
@@ -825,7 +819,7 @@ onMounted(() => {
 
 .note-info-text {
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 .note-button-container {

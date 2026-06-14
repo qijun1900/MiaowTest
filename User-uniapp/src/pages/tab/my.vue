@@ -11,11 +11,7 @@
                     :hover-stay-time="80"
                     @click="goSetting"
                 >
-                    <image
-                        class="header-setting__icon"
-                        src="/static/navMy/c-my-setting.png"
-                        mode="aspectFit"
-                    />
+                    <t-icon name="setting-1" size="22px" color="var(--app-text-primary)" />
                 </view>
             </view>
         </view>
@@ -273,10 +269,6 @@ onShow(() => {
     background: var(--app-bg-container-active, var(--app-bg-secondary));
 }
 
-.header-setting__icon {
-    width: 44rpx;
-    height: 44rpx;
-}
 
 /* 登录弹窗 */
 .rect {

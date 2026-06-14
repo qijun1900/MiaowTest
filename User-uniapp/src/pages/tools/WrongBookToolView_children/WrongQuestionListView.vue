@@ -449,6 +449,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../../components/core/ThemeProvider.vue";
 import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 import { useAutoHideHeader } from "../../../composables/useAutoHideHeader.js";

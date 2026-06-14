@@ -68,6 +68,7 @@
 </template>
 
 <script setup>
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
 import SliderSelector from "../../components/core/SliderSelector.vue";

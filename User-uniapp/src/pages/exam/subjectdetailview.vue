@@ -18,10 +18,7 @@
                 <view class="exam-info">
                     <view class="info-item">
                         <view class="info-icon-wrapper">
-                            <image
-                                src="/static/other/subject-name.png"
-                                class="info-icon"
-                            ></image>
+                            <t-icon name="education" size="16px" color="var(--app-text-secondary)" />
                         </view>
                         <view class="info-content-wrapper">
                             <text class="info-title">考试名称</text>
@@ -33,10 +30,7 @@
 
                     <view class="info-item">
                         <view class="info-icon-wrapper">
-                            <image
-                                src="/static/other/year.png"
-                                class="info-icon"
-                            ></image>
+                            <t-icon name="calendar" size="16px" color="var(--app-text-secondary)" />
                         </view>
                         <view class="info-content-wrapper">
                             <text class="info-title">考试年份</text>
@@ -48,10 +42,7 @@
 
                     <view class="info-item">
                         <view class="info-icon-wrapper">
-                            <image
-                                src="/static/other/time.png"
-                                class="info-icon"
-                            ></image>
+                            <t-icon name="time" size="16px" color="var(--app-text-secondary)" />
                         </view>
                         <view class="info-content-wrapper">
                             <text class="info-title">更新时间</text>
@@ -63,10 +54,7 @@
 
                     <view class="info-item">
                         <view class="info-icon-wrapper">
-                            <image
-                                src="/static/other/open-time.png"
-                                class="info-icon"
-                            ></image>
+                            <t-icon name="time" size="16px" color="var(--app-text-secondary)" />
                         </view>
                         <view class="info-content-wrapper">
                             <text class="info-title">开考时间</text>
@@ -506,12 +494,6 @@ const handleAuth = () => {
     border-bottom: none;
 }
 
-.info-icon {
-    width: 33rpx;
-    height: 33rpx;
-    margin-right: 10rpx;
-    flex-shrink: 0;
-}
 
 .info-title {
     font-weight: bold;

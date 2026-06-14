@@ -272,7 +272,7 @@ const isMember = ref(false);
 .button-text {
     font-size: 26rpx;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--app-bg-container);
     position: relative;
     z-index: 2;
     animation: textPulse 2s ease-in-out infinite;
