@@ -282,7 +282,7 @@ const handleDelete = () => {
 }
 
 .form-container {
-    background: #fff;
+    background: var(--app-bg-container);
     border-radius: 32rpx;
     padding: 48rpx 32rpx;
     box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
@@ -294,7 +294,7 @@ const handleDelete = () => {
 
 .form-label {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     margin-bottom: 24rpx;
     font-weight: 600;
     display: flex;
@@ -303,14 +303,14 @@ const handleDelete = () => {
 }
 
 .required {
-    color: #f44336;
+    color: var(--app-danger);
     margin-left: 4rpx;
 }
 
 .input-wrapper {
     display: flex;
     align-items: center;
-    background: #f8f8f8;
+    background: var(--app-bg-secondary);
     border-radius: 18rpx;
     padding: 0 24rpx;
     border: 2rpx solid transparent;
@@ -318,36 +318,36 @@ const handleDelete = () => {
 }
 
 .input-wrapper:focus-within {
-    background: #fff;
+    background: var(--app-bg-container);
     border-color: #4d62ff;
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
 
 .input-wrapper.has-error {
-    border-color: #f44336;
-    background: #fff;
+    border-color: var(--app-danger);
+    background: var(--app-bg-container);
 }
 
 .form-input {
     flex: 1;
     height: 96rpx;
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .form-input.is-error {
-    color: #f44336;
+    color: var(--app-danger);
 }
 
 .textarea-wrapper {
-    background: #f8f8f8;
+    background: var(--app-bg-secondary);
     border-radius: 18rpx;
     padding: 20rpx 24rpx;
     border: 2rpx solid transparent;
 }
 
 .textarea-wrapper:focus-within {
-    background: #fff;
+    background: var(--app-bg-container);
     border-color: #4d62ff;
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
@@ -357,12 +357,12 @@ const handleDelete = () => {
     min-height: 140rpx;
     font-size: 28rpx;
     line-height: 1.5;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .char-count {
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 .description-count {
@@ -376,7 +376,7 @@ const handleDelete = () => {
     align-items: center;
     gap: 8rpx;
     font-size: 24rpx;
-    color: #f44336;
+    color: var(--app-danger);
 }
 
 .form-actions {
@@ -401,7 +401,7 @@ const handleDelete = () => {
 
 .btn-submit {
     background: linear-gradient(135deg, #4d62ff 0%, #3f57f0 100%);
-    color: #fff;
+    color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(77, 98, 255, 0.32);
 }
 
@@ -410,8 +410,8 @@ const handleDelete = () => {
 }
 
 .btn-delete {
-    background: #fff;
-    color: #f44336;
+    background: var(--app-bg-container);
+    color: var(--app-danger);
     border: 2rpx solid #ffd6d6;
 }
 
@@ -432,7 +432,7 @@ const handleDelete = () => {
     width: 100%;
     height: 100%;
     border: 4rpx solid rgba(255, 255, 255, 0.3);
-    border-top-color: #fff;
+    border-top-color: var(--app-bg-container);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -453,7 +453,7 @@ const handleDelete = () => {
 .spinner-circle {
     width: 100%;
     height: 100%;
-    border: 6rpx solid #e0e0e0;
+    border: 6rpx solid var(--app-border);
     border-top-color: #4d62ff;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -462,7 +462,7 @@ const handleDelete = () => {
 .loading-text {
     margin-top: 24rpx;
     font-size: 28rpx;
-    color: #666;
+    color: var(--app-text-secondary);
 }
 
 @keyframes spin {

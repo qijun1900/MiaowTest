@@ -253,13 +253,13 @@ onMounted(() => {
 .tags-title {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .refresh-btn {
     display: flex;
     align-items: center;
-    color: #007aff;
+    color: var(--app-brand);
     font-size: 28rpx;
 }
 
@@ -274,8 +274,8 @@ onMounted(() => {
 }
 
 .subject-tag {
-    background-color: #f0f7ff;
-    color: #007aff;
+    background-color: var(--app-brand-light);
+    color: var(--app-brand);
     padding: 10rpx 20rpx;
     border-radius: 30rpx;
     font-size: 28rpx;
@@ -283,7 +283,7 @@ onMounted(() => {
 
 .search-results {
     margin-top: 10rpx;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border-radius: 15rpx;
     overflow: hidden;
     margin-bottom: 25rpx;
@@ -291,7 +291,7 @@ onMounted(() => {
 
 .result-item {
     padding: 23rpx 30rpx;
-    border-bottom: 2rpx solid #eee;
+    border-bottom: 2rpx solid var(--app-border);
 }
 
 .result-item:last-child {
@@ -306,7 +306,7 @@ onMounted(() => {
 
 .result-text {
     font-size: 32rpx;
-    color: #333;
+    color: var(--app-text-primary);
     flex: 1;
 }
 
@@ -318,21 +318,21 @@ onMounted(() => {
 .no-results {
     margin-top: 20rpx;
     text-align: center;
-    color: #999;
+    color: var(--app-text-secondary);
     font-size: 35rpx;
 }
 
 .loading {
     margin-top: 20rpx;
     text-align: center;
-    color: #666;
+    color: var(--app-text-secondary);
     font-size: 14rpx;
 }
 
 .initial-tip {
     margin-top: 20rpx;
     text-align: center;
-    color: #999;
+    color: var(--app-text-secondary);
     font-size: 35rpx;
 }
 </style>

@@ -463,7 +463,7 @@ onBeforeUnmount(() => {
     height: 60rpx;
     border-radius: 30rpx;
     border: 2rpx solid #dfe7df;
-    background: #ffffff;
+    background: var(--app-bg-container);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -524,7 +524,7 @@ onBeforeUnmount(() => {
 
 .hero-stat {
     flex-shrink: 0;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 24rpx;
     border: 2rpx solid #dfe7df;
     padding: 12rpx 18rpx;
@@ -683,8 +683,8 @@ onBeforeUnmount(() => {
 }
 
 .create-card:active {
-    border-color: #999;
-    background: #f9f9f9 !important;
+    border-color: var(--app-text-secondary);
+    background: var(--app-bg-secondary) !important;
 }
 
 .create-content {
@@ -720,7 +720,7 @@ onBeforeUnmount(() => {
 }
 
 .create-text {
-    color: #999;
+    color: var(--app-text-secondary);
     font-size: 28rpx;
     font-weight: 500;
 }
@@ -736,7 +736,7 @@ onBeforeUnmount(() => {
 
 .form-label {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     margin-bottom: 20rpx;
     font-weight: 600;
     display: flex;
@@ -760,13 +760,13 @@ onBeforeUnmount(() => {
 }
 
 .input-wrapper:focus-within {
-    background: #fff;
-    border-color: #4caf50;
+    background: var(--app-bg-container);
+    border-color: var(--app-success);
     box-shadow: 0 0 0 4rpx rgba(76, 175, 80, 0.1);
 }
 
 .input-wrapper.has-error {
-    background: #fff;
+    background: var(--app-bg-container);
     border-color: #f44336;
     box-shadow: 0 0 0 4rpx rgba(244, 67, 54, 0.1);
 }
@@ -776,7 +776,7 @@ onBeforeUnmount(() => {
     height: 88rpx;
     padding: 0 16rpx;
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     box-sizing: border-box;
     border: none;
     background: transparent;
@@ -788,7 +788,7 @@ onBeforeUnmount(() => {
 
 .char-count {
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 .form-error {
@@ -843,7 +843,7 @@ onBeforeUnmount(() => {
 
 .color-item.active {
     transform: scale(1.1);
-    border-color: #fff;
+    border-color: var(--app-bg-container);
     box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.25);
 }
 
@@ -867,7 +867,7 @@ onBeforeUnmount(() => {
     gap: 30rpx;
     margin-top: 60rpx;
     padding-top: 40rpx;
-    border-top: 2rpx solid #f0f0f0;
+    border-top: 2rpx solid var(--app-bg-secondary);
 }
 
 .btn {
@@ -885,20 +885,20 @@ onBeforeUnmount(() => {
 }
 
 .btn-cancel {
-    background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
-    color: #666;
+    background: linear-gradient(135deg, var(--app-bg-secondary) 0%, #ebebeb 100%);
+    color: var(--app-text-secondary);
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
 }
 
 .btn-cancel:active {
-    background: linear-gradient(135deg, #e8e8e8 0%, #ddd 100%);
+    background: linear-gradient(135deg, var(--app-border) 0%, #ddd 100%);
     transform: scale(0.98);
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--app-success) 0%, #45a049 100%);
+    color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(76, 175, 80, 0.35);
 }
 
@@ -1000,7 +1000,7 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100%;
     border: 4rpx solid rgba(255, 255, 255, 0.3);
-    border-top-color: #fff;
+    border-top-color: var(--app-bg-container);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

@@ -881,11 +881,11 @@ onUnmounted(() => {
 }
 
 .toolbar-item.active {
-    background-color: #007aff;
+    background-color: var(--app-brand);
 }
 
 .toolbar-item.active .iconfont {
-    color: #ffffff;
+    color: var(--app-bg-container);
 }
 
 .toolbar-item.disabled {
@@ -903,7 +903,7 @@ onUnmounted(() => {
     position: absolute;
     top: 80rpx;
     left: 10rpx;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border: 1rpx solid #e5e5e5;
     border-radius: 8rpx;
     padding: 10rpx;
@@ -946,7 +946,7 @@ onUnmounted(() => {
     position: absolute;
     top: 80rpx;
     left: 10rpx;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border: 1rpx solid #e5e5e5;
     border-radius: 8rpx;
     padding: 10rpx;
@@ -959,7 +959,7 @@ onUnmounted(() => {
 .font-size-option {
     padding: 10rpx;
     text-align: center;
-    border-bottom: 1rpx solid #f0f0f0;
+    border-bottom: 1rpx solid var(--app-bg-secondary);
 }
 
 .font-size-option-last {
@@ -975,15 +975,15 @@ onUnmounted(() => {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 20rpx;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     line-height: 1.5;
     font-size: 28rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .iconfont {
     font-size: 32rpx;
-    color: #333;
+    color: var(--app-text-primary);
     font-weight: bold;
 }
 </style>

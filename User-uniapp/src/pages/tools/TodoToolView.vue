@@ -494,7 +494,7 @@ onMounted(() => {
 <style scoped>
 .container {
     padding: 20rpx;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     min-height: 100vh;
 }
 
@@ -504,7 +504,7 @@ onMounted(() => {
 
 /* 待办事项列表样式 */
 .todos-list {
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 20rpx;
     padding: 30rpx;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
@@ -522,7 +522,7 @@ onMounted(() => {
 
 .loading-text {
     margin-top: 20rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     font-size: 28rpx;
 }
 
@@ -538,14 +538,14 @@ onMounted(() => {
 .empty-title {
     margin-top: 30rpx;
     font-size: 32rpx;
-    color: #333;
+    color: var(--app-text-primary);
     font-weight: 600;
 }
 
 .empty-desc {
     margin-top: 16rpx;
     font-size: 26rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 /* 待办事项容器 */
@@ -559,7 +559,7 @@ onMounted(() => {
     align-items: center;
     margin-bottom: 30rpx;
     padding-bottom: 20rpx;
-    border-bottom: 2rpx solid #f0f0f0;
+    border-bottom: 2rpx solid var(--app-bg-secondary);
 }
 
 .header-actions {
@@ -587,14 +587,14 @@ onMounted(() => {
 
 .progress-text {
     font-size: 24rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     font-weight: 500;
 }
 
 .progress-bar {
     width: 100rpx;
     height: 8rpx;
-    background: #f0f0f0;
+    background: var(--app-bg-secondary);
     border-radius: 4rpx;
     overflow: hidden;
 }
@@ -621,19 +621,19 @@ onMounted(() => {
 .congratulations-text {
     margin-left: 16rpx;
     font-size: 28rpx;
-    color: #4caf50;
+    color: var(--app-success);
     font-weight: 600;
 }
 
 .todos-title {
     font-size: 32rpx;
     font-weight: 600;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .todos-count {
     font-size: 26rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 /* 单个待办事项 */
@@ -641,7 +641,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     padding: 24rpx 0;
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 1rpx solid var(--app-bg-secondary);
     transition: all 0.3s ease;
     animation: slideInLeft 0.4s ease-out;
     animation-fill-mode: both;
@@ -668,7 +668,7 @@ onMounted(() => {
 }
 
 .todo-item:hover {
-    background: #fafafa;
+    background: var(--app-bg-container);
     border-radius: 12rpx;
     padding-left: 20rpx;
     padding-right: 20rpx;
@@ -692,19 +692,19 @@ onMounted(() => {
 
 .todo-title {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     margin-bottom: 8rpx;
     transition: all 0.3s ease;
 }
 
 .todo-title.completed-text {
     text-decoration: line-through;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 .todo-desc {
     font-size: 26rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     line-height: 1.4;
 }
 
@@ -752,25 +752,25 @@ onMounted(() => {
     display: block;
     font-size: 30rpx;
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--app-text-primary);
 }
 
 /* 输入框样式 */
 .form-input {
     width: 100%;
     height: 96rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border: 2rpx solid #e1e5e9;
     border-radius: 16rpx;
     padding: 0 10rpx;
     font-size: 30rpx;
-    color: #1a1a1a;
+    color: var(--app-text-primary);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
 .form-input:focus {
-    border-color: #007aff;
+    border-color: var(--app-brand);
     background: #f8f9ff;
     box-shadow: 0 4rpx 20rpx rgba(0, 122, 255, 0.15);
     transform: translateY(-2rpx);
@@ -785,19 +785,19 @@ onMounted(() => {
 .form-textarea {
     width: 100%;
     height: 180rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border: 2rpx solid #e1e5e9;
     border-radius: 16rpx;
     padding: 20rpx;
     font-size: 30rpx;
-    color: #1a1a1a;
+    color: var(--app-text-primary);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
     resize: none;
 }
 
 .form-textarea:focus {
-    border-color: #007aff;
+    border-color: var(--app-brand);
     background: #f8f9ff;
     box-shadow: 0 4rpx 20rpx rgba(0, 122, 255, 0.15);
 }
@@ -815,7 +815,7 @@ onMounted(() => {
 /* 错误提示 */
 .error-text {
     display: block;
-    color: #ff4757;
+    color: var(--app-danger);
     font-size: 24rpx;
     margin-top: 12rpx;
     animation: shake 0.5s ease-in-out;
@@ -839,7 +839,7 @@ onMounted(() => {
     display: flex;
     gap: 24rpx;
     padding-top: 20rpx;
-    border-top: 1rpx solid #f0f0f0;
+    border-top: 1rpx solid var(--app-bg-secondary);
 }
 
 .action-btn {
@@ -872,8 +872,8 @@ onMounted(() => {
 }
 
 .cancel-btn {
-    background: #f8f9fa !important;
-    color: #666 !important;
+    background: var(--app-bg-secondary) !important;
+    color: var(--app-text-secondary) !important;
     border: 2rpx solid #e1e5e9 !important;
 }
 
@@ -919,7 +919,7 @@ onMounted(() => {
     height: 38rpx;
     border: 2rpx solid #c0c4cc;
     border-radius: 50%;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
 }
 
 /* 微交互动画 */

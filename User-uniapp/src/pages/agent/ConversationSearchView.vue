@@ -353,14 +353,14 @@ onUnmounted(() => {
 <style scoped>
 .container {
     height: 100vh;
-    background: #f6f7f9;
+    background: var(--app-bg-secondary);
     display: flex;
     flex-direction: column;
 }
 
 /* 自定义导航栏 */
 .custom-navbar {
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-bottom: 1rpx solid rgba(15, 23, 42, 0.06);
     flex-shrink: 0;
 }
@@ -397,7 +397,7 @@ onUnmounted(() => {
 
 .cancel-text {
     font-size: 28rpx;
-    color: #2d2f36;
+    color: var(--app-text-primary);
     white-space: nowrap;
 }
 
@@ -415,13 +415,13 @@ onUnmounted(() => {
 .nav-search-input {
     flex: 1;
     font-size: 28rpx;
-    color: #2d2f36;
+    color: var(--app-text-primary);
     height: 64rpx;
     line-height: 64rpx;
 }
 
 .nav-search-placeholder {
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
     font-size: 28rpx;
 }
 
@@ -431,7 +431,7 @@ onUnmounted(() => {
     align-items: center;
     justify-content: space-between;
     padding: 20rpx 32rpx 12rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-top: 1rpx solid rgba(15, 23, 42, 0.08);
     flex-shrink: 0;
 }
@@ -443,7 +443,7 @@ onUnmounted(() => {
 
 .action-bar-count {
     font-size: 28rpx;
-    color: #2d2f36;
+    color: var(--app-text-primary);
     font-weight: 500;
 }
 
@@ -477,7 +477,7 @@ onUnmounted(() => {
 
 .action-delete-text {
     font-size: 28rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 
@@ -541,7 +541,7 @@ onUnmounted(() => {
 .searching-bar-inner {
     height: 100%;
     width: 30%;
-    background: #2d2f36;
+    background: var(--app-text-primary);
     border-radius: 4rpx;
     animation: searching-slide 1s ease-in-out infinite;
 }
@@ -563,7 +563,7 @@ onUnmounted(() => {
     align-items: center;
     padding: 28rpx 32rpx;
     gap: 20rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-bottom: 1rpx solid rgba(15, 23, 42, 0.04);
 }
 
@@ -598,7 +598,7 @@ onUnmounted(() => {
 
 .result-title {
     font-size: 30rpx;
-    color: #2d2f36;
+    color: var(--app-text-primary);
     font-weight: 500;
     overflow: hidden;
     white-space: nowrap;
@@ -612,7 +612,7 @@ onUnmounted(() => {
 
 .result-preview {
     font-size: 24rpx;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -636,6 +636,6 @@ onUnmounted(() => {
 
 .empty-text {
     font-size: 28rpx;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
 }
 </style>

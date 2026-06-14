@@ -346,7 +346,7 @@ onLoad((options = {}) => {
     height: 56rpx;
     border-radius: 28rpx;
     border: 2rpx solid #d8deea;
-    background: #ffffff;
+    background: var(--app-bg-container);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -528,7 +528,7 @@ onLoad((options = {}) => {
     padding: 0 24rpx;
     border-radius: 32rpx;
     border: 2rpx solid #dce4f6;
-    background: #ffffff;
+    background: var(--app-bg-container);
     display: flex;
     align-items: center;
     justify-content: center;

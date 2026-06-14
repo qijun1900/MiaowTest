@@ -1120,7 +1120,7 @@ function escapeHtml(value) {
     padding: 22rpx 0;
     text-align: center;
     background: var(--app-brand);
-    color: #ffffff;
+    color: var(--app-bg-container);
     border-radius: 12rpx;
     font-size: 28rpx;
 }
@@ -1130,6 +1130,6 @@ function escapeHtml(value) {
 }
 
 .bubble-select-btn text {
-    color: #ffffff;
+    color: var(--app-bg-container);
 }
 </style>

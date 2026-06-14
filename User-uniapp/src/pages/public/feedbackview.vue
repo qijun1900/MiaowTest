@@ -175,12 +175,12 @@ onLoad((option) => {
 <style scoped>
 .feedback-container {
     padding: 20rpx;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     min-height: 100vh;
 }
 
 .form-container {
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 30rpx;
     box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
@@ -193,13 +193,13 @@ onLoad((option) => {
 .label {
     display: block;
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     margin-bottom: 20rpx;
     font-weight: bold;
 }
 
 .required {
-    color: #ff4d4f;
+    color: var(--app-danger);
 }
 
 .radio-item {
@@ -211,7 +211,7 @@ onLoad((option) => {
 .radio-text {
     margin-left: 20rpx;
     font-size: 28rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .textarea {
@@ -228,7 +228,7 @@ onLoad((option) => {
     display: block;
     text-align: right;
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     margin-top: 10rpx;
 }
 
@@ -245,8 +245,8 @@ onLoad((option) => {
 .submit-btn {
     width: 100%;
     height: 80rpx;
-    background-color: #007aff;
-    color: #fff;
+    background-color: var(--app-brand);
+    color: var(--app-bg-container);
     border-radius: 8rpx;
     font-size: 32rpx;
     display: flex;
@@ -274,7 +274,7 @@ onLoad((option) => {
 
 .success-text {
     font-size: 32rpx;
-    color: #333;
+    color: var(--app-text-primary);
     text-align: center;
     margin-bottom: 60rpx;
     line-height: 1.5;
@@ -293,12 +293,12 @@ onLoad((option) => {
 }
 
 .resubmit-btn {
-    background-color: #007aff;
-    color: #fff;
+    background-color: var(--app-brand);
+    color: var(--app-bg-container);
 }
 
 .back-btn {
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: var(--app-bg-secondary);
+    color: var(--app-text-primary);
 }
 </style>

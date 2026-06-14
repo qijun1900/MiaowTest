@@ -68,7 +68,7 @@ const selectValue = (value) => {
 
 <style scoped>
 .subject-filter {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     padding: 20rpx 0;
     margin-bottom: 20rpx;
     box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
@@ -89,14 +89,14 @@ const selectValue = (value) => {
     margin-right: 20rpx;
     border-radius: 30rpx;
     font-size: 28rpx;
-    color: #666666;
-    background-color: #f5f5f5;
+    color: var(--app-text-secondary);
+    background-color: var(--app-bg-secondary);
     transition: all 0.3s ease;
 }
 
 .subject-item.active {
-    color: #ffffff;
-    background-color: #1e6bff;
+    color: var(--app-bg-container);
+    background-color: var(--app-brand);
     font-weight: 500;
 }
 

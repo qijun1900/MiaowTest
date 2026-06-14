@@ -56,7 +56,7 @@ const handleSelect = (item) => {
     height: 68rpx;
     padding: 0 28rpx;
     border-radius: 999rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border: 1rpx solid #edf0f4;
     box-shadow: 0 4rpx 12rpx rgba(17, 24, 39, 0.035);
     display: inline-flex;

@@ -1130,7 +1130,7 @@ onBeforeUnmount(() => {
 .search-box {
     display: flex;
     align-items: center;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 48rpx;
     padding: 20rpx 32rpx;
     box-shadow: 0 4rpx 16rpx rgba(255, 149, 85, 0.08);
@@ -1146,7 +1146,7 @@ onBeforeUnmount(() => {
 .search-input {
     flex: 1;
     font-size: 28rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     height: 40rpx;
     line-height: 40rpx;
 }
@@ -1208,7 +1208,7 @@ onBeforeUnmount(() => {
     padding: 12rpx 20rpx;
     border-radius: 28rpx;
     border: 2rpx solid #ffe8d6;
-    background: #ffffff;
+    background: var(--app-bg-container);
     transition: all 0.2s ease;
 }
 
@@ -1224,7 +1224,7 @@ onBeforeUnmount(() => {
 }
 
 .status-filter-item-active .status-filter-text {
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 
@@ -1241,7 +1241,7 @@ onBeforeUnmount(() => {
     display: inline-flex;
     align-items: center;
     padding: 16rpx 32rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 40rpx;
     border: 2rpx solid #ffe8d6;
     transition: all 0.3s ease;
@@ -1256,13 +1256,13 @@ onBeforeUnmount(() => {
 
 .tab-text {
     font-size: 28rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
     white-space: nowrap;
     transition: color 0.3s ease;
 }
 
 .tab-active .tab-text {
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 
@@ -1280,7 +1280,7 @@ onBeforeUnmount(() => {
 
 .tab-active .tab-badge {
     background: rgba(255, 255, 255, 0.3);
-    color: #ffffff;
+    color: var(--app-bg-container);
 }
 
 /* 错题列表样式 */
@@ -1313,7 +1313,7 @@ onBeforeUnmount(() => {
 
 .load-more-text {
     font-size: 24rpx;
-    color: #b0b0b0;
+    color: var(--app-text-secondary);
 }
 
 /* Loading 加载状态 */
@@ -1374,7 +1374,7 @@ onBeforeUnmount(() => {
 
 .empty-desc {
     font-size: 28rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     line-height: 1.6;
     margin-bottom: 48rpx;
     max-width: 500rpx;
@@ -1398,12 +1398,12 @@ onBeforeUnmount(() => {
 
 .empty-action-text {
     font-size: 30rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 
 .question-card {
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 24rpx;
     padding: 32rpx;
     padding-top: 56rpx;
@@ -1439,8 +1439,8 @@ onBeforeUnmount(() => {
 }
 
 .status-badge.status-mastered {
-    background: #e8f5e9;
-    color: #4caf50;
+    background: var(--app-success-light);
+    color: var(--app-success);
     border: 2rpx solid #c8e6c9;
 }
 
@@ -1476,8 +1476,8 @@ onBeforeUnmount(() => {
 }
 
 .tag-green {
-    background: #e8f5e9;
-    color: #4caf50;
+    background: var(--app-success-light);
+    color: var(--app-success);
 }
 
 .tag-yellow {
@@ -1486,7 +1486,7 @@ onBeforeUnmount(() => {
 }
 
 .tag-red {
-    background: #ffebee;
+    background: var(--app-danger-light);
     color: #f44336;
 }
 
@@ -1501,7 +1501,7 @@ onBeforeUnmount(() => {
 }
 
 .tag-gray {
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     color: #757575;
 }
 
@@ -1517,12 +1517,12 @@ onBeforeUnmount(() => {
     align-items: center;
     margin-bottom: 20rpx;
     padding-bottom: 20rpx;
-    border-bottom: 2rpx solid #f5f5f5;
+    border-bottom: 2rpx solid var(--app-bg-secondary);
 }
 
 .meta-text {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 .answer-status {
@@ -1531,14 +1531,14 @@ onBeforeUnmount(() => {
     gap: 8rpx;
     padding: 8rpx 16rpx;
     border-radius: 20rpx;
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .answer-status:active {
     transform: scale(0.95);
-    background: #eeeeee;
+    background: var(--app-border);
 }
 
 .status-show {
@@ -1570,12 +1570,12 @@ onBeforeUnmount(() => {
 .answer-section {
     margin-top: 24rpx;
     padding-top: 20rpx;
-    border-top: 2rpx solid #f5f5f5;
+    border-top: 2rpx solid var(--app-bg-secondary);
 }
 
 .answer-title {
     font-size: 28rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 600;
     margin-bottom: 16rpx;
     margin-top: 28rpx;
@@ -1619,7 +1619,7 @@ onBeforeUnmount(() => {
 .answer-text {
     font-size: 32rpx;
     line-height: 1.5;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 500;
 }
 
@@ -1630,7 +1630,7 @@ onBeforeUnmount(() => {
 
 .note-block {
     padding: 20rpx 28rpx;
-    background: #fafafa;
+    background: var(--app-bg-container);
     border-radius: 12rpx;
 }
 
@@ -1640,7 +1640,7 @@ onBeforeUnmount(() => {
     gap: 16rpx;
     margin-top: 32rpx;
     padding-top: 24rpx;
-    border-top: 2rpx solid #f5f5f5;
+    border-top: 2rpx solid var(--app-bg-secondary);
 }
 
 .answer-btn {
@@ -1651,14 +1651,14 @@ onBeforeUnmount(() => {
     gap: 8rpx;
     padding: 16rpx 24rpx;
     border-radius: 20rpx;
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .answer-btn:active {
     transform: scale(0.95);
-    background: #eeeeee;
+    background: var(--app-border);
 }
 
 .answer-btn:first-child {
@@ -1671,7 +1671,7 @@ onBeforeUnmount(() => {
 }
 
 .answer-btn:last-child {
-    background: #f0f7ff;
+    background: var(--app-brand-light);
     border: 2rpx solid #d6ebff;
 }
 
@@ -1681,7 +1681,7 @@ onBeforeUnmount(() => {
 
 .answer-btn-text {
     font-size: 26rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
     font-weight: 500;
 }
 
@@ -1700,7 +1700,7 @@ onBeforeUnmount(() => {
     align-items: center;
     margin-top: 20rpx;
     padding-top: 20rpx;
-    border-top: 2rpx solid #f5f5f5;
+    border-top: 2rpx solid var(--app-bg-secondary);
 }
 
 .footer-left {
@@ -1709,7 +1709,7 @@ onBeforeUnmount(() => {
     gap: 8rpx;
     padding: 12rpx 24rpx;
     border-radius: 20rpx;
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     cursor: pointer;
 }
 
@@ -1726,7 +1726,7 @@ onBeforeUnmount(() => {
 .footer-btn {
     padding: 12rpx 28rpx;
     border-radius: 20rpx;
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     cursor: pointer;
 }
 
@@ -1735,19 +1735,19 @@ onBeforeUnmount(() => {
 }
 
 .footer-btn.primary.disabled {
-    background: #e8f5e9;
+    background: var(--app-success-light);
 }
 
 .footer-btn .btn-text {
     font-size: 24rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
 }
 
 .footer-btn.primary .btn-text {
-    color: #ffffff;
+    color: var(--app-bg-container);
 }
 
 .footer-btn.primary.disabled .btn-text {
-    color: #4caf50;
+    color: var(--app-success);
 }
 </style>

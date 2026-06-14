@@ -541,7 +541,7 @@ onUnload(() => {
   height: 60rpx;
   border-radius: 30rpx;
   border: 2rpx solid #e8ddd1;
-  background: #ffffff;
+  background: var(--app-bg-container);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -573,7 +573,7 @@ onUnload(() => {
   height: 84rpx;
   border-radius: 42rpx;
   border: 2rpx solid #dce6fa;
-  background: #ffffff;
+  background: var(--app-bg-container);
   display: flex;
   align-items: center;
   gap: 14rpx;
@@ -622,7 +622,7 @@ onUnload(() => {
   padding: 0 18rpx;
   border-radius: 31rpx;
   border: 2rpx solid #dce4f6;
-  background: #ffffff;
+  background: var(--app-bg-container);
   display: flex;
   align-items: center;
   gap: 8rpx;
@@ -645,7 +645,7 @@ onUnload(() => {
   height: 62rpx;
   border-radius: 31rpx;
   border: 2rpx solid #dce4f6;
-  background: #ffffff;
+  background: var(--app-bg-container);
   display: flex;
   align-items: center;
   justify-content: center;

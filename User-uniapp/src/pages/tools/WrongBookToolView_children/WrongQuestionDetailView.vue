@@ -372,12 +372,12 @@ onLoad(async (options) => {
 
 .selector-label {
     font-size: 28rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     margin-bottom: 10rpx;
 }
 
 .picker-display {
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 12rpx;
     padding: 24rpx 30rpx;
     display: flex;
@@ -388,7 +388,7 @@ onLoad(async (options) => {
 
 .picker-display text {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .question-form {

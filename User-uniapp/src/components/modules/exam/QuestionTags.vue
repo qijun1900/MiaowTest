@@ -355,7 +355,7 @@ watch(
     color: #8b5a3c;
     border: 2rpx solid #ffb88c;
     border-radius: 12rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
 }
 
 .tag-input::placeholder {

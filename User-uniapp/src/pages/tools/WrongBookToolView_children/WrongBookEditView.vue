@@ -412,7 +412,7 @@ const handleDelete = () => {
 .preview-book-title {
     font-size: 40rpx;
     font-weight: bold;
-    color: #fff;
+    color: var(--app-bg-container);
     margin-top: auto;
     margin-bottom: 20rpx;
     text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
@@ -443,7 +443,7 @@ const handleDelete = () => {
 
 /* 表单区域 */
 .form-container {
-    background: #fff;
+    background: var(--app-bg-container);
     border-radius: 32rpx;
     padding: 48rpx 32rpx;
     box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
@@ -455,7 +455,7 @@ const handleDelete = () => {
 
 .form-label {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     margin-bottom: 24rpx;
     font-weight: 600;
     display: flex;
@@ -485,13 +485,13 @@ const handleDelete = () => {
 }
 
 .input-wrapper:focus-within {
-    background: #fff;
-    border-color: #4caf50;
+    background: var(--app-bg-container);
+    border-color: var(--app-success);
     box-shadow: 0 0 0 6rpx rgba(76, 175, 80, 0.1);
 }
 
 .input-wrapper.has-error {
-    background: #fff;
+    background: var(--app-bg-container);
     border-color: #f44336;
     box-shadow: 0 0 0 6rpx rgba(244, 67, 54, 0.1);
 }
@@ -500,7 +500,7 @@ const handleDelete = () => {
     flex: 1;
     height: 100%;
     font-size: 32rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .input-placeholder {
@@ -509,7 +509,7 @@ const handleDelete = () => {
 
 .char-count {
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     margin-left: 16rpx;
 }
 
@@ -556,7 +556,7 @@ const handleDelete = () => {
 
 .color-item.active {
     transform: scale(1.15);
-    border-color: #fff;
+    border-color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.2);
 }
 
@@ -603,9 +603,9 @@ const handleDelete = () => {
 }
 
 .btn-delete {
-    background: #fff;
+    background: var(--app-bg-container);
     color: #f44336;
-    border: 2rpx solid #ffebee;
+    border: 2rpx solid var(--app-danger-light);
 }
 
 .btn-delete:active {
@@ -615,8 +615,8 @@ const handleDelete = () => {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, #4caf50 0%, #43a047 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--app-success) 0%, #43a047 100%);
+    color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(76, 175, 80, 0.3);
 }
 
@@ -652,7 +652,7 @@ const handleDelete = () => {
     width: 100%;
     height: 100%;
     border: 6rpx solid #e0e0e0;
-    border-top-color: #4caf50;
+    border-top-color: var(--app-success);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -666,7 +666,7 @@ const handleDelete = () => {
     width: 100%;
     height: 100%;
     border: 4rpx solid rgba(255, 255, 255, 0.3);
-    border-top-color: #fff;
+    border-top-color: var(--app-bg-container);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

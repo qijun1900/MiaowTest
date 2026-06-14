@@ -135,7 +135,7 @@ const handleAddAttachment = () => {
     margin: 0 24rpx;
     padding: 18rpx 20rpx 14rpx;
     border-radius: 34rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border: 1rpx solid rgba(15, 23, 42, 0.08);
     box-shadow: 0 10rpx 22rpx rgba(17, 24, 39, 0.08);
 }
@@ -208,7 +208,7 @@ const handleAddAttachment = () => {
 }
 
 .attach-btn {
-    background: #ffffff;
+    background: var(--app-bg-container);
     border: 1rpx solid rgba(15, 23, 42, 0.18);
 }
 

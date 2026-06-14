@@ -1018,7 +1018,7 @@ onUnload(() => {
 }
 
 .mode-item.active {
-  background: #ffffff;
+  background: var(--app-bg-container);
   box-shadow: 0 3rpx 10rpx rgba(47, 58, 84, 0.12);
 }
 
@@ -1049,7 +1049,7 @@ onUnload(() => {
 
 .save-text {
   font-size: 30rpx;
-  color: #ffffff;
+  color: var(--app-bg-container);
   font-weight: 600;
 }
 
@@ -1083,7 +1083,7 @@ onUnload(() => {
 .panel {
   border-radius: 26rpx;
   border: 2rpx solid #d3daeb;
-  background: #ffffff;
+  background: var(--app-bg-container);
   box-shadow:
     0 10rpx 20rpx rgba(131, 144, 172, 0.08),
     inset 0 1rpx 0 rgba(255, 255, 255, 0.6);
@@ -1183,7 +1183,7 @@ onUnload(() => {
 
 .clear-content-text {
   font-size: 22rpx;
-  color: #ef4444;
+  color: var(--app-danger);
   font-weight: 500;
 }
 
@@ -1226,12 +1226,12 @@ onUnload(() => {
 .markdown-switch-btn {
   padding: 8rpx 16rpx;
   border-radius: 16rpx;
-  background: #f1f5f9;
+  background: var(--app-bg-secondary);
 }
 
 .markdown-switch-text {
   font-size: 22rpx;
-  color: #64748b;
+  color: var(--app-text-secondary);
 }
 
 .markdown-textarea {

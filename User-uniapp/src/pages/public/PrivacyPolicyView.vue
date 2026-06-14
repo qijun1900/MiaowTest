@@ -103,7 +103,7 @@
 <style scoped>
 .privacy-policy-container {
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     padding: 20rpx;
 }
 
@@ -111,7 +111,7 @@
     text-align: center;
     margin-bottom: 40rpx;
     padding: 30rpx 0;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
@@ -119,12 +119,12 @@
 .title {
     font-size: 36rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.4;
 }
 
 .content {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 30rpx;
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
@@ -133,7 +133,7 @@
 .section {
     margin-bottom: 30rpx;
     padding-bottom: 20rpx;
-    border-bottom: 1rpx solid #eeeeee;
+    border-bottom: 1rpx solid var(--app-border);
 }
 
 .section:last-child {
@@ -145,7 +145,7 @@
 .section-title {
     font-size: 32rpx;
     font-weight: 500;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.6;
     display: block;
     margin-bottom: 20rpx;
@@ -154,7 +154,7 @@
 .section-header {
     font-size: 30rpx;
     font-weight: 600;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.5;
     display: block;
     margin-bottom: 16rpx;
@@ -162,7 +162,7 @@
 
 .section-content {
     font-size: 28rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
     line-height: 1.6;
     display: block;
     margin-bottom: 16rpx;
@@ -171,20 +171,20 @@
 
 .contact-info {
     font-size: 28rpx;
-    color: #007aff;
+    color: var(--app-brand);
     font-weight: 500;
     line-height: 1.5;
     display: block;
     margin: 20rpx 0;
     text-align: center;
-    background-color: #f0f7ff;
+    background-color: var(--app-brand-light);
     padding: 16rpx;
     border-radius: 8rpx;
 }
 
 .update-date {
     font-size: 26rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     text-align: center;
     display: block;
     margin: 20rpx 0;

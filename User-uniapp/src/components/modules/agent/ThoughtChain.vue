@@ -214,13 +214,13 @@ const statusText = computed(() => {
 
 .status-text {
     flex: 1;
-    color: #333;
+    color: var(--app-text-primary);
     font-weight: 500;
 }
 
 .arrow-icon {
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     transition: transform 0.3s ease;
 }
 
@@ -252,7 +252,7 @@ const statusText = computed(() => {
 
 .typing-suffix {
     display: inline;
-    color: #64748b;
+    color: var(--app-text-secondary);
     margin-left: 4rpx;
     animation: blink 1s step-end infinite;
 }

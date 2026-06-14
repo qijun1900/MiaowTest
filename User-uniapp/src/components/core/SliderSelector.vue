@@ -82,7 +82,7 @@ watch(
 .selector-container {
     position: relative;
     display: flex;
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     border-radius: 16rpx;
     padding: 8rpx;
     gap: 4rpx;
@@ -92,7 +92,7 @@ watch(
     position: absolute;
     top: 8rpx;
     bottom: 8rpx;
-    background: white;
+    background: var(--app-bg-container);
     border-radius: 12rpx;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -122,14 +122,14 @@ watch(
 
 .type-label {
     font-size: 30rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     font-weight: 400;
     transition: all 0.3s ease;
     white-space: nowrap;
 }
 
 .type-item.active .type-label {
-    color: #333;
+    color: var(--app-text-primary);
     font-weight: 600;
 }
 </style>

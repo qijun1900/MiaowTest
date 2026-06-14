@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
     height: 60rpx;
     border-radius: 30rpx;
     border: 2rpx solid #d5ddf0;
-    background: #ffffff;
+    background: var(--app-bg-container);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -496,7 +496,7 @@ onBeforeUnmount(() => {
 
 .hero-stat {
     flex-shrink: 0;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 24rpx;
     border: 2rpx solid #e8e3db;
     padding: 12rpx 18rpx;
@@ -652,8 +652,8 @@ onBeforeUnmount(() => {
 }
 
 .create-card:active {
-    border-color: #999;
-    background: #f9f9f9 !important;
+    border-color: var(--app-text-secondary);
+    background: var(--app-bg-secondary) !important;
 }
 
 .create-content {
@@ -684,12 +684,12 @@ onBeforeUnmount(() => {
 }
 
 .create-card:active .create-icon {
-    background: #e0e0e0;
+    background: var(--app-border);
     transform: scale(0.95);
 }
 
 .create-text {
-    color: #999;
+    color: var(--app-text-secondary);
     font-size: 28rpx;
     font-weight: 500;
 }
@@ -786,7 +786,7 @@ onBeforeUnmount(() => {
 
 .form-label {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     margin-bottom: 20rpx;
     font-weight: 600;
     display: flex;
@@ -794,7 +794,7 @@ onBeforeUnmount(() => {
 }
 
 .required {
-    color: #f44336;
+    color: var(--app-danger);
     margin-left: 8rpx;
     font-weight: normal;
 }
@@ -802,7 +802,7 @@ onBeforeUnmount(() => {
 .input-wrapper {
     display: flex;
     align-items: center;
-    background: #f8f8f8;
+    background: var(--app-bg-secondary);
     border-radius: 16rpx;
     padding: 0 20rpx;
     border: 2rpx solid transparent;
@@ -810,14 +810,14 @@ onBeforeUnmount(() => {
 }
 
 .input-wrapper:focus-within {
-    background: #fff;
+    background: var(--app-bg-container);
     border-color: #4d62ff;
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
 
 .input-wrapper.has-error {
-    background: #fff;
-    border-color: #f44336;
+    background: var(--app-bg-container);
+    border-color: var(--app-danger);
     box-shadow: 0 0 0 4rpx rgba(244, 67, 54, 0.1);
 }
 
@@ -826,25 +826,25 @@ onBeforeUnmount(() => {
     height: 88rpx;
     padding: 0 16rpx;
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     box-sizing: border-box;
     border: none;
     background: transparent;
 }
 
 .form-input.is-error {
-    color: #f44336;
+    color: var(--app-danger);
 }
 
 .textarea-wrapper {
-    background: #f8f8f8;
+    background: var(--app-bg-secondary);
     border-radius: 16rpx;
     padding: 10rpx 20rpx 8rpx;
     border: 2rpx solid transparent;
 }
 
 .textarea-wrapper:focus-within {
-    background: #fff;
+    background: var(--app-bg-container);
     border-color: #4d62ff;
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
@@ -855,12 +855,12 @@ onBeforeUnmount(() => {
     min-height: 120rpx;
     font-size: 28rpx;
     line-height: 1.5;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .char-count {
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 .description-count {
@@ -874,7 +874,7 @@ onBeforeUnmount(() => {
     gap: 8rpx;
     margin-top: 16rpx;
     font-size: 26rpx;
-    color: #f44336;
+    color: var(--app-danger);
     animation: slideDown 0.3s ease;
 }
 
@@ -883,7 +883,7 @@ onBeforeUnmount(() => {
     gap: 30rpx;
     margin-top: 54rpx;
     padding-top: 36rpx;
-    border-top: 2rpx solid #f0f0f0;
+    border-top: 2rpx solid var(--app-bg-secondary);
 }
 
 .btn {
@@ -902,7 +902,7 @@ onBeforeUnmount(() => {
 
 .btn-cancel {
     background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
-    color: #666;
+    color: var(--app-text-secondary);
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
 }
 
@@ -914,7 +914,7 @@ onBeforeUnmount(() => {
 
 .btn-submit {
     background: linear-gradient(135deg, #4d62ff 0%, #3f57f0 100%);
-    color: #fff;
+    color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(77, 98, 255, 0.32);
 }
 
@@ -944,7 +944,7 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100%;
     border: 4rpx solid rgba(255, 255, 255, 0.3);
-    border-top-color: #fff;
+    border-top-color: var(--app-bg-container);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

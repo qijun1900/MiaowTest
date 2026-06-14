@@ -677,7 +677,7 @@ const resetState = () => {
 
 .header-title {
     font-size: 34rpx;
-    color: #fff;
+    color: var(--app-bg-container);
     font-weight: 600;
 }
 
@@ -716,7 +716,7 @@ const resetState = () => {
 /* 选区边框 */
 .selection-border {
     position: absolute;
-    border: 3rpx solid #fff;
+    border: 3rpx solid var(--app-bg-container);
     pointer-events: none;
     box-shadow: 0 0 0 1rpx rgba(0, 0, 0, 0.3);
 }
@@ -726,7 +726,7 @@ const resetState = () => {
     position: absolute;
     width: 40rpx;
     height: 40rpx;
-    border-color: #fff;
+    border-color: var(--app-bg-container);
     border-style: solid;
     border-width: 0;
     pointer-events: none;
@@ -763,7 +763,7 @@ const resetState = () => {
 /* 边缘手柄 */
 .edge-handle {
     position: absolute;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border-radius: 3rpx;
     pointer-events: none;
 }
@@ -862,7 +862,7 @@ const resetState = () => {
 }
 
 .confirm-btn {
-    background: #07c160;
+    background: var(--app-success);
 }
 
 .confirm-btn.disabled {
@@ -879,11 +879,11 @@ const resetState = () => {
 }
 
 .btn-action-text {
-    color: #fff;
+    color: var(--app-bg-container);
 }
 
 .confirm-text {
-    color: #fff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 
