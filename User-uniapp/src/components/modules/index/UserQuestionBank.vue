@@ -167,27 +167,27 @@ onMounted(async () => {
 }
 
 .question-bank-item {
-    margin-bottom: 28rpx;
-    box-shadow: var(--app-shadow-card);
-    border-radius: 16rpx;
+    margin-bottom: 8rpx;
     background: transparent;
     overflow: hidden;
 }
 
 .question-bank-item-swipe {
-    padding: 13rpx 0;
+    padding: 20rpx 0;
     position: relative;
     overflow: visible;
-    background-color: var(--app-bg-container);
-    border-radius: 16rpx;
-    width: 100%; /* 恢复为100%，防止内容溢出 */
+    background-color: transparent;
+    width: 100%;
     min-height: 110rpx;
     display: flex;
     align-items: center;
-    box-shadow: var(--app-shadow-card);
-    border: 1rpx solid var(--app-border);
+    border-bottom: 1rpx solid var(--app-border);
     transform: translateX(0);
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.question-bank-item:last-child .question-bank-item-swipe {
+    border-bottom: none;
 }
 
 .question-bank-item-swipe.swiped {
@@ -301,10 +301,7 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
     padding: 80rpx 40rpx;
-    background-color: var(--app-bg-container);
-    border-radius: 12rpx;
-    margin-top: 80rpx;
-    box-shadow: var(--app-shadow-card);
+    background-color: transparent;
 }
 
 .empty-image {

@@ -213,5 +213,8 @@ onMounted(() => {
 
 .my-question-bank {
     padding: 20rpx;
+    background-color: var(--app-bg-container);
+    border-radius: 12rpx;
+    margin: 20rpx 0;
 }
 </style>

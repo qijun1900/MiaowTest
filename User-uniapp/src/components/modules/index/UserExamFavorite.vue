@@ -115,14 +115,17 @@ onMounted(() => {
 }
 
 .subject-item {
-    background-color: #ffffff;
-    border-radius: 12rpx;
+    background-color: transparent;
     padding: 29rpx;
-    margin-bottom: 15rpx;
+    margin-bottom: 0;
     display: flex;
     align-items: center;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+    border-bottom: 1rpx solid var(--app-border);
     transition: transform 0.2s ease;
+}
+
+.subject-item:last-child {
+    border-bottom: none;
 }
 
 .subject-item:active {
@@ -180,9 +183,7 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     padding: 80rpx 40rpx;
-    background-color: var(--app-bg-container);
-    border-radius: 12rpx;
-    margin-top: 20rpx;
+    background-color: transparent;
 }
 
 .empty-image {
