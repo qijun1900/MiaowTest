@@ -56,7 +56,8 @@
     </ThemeProvider>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onBeforeUnmount } from "vue";
+import { onShow } from "@dcloudio/uni-app";
 import uniNoticeBar from "../../components/core/uniNoticeBar.vue";
 import uniSwiper from "../../components/core/uniSwiper.vue";
 import uniNavigation from "../../components/modules/index/Navbar.vue";
@@ -69,6 +70,7 @@ import UserExamFavorite from "../../components/modules/index/UserExamFavorite.vu
 import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import BackToTop from "../../components/core/BackToTop.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
+import { AppearanceStore } from "../../stores/modules/AppearanceStore";
 import showShareMenu from "../../util/wechatShare.js";
 
 const noticeData = ref([]); // 添加notice需要的数据
@@ -76,6 +78,27 @@ const swiperList = ref([]); // 添加swiper需要的数据
 const list = ref(["我的题库", "收藏考试"]); // 添加subsection需要的数据
 const currentMode = ref(0); // 当前选中的模式，默认为0
 const backToTopRef = ref(); // 回到顶部组件引用
+const appearanceStore = AppearanceStore();
+
+// 动态设置原生导航栏颜色，跟随主题
+const applyNavBarTheme = () => {
+    const preset = appearanceStore.getCurrentPreset?.();
+    const mode = appearanceStore.resolveMode();
+    const bg = mode === "dark" ? "#1f1e1b" : "#f5f7fa";
+    const frontColor = mode === "dark" ? "#ffffff" : "#000000";
+    // Aurora light 用原有蓝色背景
+    if (preset?.key === "aurora" && mode === "light") {
+        uni.setNavigationBarColor({
+            backgroundColor: "#f5f7fa",
+            frontColor: "#000000",
+        });
+    } else {
+        uni.setNavigationBarColor({
+            backgroundColor: bg,
+            frontColor: frontColor,
+        });
+    }
+};
 
 //选择模式
 const handleSendMode = (value) => {
@@ -136,9 +159,21 @@ onPageScroll((e) => {
 onMounted(() => {
     fetchNoticeInfo();
     fetchBannerInfo();
+    applyNavBarTheme();
     //#ifdef MP-WEIXIN
     showShareMenu();
     //#endif
+    // 监听主题切换事件，实时更新导航栏
+    uni.$on("app:theme-change", applyNavBarTheme);
+});
+
+onShow(() => {
+    // 页面显示时同步一次（从设置页切回来时）
+    applyNavBarTheme();
+});
+
+onBeforeUnmount(() => {
+    uni.$off("app:theme-change", applyNavBarTheme);
 });
 </script>
 <style scoped lang="scss">

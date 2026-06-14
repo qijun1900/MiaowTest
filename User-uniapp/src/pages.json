@@ -23,7 +23,7 @@
 					"pullToRefresh": {
 						"support": true, // 是否支持下拉刷新
 						"style": "circle",
-						"color": "#007AFF" // 下拉刷新圆圈的颜色
+						"color": "#888888" // 下拉刷新圆圈颜色，使用中性灰适配所有主题
 					}
 				}
 			}
@@ -39,7 +39,7 @@
 					"pullToRefresh": {
 						"support": true, // 是否支持下拉刷新
 						"style": "circle",
-						"color": "#007AFF" // 下拉刷新圆圈的颜色
+						"color": "#888888"
 					}
 				},
 				"enablePullDownRefresh": true,
@@ -61,7 +61,7 @@
 					"pullToRefresh": {
 						"support": true, // 是否支持下拉刷新
 						"style": "circle",
-						"color": "#007AFF" // 下拉刷新圆圈的颜色
+						"color": "#888888"
 					}
 				}
 			}
