@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="content">
         <view class="card-container">
             <view class="noticbar">
@@ -52,6 +53,7 @@
         </view>
         <BackToTop ref="backToTopRef" position="bottom-right" />
     </view>
+    </ThemeProvider>
 </template>
 <script setup>
 import { onMounted, ref } from "vue";
@@ -66,6 +68,7 @@ import Subsection from "../../components/core/Subsection.vue";
 import UserExamFavorite from "../../components/modules/index/UserExamFavorite.vue";
 import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import BackToTop from "../../components/core/BackToTop.vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import showShareMenu from "../../util/wechatShare.js";
 
 const noticeData = ref([]); // 添加notice需要的数据
@@ -139,10 +142,15 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
+.content {
+    min-height: 100vh;
+    background-color: var(--app-bg-page);
+}
+
 .card-container {
     margin-top: 20rpx;
     border-radius: 20rpx;
-    background-color: #e6eeff;
+    background-color: var(--app-brand-light);
     overflow: hidden;
 }
 
@@ -157,7 +165,7 @@ onMounted(() => {
 
 .hot-exam {
     padding: 20rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 12rpx;
     margin: 20rpx 0;
 }
@@ -172,9 +180,9 @@ onMounted(() => {
 .hot-exam-title {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     padding-left: 10rpx;
-    border-left: 6rpx solid #007aff;
+    border-left: 6rpx solid var(--app-brand);
     width: 55%;
 }
 
@@ -182,24 +190,24 @@ onMounted(() => {
     display: flex;
     align-items: center;
     padding: 10rpx 20rpx;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     border-radius: 20rpx;
     transition: background-color 0.2s ease;
 }
 
 .more-section:active {
-    background-color: #e8e8e8;
+    background-color: var(--app-border);
 }
 
 .more-text {
     font-size: 24rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
     margin-right: 8rpx;
 }
 
 .arrow-icon {
     font-size: 28rpx;
-    color: #007aff;
+    color: var(--app-brand);
     font-weight: bold;
 }
 

@@ -102,7 +102,7 @@ defineExpose({
     left: 0;
     right: 0;
     z-index: 1000;
-    background-color: #f5f7fa;
+    background-color: var(--app-bg-page);
 }
 
 .navbar-content {
@@ -133,7 +133,7 @@ defineExpose({
 .nav-title {
     font-size: 36rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 // 搜索框样式（集成在导航栏中）

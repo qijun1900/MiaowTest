@@ -2,8 +2,8 @@
     <view class="noticeBar">
         <uni-notice-bar
             v-if="displayText"
-            color="#2979FF"
-            background-color="#e4eeff"
+            :color="brandColor"
+            :background-color="brandLight"
             show-icon
             scrollable
             :text="displayText"
@@ -14,6 +14,9 @@
 </template>
 <script setup>
 import { computed } from "vue";
+import { AppearanceStore } from "../../stores/modules/AppearanceStore";
+
+const appearanceStore = AppearanceStore();
 
 const props = defineProps({
     noticeData: {
@@ -22,12 +25,24 @@ const props = defineProps({
     },
 });
 
+// 从主题 store 获取当前品牌色
+const brandColor = computed(() => {
+    const preset = appearanceStore.getCurrentPreset?.();
+    return preset?.primary || "#2979ff";
+});
+
+// 浅色底：用 getComputedStyle 读 CSS 变量太重，直接按预设映射
+const brandLight = computed(() => {
+    const key = appearanceStore.themePreset;
+    // Claude 暖色底 / Aurora 蓝色底
+    if (key === "claude") return "#fbeee5";
+    return "#eaf1ff";
+});
+
 const displayText = computed(() => {
     if (props.noticeData && props.noticeData.length > 0) {
-        // 取第一条通知的content字段，移除HTML标签
         const firstNotice = props.noticeData[0];
         if (firstNotice.content) {
-            // 移除HTML标签
             return firstNotice.content.replace(/<[^>]*>/g, "");
         }
         return firstNotice.title || "";

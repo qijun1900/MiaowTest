@@ -184,31 +184,31 @@ const handleToolClick = (tool) => {
 
 /* 工具卡片样式 */
 .tool-card {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 8rpx;
     padding: 25rpx 40rpx 25rpx 25rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2rpx 12rpx 0 rgba(0, 0, 0, 0.1);
+    box-shadow: var(--app-shadow-card);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;
     min-height: 120rpx;
-    border: 2px solid #ebeef5;
+    border: 2px solid var(--app-border);
 }
 
 .tool-card-dragging {
     opacity: 0.85;
-    border-color: #5c8dff;
-    box-shadow: 0 8rpx 22rpx rgba(92, 141, 255, 0.2);
+    border-color: var(--app-brand);
+    box-shadow: var(--app-shadow-elevated);
 }
 
 .tool-card:active {
     transform: scale(0.98);
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+    box-shadow: var(--app-shadow-card);
 }
 
 /* 确保容器在小程序和H5环境下都能正常显示 */
@@ -227,7 +227,7 @@ const handleToolClick = (tool) => {
 .tool-icon {
     width: 80rpx;
     height: 80rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 8rpx;
     display: flex;
     align-items: center;
@@ -248,13 +248,13 @@ const handleToolClick = (tool) => {
 .tool-title {
     font-size: 32rpx;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .tool-desc {
     font-size: 25rpx;
-    color: #a0a5a5;
+    color: var(--app-text-secondary);
 }
 
 /* 响应式设计 - 小屏幕设备 */

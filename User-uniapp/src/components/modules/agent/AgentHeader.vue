@@ -205,7 +205,7 @@ const handleOption = (action) => {
     position: relative;
     z-index: 10;
     flex-shrink: 0;
-    background: #f6f7f9;
+    background: var(--app-bg-page);
     box-sizing: border-box;
 }
 
@@ -216,7 +216,8 @@ const handleOption = (action) => {
     right: 0;
     z-index: 100;
     /* 半透明背景 + 毛玻璃滤镜：在支持 backdrop-filter 的环境下让下方内容直接模糊 */
-    background: rgba(246, 247, 249, 0.82);
+    background: var(--app-bg-page);
+    opacity: 0.92;
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     box-sizing: border-box;
@@ -232,10 +233,10 @@ const handleOption = (action) => {
     pointer-events: none;
     background: linear-gradient(
         to bottom,
-        rgba(246, 247, 249, 0.95) 0%,
-        rgba(246, 247, 249, 0.6) 45%,
-        rgba(246, 247, 249, 0) 100%
+        var(--app-bg-page) 0%,
+        transparent 100%
     );
+    opacity: 0.8;
 }
 
 .nav-row {
@@ -266,7 +267,7 @@ const handleOption = (action) => {
 .menu-line {
     height: 4rpx;
     border-radius: 4rpx;
-    background: #30323a;
+    background: var(--app-text-primary);
 }
 
 .line-top {
@@ -286,14 +287,14 @@ const handleOption = (action) => {
     align-items: center;
     justify-content: center;
     gap: 10rpx;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1rpx solid rgba(15, 23, 42, 0.1);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
 }
 
 .model-text {
     font-size: 34rpx;
     font-weight: 600;
-    color: #2d2f36;
+    color: var(--app-text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -302,8 +303,8 @@ const handleOption = (action) => {
 .model-arrow {
     width: 12rpx;
     height: 12rpx;
-    border-right: 3rpx solid #72788a;
-    border-bottom: 3rpx solid #72788a;
+    border-right: 3rpx solid var(--app-text-secondary);
+    border-bottom: 3rpx solid var(--app-text-secondary);
     transform: rotate(45deg) translateY(-2rpx);
 }
 
@@ -331,7 +332,7 @@ const handleOption = (action) => {
 .more-dot {
     width: 8rpx;
     height: 8rpx;
-    background-color: #30323a;
+    background-color: var(--app-text-primary);
     border-radius: 50%;
 }
 
@@ -349,10 +350,10 @@ const handleOption = (action) => {
     top: 90rpx;
     right: 0;
     width: 320rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 10rpx 0;
-    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.12);
+    box-shadow: var(--app-shadow-elevated);
     z-index: 101;
     display: flex;
     flex-direction: column;
@@ -364,7 +365,7 @@ const handleOption = (action) => {
 
 .dropdown-title {
     font-size: 26rpx;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
     font-weight: 500;
     overflow: hidden;
     white-space: nowrap;
@@ -380,21 +381,21 @@ const handleOption = (action) => {
 }
 
 .option-item:active {
-    background-color: #f7f8f9;
+    background-color: var(--app-bg-secondary);
 }
 
 .option-text {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .option-item-danger .option-text {
-    color: #ef4444; 
+    color: var(--app-danger);
 }
 
 .dropdown-divider {
     height: 1rpx;
-    background-color: #f0f0f0;
+    background-color: var(--app-border);
     margin: 8rpx 0;
 }
 
@@ -402,7 +403,7 @@ const handleOption = (action) => {
 /* 简洁白风格：纯白背景、细灰分隔、低饱和度强调色 */
 .model-sheet {
     width: 100%;
-    background: #ffffff;
+    background: var(--app-bg-container);
     padding: 16rpx 0 calc(16rpx + env(safe-area-inset-bottom));
     max-height: 75vh;
     display: flex;
@@ -413,7 +414,7 @@ const handleOption = (action) => {
 .model-sheet-handle {
     width: 64rpx;
     height: 6rpx;
-    background: #e5e7eb;
+    background: var(--app-border);
     border-radius: 999rpx;
     margin: 0 auto 16rpx;
 }
@@ -421,7 +422,7 @@ const handleOption = (action) => {
 .model-sheet-title {
     font-size: 30rpx;
     font-weight: 500;
-    color: #1f2937;
+    color: var(--app-text-primary);
     text-align: center;
     padding: 8rpx 0 20rpx;
 }
@@ -438,19 +439,19 @@ const handleOption = (action) => {
     padding: 26rpx 28rpx;
     margin: 0 24rpx 8rpx;
     border-radius: 16rpx;
-    background: #ffffff;
-    border: 1rpx solid #eef0f3;
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
     box-sizing: border-box;
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .model-sheet-item:active {
-    background: #f7f8fa;
+    background: var(--app-bg-secondary);
 }
 
 .model-sheet-item-active {
-    background: #ffffff;
-    border-color: #1f2937;
+    background: var(--app-bg-container);
+    border-color: var(--app-brand);
 }
 
 .model-sheet-item-main {
@@ -464,7 +465,7 @@ const handleOption = (action) => {
 
 .model-sheet-item-label {
     font-size: 30rpx;
-    color: #1f2937;
+    color: var(--app-text-primary);
     font-weight: 400;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -472,15 +473,15 @@ const handleOption = (action) => {
 }
 
 .model-sheet-item-active .model-sheet-item-label {
-    color: #1f2937;
+    color: var(--app-text-primary);
     font-weight: 600;
 }
 
 .model-sheet-item-tag {
     font-size: 22rpx;
-    color: #6b7280;
+    color: var(--app-text-secondary);
     background: transparent;
-    border: 1rpx solid #e5e7eb;
+    border: 1rpx solid var(--app-border);
     padding: 2rpx 12rpx;
     border-radius: 6rpx;
     flex-shrink: 0;
@@ -491,15 +492,15 @@ const handleOption = (action) => {
     margin: 12rpx 24rpx 0;
     padding: 26rpx 0;
     text-align: center;
-    background: #ffffff;
-    border: 1rpx solid #eef0f3;
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
     border-radius: 16rpx;
     font-size: 30rpx;
     font-weight: 500;
-    color: #1f2937;
+    color: var(--app-text-primary);
 }
 
 .model-sheet-cancel:active {
-    background: #f7f8fa;
+    background: var(--app-bg-secondary);
 }
 </style>

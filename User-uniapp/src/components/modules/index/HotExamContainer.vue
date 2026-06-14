@@ -96,13 +96,13 @@ onMounted(() => {
 }
 
 .exam-item {
-    flex-shrink: 0; /*  防止元素缩小 */
+    flex-shrink: 0;
     width: 218rpx;
     margin-right: 22rpx;
-    background-color: #f0f0f0;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
     overflow: hidden;
-    box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+    box-shadow: var(--app-shadow-card);
     transition: transform 0.2s ease;
 }
 
@@ -113,14 +113,14 @@ onMounted(() => {
 .exam-cover {
     width: 100%;
     height: 235rpx;
-    background-color: #e0e0e0;
+    background-color: var(--app-bg-secondary);
 }
 
 .exam-title {
     padding: 10rpx 8rpx;
     font-size: 23rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     text-align: center;
     white-space: nowrap;
     line-height: 1.4;
@@ -133,7 +133,7 @@ onMounted(() => {
 
 /* 占位图样式 */
 .placeholder-item {
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
 }
 
 .placeholder-cover {

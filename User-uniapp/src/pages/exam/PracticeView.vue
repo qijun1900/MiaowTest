@@ -1,10 +1,11 @@
 <template>
+    <ThemeProvider>
     <view>
         <!-- TDesign自定义导航栏 -->
-        <t-navbar 
-            left-arrow 
-            :fixed="true" 
-            custom-style="background: #F8F8F8" 
+        <t-navbar
+            left-arrow
+            :fixed="true"
+            :custom-style="`background: var(--app-bg-container)`"
             @go-back="leftClick">
             <template #title>
                 <Subsection
@@ -265,6 +266,7 @@
             </template>
         </tPopup>
     </view>
+    </ThemeProvider>
 </template>
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
@@ -278,6 +280,7 @@ import ShortQuestion from "../../components/modules/exam/ShortQuestion.vue"; //T
 import { useObjectiveAnswerStore } from "../../stores/modules/ObjectiveAnswerStore";
 import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerStore";
 import tPopup from "../../components/core/tPopup.vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import AnswerSheet from "../../components/modules/exam/AnswerSheet.vue";
 import { useStatisticsStore } from "../../stores/modules/StatisticsStore";
 import { storeToRefs } from "pinia"; // 从Pinia导入storeToRefs
@@ -974,7 +977,7 @@ onMounted(() => {
 <style scoped>
 /* TDesign tab-bar 自定义背景色 */
 .bottom :deep(.t-tab-bar) {
-    --td-tab-bar-bg-color: #f2f2f2;
+    --td-tab-bar-bg-color: var(--app-bg-container);
 }
 
 .subsection-wrapper {
@@ -1043,7 +1046,7 @@ onMounted(() => {
 .note-editor-wrapper {
     border-radius: 12rpx;
     overflow: hidden;
-    border: 1px solid #eee;
+    border: 1px solid var(--app-border);
     height: 600rpx;
 }
 
@@ -1064,7 +1067,7 @@ onMounted(() => {
 
 .note-info-text {
     font-size: 24rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 .note-button-container {
@@ -1079,7 +1082,7 @@ onMounted(() => {
 }
 .answer-sheet {
     padding: 10rpx 10rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 28rpx;
     margin-top: 20rpx;
     overflow-y: auto;

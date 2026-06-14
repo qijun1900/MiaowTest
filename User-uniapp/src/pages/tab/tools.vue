@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 使用PageHead组件 -->
         <PageHead ref="pageHeadRef" title="所有工具" />
@@ -10,12 +11,14 @@
             @orderChange="handleOrderChange"
         />
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import PageHead from "../../components/core/PageHead.vue";
 import ToolsList from "../../components/modules/tools/ToolsList.vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import showShareMenu from "../../util/wechatShare.js";
 import checkLogin from "../../util/checkLogin.js";
 
@@ -128,7 +131,7 @@ onMounted(() => {
     min-height: 100vh;
     height: 100vh;
     overflow-y: auto;
-    background-color: #f5f7fa;
+    background-color: var(--app-bg-page);
     position: relative;
 }
 </style>

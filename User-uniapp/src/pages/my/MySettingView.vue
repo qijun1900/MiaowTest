@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 用户信息卡片 -->
         <view class="profile-card" @click="handleProfileCardClick">
@@ -15,7 +16,7 @@
                     </template>
                 </view>
             </view>
-            <t-icon name="chevron-right" size="14px" color="#999"></t-icon>
+            <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
         </view>
 
         <!-- 外观设置 -->
@@ -25,77 +26,87 @@
             <!-- 深浅模式 -->
             <view class="setting-item" @click="handleDarkMode">
                 <view class="setting-left">
-                    <view class="setting-icon darkmode-icon">
-                        <t-icon name="browse" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="browse" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">深浅模式</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ appearanceStore.getDarkModeText() }}</text>
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
 
-            <!-- 主题 -->
+            <!-- 主题预设 -->
             <view class="setting-item" @click="showThemePopup = true">
                 <view class="setting-left">
-                    <view class="setting-icon theme-icon">
-                        <t-icon name="star-filled" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="star-filled" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">主题</text>
                 </view>
                 <view class="setting-right">
                     <view
                         class="theme-color-dot"
-                        :style="{ backgroundColor: appearanceStore.themeColor }"
+                        :style="{ backgroundColor: currentPreset.primary }"
                     ></view>
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <text class="setting-value">{{ currentPreset.name }}</text>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
 
             <!-- 字号 -->
             <view class="setting-item" @click="handleFontSize">
                 <view class="setting-left">
-                    <view class="setting-icon fontsize-icon">
-                        <t-icon name="translate" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="translate" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">字号</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ appearanceStore.fontSizeOptions[appearanceStore.fontSizeIndex] }}</text>
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
         </view>
 
-        <!-- 主题色选择弹窗 -->
+        <!-- 主题预设选择弹窗 -->
         <t-popup
             :visible="showThemePopup"
             placement="bottom"
             @visible-change="(visible) => { if (!visible) showThemePopup = false }"
         >
             <view class="theme-picker">
-                <view class="theme-picker-title">选择主题色</view>
-                <view class="theme-color-list">
+                <view class="theme-picker-title">选择主题</view>
+                <view class="theme-preset-list">
                     <view
-                        v-for="(item, index) in appearanceStore.themeColors"
-                        :key="index"
-                        class="theme-color-item"
-                        @click="selectThemeColor(item.color)"
+                        v-for="preset in appearanceStore.themePresets"
+                        :key="preset.key"
+                        class="theme-preset-card"
+                        :class="{ active: appearanceStore.themePreset === preset.key }"
+                        @click="selectPreset(preset.key)"
                     >
                         <view
-                            class="theme-color-circle"
-                            :class="{ active: appearanceStore.themeColor === item.color }"
-                            :style="{ backgroundColor: item.color }"
+                            class="theme-preset-swatch"
+                            :style="getPresetSwatchStyle(preset)"
                         >
-                            <t-icon
-                                v-if="appearanceStore.themeColor === item.color"
-                                name="check"
-                                size="16px"
-                                color="#fff"
-                            ></t-icon>
+                            <view
+                                class="theme-preset-dot"
+                                :style="{ backgroundColor: preset.primary }"
+                            ></view>
                         </view>
-                        <text class="theme-color-name">{{ item.name }}</text>
+                        <view class="theme-preset-info">
+                            <view class="theme-preset-name-row">
+                                <text class="theme-preset-name">{{ preset.name }}</text>
+                                <t-icon
+                                    v-if="appearanceStore.themePreset === preset.key"
+                                    name="check-circle-filled"
+                                    size="18px"
+                                    color="var(--app-brand)"
+                                ></t-icon>
+                            </view>
+                            <text class="theme-preset-desc">{{ preset.description }}</text>
+                        </view>
                     </view>
                 </view>
                 <view class="theme-picker-close" @click="showThemePopup = false">
@@ -109,35 +120,35 @@
             <!-- 账号安全（登录后可见） -->
             <view v-if="isLoggedIn" class="setting-item" @click="handleAccountSecurity">
                 <view class="setting-left">
-                    <view class="setting-icon safe-icon">
-                        <t-icon name="lock-on" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="lock-on" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">账号安全</text>
                 </view>
                 <view class="setting-right">
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
 
             <!-- 账号绑定（登录后可见） -->
             <view v-if="isLoggedIn" class="setting-item" @click="handleAccountBind">
                 <view class="setting-left">
-                    <view class="setting-icon bind-icon">
-                        <t-icon name="link" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="link" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">账号绑定</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ bindStatusText }}</text>
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
 
             <!-- 消息通知 -->
             <view class="setting-item">
                 <view class="setting-left">
-                    <view class="setting-icon notify-icon">
-                        <t-icon name="notification" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="notification" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">消息通知</text>
                 </view>
@@ -153,28 +164,28 @@
             <!-- 清除缓存 -->
             <view class="setting-item" @click="handleClearCache">
                 <view class="setting-left">
-                    <view class="setting-icon clear-icon">
-                        <t-icon name="delete" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="delete" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">清除缓存</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">{{ cacheSize }}</text>
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
 
             <!-- 检查更新 -->
             <view class="setting-item" @click="handleCheckUpdate">
                 <view class="setting-left">
-                    <view class="setting-icon update-icon">
-                        <t-icon name="refresh" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="refresh" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">检查更新</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">v{{ appVersion }}</text>
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
         </view>
@@ -183,40 +194,40 @@
             <!-- 用户协议 -->
             <view class="setting-item" @click="handleUserAgreement">
                 <view class="setting-left">
-                    <view class="setting-icon agreement-icon">
-                        <t-icon name="file" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="file" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">用户协议</text>
                 </view>
                 <view class="setting-right">
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
 
             <!-- 隐私政策 -->
             <view class="setting-item" @click="handlePrivacyPolicy">
                 <view class="setting-left">
-                    <view class="setting-icon privacy-icon">
-                        <t-icon name="browse" size="18px" color="#999"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="browse" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">隐私政策</text>
                 </view>
                 <view class="setting-right">
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
 
             <!-- 关于我们 -->
             <view class="setting-item" @click="handleAbout">
                 <view class="setting-left">
-                    <view class="setting-icon about-icon">
-                        <t-icon name="info-circle" size="18px" color="#80848f"></t-icon>
+                    <view class="setting-icon">
+                        <t-icon name="info-circle" size="18px" color="var(--app-text-secondary)"></t-icon>
                     </view>
                     <text class="setting-label">关于我们</text>
                 </view>
                 <view class="setting-right">
                     <text class="setting-value">v{{ appVersion }}</text>
-                    <t-icon name="chevron-right" size="14px" color="#ccc"></t-icon>
+                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
         </view>
@@ -226,6 +237,7 @@
             <view class="logout-btn" @click="handleLogout">退出登录</view>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -234,6 +246,7 @@ import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import { AppearanceStore } from "../../stores/modules/AppearanceStore";
 import { clearExamCache } from "../../util/cacheCleaner";
 import userAvatar from "../../components/core/userAvatar.vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import logSDK from "../../util/logSDK";
 // #ifdef MP-WEIXIN
@@ -260,6 +273,22 @@ const bindStatus = ref({
     isEmailBound: false,
     isWechatBound: false,
 });
+
+// 当前主题预设
+const currentPreset = computed(
+    () => appearanceStore.getCurrentPreset?.() || appearanceStore.themePresets[0]
+);
+
+// 预设卡片左侧色样：根据预设给一个对应的渐变底
+const getPresetSwatchStyle = (preset) => {
+    const map = {
+        aurora: "linear-gradient(135deg, #eaf1ff 0%, #ffffff 100%)",
+        claude: "linear-gradient(135deg, #f5f0e8 0%, #faf7f2 100%)",
+    };
+    return {
+        background: map[preset.key] || map.aurora,
+    };
+};
 
 // 绑定状态文案
 const bindStatusText = computed(() => {
@@ -318,7 +347,7 @@ const handleAccountSecurity = () => {
     uni.showToast({ title: "功能开发中", icon: "none" });
 };
 
-// 账号绑定：跳转个人信息页（个人信息页已有完整的邮箱/微信绑定 UI）
+// 账号绑定：跳转个人信息页
 const handleAccountBind = () => {
     uni.navigateTo({ url: "/pages/my/UserInfoView" });
 };
@@ -346,11 +375,11 @@ const handleDarkMode = () => {
     });
 };
 
-// 选择主题色
-const selectThemeColor = (color) => {
-    appearanceStore.setThemeColor(color);
+// 选择主题预设
+const selectPreset = (presetKey) => {
+    appearanceStore.setThemePreset(presetKey);
     showThemePopup.value = false;
-    uni.showToast({ title: "主题色已切换", icon: "none" });
+    uni.showToast({ title: "主题已切换", icon: "none", position: "top" });
 };
 
 // 字号
@@ -451,7 +480,7 @@ onMounted(() => {
 <style scoped>
 .container {
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-page);
     padding: 20rpx;
 }
 
@@ -460,11 +489,11 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 30rpx;
     margin-bottom: 20rpx;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+    box-shadow: var(--app-shadow-card);
 }
 
 .profile-left {
@@ -481,21 +510,21 @@ onMounted(() => {
 .profile-name {
     font-size: 32rpx;
     font-weight: 500;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .profile-uid {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 /* 设置分组 */
 .settings-group {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     margin-bottom: 20rpx;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+    box-shadow: var(--app-shadow-card);
     overflow: hidden;
 }
 
@@ -504,7 +533,7 @@ onMounted(() => {
     align-items: center;
     justify-content: space-between;
     padding: 28rpx 30rpx;
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 1rpx solid var(--app-border);
 }
 
 .setting-item:last-child {
@@ -520,59 +549,16 @@ onMounted(() => {
     width: 56rpx;
     height: 56rpx;
     border-radius: 12rpx;
+    background-color: var(--app-bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 20rpx;
 }
 
-.safe-icon {
-    background-color: #f5f5f5;
-}
-
-.notify-icon {
-    background-color: #f5f5f5;
-}
-
-.clear-icon {
-    background-color: #f5f5f5;
-}
-
-.update-icon {
-    background-color: #f5f5f5;
-}
-
-.darkmode-icon {
-    background-color: #f5f5f5;
-}
-
-.theme-icon {
-    background-color: #f5f5f5;
-}
-
-.fontsize-icon {
-    background-color: #f5f5f5;
-}
-
-.agreement-icon {
-    background-color: #f5f5f5;
-}
-
-.privacy-icon {
-    background-color: #f5f5f5;
-}
-
-.about-icon {
-    background-color: #f5f5f5;
-}
-
-.bind-icon {
-    background-color: #f5f5f5;
-}
-
 .setting-label {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 .setting-right {
@@ -582,7 +568,7 @@ onMounted(() => {
 
 .setting-value {
     font-size: 26rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     margin-right: 10rpx;
 }
 
@@ -592,76 +578,107 @@ onMounted(() => {
     height: 28rpx;
     border-radius: 50%;
     margin-right: 10rpx;
-    border: 2rpx solid #eee;
+    border: 2rpx solid var(--app-border);
     flex-shrink: 0;
 }
 
 /* 分组标题 */
 .group-header {
     font-size: 26rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     padding: 20rpx 30rpx 10rpx;
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 1rpx solid var(--app-border);
 }
 
-/* 主题色选择弹窗 */
+/* 主题预设选择弹窗 */
 .theme-picker {
     padding: 30rpx;
+    background-color: var(--app-bg-container);
 }
 
 .theme-picker-title {
     font-size: 32rpx;
     font-weight: 500;
-    color: #333333;
+    color: var(--app-text-primary);
     text-align: center;
-    margin-bottom: 40rpx;
+    margin-bottom: 30rpx;
 }
 
-.theme-color-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30rpx;
-    margin-bottom: 40rpx;
-}
-
-.theme-color-item {
+.theme-preset-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 120rpx;
+    gap: 20rpx;
+    margin-bottom: 30rpx;
 }
 
-.theme-color-circle {
-    width: 72rpx;
-    height: 72rpx;
-    border-radius: 50%;
+.theme-preset-card {
+    display: flex;
+    align-items: center;
+    padding: 24rpx;
+    border-radius: 16rpx;
+    background-color: var(--app-bg-secondary);
+    border: 2rpx solid transparent;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.theme-preset-card.active {
+    border-color: var(--app-brand);
+    background-color: var(--app-brand-light);
+}
+
+.theme-preset-swatch {
+    width: 88rpx;
+    height: 88rpx;
+    border-radius: 16rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12rpx;
-    border: 4rpx solid transparent;
-    transition: border-color 0.2s;
+    margin-right: 24rpx;
+    flex-shrink: 0;
+    border: 1rpx solid var(--app-border);
 }
 
-.theme-color-circle.active {
-    border-color: #333333;
+.theme-preset-dot {
+    width: 40rpx;
+    height: 40rpx;
+    border-radius: 50%;
+    box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);
 }
 
-.theme-color-name {
+.theme-preset-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.theme-preset-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6rpx;
+}
+
+.theme-preset-name {
+    font-size: 30rpx;
+    font-weight: 500;
+    color: var(--app-text-primary);
+}
+
+.theme-preset-desc {
     font-size: 24rpx;
-    color: #666666;
+    color: var(--app-text-secondary);
 }
 
 .theme-picker-close {
     text-align: center;
     padding: 20rpx 0;
-    border-top: 1rpx solid #f5f5f5;
+    border-top: 1rpx solid var(--app-border);
 }
 
 .theme-picker-close text {
     font-size: 28rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 /* 退出登录 */
@@ -671,13 +688,13 @@ onMounted(() => {
 }
 
 .logout-btn {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     height: 100rpx;
     line-height: 100rpx;
     text-align: center;
     font-size: 32rpx;
-    color: #ff4d4f;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+    color: var(--app-danger);
+    box-shadow: var(--app-shadow-card);
 }
 </style>

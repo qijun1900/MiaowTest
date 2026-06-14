@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 自定义导航栏组件 -->
         <PageHead
@@ -77,6 +78,7 @@
             </t-divider>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -87,6 +89,7 @@ import {
 } from "../../API/Exam/ExamAPI";
 import BackToTop from "../../components/core/BackToTop.vue";
 import PageHead from "../../components/core/PageHead.vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import escconfig from "../../config/esc.config";
 import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import formatTime from "../../util/formatTime";
@@ -228,7 +231,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .container {
     min-height: 100vh;
-    background-color: #f5f7fa;
+    background-color: var(--app-bg-page);
 }
 
 // 内容区域样式
@@ -245,13 +248,13 @@ onMounted(() => {
 }
 
 .subject-item {
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 12rpx;
     padding: 29rpx;
     margin-bottom: 13rpx;
     display: flex;
     align-items: center;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+    box-shadow: var(--app-shadow-card);
     transition: transform 0.2s ease;
 }
 
@@ -365,18 +368,18 @@ onMounted(() => {
 .subject-name {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .update-time {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 .subject-arrow {
     font-size: 32rpx;
-    color: #c77f4d;
+    color: var(--app-brand);
     font-weight: bold;
     margin-left: 20rpx;
 }

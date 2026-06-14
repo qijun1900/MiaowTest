@@ -1,0 +1,46 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ *  主题入口：导出所有预设 × 模式的选择器
+ *
+ *  选择器策略：
+ *    - :root  — H5 端 document.documentElement（html 元素）
+ *    - page   — 小程序/APP 端原生 page 容器
+ *    - .theme-xxx.mode-xxx — ThemeProvider 注入的具名 class（任意位置生效）
+ *
+ *  使用：在业务页面中只引用 var(--app-*) / var(--td-*) ，不要再写颜色字面量。
+ * ──────────────────────────────────────────────────────────────────────────── */
+@import './_aurora-light.scss';
+@import './_aurora-dark.scss';
+@import './_claude-light.scss';
+@import './_claude-dark.scss';
+
+/* ── 主题选择器 ──────────────────────────────────────────────────────── */
+
+:root.theme-aurora.mode-light,
+page.theme-aurora.mode-light,
+.theme-aurora.mode-light {
+  @include aurora-light;
+}
+
+:root.theme-aurora.mode-dark,
+page.theme-aurora.mode-dark,
+.theme-aurora.mode-dark {
+  @include aurora-dark;
+}
+
+:root.theme-claude.mode-light,
+page.theme-claude.mode-light,
+.theme-claude.mode-light {
+  @include claude-light;
+}
+
+:root.theme-claude.mode-dark,
+page.theme-claude.mode-dark,
+.theme-claude.mode-dark {
+  @include claude-dark;
+}
+
+/* ── page 元素全局背景：跟随当前主题 ─────────────────────────────────── */
+/* uni-app 的 page 是最外层容器，必须单独设背景，否则透出默认白色 */
+page {
+  background-color: var(--app-bg-page);
+}

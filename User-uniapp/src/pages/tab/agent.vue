@@ -1,5 +1,6 @@
 <template>
     <page-meta page-style="overflow: hidden;" />
+    <ThemeProvider>
     <view class="container" :style="containerStyle">
         <!--
             AgentHeader 内部结构说明：
@@ -266,6 +267,7 @@
             <text class="note-toast-link">查看笔记</text>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -283,6 +285,7 @@ import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
 import tPopup from "../../components/core/tPopup.vue";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { getNotebooksAPI, saveNotebookNoteAPI } from "../../API/Tools/NotesBookAPI.js";
 import { useAgentAttachments } from "../../composables/useAgentAttachments.js";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
@@ -1159,7 +1162,8 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     justify-content: center;
     gap: 12rpx;
     padding: 20rpx 0;
-    background: rgba(246, 247, 249, 0.95);
+    background: var(--app-bg-page);
+    opacity: 0.95;
 }
 
 .container {
@@ -1171,7 +1175,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: #f6f7f9;
+    background: var(--app-bg-page);
 }
 
 /* ── 内容滚动区 ──────────────────────────────────────────────────────────────── */
@@ -1253,8 +1257,8 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 .streaming-bubble {
     margin: 12rpx 0;
     padding: 18rpx 26rpx;
-    background: #ffffff;
-    border: 1rpx solid rgba(15, 23, 42, 0.06);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
     border-radius: 8rpx 26rpx 26rpx;
     max-width: 100%;
 }
@@ -1270,7 +1274,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-weight: 400;
-    color: #1f2328;
+    color: var(--app-text-primary);
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -1282,7 +1286,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 .streaming-cursor {
     font-family: inherit;
     font-size: 30rpx;
-    color: #94a3b8;
+    color: var(--app-text-placeholder);
     animation: cursor-blink 0.8s infinite;
 }
 
@@ -1308,16 +1312,16 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     align-items: center;
     gap: 12rpx;
     padding: 24rpx 28rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 16rpx;
-    box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+    box-shadow: var(--app-shadow-elevated);
     animation: toast-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .note-toast-text {
     flex: 1;
     font-size: 28rpx;
-    color: #333;
+    color: var(--app-text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1325,7 +1329,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
 .note-toast-link {
     font-size: 28rpx;
-    color: #2563eb;
+    color: var(--app-brand);
     font-weight: 500;
     flex-shrink: 0;
 }
@@ -1375,25 +1379,25 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 /* ── 删除会话 简约白色弹窗 ─────────────────────────────────────── */
 .simple-delete-dialog {
     --td-dialog-border-radius: 24rpx;
-    --td-dialog-title-color: #1f2328;
-    --td-dialog-content-color: #6b7280;
+    --td-dialog-title-color: var(--app-text-primary);
+    --td-dialog-content-color: var(--app-text-secondary);
     --td-dialog-width: 600rpx;
 }
 
 /* ── 重命名弹窗 ────────────────────────────────────────────────── */
 .simple-rename-dialog {
     --td-dialog-border-radius: 24rpx;
-    --td-dialog-title-color: #1f2328;
-    --td-dialog-content-color: #6b7280;
+    --td-dialog-title-color: var(--app-text-primary);
+    --td-dialog-content-color: var(--app-text-secondary);
     --td-dialog-width: 600rpx;
 }
 
 .rename-input-wrap {
     margin-top: 16rpx;
-    background: #f6f7f9;
+    background: var(--app-bg-secondary);
     border-radius: 16rpx;
     overflow: hidden;
-    border: 1.5rpx solid rgba(15, 23, 42, 0.07);
+    border: 1.5rpx solid var(--app-border);
 }
 
 .rename-input-wrap :deep(.t-input) {
@@ -1420,7 +1424,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     width: 100%;
     min-height: 240rpx;
     padding: 0 0 24rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
 }
 
 .picker-state {
@@ -1434,7 +1438,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
 .picker-state-text {
     font-size: 26rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 /* 骨架屏 */
@@ -1494,8 +1498,8 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     display: flex;
     align-items: center;
     padding: 28rpx 32rpx;
-    background: #ffffff;
-    border-bottom: 1rpx solid #f2f2f2;
+    background: var(--app-bg-container);
+    border-bottom: 1rpx solid var(--app-border);
     transition: background 0.15s ease;
 }
 
@@ -1504,18 +1508,18 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 }
 
 .notebook-item-active {
-    background: #f7f7f7;
+    background: var(--app-bg-secondary);
 }
 
 .notebook-item-saving {
-    background: #fafafa;
+    background: var(--app-bg-secondary);
 }
 
 .notebook-icon {
     width: 64rpx;
     height: 64rpx;
     border-radius: 12rpx;
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1533,7 +1537,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
 .notebook-title {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.4;
     white-space: nowrap;
@@ -1543,7 +1547,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
 .notebook-meta {
     font-size: 22rpx;
-    color: #94a3b8;
+    color: var(--app-text-secondary);
     margin-top: 6rpx;
 }
 
@@ -1569,8 +1573,8 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 .spinner-circle-small {
     width: 32rpx;
     height: 32rpx;
-    border: 3rpx solid #e5e7eb;
-    border-top-color: #999;
+    border: 3rpx solid var(--app-border);
+    border-top-color: var(--app-text-secondary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }

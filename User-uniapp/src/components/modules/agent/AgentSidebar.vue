@@ -289,7 +289,7 @@ const handleNav = (target) => {
 .sidebar-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--app-bg-mask);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -305,7 +305,7 @@ const handleNav = (target) => {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #f6f7f9;
+    background: var(--app-bg-page);
     display: flex;
     flex-direction: column;
     transform: translateX(-100%);
@@ -320,8 +320,8 @@ const handleNav = (target) => {
 .sidebar-header {
     position: relative;
     z-index: 10;
-    background: #f6f7f9;
-    border-bottom: 1rpx solid rgba(15, 23, 42, 0.08);
+    background: var(--app-bg-page);
+    border-bottom: 1rpx solid var(--app-border);
     box-sizing: border-box;
 }
 
@@ -354,7 +354,7 @@ const handleNav = (target) => {
     top: 50%;
     width: 24rpx;
     height: 3rpx;
-    background: #30323a;
+    background: var(--app-text-primary);
     border-radius: 3rpx;
 }
 
@@ -369,7 +369,7 @@ const handleNav = (target) => {
 .sidebar-title {
     font-size: 34rpx;
     font-weight: 600;
-    color: #2d2f36;
+    color: var(--app-text-primary);
 }
 
 /* 用户信息区 */
@@ -384,7 +384,7 @@ const handleNav = (target) => {
     width: 72rpx;
     height: 72rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--app-brand);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -405,12 +405,12 @@ const handleNav = (target) => {
 .user-name {
     font-size: 30rpx;
     font-weight: 600;
-    color: #2d2f36;
+    color: var(--app-text-primary);
 }
 
 .user-desc {
     font-size: 24rpx;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
 }
 
 /* 搜索栏 */
@@ -421,8 +421,8 @@ const handleNav = (target) => {
 .search-bar {
     height: 64rpx;
     border-radius: 32rpx;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1rpx solid rgba(15, 23, 42, 0.1);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
     display: flex;
     align-items: center;
     padding: 0 20rpx;
@@ -440,7 +440,7 @@ const handleNav = (target) => {
 .search-icon {
     width: 16rpx;
     height: 16rpx;
-    border: 3rpx solid #8b8fa3;
+    border: 3rpx solid var(--app-text-secondary);
     border-radius: 50%;
     position: relative;
 }
@@ -452,7 +452,7 @@ const handleNav = (target) => {
     bottom: -4rpx;
     width: 8rpx;
     height: 3rpx;
-    background: #8b8fa3;
+    background: var(--app-text-secondary);
     border-radius: 3rpx;
     transform: rotate(45deg);
 }
@@ -460,7 +460,7 @@ const handleNav = (target) => {
 .search-placeholder-text {
     flex: 1;
     font-size: 28rpx;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
 }
 
 /* 主导航区 */
@@ -478,23 +478,23 @@ const handleNav = (target) => {
 }
 
 .nav-item:active {
-    background: rgba(15, 23, 42, 0.04);
+    background: var(--app-bg-secondary);
 }
 
 .nav-item-active {
-    background: rgba(102, 126, 234, 0.06);
+    background: var(--app-brand-light);
 }
 
 
 .nav-text {
     font-size: 32rpx;
-    color: #2d2f36;
+    color: var(--app-text-primary);
     font-weight: 500;
 }
 
 .section-divider {
     height: 1rpx;
-    background: rgba(15, 23, 42, 0.06);
+    background: var(--app-border);
     margin: 10rpx 44rpx;
 }
 
@@ -502,7 +502,7 @@ const handleNav = (target) => {
     padding: 20rpx 44rpx 10rpx;
     font-size: 26rpx;
     font-weight: 600;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
 }
 
 /* 会话列表 */
@@ -520,7 +520,7 @@ const handleNav = (target) => {
     padding: 32rpx 20rpx;
     gap: 16rpx;
     margin-bottom: 8rpx;
-    border-bottom: 1rpx solid rgba(15, 23, 42, 0.06);
+    border-bottom: 1rpx solid var(--app-border);
     transition: all 0.2s ease;
     box-sizing: border-box;
     width: 100%;
@@ -531,12 +531,12 @@ const handleNav = (target) => {
 }
 
 .chat-item:active {
-    background: rgba(15, 23, 42, 0.04);
+    background: var(--app-bg-secondary);
     border-radius: 12rpx;
 }
 
 .chat-item-active {
-    background: rgba(102, 126, 234, 0.08);
+    background: var(--app-brand-light);
     border-radius: 12rpx;
     border-bottom-color: transparent;
 }
@@ -553,11 +553,11 @@ const handleNav = (target) => {
     width: 16rpx;
     height: 16rpx;
     border-radius: 50%;
-    background: #8b8fa3;
+    background: var(--app-text-secondary);
 }
 
 .chat-item-active .chat-dot {
-    background: #667eea;
+    background: var(--app-brand);
 }
 
 .chat-item-star {
@@ -576,7 +576,7 @@ const handleNav = (target) => {
 
 .chat-item-title {
     font-size: 32rpx;
-    color: #2d2f36;
+    color: var(--app-text-primary);
     font-weight: 500;
     overflow: hidden;
     white-space: nowrap;
@@ -593,8 +593,8 @@ const handleNav = (target) => {
 .chat-item-spinner {
     width: 28rpx;
     height: 28rpx;
-    border: 3rpx solid rgba(102, 126, 234, 0.2);
-    border-top-color: #667eea;
+    border: 3rpx solid var(--app-border);
+    border-top-color: var(--app-brand);
     border-radius: 50%;
     animation: sidebar-spin 0.6s linear infinite;
     flex-shrink: 0;
@@ -606,7 +606,7 @@ const handleNav = (target) => {
 
 .chat-item-time {
     font-size: 22rpx;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
 }
 
 /* 空状态 */
@@ -619,14 +619,15 @@ const handleNav = (target) => {
 
 .empty-text {
     font-size: 28rpx;
-    color: #8b8fa3;
+    color: var(--app-text-secondary);
 }
 
 /* 底部功能区 */
 .sidebar-footer {
     padding: 18rpx 24rpx calc(18rpx + env(safe-area-inset-bottom));
-    border-top: 1rpx solid rgba(15, 23, 42, 0.06);
-    background: rgba(246, 247, 249, 0.96);
+    border-top: 1rpx solid var(--app-border);
+    background: var(--app-bg-page);
+    opacity: 0.96;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -642,11 +643,11 @@ const handleNav = (target) => {
     width: 80rpx;
     height: 80rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, #32353d 0%, #565a66 100%);
+    background: var(--app-brand);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10rpx 24rpx rgba(17, 24, 39, 0.16);
+    box-shadow: var(--app-shadow-card);
     overflow: hidden;
 }
 
@@ -671,7 +672,7 @@ const handleNav = (target) => {
 .footer-user-name {
     font-size: 30rpx;
     font-weight: 600;
-    color: #22252d;
+    color: var(--app-text-primary);
     line-height: 1.5;
 }
 
@@ -682,12 +683,12 @@ const handleNav = (target) => {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #ffffff;
-    border: 1rpx solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 8rpx 18rpx rgba(17, 24, 39, 0.08);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
+    box-shadow: var(--app-shadow-card);
 }
 
 .footer-settings:active {
-    background: rgba(15, 23, 42, 0.04);
+    background: var(--app-bg-secondary);
 }
 </style>

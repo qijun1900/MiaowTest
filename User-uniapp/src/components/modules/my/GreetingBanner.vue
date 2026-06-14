@@ -58,6 +58,6 @@ onUnmounted(() => {
     font-size: 30rpx;
     line-height: 1.5;
     font-weight: 600;
-    color: rgba(24, 53, 88, 0.62);
+    color: var(--app-text-secondary);
 }
 </style>

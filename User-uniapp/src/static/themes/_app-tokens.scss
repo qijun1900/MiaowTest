@@ -1,0 +1,61 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ *  业务语义层 token（--app-*）
+ *
+ *  规则：
+ *    1. 业务页面只引用本层 token，不直接引用 --td-* / 颜色字面量
+ *    2. 每个预设（aurora / claude）× 模式（light / dark）覆盖 --td-* 后，
+ *       再把 --app-* 映射到当前 --td-* 即可继承一致的色板
+ *
+ *  当前 token 集（按使用频率排序）：
+ *    --app-bg-page              页面整体背景
+ *    --app-bg-container         一级容器（卡片/分组）背景
+ *    --app-bg-secondary         二级容器/弱化区域背景
+ *    --app-bg-mask              半透明遮罩
+ *
+ *    --app-text-primary         主文字
+ *    --app-text-secondary       次级/说明文字
+ *    --app-text-placeholder     占位文字
+ *    --app-text-anti            反色文字（深色按钮上的白字）
+ *    --app-text-link            链接文字
+ *
+ *    --app-brand                品牌主色（按钮/链接/选中态）
+ *    --app-brand-hover          hover 态
+ *    --app-brand-light          浅色填充（标签底色）
+ *
+ *    --app-border               常规分隔线
+ *    --app-border-strong        强分隔线
+ *
+ *    --app-success / --app-warning / --app-danger 反馈色
+ *
+ *    --app-shadow-card          卡片阴影
+ *    --app-shadow-elevated      浮层阴影
+ *
+ *  这一层不带任何颜色字面量，所有值通过 var(--td-*) 引用主题层定义。
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+@mixin app-tokens-from-td {
+  --app-bg-page: var(--td-bg-color-page);
+  --app-bg-container: var(--td-bg-color-container);
+  --app-bg-secondary: var(--td-bg-color-secondarycontainer);
+  --app-bg-mask: var(--td-mask-active);
+
+  --app-text-primary: var(--td-text-color-primary);
+  --app-text-secondary: var(--td-text-color-secondary);
+  --app-text-placeholder: var(--td-text-color-placeholder);
+  --app-text-anti: var(--td-text-color-anti);
+  --app-text-link: var(--td-text-color-link);
+
+  --app-brand: var(--td-brand-color);
+  --app-brand-hover: var(--td-brand-color-active);
+  --app-brand-light: var(--td-brand-color-light);
+
+  --app-border: var(--td-border-level-1-color);
+  --app-border-strong: var(--td-border-level-2-color);
+
+  --app-success: var(--td-success-color);
+  --app-warning: var(--td-warning-color);
+  --app-danger: var(--td-error-color);
+
+  --app-shadow-card: var(--td-shadow-4);
+  --app-shadow-elevated: var(--td-shadow-2);
+}

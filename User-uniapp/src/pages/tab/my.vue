@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 固定头部：问候语 + 设置按钮 -->
         <view class="header-fixed" :style="customNavbarStyle">
@@ -80,6 +81,7 @@
             </template>
         </tOverlay>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -95,6 +97,7 @@ import UserInfoCard from "../../components/modules/my/UserInfoCard.vue";
 import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
 import UserActivityHeatmap from "../../components/modules/my/UserActivityHeatmap.vue";
 import { useNavBarSafeArea } from "../../composables/useNavBarSafeArea.js";
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
 
 const { customNavbarStyle, navRowStyle, refreshLayoutInfo } =
     useNavBarSafeArea({ reserveMenuButtonRight: true });
@@ -205,7 +208,7 @@ onShow(() => {
 .container {
     min-height: 100vh;
     overflow-x: hidden;
-    background-color: #f5f7fa;
+    background-color: var(--app-bg-page);
     padding: 0 15rpx;
 }
 
@@ -216,11 +219,12 @@ onShow(() => {
     left: 0;
     right: 0;
     z-index: 100;
-    background-color: rgba(245, 247, 250, 0.85);
+    background-color: var(--app-bg-page);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     padding: 0 8rpx 0 0;
     box-sizing: border-box;
+    opacity: 0.92;
 }
 
 .header-fixed::after {
@@ -232,12 +236,13 @@ onShow(() => {
     height: 40rpx;
     background: linear-gradient(
         to bottom,
-        rgba(245, 247, 250, 0.6) 0%,
-        rgba(245, 247, 250, 0) 100%
+        var(--app-bg-page) 0%,
+        transparent 100%
     );
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     pointer-events: none;
+    opacity: 0.6;
 }
 
 .header-row {
@@ -265,7 +270,7 @@ onShow(() => {
 }
 
 .header-setting--active {
-    background: rgba(24, 53, 88, 0.08);
+    background: var(--app-bg-container-active, var(--app-bg-secondary));
 }
 
 .header-setting__icon {
@@ -276,12 +281,10 @@ onShow(() => {
 /* 登录弹窗 */
 .rect {
     width: 600rpx;
-    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+    background: var(--app-bg-container);
     border-radius: 20rpx;
-    box-shadow:
-        0 16rpx 48rpx rgba(198, 226, 255, 0.15),
-        0 4rpx 16rpx rgba(198, 226, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: var(--app-shadow-elevated);
+    border: 1px solid var(--app-border);
     padding: 20rpx 0;
 }
 
@@ -296,12 +299,12 @@ onShow(() => {
 .overlay-title {
     font-size: 32rpx;
     font-weight: 580;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 .login-tips {
     font-size: 26rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     margin-bottom: 10rpx;
 }
 

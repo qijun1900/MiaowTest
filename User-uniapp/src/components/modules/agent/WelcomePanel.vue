@@ -132,7 +132,7 @@ const handleActionClick = (item) => {
     font-size: 38rpx;
     line-height: 1.5;
     font-weight: 600;
-    color: #313644;
+    color: var(--app-text-secondary);
     margin-bottom: 8rpx;
 }
 
@@ -141,7 +141,7 @@ const handleActionClick = (item) => {
     font-size: 48rpx;
     line-height: 1.18;
     font-weight: 800;
-    color: #121826;
+    color: var(--app-text-primary);
 }
 
 .welcome-actions {
@@ -156,9 +156,9 @@ const handleActionClick = (item) => {
     height: 84rpx;
     padding: 0 34rpx 0 30rpx;
     border-radius: 999rpx;
-    background: #ffffff;
-    border: 1rpx solid #edf0f4;
-    box-shadow: 0 4rpx 12rpx rgba(17, 24, 39, 0.035);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
+    box-shadow: var(--app-shadow-card);
     display: inline-flex;
     align-items: center;
     gap: 20rpx;
@@ -168,7 +168,7 @@ const handleActionClick = (item) => {
 
 .welcome-action:active {
     transform: scale(0.985);
-    background: #fafbfc;
+    background: var(--app-bg-secondary);
 }
 
 .action-icon {
@@ -191,7 +191,7 @@ const handleActionClick = (item) => {
     font-size: 30rpx;
     line-height: 1;
     font-weight: 700;
-    color: #8e9198;
+    color: var(--app-text-secondary);
     white-space: nowrap;
 }
 
@@ -217,9 +217,9 @@ const handleActionClick = (item) => {
     height: 84rpx;
     padding: 0 40rpx;
     border-radius: 999rpx;
-    background: #ffffff;
-    border: 1rpx solid #edf0f4;
-    box-shadow: 0 4rpx 12rpx rgba(17, 24, 39, 0.035);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
+    box-shadow: var(--app-shadow-card);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -230,7 +230,7 @@ const handleActionClick = (item) => {
     font-size: 30rpx;
     line-height: 1;
     font-weight: 700;
-    color: #8e9198;
+    color: var(--app-text-secondary);
     white-space: nowrap;
 }
 
@@ -238,10 +238,10 @@ const handleActionClick = (item) => {
     margin-top: 56rpx;
     width: 500rpx;
     height: 112rpx;
-    background: #ffffff;
-    border: 1rpx solid #edf0f4;
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
     border-radius: 999rpx;
-    box-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.06);
+    box-shadow: var(--app-shadow-card);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -250,12 +250,12 @@ const handleActionClick = (item) => {
 
 .login-action-btn:active {
     transform: scale(0.985);
-    background: #fafbfc;
+    background: var(--app-bg-secondary);
 }
 
 .login-action-text {
     font-size: 38rpx;
     font-weight: 700;
-    color: #313644;
+    color: var(--app-text-primary);
 }
 </style>

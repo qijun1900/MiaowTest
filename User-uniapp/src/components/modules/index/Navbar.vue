@@ -76,7 +76,7 @@ const handleNavClick = (item) => {
 <style scoped lang="scss">
 .navigation-container {
     padding: 20rpx;
-    background-color: #e6eeff;
+    background-color: var(--app-brand-light);
 }
 
 .grid-item {
@@ -85,14 +85,13 @@ const handleNavClick = (item) => {
     align-items: center;
     justify-content: center;
     padding: 5rpx 0;
-    /* 添加以下样式确保H5端正确显示 */
     width: 100%;
     box-sizing: border-box;
 }
 
 .nav-title {
     font-size: 24rpx;
-    color: #333;
+    color: var(--app-text-primary);
     font-weight: bold;
     text-align: center;
     margin-top: 10rpx;

@@ -68,9 +68,9 @@ const handleNavClick = async (item) => {
 .navigation-container {
     margin: 20rpx 10rpx;
     padding: 30rpx 0;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 24rpx;
-    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+    box-shadow: var(--app-shadow-card);
 }
 
 .nav-grid {
@@ -113,7 +113,7 @@ const handleNavClick = async (item) => {
 
 .nav-title {
     font-size: 26rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.4;
     letter-spacing: 0.5rpx;

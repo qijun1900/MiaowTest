@@ -168,7 +168,7 @@ onMounted(async () => {
 
 .question-bank-item {
     margin-bottom: 28rpx;
-    box-shadow: 0 4rpx 16rpx rgba(77, 148, 255, 0.08);
+    box-shadow: var(--app-shadow-card);
     border-radius: 16rpx;
     background: transparent;
     overflow: hidden;
@@ -178,14 +178,14 @@ onMounted(async () => {
     padding: 13rpx 0;
     position: relative;
     overflow: visible;
-    background-color: #fff;
+    background-color: var(--app-bg-container);
     border-radius: 16rpx;
     width: 100%; /* 恢复为100%，防止内容溢出 */
     min-height: 110rpx;
     display: flex;
     align-items: center;
-    box-shadow: 0 2rpx 8rpx rgba(77, 148, 255, 0.06);
-    border: 1rpx solid #f0f7ff;
+    box-shadow: var(--app-shadow-card);
+    border: 1rpx solid var(--app-border);
     transform: translateX(0);
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -201,7 +201,7 @@ onMounted(async () => {
     margin-left: 22rpx;
     margin-right: 28rpx;
     flex-shrink: 0;
-    background: #e6f2ff;
+    background: var(--app-brand-light);
 }
 
 .bank-info {
@@ -214,7 +214,7 @@ onMounted(async () => {
 .bank-name {
     font-size: 32rpx;
     font-weight: bold;
-    color: #1a5fb4;
+    color: var(--app-brand);
     margin-bottom: 10rpx;
 }
 
@@ -226,12 +226,12 @@ onMounted(async () => {
 
 .question-count {
     font-size: 24rpx;
-    color: #666;
+    color: var(--app-text-secondary);
 }
 
 .time {
     font-size: 25rpx;
-    color: #999;
+    color: var(--app-text-secondary);
 }
 
 .more-section {
@@ -249,7 +249,7 @@ onMounted(async () => {
 
 .arrow-icon {
     font-size: 32rpx;
-    color: #4d94ff;
+    color: var(--app-brand);
     font-weight: bold;
 }
 
@@ -263,7 +263,7 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ff4757;
+    background-color: var(--app-danger);
     transform: translateX(100%);
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     z-index: 2;
@@ -301,10 +301,10 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
     padding: 80rpx 40rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 12rpx;
     margin-top: 80rpx;
-    box-shadow: 0 2rpx 8rpx rgba(77, 148, 255, 0.06);
+    box-shadow: var(--app-shadow-card);
 }
 
 .empty-image {
@@ -317,13 +317,13 @@ onMounted(async () => {
 .empty-text {
     font-size: 32rpx;
     font-weight: bold;
-    color: #666;
+    color: var(--app-text-primary);
     margin-bottom: 20rpx;
 }
 
 .empty-desc {
     font-size: 26rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     text-align: center;
 }
 </style>

@@ -684,7 +684,7 @@ function escapeHtml(value) {
 
 .bubble-avatar {
     overflow: hidden;
-    background: #eef2f7;
+    background: var(--app-bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -732,7 +732,7 @@ function escapeHtml(value) {
 .bubble-box {
     box-sizing: border-box;
     padding: 18rpx 26rpx;
-    color: #1f2328;
+    color: var(--app-text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "Söhne", "SF Pro Text",
         "SF Pro Display", "Segoe UI", "Roboto", "Helvetica Neue",
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
@@ -755,12 +755,12 @@ function escapeHtml(value) {
 }
 
 .bubble-box-start {
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 8rpx 26rpx 26rpx;
 }
 
 .bubble-box-end {
-    background: #dbeafe;
+    background: var(--app-brand-light);
     border-radius: 26rpx 8rpx 26rpx 26rpx;
 }
 
@@ -777,7 +777,7 @@ function escapeHtml(value) {
 }
 
 .bubble-filled {
-    border: 1rpx solid rgba(15, 23, 42, 0.06);
+    border: 1rpx solid var(--app-border);
 }
 
 .bubble-borderless {
@@ -787,12 +787,12 @@ function escapeHtml(value) {
 
 .bubble-outlined {
     background: transparent;
-    border: 1rpx solid rgba(148, 163, 184, 0.55);
+    border: 1rpx solid var(--app-border-strong);
 }
 
 .bubble-shadow {
-    border: 1rpx solid rgba(15, 23, 42, 0.04);
-    box-shadow: 0 10rpx 26rpx rgba(15, 23, 42, 0.1);
+    border: 1rpx solid var(--app-border);
+    box-shadow: var(--app-shadow-elevated);
 }
 
 .bubble-images {
@@ -808,7 +808,7 @@ function escapeHtml(value) {
     width: 180rpx;
     height: 180rpx;
     border-radius: 12rpx;
-    background: #f0f2f5;
+    background: var(--app-bg-secondary);
 }
 
 .bubble-files {
@@ -825,8 +825,8 @@ function escapeHtml(value) {
     gap: 18rpx;
     padding: 18rpx 20rpx;
     border-radius: 18rpx;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1rpx solid rgba(148, 163, 184, 0.16);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
 }
 
 .bubble-file-icon-wrap {
@@ -849,7 +849,7 @@ function escapeHtml(value) {
 
 .bubble-file-name {
     font-size: 26rpx;
-    color: #1f2328;
+    color: var(--app-text-primary);
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
@@ -858,7 +858,7 @@ function escapeHtml(value) {
 
 .bubble-file-ext {
     font-size: 22rpx;
-    color: #94a3b8;
+    color: var(--app-text-secondary);
 }
 
 .bubble-no-style {
@@ -895,7 +895,7 @@ function escapeHtml(value) {
 
 .bubble-typing-suffix {
     display: inline;
-    color: #64748b;
+    color: var(--app-text-secondary);
     margin-left: 2rpx;
 }
 
@@ -910,7 +910,7 @@ function escapeHtml(value) {
     height: 10rpx;
     margin-right: 8rpx;
     border-radius: 999rpx;
-    background: #94a3b8;
+    background: var(--app-text-secondary);
     animation: bubble-loading 1s infinite ease-in-out;
 }
 
@@ -1005,10 +1005,10 @@ function escapeHtml(value) {
     top: 100%;
     margin-top: 10rpx;
     min-width: 280rpx;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 16rpx;
     padding: 10rpx 0;
-    box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.18);
+    box-shadow: var(--app-shadow-elevated);
     z-index: 999;
     display: flex;
     flex-direction: column;
@@ -1030,17 +1030,17 @@ function escapeHtml(value) {
 }
 
 .bubble-action-item:active {
-    background-color: #f7f8f9;
+    background-color: var(--app-bg-secondary);
 }
 
 .bubble-action-text {
     font-size: 28rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .bubble-action-divider {
     height: 1rpx;
-    background-color: #f0f0f0;
+    background-color: var(--app-border);
     margin: 4rpx 0;
 }
 
@@ -1052,7 +1052,7 @@ function escapeHtml(value) {
     right: 0;
     bottom: 0;
     z-index: 1000;
-    background: rgba(15, 23, 42, 0.45);
+    background: var(--app-bg-mask);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1064,12 +1064,12 @@ function escapeHtml(value) {
     width: 100%;
     max-width: 680rpx;
     max-height: 80vh;
-    background: #ffffff;
+    background: var(--app-bg-container);
     border-radius: 20rpx;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.3);
+    box-shadow: var(--app-shadow-elevated);
 }
 
 .bubble-select-header {
@@ -1077,13 +1077,13 @@ function escapeHtml(value) {
     align-items: center;
     justify-content: space-between;
     padding: 24rpx 30rpx;
-    border-bottom: 1rpx solid #f0f0f0;
+    border-bottom: 1rpx solid var(--app-border);
 }
 
 .bubble-select-title {
     font-size: 34rpx;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--app-text-primary);
 }
 
 .bubble-select-close {
@@ -1104,7 +1104,7 @@ function escapeHtml(value) {
 .bubble-select-text {
     font-size: 34rpx;
     line-height: 1.7;
-    color: #1f2328;
+    color: var(--app-text-primary);
     word-break: break-word;
     white-space: pre-wrap;
     user-select: text;
@@ -1113,13 +1113,13 @@ function escapeHtml(value) {
 
 .bubble-select-footer {
     padding: 20rpx 30rpx calc(20rpx + env(safe-area-inset-bottom));
-    border-top: 1rpx solid #f0f0f0;
+    border-top: 1rpx solid var(--app-border);
 }
 
 .bubble-select-btn {
     padding: 22rpx 0;
     text-align: center;
-    background: #1f2937;
+    background: var(--app-brand);
     color: #ffffff;
     border-radius: 12rpx;
     font-size: 28rpx;

@@ -11,12 +11,21 @@
 ────────────────────────────────────────────────────────────────────────────── -->
 <script>
 import logSDK from "./util/logSDK";
+import { AppearanceStore } from "./stores/modules/AppearanceStore";
 // #ifdef APP-PLUS
 import { checkForUpdate } from "./util/checkUpdate";
 // #endif
 
 export default {
     onLaunch: function () {
+        // ── 初始化外观/主题 ────────────────────────────────────────────────────
+        // 在 logSDK 之前先恢复主题，避免首屏闪烁错配色
+        try {
+            AppearanceStore().initAppearance();
+        } catch (e) {
+            console.warn("initAppearance failed", e?.message || e);
+        }
+
         // ── 微信云托管初始化 ──────────────────────────────────────────────────────
         // 仅在微信小程序环境下执行（条件编译），初始化微信云开发能力。
         // logSDK 的 requestByCloud 依赖 wx.cloud，必须在 SDK 初始化前完成。
@@ -128,6 +137,7 @@ export default {
 
 <style lang="scss">
 @import './static/theme.css';
+@import './static/themes/index.scss';
 /* ── 全局公共样式 ──────────────────────────────────────────────────────────── */
 
 /* 提升模态框层级，确保 uni-modal 始终覆盖在其他元素之上 */

@@ -39,15 +39,15 @@ const props = defineProps({
     },
     activeColor: {
         type: String,
-        default: "#3c9cff",
+        default: "var(--app-brand)",
     },
     inactiveColor: {
         type: String,
-        default: "#303133",
+        default: "var(--app-text-primary)",
     },
     bgColor: {
         type: String,
-        default: "#eeeeef",
+        default: "var(--app-bg-secondary)",
     },
     fontSize: {
         type: Number,

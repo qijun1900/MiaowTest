@@ -133,7 +133,7 @@ onMounted(() => {
     width: 80rpx;
     height: 80rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, #c0ccff 0%, #6b9fe8 100%);
+    background: var(--app-brand-light);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -157,18 +157,18 @@ onMounted(() => {
 .subject-name {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
+    color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .update-time {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 .subject-arrow {
     font-size: 32rpx;
-    color: #007aff;
+    color: var(--app-brand);
     font-weight: bold;
     margin-left: 20rpx;
 }
@@ -180,7 +180,7 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     padding: 80rpx 40rpx;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
     border-radius: 12rpx;
     margin-top: 20rpx;
 }
@@ -195,13 +195,13 @@ onMounted(() => {
 .empty-text {
     font-size: 32rpx;
     font-weight: bold;
-    color: #666666;
+    color: var(--app-text-primary);
     margin-bottom: 20rpx;
 }
 
 .empty-desc {
     font-size: 26rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
     text-align: center;
 }
 </style>

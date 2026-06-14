@@ -132,18 +132,15 @@ const handleClick = () => {
     position: relative;
     margin: 0 10rpx 40rpx 10rpx;
     border-radius: 36rpx;
-    background: #ffffff;
-    box-shadow: 0 20rpx 40rpx -12rpx rgba(66, 133, 244, 0.15),
-        0 8rpx 16rpx -8rpx rgba(66, 133, 244, 0.08); /* 高级弥散阴影 */
-    /* 移除 overflow: hidden 允许头像突破卡片上方 */
+    background: var(--app-bg-container);
+    box-shadow: var(--app-shadow-elevated);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--app-border);
 }
 
 .card-hover {
     transform: translateY(2rpx) scale(0.99);
-    box-shadow: 0 10rpx 20rpx -8rpx rgba(66, 133, 244, 0.12),
-        0 4rpx 8rpx -4rpx rgba(66, 133, 244, 0.05);
+    box-shadow: var(--app-shadow-card);
 }
 
 /* ====== 流体背景与玻璃态 ====== */
@@ -164,9 +161,10 @@ const handleClick = () => {
     inset: 0;
     background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.9) 0%,
-        rgba(255, 255, 255, 0.6) 100%
+        var(--app-bg-container) 0%,
+        var(--app-bg-secondary) 100%
     );
+    opacity: 0.75;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     z-index: 2;
@@ -186,8 +184,8 @@ const handleClick = () => {
     height: 240rpx;
     background: radial-gradient(
         circle,
-        #d4e4ff 0%,
-        rgba(212, 228, 255, 0) 70%
+        var(--app-brand-light) 0%,
+        transparent 70%
     );
     top: -40rpx;
     right: -40rpx;
@@ -199,8 +197,8 @@ const handleClick = () => {
     height: 300rpx;
     background: radial-gradient(
         circle,
-        #e1f0ff 0%,
-        rgba(225, 240, 255, 0) 70%
+        var(--app-brand-light) 0%,
+        transparent 70%
     );
     bottom: -100rpx;
     left: -80rpx;
@@ -212,8 +210,8 @@ const handleClick = () => {
     height: 180rpx;
     background: radial-gradient(
         circle,
-        #ebf5ff 0%,
-        rgba(235, 245, 255, 0) 70%
+        var(--app-brand-light) 0%,
+        transparent 70%
     );
     top: 50%;
     left: 30%;
@@ -251,13 +249,11 @@ const handleClick = () => {
 
 .avatar-container {
     border-radius: 50%;
-    /* 弱化后的轻量级悬浮立体阴影 */
-    box-shadow: 0 8rpx 20rpx -6rpx rgba(66, 133, 244, 0.15), 
-                0 2rpx 8rpx -2rpx rgba(0, 0, 0, 0.04);
+    box-shadow: var(--app-shadow-card);
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ffffff; /* 确保背景纯净，避免PNG透明底漏出阴影重叠 */
+    background-color: var(--app-bg-container);
 }
 
 .vip-crown {
@@ -267,7 +263,7 @@ const handleClick = () => {
     width: 40rpx;
     height: 40rpx;
     background: linear-gradient(135deg, #333, #1a1a1a);
-    border: 4rpx solid #fff;
+    border: 4rpx solid var(--app-bg-container);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -296,14 +292,14 @@ const handleClick = () => {
 .login-title {
     font-size: 40rpx;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--app-text-primary);
     margin-bottom: 8rpx;
     display: block;
 }
 
 .login-desc .desc-text {
     font-size: 26rpx;
-    color: #8c9aaf;
+    color: var(--app-text-secondary);
 }
 
 /* 已登录 */
@@ -317,7 +313,7 @@ const handleClick = () => {
 .username-text {
     font-size: 38rpx;
     font-weight: 700;
-    color: #1a2332;
+    color: var(--app-text-primary);
     letter-spacing: 0.5rpx;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -351,22 +347,22 @@ const handleClick = () => {
 .id-capsule {
     display: inline-flex;
     align-items: center;
-    background: rgba(66, 133, 244, 0.08);
-    border: 1px solid rgba(66, 133, 244, 0.15);
+    background: var(--app-brand-light);
+    border: 1px solid var(--app-border);
     border-radius: 100rpx;
     padding: 4rpx 16rpx;
 }
 
 .id-label {
     font-size: 22rpx;
-    color: #4285f4;
+    color: var(--app-brand);
     font-weight: 600;
     margin-right: 8rpx;
 }
 
 .id-value {
     font-size: 22rpx;
-    color: #64748b;
+    color: var(--app-text-secondary);
     font-family: "Courier New", Courier, monospace;
     font-weight: 500;
     letter-spacing: 0.5rpx;
@@ -382,8 +378,8 @@ const handleClick = () => {
     width: 52rpx;
     height: 52rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, #4285f4, #3b76e2);
-    box-shadow: 0 6rpx 16rpx rgba(66, 133, 244, 0.3);
+    background: var(--app-brand);
+    box-shadow: 0 6rpx 16rpx var(--app-brand-light);
     display: flex;
     align-items: center;
     justify-content: center;

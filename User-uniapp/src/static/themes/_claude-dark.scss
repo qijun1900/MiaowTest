@@ -1,0 +1,62 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ *  Claude · Dark
+ *  参考 claude.ai 深色：深墨色背景 + 偏暖的浅橙主色
+ * ──────────────────────────────────────────────────────────────────────────── */
+@import './_app-tokens.scss';
+
+@mixin claude-dark {
+  --td-brand-color-1: #3a1e13;
+  --td-brand-color-2: #4d2718;
+  --td-brand-color-3: #6b3623;
+  --td-brand-color-4: #8a4530;
+  --td-brand-color-5: #a85a3f;
+  --td-brand-color-6: #c96442;
+  --td-brand-color-7: #d97757;   // primary（dark 模式更亮的橙）
+  --td-brand-color-8: #e08b6c;
+  --td-brand-color-9: #e8a48a;
+  --td-brand-color-10: #f0bea8;
+
+  --td-primary-color-1: var(--td-brand-color-1);
+  --td-primary-color-2: var(--td-brand-color-2);
+  --td-primary-color-3: var(--td-brand-color-3);
+  --td-primary-color-4: var(--td-brand-color-4);
+  --td-primary-color-5: var(--td-brand-color-5);
+  --td-primary-color-6: var(--td-brand-color-6);
+  --td-primary-color-7: var(--td-brand-color-7);
+  --td-primary-color-8: var(--td-brand-color-8);
+  --td-primary-color-9: var(--td-brand-color-9);
+  --td-primary-color-10: var(--td-brand-color-10);
+
+  --td-brand-color: #d97757;
+  --td-brand-color-focus: var(--td-primary-color-2);
+  --td-brand-color-active: #e08b6c;
+  --td-brand-color-disabled: var(--td-primary-color-3);
+  --td-brand-color-light: var(--td-primary-color-1);
+  --td-brand-color-light-active: var(--td-primary-color-2);
+
+  // 深墨色暖背景
+  --td-bg-color-page: #1f1e1b;
+  --td-bg-color-container: #262521;
+  --td-bg-color-container-active: #2f2d28;
+  --td-bg-color-secondarycontainer: #2a2926;
+  --td-bg-color-component: #3a3833;
+  --td-bg-color-specialcomponent: transparent;
+
+  --td-text-color-primary: #e8e4d9;
+  --td-text-color-secondary: #a39e92;
+  --td-text-color-placeholder: #756f63;
+  --td-text-color-disabled: #4d4a42;
+  --td-text-color-anti: #f5f0e8;
+  --td-text-color-brand: #d97757;
+  --td-text-color-link: #d97757;
+
+  --td-border-level-1-color: #3a3833;
+  --td-border-level-2-color: #4d4a42;
+
+  --td-mask-active: rgba(0, 0, 0, 0.55);
+  --td-shadow-4: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
+  --td-shadow-2: 0 8px 10px rgba(0, 0, 0, 0.18), 0 3px 14px rgba(0, 0, 0, 0.15),
+    0 5px 5px rgba(0, 0, 0, 0.2);
+
+  @include app-tokens-from-td;
+}

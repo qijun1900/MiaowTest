@@ -80,9 +80,9 @@ watch(
     outline: none !important;
     -webkit-tap-highlight-color: transparent !important;
     transition: all 0.3s ease !important;
-    background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%) !important;
-    border: 2rpx solid #e0e8f0 !important;
-    box-shadow: 0 2rpx 8rpx rgba(77, 148, 255, 0.1) !important;
+    background: var(--app-bg-container) !important;
+    border: 2rpx solid var(--app-border) !important;
+    box-shadow: var(--app-shadow-card) !important;
     height: 80rpx !important;
 }
 
@@ -92,7 +92,7 @@ watch(
     -webkit-tap-highlight-color: transparent !important;
     pointer-events: none !important;
     font-size: 28rpx !important;
-    color: #333333 !important;
+    color: var(--app-text-primary) !important;
     background: transparent !important;
 }
 
@@ -105,7 +105,7 @@ watch(
 /* 搜索框占位符样式 */
 :deep(.uni-searchbar__placeholder) {
     font-size: 28rpx !important;
-    color: #999999 !important;
+    color: var(--app-text-placeholder) !important;
 }
 
 /* 搜索框点击效果 */
