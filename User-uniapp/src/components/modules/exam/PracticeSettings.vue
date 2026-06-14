@@ -101,7 +101,7 @@ watch(() => props.isShowHelper, (v) => { localIsShowHelper.value = v; });
     align-items: center;
     justify-content: space-between;
     padding: 28rpx 0;
-    border-bottom: 1rpx solid #f0f0f0;
+    border-bottom: 1rpx solid var(--app-bg-secondary);
 }
 
 .setting-item:last-child {
@@ -110,7 +110,7 @@ watch(() => props.isShowHelper, (v) => { localIsShowHelper.value = v; });
 
 .setting-label {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     white-space: nowrap;
 }
 
@@ -122,11 +122,11 @@ watch(() => props.isShowHelper, (v) => { localIsShowHelper.value = v; });
 
 .label-tip {
     font-size: 22rpx;
-    color: #bbb;
+    color: var(--app-text-secondary);
 }
 
 .label-tip.error {
-    color: #ee4040;
+    color: var(--app-danger);
 }
 
 .setting-control {
@@ -145,7 +145,7 @@ watch(() => props.isShowHelper, (v) => { localIsShowHelper.value = v; });
 
 .slider-value {
     font-size: 28rpx;
-    color: #3c9cff;
+    color: var(--app-brand);
     font-weight: 600;
     min-width: 60rpx;
     text-align: right;

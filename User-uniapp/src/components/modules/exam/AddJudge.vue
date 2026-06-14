@@ -416,7 +416,7 @@ defineExpose({
 
 .options-container {
     margin-top: 20rpx;
-    background: white;
+    background: var(--app-bg-container);
     padding: 20rpx;
     border-radius: 15rpx;
     border: 1rpx solid #e0e0e0;
@@ -433,14 +433,14 @@ defineExpose({
     align-items: center;
     padding: 28rpx 32rpx;
     border-radius: 16rpx;
-    background-color: #f9f9f9;
+    background-color: var(--app-bg-secondary);
     border: 2rpx solid #e8e8e8;
     transition: all 0.3s ease;
 }
 
 .judge-option.selected {
-    background-color: #e6f7ff;
-    border-color: #1890ff;
+    background-color: var(--app-brand-light);
+    border-color: var(--app-brand);
     box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.2);
 }
 
@@ -455,34 +455,34 @@ defineExpose({
 }
 
 .correct-icon {
-    background-color: #f6ffed;
+    background-color: var(--app-success-light);
     border: 2rpx solid #b7eb8f;
 }
 
 .wrong-icon {
-    background-color: #fff2f0;
+    background-color: var(--app-danger-light);
     border: 2rpx solid #ffccc7;
 }
 
 .judge-option.selected .correct-icon {
-    background-color: #52c41a;
-    border-color: #52c41a;
+    background-color: var(--app-success-light);
+    border-color: var(--app-success);
 }
 
 .judge-option.selected .wrong-icon {
-    background-color: #ff4d4f;
-    border-color: #ff4d4f;
+    background-color: var(--app-danger-light);
+    border-color: var(--app-danger);
 }
 
 .option-text {
     font-size: 32rpx;
-    color: #333;
+    color: var(--app-text-primary);
     font-weight: 500;
     flex: 1;
 }
 
 .judge-option.selected .option-text {
-    color: #1890ff;
+    color: var(--app-brand);
     font-weight: 600;
 }
 
@@ -502,8 +502,8 @@ defineExpose({
 }
 
 .radio-circle.selected {
-    background-color: #1890ff;
-    border-color: #1890ff;
+    background-color: var(--app-brand);
+    border-color: var(--app-brand);
     position: relative;
 }
 
@@ -516,7 +516,7 @@ defineExpose({
     width: 16rpx;
     height: 16rpx;
     border-radius: 50%;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
 }
 
 .my-wrong-answer-section {
@@ -525,7 +525,7 @@ defineExpose({
 
 .wrong-answer-title {
     font-size: 28rpx;
-    color: #ff4d4f;
+    color: var(--app-danger);
     margin-bottom: 20rpx;
     font-weight: 500;
 }
@@ -544,14 +544,14 @@ defineExpose({
     align-items: center;
     justify-content: center;
     font-size: 30rpx;
-    color: #999;
-    background-color: #ffffff;
+    color: var(--app-text-secondary);
+    background-color: var(--app-bg-container);
     transition: all 0.3s;
 }
 
 .judge-btn.selected {
-    border-color: #ff4d4f;
-    background-color: #fff1f0;
-    color: #ff4d4f;
+    border-color: var(--app-danger);
+    background-color: var(--app-danger-light);
+    color: var(--app-danger);
 }
 </style>

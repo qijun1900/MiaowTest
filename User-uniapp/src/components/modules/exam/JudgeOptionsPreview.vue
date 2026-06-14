@@ -109,25 +109,25 @@ const isUserWrongOption = (index) => {
 .section-title-text {
     font-size: 28rpx;
     font-weight: 600;
-    color: #333333;
+    color: var(--app-text-primary);
 }
 
 .judge-option-item {
     margin-bottom: 12rpx;
     border-radius: 12rpx;
     padding: 20rpx 24rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     border: 2rpx solid transparent;
     transition: all 0.3s ease;
 }
 
 .judge-option-item.correct-option {
-    background-color: #e8f5e9;
-    border: 2rpx solid #4caf50;
+    background-color: var(--app-success-light);
+    border: 2rpx solid var(--app-success);
 }
 
 .judge-option-item.user-wrong-option {
-    background-color: #ffebee;
+    background-color: var(--app-danger-light);
     border: 2rpx solid #f44336;
 }
 
@@ -140,14 +140,14 @@ const isUserWrongOption = (index) => {
 .option-tag {
     font-size: 26rpx;
     font-weight: bold;
-    color: #007aff;
+    color: var(--app-brand);
     min-width: 40rpx;
 }
 
 .option-content {
     flex: 1;
     font-size: 28rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.6;
 }
 

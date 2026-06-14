@@ -173,58 +173,58 @@ const isAnsweredIncorrectly = (questionId) => {
     align-items: center;
     font-size: 32rpx;
     font-weight: bold;
-    color: #333333;
-    background-color: #f5f5f5; /* 未答题默认浅灰色 */
-    border: 2rpx solid #dcdfe6;
+    color: var(--app-text-primary);
+    background-color: var(--app-bg-secondary); /* 未答题默认浅灰色 */
+    border: 2rpx solid var(--app-border);
 }
 
 .answer-circle.answered {
     background-color: #fffacd; /* 已作答淡黄色背景 */
     border-color: #ffd700;
-    color: #333333; /* 保持文字为深色 */
+    color: var(--app-text-primary); /* 保持文字为深色 */
 }
 
 .answer-circle.correct {
-    background-color: #6bd46e; /* 答对绿色 */
-    border-color: #4caf50;
-    color: #ffffff; /* 答对时文字为白色 */
+    background-color: var(--app-success-light); /* 答对浅绿 */
+    border-color: var(--app-success);
+    color: var(--app-success); /* 答对时文字为深绿 */
 }
 
 .answer-circle.incorrect {
-    background-color: #ff7878; /* 答错红色 */
-    border-color: #f56c6c;
-    color: #ffffff; /* 答错时文字为白色 */
+    background-color: var(--app-danger-light); /* 答错浅红 */
+    border-color: var(--app-danger);
+    color: var(--app-danger); /* 答错时文字为深红 */
 }
 
 .answer-circle.unanswered {
-    background-color: #f5f5f5; /* 未答题浅灰色 */
-    border-color: #dcdfe6;
-    color: #333333; /* 未答题时文字为深色 */
+    background-color: var(--app-bg-secondary); /* 未答题浅灰色 */
+    border-color: var(--app-border);
+    color: var(--app-text-primary); /* 未答题时文字为深色 */
 }
 
 .answer-circle.current {
-    background-color: #e6f7ff; /* 当前题目淡蓝色背景 */
-    border-color: #1890ff;
-    color: #1890ff; /* 当前题目文字为蓝色 */
+    background-color: var(--app-brand-light); /* 当前题目淡蓝色背景 */
+    border-color: var(--app-brand);
+    color: var(--app-brand); /* 当前题目文字为蓝色 */
 }
 
 /* 当题目既是当前又是已答对/答错时的样式优先级 */
 .answer-circle.current.correct {
-    background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
-    border-color: #1890ff;
-    color: #1890ff; /* 当前题目优先显示蓝色文字 */
+    background-color: var(--app-brand-light); /* 当前题目优先显示淡蓝色背景 */
+    border-color: var(--app-brand);
+    color: var(--app-brand); /* 当前题目优先显示蓝色文字 */
 }
 
 .answer-circle.current.incorrect {
-    background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
-    border-color: #1890ff;
-    color: #1890ff; /* 当前题目优先显示蓝色文字 */
+    background-color: var(--app-brand-light); /* 当前题目优先显示淡蓝色背景 */
+    border-color: var(--app-brand);
+    color: var(--app-brand); /* 当前题目优先显示蓝色文字 */
 }
 
 /* 当题目既是当前又是已作答时的样式优先级 */
 .answer-circle.current.answered {
-    background-color: #e6f7ff; /* 当前题目优先显示淡蓝色背景 */
-    border-color: #1890ff;
-    color: #1890ff; /* 当前题目优先显示蓝色文字 */
+    background-color: var(--app-brand-light); /* 当前题目优先显示淡蓝色背景 */
+    border-color: var(--app-brand);
+    color: var(--app-brand); /* 当前题目优先显示蓝色文字 */
 }
 </style>

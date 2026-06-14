@@ -39,7 +39,7 @@ defineEmits(["addImage"]);
 .divider-text {
     font-size: 30rpx;
     font-weight: 550;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .add-image-btn {
@@ -52,6 +52,6 @@ defineEmits(["addImage"]);
 
 .add-image-text {
     font-size: 28rpx;
-    color: #07c160;
+    color: var(--app-success);
 }
 </style>

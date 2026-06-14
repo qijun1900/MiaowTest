@@ -26,6 +26,7 @@
  *    --app-border-strong        强分隔线
  *
  *    --app-success / --app-warning / --app-danger 反馈色
+ *    --app-success-light / --app-danger-light 反馈色浅色背景
  *
  *    --app-shadow-card          卡片阴影
  *    --app-shadow-elevated      浮层阴影
@@ -53,8 +54,10 @@
   --app-border-strong: var(--td-border-level-2-color);
 
   --app-success: var(--td-success-color);
+  --app-success-light: var(--td-success-color-1, #e8f5e9);
   --app-warning: var(--td-warning-color);
   --app-danger: var(--td-error-color);
+  --app-danger-light: var(--td-error-color-1, #ffebee);
 
   --app-shadow-card: var(--td-shadow-4);
   --app-shadow-elevated: var(--td-shadow-2);

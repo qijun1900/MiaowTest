@@ -326,7 +326,7 @@ watch(
 
 .tag-item.selected {
     background: linear-gradient(135deg, #f4a460 0%, #e8956f 100%);
-    color: #ffffff;
+    color: var(--app-bg-container);
     gap: 12rpx;
     box-shadow: 0 4rpx 12rpx rgba(232, 149, 111, 0.25);
 }

@@ -265,7 +265,7 @@ const onCropCancel = () => {
 
 .content-text {
     font-size: 30rpx;
-    color: #333333;
+    color: var(--app-text-primary);
     line-height: 1.6;
     margin-bottom: 20rpx;
     word-break: break-word;
@@ -286,7 +286,7 @@ const onCropCancel = () => {
     width: 100%;
     border-radius: 12rpx;
     overflow: hidden;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -341,7 +341,7 @@ const onCropCancel = () => {
 
 .mask-text {
     font-size: 24rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 
@@ -354,7 +354,7 @@ const onCropCancel = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     z-index: 10;
 }
 
@@ -386,14 +386,14 @@ const onCropCancel = () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     gap: 16rpx;
     z-index: 10;
 }
 
 .error-text {
     font-size: 24rpx;
-    color: #999999;
+    color: var(--app-text-secondary);
 }
 
 /* 全屏按钮 */
@@ -494,7 +494,7 @@ const onCropCancel = () => {
 
 .indicator-text {
     font-size: 28rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 
@@ -520,7 +520,7 @@ const onCropCancel = () => {
 
 .edit-crop-text {
     font-size: 26rpx;
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-weight: 500;
 }
 </style>

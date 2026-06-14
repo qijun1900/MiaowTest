@@ -244,15 +244,15 @@ const submitMultiAnswer = () => {
 .question-index {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
     float: left;
     margin-top: 16rpx;
 }
 .question-lable {
     margin-left: 12rpx;
     margin-right: 12rpx;
-    background-color: #0d82ff;
-    color: #fafafa;
+    background-color: var(--app-brand);
+    color: var(--app-bg-container);
     padding: 6rpx 14rpx;
     border-radius: 8rpx;
     font-size: 24rpx;
@@ -261,7 +261,7 @@ const submitMultiAnswer = () => {
 }
 .question-stem {
     font-size: 34rpx;
-    color: #000000;
+    color: var(--app-text-primary);
     font-weight: 572;
     display: inline;
 }
@@ -275,7 +275,7 @@ const submitMultiAnswer = () => {
     display: flex;
     align-items: center;
     padding: 30rpx 30rpx;
-    background-color: #f8f9fa;
+    background-color: var(--app-bg-secondary);
     border-radius: 18rpx;
     border: 2rpx solid #e9ecef;
     transition: all 0.3s ease;
@@ -283,32 +283,32 @@ const submitMultiAnswer = () => {
 
 /* 选中答案样式 */
 .selected-answer {
-    background-color: #e3f2fd;
-    border-color: #0d82ff;
+    background-color: var(--app-brand-light);
+    border-color: var(--app-brand);
 }
 
 /* 多选选中样式 */
 .multiple-selected {
-    background-color: #e3f2fd;
-    border-color: #0d82ff;
+    background-color: var(--app-brand-light);
+    border-color: var(--app-brand);
 }
 
 /* 正确答案样式 */
 .correct-answer {
-    background-color: #e8f5e9;
-    border-color: #4caf50;
+    background-color: var(--app-success-light);
+    border-color: var(--app-success);
 }
 
 /* 错误答案样式 */
 .wrong-answer {
-    background-color: #ffeaea;
-    border-color: #ff4d4f;
+    background-color: var(--app-danger-light);
+    border-color: var(--app-danger);
 }
 
 .option-tag {
     font-size: 28rpx;
     font-weight: bold;
-    color: #0d82ff;
+    color: var(--app-brand);
     margin-right: 16rpx;
     min-width: 40rpx;
     text-align: center;
@@ -316,27 +316,27 @@ const submitMultiAnswer = () => {
 
 /* 选中答案选项标签样式 */
 .selected-answer .option-tag {
-    color: #0d82ff;
+    color: var(--app-brand);
 }
 
 /* 多选选中选项标签样式 */
 .multiple-selected .option-tag {
-    color: #0d82ff;
+    color: var(--app-brand);
 }
 
 /* 正确答案选项标签样式  */
 .correct-answer .option-tag {
-    color: #4caf50;
+    color: var(--app-success);
 }
 
 /* 错误答案选项标签样式 */
 .wrong-answer .option-tag {
-    color: #ff4d4f;
+    color: var(--app-danger);
 }
 
 .option-content {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
 }
@@ -345,7 +345,7 @@ const submitMultiAnswer = () => {
 .question-answer-container {
     margin-top: 50rpx;
     padding: 30rpx 20rpx;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
     display: flex;
     align-items: center;
@@ -354,14 +354,14 @@ const submitMultiAnswer = () => {
 .answer-label {
     font-size: 28rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
     margin-right: 10rpx;
 }
 
 .answer-content {
     font-size: 28rpx;
     font-weight: bold;
-    color: #54c058;
+    color: var(--app-success);
     margin-right: 8rpx;
 }
 

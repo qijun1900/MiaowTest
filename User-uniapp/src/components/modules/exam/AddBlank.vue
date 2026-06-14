@@ -417,7 +417,7 @@ defineExpose({
 
 .options-container {
     margin-top: 20rpx;
-    background: white;
+    background: var(--app-bg-container);
     padding: 24rpx;
     border-radius: 16rpx;
     border: 1rpx solid #e0e0e0;
@@ -433,7 +433,7 @@ defineExpose({
     width: 40rpx;
     height: 40rpx;
     border-radius: 50%;
-    background-color: #ff4d4f;
+    background-color: var(--app-danger);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -441,7 +441,7 @@ defineExpose({
 }
 
 .minus-icon {
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-size: 32rpx;
     font-weight: bold;
 }
@@ -450,7 +450,7 @@ defineExpose({
     width: 80rpx;
     height: 40rpx;
     border-radius: 20rpx;
-    background-color: #f0f0f0;
+    background-color: var(--app-bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -465,13 +465,13 @@ defineExpose({
     border-radius: 16rpx;
     padding: 0 24rpx;
     margin-right: 20rpx;
-    background: #fafafa;
+    background: var(--app-bg-container);
     transition: all 0.3s ease;
 }
 
 .option-input:focus {
-    border-color: #1890ff;
-    background: #fff;
+    border-color: var(--app-brand);
+    background: var(--app-bg-container);
     box-shadow: 0 0 0 4rpx rgba(24, 144, 255, 0.1);
 }
 
@@ -483,20 +483,20 @@ defineExpose({
     border: 1rpx dashed #d9d9d9;
     border-radius: 16rpx;
     margin-top: 20rpx;
-    background-color: #f9f9f9;
+    background-color: var(--app-bg-secondary);
     transition: all 0.3s ease;
 }
 
 .add-option-btn:active {
-    background-color: #f0f0f0;
-    border-color: #1890ff;
+    background-color: var(--app-bg-secondary);
+    border-color: var(--app-brand);
 }
 
 .add-icon {
     margin-right: 10rpx;
     font-size: 32rpx;
     font-weight: bold;
-    color: #1890ff;
+    color: var(--app-brand);
 }
 
 .wrong-answer-images {

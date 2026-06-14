@@ -482,7 +482,7 @@ defineExpose({
 
 .options-container {
     margin-top: 20rpx;
-    background: white;
+    background: var(--app-bg-container);
     padding: 24rpx;
     border-radius: 16rpx;
     border: 1rpx solid #e0e0e0;
@@ -498,7 +498,7 @@ defineExpose({
     width: 40rpx;
     height: 40rpx;
     border-radius: 50%;
-    background-color: #ff4d4f;
+    background-color: var(--app-danger);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -506,7 +506,7 @@ defineExpose({
 }
 
 .minus-icon {
-    color: #ffffff;
+    color: var(--app-bg-container);
     font-size: 32rpx;
     font-weight: bold;
 }
@@ -515,7 +515,7 @@ defineExpose({
     width: 40rpx;
     height: 40rpx;
     border-radius: 50%;
-    background-color: #f0f0f0;
+    background-color: var(--app-bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -530,13 +530,13 @@ defineExpose({
     border-radius: 16rpx;
     padding: 0 24rpx;
     margin-right: 20rpx;
-    background: #fafafa;
+    background: var(--app-bg-container);
     transition: all 0.3s ease;
 }
 
 .option-input:focus {
-    border-color: #1890ff;
-    background: #fff;
+    border-color: var(--app-brand);
+    background: var(--app-bg-container);
     box-shadow: 0 0 0 4rpx rgba(24, 144, 255, 0.1);
 }
 
@@ -556,8 +556,8 @@ defineExpose({
 }
 
 .radio-circle.selected {
-    background-color: #1890ff;
-    border-color: #1890ff;
+    background-color: var(--app-brand);
+    border-color: var(--app-brand);
     position: relative;
 }
 
@@ -570,7 +570,7 @@ defineExpose({
     width: 16rpx;
     height: 16rpx;
     border-radius: 50%;
-    background-color: #ffffff;
+    background-color: var(--app-bg-container);
 }
 
 .add-option-btn {
@@ -581,29 +581,29 @@ defineExpose({
     border: 1rpx dashed #d9d9d9;
     border-radius: 16rpx;
     margin-top: 20rpx;
-    background-color: #f9f9f9;
+    background-color: var(--app-bg-secondary);
     transition: all 0.3s ease;
 }
 
 .add-option-btn:active {
-    background-color: #f0f0f0;
-    border-color: #1890ff;
+    background-color: var(--app-bg-secondary);
+    border-color: var(--app-brand);
 }
 
 .add-icon {
     margin-right: 10rpx;
     font-size: 32rpx;
     font-weight: bold;
-    color: #1890ff;
+    color: var(--app-brand);
 }
 
 .debug-info {
     margin-top: 20rpx;
     padding: 20rpx;
-    background: #f5f5f5;
+    background: var(--app-bg-secondary);
     border-radius: 8rpx;
     font-size: 24rpx;
-    color: #666;
+    color: var(--app-text-secondary);
 }
 
 .my-wrong-answer-section {
@@ -612,7 +612,7 @@ defineExpose({
 
 .wrong-answer-title {
     font-size: 28rpx;
-    color: #ff4d4f;
+    color: var(--app-danger);
     margin-bottom: 20rpx;
     font-weight: 500;
 }
@@ -632,15 +632,15 @@ defineExpose({
     align-items: center;
     justify-content: center;
     font-size: 32rpx;
-    color: #999;
-    background-color: #ffffff;
+    color: var(--app-text-secondary);
+    background-color: var(--app-bg-container);
     transition: all 0.3s;
 }
 
 .wrong-answer-option-btn.selected {
-    border-color: #ff4d4f;
-    background-color: #fff1f0;
-    color: #ff4d4f;
+    border-color: var(--app-danger);
+    background-color: var(--app-danger-light);
+    color: var(--app-danger);
 }
 
 .wrong-answer-judge {
@@ -657,20 +657,20 @@ defineExpose({
     align-items: center;
     justify-content: center;
     font-size: 30rpx;
-    color: #999;
-    background-color: #ffffff;
+    color: var(--app-text-secondary);
+    background-color: var(--app-bg-container);
     transition: all 0.3s;
 }
 
 .judge-btn.selected {
-    border-color: #ff4d4f;
-    background-color: #fff1f0;
-    color: #ff4d4f;
+    border-color: var(--app-danger);
+    background-color: var(--app-danger-light);
+    color: var(--app-danger);
 }
 
 .wrong-answer-input-wrapper {
     width: 100%;
-    background-color: #fff9f9;
+    background-color: var(--app-danger-light);
     border-radius: 12rpx;
     border: 2rpx solid #d9d9d9;
     overflow: hidden;

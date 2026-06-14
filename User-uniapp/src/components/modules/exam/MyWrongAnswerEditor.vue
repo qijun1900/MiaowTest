@@ -74,7 +74,7 @@ const handleAddImage = () => {
 
 .wrong-answer-title {
     font-size: 28rpx;
-    color: #ff4d4f;
+    color: var(--app-danger);
     font-weight: 500;
 }
 
@@ -87,12 +87,12 @@ const handleAddImage = () => {
 
 .add-image-text {
     font-size: 28rpx;
-    color: #07c160;
+    color: var(--app-success);
 }
 
 .wrong-answer-input-wrapper {
     width: 100%;
-    background-color: #fff9f9;
+    background-color: var(--app-danger-light);
     border-radius: 12rpx;
     border: 2rpx solid #d9d9d9;
     overflow: hidden;

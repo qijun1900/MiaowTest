@@ -423,7 +423,7 @@ defineExpose({
 
 .answer-container {
     margin-top: 20rpx;
-    background: white;
+    background: var(--app-bg-container);
     padding: 24rpx;
     border-radius: 16rpx;
     border: 1rpx solid #e0e0e0;
@@ -436,7 +436,7 @@ defineExpose({
     justify-content: space-between;
     margin-bottom: 20rpx;
     padding-bottom: 15rpx;
-    border-bottom: 1rpx solid #f0f0f0;
+    border-bottom: 1rpx solid var(--app-bg-secondary);
 }
 
 .answer-header-left {
@@ -448,7 +448,7 @@ defineExpose({
     width: 50rpx;
     height: 50rpx;
     border-radius: 50%;
-    background-color: #e6f7ff;
+    background-color: var(--app-brand-light);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -458,7 +458,7 @@ defineExpose({
 .answer-title {
     font-size: 32rpx;
     font-weight: 600;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .add-image-btn {
@@ -470,7 +470,7 @@ defineExpose({
 
 .add-image-text {
     font-size: 28rpx;
-    color: #07c160;
+    color: var(--app-success);
 }
 
 .wrong-answer-images {

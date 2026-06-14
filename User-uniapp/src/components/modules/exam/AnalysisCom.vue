@@ -51,7 +51,7 @@ const analysis = computed(() => {
 .question-explanation-container {
     margin-top: 45rpx;
     padding: 30rpx 20rpx;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
     margin-bottom: 30rpx;
 }
@@ -59,11 +59,11 @@ const analysis = computed(() => {
 .explanation-label {
     font-size: 28rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
 }
 .question-explanation-content {
     font-size: 26rpx;
-    color: #303030;
+    color: var(--app-text-primary);
     font-weight: 538;
 }
 </style>

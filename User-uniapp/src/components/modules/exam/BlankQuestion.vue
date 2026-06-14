@@ -199,15 +199,15 @@ onMounted(() => {
 .question-index {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
     float: left;
     margin-top: 16rpx;
 }
 .question-lable {
     margin-left: 12rpx;
     margin-right: 12rpx;
-    background-color: #0d82ff;
-    color: #fafafa;
+    background-color: var(--app-brand);
+    color: var(--app-bg-container);
     padding: 6rpx 14rpx;
     border-radius: 8rpx;
     font-size: 24rpx;
@@ -216,18 +216,18 @@ onMounted(() => {
 }
 .question-stem {
     font-size: 34rpx;
-    color: #000000;
+    color: var(--app-text-primary);
     font-weight: 572;
     display: inline;
 }
 .input-container {
     margin-top: 30rpx;
-    background-color: rgb(248, 248, 248);
+    background-color: var(--app-bg-secondary);
     border-radius: 13rpx;
 }
 .input-label {
     font-size: 28rpx;
-    color: #3797ff;
+    color: var(--app-brand);
     font-weight: 572;
     margin-left: 13rpx;
     margin-top: 6rpx;
@@ -239,7 +239,7 @@ onMounted(() => {
 .question-answer-container {
     margin-top: 50rpx;
     padding: 30rpx 20rpx;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
     border-radius: 12rpx;
     display: flex;
     align-items: center;
@@ -247,12 +247,12 @@ onMounted(() => {
 .answer-label {
     font-size: 28rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
     margin-right: 10rpx;
 }
 .answer-index {
     font-size: 30rpx;
-    color: #333;
+    color: var(--app-text-primary);
     line-height: 1.6;
     font-weight: 550;
 }
