@@ -196,7 +196,7 @@ const statusText = computed(() => {
     display: flex;
     align-items: center;
     padding: 12rpx 20rpx;
-    background-color: #f0f2f5;
+    background-color: var(--app-bg-secondary);
     border-radius: 8rpx;
     cursor: pointer;
     user-select: none;

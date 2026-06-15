@@ -42,7 +42,7 @@ const props = defineProps({
 
 .empty-text {
     font-size: 28rpx;
-    color: #999;
+    color: var(--app-text-secondary);
     text-align: center;
 }
 </style>

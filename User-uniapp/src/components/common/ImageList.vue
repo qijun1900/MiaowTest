@@ -160,7 +160,7 @@ const previewImage = (index) => {
     height: 150rpx;
     border-radius: 12rpx;
     overflow: hidden;
-    background-color: #f5f5f5;
+    background-color: var(--app-bg-secondary);
 }
 
 .preview-image {

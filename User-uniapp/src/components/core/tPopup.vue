@@ -78,7 +78,7 @@ const onVisibleChange = (context) => {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background-color: #f3f3f3;
+    background-color: var(--app-bg-container);
     border-radius: 20rpx 20rpx 0 0;
     overflow: hidden;
 }
@@ -86,13 +86,13 @@ const onVisibleChange = (context) => {
 .popup-header {
     padding: 10rpx 0;
     text-align: center;
-    border-bottom: 1px solid #c6c6c6;
+    border-bottom: 1px solid var(--app-border);
 }
 
 .popup-title {
     font-size: 32rpx;
     font-weight: bold;
-    color: #333;
+    color: var(--app-text-primary);
 }
 
 .popup-content {

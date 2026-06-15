@@ -88,7 +88,7 @@ const handleClick = (index) => {
     border-radius: 12rpx;
     padding: 4rpx;
     gap: 4rpx;
-    background-color: #eeeeef;
+    background-color: var(--app-bg-secondary);
 }
 
 .subsection-item {

@@ -9,13 +9,13 @@
 defineProps({
     text: {
         type: String,
-        default: "ÕýÔÚ¼ÓÔØ...",
+        default: "ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½...",
     },
 });
 </script>
 
 <style scoped>
-/* Loading ¶¯»­ÑùÊ½ */
+/* Loading ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ */
 .theme-loading-container {
     display: flex;
     flex-direction: column;
@@ -36,7 +36,7 @@ defineProps({
 
 .loading-text {
     font-size: 28rpx;
-    color: #666;
+    color: var(--app-text-secondary);
     text-align: center;
 }
 

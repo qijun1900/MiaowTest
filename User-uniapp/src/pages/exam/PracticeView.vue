@@ -285,7 +285,7 @@ import AnswerSheet from "../../components/modules/exam/AnswerSheet.vue";
 import { useStatisticsStore } from "../../stores/modules/StatisticsStore";
 import { storeToRefs } from "pinia"; // 从Pinia导入storeToRefs
 import navBarHeightUtil from "../../util/navBarHeight";
-import dragButton from "../../components/plug-in/drag-button/drag-button.vue";
+import dragButton from "../../uni_modules/drag-button/drag-button.vue";
 import {
     checkFavoriteQuestionAPI,
     addFavoriteQuestionAPI,

@@ -454,7 +454,7 @@ import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 import { useAutoHideHeader } from "../../../composables/useAutoHideHeader.js";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
-import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
+import dragButton from "../../../uni_modules/drag-button/drag-button.vue";
 import SelectOptionsPreview from "../../../components/modules/exam/SelectOptionsPreview.vue";
 import JudgeOptionsPreview from "../../../components/modules/exam/JudgeOptionsPreview.vue";
 import QuestionContentDisplay from "../../../components/modules/exam/QuestionContentDisplay.vue";

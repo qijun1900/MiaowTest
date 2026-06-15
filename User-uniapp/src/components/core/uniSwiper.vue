@@ -101,6 +101,6 @@ const onItemClick = (item, index) => {
     align-items: center;
     justify-content: center;
     font-size: 32rpx;
-    color: #333;
+    color: var(--app-text-primary);
 }
 </style>

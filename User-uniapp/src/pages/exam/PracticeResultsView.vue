@@ -84,7 +84,7 @@ import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, onMounted, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { storeToRefs } from "pinia";
-import FireworkEffect from "@/components/plug-in/firework-effect/firework-effect.vue"; //特效
+import FireworkEffect from "@/uni_modules/firework-effect/firework-effect.vue"; //特效
 import AnswerSheet from "../../components/modules/exam/AnswerSheet.vue";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";
 import { useStatisticsStore } from "../../stores/modules/StatisticsStore";

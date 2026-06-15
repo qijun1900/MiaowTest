@@ -199,7 +199,7 @@ import ThemeProvider from "../../../components/core/ThemeProvider.vue";
 import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onReachBottom, onShow, onUnload } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
-import dragButton from "../../../components/plug-in/drag-button/drag-button.vue";
+import dragButton from "../../../uni_modules/drag-button/drag-button.vue";
 
 const { navBarInfo } = useNavBarSafeArea({
     reserveMenuButtonRight: true,

@@ -51,12 +51,12 @@
 
 .skeleton-bubble-ai {
     width: 75%;
-    background: #ffffff;
+    background: var(--app-bg-container);
 }
 
 .skeleton-bubble-user {
     width: 55%;
-    background: #e8e8e8;
+    background: var(--app-border);
 }
 
 .skeleton-line {

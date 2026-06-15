@@ -68,23 +68,23 @@ const handleSelect = (item) => {
 
 .prompt-tag:active {
     transform: scale(0.985);
-    background: #f0f2f5;
+    background: var(--app-bg-secondary);
 }
 
 .prompt-tag-active {
-    background: #eef3ff;
-    border-color: #c5d4f5;
+    background: var(--app-brand-light);
+    border-color: var(--app-brand);
 }
 
 .prompt-tag-active .prompt-tag-label {
-    color: #3b7cff;
+    color: var(--app-brand);
 }
 
 .prompt-tag-label {
     font-size: 28rpx;
     line-height: 1;
     font-weight: 600;
-    color: #8e9198;
+    color: var(--app-text-secondary);
     white-space: nowrap;
 }
 </style>

@@ -144,7 +144,7 @@ const handleAddAttachment = () => {
     width: 100%;
     min-height: 74rpx;
     font-size: 30rpx;
-    color: #2a2e37;
+    color: var(--app-text-primary);
     line-height: 1.4;
 }
 
@@ -170,25 +170,25 @@ const handleAddAttachment = () => {
     display: inline-flex;
     align-items: center;
     gap: 10rpx;
-    background: #eef2f8;
-    border: 1rpx solid rgba(83, 118, 255, 0.16);
+    background: var(--app-bg-secondary);
+    border: 1rpx solid var(--app-border);
 }
 
 .thinking-chip-active {
-    background: #e5edff;
-    border-color: rgba(83, 118, 255, 0.34);
+    background: var(--app-brand-light);
+    border-color: var(--app-brand);
 }
 
 .chip-dot {
     width: 16rpx;
     height: 16rpx;
     border-radius: 50%;
-    background: #5b76ff;
+    background: var(--app-brand);
 }
 
 .chip-text {
     font-size: 26rpx;
-    color: #4b63d6;
+    color: var(--app-brand);
     font-weight: 600;
 }
 
@@ -222,7 +222,7 @@ const handleAddAttachment = () => {
 }
 
 .send-btn {
-    background: #2f6bff;
+    background: var(--app-brand);
     box-shadow: 0 8rpx 18rpx rgba(47, 107, 255, 0.26);
 }
 
@@ -245,7 +245,7 @@ const handleAddAttachment = () => {
     position: absolute;
     left: 50%;
     top: 50%;
-    background: #2f333b;
+    background: var(--app-text-primary);
     transform: translate(-50%, -50%);
     border-radius: 999rpx;
 }

@@ -78,6 +78,6 @@ const mergedTagStyle = computed(() => ({
 .content-renderer {
   font-size: 32rpx;
   line-height: 1.8;
-  color: #4f576b;
+  color: var(--app-text-primary);
 }
 </style>

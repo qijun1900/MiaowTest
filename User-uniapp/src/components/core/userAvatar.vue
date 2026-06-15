@@ -143,9 +143,9 @@ const handleError = (e) => {
 .avatar {
     display: block;
     object-fit: cover; /** 确保图片填充容器，保持比例 */
-    background-color: #f0f8ff;
-    box-shadow: 0 4rpx 12rpx rgba(198, 226, 255, 0.25); /* 柔和的蓝色阴影 */
-    border: 2px solid rgba(255, 255, 255, 0.9); /* 明亮的白色边框 */
+    background-color: var(--app-bg-secondary);
+    box-shadow: var(--app-shadow-card);
+    border: 2px solid var(--app-border);
 }
 
 .online-dot {

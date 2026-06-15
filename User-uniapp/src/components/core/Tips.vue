@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
     padding: 15rpx 22rpx;
     font-size: 28rpx;
     line-height: 1.2;
-    color: #606266;
+    color: var(--app-text-primary);
 }
 
 .tips-icon {
@@ -170,19 +170,19 @@ onBeforeUnmount(() => {
     font-size: 30rpx;
 
     .icon-info {
-        color: #409eff;
+        color: var(--app-brand);
     }
 
     .icon-success {
-        color: #67c23a;
+        color: var(--app-success);
     }
 
     .icon-warning {
-        color: #e6a23c;
+        color: var(--app-warning);
     }
 
     .icon-error {
-        color: #f56c6c;
+        color: var(--app-danger);
     }
 }
 
@@ -196,7 +196,7 @@ onBeforeUnmount(() => {
     cursor: pointer;
 
     .icon-close {
-        color: #909399;
+        color: var(--app-text-secondary);
         font-size: 30rpx;
     }
 }

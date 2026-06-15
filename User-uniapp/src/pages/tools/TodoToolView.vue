@@ -219,10 +219,10 @@
 
 <script setup>
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
-import lxCalendar from "../../components/lx-calendar/lx-calendar.vue";
+import lxCalendar from "../../uni_modules/lx-calendar/lx-calendar.vue";
 import { ref, onMounted, watch, computed } from "vue";
 import formatTime from "../../util/formatTime";
-import dragButton from "../../components/plug-in/drag-button/drag-button.vue";
+import dragButton from "../../uni_modules/drag-button/drag-button.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import {
     setTodayTodosAPI,
