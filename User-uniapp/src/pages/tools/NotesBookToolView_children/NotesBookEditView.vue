@@ -285,7 +285,7 @@ const handleDelete = () => {
 <style scoped>
 .container {
     min-height: 100vh;
-    background: #fff9f2;
+    background: var(--app-bg-page);
     padding: 30rpx 24rpx;
     box-sizing: border-box;
 }
@@ -332,7 +332,7 @@ const handleDelete = () => {
 
 .input-wrapper:focus-within {
     background: var(--app-bg-container);
-    border-color: #4d62ff;
+    border-color: var(--app-brand);
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
 
@@ -361,7 +361,7 @@ const handleDelete = () => {
 
 .textarea-wrapper:focus-within {
     background: var(--app-bg-container);
-    border-color: #4d62ff;
+    border-color: var(--app-brand);
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
 
@@ -413,7 +413,7 @@ const handleDelete = () => {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, #4d62ff 0%, #3f57f0 100%);
+    background: linear-gradient(135deg, var(--app-brand) 0%, var(--app-brand-hover) 100%);
     color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(77, 98, 255, 0.32);
 }
@@ -425,7 +425,7 @@ const handleDelete = () => {
 .btn-delete {
     background: var(--app-bg-container);
     color: var(--app-danger);
-    border: 2rpx solid #ffd6d6;
+    border: 2rpx solid var(--app-danger-light);
 }
 
 .btn-delete:disabled {
@@ -467,7 +467,7 @@ const handleDelete = () => {
     width: 100%;
     height: 100%;
     border: 6rpx solid var(--app-border);
-    border-top-color: #4d62ff;
+    border-top-color: var(--app-brand);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

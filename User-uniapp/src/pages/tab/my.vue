@@ -76,12 +76,22 @@
                 </view>
             </template>
         </tOverlay>
+
+        <!-- 底部安全区占位 -->
+        <view :style="{ height: tabBarPlaceholderHeight }"></view>
     </view>
+
+    <!-- 自定义 TabBar -->
+    <CustomTabBar
+        :current-index="4"
+        :visible="isTabBarVisible"
+        @change="handleTabChange"
+    />
     </ThemeProvider>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { onShow, onPullDownRefresh } from "@dcloudio/uni-app";
 import tOverlay from "../../components/core/tOverlay.vue";
 import { wechatLogin } from "../../util/wechatLogin";
@@ -94,9 +104,23 @@ import GreetingBanner from "../../components/modules/my/GreetingBanner.vue";
 import UserActivityHeatmap from "../../components/modules/my/UserActivityHeatmap.vue";
 import { useNavBarSafeArea } from "../../composables/useNavBarSafeArea.js";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
+import CustomTabBar from "../../components/core/CustomTabBar.vue";
 
 const { customNavbarStyle, navRowStyle, refreshLayoutInfo } =
     useNavBarSafeArea({ reserveMenuButtonRight: true });
+
+// 自定义 TabBar - 常显
+const isTabBarVisible = ref(true);
+const safeAreaBottom = ref(0);
+try {
+    const sysInfo = uni.getSystemInfoSync();
+    safeAreaBottom.value = sysInfo.safeAreaInsets?.bottom || 0;
+} catch (e) {
+    safeAreaBottom.value = 0;
+}
+const tabBarPlaceholderHeight = computed(() => {
+    return `${50 + safeAreaBottom.value}px`;
+});
 
 const AGREED_KEY = "user_agreed_policy";
 const LoginOverlayShow = ref(false);
@@ -189,6 +213,11 @@ onPullDownRefresh(async () => {
 
 watch(agreed, (val) => {
     uni.setStorageSync(AGREED_KEY, val);
+});
+
+// 页面加载时隐藏原生 TabBar
+onMounted(() => {
+    uni.hideTabBar({ animation: false });
 });
 
 onShow(() => {

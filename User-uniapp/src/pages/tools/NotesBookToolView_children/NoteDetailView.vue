@@ -289,7 +289,7 @@ onLoad((options = {}) => {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #fff9f2;
+    background: var(--app-bg-page);
 }
 
 .top-wrapper {
@@ -370,8 +370,8 @@ onLoad((options = {}) => {
 
 .content-card {
     border-radius: 24rpx;
-    border: 2rpx solid #e8ddd1;
-    background: #fffefb;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
     padding: 24rpx 24rpx 28rpx;
     box-shadow: 0 8rpx 18rpx rgba(132, 112, 95, 0.1);
 }
@@ -379,7 +379,7 @@ onLoad((options = {}) => {
 .note-title {
     font-size: 48rpx;
     line-height: 1.32;
-    color: #403a40;
+    color: var(--app-text-primary);
     font-weight: 700;
     word-break: break-all;
 }
@@ -389,12 +389,12 @@ onLoad((options = {}) => {
     display: flex;
     align-items: center;
     gap: 8rpx;
-    color: #8d8488;
+    color: var(--app-text-secondary);
 }
 
 .meta-text {
     font-size: 25rpx;
-    color: #8d8488;
+    color: var(--app-text-secondary);
 }
 
 .meta-divider {
@@ -417,8 +417,8 @@ onLoad((options = {}) => {
 .tag-section {
     margin-top: 16rpx;
     border-radius: 24rpx;
-    border: 2rpx solid #e8ddd1;
-    background: #fffefb;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
     padding: 20rpx 22rpx;
     box-shadow: 0 8rpx 18rpx rgba(132, 112, 95, 0.08);
 }
@@ -437,7 +437,7 @@ onLoad((options = {}) => {
 }
 
 .tag-item {
-    background: #eee6dc;
+    background: var(--app-bg-secondary);
     color: #91898d;
     padding: 8rpx 14rpx;
     border-radius: 12rpx;
@@ -447,8 +447,8 @@ onLoad((options = {}) => {
 
 .loading-wrap {
     border-radius: 24rpx;
-    border: 2rpx solid #e8ddd1;
-    background: #fffefb;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
     padding: 24rpx;
     box-shadow: 0 8rpx 18rpx rgba(132, 112, 95, 0.08);
 }
@@ -480,7 +480,7 @@ onLoad((options = {}) => {
 .shimmer {
     position: relative;
     overflow: hidden;
-    background: #efe7dd;
+    background: var(--app-bg-secondary);
 }
 
 .shimmer::after {

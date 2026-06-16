@@ -362,7 +362,7 @@ const handleDelete = () => {
 <style scoped>
 .container {
     min-height: 100vh;
-    background: #fff9f2;
+    background: var(--app-bg-page);
     padding: 30rpx 24rpx;
     box-sizing: border-box;
 }
@@ -481,7 +481,7 @@ const handleDelete = () => {
 }
 
 .required {
-    color: #f44336;
+    color: var(--app-danger);
     margin-left: 4rpx;
     font-weight: normal;
 }
@@ -505,7 +505,7 @@ const handleDelete = () => {
 
 .input-wrapper.has-error {
     background: var(--app-bg-container);
-    border-color: #f44336;
+    border-color: var(--app-danger);
     box-shadow: 0 0 0 6rpx rgba(244, 67, 54, 0.1);
 }
 
@@ -532,7 +532,7 @@ const handleDelete = () => {
     gap: 8rpx;
     margin-top: 16rpx;
     font-size: 26rpx;
-    color: #f44336;
+    color: var(--app-danger);
     padding-left: 8rpx;
     animation: slideDown 0.3s ease;
 }
@@ -617,7 +617,7 @@ const handleDelete = () => {
 
 .btn-delete {
     background: var(--app-bg-container);
-    color: #f44336;
+    color: var(--app-danger);
     border: 2rpx solid var(--app-danger-light);
 }
 
@@ -664,7 +664,7 @@ const handleDelete = () => {
 .spinner-circle {
     width: 100%;
     height: 100%;
-    border: 6rpx solid #e0e0e0;
+    border: 6rpx solid var(--app-border);
     border-top-color: var(--app-success);
     border-radius: 50%;
     animation: spin 1s linear infinite;

@@ -413,11 +413,11 @@ onBeforeUnmount(() => {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #fff9f2;
+    background: var(--app-bg-page);
 }
 
 .top-wrapper {
-    background: #fff9f2;
+    background: var(--app-bg-page);
     border-bottom: 1rpx solid #dfe7df;
     box-shadow: 0 4rpx 18rpx rgba(86, 118, 86, 0.08);
     z-index: 30;
@@ -482,7 +482,7 @@ onBeforeUnmount(() => {
 }
 
 .container {
-    background: #fff9f2;
+    background: var(--app-bg-page);
     padding: 30rpx 20rpx;
 }
 
@@ -671,8 +671,8 @@ onBeforeUnmount(() => {
 
 /* 新建错题本卡片 */
 .create-card {
-    background: #fff9f2 !important;
-    border: 4rpx dashed #ddd;
+    background: var(--app-bg-page) !important;
+    border: 4rpx dashed var(--app-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -717,7 +717,7 @@ onBeforeUnmount(() => {
 }
 
 .create-card:active .create-icon {
-    background: #e0e0e0;
+    background: var(--app-border);
     transform: scale(0.95);
 }
 
@@ -746,7 +746,7 @@ onBeforeUnmount(() => {
 }
 
 .required {
-    color: #f44336;
+    color: var(--app-danger);
     margin-left: 8rpx;
     font-weight: normal;
 }
@@ -769,7 +769,7 @@ onBeforeUnmount(() => {
 
 .input-wrapper.has-error {
     background: var(--app-bg-container);
-    border-color: #f44336;
+    border-color: var(--app-danger);
     box-shadow: 0 0 0 4rpx rgba(244, 67, 54, 0.1);
 }
 
@@ -785,7 +785,7 @@ onBeforeUnmount(() => {
 }
 
 .form-input.is-error {
-    color: #f44336;
+    color: var(--app-danger);
 }
 
 .char-count {
@@ -799,7 +799,7 @@ onBeforeUnmount(() => {
     gap: 8rpx;
     margin-top: 16rpx;
     font-size: 26rpx;
-    color: #f44336;
+    color: var(--app-danger);
     animation: slideDown 0.3s ease;
 }
 
@@ -926,7 +926,7 @@ onBeforeUnmount(() => {
 }
 
 .skeleton-card {
-    background: #fffefb;
+    background: var(--app-bg-container);
     border: 2rpx solid #efe4d8;
     box-shadow: 0 10rpx 24rpx rgba(141, 116, 86, 0.08);
 }

@@ -4,7 +4,7 @@
     <view class="top-wrapper" :style="{ height: navBarInfo.totalHeight + 'px', paddingTop: navBarInfo.statusBarHeight + 'px' }">
       <view class="nav-row" :style="{ height: navBarInfo.navBarHeight + 'px' }">
         <view class="nav-left" @click="handleBack">
-          <t-icon name="chevron-left" size="44rpx" color="#403a40"></t-icon>
+          <t-icon name="chevron-left" size="44rpx" color="var(--app-text-primary)"></t-icon>
         </view>
         <text class="nav-title">{{ bookTitle || '笔记列表' }}</text>
         <view class="nav-right">
@@ -487,7 +487,7 @@ onUnload(() => {
   min-height: 100vh;
   box-sizing: border-box;
   padding: 22rpx 16rpx calc(32rpx + env(safe-area-inset-bottom));
-  background: #fff9f2;
+  background: var(--app-bg-page);
 }
 
 .top-wrapper {
@@ -496,8 +496,8 @@ onUnload(() => {
   left: 0;
   right: 0;
   z-index: 200;
-  background: #fff9f2;
-  border-bottom: 1rpx solid #e8ddd1;
+  background: var(--app-bg-page);
+  border-bottom: 1rpx solid var(--app-border);
   box-shadow: 0 4rpx 18rpx rgba(132, 112, 95, 0.08);
   box-sizing: border-box;
   padding-left: 18rpx;
@@ -523,7 +523,7 @@ onUnload(() => {
   flex: 1;
   text-align: center;
   font-size: 34rpx;
-  color: #403a40;
+  color: var(--app-text-primary);
   font-weight: 700;
   padding: 0 12rpx;
   overflow: hidden;
@@ -542,7 +542,7 @@ onUnload(() => {
   width: 60rpx;
   height: 60rpx;
   border-radius: 30rpx;
-  border: 2rpx solid #e8ddd1;
+  border: 2rpx solid var(--app-border);
   background: var(--app-bg-container);
   display: flex;
   align-items: center;
@@ -558,7 +558,7 @@ onUnload(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #fff9f2;
+  background: var(--app-bg-page);
   padding-top: 2rpx;
   padding-bottom: 10rpx;
 }
@@ -639,7 +639,7 @@ onUnload(() => {
   width: 164rpx;
   padding: 0;
   border: none;
-  background: #efe7dd;
+  background: var(--app-bg-secondary);
 }
 
 .view-btn {
@@ -662,7 +662,7 @@ onUnload(() => {
 
 .skeleton-view-btn {
   border: none;
-  background: #efe7dd;
+  background: var(--app-bg-secondary);
 }
 
 .grid-icon {
@@ -686,14 +686,14 @@ onUnload(() => {
   width: 10rpx;
   height: 10rpx;
   border-radius: 3rpx;
-  background: #8190ac;
+  background: var(--app-text-secondary);
 }
 
 .list-line {
   width: 24rpx;
   height: 4rpx;
   border-radius: 4rpx;
-  background: #8190ac;
+  background: var(--app-text-secondary);
 }
 
 .list-wrap {
@@ -828,8 +828,8 @@ onUnload(() => {
 .note-card {
   display: flex;
   border-radius: 24rpx;
-  border: 2rpx solid #e8ddd1;
-  background: #fffefb;
+  border: 2rpx solid var(--app-border);
+  background: var(--app-bg-container);
   overflow: hidden;
   box-shadow: 0 8rpx 18rpx rgba(132, 112, 95, 0.1);
   transition:
@@ -883,7 +883,7 @@ onUnload(() => {
   height: 44rpx;
   padding: 0 14rpx;
   border-radius: 22rpx;
-  background: #f5eee6;
+  background: var(--app-bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -908,7 +908,7 @@ onUnload(() => {
   display: -webkit-box;
   font-size: 42rpx;
   line-height: 1.28;
-  color: #403a40;
+  color: var(--app-text-primary);
   font-weight: 600;
   line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -922,7 +922,7 @@ onUnload(() => {
   width: 44rpx;
   height: 44rpx;
   border-radius: 22rpx;
-  background: #f5eee6;
+  background: var(--app-bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -972,7 +972,7 @@ onUnload(() => {
 
 .meta-text {
   font-size: 26rpx;
-  color: #8d8488;
+  color: var(--app-text-secondary);
 }
 
 .tag-wrap {
@@ -984,7 +984,7 @@ onUnload(() => {
 }
 
 .tag-item {
-  background: #eee6dc;
+  background: var(--app-bg-secondary);
   color: #91898d;
   padding: 8rpx 14rpx;
   border-radius: 12rpx;

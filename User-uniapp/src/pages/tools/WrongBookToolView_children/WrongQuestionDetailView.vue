@@ -336,7 +336,7 @@ onLoad(async (options) => {
 <style scoped>
 .container {
     min-height: 100vh;
-    background: #fff9f2;
+    background: var(--app-bg-page);
     padding: 15rpx 15rpx;
 }
 
@@ -396,7 +396,7 @@ onLoad(async (options) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1rpx solid #e0e0e0;
+    border: 1rpx solid var(--app-border);
 }
 
 .picker-display text {

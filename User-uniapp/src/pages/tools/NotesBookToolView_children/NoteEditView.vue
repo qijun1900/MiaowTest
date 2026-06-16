@@ -1169,7 +1169,7 @@ onUnload(() => {
 
 .paste-ai-text {
   font-size: 22rpx;
-  color: #6366f1;
+  color: var(--app-brand);
   font-weight: 500;
 }
 
@@ -1215,7 +1215,7 @@ onUnload(() => {
 
 .markdown-mode-text {
   font-size: 22rpx;
-  color: #6366f1;
+  color: var(--app-brand);
   font-weight: 500;
 }
 

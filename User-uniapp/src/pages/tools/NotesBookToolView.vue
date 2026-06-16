@@ -5,12 +5,12 @@
             <view class="custom-navbar" :style="customNavbarStyle">
                 <view class="nav-row" :style="navRowStyle">
                     <view class="nav-left" @click="handleBack">
-                        <t-icon name="chevron-left" size="44rpx" color="#1a2540"></t-icon>
+                        <t-icon name="chevron-left" size="44rpx" color="var(--app-text-primary)"></t-icon>
                     </view>
                     <text class="nav-title">笔记本</text>
                     <view class="nav-right">
                         <view class="nav-action" @click="handleCreateNotebook">
-                            <t-icon name="add" size="40rpx" color="#4d62ff"></t-icon>
+                            <t-icon name="add" size="40rpx" color="var(--app-brand)"></t-icon>
                         </view>
                     </view>
                 </view>
@@ -121,7 +121,7 @@
                             <uni-icons
                                 type="compose"
                                 size="18"
-                                :color="validationErrors.title ? '#f44336' : '#999'"
+                                :color="validationErrors.title ? 'var(--app-danger)' : 'var(--app-text-secondary)'"
                             ></uni-icons>
                             <input
                                 class="form-input"
@@ -134,7 +134,7 @@
                             <text class="char-count">{{ formData.title.length }}/20</text>
                         </view>
                         <view v-if="validationErrors.title" class="form-error">
-                            <uni-icons type="info-filled" size="14" color="#f44336"></uni-icons>
+                            <uni-icons type="info-filled" size="14" color="var(--app-danger)"></uni-icons>
                             <text>{{ validationErrors.title }}</text>
                         </view>
                     </view>
@@ -357,12 +357,12 @@ onBeforeUnmount(() => {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #fff9f2;
+    background: var(--app-bg-page);
 }
 
 .top-wrapper {
-    background: #fff9f2;
-    border-bottom: 1rpx solid #e8e3db;
+    background: var(--app-bg-page);
+    border-bottom: 1rpx solid var(--app-border);
     box-shadow: 0 4rpx 18rpx rgba(126, 136, 162, 0.08);
     z-index: 30;
 }
@@ -392,7 +392,7 @@ onBeforeUnmount(() => {
     flex: 1;
     text-align: center;
     font-size: 34rpx;
-    color: #1a2540;
+    color: var(--app-text-primary);
     font-weight: 700;
     padding: 0 12rpx;
 }
@@ -428,7 +428,7 @@ onBeforeUnmount(() => {
 .scroll-content {
     position: relative;
     box-sizing: border-box;
-    background: #fff9f2;
+    background: var(--app-bg-page);
     padding: 26rpx 20rpx calc(46rpx + env(safe-area-inset-bottom));
     overflow: hidden;
     font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -476,14 +476,14 @@ onBeforeUnmount(() => {
     width: 14rpx;
     height: 14rpx;
     border-radius: 50%;
-    background: #4d62ff;
+    background: var(--app-brand);
     box-shadow: 0 0 0 8rpx rgba(77, 98, 255, 0.12);
     flex-shrink: 0;
 }
 
 .section-title {
     font-size: 44rpx;
-    color: #1a2540;
+    color: var(--app-text-primary);
     font-weight: 700;
     letter-spacing: 0.8rpx;
 }
@@ -500,7 +500,7 @@ onBeforeUnmount(() => {
     flex-shrink: 0;
     background: var(--app-bg-container);
     border-radius: 24rpx;
-    border: 2rpx solid #e8e3db;
+    border: 2rpx solid var(--app-border);
     padding: 12rpx 18rpx;
     box-shadow: 0 8rpx 20rpx rgba(137, 112, 84, 0.1);
     display: flex;
@@ -644,7 +644,7 @@ onBeforeUnmount(() => {
 }
 
 .create-card {
-    background: #fff9f2 !important;
+    background: var(--app-bg-page) !important;
     border: 4rpx dashed #ddd;
     display: flex;
     align-items: center;
@@ -813,7 +813,7 @@ onBeforeUnmount(() => {
 
 .input-wrapper:focus-within {
     background: var(--app-bg-container);
-    border-color: #4d62ff;
+    border-color: var(--app-brand);
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
 
@@ -847,7 +847,7 @@ onBeforeUnmount(() => {
 
 .textarea-wrapper:focus-within {
     background: var(--app-bg-container);
-    border-color: #4d62ff;
+    border-color: var(--app-brand);
     box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.1);
 }
 
@@ -915,7 +915,7 @@ onBeforeUnmount(() => {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, #4d62ff 0%, #3f57f0 100%);
+    background: linear-gradient(135deg, var(--app-brand) 0%, var(--app-brand-hover) 100%);
     color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(77, 98, 255, 0.32);
 }

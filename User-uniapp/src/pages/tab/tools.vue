@@ -10,19 +10,43 @@
             @toolClick="handleToolClick"
             @orderChange="handleOrderChange"
         />
+
+        <!-- 底部安全区占位 -->
+        <view :style="{ height: tabBarPlaceholderHeight }"></view>
     </view>
+
+    <!-- 自定义 TabBar -->
+    <CustomTabBar
+        :current-index="3"
+        :visible="isTabBarVisible"
+        @change="handleTabChange"
+    />
     </ThemeProvider>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import PageHead from "../../components/core/PageHead.vue";
 import ToolsList from "../../components/modules/tools/ToolsList.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import showShareMenu from "../../util/wechatShare.js";
 import checkLogin from "../../util/checkLogin.js";
+import CustomTabBar from "../../components/core/CustomTabBar.vue";
 
 const pageHeadRef = ref();
+
+// 自定义 TabBar - 常显
+const isTabBarVisible = ref(true);
+const safeAreaBottom = ref(0);
+try {
+    const sysInfo = uni.getSystemInfoSync();
+    safeAreaBottom.value = sysInfo.safeAreaInsets?.bottom || 0;
+} catch (e) {
+    safeAreaBottom.value = 0;
+}
+const tabBarPlaceholderHeight = computed(() => {
+    return `${50 + safeAreaBottom.value}px`;
+});
 const TOOLS_ORDER_STORAGE_KEY = "tools:list:order";
 
 // 工具列表配置
@@ -120,6 +144,8 @@ const handleToolClick = async (tool) => {
 // 页面加载时执行
 onMounted(() => {
     loadToolsOrder();
+    // 隐藏原生 TabBar
+    uni.hideTabBar({ animation: false });
     //#ifdef MP-WEIXIN
     showShareMenu();
     //#endif

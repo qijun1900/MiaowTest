@@ -53,11 +53,21 @@
             <UserExamFavorite v-if="currentMode === 1" />
         </view>
         <BackToTop ref="backToTopRef" position="bottom-right" />
+
+        <!-- 底部安全区占位 -->
+        <view :style="{ height: tabBarPlaceholderHeight }"></view>
     </view>
+
+    <!-- 自定义 TabBar -->
+    <CustomTabBar
+        :current-index="0"
+        :visible="isTabBarVisible"
+        @change="handleTabChange"
+    />
     </ThemeProvider>
 </template>
 <script setup>
-import { onMounted, ref, onBeforeUnmount } from "vue";
+import { onMounted, ref, onBeforeUnmount, computed } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import uniNoticeBar from "../../components/core/uniNoticeBar.vue";
 import uniSwiper from "../../components/core/uniSwiper.vue";
@@ -74,6 +84,7 @@ import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { AppearanceStore } from "../../stores/modules/AppearanceStore";
 import showShareMenu from "../../util/wechatShare.js";
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
+import CustomTabBar from "../../components/core/CustomTabBar.vue";
 
 const handleNavBack = () => {
     const pages = getCurrentPages();
@@ -90,6 +101,19 @@ const list = ref(["我的题库", "收藏考试"]); // 添加subsection需要的
 const currentMode = ref(0); // 当前选中的模式，默认为0
 const backToTopRef = ref(); // 回到顶部组件引用
 const appearanceStore = AppearanceStore();
+
+// 自定义 TabBar - 常显
+const isTabBarVisible = ref(true);
+const safeAreaBottom = ref(0);
+try {
+    const sysInfo = uni.getSystemInfoSync();
+    safeAreaBottom.value = sysInfo.safeAreaInsets?.bottom || 0;
+} catch (e) {
+    safeAreaBottom.value = 0;
+}
+const tabBarPlaceholderHeight = computed(() => {
+    return `${50 + safeAreaBottom.value}px`;
+});
 
 // 动态设置原生导航栏颜色，跟随主题
 const applyNavBarTheme = () => {
@@ -171,6 +195,8 @@ onMounted(() => {
     fetchNoticeInfo();
     fetchBannerInfo();
     applyNavBarTheme();
+    // 隐藏原生 TabBar
+    uni.hideTabBar({ animation: false });
     //#ifdef MP-WEIXIN
     showShareMenu();
     //#endif

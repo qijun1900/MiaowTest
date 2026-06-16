@@ -222,6 +222,13 @@
             @search-click="handleSearchClick"
             @filter-change="handleSidebarFilterChange"
         />
+
+        <!-- 自定义 TabBar -->
+        <CustomTabBar
+            :current-index="2"
+            :visible="isTabBarVisible"
+            @change="handleTabChange"
+        />
         <!-- 删除会话确认弹窗 -->
         <t-dialog
             :visible="deleteDialogVisible"
@@ -286,6 +293,7 @@ import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
+import CustomTabBar from "../../components/core/CustomTabBar.vue";
 import { getNotebooksAPI, saveNotebookNoteAPI } from "../../API/Tools/NotesBookAPI.js";
 import { useAgentAttachments } from "../../composables/useAgentAttachments.js";
 import { useAutoTabBar } from "../../composables/useAutoTabBar.js";
@@ -449,12 +457,17 @@ const systemInfo = uni.getSystemInfoSync();
 const isAndroid = systemInfo.platform.toLowerCase() === 'android';
 
 // ─── TabBar 自动隐藏与显示逻辑 ──────────────────────────────────────────────────
-const { 
+const {
+        isTabBarVisible,
         handleScroll, // 监听内容区滚动以自动隐藏 TabBar
         handleTouchStart,// 监听输入区触摸以自动显示 TabBar
         handleSenderFocus, // 监听输入区 focus 以自动隐藏 TabBar
         handleSenderBlur // 监听输入区 blur 以自动隐藏 TabBar
     } = useAutoTabBar(keyboardHeight);
+
+const handleTabChange = (index) => {
+    // Tab 切换由 CustomTabBar 内部处理
+};
 
 // H5：通过 visualViewport resize 计算键盘高度
 const handleViewportResize = () => {
@@ -469,6 +482,9 @@ const handleViewportResize = () => {
 onMounted(() => {
     loadAgentList();
     loadConversationList();
+
+    // 隐藏原生 TabBar
+    uni.hideTabBar({ animation: false });
 
     // 测量 scroll-view 真实高度，用于动态计算底部占位
     setTimeout(measureScrollViewHeight, 100);

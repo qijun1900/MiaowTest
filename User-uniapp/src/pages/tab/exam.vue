@@ -76,13 +76,23 @@
                 v-if="examSubjects.length > 0 && !loading"
             >
             </t-divider>
+
+            <!-- 底部安全区占位 -->
+            <view :style="{ height: tabBarPlaceholderHeight }"></view>
         </view>
     </view>
+
+    <!-- 自定义 TabBar -->
+    <CustomTabBar
+        :current-index="1"
+        :visible="isTabBarVisible"
+        @change="handleTabChange"
+    />
     </ThemeProvider>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import {
     getExamSubjects,
     clearExamSubjectsCache,
@@ -95,6 +105,7 @@ import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import formatTime from "../../util/formatTime";
 import showShareMenu from "../../util/wechatShare.js";
 import checkLogin from "../../util/checkLogin.js";
+import CustomTabBar from "../../components/core/CustomTabBar.vue";
 
 // 响应式数据
 const examSubjects = ref([]);
@@ -102,6 +113,19 @@ const loading = ref(false);
 const backToTopRef = ref();
 const pageHeadRef = ref();
 const coverLoadedMap = ref({});
+
+// 自定义 TabBar - 常显
+const isTabBarVisible = ref(true);
+const safeAreaBottom = ref(0);
+try {
+    const sysInfo = uni.getSystemInfoSync();
+    safeAreaBottom.value = sysInfo.safeAreaInsets?.bottom || 0;
+} catch (e) {
+    safeAreaBottom.value = 0;
+}
+const tabBarPlaceholderHeight = computed(() => {
+    return `${50 + safeAreaBottom.value}px`;
+});
 
 const COVER_PLACEHOLDER_COLORS = [
     ["#f2c37a", "#ef8f6f"],
@@ -222,6 +246,8 @@ onPageScroll((e) => {
 // 页面加载时获取数据
 onMounted(() => {
     fetchExamSubjects();
+    // 隐藏原生 TabBar
+    uni.hideTabBar({ animation: false });
     //#ifdef MP-WEIXIN
     showShareMenu();
     //#endif

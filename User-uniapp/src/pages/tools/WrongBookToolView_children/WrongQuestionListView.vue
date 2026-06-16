@@ -1052,7 +1052,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .container {
     min-height: 100vh;
-    background: #fff9f2;
+    background: var(--app-bg-page);
     padding-top: 0;
 }
 
@@ -1062,7 +1062,7 @@ onBeforeUnmount(() => {
     left: 0;
     right: 0;
     z-index: 200;
-    background: #fff9f2;
+    background: var(--app-bg-page);
     border-bottom: 1rpx solid #ffe8d6;
     box-shadow: 0 4rpx 18rpx rgba(255, 149, 85, 0.06);
     box-sizing: border-box;
@@ -1104,7 +1104,7 @@ onBeforeUnmount(() => {
 
 .fixed-header {
     position: sticky;
-    background: #fff9f2;
+    background: var(--app-bg-page);
     z-index: 100;
     padding-bottom: 16rpx;
     box-shadow: 0 2rpx 8rpx rgba(255, 149, 85, 0.05);
@@ -1154,7 +1154,7 @@ onBeforeUnmount(() => {
 }
 
 .search-placeholder {
-    color: #cccccc;
+    color: var(--app-text-secondary);
 }
 
 .clear-icon {
