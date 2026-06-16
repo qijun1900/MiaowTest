@@ -24,97 +24,111 @@
         <view class="settings-group">
             <view class="group-header">外观设置</view>
 
-            <!-- 深浅模式 -->
-            <view class="setting-item" @click="handleDarkMode">
-                <view class="setting-left">
-                    <view class="setting-icon">
-                        <t-icon name="browse" size="18px" color="var(--app-text-secondary)"></t-icon>
-                    </view>
-                    <text class="setting-label">深浅模式</text>
+            <!-- 深浅模式：卡片直接展示 -->
+            <view class="inline-section">
+                <view class="inline-label">
+                    <t-icon name="browse" size="18px" color="var(--app-text-secondary)"></t-icon>
+                    <text>深浅模式</text>
                 </view>
-                <view class="setting-right">
-                    <text class="setting-value">{{ appearanceStore.getDarkModeText() }}</text>
-                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
-                </view>
-            </view>
-
-            <!-- 主题预设 -->
-            <view class="setting-item" @click="showThemePopup = true">
-                <view class="setting-left">
-                    <view class="setting-icon">
-                        <t-icon name="star-filled" size="18px" color="var(--app-text-secondary)"></t-icon>
-                    </view>
-                    <text class="setting-label">主题</text>
-                </view>
-                <view class="setting-right">
+                <view class="dark-mode-options">
                     <view
-                        class="theme-color-dot"
-                        :style="{ backgroundColor: currentPreset.primary }"
-                    ></view>
-                    <text class="setting-value">{{ currentPreset.name }}</text>
-                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
-                </view>
-            </view>
-
-            <!-- 字号 -->
-            <view class="setting-item" @click="handleFontSize">
-                <view class="setting-left">
-                    <view class="setting-icon">
-                        <t-icon name="translate" size="18px" color="var(--app-text-secondary)"></t-icon>
+                        v-for="option in darkModeOptions"
+                        :key="option.value"
+                        class="dark-mode-card"
+                        :class="{ active: appearanceStore.darkMode === option.value }"
+                        @click="selectDarkMode(option.value)"
+                    >
+                        <view class="dark-mode-preview" :class="`preview-${option.value}`">
+                            <view class="preview-status-bar">
+                                <view class="preview-dot"></view>
+                                <view class="preview-dot"></view>
+                                <view class="preview-dot"></view>
+                            </view>
+                            <view class="preview-content">
+                                <view class="preview-line long"></view>
+                                <view class="preview-line short"></view>
+                                <view class="preview-card-mini"></view>
+                            </view>
+                        </view>
+                        <view class="dark-mode-info">
+                            <t-icon
+                                v-if="appearanceStore.darkMode === option.value"
+                                name="check-circle-filled"
+                                size="18px"
+                                color="var(--app-brand)"
+                            ></t-icon>
+                            <text class="dark-mode-name">{{ option.label }}</text>
+                        </view>
                     </view>
-                    <text class="setting-label">字号</text>
-                </view>
-                <view class="setting-right">
-                    <text class="setting-value">{{ appearanceStore.fontSizeOptions[appearanceStore.fontSizeIndex] }}</text>
-                    <t-icon name="chevron-right" size="14px" color="var(--app-text-placeholder)"></t-icon>
                 </view>
             </view>
-        </view>
 
-        <!-- 主题预设选择弹窗 -->
-        <t-popup
-            :visible="showThemePopup"
-            placement="bottom"
-            @visible-change="(visible) => { if (!visible) showThemePopup = false }"
-        >
-            <view class="theme-picker">
-                <view class="theme-picker-title">选择主题</view>
-                <view class="theme-preset-list">
+            <!-- 主题：卡片直接展示 -->
+            <view class="inline-section">
+                <view class="inline-label">
+                    <t-icon name="palette" size="18px" color="var(--app-text-secondary)"></t-icon>
+                    <text>主题风格</text>
+                </view>
+                <view class="theme-preview-area">
                     <view
                         v-for="preset in appearanceStore.themePresets"
                         :key="preset.key"
-                        class="theme-preset-card"
+                        class="theme-preview-card"
                         :class="{ active: appearanceStore.themePreset === preset.key }"
                         @click="selectPreset(preset.key)"
                     >
-                        <view
-                            class="theme-preset-swatch"
-                            :style="getPresetSwatchStyle(preset)"
-                        >
-                            <view
-                                class="theme-preset-dot"
-                                :style="{ backgroundColor: preset.primary }"
-                            ></view>
-                        </view>
-                        <view class="theme-preset-info">
-                            <view class="theme-preset-name-row">
-                                <text class="theme-preset-name">{{ preset.name }}</text>
-                                <t-icon
-                                    v-if="appearanceStore.themePreset === preset.key"
-                                    name="check-circle-filled"
-                                    size="18px"
-                                    color="var(--app-brand)"
-                                ></t-icon>
+                        <view class="theme-mock-page" :style="getMockPageStyle(preset)">
+                            <view class="mock-navbar" :style="getNavBarStyle(preset)">
+                                <view class="mock-dot" :style="{ background: preset.primary }"></view>
+                                <view class="mock-title-line" :style="{ background: getMockText(preset, 0.8) }"></view>
                             </view>
-                            <text class="theme-preset-desc">{{ preset.description }}</text>
+                            <view class="mock-body">
+                                <view class="mock-card" :style="{ background: getMockCard(preset) }">
+                                    <view class="mock-card-line" :style="{ background: getMockText(preset, 0.6) }"></view>
+                                    <view class="mock-card-line short" :style="{ background: getMockText(preset, 0.3) }"></view>
+                                </view>
+                                <view class="mock-card" :style="{ background: getMockCard(preset) }">
+                                    <view class="mock-card-line" :style="{ background: getMockText(preset, 0.6) }"></view>
+                                </view>
+                                <view class="mock-btn" :style="{ background: preset.primary }"></view>
+                            </view>
+                        </view>
+                        <view class="theme-preview-label">
+                            <view class="theme-color-ring" :style="{ borderColor: preset.primary }">
+                                <view class="theme-color-fill" :style="{ background: preset.primary }"></view>
+                            </view>
+                            <text class="theme-preview-name">{{ preset.name }}</text>
+                            <t-icon
+                                v-if="appearanceStore.themePreset === preset.key"
+                                name="check-circle-filled"
+                                size="18px"
+                                :color="preset.primary"
+                            ></t-icon>
                         </view>
                     </view>
                 </view>
-                <view class="theme-picker-close" @click="showThemePopup = false">
-                    <text>取消</text>
-                </view>
             </view>
-        </t-popup>
+
+            <!-- 字号：卡片直接展示 -->
+            <view class="inline-section">
+                <view class="inline-label">
+                    <t-icon name="translate" size="18px" color="var(--app-text-secondary)"></t-icon>
+                    <text>字体大小</text>
+                </view>
+                <view class="font-size-options">
+                    <view
+                        v-for="(option, index) in fontSizeOptions"
+                        :key="index"
+                        class="font-size-card"
+                        :class="{ active: appearanceStore.fontSizeIndex === index }"
+                    >
+                        <text class="font-size-preview" :style="{ fontSize: option.previewSize }">A</text>
+                        <text class="font-size-name">{{ option.label }}</text>
+                    </view>
+                </view>
+                <text class="font-size-hint">调整应用内文字大小，提升阅读体验</text>
+            </view>
+        </view>
 
         <!-- 设置列表 -->
         <view class="settings-group">
@@ -278,7 +292,19 @@ const appVersion = ref("1.4.0");
 // #endif
 const cacheSize = ref("计算中...");
 const notificationEnabled = ref(true);
-const showThemePopup = ref(false);
+
+const darkModeOptions = [
+    { label: "跟随系统", value: "auto", icon: "system" },
+    { label: "浅色", value: "light", icon: "sun" },
+    { label: "深色", value: "dark", icon: "moon" },
+];
+
+const fontSizeOptions = [
+    { label: "小", previewSize: "24rpx" },
+    { label: "标准", previewSize: "32rpx" },
+    { label: "大", previewSize: "42rpx" },
+    { label: "特大", previewSize: "52rpx" },
+];
 
 // 绑定状态
 const bindStatus = ref({
@@ -291,15 +317,24 @@ const currentPreset = computed(
     () => appearanceStore.getCurrentPreset?.() || appearanceStore.themePresets[0]
 );
 
-// 预设卡片左侧色样：根据预设给一个对应的渐变底
-const getPresetSwatchStyle = (preset) => {
-    const map = {
-        aurora: "linear-gradient(135deg, #eaf1ff 0%, #ffffff 100%)",
-        claude: "linear-gradient(135deg, #f5f0e8 0%, #faf7f2 100%)",
-    };
-    return {
-        background: map[preset.key] || map.aurora,
-    };
+// 主题预览样式
+const getMockPageStyle = (preset) => {
+    const bg = { aurora: '#f5f7fa', claude: '#f5f0e8' };
+    return { background: bg[preset.key] || bg.aurora };
+};
+
+const getNavBarStyle = (preset) => {
+    const bg = { aurora: '#f5f7fa', claude: '#f5f0e8' };
+    return { background: bg[preset.key] || bg.aurora };
+};
+
+const getMockText = (preset, opacity) => {
+    if (preset.key === 'claude') return `rgba(61, 57, 41, ${opacity})`;
+    return `rgba(0, 0, 0, ${opacity})`;
+};
+
+const getMockCard = (preset) => {
+    return preset.key === 'claude' ? '#faf7f2' : '#ffffff';
 };
 
 // 绑定状态文案
@@ -373,18 +408,10 @@ const handleNotificationChange = (value) => {
     });
 };
 
-// 深浅模式
-const handleDarkMode = () => {
-    const options = ["跟随系统", "浅色模式", "深色模式"];
-    const values = ["auto", "light", "dark"];
-    const currentIndex = values.indexOf(appearanceStore.darkMode);
-    uni.showActionSheet({
-        itemList: options,
-        current: currentIndex >= 0 ? currentIndex : 0,
-        success: (res) => {
-            appearanceStore.setDarkMode(values[res.tapIndex]);
-        },
-    });
+// 选择深浅模式
+const selectDarkMode = (mode) => {
+    appearanceStore.setDarkMode(mode);
+    showDarkModePopup.value = false;
 };
 
 // 选择主题预设
@@ -584,14 +611,270 @@ onMounted(() => {
     margin-right: 10rpx;
 }
 
-/* 主题色小圆点 */
-.theme-color-dot {
-    width: 28rpx;
-    height: 28rpx;
+/* ── 内联选择区域 ── */
+.inline-section {
+    padding: 24rpx 30rpx;
+    border-bottom: 1rpx solid var(--app-border);
+}
+
+.inline-label {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    margin-bottom: 20rpx;
+    font-size: 28rpx;
+    color: var(--app-text-secondary);
+}
+
+/* ── 深浅模式卡片 ── */
+.dark-mode-options {
+    display: flex;
+    gap: 16rpx;
+}
+
+.dark-mode-card {
+    flex: 1;
+    border-radius: 16rpx;
+    overflow: hidden;
+    border: 3rpx solid transparent;
+    transition: all 0.25s ease;
+    background: var(--app-bg-secondary);
+}
+
+.dark-mode-card.active {
+    border-color: var(--app-brand);
+    box-shadow: 0 0 0 4rpx var(--app-brand-light);
+}
+
+.dark-mode-preview {
+    padding: 14rpx;
+    border-radius: 12rpx 12rpx 0 0;
+    min-height: 160rpx;
+}
+
+.preview-auto {
+    background: linear-gradient(135deg, #f5f7fa 0%, #1f1e1b 100%);
+}
+
+.preview-light {
+    background: #f5f7fa;
+}
+
+.preview-dark {
+    background: #1f1e1b;
+}
+
+.preview-status-bar {
+    display: flex;
+    gap: 6rpx;
+    margin-bottom: 14rpx;
+    padding: 0 4rpx;
+}
+
+.preview-dot {
+    width: 8rpx;
+    height: 8rpx;
     border-radius: 50%;
-    margin-right: 10rpx;
-    border: 2rpx solid var(--app-border);
-    flex-shrink: 0;
+    background: rgba(128, 128, 128, 0.5);
+}
+
+.preview-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+    padding: 0 4rpx;
+}
+
+.preview-line {
+    height: 8rpx;
+    border-radius: 4rpx;
+    background: rgba(128, 128, 128, 0.3);
+}
+
+.preview-line.long {
+    width: 80%;
+}
+
+.preview-line.short {
+    width: 50%;
+}
+
+.preview-card-mini {
+    margin-top: 6rpx;
+    height: 40rpx;
+    border-radius: 8rpx;
+    background: rgba(128, 128, 128, 0.15);
+}
+
+.dark-mode-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6rpx;
+    padding: 12rpx 0;
+}
+
+.dark-mode-name {
+    font-size: 22rpx;
+    font-weight: 500;
+    color: var(--app-text-primary);
+}
+
+/* ── 主题预览卡片 ── */
+.theme-preview-area {
+    display: flex;
+    gap: 20rpx;
+}
+
+.theme-preview-card {
+    flex: 1;
+    border-radius: 16rpx;
+    overflow: hidden;
+    border: 3rpx solid var(--app-border);
+    transition: all 0.3s ease;
+    background: var(--app-bg-secondary);
+}
+
+.theme-preview-card.active {
+    border-color: var(--app-brand);
+    box-shadow: 0 0 0 4rpx var(--app-brand-light);
+    transform: scale(1.02);
+}
+
+.theme-mock-page {
+    padding: 10rpx;
+    min-height: 220rpx;
+    border-radius: 12rpx 12rpx 0 0;
+}
+
+.mock-navbar {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    padding: 6rpx 8rpx;
+    border-radius: 6rpx;
+    margin-bottom: 10rpx;
+}
+
+.mock-dot {
+    width: 12rpx;
+    height: 12rpx;
+    border-radius: 50%;
+}
+
+.mock-title-line {
+    height: 8rpx;
+    width: 50rpx;
+    border-radius: 4rpx;
+}
+
+.mock-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+    padding: 0 4rpx;
+}
+
+.mock-card {
+    padding: 8rpx;
+    border-radius: 8rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 5rpx;
+}
+
+.mock-card-line {
+    height: 6rpx;
+    border-radius: 3rpx;
+}
+
+.mock-card-line.short {
+    width: 60%;
+}
+
+.mock-btn {
+    height: 20rpx;
+    border-radius: 10rpx;
+    margin-top: 4rpx;
+}
+
+.theme-preview-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
+    padding: 12rpx 0;
+}
+
+.theme-color-ring {
+    width: 24rpx;
+    height: 24rpx;
+    border-radius: 50%;
+    border: 3rpx solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-color-fill {
+    width: 12rpx;
+    height: 12rpx;
+    border-radius: 50%;
+}
+
+.theme-preview-name {
+    font-size: 22rpx;
+    font-weight: 500;
+    color: var(--app-text-primary);
+}
+
+/* ── 字号卡片 ── */
+.font-size-options {
+    display: flex;
+    gap: 16rpx;
+}
+
+.font-size-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10rpx;
+    padding: 24rpx 0;
+    border-radius: 16rpx;
+    background: var(--app-bg-secondary);
+    border: 3rpx solid transparent;
+    transition: all 0.25s ease;
+}
+
+.font-size-card.active {
+    border-color: var(--app-brand);
+    background: var(--app-brand-light);
+    box-shadow: 0 0 0 4rpx var(--app-brand-light);
+}
+
+.font-size-preview {
+    font-weight: 700;
+    color: var(--app-text-primary);
+    line-height: 1;
+}
+
+.font-size-name {
+    font-size: 22rpx;
+    color: var(--app-text-secondary);
+    font-weight: 500;
+}
+
+.font-size-card.active .font-size-name {
+    color: var(--app-brand);
+    font-weight: 600;
+}
+
+.font-size-hint {
+    margin-top: 14rpx;
+    font-size: 22rpx;
+    color: var(--app-text-placeholder);
 }
 
 /* 分组标题 */
@@ -600,97 +883,6 @@ onMounted(() => {
     color: var(--app-text-secondary);
     padding: 20rpx 30rpx 10rpx;
     border-bottom: 1rpx solid var(--app-border);
-}
-
-/* 主题预设选择弹窗 */
-.theme-picker {
-    padding: 30rpx;
-    background-color: var(--app-bg-container);
-}
-
-.theme-picker-title {
-    font-size: 32rpx;
-    font-weight: 500;
-    color: var(--app-text-primary);
-    text-align: center;
-    margin-bottom: 30rpx;
-}
-
-.theme-preset-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20rpx;
-    margin-bottom: 30rpx;
-}
-
-.theme-preset-card {
-    display: flex;
-    align-items: center;
-    padding: 24rpx;
-    border-radius: 16rpx;
-    background-color: var(--app-bg-secondary);
-    border: 2rpx solid transparent;
-    transition: border-color 0.2s, background-color 0.2s;
-}
-
-.theme-preset-card.active {
-    border-color: var(--app-brand);
-    background-color: var(--app-brand-light);
-}
-
-.theme-preset-swatch {
-    width: 88rpx;
-    height: 88rpx;
-    border-radius: 16rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 24rpx;
-    flex-shrink: 0;
-    border: 1rpx solid var(--app-border);
-}
-
-.theme-preset-dot {
-    width: 40rpx;
-    height: 40rpx;
-    border-radius: 50%;
-    box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);
-}
-
-.theme-preset-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.theme-preset-name-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6rpx;
-}
-
-.theme-preset-name {
-    font-size: 30rpx;
-    font-weight: 500;
-    color: var(--app-text-primary);
-}
-
-.theme-preset-desc {
-    font-size: 24rpx;
-    color: var(--app-text-secondary);
-}
-
-.theme-picker-close {
-    text-align: center;
-    padding: 20rpx 0;
-    border-top: 1rpx solid var(--app-border);
-}
-
-.theme-picker-close text {
-    font-size: 28rpx;
-    color: var(--app-text-secondary);
 }
 
 /* 退出登录 */
