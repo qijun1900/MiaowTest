@@ -1,5 +1,6 @@
 <template>
     <!-- 自定义 添加返回按钮 -->
+    <ThemeProvider>
     <view class="back-btn" :style="{ top: backBtnTop }" @click="goBack">
         <t-icon name="arrow-left" color="#3c9cff" size="24"></t-icon>
         <text class="back-text">返回</text>
@@ -199,6 +200,7 @@
         <view class="bg-decoration top-right"></view>
         <view class="bg-decoration bottom-left"></view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>

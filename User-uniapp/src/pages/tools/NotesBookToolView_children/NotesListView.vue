@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
   <view class="container" :style="{ paddingTop: navBarInfo.totalHeight + 'px' }">
     <view class="top-wrapper" :style="{ height: navBarInfo.totalHeight + 'px', paddingTop: navBarInfo.statusBarHeight + 'px' }">
       <view class="nav-row" :style="{ height: navBarInfo.navBarHeight + 'px' }">
@@ -192,6 +193,7 @@
       @btnClick="handleFloatingAddNote"
     />
   </view>
+    </ThemeProvider>
 </template>
 
 <script setup>

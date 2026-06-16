@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="笔记详情" @back="handleNavBack" />
     <view class="container">
         <view class="question-list">
             <!-- Loading -->
@@ -180,6 +181,16 @@ import { useObjectiveAnswerStore } from "../../stores/modules/ObjectiveAnswerSto
 import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerStore";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
 import ContentRenderer from "../../components/common/ContentRenderer.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const QuestionStore = useQuestionStore();
 const objectiveAnswerStore = useObjectiveAnswerStore();

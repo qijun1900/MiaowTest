@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="编辑笔记本" @back="handleNavBack" />
     <view class="container">
         <view v-if="loading" class="loading-container">
             <view class="loading-spinner">
@@ -106,10 +108,12 @@
             </view>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
 import ThemeProvider from "../../../components/core/ThemeProvider.vue";
+import CustomNavBar from "../../../components/common/CustomNavBar.vue";
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import {
@@ -130,6 +134,15 @@ const formData = ref({
 const validationErrors = ref({
     title: "",
 });
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 onLoad(async (options) => {
     if (options.id) {

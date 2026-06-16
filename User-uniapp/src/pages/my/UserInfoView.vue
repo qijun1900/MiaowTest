@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="个人信息" @back="handleNavBack" />
     <view class="container">
         <!-- 用户头像区域 -->
         <view class="avatar-section" @click="handleEditAvatar">
@@ -118,6 +119,17 @@ import logSDK from "../../util/logSDK";
 // #ifdef MP-WEIXIN
 import { wechatBind } from "../../util/wechatLogin";
 // #endif
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const instance = getCurrentInstance();
 const bindStatus = ref({

@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="我的错题" @back="handleNavBack" />
     <view class="wrong-question-container">
         <!-- 页面头部统计信息 -->
         <view class="header-stats">
@@ -307,6 +309,7 @@
         </view>
         <BackToTop ref="backToTopRef" position="bottom-right" />
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -328,8 +331,19 @@ import {
 } from "../../API/Exam/QuestionAPI";
 import formatInfo from "../../util/formatInfo";
 import ContentRenderer from "../../components/common/ContentRenderer.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
 
 // Store 实例
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
+
 const questionStore = useQuestionStore(); // 获取问题数据
 const objectiveAnswerStore = useObjectiveAnswerStore(); // 获取客观题答案数据
 const subjectiveAnswerStore = useSubjectiveAnswerStore(); // 获取主观题答案数据

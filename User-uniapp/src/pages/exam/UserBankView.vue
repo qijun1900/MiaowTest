@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="题库详情" @back="handleNavBack" />
     <view class="UserBankView">
         <!-- 题库信息头部 -->
         <view class="bank-header">
@@ -164,6 +166,7 @@
             </tPopup>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 <script setup>
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
@@ -180,6 +183,17 @@ import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue
 import useSwipe from "../../composables/useSwipe.js"; // 导入封装的滑动删除方法
 import { deleteQuestionAPI } from "../../API/Exam/QuestionAPI";
 import Tips from "../../components/core/Tips.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
+
 const bankData = ref([]); // 题库信息数据
 const QuestionData = ref([]); //题库题目数据
 const isLoading = ref(false); // 加载状态

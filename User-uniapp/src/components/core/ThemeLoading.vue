@@ -9,13 +9,13 @@
 defineProps({
     text: {
         type: String,
-        default: "���ڼ���...",
+        default: "加载中...",
     },
 });
 </script>
 
 <style scoped>
-/* Loading ������ʽ */
+/* Loading 组件样式 */
 .theme-loading-container {
     display: flex;
     flex-direction: column;
@@ -27,8 +27,8 @@ defineProps({
 .loading-spinner {
     width: 60rpx;
     height: 60rpx;
-    border: 4rpx solid #e6f2ff;
-    border-top: 4rpx solid #4d94ff;
+    border: 4rpx solid var(--app-brand-light);
+    border-top: 4rpx solid var(--app-brand);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 30rpx;

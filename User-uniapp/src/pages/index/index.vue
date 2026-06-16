@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="题喵喵" :showBack="false" @back="handleNavBack" />
     <view class="content">
         <view class="card-container">
             <view class="noticbar">
@@ -72,6 +73,16 @@ import BackToTop from "../../components/core/BackToTop.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { AppearanceStore } from "../../stores/modules/AppearanceStore";
 import showShareMenu from "../../util/wechatShare.js";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const noticeData = ref([]); // 添加notice需要的数据
 const swiperList = ref([]); // 添加swiper需要的数据

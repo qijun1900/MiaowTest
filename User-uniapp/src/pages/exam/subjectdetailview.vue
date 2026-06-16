@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="考试详情" @back="handleNavBack" />
     <view class="container">
         <!-- 顶部卡片式布局 -->
         <view class="exam-detail-card">
@@ -265,6 +266,16 @@ import ThemeLoading from "../../components/core/ThemeLoading.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import Subsection from "../../components/core/Subsection.vue";
 import checkLogin from "../../util/checkLogin";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const examInfo = ref({});
 const subjectTypes = ref([]); // 考试题型数据

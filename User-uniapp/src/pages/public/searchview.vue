@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="搜索" @back="handleNavBack" />
     <view class="container">
         <uniSearch
             placeholder="请输入考试科目~"
@@ -75,6 +77,7 @@
             <text>加载中...</text>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -84,6 +87,16 @@ import uniSearch from "../../components/core/uniSearch.vue";
 import { getExamSubjects } from "../../API/Exam/ExamAPI";
 import escconfig from "../../config/esc.config";
 import Empty from "../../components/core/Empty.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const examSubjects = ref([]); // 考试科目数据
 const searchQuery = ref(""); // 搜索关键词

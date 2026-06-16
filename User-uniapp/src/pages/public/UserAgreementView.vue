@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="用户协议" @back="handleNavBack" />
     <view class="user-agreement-container">
         <view class="header">
             <text class="title">题喵喵用户协议</text>
@@ -187,10 +189,21 @@
             </view>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
-// 用户协议页面
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 </script>
 
 <style scoped>

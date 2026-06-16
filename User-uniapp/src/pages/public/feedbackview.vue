@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="意见反馈" @back="handleNavBack" />
     <view class="feedback-container">
         <view class="form-container" v-if="!isSuccess">
             <view>
@@ -69,6 +71,7 @@
             <button class="back-btn" @click="backTo">返回</button>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -76,6 +79,16 @@ import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref } from "vue";
 import { submitFeedbackAPI } from "../../API/public/FeedbackAPI";
 import { onLoad } from "@dcloudio/uni-app";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
+
 // 反馈类型选项
 const feedbackTypes = [
     { value: 1, label: "系统反馈" },

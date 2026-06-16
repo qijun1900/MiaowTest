@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="page" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
         <view class="top-wrapper">
             <view class="custom-navbar" :style="customNavbarStyle">
@@ -238,6 +239,7 @@
             </template>
         </tPopup>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>

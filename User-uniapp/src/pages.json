@@ -15,6 +15,7 @@
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "题喵喵",
+				"navigationStyle": "custom",
 				"navigationBarTextStyle": "black",
 				"navigationBarBackgroundColor": "#f5f7fa",
 				"enablePullDownRefresh": true,
@@ -97,19 +98,22 @@
 				{
 					"path": "searchview",
 					"style": {
-						"navigationBarTitleText": "搜索"
+						"navigationBarTitleText": "搜索",
+						"navigationStyle": "custom"
 					}
 				},
 				{
 					"path": "feedbackview",
 					"style": {
-						"navigationBarTitleText": "意见反馈"
+						"navigationBarTitleText": "意见反馈",
+						"navigationStyle": "custom"
 					}
 				},
 				{
 					"path": "PrivacyPolicyView",
 					"style": {
 						"navigationBarTitleText": "隐私政策",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -117,6 +121,7 @@
 					"path": "UserAgreementView",
 					"style": {
 						"navigationBarTitleText": "用户协议",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				}
@@ -136,13 +141,15 @@
 					"path": "subjectdetailview",
 					"style": {
 						"navigationBarTitleText": "考试详情",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
 				{
 					"path": "PracticeSettingView",
 					"style": {
-						"navigationBarTitleText": "练习设置"
+						"navigationBarTitleText": "练习设置",
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -158,6 +165,7 @@
 					"path": "PracticeResultsView",
 					"style": {
 						"navigationBarTitleText": "练习结果",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -165,6 +173,7 @@
 					"path": "ManualImportView",
 					"style": {
 						"navigationBarTitleText": "手动导入",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -172,6 +181,7 @@
 					"path": "UserBankView",
 					"style": {
 						"navigationBarTitleText": "题库详情",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -179,6 +189,7 @@
 					"path": "WrongQuestionView",
 					"style": {
 						"navigationBarTitleText": "我的错题",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -186,6 +197,7 @@
 					"path": "ExamDiskView",
 					"style": {
 						"navigationBarTitleText": "资料详情",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				}
@@ -198,6 +210,7 @@
 					"path": "UserInfoView",
 					"style": {
 						"navigationBarTitleText": "个人信息",
+						"navigationStyle": "custom",
 						"disableScroll": true, // 禁止页面滚动
 						"scrollIndicator": "none"
 					}
@@ -238,6 +251,7 @@
 					"path": "MyWrongView",
 					"style": {
 						"navigationBarTitleText": "我的错题",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -245,6 +259,7 @@
 					"path": "MyNoteView",
 					"style": {
 						"navigationBarTitleText": "我的笔记",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -252,6 +267,7 @@
 					"path": "MyNoteDetailView",
 					"style": {
 						"navigationBarTitleText": "笔记详情",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -259,6 +275,7 @@
 					"path": "MySettingView",
 					"style": {
 						"navigationBarTitleText": "设置",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -266,6 +283,7 @@
 					"path": "MyMessageView",
 					"style": {
 						"navigationBarTitleText": "我的消息",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				},
@@ -273,6 +291,7 @@
 					"path": "UserQuestionBankView",
 					"style": {
 						"navigationBarTitleText": "我的题库",
+						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
 				}
@@ -296,7 +315,8 @@
 				{
 					"path": "TodoToolView",
 					"style": {
-						"navigationBarTitleText": "TODO"
+						"navigationBarTitleText": "TODO",
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -310,7 +330,8 @@
 				{
 					"path": "NotesBookToolView_children/NotesBookEditView",
 					"style": {
-						"navigationBarTitleText": "编辑笔记本"
+						"navigationBarTitleText": "编辑笔记本",
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -324,7 +345,8 @@
 				{
 					"path": "WrongBookToolView_children/WrongBookEditView",
 					"style": {
-						"navigationBarTitleText": "编辑错题本"
+						"navigationBarTitleText": "编辑错题本",
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -338,7 +360,8 @@
 				{
 					"path": "WrongBookToolView_children/WrongQuestionDetailView",
 					"style": {
-						"navigationBarTitleText": ""
+						"navigationBarTitleText": "",
+						"navigationStyle": "custom"
 					}
 				},
 				{

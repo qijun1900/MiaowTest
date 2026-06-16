@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view
         class="note-detail-page"
         :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
@@ -105,6 +106,7 @@
             </view>
         </scroll-view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>

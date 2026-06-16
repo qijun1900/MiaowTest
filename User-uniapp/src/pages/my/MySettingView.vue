@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="设置" @back="handleNavBack" />
     <view class="container">
         <!-- 用户信息卡片 -->
         <view class="profile-card" @click="handleProfileCardClick">
@@ -247,6 +248,7 @@ import { AppearanceStore } from "../../stores/modules/AppearanceStore";
 import { clearExamCache } from "../../util/cacheCleaner";
 import userAvatar from "../../components/core/userAvatar.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
 import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import logSDK from "../../util/logSDK";
 // #ifdef MP-WEIXIN
@@ -258,6 +260,16 @@ import { checkForUpdate } from "../../util/checkUpdate";
 
 const userInfoStore = UserInfoStore();
 const appearanceStore = AppearanceStore();
+
+// 导航栏返回
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 // #ifdef APP-PLUS
 const appVersion = ref(plus.runtime.version);
 // #endif

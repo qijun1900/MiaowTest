@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="资料详情" @back="handleNavBack" />
     <view class="view">
         <view class="container">
             <view class="head">
@@ -136,6 +137,16 @@ import formatTime from "../../util/formatTime";
 import { getExamTitleNetUrlAPI } from "../../API/Exam/ExamAPI";
 import copy from "../../util/copy";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const title = ref("");
 const titleid = ref(null);

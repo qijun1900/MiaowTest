@@ -2,21 +2,28 @@
     <t-divider
         :content="props.text"
         :align="props.textPosition"
-        :custom-style="{ color: '#007AFF', borderColor: '#86bbf5' }"
+        :custom-style="dividerStyle"
     >
     </t-divider>
 </template>
 <script setup>
+import { computed } from "vue";
+
 const props = defineProps({
     text: {
-        // ��������
+        // 分割线文字
         type: String,
-        default: "��������",
+        default: "分割线",
     },
     textPosition: {
-        // ����λ��
+        // 文字位置
         type: String,
-        default: "left", // ��ѡֵ��left��right
+        default: "left", // 可选值：left、right
     },
 });
+
+const dividerStyle = computed(() => ({
+    color: 'var(--app-text-secondary)',
+    borderColor: 'var(--app-border)',
+}));
 </script>

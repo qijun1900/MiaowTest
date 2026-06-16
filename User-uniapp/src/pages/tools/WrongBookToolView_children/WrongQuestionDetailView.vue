@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="" @back="handleNavBack" />
     <view class="container">
         <!-- 加载状态 -->
         <view v-if="loading" class="loading-container">
@@ -104,10 +106,12 @@
             </view>
         </template>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
 import ThemeProvider from "../../../components/core/ThemeProvider.vue";
+import CustomNavBar from "../../../components/common/CustomNavBar.vue";
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import SliderSelector from "../../../components/core/SliderSelector.vue";
@@ -153,6 +157,15 @@ const difficulties = ref([
 
 // 选中的难度
 const selectedDifficulty = ref({ label: "简单", value: "easy" });
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const handleTypeChange = ({ value }) => {
     selectedQuestionTypeValue.value = value;

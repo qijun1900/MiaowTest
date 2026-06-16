@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="TODO" @back="handleNavBack" />
     <view class="container">
         <view class="calendar-section">
             <lxCalendar
@@ -215,6 +217,7 @@
             </template>
         </tPopup>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -233,6 +236,16 @@ import {
     editTodoAPI,
 } from "../../API/Tools/TodosAPI";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const initialDate = ref(formatTime.getTodayDate()); // 初始日期设置为今天
 const dotDates = ref([]); // 下方显示圆点的日期，挂载时候获取

@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="我的错题" @back="handleNavBack" />
     <view class="question-wrong-container">
         <ThemeLoading v-if="loading" text="正在加载错题..." />
         <!-- 科目筛选 -->
@@ -167,6 +168,17 @@ import { useSubjectiveAnswerStore } from "../../stores/modules/SubjectiveAnswerS
 import tPopup from "../../components/core/tPopup.vue";
 import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue";
 import ContentRenderer from "../../components/common/ContentRenderer.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const objectiveAnswerStore = useObjectiveAnswerStore();
 const subjectiveAnswerStore = useSubjectiveAnswerStore();

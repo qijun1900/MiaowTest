@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="练习结果" @back="handleNavBack" />
     <view class="container">
         <view class="animation">
             <firework-effect ref="fireworkRef"></firework-effect>
@@ -77,6 +79,7 @@
             </t-button>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -88,6 +91,16 @@ import FireworkEffect from "@/uni_modules/firework-effect/firework-effect.vue"; 
 import AnswerSheet from "../../components/modules/exam/AnswerSheet.vue";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";
 import { useStatisticsStore } from "../../stores/modules/StatisticsStore";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const fireworkRef = ref(null);
 const QuestionStore = useQuestionStore();

@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="练习设置" @back="handleNavBack" />
     <view class="container">
         <!-- 练习信息 -->
         <view class="info-section">
@@ -63,6 +64,16 @@ import { useQuestionStore } from "../../stores/modules/QuestionStore";
 import { onLoad } from "@dcloudio/uni-app";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import PracticeSettings from "../../components/modules/exam/PracticeSettings.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const QuestionStore = useQuestionStore();
 const QuestionTypeData = ref({});

@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="手动导入" @back="handleNavBack" />
     <view class="container">
         <view class="content">
             <!-- 题型选择器 -->
@@ -65,6 +67,7 @@
             </view>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
@@ -76,6 +79,16 @@ import AddSelect from "../../components/modules/exam/AddSelect.vue"; // 选择�
 import AddBlank from "../../components/modules/exam/AddBlank.vue"; // 填空题2
 import AddJudge from "../../components/modules/exam/AddJudge.vue"; // 判断题3
 import AddShort from "../../components/modules/exam/AddShort.vue"; // 简答题4
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const questionbankId = ref(null);
 const selectedQuestionTypeValue = ref(1); // 默认选择题

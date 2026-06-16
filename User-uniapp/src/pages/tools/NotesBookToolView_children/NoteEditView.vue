@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
   <view
     class="note-editor-page"
     :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
@@ -132,6 +133,7 @@
       @useOriginal="onCropUseOriginal"
     />
   </view>
+    </ThemeProvider>
 </template>
 
 <script setup>

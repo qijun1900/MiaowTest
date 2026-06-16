@@ -56,7 +56,7 @@ const props = defineProps({
     // 主要颜色
     primaryColor: {
         type: String,
-        default: "#007AFF",
+        default: "var(--app-brand)",
     },
 });
 
@@ -121,9 +121,9 @@ defineExpose({
     padding: 12rpx;
     transition: all 0.3s ease;
     --back-button-size: 50px;
-    --back-button-bg: #ffffff;
-    --back-button-border: #e0e0e0;
-    --back-button-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --back-button-bg: var(--app-bg-container);
+    --back-button-border: var(--app-border);
+    --back-button-shadow: var(--app-shadow-card);
 }
 
 .position-bottom-right {

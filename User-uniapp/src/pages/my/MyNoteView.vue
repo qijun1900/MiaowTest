@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="我的笔记" @back="handleNavBack" />
     <view class="container">
         <view class="exam-list">
             <ThemeLoading v-if="loading" text="正在加载笔记..." />
@@ -47,6 +48,16 @@ import escconfig from "../../config/esc.config";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
 import { getNoteExamListAPI } from "../../API/My/UserNoteAPI";
 import Empty from "../../components/core/Empty.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 const NoteExam = ref([]);
 const loading = ref(false);

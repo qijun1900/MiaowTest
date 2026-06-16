@@ -1,5 +1,6 @@
 <template>
     <ThemeProvider>
+    <CustomNavBar title="我的消息" @back="handleNavBack" />
     <view class="container">
         <!-- 消息列表区域 -->
         <view class="message-list">
@@ -14,6 +15,16 @@
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref } from "vue";
 import Empty from "../../components/core/Empty.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 
 // 消息列表数据（当前为空）
 const messages = ref([]);

@@ -1,4 +1,5 @@
 <template>
+    <ThemeProvider>
     <view class="container">
         <!-- 自定义导航栏 -->
         <view class="custom-navbar" :style="{ paddingTop: statusBarHeight + 'px' }">
@@ -126,6 +127,7 @@
             @close="showDeleteDialog = false"
         />
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>

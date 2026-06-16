@@ -1,4 +1,6 @@
 <template>
+    <ThemeProvider>
+    <CustomNavBar title="隐私政策" @back="handleNavBack" />
     <view class="privacy-policy-container">
         <view class="header">
             <text class="title">题喵喵小程序隐私保护指引</text>
@@ -94,10 +96,21 @@
             </view>
         </view>
     </view>
+    </ThemeProvider>
 </template>
 
 <script setup>
-// 隐私政策页面
+import ThemeProvider from "../../components/core/ThemeProvider.vue";
+import CustomNavBar from "../../components/common/CustomNavBar.vue";
+
+const handleNavBack = () => {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+        uni.navigateBack({ delta: 1 });
+    } else {
+        uni.switchTab({ url: "/pages/index/index" });
+    }
+};
 </script>
 
 <style scoped>
