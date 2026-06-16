@@ -13,13 +13,12 @@
             :key="index"
         >
             <view class="input-label">
-                <uni-icons color="#3797ff" type="compose" size="20"></uni-icons>
                 <text>空{{ index + 1 }}</text>
             </view>
             <view class="input-textarea">
                 <t-textarea
                     :value="userinput[index]"
-                    @change="(val) => { userinput[index] = val }"
+                    @change="(val) => { userinput[index] = val.value }"
                     :placeholder="'请在此处输入空' + (index + 1) + '的答案'"
                     autosize
                 >

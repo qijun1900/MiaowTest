@@ -6,14 +6,10 @@
             <ContentRenderer class="question-stem" :content="question.stem" style="display: inline;" />
         </view>
         <view class="input-container" v-show="props.currentMode === 0">
-            <view class="input-label">
-                <uni-icons color="#3797ff" type="compose" size="20">
-                </uni-icons>
-            </view>
             <view class="input-textarea">
                 <t-textarea
                     :value="userinput"
-                    @change="(val) => { userinput = val }"
+                    @change="(val) => { userinput = val.value }"
                     placeholder="请在此处输入答案~"
                     autosize
                 >
