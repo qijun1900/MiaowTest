@@ -52,7 +52,6 @@
                 theme="primary"
                 shape="round"
                 size="large"
-                block
                 @click="exportToPDF"
             >
                 导出为PDF
@@ -62,7 +61,6 @@
                 theme="danger"
                 shape="round"
                 size="large"
-                block
                 @click="viewWrongQuestions"
             >
                 查看错题
@@ -72,7 +70,6 @@
                 theme="danger"
                 shape="round"
                 size="large"
-                block
                 @click="handleBack"
             >
                 返回题库
@@ -284,10 +281,13 @@ const handleBack = () => {
     backdrop-filter: blur(10rpx);
     border-top: 1rpx solid rgba(0, 0, 0, 0.05);
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
     gap: 16rpx;
     padding: 20rpx 30rpx;
     padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.bottom-action-container :deep(.t-button) {
+    flex: 1;
 }
 </style>

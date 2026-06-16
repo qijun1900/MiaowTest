@@ -62,7 +62,6 @@
     <CustomTabBar
         :current-index="0"
         :visible="isTabBarVisible"
-        @change="handleTabChange"
     />
     </ThemeProvider>
 </template>
@@ -114,6 +113,7 @@ try {
 const tabBarPlaceholderHeight = computed(() => {
     return `${50 + safeAreaBottom.value}px`;
 });
+
 
 // 动态设置原生导航栏颜色，跟随主题
 const applyNavBarTheme = () => {

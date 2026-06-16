@@ -265,6 +265,19 @@
                 </view>
             </template>
         </tPopup>
+        <!-- 清空记录确认弹窗 -->
+        <t-dialog
+            :visible="showCleanDialog"
+            title="提示"
+            content="确定要清空本次记录吗？"
+            :confirm-btn="{ content: '清空', theme: 'danger' }"
+            cancel-btn="取消"
+            :show-overlay="true"
+            :z-index="12000"
+            @confirm="handleConfirmClean"
+            @cancel="showCleanDialog = false"
+            @close="showCleanDialog = false"
+        />
     </view>
     </ThemeProvider>
 </template>
@@ -313,6 +326,7 @@ const ObjectiveAnswerStore = useObjectiveAnswerStore(); // 客观题答案Store
 const SubjectiveAnswerStore = useSubjectiveAnswerStore(); // 主观题答案Store
 const refreshKey = ref(0); // 用于触发子组件刷新
 const popupShow = ref(false); //答题卡弹窗
+const showCleanDialog = ref(false); //清空记录弹窗
 const StatisticsStore = useStatisticsStore(); // 统计答题数据Store
 const { correctCount, incorrectCount, accuracyRate } =
     storeToRefs(StatisticsStore);
@@ -883,24 +897,23 @@ const handleQuestionCardClick = (index) => {
 
 // 处理清空答案
 const handleCleanAnswer = () => {
-    uni.showModal({
-        title: "提示",
-        content: "确定要清空本次记录吗？",
-        confirmColor: "#FF0000", // 设置确认按钮颜色为红色
-        confirmText: "清空", // 设置确认按钮文本为"清空"
-        cancelText: "取消", // 设置取消按钮文本为"取消"
-        success: (res) => {
-            if (res.confirm) {
-                SubjectiveAnswerStore.clearAllAnswers();
-                ObjectiveAnswerStore.clearAllAnswers();
-                popupShow.value = false;
-                refreshKey.value++;
-                uni.showToast({
-                    title: "作答已清空",
-                    icon: "none",
-                });
-            }
-        },
+    popupShow.value = false;
+    setTimeout(() => {
+        showCleanDialog.value = true;
+    }, 200);
+};
+
+// 确认清空
+const handleConfirmClean = () => {
+    SubjectiveAnswerStore.clearAllAnswers();
+    ObjectiveAnswerStore.clearAllAnswers();
+    popupShow.value = false;
+    showCleanDialog.value = false;
+    refreshKey.value++;
+    uni.showToast({
+        title: "作答已清空",
+        icon: "none",
+        position: "top",
     });
 };
 
