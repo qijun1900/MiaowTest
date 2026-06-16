@@ -85,7 +85,6 @@
     <CustomTabBar
         :current-index="4"
         :visible="isTabBarVisible"
-        @change="handleTabChange"
     />
     </ThemeProvider>
 </template>
@@ -121,6 +120,7 @@ try {
 const tabBarPlaceholderHeight = computed(() => {
     return `${50 + safeAreaBottom.value}px`;
 });
+
 
 const AGREED_KEY = "user_agreed_policy";
 const LoginOverlayShow = ref(false);

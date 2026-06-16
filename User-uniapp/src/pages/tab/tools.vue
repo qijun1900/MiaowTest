@@ -19,7 +19,6 @@
     <CustomTabBar
         :current-index="3"
         :visible="isTabBarVisible"
-        @change="handleTabChange"
     />
     </ThemeProvider>
 </template>

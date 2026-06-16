@@ -227,7 +227,6 @@
         <CustomTabBar
             :current-index="2"
             :visible="isTabBarVisible"
-            @change="handleTabChange"
         />
         <!-- 删除会话确认弹窗 -->
         <t-dialog
@@ -464,10 +463,6 @@ const {
         handleSenderFocus, // 监听输入区 focus 以自动隐藏 TabBar
         handleSenderBlur // 监听输入区 blur 以自动隐藏 TabBar
     } = useAutoTabBar(keyboardHeight);
-
-const handleTabChange = (index) => {
-    // Tab 切换由 CustomTabBar 内部处理
-};
 
 // H5：通过 visualViewport resize 计算键盘高度
 const handleViewportResize = () => {
