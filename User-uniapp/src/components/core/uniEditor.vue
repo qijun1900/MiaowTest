@@ -977,12 +977,12 @@ onUnmounted(() => {
     padding: 20rpx;
     background-color: var(--app-bg-container);
     line-height: 1.5;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
 .iconfont {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: bold;
 }

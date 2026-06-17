@@ -507,7 +507,7 @@ defineExpose({
 
 .minus-icon {
     color: var(--app-bg-container);
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
 }
 
@@ -592,7 +592,7 @@ defineExpose({
 
 .add-icon {
     margin-right: 10rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
 }
@@ -602,7 +602,7 @@ defineExpose({
     padding: 20rpx;
     background: var(--app-bg-secondary);
     border-radius: 8rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -611,7 +611,7 @@ defineExpose({
 }
 
 .wrong-answer-title {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     margin-bottom: 20rpx;
     font-weight: 500;
@@ -631,7 +631,7 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     background-color: var(--app-bg-container);
     transition: all 0.3s;
@@ -656,7 +656,7 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     background-color: var(--app-bg-container);
     transition: all 0.3s;

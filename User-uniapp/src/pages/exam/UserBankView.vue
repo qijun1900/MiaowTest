@@ -386,7 +386,7 @@ onShow(() => {
 }
 
 .bank-name {
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     margin-bottom: 15rpx;
@@ -406,7 +406,7 @@ onShow(() => {
 
 
 .meta-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -432,7 +432,7 @@ onShow(() => {
 }
 
 .list-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
 }
@@ -495,7 +495,7 @@ onShow(() => {
 
 .question-number {
     width: 100rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     text-align: center;
 }
@@ -505,13 +505,13 @@ onShow(() => {
 }
 
 .question-type {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     margin-bottom: 8rpx;
 }
 
 .question-title {
-    font-size: 31rpx;
+    font-size: calc(31rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.5;
 }
@@ -581,7 +581,7 @@ onShow(() => {
     border-radius: 28rpx;
     padding: 0 8rpx;
     margin: 0;
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     transition: all 0.3s ease;
     box-shadow: 0 2rpx 8rpx rgba(77, 148, 255, 0.15);
 }
@@ -619,7 +619,7 @@ onShow(() => {
     justify-content: center;
     background-color: var(--app-brand);
     color: var(--app-bg-container);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     border-radius: 40rpx;
     border: none;
     box-shadow: 0 4rpx 12rpx rgba(77, 148, 255, 0.3);
@@ -640,7 +640,7 @@ onShow(() => {
     justify-content: center;
     background-color: var(--app-bg-container);
     color: var(--app-brand);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     border-radius: 40rpx;
     border: 2rpx solid var(--app-brand);
     box-shadow: 0 4rpx 12rpx rgba(77, 148, 255, 0.15);

@@ -131,7 +131,7 @@ defineExpose({
 /* #endif */
 
 .nav-title {
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }

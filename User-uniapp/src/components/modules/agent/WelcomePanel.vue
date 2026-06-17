@@ -129,7 +129,7 @@ const handleActionClick = (item) => {
 
 .welcome-greeting {
     display: block;
-    font-size: 38rpx;
+    font-size: calc(38rpx * var(--app-font-scale, 1));
     line-height: 1.5;
     font-weight: 600;
     color: var(--app-text-secondary);
@@ -138,7 +138,7 @@ const handleActionClick = (item) => {
 
 .welcome-title {
     display: block;
-    font-size: 48rpx;
+    font-size: calc(48rpx * var(--app-font-scale, 1));
     line-height: 1.18;
     font-weight: 800;
     color: var(--app-text-primary);
@@ -188,7 +188,7 @@ const handleActionClick = (item) => {
 }
 
 .action-title {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     line-height: 1;
     font-weight: 700;
     color: var(--app-text-secondary);
@@ -227,7 +227,7 @@ const handleActionClick = (item) => {
 }
 
 .feature-card-text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     line-height: 1;
     font-weight: 700;
     color: var(--app-text-secondary);
@@ -254,7 +254,7 @@ const handleActionClick = (item) => {
 }
 
 .login-action-text {
-    font-size: 38rpx;
+    font-size: calc(38rpx * var(--app-font-scale, 1));
     font-weight: 700;
     color: var(--app-text-primary);
 }

@@ -55,7 +55,7 @@ onUnmounted(() => {
 }
 
 .greeting-title {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     line-height: 1.5;
     font-weight: 600;
     color: var(--app-text-secondary);

@@ -545,7 +545,7 @@ onMounted(() => {
 .question-type {
     padding: 6rpx 16rpx;
     border-radius: 16rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     font-weight: 500;
     border: 2rpx solid;
 }
@@ -561,7 +561,7 @@ onMounted(() => {
 }
 
 .favorite-icon {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: #ffd700;
 }
 
@@ -570,14 +570,14 @@ onMounted(() => {
 }
 
 .question-number {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
     margin-bottom: 12rpx;
 }
 
 .question-stem {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.6;
@@ -602,7 +602,7 @@ onMounted(() => {
 }
 
 .option-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
     margin-right: 16rpx;
@@ -610,7 +610,7 @@ onMounted(() => {
 }
 
 .option-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
@@ -633,13 +633,13 @@ onMounted(() => {
 .note-title {
     display: flex;
     align-items: center;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
 
 .note-icon {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     margin-right: 12rpx;
 }
 
@@ -650,7 +650,7 @@ onMounted(() => {
 }
 
 .note-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     line-height: 1.8;
     color: var(--app-text-primary);
     word-wrap: break-word;
@@ -668,7 +668,7 @@ onMounted(() => {
 .favorite-time {
     display: flex;
     align-items: center;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -681,7 +681,7 @@ onMounted(() => {
 .action-btn {
     padding: 12rpx 24rpx;
     border-radius: 18rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     border: none;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -695,7 +695,7 @@ onMounted(() => {
 
 .btn-icon {
     margin-right: 8rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
 }
 
 /* 编辑按钮样式 */
@@ -829,7 +829,7 @@ onMounted(() => {
 }
 
 .note-info-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -858,15 +858,15 @@ onMounted(() => {
 
     .action-btn {
         padding: 10rpx 20rpx;
-        font-size: 22rpx;
+        font-size: calc(22rpx * var(--app-font-scale, 1));
     }
 
     .question-title {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
     }
 
     .option-text {
-        font-size: 26rpx;
+        font-size: calc(26rpx * var(--app-font-scale, 1));
     }
 
     .note-header {
@@ -874,11 +874,11 @@ onMounted(() => {
     }
 
     .note-title {
-        font-size: 26rpx;
+        font-size: calc(26rpx * var(--app-font-scale, 1));
     }
 
     .note-icon {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         margin-right: 10rpx;
     }
 
@@ -887,7 +887,7 @@ onMounted(() => {
     }
 
     .note-text {
-        font-size: 26rpx;
+        font-size: calc(26rpx * var(--app-font-scale, 1));
         line-height: 1.7;
     }
 }

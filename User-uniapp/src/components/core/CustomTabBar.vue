@@ -356,7 +356,7 @@ onBeforeUnmount(() => {
 
 /* 文字 */
 .tab-item__text {
-    font-size: 10px;
+    font-size: calc(10px * var(--app-font-scale, 1));
     line-height: 1.2;
     color: var(--app-text-secondary);
     transition: color 0.2s ease, font-weight 0.2s ease;

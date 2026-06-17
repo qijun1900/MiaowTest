@@ -57,12 +57,12 @@ const analysis = computed(() => {
 }
 
 .explanation-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
 .question-explanation-content {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 538;
 }

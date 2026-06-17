@@ -121,6 +121,7 @@
                         :key="index"
                         class="font-size-card"
                         :class="{ active: appearanceStore.fontSizeIndex === index }"
+                        @click="selectFontSize(index)"
                     >
                         <text class="font-size-preview" :style="{ fontSize: option.previewSize }">A</text>
                         <text class="font-size-name">{{ option.label }}</text>
@@ -411,28 +412,21 @@ const handleNotificationChange = (value) => {
 // 选择深浅模式
 const selectDarkMode = (mode) => {
     appearanceStore.setDarkMode(mode);
-    showDarkModePopup.value = false;
 };
 
 // 选择主题预设
 const selectPreset = (presetKey) => {
     appearanceStore.setThemePreset(presetKey);
-    showThemePopup.value = false;
     uni.showToast({ title: "主题已切换", icon: "none", position: "top" });
 };
 
-// 字号
-const handleFontSize = () => {
-    uni.showActionSheet({
-        itemList: appearanceStore.fontSizeOptions,
-        current: appearanceStore.fontSizeIndex,
-        success: (res) => {
-            appearanceStore.setFontSize(res.tapIndex);
-            uni.showToast({
-                title: "字号已切换为" + appearanceStore.fontSizeOptions[res.tapIndex],
-                icon: "none",
-            });
-        },
+// 选择字号
+const selectFontSize = (index) => {
+    appearanceStore.setFontSize(index);
+    uni.showToast({
+        title: "字号已切换为" + fontSizeOptions[index].label,
+        icon: "none",
+        position: "top",
     });
 };
 
@@ -547,14 +541,14 @@ onMounted(() => {
 }
 
 .profile-name {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 500;
     color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .profile-uid {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -596,7 +590,7 @@ onMounted(() => {
 }
 
 .setting-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
@@ -606,7 +600,7 @@ onMounted(() => {
 }
 
 .setting-value {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-right: 10rpx;
 }
@@ -622,7 +616,7 @@ onMounted(() => {
     align-items: center;
     gap: 12rpx;
     margin-bottom: 20rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -715,7 +709,7 @@ onMounted(() => {
 }
 
 .dark-mode-name {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     font-weight: 500;
     color: var(--app-text-primary);
 }
@@ -823,7 +817,7 @@ onMounted(() => {
 }
 
 .theme-preview-name {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     font-weight: 500;
     color: var(--app-text-primary);
 }
@@ -861,7 +855,7 @@ onMounted(() => {
 }
 
 .font-size-name {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     font-weight: 500;
 }
@@ -873,13 +867,13 @@ onMounted(() => {
 
 .font-size-hint {
     margin-top: 14rpx;
-    font-size: 22rpx;
+    font-size: var(--app-font-base);
     color: var(--app-text-placeholder);
 }
 
 /* 分组标题 */
 .group-header {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     padding: 20rpx 30rpx 10rpx;
     border-bottom: 1rpx solid var(--app-border);
@@ -897,7 +891,7 @@ onMounted(() => {
     height: 100rpx;
     line-height: 100rpx;
     text-align: center;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     box-shadow: var(--app-shadow-card);
 }

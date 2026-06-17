@@ -130,7 +130,7 @@ const handleNavBack = () => {
 }
 
 .title {
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     line-height: 1.4;
@@ -156,7 +156,7 @@ const handleNavBack = () => {
 }
 
 .section-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 500;
     color: var(--app-text-primary);
     line-height: 1.6;
@@ -165,7 +165,7 @@ const handleNavBack = () => {
 }
 
 .section-header {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
     line-height: 1.5;
@@ -174,7 +174,7 @@ const handleNavBack = () => {
 }
 
 .section-content {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.6;
     display: block;
@@ -183,7 +183,7 @@ const handleNavBack = () => {
 }
 
 .contact-info {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 500;
     line-height: 1.5;
@@ -196,7 +196,7 @@ const handleNavBack = () => {
 }
 
 .update-date {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     text-align: center;
     display: block;

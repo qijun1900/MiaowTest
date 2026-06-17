@@ -264,7 +264,7 @@ onMounted(() => {
 }
 
 .tags-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
@@ -273,7 +273,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     color: var(--app-brand);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 .refresh-btn text {
@@ -291,7 +291,7 @@ onMounted(() => {
     color: var(--app-brand);
     padding: 10rpx 20rpx;
     border-radius: 30rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 .search-results {
@@ -318,7 +318,7 @@ onMounted(() => {
 }
 
 .result-text {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     flex: 1;
 }
@@ -332,20 +332,20 @@ onMounted(() => {
     margin-top: 20rpx;
     text-align: center;
     color: var(--app-text-secondary);
-    font-size: 35rpx;
+    font-size: calc(35rpx * var(--app-font-scale, 1));
 }
 
 .loading {
     margin-top: 20rpx;
     text-align: center;
     color: var(--app-text-secondary);
-    font-size: 14rpx;
+    font-size: calc(14rpx * var(--app-font-scale, 1));
 }
 
 .initial-tip {
     margin-top: 20rpx;
     text-align: center;
     color: var(--app-text-secondary);
-    font-size: 35rpx;
+    font-size: calc(35rpx * var(--app-font-scale, 1));
 }
 </style>

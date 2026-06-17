@@ -447,7 +447,7 @@ onBeforeUnmount(() => {
 .nav-title {
     flex: 1;
     text-align: center;
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     color: #1f2a1f;
     font-weight: 700;
     padding: 0 12rpx;
@@ -510,7 +510,7 @@ onBeforeUnmount(() => {
 }
 
 .section-title {
-    font-size: 44rpx;
+    font-size: calc(44rpx * var(--app-font-scale, 1));
     color: #1f2a1f;
     font-weight: 700;
     letter-spacing: 0.8rpx;
@@ -519,7 +519,7 @@ onBeforeUnmount(() => {
 .hero-subtitle {
     margin-top: 14rpx;
     display: block;
-    font-size: 27rpx;
+    font-size: calc(27rpx * var(--app-font-scale, 1));
     color: #5e6d62;
     line-height: 1.45;
 }
@@ -538,13 +538,13 @@ onBeforeUnmount(() => {
 }
 
 .hero-stat-value {
-    font-size: 38rpx;
+    font-size: calc(38rpx * var(--app-font-scale, 1));
     color: #2c7a36;
     font-weight: 700;
 }
 
 .hero-stat-label {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #76837a;
 }
 
@@ -616,7 +616,7 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: bold;
     margin-bottom: 32rpx;
     backdrop-filter: blur(10rpx);
@@ -627,7 +627,7 @@ onBeforeUnmount(() => {
 
 .subject-name {
     color: #fff;
-    font-size: 38rpx;
+    font-size: calc(38rpx * var(--app-font-scale, 1));
     font-weight: 600;
     margin-bottom: 20rpx;
     line-height: 1.4;
@@ -641,7 +641,7 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 8rpx;
     color: rgba(255, 255, 255, 0.95);
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     margin-bottom: auto;
     position: relative;
     z-index: 1;
@@ -665,7 +665,7 @@ onBeforeUnmount(() => {
 
 .stats-text {
     color: rgba(255, 255, 255, 0.95);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 500;
 }
 
@@ -723,7 +723,7 @@ onBeforeUnmount(() => {
 
 .create-text {
     color: var(--app-text-secondary);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 500;
 }
 
@@ -737,7 +737,7 @@ onBeforeUnmount(() => {
 }
 
 .form-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     margin-bottom: 20rpx;
     font-weight: 600;
@@ -777,7 +777,7 @@ onBeforeUnmount(() => {
     flex: 1;
     height: 88rpx;
     padding: 0 16rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     box-sizing: border-box;
     border: none;
@@ -789,7 +789,7 @@ onBeforeUnmount(() => {
 }
 
 .char-count {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -798,7 +798,7 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 8rpx;
     margin-top: 16rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     animation: slideDown 0.3s ease;
 }
@@ -876,7 +876,7 @@ onBeforeUnmount(() => {
     flex: 1;
     height: 96rpx;
     border-radius: 48rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     border: none;
     transition: all 0.3s ease;

@@ -676,13 +676,13 @@ const resetState = () => {
 }
 
 .header-title {
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: 600;
 }
 
 .header-hint {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: rgba(255, 255, 255, 0.6);
     margin-top: 6rpx;
 }
@@ -871,7 +871,7 @@ const resetState = () => {
 }
 
 .btn-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 .cancel-text {

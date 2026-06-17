@@ -100,7 +100,7 @@ const handleClick = (index) => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     line-height: 1.4;
 }
 

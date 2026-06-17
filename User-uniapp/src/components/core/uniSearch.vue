@@ -91,7 +91,7 @@ watch(
     outline: none !important;
     -webkit-tap-highlight-color: transparent !important;
     pointer-events: none !important;
-    font-size: 28rpx !important;
+    font-size: calc(28rpx * var(--app-font-scale, 1)) !important;
     color: var(--app-text-primary) !important;
     background: transparent !important;
 }
@@ -104,7 +104,7 @@ watch(
 
 /* 搜索框占位符样式 */
 :deep(.uni-searchbar__placeholder) {
-    font-size: 28rpx !important;
+    font-size: calc(28rpx * var(--app-font-scale, 1)) !important;
     color: var(--app-text-placeholder) !important;
 }
 

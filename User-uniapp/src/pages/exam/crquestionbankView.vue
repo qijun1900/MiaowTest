@@ -389,7 +389,7 @@ onMounted(async () => {
     background-color: rgba(255, 255, 255, 0.8);
 
     .back-text {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         color: var(--app-brand);
     }
 }
@@ -409,7 +409,7 @@ onMounted(async () => {
 
 .page-title {
     display: block;
-    font-size: 44rpx;
+    font-size: calc(44rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     margin-bottom: 16rpx;
@@ -418,7 +418,7 @@ onMounted(async () => {
 
 .page-subtitle {
     display: block;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.5;
 }
@@ -443,7 +443,7 @@ onMounted(async () => {
 }
 
 .input-title {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
@@ -462,7 +462,7 @@ onMounted(async () => {
         background: var(--app-bg-secondary);
         border: 2rpx solid #e9ecef;
         border-radius: 12rpx;
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         color: var(--app-text-primary);
         transition: all 0.3s ease;
 
@@ -474,13 +474,13 @@ onMounted(async () => {
 
         &::placeholder {
             color: var(--app-text-secondary);
-            font-size: 26rpx;
+            font-size: calc(26rpx * var(--app-font-scale, 1));
         }
     }
 }
 
 .input-counter {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     background: rgba(255, 255, 255, 0.8);
     padding: 4rpx 8rpx;
@@ -495,12 +495,12 @@ onMounted(async () => {
 }
 
 .error-text {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
 }
 
 .success-text {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-success);
 }
 
@@ -530,7 +530,7 @@ onMounted(async () => {
 }
 
 .disabled-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     font-weight: bold;
     background: rgba(255, 255, 255, 0.8);
@@ -583,7 +583,7 @@ onMounted(async () => {
 
 .option-title {
     display: block;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-bottom: 6rpx;
@@ -592,7 +592,7 @@ onMounted(async () => {
 
 .option-desc {
     display: block;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.4;
 }
@@ -613,7 +613,7 @@ onMounted(async () => {
 }
 
 .feature-title {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     margin-bottom: 24rpx;
@@ -633,7 +633,7 @@ onMounted(async () => {
 }
 
 .feature-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
@@ -691,11 +691,11 @@ onMounted(async () => {
     }
 
     .option-title {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
     }
 
     .option-desc {
-        font-size: 22rpx;
+        font-size: calc(22rpx * var(--app-font-scale, 1));
     }
 }
 </style>

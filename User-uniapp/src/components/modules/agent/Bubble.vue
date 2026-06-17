@@ -738,7 +738,7 @@ function escapeHtml(value) {
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
         "Source Han Sans SC", "Noto Sans CJK SC", "Noto Sans SC",
         "WenQuanYi Micro Hei", system-ui, sans-serif;
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-weight: 400;
@@ -848,7 +848,7 @@ function escapeHtml(value) {
 }
 
 .bubble-file-name {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     white-space: nowrap;
@@ -857,7 +857,7 @@ function escapeHtml(value) {
 }
 
 .bubble-file-ext {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -875,7 +875,7 @@ function escapeHtml(value) {
 
 .bubble-mp-html {
     font-family: inherit;
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
@@ -941,35 +941,35 @@ function escapeHtml(value) {
 /* H5 / App 端按屏幕物理宽度判断；小程序中 rpx 已按 750 基线自动缩放，此处主要服务 H5。 */
 @media screen and (max-width: 360px) {
     .bubble-box {
-        font-size: 32rpx;
+        font-size: calc(32rpx * var(--app-font-scale, 1));
         padding: 16rpx 22rpx;
         line-height: 1.68;
     }
     .bubble-mp-html {
-        font-size: 32rpx;
+        font-size: calc(32rpx * var(--app-font-scale, 1));
         line-height: 1.68;
     }
 }
 
 @media screen and (min-width: 768px) {
     .bubble-box {
-        font-size: 18px;
+        font-size: calc(18px * var(--app-font-scale, 1));
         padding: 12px 18px;
         line-height: 1.7;
     }
     .bubble-mp-html {
-        font-size: 18px;
+        font-size: calc(18px * var(--app-font-scale, 1));
         line-height: 1.7;
     }
 }
 
 @media screen and (min-width: 1024px) {
     .bubble-box {
-        font-size: 18.5px;
+        font-size: calc(18.5px * var(--app-font-scale, 1));
         line-height: 1.72;
     }
     .bubble-mp-html {
-        font-size: 18.5px;
+        font-size: calc(18.5px * var(--app-font-scale, 1));
         line-height: 1.72;
     }
 }
@@ -1034,7 +1034,7 @@ function escapeHtml(value) {
 }
 
 .bubble-action-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
@@ -1081,7 +1081,7 @@ function escapeHtml(value) {
 }
 
 .bubble-select-title {
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
@@ -1102,7 +1102,7 @@ function escapeHtml(value) {
 }
 
 .bubble-select-text {
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     line-height: 1.7;
     color: var(--app-text-primary);
     word-break: break-word;
@@ -1122,7 +1122,7 @@ function escapeHtml(value) {
     background: var(--app-brand);
     color: var(--app-bg-container);
     border-radius: 12rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 .bubble-select-btn:active {

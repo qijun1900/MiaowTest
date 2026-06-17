@@ -322,14 +322,14 @@ onLoad((options = {}) => {
 }
 
 .nav-left-text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: #5f6779;
 }
 
 .nav-title {
     flex: 1;
     text-align: center;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: #3e4656;
     font-weight: 600;
     padding: 0 12rpx;
@@ -377,7 +377,7 @@ onLoad((options = {}) => {
 }
 
 .note-title {
-    font-size: 48rpx;
+    font-size: calc(48rpx * var(--app-font-scale, 1));
     line-height: 1.32;
     color: var(--app-text-primary);
     font-weight: 700;
@@ -393,12 +393,12 @@ onLoad((options = {}) => {
 }
 
 .meta-text {
-    font-size: 25rpx;
+    font-size: calc(25rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
 .meta-divider {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: #b9aeb1;
 }
 
@@ -409,7 +409,7 @@ onLoad((options = {}) => {
 }
 
 .detail-render {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: #59515a;
     line-height: 1.85;
 }
@@ -424,7 +424,7 @@ onLoad((options = {}) => {
 }
 
 .tag-title {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: #6b6170;
 }
 
@@ -441,7 +441,7 @@ onLoad((options = {}) => {
     color: #91898d;
     padding: 8rpx 14rpx;
     border-radius: 12rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     line-height: 1.1;
 }
 
@@ -514,12 +514,12 @@ onLoad((options = {}) => {
 }
 
 .empty-text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: #8c96ad;
 }
 
 .empty-desc {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #a9b4cb;
     text-align: center;
 }
@@ -538,6 +538,6 @@ onLoad((options = {}) => {
 
 .retry-btn-text {
     color: #5f6d84;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
 }
 </style>

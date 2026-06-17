@@ -86,7 +86,7 @@ const isUserWrongOption = (optionIndex) => {
 }
 
 .section-title-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
@@ -117,7 +117,7 @@ const isUserWrongOption = (optionIndex) => {
 }
 
 .option-tag {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     min-width: 40rpx;
@@ -125,7 +125,7 @@ const isUserWrongOption = (optionIndex) => {
 
 .option-content {
     flex: 1;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.6;
 }

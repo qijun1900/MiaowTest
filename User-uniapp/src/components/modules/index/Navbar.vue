@@ -90,7 +90,7 @@ const handleNavClick = (item) => {
 }
 
 .nav-title {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: bold;
     text-align: center;

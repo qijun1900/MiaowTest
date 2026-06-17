@@ -390,7 +390,7 @@ watch(
         background-color: rgba(255, 255, 255, 0.8);
 
         .back-text {
-            font-size: 28rpx;
+            font-size: calc(28rpx * var(--app-font-scale, 1));
             color: var(--app-brand);
         }
     }
@@ -475,14 +475,14 @@ watch(
     }
 
     .title {
-        font-size: 44rpx;
+        font-size: calc(44rpx * var(--app-font-scale, 1));
         font-weight: bold;
         color: var(--app-brand);
         margin-bottom: 10rpx;
     }
 
     .subtitle {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         color: var(--app-text-secondary);
     }
 }
@@ -507,7 +507,7 @@ watch(
 
         .forget-pwd {
             color: var(--app-brand);
-            font-size: 28rpx;
+            font-size: calc(28rpx * var(--app-font-scale, 1));
         }
     }
 
@@ -518,7 +518,7 @@ watch(
     .register-link {
         text-align: center;
         margin-top: 40rpx;
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         color: var(--app-text-secondary);
         display: flex;
         justify-content: center;
@@ -557,7 +557,7 @@ watch(
         }
 
         .divider-text {
-            font-size: 26rpx;
+            font-size: calc(26rpx * var(--app-font-scale, 1));
             color: var(--app-text-secondary);
             background-color: var(--app-brand-light);
             padding: 0 20rpx;
@@ -592,7 +592,7 @@ watch(
     }
 
     .wechat-login-text {
-        font-size: 26rpx;
+        font-size: calc(26rpx * var(--app-font-scale, 1));
         color: var(--app-text-secondary);
         margin-top: 5rpx;
     }

@@ -41,7 +41,7 @@ const props = defineProps({
 }
 
 .empty-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     text-align: center;
 }

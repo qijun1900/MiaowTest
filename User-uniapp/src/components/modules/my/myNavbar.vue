@@ -107,7 +107,7 @@ const handleNavClick = async (item) => {
 
 
 .nav-title {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.4;
@@ -147,7 +147,7 @@ const handleNavClick = async (item) => {
     }
 
     .nav-title {
-        font-size: 24rpx;
+        font-size: calc(24rpx * var(--app-font-scale, 1));
     }
 }
 </style>

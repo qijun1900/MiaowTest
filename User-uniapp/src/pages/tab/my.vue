@@ -318,13 +318,13 @@ onShow(() => {
 }
 
 .overlay-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 580;
     color: var(--app-text-primary);
 }
 
 .login-tips {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-bottom: 10rpx;
 }

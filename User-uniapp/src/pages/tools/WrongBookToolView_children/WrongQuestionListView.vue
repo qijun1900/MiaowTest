@@ -1088,7 +1088,7 @@ onBeforeUnmount(() => {
 .nav-title {
     flex: 1;
     text-align: center;
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     color: #3d2a1a;
     font-weight: 700;
     padding: 0 12rpx;
@@ -1147,7 +1147,7 @@ onBeforeUnmount(() => {
 
 .search-input {
     flex: 1;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     height: 40rpx;
     line-height: 40rpx;
@@ -1189,7 +1189,7 @@ onBeforeUnmount(() => {
 }
 
 .filter-chip-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #ff9555;
     font-weight: 500;
     white-space: nowrap;
@@ -1220,7 +1220,7 @@ onBeforeUnmount(() => {
 }
 
 .status-filter-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #8b8b8b;
     white-space: nowrap;
 }
@@ -1257,7 +1257,7 @@ onBeforeUnmount(() => {
 }
 
 .tab-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     white-space: nowrap;
     transition: color 0.3s ease;
@@ -1272,7 +1272,7 @@ onBeforeUnmount(() => {
     margin-left: 8rpx;
     background: #ffe8d6;
     color: #ff9555;
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     padding: 2rpx 12rpx;
     border-radius: 20rpx;
     min-width: 32rpx;
@@ -1314,7 +1314,7 @@ onBeforeUnmount(() => {
 }
 
 .load-more-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -1347,7 +1347,7 @@ onBeforeUnmount(() => {
 
 .loading-text {
     margin-top: 32rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: #ff9555;
     font-weight: 500;
 }
@@ -1368,14 +1368,14 @@ onBeforeUnmount(() => {
 }
 
 .empty-title {
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     color: #ff9555;
     font-weight: 600;
     margin-bottom: 16rpx;
 }
 
 .empty-desc {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.6;
     margin-bottom: 48rpx;
@@ -1399,7 +1399,7 @@ onBeforeUnmount(() => {
 }
 
 .empty-action-text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: 500;
 }
@@ -1422,7 +1422,7 @@ onBeforeUnmount(() => {
     right: 24rpx;
     padding: 8rpx 20rpx;
     border-radius: 20rpx;
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     font-weight: 500;
     z-index: 10;
     white-space: nowrap;
@@ -1466,7 +1466,7 @@ onBeforeUnmount(() => {
 .tag {
     padding: 8rpx 20rpx;
     border-radius: 24rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
@@ -1523,7 +1523,7 @@ onBeforeUnmount(() => {
 }
 
 .meta-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -1544,12 +1544,12 @@ onBeforeUnmount(() => {
 }
 
 .status-show {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #67c23a;
 }
 
 .status-hide {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #909399;
 }
 
@@ -1576,7 +1576,7 @@ onBeforeUnmount(() => {
 }
 
 .answer-title {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 600;
     margin-bottom: 16rpx;
@@ -1619,7 +1619,7 @@ onBeforeUnmount(() => {
 }
 
 .answer-text {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     line-height: 1.5;
     color: var(--app-text-primary);
     font-weight: 500;
@@ -1682,7 +1682,7 @@ onBeforeUnmount(() => {
 }
 
 .answer-btn-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     font-weight: 500;
 }
@@ -1716,7 +1716,7 @@ onBeforeUnmount(() => {
 }
 
 .footer-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #909399;
 }
 
@@ -1741,7 +1741,7 @@ onBeforeUnmount(() => {
 }
 
 .footer-btn .btn-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 

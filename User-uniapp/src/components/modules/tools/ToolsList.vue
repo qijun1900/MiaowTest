@@ -246,14 +246,14 @@ const handleToolClick = (tool) => {
 }
 
 .tool-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .tool-desc {
-    font-size: 25rpx;
+    font-size: calc(25rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -271,11 +271,11 @@ const handleToolClick = (tool) => {
     }
 
     .tool-title {
-        font-size: 30rpx;
+        font-size: calc(30rpx * var(--app-font-scale, 1));
     }
 
     .tool-desc {
-        font-size: 24rpx;
+        font-size: calc(24rpx * var(--app-font-scale, 1));
     }
 }
 
@@ -299,11 +299,11 @@ const handleToolClick = (tool) => {
     }
 
     .tool-title {
-        font-size: 36rpx;
+        font-size: calc(36rpx * var(--app-font-scale, 1));
     }
 
     .tool-desc {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
     }
 }
 </style>

@@ -306,7 +306,7 @@ const handleDelete = () => {
 }
 
 .form-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     margin-bottom: 24rpx;
     font-weight: 600;
@@ -344,7 +344,7 @@ const handleDelete = () => {
 .form-input {
     flex: 1;
     height: 96rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
@@ -368,13 +368,13 @@ const handleDelete = () => {
 .form-textarea {
     width: 100%;
     min-height: 140rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     line-height: 1.5;
     color: var(--app-text-primary);
 }
 
 .char-count {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -388,7 +388,7 @@ const handleDelete = () => {
     display: flex;
     align-items: center;
     gap: 8rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
 }
 
@@ -404,7 +404,7 @@ const handleDelete = () => {
     height: 96rpx;
     border-radius: 48rpx;
     border: none;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -474,7 +474,7 @@ const handleDelete = () => {
 
 .loading-text {
     margin-top: 24rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 

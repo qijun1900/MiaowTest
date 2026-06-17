@@ -242,7 +242,7 @@ const submitMultiAnswer = () => {
     overflow: hidden;
 }
 .question-index {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     float: left;
@@ -255,12 +255,12 @@ const submitMultiAnswer = () => {
     color: var(--app-bg-container);
     padding: 6rpx 14rpx;
     border-radius: 8rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     float: left;
     margin-top: 16rpx;
 }
 .question-stem {
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 572;
     display: inline;
@@ -306,7 +306,7 @@ const submitMultiAnswer = () => {
 }
 
 .option-tag {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     margin-right: 16rpx;
@@ -335,7 +335,7 @@ const submitMultiAnswer = () => {
 }
 
 .option-content {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
@@ -352,14 +352,14 @@ const submitMultiAnswer = () => {
 }
 
 .answer-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-right: 10rpx;
 }
 
 .answer-content {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-success);
     margin-right: 8rpx;

@@ -189,7 +189,7 @@ const statusText = computed(() => {
     margin: 10rpx 0;
     border-radius: 12rpx;
     overflow: hidden;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 .header-btn {
@@ -208,7 +208,7 @@ const statusText = computed(() => {
 }
 
 .status-icon {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     margin-right: 12rpx;
 }
 
@@ -219,7 +219,7 @@ const statusText = computed(() => {
 }
 
 .arrow-icon {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     transition: transform 0.3s ease;
 }

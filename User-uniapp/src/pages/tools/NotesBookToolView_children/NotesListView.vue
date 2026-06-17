@@ -522,7 +522,7 @@ onUnload(() => {
 .nav-title {
   flex: 1;
   text-align: center;
-  font-size: 34rpx;
+  font-size: calc(34rpx * var(--app-font-scale, 1));
   color: var(--app-text-primary);
   font-weight: 700;
   padding: 0 12rpx;
@@ -586,7 +586,7 @@ onUnload(() => {
 .search-input {
   flex: 1;
   height: 84rpx;
-  font-size: 30rpx;
+  font-size: calc(30rpx * var(--app-font-scale, 1));
   color: #44506a;
 }
 
@@ -603,7 +603,7 @@ onUnload(() => {
 }
 
 .result-count {
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--app-font-scale, 1));
   color: #6b7690;
 }
 
@@ -631,7 +631,7 @@ onUnload(() => {
 }
 
 .sort-pill-text {
-  font-size: 26rpx;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
   color: #5f6d84;
 }
 
@@ -735,7 +735,7 @@ onUnload(() => {
 }
 
 .load-more-text {
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--app-font-scale, 1));
   color: #b0a69c;
 }
 
@@ -857,7 +857,7 @@ onUnload(() => {
 }
 
 .grid-note-title {
-  font-size: 32rpx;
+  font-size: calc(32rpx * var(--app-font-scale, 1));
   line-height: 1.3;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -906,7 +906,7 @@ onUnload(() => {
   width: 0;
   max-width: 100%;
   display: -webkit-box;
-  font-size: 42rpx;
+  font-size: calc(42rpx * var(--app-font-scale, 1));
   line-height: 1.28;
   color: var(--app-text-primary);
   font-weight: 600;
@@ -930,7 +930,7 @@ onUnload(() => {
 
 .note-preview {
   margin-top: 12rpx;
-  font-size: 33rpx;
+  font-size: calc(33rpx * var(--app-font-scale, 1));
   line-height: 1.62;
   color: #635c62;
   display: -webkit-box;
@@ -943,7 +943,7 @@ onUnload(() => {
 
 .grid-note-preview {
   margin-top: 10rpx;
-  font-size: 26rpx;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
   line-height: 1.5;
   min-height: 112rpx;
   -webkit-line-clamp: 4;
@@ -971,7 +971,7 @@ onUnload(() => {
 }
 
 .meta-text {
-  font-size: 26rpx;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
   color: var(--app-text-secondary);
 }
 
@@ -988,7 +988,7 @@ onUnload(() => {
   color: #91898d;
   padding: 8rpx 14rpx;
   border-radius: 12rpx;
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--app-font-scale, 1));
   line-height: 1.1;
 }
 
@@ -1001,12 +1001,12 @@ onUnload(() => {
 }
 
 .empty-text {
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--app-font-scale, 1));
   color: #9ca8bf;
 }
 
 .empty-desc {
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--app-font-scale, 1));
   color: #b2bdd3;
 }
 

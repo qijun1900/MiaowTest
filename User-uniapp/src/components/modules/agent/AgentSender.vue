@@ -143,7 +143,7 @@ const handleAddAttachment = () => {
 .sender-input {
     width: 100%;
     min-height: 74rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.4;
 }
@@ -187,7 +187,7 @@ const handleAddAttachment = () => {
 }
 
 .chip-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
 }

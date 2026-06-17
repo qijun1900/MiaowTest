@@ -475,7 +475,7 @@ defineExpose({
 }
 
 .option-text {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     flex: 1;
@@ -524,7 +524,7 @@ defineExpose({
 }
 
 .wrong-answer-title {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     margin-bottom: 20rpx;
     font-weight: 500;
@@ -543,7 +543,7 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     background-color: var(--app-bg-container);
     transition: all 0.3s;

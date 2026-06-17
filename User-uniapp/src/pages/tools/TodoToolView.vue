@@ -536,7 +536,7 @@ onMounted(() => {
 .loading-text {
     margin-top: 20rpx;
     color: var(--app-text-secondary);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 /* 空状态样式 */
@@ -550,14 +550,14 @@ onMounted(() => {
 
 .empty-title {
     margin-top: 30rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 600;
 }
 
 .empty-desc {
     margin-top: 16rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -599,7 +599,7 @@ onMounted(() => {
 }
 
 .progress-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     font-weight: 500;
 }
@@ -633,19 +633,19 @@ onMounted(() => {
 
 .congratulations-text {
     margin-left: 16rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-success);
     font-weight: 600;
 }
 
 .todos-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
 
 .todos-count {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -704,7 +704,7 @@ onMounted(() => {
 }
 
 .todo-title {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     margin-bottom: 8rpx;
     transition: all 0.3s ease;
@@ -716,7 +716,7 @@ onMounted(() => {
 }
 
 .todo-desc {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.4;
 }
@@ -763,7 +763,7 @@ onMounted(() => {
 
 .form-label {
     display: block;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
@@ -776,7 +776,7 @@ onMounted(() => {
     border: 2rpx solid #e1e5e9;
     border-radius: 16rpx;
     padding: 0 10rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
@@ -802,7 +802,7 @@ onMounted(() => {
     border: 2rpx solid #e1e5e9;
     border-radius: 16rpx;
     padding: 20rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
@@ -821,7 +821,7 @@ onMounted(() => {
 }
 
 .counter-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #8a8a8a;
 }
 
@@ -829,7 +829,7 @@ onMounted(() => {
 .error-text {
     display: block;
     color: var(--app-danger);
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     margin-top: 12rpx;
     animation: shake 0.5s ease-in-out;
 }
@@ -859,7 +859,7 @@ onMounted(() => {
     flex: 1;
     height: 96rpx;
     border-radius: 48rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 600;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;

@@ -380,7 +380,7 @@ onMounted(() => {
 .edit-avatar-btn {
     display: flex;
     align-items: center;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
 }
 
@@ -408,14 +408,14 @@ onMounted(() => {
 }
 
 .info-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
 .info-value {
     display: flex;
     align-items: center;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -424,7 +424,7 @@ onMounted(() => {
 }
 
 .openid-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -438,7 +438,7 @@ onMounted(() => {
     height: 100rpx;
     line-height: 100rpx;
     text-align: center;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }

@@ -205,7 +205,7 @@ onLoad((option) => {
 
 .label {
     display: block;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     margin-bottom: 20rpx;
     font-weight: bold;
@@ -223,7 +223,7 @@ onLoad((option) => {
 
 .radio-text {
     margin-left: 20rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
@@ -233,14 +233,14 @@ onLoad((option) => {
     border: 1rpx solid #d9d9d9;
     border-radius: 8rpx;
     padding: 20rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     box-sizing: border-box;
 }
 
 .char-count {
     display: block;
     text-align: right;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-top: 10rpx;
 }
@@ -251,7 +251,7 @@ onLoad((option) => {
     border: 1rpx solid #d9d9d9;
     border-radius: 8rpx;
     padding: 0 20rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     box-sizing: border-box;
 }
 
@@ -261,7 +261,7 @@ onLoad((option) => {
     background-color: var(--app-brand);
     color: var(--app-bg-container);
     border-radius: 8rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -286,7 +286,7 @@ onLoad((option) => {
 }
 
 .success-text {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     text-align: center;
     margin-bottom: 60rpx;
@@ -298,7 +298,7 @@ onLoad((option) => {
     width: 80%;
     height: 80rpx;
     border-radius: 8rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     display: flex;
     align-items: center;
     justify-content: center;

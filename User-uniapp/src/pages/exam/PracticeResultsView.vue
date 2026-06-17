@@ -194,13 +194,13 @@ const handleBack = () => {
 }
 
 .accuracy-number {
-    font-size: 40rpx;
+    font-size: calc(40rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: bold;
 }
 
 .accuracy-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
 }
@@ -218,7 +218,7 @@ const handleBack = () => {
 }
 
 .data-title .data-label {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
@@ -253,14 +253,14 @@ const handleBack = () => {
 }
 
 .data-value {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-bottom: 5rpx;
 }
 
 .data-label {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 .answer-sheet-container {

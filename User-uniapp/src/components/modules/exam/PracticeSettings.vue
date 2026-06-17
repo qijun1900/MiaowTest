@@ -109,7 +109,7 @@ watch(() => props.isShowHelper, (v) => { localIsShowHelper.value = v; });
 }
 
 .setting-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     white-space: nowrap;
 }
@@ -121,7 +121,7 @@ watch(() => props.isShowHelper, (v) => { localIsShowHelper.value = v; });
 }
 
 .label-tip {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -144,7 +144,7 @@ watch(() => props.isShowHelper, (v) => { localIsShowHelper.value = v; });
 }
 
 .slider-value {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
     min-width: 60rpx;

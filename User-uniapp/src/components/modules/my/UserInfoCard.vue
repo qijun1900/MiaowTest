@@ -290,7 +290,7 @@ const handleClick = () => {
 
 /* 未登录 */
 .login-title {
-    font-size: 40rpx;
+    font-size: calc(40rpx * var(--app-font-scale, 1));
     font-weight: 700;
     color: var(--app-text-primary);
     margin-bottom: 8rpx;
@@ -298,7 +298,7 @@ const handleClick = () => {
 }
 
 .login-desc .desc-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -311,7 +311,7 @@ const handleClick = () => {
 }
 
 .username-text {
-    font-size: 38rpx;
+    font-size: calc(38rpx * var(--app-font-scale, 1));
     font-weight: 700;
     color: var(--app-text-primary);
     letter-spacing: 0.5rpx;
@@ -332,7 +332,7 @@ const handleClick = () => {
 }
 
 .pro-text {
-    font-size: 20rpx;
+    font-size: calc(20rpx * var(--app-font-scale, 1));
     font-weight: 800;
     color: #d4af37;
     font-style: italic;
@@ -354,14 +354,14 @@ const handleClick = () => {
 }
 
 .id-label {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
     margin-right: 8rpx;
 }
 
 .id-value {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     font-family: "Courier New", Courier, monospace;
     font-weight: 500;

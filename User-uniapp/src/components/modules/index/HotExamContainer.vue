@@ -118,7 +118,7 @@ onMounted(() => {
 
 .exam-title {
     padding: 10rpx 8rpx;
-    font-size: 23rpx;
+    font-size: calc(23rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     text-align: center;

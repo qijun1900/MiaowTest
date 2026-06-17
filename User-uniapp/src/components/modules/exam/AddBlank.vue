@@ -442,7 +442,7 @@ defineExpose({
 
 .minus-icon {
     color: var(--app-bg-container);
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
 }
 
@@ -494,7 +494,7 @@ defineExpose({
 
 .add-icon {
     margin-right: 10rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
 }

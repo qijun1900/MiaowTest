@@ -391,7 +391,7 @@ onBeforeUnmount(() => {
 .nav-title {
     flex: 1;
     text-align: center;
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 700;
     padding: 0 12rpx;
@@ -482,7 +482,7 @@ onBeforeUnmount(() => {
 }
 
 .section-title {
-    font-size: 44rpx;
+    font-size: calc(44rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 700;
     letter-spacing: 0.8rpx;
@@ -491,7 +491,7 @@ onBeforeUnmount(() => {
 .hero-subtitle {
     margin-top: 14rpx;
     display: block;
-    font-size: 27rpx;
+    font-size: calc(27rpx * var(--app-font-scale, 1));
     color: #6e7791;
     line-height: 1.45;
 }
@@ -510,13 +510,13 @@ onBeforeUnmount(() => {
 }
 
 .hero-stat-value {
-    font-size: 38rpx;
+    font-size: calc(38rpx * var(--app-font-scale, 1));
     color: #354b91;
     font-weight: 700;
 }
 
 .hero-stat-label {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #7f8798;
 }
 
@@ -588,7 +588,7 @@ onBeforeUnmount(() => {
 }
 
 .count-text {
-    font-size: 23rpx;
+    font-size: calc(23rpx * var(--app-font-scale, 1));
     color: #3f56c9;
     font-weight: 600;
 }
@@ -601,7 +601,7 @@ onBeforeUnmount(() => {
 
 .book-title {
     display: block;
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     color: #16233e;
     font-weight: 700;
     line-height: 1.4;
@@ -609,7 +609,7 @@ onBeforeUnmount(() => {
 
 .book-desc {
     margin-top: 12rpx;
-    font-size: 27rpx;
+    font-size: calc(27rpx * var(--app-font-scale, 1));
     color: #5f6f8a;
     line-height: 1.52;
     display: block;
@@ -627,7 +627,7 @@ onBeforeUnmount(() => {
 }
 
 .footer-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #747f93;
 }
 
@@ -639,7 +639,7 @@ onBeforeUnmount(() => {
 }
 
 .footer-hint {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: #8f96a6;
 }
 
@@ -692,7 +692,7 @@ onBeforeUnmount(() => {
 
 .create-text {
     color: var(--app-text-secondary);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 500;
 }
 
@@ -787,7 +787,7 @@ onBeforeUnmount(() => {
 }
 
 .form-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     margin-bottom: 20rpx;
     font-weight: 600;
@@ -827,7 +827,7 @@ onBeforeUnmount(() => {
     flex: 1;
     height: 88rpx;
     padding: 0 16rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     box-sizing: border-box;
     border: none;
@@ -855,13 +855,13 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 140rpx;
     min-height: 120rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     line-height: 1.5;
     color: var(--app-text-primary);
 }
 
 .char-count {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -875,7 +875,7 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 8rpx;
     margin-top: 16rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     animation: slideDown 0.3s ease;
 }
@@ -892,7 +892,7 @@ onBeforeUnmount(() => {
     flex: 1;
     height: 96rpx;
     border-radius: 48rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     border: none;
     transition: all 0.3s ease;

@@ -140,7 +140,7 @@ onMounted(() => {
 }
 
 .question-index {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     float: left;
@@ -154,13 +154,13 @@ onMounted(() => {
     color: var(--app-bg-container);
     padding: 6rpx 14rpx;
     border-radius: 8rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     float: left;
     margin-top: 16rpx;
 }
 
 .question-stem {
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 572;
     display: inline;
@@ -173,7 +173,7 @@ onMounted(() => {
 }
 
 .input-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 572;
     margin-left: 13rpx;
@@ -192,7 +192,7 @@ onMounted(() => {
 }
 
 .answer-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-right: 10rpx;

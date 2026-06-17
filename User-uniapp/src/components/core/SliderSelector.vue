@@ -121,7 +121,7 @@ watch(
 }
 
 .type-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     font-weight: 400;
     transition: all 0.3s ease;

@@ -510,13 +510,13 @@ const handleAuth = () => {
     font-weight: bold;
     color: var(--app-text-primary);
     margin-right: 5rpx;
-    font-size: 25rpx;
+    font-size: calc(25rpx * var(--app-font-scale, 1));
     flex-shrink: 0;
 }
 
 .info-content {
     color: var(--app-text-secondary);
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     flex: 1;
     word-break: break-all;
 }
@@ -539,7 +539,7 @@ const handleAuth = () => {
 .empty-tip {
     margin: 20rpx 0 18rpx 0;
     color: var(--app-text-secondary);
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     text-align: center;
 }
 
@@ -557,7 +557,7 @@ const handleAuth = () => {
     color: var(--app-bg-container);
     border: none;
     border-radius: 36rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 600;
     box-shadow: 0 4rpx 16rpx rgba(64, 158, 255, 0.12);
     transition: background 0.2s;
@@ -637,7 +637,7 @@ const handleAuth = () => {
 }
 
 .subject-type-name {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     flex: 1;
@@ -657,7 +657,7 @@ const handleAuth = () => {
 
 .question-count {
     color: var(--app-bg-container);
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     font-weight: 700;
 }
 
@@ -695,21 +695,21 @@ const handleAuth = () => {
 
 .auth-title {
     color: var(--app-danger);
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     margin-top: 10rpx;
 }
 
 .auth-desc {
     color: var(--app-text-secondary);
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     line-height: 40rpx;
     margin-bottom: 10rpx;
 }
 
 .auth-note {
     color: var(--app-text-primary);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     align-self: flex-start;
     margin-top: 5rpx;
@@ -717,7 +717,7 @@ const handleAuth = () => {
 
 .auth-info {
     color: var(--app-text-primary);
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     line-height: 36rpx;
     align-self: flex-start;
     text-indent: 20rpx;

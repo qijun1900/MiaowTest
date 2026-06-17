@@ -241,7 +241,7 @@ const copyLink = async () => {
 }
 
 .head-title {
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
@@ -271,7 +271,7 @@ const copyLink = async () => {
 .title-item {
     display: flex;
     margin-bottom: 20rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 .label {
@@ -308,7 +308,7 @@ const copyLink = async () => {
 .action-btn {
     height: 88rpx;
     border-radius: 44rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     text-align: center;
     border: none;
     position: relative;
@@ -391,7 +391,7 @@ const copyLink = async () => {
     display: flex;
     align-items: flex-start;
     margin-bottom: 20rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
 }
 
 .tip-item:last-child {
@@ -415,13 +415,13 @@ const copyLink = async () => {
     }
 
     .title-item {
-        font-size: 26rpx;
+        font-size: calc(26rpx * var(--app-font-scale, 1));
     }
 
     .action-btn {
         height: 80rpx;
         line-height: 80rpx;
-        font-size: 30rpx;
+        font-size: calc(30rpx * var(--app-font-scale, 1));
     }
 }
 </style>

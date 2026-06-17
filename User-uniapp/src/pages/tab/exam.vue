@@ -391,19 +391,19 @@ onMounted(() => {
 }
 
 .subject-name {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-bottom: 8rpx;
 }
 
 .update-time {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
 .subject-arrow {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: bold;
     margin-left: 20rpx;

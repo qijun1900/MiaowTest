@@ -185,7 +185,7 @@ defineExpose({
 }
 
 .nav-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
     overflow: hidden;

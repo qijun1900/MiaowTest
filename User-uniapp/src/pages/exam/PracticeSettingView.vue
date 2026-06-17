@@ -149,7 +149,7 @@ const handleStart = () => {
 
 .section-title {
     display: block;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-secondary);
     padding: 0 8rpx 16rpx;
@@ -180,13 +180,13 @@ const handleStart = () => {
 }
 
 .info-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     flex-shrink: 0;
 }
 
 .info-value {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     text-align: right;
     overflow: hidden;

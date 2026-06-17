@@ -631,14 +631,14 @@ onPageScroll((e) => {
 }
 
 .stats-number {
-    font-size: 48rpx;
+    font-size: calc(48rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     margin-bottom: 10rpx;
 }
 
 .stats-label {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -658,7 +658,7 @@ onPageScroll((e) => {
 }
 
 .filter-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
 }
@@ -674,7 +674,7 @@ onPageScroll((e) => {
 
 .loading-text {
     margin-top: 20rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -702,7 +702,7 @@ onPageScroll((e) => {
 }
 
 .question-index {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
@@ -712,7 +712,7 @@ onPageScroll((e) => {
     color: var(--app-bg-container);
     padding: 6rpx 16rpx;
     border-radius: 20rpx;
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
 }
 
 .question-actions {
@@ -726,7 +726,7 @@ onPageScroll((e) => {
 }
 
 .question-stem {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.6;
@@ -749,7 +749,7 @@ onPageScroll((e) => {
 }
 
 .title-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
@@ -765,7 +765,7 @@ onPageScroll((e) => {
 }
 
 .blank-index {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     min-width: 80rpx;
@@ -774,7 +774,7 @@ onPageScroll((e) => {
 
 .blank-answer {
     flex: 1;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.6;
     word-break: break-all;
@@ -789,7 +789,7 @@ onPageScroll((e) => {
 }
 
 .essay-answer {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.8;
     word-break: break-all;
@@ -808,7 +808,7 @@ onPageScroll((e) => {
 }
 
 .answer-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-bottom: 15rpx;
@@ -818,7 +818,7 @@ onPageScroll((e) => {
 .answer-content {
     border-radius: 12rpx;
     padding: 20rpx 5rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.6;
 
@@ -838,7 +838,7 @@ onPageScroll((e) => {
 }
 
 .answer-item {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.6;
     margin-bottom: 10rpx;
@@ -867,20 +867,20 @@ onPageScroll((e) => {
 }
 
 .analysis-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }
 
 .analysis-content {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.7;
     margin-bottom: 15rpx;
 }
 
 .markdown-content {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.7;
     white-space: pre-wrap;
@@ -895,7 +895,7 @@ onPageScroll((e) => {
 .no-answer {
     color: var(--app-text-secondary);
     font-style: italic;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 .ai-warning {
@@ -909,7 +909,7 @@ onPageScroll((e) => {
 }
 
 .ai-warning-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #f57c00;
 }
 
@@ -929,14 +929,14 @@ onPageScroll((e) => {
 }
 
 .empty-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-bottom: 15rpx;
 }
 
 .empty-description {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     line-height: 1.5;
 }

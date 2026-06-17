@@ -90,7 +90,7 @@ const onVisibleChange = (context) => {
 }
 
 .popup-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
 }

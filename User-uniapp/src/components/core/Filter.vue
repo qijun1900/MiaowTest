@@ -88,7 +88,7 @@ const selectValue = (value) => {
     padding: 12rpx 30rpx;
     margin-right: 20rpx;
     border-radius: 30rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     background-color: var(--app-bg-secondary);
     transition: all 0.3s ease;

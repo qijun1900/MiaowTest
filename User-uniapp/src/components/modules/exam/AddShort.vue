@@ -456,7 +456,7 @@ defineExpose({
 }
 
 .answer-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
@@ -469,7 +469,7 @@ defineExpose({
 }
 
 .add-image-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-success);
 }
 

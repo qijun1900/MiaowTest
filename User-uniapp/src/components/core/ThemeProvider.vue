@@ -31,19 +31,28 @@ const appearanceStore = AppearanceStore();
 
 const preset = ref(appearanceStore.themePreset || "aurora");
 const mode = ref(appearanceStore.resolveMode());
+const fontKey = ref(
+    appearanceStore.fontSizeKeys[appearanceStore.fontSizeIndex] || "standard"
+);
 
-const themeClass = computed(() => `theme-${preset.value} mode-${mode.value}`);
+const themeClass = computed(
+    () => `theme-${preset.value} mode-${mode.value} font-${fontKey.value}`
+);
 
 const handleThemeChange = (payload) => {
     if (!payload) return;
     if (payload.preset) preset.value = payload.preset;
     if (payload.mode) mode.value = payload.mode;
+    if (payload.fontKey) fontKey.value = payload.fontKey;
 };
 
 onMounted(() => {
     // 首次挂载时同步一次最新状态（处理 store 在 provider 之前已初始化的情况）
     preset.value = appearanceStore.themePreset || "aurora";
     mode.value = appearanceStore.resolveMode();
+    fontKey.value =
+        appearanceStore.fontSizeKeys[appearanceStore.fontSizeIndex] ||
+        "standard";
     uni.$on("app:theme-change", handleThemeChange);
 });
 

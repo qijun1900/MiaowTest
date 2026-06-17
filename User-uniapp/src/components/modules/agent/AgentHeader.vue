@@ -292,7 +292,7 @@ const handleOption = (action) => {
 }
 
 .model-text {
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
     white-space: nowrap;
@@ -364,7 +364,7 @@ const handleOption = (action) => {
 }
 
 .dropdown-title {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     font-weight: 500;
     overflow: hidden;
@@ -385,7 +385,7 @@ const handleOption = (action) => {
 }
 
 .option-text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
@@ -420,7 +420,7 @@ const handleOption = (action) => {
 }
 
 .model-sheet-title {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 500;
     color: var(--app-text-primary);
     text-align: center;
@@ -464,7 +464,7 @@ const handleOption = (action) => {
 }
 
 .model-sheet-item-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 400;
     overflow: hidden;
@@ -478,7 +478,7 @@ const handleOption = (action) => {
 }
 
 .model-sheet-item-tag {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     background: transparent;
     border: 1rpx solid var(--app-border);
@@ -495,7 +495,7 @@ const handleOption = (action) => {
     background: var(--app-bg-container);
     border: 1rpx solid var(--app-border);
     border-radius: 16rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 500;
     color: var(--app-text-primary);
 }

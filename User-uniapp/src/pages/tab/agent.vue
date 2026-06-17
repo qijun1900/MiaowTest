@@ -455,6 +455,11 @@ const keyboardHeight = ref(0);
 const systemInfo = uni.getSystemInfoSync();
 const isAndroid = systemInfo.platform.toLowerCase() === 'android';
 
+// TabBar 高度（与 CustomTabBar 内部一致：内容 50px + 安全区）
+const TAB_BAR_CONTENT_HEIGHT_PX = 50;
+const safeAreaBottomPx = systemInfo.safeAreaInsets?.bottom || 0;
+const tabBarHeightPx = TAB_BAR_CONTENT_HEIGHT_PX + safeAreaBottomPx;
+
 // ─── TabBar 自动隐藏与显示逻辑 ──────────────────────────────────────────────────
 const {
         isTabBarVisible,
@@ -542,16 +547,24 @@ const containerStyle = computed(() => {
 });
 
 /**
- * sender 区域的底部内边距：
- * · 键盘弹起时：仅保留小间距，不需要 safe-area（容器底部已经在键盘顶）
- * · 键盘收起时：加上 env(safe-area-inset-bottom) 适配底部安全区
+ * sender 区域定位与内边距：
+ * · 键盘弹起：bottom=0、仅小间距（容器底部已在键盘顶部，TabBar 也已隐藏）
+ * · TabBar 可见：bottom 上移 TabBar 高度，避免被遮挡；安全区由 TabBar 承担
+ * · TabBar 隐藏 + 键盘收起：bottom=0、加上 safe-area
  */
-const senderAreaStyle = computed(() => ({
-    paddingBottom:
-        keyboardHeight.value > 0
-            ? "14rpx"
-            : "calc(14rpx + env(safe-area-inset-bottom))",
-}));
+const senderAreaStyle = computed(() => {
+    const keyboardUp = keyboardHeight.value > 0;
+    const tabBarUp = !keyboardUp && isTabBarVisible.value;
+    return {
+        bottom: tabBarUp ? `${tabBarHeightPx}px` : "0px",
+        paddingBottom:
+            keyboardUp || tabBarUp
+                ? "14rpx"
+                : "calc(14rpx + env(safe-area-inset-bottom))",
+        transition:
+            "bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    };
+});
 
 const triggerVibrate = () => {
     uni.vibrateShort({ type: 'light', fail: () => {} });
@@ -1281,7 +1294,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
         "Source Han Sans SC", "Noto Sans CJK SC", "Noto Sans SC",
         "WenQuanYi Micro Hei", system-ui, sans-serif;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-weight: 400;
@@ -1296,7 +1309,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
 .streaming-cursor {
     font-family: inherit;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-placeholder);
     animation: cursor-blink 0.8s infinite;
 }
@@ -1331,7 +1344,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
 .note-toast-text {
     flex: 1;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     white-space: nowrap;
     overflow: hidden;
@@ -1339,7 +1352,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 }
 
 .note-toast-link {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 500;
     flex-shrink: 0;
@@ -1357,7 +1370,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     }
     .streaming-text,
     .streaming-cursor {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         line-height: 1.68;
     }
 }
@@ -1369,7 +1382,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     }
     .streaming-text,
     .streaming-cursor {
-        font-size: 16px;
+        font-size: calc(16px * var(--app-font-scale, 1));
         line-height: 1.7;
     }
 }
@@ -1377,7 +1390,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 @media screen and (min-width: 1024px) {
     .streaming-text,
     .streaming-cursor {
-        font-size: 16.5px;
+        font-size: calc(16.5px * var(--app-font-scale, 1));
         line-height: 1.72;
     }
 }
@@ -1448,7 +1461,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 }
 
 .picker-state-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -1547,7 +1560,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
 
 .notebook-title {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.4;
@@ -1557,7 +1570,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 }
 
 .notebook-meta {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-top: 6rpx;
 }

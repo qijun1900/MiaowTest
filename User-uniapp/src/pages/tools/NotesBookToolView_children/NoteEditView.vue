@@ -991,7 +991,7 @@ onUnload(() => {
 }
 
 .cancel-text {
-  font-size: 30rpx;
+  font-size: calc(30rpx * var(--app-font-scale, 1));
   color: #5f6779;
 }
 
@@ -1025,7 +1025,7 @@ onUnload(() => {
 }
 
 .mode-text {
-  font-size: 26rpx;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
   color: #666f82;
 }
 
@@ -1050,7 +1050,7 @@ onUnload(() => {
 }
 
 .save-text {
-  font-size: 30rpx;
+  font-size: calc(30rpx * var(--app-font-scale, 1));
   color: var(--app-bg-container);
   font-weight: 600;
 }
@@ -1066,14 +1066,14 @@ onUnload(() => {
 
 .title-input {
   height: 96rpx;
-  font-size: 50rpx;
+  font-size: calc(50rpx * var(--app-font-scale, 1));
   color: #4a5162;
   font-weight: 700;
 }
 
 .title-placeholder {
   color: #9ea6b6;
-  font-size: 58rpx;
+  font-size: calc(58rpx * var(--app-font-scale, 1));
 }
 
 .title-divider {
@@ -1114,7 +1114,7 @@ onUnload(() => {
 }
 
 .preview-rich {
-  font-size: 32rpx;
+  font-size: calc(32rpx * var(--app-font-scale, 1));
   color: #4f576b;
   line-height: 1.8;
 }
@@ -1142,7 +1142,7 @@ onUnload(() => {
 
 :deep(.editor-container) {
   padding: 14rpx 18rpx;
-  font-size: 16px;
+  font-size: calc(16px * var(--app-font-scale, 1));
   color: #4f576b;
   line-height: 1.75;
 }
@@ -1168,7 +1168,7 @@ onUnload(() => {
 }
 
 .paste-ai-text {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-brand);
   font-weight: 500;
 }
@@ -1184,7 +1184,7 @@ onUnload(() => {
 }
 
 .clear-content-text {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-danger);
   font-weight: 500;
 }
@@ -1214,7 +1214,7 @@ onUnload(() => {
 }
 
 .markdown-mode-text {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-brand);
   font-weight: 500;
 }
@@ -1232,7 +1232,7 @@ onUnload(() => {
 }
 
 .markdown-switch-text {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-text-secondary);
 }
 
@@ -1241,7 +1241,7 @@ onUnload(() => {
   width: 100%;
   height: 100%;
   padding: 20rpx 16rpx;
-  font-size: 30rpx;
+  font-size: calc(30rpx * var(--app-font-scale, 1));
   color: #4f576b;
   line-height: 1.75;
   box-sizing: border-box;

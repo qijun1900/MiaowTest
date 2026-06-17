@@ -186,7 +186,7 @@ const isMember = ref(false);
 }
 
 .vip-main-title {
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: 700;
     background: linear-gradient(135deg, #8b7355 0%, #a1887f 50%, #8b7355 100%);
     -webkit-background-clip: text;
@@ -197,7 +197,7 @@ const isMember = ref(false);
 }
 
 .vip-sub-title {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #8d6e63;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -270,7 +270,7 @@ const isMember = ref(false);
 }
 
 .button-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-bg-container);
     position: relative;
@@ -333,14 +333,14 @@ const isMember = ref(false);
 .crown {
     top: 15rpx;
     left: 25rpx;
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     opacity: 0.6;
     filter: brightness(0.9);
     animation: crownRotate 8s ease-in-out infinite;
 }
 
 .sparkle {
-    font-size: 18rpx;
+    font-size: calc(18rpx * var(--app-font-scale, 1));
     opacity: 0;
     animation: sparkle 3s ease-in-out infinite;
     filter: brightness(0.9);
@@ -545,11 +545,11 @@ const isMember = ref(false);
     }
 
     .vip-main-title {
-        font-size: 32rpx;
+        font-size: calc(32rpx * var(--app-font-scale, 1));
     }
 
     .vip-sub-title {
-        font-size: 22rpx;
+        font-size: calc(22rpx * var(--app-font-scale, 1));
     }
 
     .vip-button {
@@ -557,7 +557,7 @@ const isMember = ref(false);
     }
 
     .button-text {
-        font-size: 24rpx;
+        font-size: calc(24rpx * var(--app-font-scale, 1));
     }
 }
 </style>

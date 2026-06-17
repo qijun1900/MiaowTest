@@ -37,7 +37,7 @@ defineEmits(["addImage"]);
 }
 
 .divider-text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 550;
     color: var(--app-text-primary);
 }
@@ -51,7 +51,7 @@ defineEmits(["addImage"]);
 }
 
 .add-image-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-success);
 }
 </style>

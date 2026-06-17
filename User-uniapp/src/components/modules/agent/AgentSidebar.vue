@@ -367,7 +367,7 @@ const handleNav = (target) => {
 }
 
 .sidebar-title {
-    font-size: 34rpx;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
@@ -391,7 +391,7 @@ const handleNav = (target) => {
 }
 
 .avatar-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     font-weight: 700;
     color: #ffffff;
 }
@@ -403,13 +403,13 @@ const handleNav = (target) => {
 }
 
 .user-name {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
 }
 
 .user-desc {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -459,7 +459,7 @@ const handleNav = (target) => {
 
 .search-placeholder-text {
     flex: 1;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -487,7 +487,7 @@ const handleNav = (target) => {
 
 
 .nav-text {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
 }
@@ -500,7 +500,7 @@ const handleNav = (target) => {
 
 .section-header {
     padding: 20rpx 44rpx 10rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-secondary);
 }
@@ -575,7 +575,7 @@ const handleNav = (target) => {
 }
 
 .chat-item-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     overflow: hidden;
@@ -605,7 +605,7 @@ const handleNav = (target) => {
 }
 
 .chat-item-time {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -618,7 +618,7 @@ const handleNav = (target) => {
 }
 
 .empty-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -658,7 +658,7 @@ const handleNav = (target) => {
 }
 
 .footer-avatar-text {
-    font-size: 36rpx;
+    font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: 700;
     color: #ffffff;
 }
@@ -670,7 +670,7 @@ const handleNav = (target) => {
 }
 
 .footer-user-name {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: var(--app-text-primary);
     line-height: 1.5;

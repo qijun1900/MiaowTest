@@ -398,7 +398,7 @@ onUnmounted(() => {
 }
 
 .cancel-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     white-space: nowrap;
 }
@@ -416,7 +416,7 @@ onUnmounted(() => {
 
 .nav-search-input {
     flex: 1;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     height: 64rpx;
     line-height: 64rpx;
@@ -424,7 +424,7 @@ onUnmounted(() => {
 
 .nav-search-placeholder {
     color: var(--app-text-secondary);
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
 /* 底部操作栏 */
@@ -444,7 +444,7 @@ onUnmounted(() => {
 }
 
 .action-bar-count {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
 }
@@ -478,7 +478,7 @@ onUnmounted(() => {
 }
 
 .action-delete-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: 500;
 }
@@ -599,7 +599,7 @@ onUnmounted(() => {
 }
 
 .result-title {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     overflow: hidden;
@@ -613,7 +613,7 @@ onUnmounted(() => {
 }
 
 .result-preview {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     overflow: hidden;
     white-space: nowrap;
@@ -621,7 +621,7 @@ onUnmounted(() => {
 }
 
 .result-time {
-    font-size: 22rpx;
+    font-size: calc(22rpx * var(--app-font-scale, 1));
     color: #b0b4c0;
     flex-shrink: 0;
 }
@@ -637,7 +637,7 @@ onUnmounted(() => {
 }
 
 .empty-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 </style>

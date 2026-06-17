@@ -296,7 +296,7 @@ onMounted(() => {
 .subject-tag {
     padding: 6rpx 16rpx;
     border-radius: 16rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: 500;
     min-width: 100rpx;
@@ -306,7 +306,7 @@ onMounted(() => {
 .question-type {
     padding: 6rpx 16rpx;
     border-radius: 16rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     font-weight: 500;
     border: 2rpx solid;
 }
@@ -328,7 +328,7 @@ onMounted(() => {
 }
 
 .favorite-icon {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: #ffd700;
 }
 
@@ -337,14 +337,14 @@ onMounted(() => {
 }
 
 .question-number {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
     margin-bottom: 12rpx;
 }
 
 .question-stem {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     font-weight: 500;
     line-height: 1.6;
@@ -369,7 +369,7 @@ onMounted(() => {
 }
 
 .option-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
     margin-right: 16rpx;
@@ -377,7 +377,7 @@ onMounted(() => {
 }
 
 .option-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.5;
     flex: 1;
@@ -394,7 +394,7 @@ onMounted(() => {
 .favorite-time {
     display: flex;
     align-items: center;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -407,7 +407,7 @@ onMounted(() => {
 .action-btn {
     padding: 10rpx 20rpx;
     border-radius: 16rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     border: none;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -445,20 +445,20 @@ onMounted(() => {
 }
 
 .empty-icon {
-    font-size: 120rpx;
+    font-size: calc(120rpx * var(--app-font-scale, 1));
     margin-bottom: 30rpx;
     opacity: 0.5;
 }
 
 .empty-text {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-bottom: 16rpx;
     font-weight: 500;
 }
 
 .empty-subtext {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -480,11 +480,11 @@ onMounted(() => {
     }
 
     .question-title {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
     }
 
     .option-text {
-        font-size: 26rpx;
+        font-size: calc(26rpx * var(--app-font-scale, 1));
     }
 }
 </style>

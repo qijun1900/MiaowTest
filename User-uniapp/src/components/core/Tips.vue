@@ -160,14 +160,14 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     padding: 15rpx 22rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     line-height: 1.2;
     color: var(--app-text-primary);
 }
 
 .tips-icon {
     margin-right: 8rpx;
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
 
     .icon-info {
         color: var(--app-brand);
@@ -197,7 +197,7 @@ onBeforeUnmount(() => {
 
     .icon-close {
         color: var(--app-text-secondary);
-        font-size: 30rpx;
+        font-size: calc(30rpx * var(--app-font-scale, 1));
     }
 }
 

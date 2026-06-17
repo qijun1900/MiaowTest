@@ -183,7 +183,7 @@ defineExpose({
 
 .back-icon {
     color: var(--app-text-primary);
-    font-size: 18rpx;
+    font-size: calc(18rpx * var(--app-font-scale, 1));
     font-weight: bold;
     margin-bottom: 2rpx;
 }

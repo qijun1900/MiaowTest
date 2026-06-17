@@ -405,33 +405,23 @@
 		"list": [
 			{
 				"pagePath": "pages/index/index",
-				"text": "首页",
-				"iconPath": "static/tabBar/index.png",
-				"selectedIconPath": "static/tabBar/index-active.png"
+				"text": "首页"
 			},
 			{
 				"pagePath": "pages/tab/exam",
-				"text": "考试",
-				"iconPath": "static/tabBar/exam.png",
-				"selectedIconPath": "static/tabBar/exam-active.png"
+				"text": "考试"
 			},
 			{
 				"pagePath": "pages/tab/agent",
-				"text": "Mio",
-				"iconPath": "static/tabBar/Agent.png",
-				"selectedIconPath": "static/tabBar/Agent.png"
+				"text": "Mio"
 			},
 			{
 				"pagePath": "pages/tab/tools",
-				"text": "工具",
-				"iconPath": "static/tabBar/tool.png",
-				"selectedIconPath": "static/tabBar/tool-active.png"
+				"text": "工具"
 			},
 			{
 				"pagePath": "pages/tab/my",
-				"text": "我的",
-				"iconPath": "static/tabBar/my.png",
-				"selectedIconPath": "static/tabBar/my-active.png"
+				"text": "我的"
 			}
 		]
 	}

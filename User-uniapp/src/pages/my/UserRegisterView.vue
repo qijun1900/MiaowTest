@@ -505,7 +505,7 @@ onUnmounted(() => {
         background-color: rgba(255, 255, 255, 0.8);
 
         .back-text {
-            font-size: 28rpx;
+            font-size: calc(28rpx * var(--app-font-scale, 1));
             color: var(--app-brand);
         }
     }
@@ -589,14 +589,14 @@ onUnmounted(() => {
     }
 
     .title {
-        font-size: 44rpx;
+        font-size: calc(44rpx * var(--app-font-scale, 1));
         font-weight: bold;
         color: var(--app-brand);
         margin-bottom: 10rpx;
     }
 
     .subtitle {
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         color: var(--app-text-secondary);
     }
 }
@@ -637,7 +637,7 @@ onUnmounted(() => {
     .register-link {
         text-align: center;
         margin-top: 40rpx;
-        font-size: 28rpx;
+        font-size: calc(28rpx * var(--app-font-scale, 1));
         color: var(--app-text-secondary);
         display: flex;
         justify-content: center;
@@ -683,21 +683,21 @@ onUnmounted(() => {
         box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.1);
 
         .captcha-title {
-            font-size: 34rpx;
+            font-size: calc(34rpx * var(--app-font-scale, 1));
             font-weight: bold;
             color: var(--app-text-primary);
             margin-bottom: 10rpx;
         }
 
         .captcha-subtitle {
-            font-size: 26rpx;
+            font-size: calc(26rpx * var(--app-font-scale, 1));
             color: var(--app-text-secondary);
             margin-bottom: 30rpx;
             text-align: center;
         }
 
         .captcha-question {
-            font-size: 40rpx;
+            font-size: calc(40rpx * var(--app-font-scale, 1));
             font-weight: bold;
             color: var(--app-brand);
             margin: 20rpx 0 30rpx;
@@ -719,7 +719,7 @@ onUnmounted(() => {
 
             .captcha-btn {
                 flex: 1;
-                font-size: 32rpx;
+                font-size: calc(32rpx * var(--app-font-scale, 1));
                 text-align: center;
                 padding: 30rpx 0;
                 transition: background-color 0.2s;

@@ -505,7 +505,7 @@ watch(
 
 .title {
   display: block;
-  font-size: 32rpx;
+  font-size: calc(32rpx * var(--app-font-scale, 1));
   color: var(--app-text-primary);
   font-weight: 700;
 }
@@ -513,7 +513,7 @@ watch(
 .subtitle {
   display: block;
   margin-top: 8rpx;
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--app-font-scale, 1));
   color: var(--app-text-secondary);
 }
 
@@ -527,7 +527,7 @@ watch(
 .month-pill {
   display: block;
   text-align: center;
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-text-secondary);
   background: var(--app-bg-secondary);
   border: 1px solid var(--app-border);
@@ -548,7 +548,7 @@ watch(
   padding: 20rpx;
   background: var(--app-bg-secondary);
   color: var(--app-text-secondary);
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--app-font-scale, 1));
   line-height: 1.6;
 }
 
@@ -569,7 +569,7 @@ watch(
 
 .summary-value {
   display: block;
-  font-size: 30rpx;
+  font-size: calc(30rpx * var(--app-font-scale, 1));
   font-weight: 700;
   color: var(--app-brand);
 }
@@ -578,7 +578,7 @@ watch(
   display: block;
   margin-top: 6rpx;
   color: var(--app-text-secondary);
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
 }
 
 .heatmap-shell {
@@ -604,7 +604,7 @@ watch(
   width: 100%;
   height: 30rpx;
   line-height: 30rpx;
-  font-size: 20rpx;
+  font-size: calc(20rpx * var(--app-font-scale, 1));
   color: var(--app-text-placeholder);
   text-align: center;
 }
@@ -654,7 +654,7 @@ watch(
   transform: translateX(-50%);
   text-align: center;
   white-space: nowrap;
-  font-size: 20rpx;
+  font-size: calc(20rpx * var(--app-font-scale, 1));
   color: var(--app-text-secondary);
 }
 
@@ -707,7 +707,7 @@ watch(
 
 .legend-text {
   color: var(--app-text-secondary);
-  font-size: 20rpx;
+  font-size: calc(20rpx * var(--app-font-scale, 1));
 }
 
 .legend-colors {
@@ -737,13 +737,13 @@ watch(
 }
 
 .detail-title {
-  font-size: 26rpx;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
   color: var(--app-text-primary);
   font-weight: 600;
 }
 
 .detail-loading {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-brand);
 }
 
@@ -755,7 +755,7 @@ watch(
 }
 
 .detail-chip {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-brand);
   border: 1px solid var(--app-border);
   border-radius: 999rpx;
@@ -788,13 +788,13 @@ watch(
 
 .section-title {
   display: block;
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--app-font-scale, 1));
   color: var(--app-text-secondary);
   margin-bottom: 8rpx;
 }
 
 .section-empty {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-text-placeholder);
 }
 
@@ -810,17 +810,17 @@ watch(
 .detail-time {
   position: relative;
   z-index: 1;
-  font-size: 21rpx;
+  font-size: calc(21rpx * var(--app-font-scale, 1));
   color: var(--app-text-secondary);
 }
 
 .detail-main {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   color: var(--app-text-primary);
 }
 
 .detail-status {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   text-align: right;
   color: var(--app-text-secondary);
 }
@@ -834,7 +834,7 @@ watch(
 }
 
 .detail-module {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
   text-align: right;
   color: var(--app-text-secondary);
 }
@@ -842,7 +842,7 @@ watch(
 .loading-tip {
   margin-top: 14rpx;
   color: var(--app-text-secondary);
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--app-font-scale, 1));
 }
 
 @media (max-width: 640px) {

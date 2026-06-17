@@ -250,7 +250,7 @@ onBeforeUnmount(() => {
 }
 
 .hot-exam-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     padding-left: 10rpx;
@@ -272,13 +272,13 @@ onBeforeUnmount(() => {
 }
 
 .more-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-right: 8rpx;
 }
 
 .arrow-icon {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: bold;
 }

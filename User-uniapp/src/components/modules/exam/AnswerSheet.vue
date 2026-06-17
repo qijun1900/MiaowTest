@@ -171,7 +171,7 @@ const isAnsweredIncorrectly = (questionId) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     background-color: var(--app-bg-secondary); /* 未答题默认浅灰色 */

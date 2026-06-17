@@ -43,7 +43,7 @@ export const AppearanceStore = defineStore(
         // ── 状态 ──────────────────────────────────────────────────────────────
         const themePreset = ref("aurora");
         const darkMode = ref("auto"); // 'auto' | 'light' | 'dark'
-        const fontSizeIndex = ref(1); // 0=小 1=中 2=大
+        const fontSizeIndex = ref(1); // 0=小 1=标准 2=大 3=特大
         const fontSizeScale = ref(1);
 
         // 旧字段：保留以兼容仍引用 appearanceStore.themeColor 的旧代码
@@ -52,8 +52,13 @@ export const AppearanceStore = defineStore(
         );
 
         const themePresets = THEME_PRESETS;
-        const fontSizeOptions = ["小", "中", "大"];
-        const fontSizeScales = [0.85, 1, 1.15];
+        const fontSizeOptions = ["小", "标准", "大", "特大"];
+        const fontSizeScales = [0.85, 1, 1.15, 1.3];
+        const fontSizeKeys = ["small", "standard", "large", "xlarge"];
+
+        const fontSizeKey = computed(
+            () => fontSizeKeys[fontSizeIndex.value] || "standard"
+        );
 
         // ── 工具 ──────────────────────────────────────────────────────────────
         const getPresetByKey = (key) =>
@@ -99,8 +104,10 @@ export const AppearanceStore = defineStore(
                 ? themePreset.value
                 : "aurora";
             const mode = resolveMode();
+            const fontKey = fontSizeKeys[fontSizeIndex.value] || "standard";
             const themeClass = `theme-${preset}`;
             const modeClass = `mode-${mode}`;
+            const fontClass = `font-${fontKey}`;
 
             // #ifdef H5
             if (typeof document !== "undefined") {
@@ -109,9 +116,13 @@ export const AppearanceStore = defineStore(
                     "theme-aurora",
                     "theme-claude",
                     "mode-light",
-                    "mode-dark"
+                    "mode-dark",
+                    "font-small",
+                    "font-standard",
+                    "font-large",
+                    "font-xlarge"
                 );
-                el.classList.add(themeClass, modeClass);
+                el.classList.add(themeClass, modeClass, fontClass);
                 el.style.setProperty(
                     "--app-font-size-scale",
                     String(fontSizeScale.value)
@@ -124,6 +135,7 @@ export const AppearanceStore = defineStore(
                 uni.$emit("app:theme-change", {
                     preset,
                     mode,
+                    fontKey,
                     fontScale: fontSizeScale.value,
                 });
             } catch (_) {}
@@ -211,10 +223,12 @@ export const AppearanceStore = defineStore(
             darkMode,
             fontSizeIndex,
             fontSizeScale,
+            fontSizeKey,
             // options
             themePresets,
             fontSizeOptions,
             fontSizeScales,
+            fontSizeKeys,
             // setters
             setThemePreset,
             setThemeColor, // 旧 API

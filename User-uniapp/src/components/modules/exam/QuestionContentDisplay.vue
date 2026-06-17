@@ -264,7 +264,7 @@ const onCropCancel = () => {
 }
 
 .content-text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     line-height: 1.6;
     margin-bottom: 20rpx;
@@ -340,7 +340,7 @@ const onCropCancel = () => {
 }
 
 .mask-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: 500;
 }
@@ -392,7 +392,7 @@ const onCropCancel = () => {
 }
 
 .error-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -416,7 +416,7 @@ const onCropCancel = () => {
 }
 
 .fullscreen-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: #ff9555;
     font-weight: 500;
 }
@@ -493,7 +493,7 @@ const onCropCancel = () => {
 }
 
 .indicator-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: 500;
 }
@@ -519,7 +519,7 @@ const onCropCancel = () => {
 }
 
 .edit-crop-text {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-bg-container);
     font-weight: 500;
 }

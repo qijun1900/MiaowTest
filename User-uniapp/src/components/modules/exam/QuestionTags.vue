@@ -302,7 +302,7 @@ watch(
 }
 
 .tags-title {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 600;
     color: #8b5a3c;
     margin-bottom: 20rpx;
@@ -320,7 +320,7 @@ watch(
     align-items: center;
     padding: 12rpx 20rpx;
     border-radius: 50rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     transition: all 0.3s;
 }
 
@@ -351,7 +351,7 @@ watch(
 .tag-input {
     flex: 1;
     padding: 20rpx 30rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: #8b5a3c;
     border: 2rpx solid #ffb88c;
     border-radius: 12rpx;
@@ -383,7 +383,7 @@ watch(
     gap: 6rpx;
     border: 1rpx solid #ffe0c7;
     padding: 12rpx 20rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
 }
 
 .tag-item.recommended.added {
@@ -418,7 +418,7 @@ watch(
 }
 
 .tag-fold-text {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: #a67c52;
 }
 </style>

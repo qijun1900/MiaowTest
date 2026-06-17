@@ -380,7 +380,7 @@ const handleDelete = () => {
 }
 
 .preview-title {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: #888;
     margin-bottom: 24rpx;
     font-weight: 500;
@@ -423,7 +423,7 @@ const handleDelete = () => {
 }
 
 .preview-book-title {
-    font-size: 40rpx;
+    font-size: calc(40rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-bg-container);
     margin-top: auto;
@@ -447,7 +447,7 @@ const handleDelete = () => {
     display: flex;
     align-items: center;
     gap: 8rpx;
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: rgba(255, 255, 255, 0.9);
     background: rgba(0, 0, 0, 0.05);
     padding: 6rpx 16rpx;
@@ -467,7 +467,7 @@ const handleDelete = () => {
 }
 
 .form-label {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
     margin-bottom: 24rpx;
     font-weight: 600;
@@ -512,7 +512,7 @@ const handleDelete = () => {
 .form-input {
     flex: 1;
     height: 100%;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 
@@ -521,7 +521,7 @@ const handleDelete = () => {
 }
 
 .char-count {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-left: 16rpx;
 }
@@ -531,7 +531,7 @@ const handleDelete = () => {
     align-items: center;
     gap: 8rpx;
     margin-top: 16rpx;
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     padding-left: 8rpx;
     animation: slideDown 0.3s ease;
@@ -599,7 +599,7 @@ const handleDelete = () => {
     width: 100%;
     height: 100rpx;
     border-radius: 50rpx;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: 600;
     border: none;
     transition: all 0.3s ease;

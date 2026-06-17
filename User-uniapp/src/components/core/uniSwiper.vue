@@ -100,7 +100,7 @@ const onItemClick = (item, index) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 </style>

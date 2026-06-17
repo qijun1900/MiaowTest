@@ -89,12 +89,12 @@ const showPrivacyPolicy = () => {
         }
 
         .tips-text {
-            font-size: 24rpx;
+            font-size: calc(24rpx * var(--app-font-scale, 1));
             color: var(--app-text-secondary);
         }
 
         .tips-link {
-            font-size: 24rpx;
+            font-size: calc(24rpx * var(--app-font-scale, 1));
             color: var(--app-brand);
             margin: 0 4rpx;
         }

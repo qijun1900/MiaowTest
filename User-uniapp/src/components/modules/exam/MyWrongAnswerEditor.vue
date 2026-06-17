@@ -73,7 +73,7 @@ const handleAddImage = () => {
 }
 
 .wrong-answer-title {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-danger);
     font-weight: 500;
 }
@@ -86,7 +86,7 @@ const handleAddImage = () => {
 }
 
 .add-image-text {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-success);
 }
 

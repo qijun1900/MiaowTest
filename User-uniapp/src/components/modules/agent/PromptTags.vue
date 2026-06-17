@@ -81,7 +81,7 @@ const handleSelect = (item) => {
 }
 
 .prompt-tag-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     line-height: 1;
     font-weight: 600;
     color: var(--app-text-secondary);

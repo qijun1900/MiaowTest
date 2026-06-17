@@ -368,7 +368,7 @@ onLoad(async (options) => {
 
 .loading-text {
     margin-top: 32rpx;
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: #ff9555;
     font-weight: 500;
 }
@@ -384,7 +384,7 @@ onLoad(async (options) => {
 }
 
 .selector-label {
-    font-size: 28rpx;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     margin-bottom: 10rpx;
 }
@@ -400,7 +400,7 @@ onLoad(async (options) => {
 }
 
 .picker-display text {
-    font-size: 30rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
 }
 

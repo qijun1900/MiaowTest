@@ -1,0 +1,50 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ *  字号 token（--app-font-*）
+ *
+ *  规则：
+ *    1. 业务页面使用 var(--app-font-*) 代替写死的 font-size: NNrpx
+ *    2. 4 档（small / standard / large / xlarge）通过根 class 切换缩放系数
+ *    3. 选择器与主题对称：:root / page / .font-xxx
+ *
+ *  语义档位：
+ *    --app-font-xs    辅助/角标文字
+ *    --app-font-sm    次级文字 / 说明
+ *    --app-font-base  正文（默认 28rpx）
+ *    --app-font-md    强调正文 / 列表项标题
+ *    --app-font-lg    卡片标题
+ *    --app-font-xl    页面大标题
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+@mixin font-tokens($scale) {
+  --app-font-scale: #{$scale};
+  --app-font-xs:   calc(22rpx * #{$scale});
+  --app-font-sm:   calc(26rpx * #{$scale});
+  --app-font-base: calc(28rpx * #{$scale});
+  --app-font-md:   calc(30rpx * #{$scale});
+  --app-font-lg:   calc(34rpx * #{$scale});
+  --app-font-xl:   calc(40rpx * #{$scale});
+}
+
+:root.font-small,
+page.font-small,
+.font-small {
+  @include font-tokens(0.85);
+}
+
+:root.font-standard,
+page.font-standard,
+.font-standard {
+  @include font-tokens(1);
+}
+
+:root.font-large,
+page.font-large,
+.font-large {
+  @include font-tokens(1.15);
+}
+
+:root.font-xlarge,
+page.font-xlarge,
+.font-xlarge {
+  @include font-tokens(1.3);
+}

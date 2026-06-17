@@ -210,7 +210,7 @@ onMounted(async () => {
 }
 
 .bank-name {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-brand);
     margin-bottom: 10rpx;
@@ -223,12 +223,12 @@ onMounted(async () => {
 }
 
 .question-count {
-    font-size: 24rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
 .time {
-    font-size: 25rpx;
+    font-size: calc(25rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
 }
 
@@ -246,7 +246,7 @@ onMounted(async () => {
 }
 
 .arrow-icon {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: bold;
 }
@@ -313,14 +313,14 @@ onMounted(async () => {
 }
 
 .empty-text {
-    font-size: 32rpx;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
     font-weight: bold;
     color: var(--app-text-primary);
     margin-bottom: 20rpx;
 }
 
 .empty-desc {
-    font-size: 26rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
     text-align: center;
 }

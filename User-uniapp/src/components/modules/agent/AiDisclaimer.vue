@@ -22,7 +22,7 @@
 }
 
 .disclaimer-text {
-    font-size: 20rpx;
+    font-size: calc(20rpx * var(--app-font-scale, 1));
     color: rgba(176, 125, 79, 0.45);
     line-height: 1.4;
 }
