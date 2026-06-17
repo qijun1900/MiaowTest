@@ -3,7 +3,6 @@
         class="custom-tab-bar"
         :class="{ 'tab-bar--hidden': !visible }"
         :style="tabBarStyle"
-        @touchstart.stop="handleTouchStart"
     >
         <!-- 背景毛玻璃层 -->
         <view class="tab-bar__backdrop" />
@@ -173,11 +172,6 @@ const handleTabClick = (index) => {
     if (tab) {
         uni.switchTab({ url: tab.pagePath });
     }
-};
-
-// 触摸事件（用于保持 TabBar 可见）
-const handleTouchStart = () => {
-    // 阻止事件冒泡，防止触发页面的 handleTouchStart 导致重复
 };
 
 // 清理定时器
