@@ -36,6 +36,7 @@
 
 - [核心能力](#核心能力)
 - [LLM/AI 架构](#llm-ai-架构)
+- [外观系统架构](#外观系统架构)
 - [技术架构](#技术架构)
 - [仓库结构](#仓库结构)
 - [快速开始](#快速开始)
@@ -59,6 +60,8 @@
 - **学习资产**：收藏、错题、词库等可持续复习链路
 - **学习工具**：计时器、TODO、错题本、笔记本等训练辅助模块
 - **账号体系**：登录态管理（邮箱和微信小程序一键登录）、个人信息与学习数据展示
+- **外观系统**：多主题预设（极光蓝 / Claude 暖橙）× 深浅模式（跟随系统 / 浅色 / 深色）× 四档字号（小 / 标准 / 大 / 特大），全局一键切换，偏好持久化
+- **自定义导航**：CustomNavBar（页面顶部）+ CustomTabBar（底部 Tab），支持主题 token 自适应配色
 
 ### 管理端 (Vue3)
 
@@ -136,6 +139,47 @@ llm/
 | 微信小程序 | 分块传输 (Chunked Response) |
 | APP | WebSocket |
 
+## 外观系统架构
+
+用户端的主题 / 深浅模式 / 字号是一套统一的 token 体系，分层定义、一键切换、跨端一致。
+
+### 三维偏好
+
+| 维度 | 取值 | 持久化 |
+|------|------|--------|
+| 主题预设 (themePreset) | `aurora`（极光蓝） / `claude`（暖橙纸质） | ✅ |
+| 深浅模式 (darkMode) | `auto`（跟随系统） / `light` / `dark` | ✅ |
+| 字号档位 (fontSizeIndex) | 0 小 (0.85×) / 1 标准 (1×) / 2 大 (1.15×) / 3 特大 (1.3×) | ✅ |
+
+### Token 分层
+
+```
+TDesign 原子 token (--td-*)        ← 三方组件库色板
+        ↓ 通过 mixin 桥接
+业务语义 token (--app-*)            ← 业务代码只引用这一层
+        ↓ 配合根 class
+最终样式 (theme-xxx mode-xxx font-xxx)
+```
+
+- `_app-tokens.scss`：定义 `--app-bg-page` / `--app-text-primary` / `--app-brand` 等业务语义变量
+- `_aurora-light.scss` / `_aurora-dark.scss` / `_claude-light.scss` / `_claude-dark.scss`：每个预设 × 模式覆盖 td 色板
+- `_font-sizes.scss`：定义 `--app-font-scale` 与 `--app-font-xs/sm/base/md/lg/xl` 六档语义字号
+
+### 注入机制
+
+| 端 | 注入位置 |
+|----|---------|
+| H5 | `documentElement.className = "theme-xxx mode-xxx font-xxx"` |
+| 小程序 / APP | `ThemeProvider` 组件给页面根 view 挂同样的 class |
+
+`AppearanceStore.applyTheme()` 统一负责：H5 直接写 DOM，跨端通过 `uni.$emit('app:theme-change')` 通知 `ThemeProvider` 订阅者更新。
+
+### 业务代码规范
+
+- **颜色**：禁止颜色字面量，一律 `var(--app-bg-page)` / `var(--app-text-primary)` 等
+- **字号**：禁止写死 `font-size: 28rpx`，统一 `font-size: calc(28rpx * var(--app-font-scale, 1))`，原数值保留，按档自动缩放
+- **页面包裹**：每个 `.vue` 页面用 `<ThemeProvider>` 包根节点，保证小程序端 class 命中
+
 ## 技术架构
 
 | 层级 | 技术方案 |
@@ -160,6 +204,12 @@ llm/
 ```text
 .
 ├── User-uniapp/           # 用户端（Uni-app）
+│   ├── src/components/
+│   │   ├── core/ThemeProvider.vue   # 主题/字号 class 注入根节点
+│   │   ├── common/CustomNavBar.vue  # 自定义顶部导航
+│   │   └── tabbar/CustomTabBar.vue  # 自定义底部 Tab
+│   ├── src/stores/modules/AppearanceStore.js  # 主题/深浅/字号 store
+│   └── src/static/themes/           # 多主题 + 字号 token 体系
 ├── Admin-web/             # 管理端（Vue3）
 ├── Express-node/          # 后端服务（Express）
 │   ├── llm/               # LLM 引擎（LangChain + DashScope）
@@ -383,6 +433,10 @@ GET /health
 | 用户端 | 会话搜索（标题 + 消息预览模糊匹配） | ✅ 已完成 |
 | 用户端 | 消息分页加载 + 骨架屏 | ✅ 已完成 |
 | 用户端 | 深度思考模式（思考过程 / 回答分离渲染） | ✅ 已完成 |
+| 用户端 | 多主题切换（极光蓝 / Claude，token 化色板） | ✅ 已完成 |
+| 用户端 | 深浅模式切换（跟随系统 / 浅色 / 深色） | ✅ 已完成 |
+| 用户端 | 全局字号切换（四档 0.85× / 1× / 1.15× / 1.3×） | ✅ 已完成 |
+| 用户端 | 自定义 NavBar + 自定义 TabBar（主题自适应） | ✅ 已完成 |
 | 后端 | 对话持久化（会话表 + 消息表，token 统计） | ✅ 已完成 |
 | 后端 | Agent 定义管理（CRUD + 发布状态） | ✅ 已完成 |
 | 管理端 | Agent 管理页面 | ✅ 已完成 |
