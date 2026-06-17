@@ -27,7 +27,10 @@
                 <view class="tab-item__icon-wrapper">
                     <view
                         class="tab-item__icon"
-                        :class="{ 'icon--bounce': bounceIndex === index }"
+                        :class="{
+                            'icon--press': pressIndex === index,
+                            'icon--active-enter': currentIndex === index,
+                        }"
                     >
                         <!-- 图片图标 -->
                         <image
@@ -54,7 +57,10 @@
                 <!-- 文字 -->
                 <text
                     class="tab-item__text"
-                    :class="{ 'text--active': currentIndex === index }"
+                    :class="{
+                        'text--active': currentIndex === index,
+                        'text--press': pressIndex === index,
+                    }"
                 >
                     {{ item.text }}
                 </text>
@@ -128,9 +134,10 @@ const tabs = ref([
 
 // 动画状态
 const rippleIndex = ref(-1);
-const bounceIndex = ref(-1);
+const pressIndex = ref(-1);
 let rippleTimer = null;
-let bounceTimer = null;
+let pressTimer = null;
+let navTimer = null;
 
 // 安全区信息
 const safeAreaBottom = ref(0);
@@ -157,27 +164,31 @@ const handleTabClick = (index) => {
         rippleIndex.value = -1;
     }, 600);
 
-    // 触发弹跳效果
-    bounceIndex.value = index;
-    clearTimeout(bounceTimer);
-    bounceTimer = setTimeout(() => {
-        bounceIndex.value = -1;
-    }, 300);
+    // 触发按压放大动画（图标 + 文字）
+    pressIndex.value = index;
+    clearTimeout(pressTimer);
+    pressTimer = setTimeout(() => {
+        pressIndex.value = -1;
+    }, 400);
 
     // 触发事件
     emit("change", index);
 
-    // 页面跳转
+    // 延迟跳转，让按压放大动画先播放，过渡更顺滑
     const tab = tabs.value[index];
     if (tab) {
-        uni.switchTab({ url: tab.pagePath });
+        clearTimeout(navTimer);
+        navTimer = setTimeout(() => {
+            uni.switchTab({ url: tab.pagePath });
+        }, 120);
     }
 };
 
 // 清理定时器
 onBeforeUnmount(() => {
     clearTimeout(rippleTimer);
-    clearTimeout(bounceTimer);
+    clearTimeout(pressTimer);
+    clearTimeout(navTimer);
 });
 </script>
 
@@ -307,20 +318,40 @@ onBeforeUnmount(() => {
     color: var(--app-brand);
 }
 
-/* 图标弹跳动画 */
-.icon--bounce {
-    animation: icon-bounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* 点击按压放大动画 */
+.icon--press {
+    animation: icon-press 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes icon-bounce {
+@keyframes icon-press {
     0% {
         transform: scale(1);
     }
-    50% {
-        transform: scale(1.25);
+    45% {
+        transform: scale(1.4);
     }
     100% {
         transform: scale(1);
+    }
+}
+
+/* 切换页面时激活图标的入场动画 */
+.icon--active-enter {
+    animation: icon-enter 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes icon-enter {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+    60% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
     }
 }
 
@@ -360,6 +391,23 @@ onBeforeUnmount(() => {
 .text--active {
     color: var(--app-brand);
     font-weight: 600;
+}
+
+/* 点击文字放大动画 */
+.text--press {
+    animation: text-press 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes text-press {
+    0% {
+        transform: scale(1);
+    }
+    45% {
+        transform: scale(1.18);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* 底部安全区 */
