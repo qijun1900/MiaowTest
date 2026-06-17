@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/AI-LangChain%20%2B%20DashScope-ff6b00.svg" alt="AI">
 </p>
 
-## 小程序扫码体验(平台限制AI功能展示不了)
+## 小程序扫码体验(平台限制AI相关功能展示不了)
 
 <p align="center">
   <img src="https://free.picui.cn/free/2026/04/18/69e3960545c05.jpg" alt="题喵喵微信小程序扫码体验" width="220">
