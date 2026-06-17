@@ -266,9 +266,6 @@ import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
 import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import logSDK from "../../util/logSDK";
-// #ifdef MP-WEIXIN
-import { wechatBind } from "../../util/wechatLogin";
-// #endif
 // #ifdef APP-PLUS
 import { checkForUpdate } from "../../util/checkUpdate";
 // #endif
@@ -295,28 +292,26 @@ const cacheSize = ref("计算中...");
 const notificationEnabled = ref(true);
 
 const darkModeOptions = [
-    { label: "跟随系统", value: "auto", icon: "system" },
-    { label: "浅色", value: "light", icon: "sun" },
-    { label: "深色", value: "dark", icon: "moon" },
+    { label: "跟随系统", value: "auto" },
+    { label: "浅色", value: "light" },
+    { label: "深色", value: "dark" },
 ];
 
-const fontSizeOptions = [
-    { label: "小", previewSize: "24rpx" },
-    { label: "标准", previewSize: "32rpx" },
-    { label: "大", previewSize: "42rpx" },
-    { label: "特大", previewSize: "52rpx" },
-];
+// 字号预览基准：用 36rpx 作为「标准」档的展示尺寸，
+// 各档按 store 真实 scale 缩放，确保预览差距 = 实际差距，避免误导
+const FONT_PREVIEW_BASE_RPX = 36;
+const fontSizeOptions = computed(() =>
+    appearanceStore.fontSizeOptions.map((label, index) => ({
+        label,
+        previewSize: `${FONT_PREVIEW_BASE_RPX * appearanceStore.fontSizeScales[index]}rpx`,
+    }))
+);
 
 // 绑定状态
 const bindStatus = ref({
     isEmailBound: false,
     isWechatBound: false,
 });
-
-// 当前主题预设
-const currentPreset = computed(
-    () => appearanceStore.getCurrentPreset?.() || appearanceStore.themePresets[0]
-);
 
 /**
  * 预先计算每个 preset 的全部内联样式对象，避免模板里调用函数返回新对象，
@@ -430,7 +425,7 @@ const selectPreset = (presetKey) => {
 const selectFontSize = (index) => {
     appearanceStore.setFontSize(index);
     uni.showToast({
-        title: "字号已切换为" + fontSizeOptions[index].label,
+        title: "字号已切换为" + fontSizeOptions.value[index].label,
         icon: "none",
         position: "top",
     });
@@ -505,7 +500,6 @@ const handleLogout = () => {
 
 onMounted(() => {
     calcCacheSize();
-    appearanceStore.initAppearance();
     if (isLoggedIn.value) {
         fetchBindStatus();
     }
