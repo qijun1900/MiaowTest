@@ -71,31 +71,31 @@
                 </view>
                 <view class="theme-preview-area">
                     <view
-                        v-for="preset in appearanceStore.themePresets"
+                        v-for="preset in decoratedPresets"
                         :key="preset.key"
                         class="theme-preview-card"
                         :class="{ active: appearanceStore.themePreset === preset.key }"
                         @click="selectPreset(preset.key)"
                     >
-                        <view class="theme-mock-page" :style="getMockPageStyle(preset)">
-                            <view class="mock-navbar" :style="getNavBarStyle(preset)">
-                                <view class="mock-dot" :style="{ background: preset.primary }"></view>
-                                <view class="mock-title-line" :style="{ background: getMockText(preset, 0.8) }"></view>
+                        <view class="theme-mock-page" :style="preset.mockPageStyle">
+                            <view class="mock-navbar" :style="preset.mockNavBarStyle">
+                                <view class="mock-dot" :style="preset.mockDotStyle"></view>
+                                <view class="mock-title-line" :style="preset.mockTitleStyle"></view>
                             </view>
                             <view class="mock-body">
-                                <view class="mock-card" :style="{ background: getMockCard(preset) }">
-                                    <view class="mock-card-line" :style="{ background: getMockText(preset, 0.6) }"></view>
-                                    <view class="mock-card-line short" :style="{ background: getMockText(preset, 0.3) }"></view>
+                                <view class="mock-card" :style="preset.mockCardStyle">
+                                    <view class="mock-card-line" :style="preset.mockCardLineStyle"></view>
+                                    <view class="mock-card-line short" :style="preset.mockCardLineShortStyle"></view>
                                 </view>
-                                <view class="mock-card" :style="{ background: getMockCard(preset) }">
-                                    <view class="mock-card-line" :style="{ background: getMockText(preset, 0.6) }"></view>
+                                <view class="mock-card" :style="preset.mockCardStyle">
+                                    <view class="mock-card-line" :style="preset.mockCardLineStyle"></view>
                                 </view>
-                                <view class="mock-btn" :style="{ background: preset.primary }"></view>
+                                <view class="mock-btn" :style="preset.mockBtnStyle"></view>
                             </view>
                         </view>
                         <view class="theme-preview-label">
-                            <view class="theme-color-ring" :style="{ borderColor: preset.primary }">
-                                <view class="theme-color-fill" :style="{ background: preset.primary }"></view>
+                            <view class="theme-color-ring" :style="preset.colorRingStyle">
+                                <view class="theme-color-fill" :style="preset.colorFillStyle"></view>
                             </view>
                             <text class="theme-preview-name">{{ preset.name }}</text>
                             <t-icon
@@ -318,25 +318,31 @@ const currentPreset = computed(
     () => appearanceStore.getCurrentPreset?.() || appearanceStore.themePresets[0]
 );
 
-// 主题预览样式
-const getMockPageStyle = (preset) => {
-    const bg = { aurora: '#f5f7fa', claude: '#f5f0e8' };
-    return { background: bg[preset.key] || bg.aurora };
-};
-
-const getNavBarStyle = (preset) => {
-    const bg = { aurora: '#f5f7fa', claude: '#f5f0e8' };
-    return { background: bg[preset.key] || bg.aurora };
-};
-
-const getMockText = (preset, opacity) => {
-    if (preset.key === 'claude') return `rgba(61, 57, 41, ${opacity})`;
-    return `rgba(0, 0, 0, ${opacity})`;
-};
-
-const getMockCard = (preset) => {
-    return preset.key === 'claude' ? '#faf7f2' : '#ffffff';
-};
+/**
+ * 预先计算每个 preset 的全部内联样式对象，避免模板里调用函数返回新对象，
+ * 防止每次 render 产生新引用触发子节点 style diff，显著降低主题卡片切换抖动。
+ */
+const decoratedPresets = computed(() =>
+    appearanceStore.themePresets.map((preset) => {
+        const isClaude = preset.key === "claude";
+        const pageBg = isClaude ? "#f5f0e8" : "#f5f7fa";
+        const cardBg = isClaude ? "#faf7f2" : "#ffffff";
+        const textBase = isClaude ? "61, 57, 41" : "0, 0, 0";
+        return {
+            ...preset,
+            mockPageStyle: { background: pageBg },
+            mockNavBarStyle: { background: pageBg },
+            mockDotStyle: { background: preset.primary },
+            mockTitleStyle: { background: `rgba(${textBase}, 0.8)` },
+            mockCardStyle: { background: cardBg },
+            mockCardLineStyle: { background: `rgba(${textBase}, 0.6)` },
+            mockCardLineShortStyle: { background: `rgba(${textBase}, 0.3)` },
+            mockBtnStyle: { background: preset.primary },
+            colorRingStyle: { borderColor: preset.primary },
+            colorFillStyle: { background: preset.primary },
+        };
+    })
+);
 
 // 绑定状态文案
 const bindStatusText = computed(() => {
@@ -631,13 +637,13 @@ onMounted(() => {
     border-radius: 16rpx;
     overflow: hidden;
     border: 3rpx solid transparent;
-    transition: all 0.25s ease;
+    transition: border-color 0.2s ease;
     background: var(--app-bg-secondary);
 }
 
 .dark-mode-card.active {
     border-color: var(--app-brand);
-    box-shadow: 0 0 0 4rpx var(--app-brand-light);
+    outline: 4rpx solid var(--app-brand-light);
 }
 
 .dark-mode-preview {
@@ -725,14 +731,13 @@ onMounted(() => {
     border-radius: 16rpx;
     overflow: hidden;
     border: 3rpx solid var(--app-border);
-    transition: all 0.3s ease;
+    transition: border-color 0.2s ease;
     background: var(--app-bg-secondary);
 }
 
 .theme-preview-card.active {
     border-color: var(--app-brand);
-    box-shadow: 0 0 0 4rpx var(--app-brand-light);
-    transform: scale(1.02);
+    outline: 4rpx solid var(--app-brand-light);
 }
 
 .theme-mock-page {
@@ -839,13 +844,13 @@ onMounted(() => {
     border-radius: 16rpx;
     background: var(--app-bg-secondary);
     border: 3rpx solid transparent;
-    transition: all 0.25s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .font-size-card.active {
     border-color: var(--app-brand);
     background: var(--app-brand-light);
-    box-shadow: 0 0 0 4rpx var(--app-brand-light);
+    outline: 4rpx solid var(--app-brand-light);
 }
 
 .font-size-preview {
