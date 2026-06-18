@@ -1,4 +1,4 @@
-import { http } from "../../util/http";
+import { http } from "../../util/http/request";
 
 /**
  * @description 获取用户笔记科目及其数量结果

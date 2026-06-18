@@ -81,7 +81,7 @@ import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
 import BackToTop from "../../components/core/BackToTop.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { AppearanceStore } from "../../stores/modules/AppearanceStore";
-import showShareMenu from "../../util/wechatShare.js";
+import showShareMenu from "../../util/wechat/share";
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
 import CustomTabBar from "../../components/core/CustomTabBar.vue";
 

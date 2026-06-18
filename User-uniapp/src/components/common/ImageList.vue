@@ -35,7 +35,7 @@
 <script setup>
 import { ref } from "vue";
 import ImageCropper from "./ImageCropper.vue";
-import { cloudFileToHttpUrl } from "../../util/cloudFileUrl";
+import { cloudFileToHttpUrl } from "../../util/http/cloudFile";
 
 const props = defineProps({
     images: {

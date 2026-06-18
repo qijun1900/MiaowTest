@@ -152,12 +152,12 @@ import {
     UserRegister,
     sendEmailVerifyCode,
 } from "../../API/My/UserLoginAPI";
-import { wechatBind } from "../../util/wechatLogin";
-import navBarHeightUtil from "../../util/navBarHeight";
+import { wechatBind } from "../../util/auth/wechatLogin";
+import navBarHeightUtil from "../../util/ui/navBar";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
-import logSDK from "../../util/logSDK";
-import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/showMessage";
+import logSDK from "../../util/log/sdk";
+import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/ui/message";
 
 const instance = getCurrentInstance();
 const AGREED_KEY = "user_agreed_policy";

@@ -252,11 +252,11 @@ import {
     createWrongBookAPI,
     getWrongBooksAPI,
 } from "../../API/Tools/WrongBookAPI";
-import formatTime from "../../util/formatTime";
+import formatTime from "../../util/format/time";
 import {
     wrongBookColors,
     generateDisplayColorList,
-} from "../../util/cardThemes";
+} from "../../util/theme/cardThemes";
 
 const { safeAreaInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,

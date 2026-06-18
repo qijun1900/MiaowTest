@@ -20,7 +20,7 @@
 
 <script setup>
 import { ref } from "vue";
-import checkLogin from "../../../util/checkLogin";
+import checkLogin from "../../../util/auth/checkLogin";
 
 // 导航项数据
 const navItems = ref([

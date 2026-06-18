@@ -114,8 +114,8 @@ import ThemeProvider from "../../../components/core/ThemeProvider.vue";
 import { computed, ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
-import { buildNotePreviewHtml, stripHtml } from "../../../util/notePreview";
-import { normalizeNoteDetailData } from "../../../util/noteNormalize";
+import { buildNotePreviewHtml, stripHtml } from "../../../util/note/preview";
+import { normalizeNoteDetailData } from "../../../util/note/normalize";
 import ContentRenderer from "../../../components/common/ContentRenderer.vue";
 import {
     getNotebookNoteDetailAPI,

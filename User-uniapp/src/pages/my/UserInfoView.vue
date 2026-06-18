@@ -108,16 +108,16 @@
 <script setup>
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
-import handleCopy from "../../util/copy";
+import handleCopy from "../../util/ui/copy";
 import { updateUserInfo, checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import { onMounted, ref, getCurrentInstance } from "vue";
-import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/showMessage";
+import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/ui/message";
 import userAvatar from "../../components/core/userAvatar.vue";
-import { httpUpload } from "../../util/http";
+import { httpUpload } from "../../util/http/index";
 import escconfig from "../../config/esc.config";
-import logSDK from "../../util/logSDK";
+import logSDK from "../../util/log/sdk";
 // #ifdef MP-WEIXIN
-import { wechatBind } from "../../util/wechatLogin";
+import { wechatBind } from "../../util/auth/wechatLogin";
 // #endif
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
 

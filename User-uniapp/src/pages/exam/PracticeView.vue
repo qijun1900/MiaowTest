@@ -297,7 +297,7 @@ import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import AnswerSheet from "../../components/modules/exam/AnswerSheet.vue";
 import { useStatisticsStore } from "../../stores/modules/StatisticsStore";
 import { storeToRefs } from "pinia"; // 从Pinia导入storeToRefs
-import navBarHeightUtil from "../../util/navBarHeight";
+import navBarHeightUtil from "../../util/ui/navBar";
 import dragButton from "../../uni_modules/drag-button/drag-button.vue";
 import {
     checkFavoriteQuestionAPI,
@@ -306,8 +306,8 @@ import {
     savePracticeNoteAPI,
     getPracticeNoteAPI,
 } from "../../API/Exam/QuestionAPI";
-import checkLogin from "../../util/checkLogin";
-import formatTime from "../../util/formatTime";
+import checkLogin from "../../util/auth/checkLogin";
+import formatTime from "../../util/format/time";
 
 const questionStore = useQuestionStore(); // 问题Store,存储问题和用户设置
 const list = ref(["答题模式", "学习模式"]); // 添加subsection需要的数据

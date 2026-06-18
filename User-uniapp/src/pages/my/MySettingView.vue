@@ -260,14 +260,14 @@
 import { ref, computed, onMounted } from "vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
 import { AppearanceStore } from "../../stores/modules/AppearanceStore";
-import { clearExamCache } from "../../util/cacheCleaner";
+import { clearExamCache } from "../../util/cache/cacheCleaner";
 import userAvatar from "../../components/core/userAvatar.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
 import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
-import logSDK from "../../util/logSDK";
+import logSDK from "../../util/log/sdk";
 // #ifdef APP-PLUS
-import { checkForUpdate } from "../../util/checkUpdate";
+import { checkForUpdate } from "../../util/update/checkUpdate";
 // #endif
 
 const userInfoStore = UserInfoStore();

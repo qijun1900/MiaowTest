@@ -148,12 +148,12 @@ import {
   stripHtml,
   normalizeToHtml,
   buildNotePreviewHtml,
-} from "../../../util/notePreview";
+} from "../../../util/note/preview";
 import {
   normalizeTagList,
   normalizeImageUrl,
   extractImageUrlsFromHtml,
-} from "../../../util/noteNormalize";
+} from "../../../util/note/normalize";
 import {
   getNotebookNoteDetailAPI,
   saveNotebookNoteAPI,

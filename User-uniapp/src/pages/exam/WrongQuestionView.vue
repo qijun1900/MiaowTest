@@ -329,7 +329,7 @@ import {
     addFavoriteQuestionAPI,
     deleteFavoriteQuestionAPI,
 } from "../../API/Exam/QuestionAPI";
-import formatInfo from "../../util/formatInfo";
+import formatInfo from "../../util/format/questionType";
 import ContentRenderer from "../../components/common/ContentRenderer.vue";
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
 

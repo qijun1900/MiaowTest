@@ -173,7 +173,7 @@ import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ref, onMounted } from "vue";
 import ThemDivider from "../../components/core/ThemeDivider.vue";
-import formatTime from "../../util/formatTime";
+import formatTime from "../../util/format/time";
 import { getUserBankQuestionList } from "../../API/Exam/QuestionAPI";
 import Empty from "../../components/core/Empty.vue";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";

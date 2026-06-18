@@ -1,4 +1,4 @@
-import { http } from "../../util/http.js";
+import { http } from "../../util/http/request";
 
 /**
  * 获取热门考试列表

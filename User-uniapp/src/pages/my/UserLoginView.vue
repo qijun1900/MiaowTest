@@ -118,12 +118,12 @@ import { ref, reactive, onMounted, computed, watch, getCurrentInstance } from "v
 import { UserAccountLogin } from "../../API/My/UserLoginAPI";
 import { checkUserBind } from "../../API/My/UserInfoUpdateAPI";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
-import { wechatLogin } from "../../util/wechatLogin";
-import navBarHeightUtil from "../../util/navBarHeight";
+import { wechatLogin } from "../../util/auth/wechatLogin";
+import navBarHeightUtil from "../../util/ui/navBar";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
-import logSDK from "../../util/logSDK";
-import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/showMessage";
+import logSDK from "../../util/log/sdk";
+import { setMessageInstance, showSuccess, showError, showWarning } from "../../util/ui/message";
 
 const instance = getCurrentInstance();
 const AGREED_KEY = "user_agreed_policy";

@@ -1,4 +1,4 @@
-import { http } from "../../util/http.js";
+import { http } from "../../util/http/request";
 
 /**
  * 检查应用更新

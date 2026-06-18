@@ -80,7 +80,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { getUserBankList, deleteUserBankAPI } from "../../../API/Exam/ExamAPI";
-import formatTime from "../../../util/formatTime";
+import formatTime from "../../../util/format/time";
 import ThemeLoading from "../../core/ThemeLoading.vue";
 import useSwipe from "../../../composables/useSwipe";
 import Tips from "../../core/Tips.vue";

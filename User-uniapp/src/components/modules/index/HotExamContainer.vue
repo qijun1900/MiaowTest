@@ -36,7 +36,7 @@
 import { ref, onMounted } from "vue";
 import { getHotExamList } from "../../../API/Index/HotExamAPI";
 import escconfig from "../../../config/esc.config";
-import checkLogin from "../../../util/checkLogin";
+import checkLogin from "../../../util/auth/checkLogin";
 
 const hotExamList = ref([]);
 const isLoading = ref(true);

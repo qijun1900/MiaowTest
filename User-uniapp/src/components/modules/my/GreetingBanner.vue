@@ -6,7 +6,7 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { getGreetingInfo } from "../../../util/greet";
+import { getGreetingInfo } from "../../../util/format/greet";
 import { UserInfoStore } from "../../../stores/modules/UserinfoStore";
 
 const tick = ref(Date.now());

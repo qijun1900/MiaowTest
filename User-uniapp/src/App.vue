@@ -10,10 +10,10 @@
     App.vue（宿主）→ logSDK.js（核心引擎）→ logEvents.js（事件契约）
 ────────────────────────────────────────────────────────────────────────────── -->
 <script>
-import logSDK from "./util/logSDK";
+import logSDK from "./util/log/sdk";
 import { AppearanceStore } from "./stores/modules/AppearanceStore";
 // #ifdef APP-PLUS
-import { checkForUpdate } from "./util/checkUpdate";
+import { checkForUpdate } from "./util/update/checkUpdate";
 // #endif
 
 export default {

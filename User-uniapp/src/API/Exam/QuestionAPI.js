@@ -1,4 +1,4 @@
-import { http } from "../../util/http.js";
+import { http } from "../../util/http/request";
 
 /**
  * 添加题目接口

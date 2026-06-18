@@ -50,7 +50,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { getUserFavorites } from "../../../API/My/FavoriteAPI";
-import formatTime from "../../../util/formatTime";
+import formatTime from "../../../util/format/time";
 import escconfig from "../../../config/esc.config";
 import ThemeLoading from "../../core/ThemeLoading.vue";
 

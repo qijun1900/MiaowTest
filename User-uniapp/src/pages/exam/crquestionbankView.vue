@@ -207,9 +207,9 @@
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, computed, onMounted } from "vue";
 import { AddUserBank } from "../../API/Exam/ExamAPI";
-import navBarHeightUtil from "../../util/navBarHeight";
-import checkLogin from "../../util/checkLogin";
-import showModal from "../../util/showModal";
+import navBarHeightUtil from "../../util/ui/navBar";
+import checkLogin from "../../util/auth/checkLogin";
+import showModal from "../../util/ui/modal";
 
 const navBarInfo = ref(0); // 导航栏高度信息
 // 题库名称和验证状态

@@ -1,4 +1,4 @@
-import { http } from "../../util/http";
+import { http } from "../../util/http/request";
 
 /**
  * @description 获取笔记本列表

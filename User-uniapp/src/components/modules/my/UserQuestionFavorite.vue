@@ -109,8 +109,8 @@ import {
     deleteFavoriteQuestionAPI,
     practiceQuestionAPI,
 } from "../../../API/Exam/QuestionAPI";
-import formatInfo from "../../../util/formatInfo";
-import formatTime from "../../../util/formatTime";
+import formatInfo from "../../../util/format/questionType";
+import formatTime from "../../../util/format/time";
 import ThemeLoading from "../../core/ThemeLoading.vue";
 import SubjectFilter from "../../core/Filter.vue";
 import ContentRenderer from "../../common/ContentRenderer.vue";

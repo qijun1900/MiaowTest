@@ -28,8 +28,8 @@ import { ref, computed, onMounted } from "vue";
 import PageHead from "../../components/core/PageHead.vue";
 import ToolsList from "../../components/modules/tools/ToolsList.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
-import showShareMenu from "../../util/wechatShare.js";
-import checkLogin from "../../util/checkLogin.js";
+import showShareMenu from "../../util/wechat/share";
+import checkLogin from "../../util/auth/checkLogin";
 import CustomTabBar from "../../components/core/CustomTabBar.vue";
 
 const pageHeadRef = ref();

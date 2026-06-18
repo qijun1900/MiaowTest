@@ -156,8 +156,8 @@ import {
     deleteWrongQuestionAPI,
     practiceQuestionAPI,
 } from "../../API/Exam/QuestionAPI";
-import formatInfo from "../../util/formatInfo";
-import formatTime from "../../util/formatTime";
+import formatInfo from "../../util/format/questionType";
+import formatTime from "../../util/format/time";
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
 import SubjectFilter from "../../components/core/Filter.vue";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";

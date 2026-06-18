@@ -145,8 +145,8 @@ import {
     ResetPassword,
     sendEmailVerifyCode,
 } from "../../API/My/UserLoginAPI";
-import navBarHeightUtil from "../../util/navBarHeight";
-import { setMessageInstance, showSuccess, showError } from "../../util/showMessage";
+import navBarHeightUtil from "../../util/ui/navBar";
+import { setMessageInstance, showSuccess, showError } from "../../util/ui/message";
 
 const instance = getCurrentInstance();
 const showPassword = ref(true);

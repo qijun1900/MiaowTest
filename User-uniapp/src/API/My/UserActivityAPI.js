@@ -1,4 +1,4 @@
-import { http } from "../../util/http.js";
+import { http } from "../../util/http/request";
 
 /**
  * 获取用户活动热力图聚合数据。

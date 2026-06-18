@@ -133,9 +133,9 @@
 <script setup>
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
-import formatTime from "../../util/formatTime";
+import formatTime from "../../util/format/time";
 import { getExamTitleNetUrlAPI } from "../../API/Exam/ExamAPI";
-import copy from "../../util/copy";
+import copy from "../../util/ui/copy";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
 

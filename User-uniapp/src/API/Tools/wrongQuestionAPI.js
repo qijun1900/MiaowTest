@@ -1,4 +1,4 @@
-import { http } from "../../util/http";
+import { http } from "../../util/http/request";
 
 /**
  * @description 添加错题到错题本

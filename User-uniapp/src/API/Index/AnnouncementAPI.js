@@ -1,4 +1,4 @@
-import { http } from "../../util/http.js";
+import { http } from "../../util/http/request";
 /**
  * 获取公告详情
  * @returns {Promise} 返回公告详情数据

@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { deleteCloudFiles, httpUpload, http } from "../util/http";
+import { deleteCloudFiles, httpUpload, http } from "../util/http/index";
 import escconfig from "../config/esc.config";
 import { UserInfoStore } from "../stores/modules/UserinfoStore";
 

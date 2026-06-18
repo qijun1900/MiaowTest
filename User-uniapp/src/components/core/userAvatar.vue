@@ -19,7 +19,7 @@
 <script setup>
 import { computed, defineProps, defineEmits } from "vue";
 import { UserInfoStore } from "../../stores/modules/UserinfoStore";
-import { cloudFileToHttpUrl } from "../../util/cloudFileUrl";
+import { cloudFileToHttpUrl } from "../../util/http/cloudFile";
 
 const userInfoStore = UserInfoStore();
 

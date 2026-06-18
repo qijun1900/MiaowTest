@@ -26,7 +26,7 @@
 <script setup>
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, onMounted } from "vue";
-import navBarHeightUtil from "../../util/navBarHeight";
+import navBarHeightUtil from "../../util/ui/navBar";
 import Subsection from "../../components/core/Subsection.vue";
 import UserQuestionFavorite from "../../components/modules/my/UserQuestionFavorite.vue";
 import UserExamFavorite from "../../components/modules/index/UserExamFavorite.vue";

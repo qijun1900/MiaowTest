@@ -172,8 +172,8 @@ import {
     practiceQuestionAPI,
     getPracticeNoteAPI,
 } from "../../API/Exam/QuestionAPI";
-import formatInfo from "../../util/formatInfo";
-import formatTime from "../../util/formatTime";
+import formatInfo from "../../util/format/questionType";
+import formatTime from "../../util/format/time";
 import BackToTop from "../../components/core/BackToTop.vue";
 import { onPageScroll } from "@dcloudio/uni-app";
 import { useQuestionStore } from "../../stores/modules/QuestionStore";

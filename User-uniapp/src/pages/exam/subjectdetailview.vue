@@ -249,7 +249,7 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import formatTime from "../../util/formatTime";
+import formatTime from "../../util/format/time";
 import {
     getExamSubjectTypes,
     getExamSubjectNetMaterialsAPI,
@@ -265,7 +265,7 @@ import {
 import ThemeLoading from "../../components/core/ThemeLoading.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import Subsection from "../../components/core/Subsection.vue";
-import checkLogin from "../../util/checkLogin";
+import checkLogin from "../../util/auth/checkLogin";
 import CustomNavBar from "../../components/common/CustomNavBar.vue";
 
 const handleNavBack = () => {

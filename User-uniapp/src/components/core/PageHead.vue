@@ -39,7 +39,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import uniSearch from "./uniSearch.vue";
-import navBarHeightUtil from "../../util/navBarHeight";
+import navBarHeightUtil from "../../util/ui/navBar";
 
 // 组件属性定义
 const props = defineProps({

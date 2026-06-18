@@ -187,8 +187,8 @@ import {
     createNotebookAPI,
     getNotebooksAPI,
 } from "../../API/Tools/NotesBookAPI";
-import formatTime from "../../util/formatTime";
-import { getRandomNotebookCardThemes } from "../../util/cardThemes";
+import formatTime from "../../util/format/time";
+import { getRandomNotebookCardThemes } from "../../util/theme/cardThemes";
 
 const { safeAreaInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,

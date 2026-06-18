@@ -1,4 +1,4 @@
-import { http } from "../../util/http";
+import { http } from "../../util/http/request";
 /**
  * @description 创建错题本
  * @param {Object} data - 创建错题本的数据对象

@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref } from "vue";
-import handleCopy from "../../../util/copy";
+import handleCopy from "../../../util/ui/copy";
 
 // 导航项数据
 const navItems = ref([

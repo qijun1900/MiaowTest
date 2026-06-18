@@ -101,9 +101,9 @@ import PageHead from "../../components/core/PageHead.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import escconfig from "../../config/esc.config";
 import { onPageScroll, onPullDownRefresh } from "@dcloudio/uni-app";
-import formatTime from "../../util/formatTime";
-import showShareMenu from "../../util/wechatShare.js";
-import checkLogin from "../../util/checkLogin.js";
+import formatTime from "../../util/format/time";
+import showShareMenu from "../../util/wechat/share";
+import checkLogin from "../../util/auth/checkLogin";
 import CustomTabBar from "../../components/core/CustomTabBar.vue";
 
 // 响应式数据

@@ -1,5 +1,5 @@
-import { http } from "../../util/http.js";
-import { cacheManager } from "../../util/cache.js";
+import { http } from "../../util/http/request";
+import { cacheManager } from "../../util/cache/cacheManager";
 
 // 缓存键
 const CACHE_KEY = "exam_subjects_cache";

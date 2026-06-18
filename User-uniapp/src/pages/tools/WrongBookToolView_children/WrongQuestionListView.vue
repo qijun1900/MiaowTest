@@ -471,7 +471,7 @@ import {
     uploadSingleFile,
     deleteRemoteImageFile,
 } from "../../../composables/useImageUpload.js";
-import formatTime from "../../../util/formatTime";
+import formatTime from "../../../util/format/time";
 
 const { navBarInfo } = useNavBarSafeArea({
     reserveMenuButtonRight: true,

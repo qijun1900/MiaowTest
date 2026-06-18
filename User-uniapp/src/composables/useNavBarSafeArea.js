@@ -1,6 +1,6 @@
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
-import navBarHeightUtil from "../util/navBarHeight";
+import navBarHeightUtil from "../util/ui/navBar";
 
 // 导航栏基础兜底值：在系统信息尚未获取前，先保证页面可渲染
 const createDefaultNavBarInfo = () => ({

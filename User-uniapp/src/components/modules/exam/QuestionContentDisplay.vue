@@ -153,7 +153,7 @@
 import { ref, reactive } from "vue";
 import ImageCropper from "../../common/ImageCropper.vue";
 import ContentRenderer from "../../common/ContentRenderer.vue";
-import { cloudFileToHttpUrl } from "../../../util/cloudFileUrl";
+import { cloudFileToHttpUrl } from "../../../util/http/cloudFile";
 
 const props = defineProps({
     // 内容对象 { text: string, images: [{url: string}] }

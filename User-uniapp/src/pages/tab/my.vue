@@ -93,9 +93,9 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { onShow, onPullDownRefresh } from "@dcloudio/uni-app";
 import tOverlay from "../../components/core/tOverlay.vue";
-import { wechatLogin } from "../../util/wechatLogin";
+import { wechatLogin } from "../../util/auth/wechatLogin";
 import myNavbar from "../../components/modules/my/myNavbar.vue";
-import showShareMenu from "../../util/wechatShare.js";
+import showShareMenu from "../../util/wechat/share";
 import { reportLoginStatus } from "../../API/My/UserLoginAPI";
 import UserAgreementTips from "../../components/modules/my/UserAgreementTips.vue";
 import UserInfoCard from "../../components/modules/my/UserInfoCard.vue";

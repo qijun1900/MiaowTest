@@ -207,7 +207,7 @@ const { navBarInfo } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
     rightPaddingExtra: 8,
 });
-import { normalizeNoteListItem } from "../../../util/noteNormalize";
+import { normalizeNoteListItem } from "../../../util/note/normalize";
 import {
   getNotebookNotesAPI,
   toggleNotebookNotePinAPI,
