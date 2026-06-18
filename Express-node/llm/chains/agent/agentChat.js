@@ -328,11 +328,12 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
   };
 
   console.log("[streamAgentChain] 调用 model.stream...");
+  // reply 提到 try 之外,abort 时 catch 才能访问到已累积的内容
+  let reply = "";
+  let tokenCount = 0;
+  let usage = null;
   try {
     const stream = await model.stream(messages, signal ? { signal } : undefined);
-    let reply = "";
-    let tokenCount = 0;
-    let usage = null;
 
     for await (const chunk of stream) {
       if (isAborted()) {
@@ -367,8 +368,8 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
   } catch (error) {
     // AbortSignal 触发的中止视作正常停止
     if (isAborted() || error?.name === "AbortError" || /aborted/i.test(error?.message || "")) {
-      console.log("[streamAgentChain] 流被中止:", error?.message);
-      return buildAbortedResult("");
+      console.log("[streamAgentChain] 流被中止, 已生成长度:", reply.length);
+      return buildAbortedResult(reply);
     }
     if (isContentModerationError(error)) {
       console.warn("[streamAgentChain] 内容审核拦截:", error.message);

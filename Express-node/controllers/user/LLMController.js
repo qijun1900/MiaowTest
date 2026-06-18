@@ -71,12 +71,16 @@ const LLMController = {
       setupSSEResponse(res);
 
       // 客户端断开连接(用户点击暂停) → 触发 AbortSignal,LangChain stream 主动结束
+      // 必须监听 res.on('close') 而非 req.on('close'):req 的 body 被 body-parser
+      // 消费完后会立刻触发 'close',误判为中止;res 的 'close' 仅在响应未结束前
+      // 连接被对端关闭时触发,语义正确。
       const ac = new AbortController();
       const onClientAbort = () => {
+        if (res.writableEnded) return; // 正常 end 后的 close 不算中止
         console.log("[SSE] 客户端断开,中止 LLM 流");
         ac.abort();
       };
-      req.on("close", onClientAbort);
+      res.on("close", onClientAbort);
 
       try {
         await LLMService.ChatWithAgentAndSaveStream({
@@ -91,7 +95,7 @@ const LLMController = {
           signal: ac.signal,
         });
       } finally {
-        req.off("close", onClientAbort);
+        res.off("close", onClientAbort);
       }
 
       if (!res.writableEnded) {
