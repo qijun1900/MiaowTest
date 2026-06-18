@@ -123,8 +123,10 @@
                 :uploading="isUploading"
                 :show-thinking-toggle="showThinkingToggle"
                 :show-attachment="true"
+                :pending="isAIStreaming"
                 @add-attachment="handleAddAttachment"
                 @submit="handleSenderSubmit"
+                @stop="handleStopStream"
                 @focus="handleSenderFocus"
                 @blur="handleSenderBlur"
             >
@@ -328,6 +330,10 @@ const conversationList = ref([]);
 const loadingConversationId = ref(null);
 let chatRequestSeq = 0;
 let msgIdSeq = 0;
+// 当前流式请求的可中止句柄 { promise, abort }
+const streamHandle = ref(null);
+// 当前流的「主动停止」标记,用于区分主动暂停和真实错误,避免回退到非流式接口
+let userAborted = false;
 const scrollToViewId = ref("");
 let _toastTimer = null;
 let _toastCallback = null;
@@ -808,6 +814,12 @@ const showActionBar = computed(() => {
     return msg && !msg.pending && !msg.typing && !msg.isStreaming;
 });
 
+// AI 正在流式生成中 → AgentSender 显示停止按钮
+const isAIStreaming = computed(() => {
+    const last = messageList.value[messageList.value.length - 1];
+    return !!(last && last.role === 'assistant' && (last.pending || last.isStreaming));
+});
+
 /**
  * 是否渲染底部滚动占位：仅在 AI 回复尚未完成时启用。
  * 这样既能保证新发送的用户消息可以被 scroll-into-view 顶到头部下方，
@@ -1104,10 +1116,12 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
         lastFlushAt = Date.now();
     };
 
+    userAborted = false;
+
     try {
         try {
             // ── 流式对话 ──
-            await chatWithAgentStream({
+            const handle = chatWithAgentStream({
                 message: text || '',
                 agentKey: currentModelKey.value,
                 conversationId: currentConversationId.value,
@@ -1131,12 +1145,23 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                 },
                 onError: () => {},
             });
+            // 暴露停止入口给 handleStopStream;同时挂上 flushBuffer 让停止时把残余 buffer 写出
+            streamHandle.value = {
+                abort: handle.abort,
+                flush: () => flushBuffer(true),
+            };
+            await handle.promise;
+            // 主动停止时把剩余 buffer 落到气泡,并复位状态
+            flushBuffer(true);
             messageList.value[aiIndex].pending = false;
             messageList.value[aiIndex].isStreaming = false;
         } catch {
-            // 流式失败：已有部分内容则保留，无内容则回退到普通接口
+            // 流式失败：已有部分内容或用户主动停止 → 保留;无内容且非主动停止才回退到普通接口
             flushBuffer(true);
-            if (!messageList.value[aiIndex].content) {
+            if (userAborted) {
+                messageList.value[aiIndex].pending = false;
+                messageList.value[aiIndex].isStreaming = false;
+            } else if (!messageList.value[aiIndex].content) {
                 const response = await chatWithAgent({
                     message: text || '',
                     agentKey: currentModelKey.value,
@@ -1162,7 +1187,31 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
         messageList.value[aiIndex].isStreaming = false;
         messageList.value[aiIndex].content = '请求失败，请稍后重试。';
         console.error("对话请求失败:", error.message);
+    } finally {
+        streamHandle.value = null;
     }
+};
+
+/**
+ * 用户点击 Sender 的停止按钮:
+ * 1. 标记 userAborted,catch 分支据此跳过非流式回退;
+ * 2. 调用传输层 abort(),触发后端 AbortSignal,LLM 立刻停止生成;
+ * 3. flush 剩余 buffer 让最后几个 token 也写进气泡;
+ * 4. 状态复位 + 轻震动反馈。
+ */
+const handleStopStream = () => {
+    const handle = streamHandle.value;
+    if (!handle) return;
+    userAborted = true;
+    try { handle.abort?.(); } catch (err) { console.warn("中止流失败:", err?.message); }
+    try { handle.flush?.(); } catch (err) { console.warn("刷新流失败:", err?.message); }
+    // 兜底:把最后一条 AI 消息的流式状态复位,确保 ActionBar 立刻出现
+    const last = messageList.value[messageList.value.length - 1];
+    if (last && last.role === 'assistant') {
+        last.pending = false;
+        last.isStreaming = false;
+    }
+    triggerVibrate();
 };
 </script>
 

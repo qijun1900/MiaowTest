@@ -9,8 +9,8 @@
  *   - util/http.js          — uni-app 统一 HTTP 封装
  */
 
-import { http } from "../../util/http";
-import { streamRequest } from "../../util/streamTransport";
+import { http } from "../../util/http/request";
+import { streamRequest } from "../../util/stream/transport";
 
 // ─── 普通 API ────────────────────────────────────────────────────────────────
 
@@ -61,7 +61,7 @@ export const toggleFavoriteConversation = (conversationId) =>
  * @param {Function} params.onMessage    - 收到 token 片段
  * @param {Function} params.onDone       - 流完成
  * @param {Function} params.onError      - 发生错误
- * @returns {Promise<void>}
+ * @returns {{ promise: Promise<void>, abort: () => void }}
  */
 export const chatWithAgentStream = ({
     message,

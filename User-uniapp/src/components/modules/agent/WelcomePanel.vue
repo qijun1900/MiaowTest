@@ -41,7 +41,7 @@
 <script setup>
 import { computed } from "vue";
 import { UserInfoStore } from "@/stores/modules/UserinfoStore";
-import { getGreetingInfo } from "@/util/greet";
+import { getGreetingInfo } from "@/util/format/greet";
 
 const userInfoStore = UserInfoStore();
 const isLoggedIn = computed(() => userInfoStore.isLoggedIn);

@@ -232,7 +232,8 @@ const LLMService = {
     images,
     files,
     onStart,
-    onToken
+    onToken,
+    signal,
   }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
@@ -246,7 +247,7 @@ const LLMService = {
 
     const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images, files);
 
-    const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, { onToken });
+    const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, { onToken, signal });
     const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
 
     maybeGenerateTitle(isNew, userMessage || "[附件消息]", replyText, convId, agentConfig.defaultModel);

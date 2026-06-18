@@ -1,5 +1,5 @@
 import { ref, computed } from "vue";
-import { httpUpload, http } from "../util/http";
+import { httpUpload, http } from "../util/http/index";
 import escconfig from "../config/esc.config";
 
 const DEFAULT_UPLOAD_URL = "/uniappAPI/upload/image";

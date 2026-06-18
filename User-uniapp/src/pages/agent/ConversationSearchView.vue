@@ -134,7 +134,7 @@
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { fetchConversationList, searchConversations, deleteConversation } from "../../API/LLM/AgentAPI.js";
-import formatTimeUtil from "../../util/formatTime.js";
+import formatTimeUtil from "../../util/format/time";
 
 // --- 状态栏高度适配 ---
 const systemInfo = uni.getSystemInfoSync();

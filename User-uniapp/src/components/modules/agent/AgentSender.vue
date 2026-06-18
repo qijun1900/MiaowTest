@@ -35,6 +35,14 @@
             </view>
 
             <view
+                v-if="pending"
+                class="send-btn stop-btn"
+                @click="handleStop"
+            >
+                <view class="stop-square"></view>
+            </view>
+            <view
+                v-else
                 class="send-btn"
                 :class="{ 'send-hidden': !canSubmit }"
                 @click="canSubmit && submitCurrent()"
@@ -82,6 +90,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    pending: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits([
@@ -91,6 +103,7 @@ const emit = defineEmits([
     "add-attachment",
     "focus",
     "blur",
+    "stop",
 ]);
 
 const hasText = computed(() => (props.modelValue || "").trim().length > 0);
@@ -127,6 +140,10 @@ const toggleThinking = () => {
 
 const handleAddAttachment = () => {
     emit("add-attachment");
+};
+
+const handleStop = () => {
+    emit("stop");
 };
 </script>
 
@@ -224,6 +241,18 @@ const handleAddAttachment = () => {
 .send-btn {
     background: var(--app-brand);
     box-shadow: 0 8rpx 18rpx rgba(47, 107, 255, 0.26);
+}
+
+.stop-btn {
+    background: #1f2937;
+    box-shadow: 0 8rpx 18rpx rgba(17, 24, 39, 0.26);
+}
+
+.stop-square {
+    width: 22rpx;
+    height: 22rpx;
+    border-radius: 4rpx;
+    background: #ffffff;
 }
 
 .send-hidden {

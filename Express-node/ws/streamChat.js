@@ -62,12 +62,23 @@ function setupStreamChatWS(server) {
       return;
     }
 
+    // 当前流的 AbortController,用于支持客户端发 type:"stop" 中止
+    let currentAC = null;
+
     ws.on("message", async (raw) => {
       let msg;
       try {
         msg = JSON.parse(raw.toString());
       } catch {
         ws.send(JSON.stringify({ event: "error", data: { message: "消息格式错误" } }));
+        return;
+      }
+
+      if (msg.type === "stop") {
+        if (currentAC) {
+          console.log("[WS] 收到 stop, 中止当前流");
+          currentAC.abort();
+        }
         return;
       }
 
@@ -96,6 +107,7 @@ function setupStreamChatWS(server) {
         }
       };
 
+      currentAC = new AbortController();
       try {
         await LLMService.ChatWithAgentAndSaveStream({
           uid,
@@ -106,16 +118,24 @@ function setupStreamChatWS(server) {
           files,
           onStart: (payload) => sendEvent("start", payload),
           onToken: (content) => sendEvent("message", { content }),
+          signal: currentAC.signal,
         });
-        sendEvent("done", { done: true });
+        sendEvent("done", { done: true, aborted: currentAC.signal.aborted });
       } catch (error) {
         console.error("[WS] 流式处理错误:", error.message);
         sendEvent("error", { message: error.message || "流式处理失败" });
+      } finally {
+        currentAC = null;
       }
+    });
+
+    ws.on("close", () => {
+      if (currentAC) currentAC.abort();
     });
 
     ws.on("error", (err) => {
       console.error("[WS] 连接错误:", err.message);
+      if (currentAC) currentAC.abort();
     });
   });
 

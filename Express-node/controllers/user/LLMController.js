@@ -70,19 +70,34 @@ const LLMController = {
       console.log("[SSE] ChatStream 收到请求, uid:", uid, "agentKey:", agentKey);
       setupSSEResponse(res);
 
-      await LLMService.ChatWithAgentAndSaveStream({
-        uid,
-        message,
-        agentKey,
-        conversationId,
-        images,
-        files,
-        onStart: (payload) => sendEvent("start", payload),
-        onToken: (content) => sendEvent("message", { content }),
-      });
+      // 客户端断开连接(用户点击暂停) → 触发 AbortSignal,LangChain stream 主动结束
+      const ac = new AbortController();
+      const onClientAbort = () => {
+        console.log("[SSE] 客户端断开,中止 LLM 流");
+        ac.abort();
+      };
+      req.on("close", onClientAbort);
 
-      sendEvent("done", { done: true });
-      res.end();
+      try {
+        await LLMService.ChatWithAgentAndSaveStream({
+          uid,
+          message,
+          agentKey,
+          conversationId,
+          images,
+          files,
+          onStart: (payload) => sendEvent("start", payload),
+          onToken: (content) => sendEvent("message", { content }),
+          signal: ac.signal,
+        });
+      } finally {
+        req.off("close", onClientAbort);
+      }
+
+      if (!res.writableEnded) {
+        sendEvent("done", { done: true, aborted: ac.signal.aborted });
+        res.end();
+      }
     } catch (error) {
       console.error("[SSE] ChatStream 错误:", error.message);
       if (!res.headersSent) {

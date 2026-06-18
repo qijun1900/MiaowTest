@@ -19,7 +19,7 @@
 import { ref, computed } from "vue";
 import XeUpload from "../../../uni_modules/xe-upload/components/xe-upload/xe-upload.vue";
 import TAttachments from "@tdesign/uniapp-chat/attachments/attachments.vue";
-import { cloudFileToHttpUrl } from "../../../util/cloudFileUrl";
+import { cloudFileToHttpUrl } from "../../../util/http/cloudFile";
 
 const props = defineProps({
     mode: {

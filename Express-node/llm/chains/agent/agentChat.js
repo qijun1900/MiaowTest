@@ -314,14 +314,31 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
         new HumanMessage(input || "你好"),
       ];
 
+  const signal = options.signal;
+  const isAborted = () => !!signal?.aborted;
+  const buildAbortedResult = (reply) => {
+    const usage = {
+      promptTokens: estimatePromptTokens(sysPrompt, history, input),
+      completionTokens: estimateTokens(reply),
+      totalTokens: 0,
+      estimated: true,
+    };
+    usage.totalTokens = usage.promptTokens + usage.completionTokens;
+    return { reply, modelName, usage, aborted: true };
+  };
+
   console.log("[streamAgentChain] 调用 model.stream...");
   try {
-    const stream = await model.stream(messages);
+    const stream = await model.stream(messages, signal ? { signal } : undefined);
     let reply = "";
     let tokenCount = 0;
     let usage = null;
 
     for await (const chunk of stream) {
+      if (isAborted()) {
+        console.log("[streamAgentChain] 用户中止, 已生成长度:", reply.length);
+        break;
+      }
       const text = typeof chunk?.content === "string" ? chunk.content : "";
       if (text) {
         reply += text;
@@ -332,6 +349,8 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
       const chunkUsage = extractUsage(chunk);
       if (chunkUsage) usage = chunkUsage;
     }
+
+    if (isAborted()) return buildAbortedResult(reply);
 
     if (!usage) {
       usage = {
@@ -346,6 +365,11 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
     console.log("[streamAgentChain] 完成, token数:", tokenCount, "总长度:", reply.length, "usage:", usage);
     return { reply, modelName, usage };
   } catch (error) {
+    // AbortSignal 触发的中止视作正常停止
+    if (isAborted() || error?.name === "AbortError" || /aborted/i.test(error?.message || "")) {
+      console.log("[streamAgentChain] 流被中止:", error?.message);
+      return buildAbortedResult("");
+    }
     if (isContentModerationError(error)) {
       console.warn("[streamAgentChain] 内容审核拦截:", error.message);
       options.onToken?.(CONTENT_MODERATION_REPLY);
