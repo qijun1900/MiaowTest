@@ -49,6 +49,10 @@
 
                 <template v-else>
                     <template v-if="shouldRenderMarkdown">
+                        <!--
+                            按段落分块挂载：每个 committed 段落是一个独立 mp-html 实例。
+                            :key="idx" 让 Vue 在新增块时只 mount 新实例、复用旧实例（content 没变 → 不重解析 → 不闪）。
+                        -->
                         <MpHtml
                             v-for="(html, idx) in renderBlocks.committed"
                             :key="idx"
@@ -57,15 +61,21 @@
                             :markdown="true"
                             :tag-style="htmlTagStyle"
                         />
+                        <!-- 流式中还未"收尾"（未出现 \n\n）的段落，用原生 <text> 平滑增量，避免 rich-text 重解析闪烁。 -->
                         <text v-if="renderBlocks.tail" class="bubble-text bubble-text-tail">{{ renderBlocks.tail }}</text>
                     </template>
+                    <!-- 非 Markdown 模式 / 打字动画期间，直接用纯文本渲染。 -->
                     <text v-else class="bubble-text">{{ renderedContent }}</text>
+                    <!-- 打字光标（如 "|"），渲染在 mp-html 之外，Markdown 模式下也安全。 -->
                     <text v-if="showTypingSuffix" class="bubble-typing-suffix">{{ typingOptions.suffix }}</text>
                 </template>
             </view>
         </view>
 
-        <!-- 长按下拉菜单（仅右侧用户消息） -->
+        <!--
+            长按下拉菜单（仅右侧用户消息）。
+            mask 用 @touchmove.stop.prevent 阻止背后页面滚动，避免用户在菜单上滑动时把对话列表一起带走。
+        -->
         <view v-if="showActionMenu" class="bubble-action-mask" @click.stop="closeActionMenu" @touchmove.stop.prevent></view>
         <view
             v-if="showActionMenu"
@@ -83,7 +93,11 @@
             </view>
         </view>
 
-        <!-- 选择文本全屏视图 -->
+        <!--
+            选择文本全屏视图。
+            小程序 <text selectable> 在普通气泡里复制体验差（容易选到时间戳/头像），
+            打开独立卡片让用户在大字体、纯文本里精确选取，并可一键全部复制。
+        -->
         <view v-if="showSelectView" class="bubble-select-overlay" @click.stop="closeSelectView">
             <view class="bubble-select-card" @click.stop @touchmove.stop>
                 <view class="bubble-select-header">
@@ -400,6 +414,14 @@ onBeforeUnmount(clearTypingTimer);
 .bubble-row-end   .bubble-stack { align-items: flex-end; }
 .bubble-row-start .bubble-stack { align-items: flex-start; }
 
+/*
+ * Claude 风格字体栈：
+ *   iOS / macOS → SF Pro（-apple-system）+ PingFang SC
+ *   Android     → Roboto + Noto Sans CJK SC
+ *   Windows     → Segoe UI + 微软雅黑
+ *   Söhne / system-ui 留给 Web/Mac 上的首选项。
+ * APP 端会被下面 #ifdef APP-PLUS 块覆盖成 Inter + Noto Sans SC。
+ */
 .bubble-box {
     box-sizing: border-box;
     padding: 18rpx 26rpx;
@@ -503,6 +525,11 @@ onBeforeUnmount(clearTypingTimer);
 
 .bubble-text { white-space: pre-wrap; }
 
+/*
+ * 流式 tail 文本：还没被"提交"为 mp-html 块的最后一段。
+ * margin-top + 一致的字号/行高，让它在视觉上接续上一段 mp-html 段落（看起来像新一段正文），
+ * 等下次出现 \n\n 被切到 committed 后，新挂载的 mp-html 块和这段 tail 的位置/高度基本对齐，肉眼不易察觉切换。
+ */
 .bubble-text-tail {
     display: block;
     margin-top: 8rpx;
@@ -522,6 +549,10 @@ onBeforeUnmount(clearTypingTimer);
     display: block;
 }
 
+/*
+ * mp-html 渲染出来的 <p> / <pre> 等会自带 margin-top / margin-bottom；按块挂载后每块都是独立 mp-html，
+ * 上下都加 margin 会让块之间的间距变成原来的两倍。强制清掉首尾子元素的边距，让块的拼接看起来像一整段。
+ */
 :deep(.bubble-mp-html > view > view:first-child),
 :deep(.bubble-mp-html > view > text:first-child) { margin-top: 0 !important; }
 
@@ -557,6 +588,12 @@ onBeforeUnmount(clearTypingTimer);
     40%           { opacity: 1;    transform: translateY(-6rpx); }
 }
 
+/*
+ * 多设备字号微调：rpx 在小程序里已按 750 基线自动缩放，下面媒体查询主要服务 H5 / App 端。
+ *   < 360px：老安卓机，缩字号、压紧 padding。
+ *   ≥ 768px：平板，回到 px 单位避免字过大。
+ *   ≥ 1024px：桌面/大平板，再放大半码增加可读性。
+ */
 @media screen and (max-width: 360px) {
     .bubble-box, .bubble-mp-html {
         font-size: calc(32rpx * var(--app-font-scale, 1));
@@ -580,6 +617,11 @@ onBeforeUnmount(clearTypingTimer);
     }
 }
 
+/*
+ * APP 端通过 @font-face + uni.loadFontFace 注入了 Inter + Noto Sans SC，
+ * 让 iOS / Android 看到统一的 Claude 风格字体；这里把字体栈优先级覆盖到注入的字体上，
+ * 系统字体只作为缺字回退。
+ */
 /* #ifdef APP-PLUS */
 .bubble-box, .bubble-mp-html {
     font-family: "Inter", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
