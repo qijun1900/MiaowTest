@@ -94,9 +94,10 @@
                 >
                     <template v-if="shouldRenderMarkdown">
                         <MpHtml
-                            v-if="markdownCommittedHtml"
+                            v-for="(html, idx) in committedBlocks"
+                            :key="idx"
                             class="bubble-mp-html"
-                            :content="markdownCommittedHtml"
+                            :content="html"
                             :markdown="isMarkdown"
                             :tag-style="htmlTagStyle"
                             :selectable="selectable"
@@ -535,13 +536,43 @@ const streamingSplit = computed(() => {
     };
 });
 
-const markdownCommittedHtml = computed(() => {
-    const committed = streamingSplit.value.committed;
-    if (!committed) return '';
-    // 同 renderHtml 的 LaTeX 兼容处理（\(..\) / \[..\] → $..$ / $$..$$）
-    return committed
-        .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
-        .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+const transformLatex = (s) =>
+    s.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
+     .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+
+// 将已稳定的内容按段落边界 \n\n 切成块（代码块 ``` 之间的 \n\n 不切，保持代码块完整）。
+// 每个块用作独立 mp-html 的 content；块一旦生成就再也不会变（committed 是单调追加的前缀），
+// Vue 通过稳定 key 复用旧 mp-html 实例 → 旧块永远不重解析 → 永不闪烁。
+const splitIntoBlocks = (text) => {
+    if (!text) return [];
+    const blocks = [];
+    let cursor = 0;
+    let inFence = false;
+    const len = text.length;
+    let i = 0;
+    while (i < len) {
+        const atLineStart = i === 0 || text[i - 1] === '\n';
+        if (atLineStart && text.substr(i, 3) === '```') {
+            inFence = !inFence;
+            i += 3;
+            continue;
+        }
+        if (!inFence && text[i] === '\n' && text[i + 1] === '\n') {
+            let j = i + 2;
+            while (j < len && text[j] === '\n') j++;
+            blocks.push(text.slice(cursor, j));
+            cursor = j;
+            i = j;
+            continue;
+        }
+        i++;
+    }
+    if (cursor < len) blocks.push(text.slice(cursor));
+    return blocks;
+};
+
+const committedBlocks = computed(() => {
+    return splitIntoBlocks(streamingSplit.value.committed).map(transformLatex);
 });
 
 const streamingTail = computed(() => streamingSplit.value.tail);
