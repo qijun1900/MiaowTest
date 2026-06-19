@@ -92,22 +92,25 @@
                     :is-typing="isTyping"
                     :progress="progress"
                 >
-                    <MpHtml
-                        v-if="shouldRenderMarkdown"
-                        class="bubble-mp-html"
-                        :content="renderHtml"
-                        :markdown="isMarkdown"
-                        :tag-style="htmlTagStyle"
-                        :selectable="selectable"
-                        :preview-img="previewImg"
-                        :show-img-menu="showImgMenu"
-                        :scroll-table="scrollTable"
-                        @load="handleHtmlLoad"
-                        @ready="handleHtmlReady"
-                        @imgtap="handleHtmlImgTap"
-                        @linktap="handleHtmlLinkTap"
-                        @error="handleHtmlError"
-                    />
+                    <template v-if="shouldRenderMarkdown">
+                        <MpHtml
+                            v-if="markdownCommittedHtml"
+                            class="bubble-mp-html"
+                            :content="markdownCommittedHtml"
+                            :markdown="isMarkdown"
+                            :tag-style="htmlTagStyle"
+                            :selectable="selectable"
+                            :preview-img="previewImg"
+                            :show-img-menu="showImgMenu"
+                            :scroll-table="scrollTable"
+                            @load="handleHtmlLoad"
+                            @ready="handleHtmlReady"
+                            @imgtap="handleHtmlImgTap"
+                            @linktap="handleHtmlLinkTap"
+                            @error="handleHtmlError"
+                        />
+                        <text v-if="streamingTail" class="bubble-text bubble-text-tail">{{ streamingTail }}</text>
+                    </template>
                     <text v-else class="bubble-text">{{ renderedContent }}</text>
                     <text v-if="showTypingSuffix" class="bubble-typing-suffix">
                         {{ typingOptions.suffix }}
@@ -275,6 +278,13 @@ const props = defineProps({
     files: {
         type: Array,
         default: () => [],
+    },
+    // 是否正处于流式输出过程。开启时强制走纯文本通道（不渲染 mp-html），
+    // 避免 mp-html 每个 chunk 都重新解析导致的闪烁/短暂空白。
+    // 流式结束（streaming 翻回 false）后再切回 mp-html 做最终的 Markdown 渲染，整个过程只切换一次。
+    streaming: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -495,6 +505,47 @@ const shouldRenderMarkdown = computed(() => {
     return props.isMarkdown && !isTyping.value;
 });
 
+// 流式渲染拆分：把 renderedContent 切成 [committed, tail]
+// committed 喂给 mp-html（只在段落边界 \n\n 或代码块闭合后才推进，避免高频重解析闪烁）
+// tail 用 <text> 平滑增量显示，等待下一次"安全提交"
+const streamingSplit = computed(() => {
+    const text = renderedContent.value || '';
+    // 非流式 / 非 Markdown / 空内容 → 整段都交给 mp-html
+    if (!props.streaming || !props.isMarkdown || !text) {
+        return { committed: text, tail: '' };
+    }
+    // 检测未闭合的 ``` 代码块：代码块内部任何 \n\n 都不能算提交点
+    const fenceCount = (text.match(/```/g) || []).length;
+    const hasOpenFence = fenceCount % 2 === 1;
+
+    let safeEnd = 0;
+    if (hasOpenFence) {
+        const openIdx = text.lastIndexOf('```');
+        const before = text.slice(0, openIdx);
+        const lastBreak = before.lastIndexOf('\n\n');
+        safeEnd = lastBreak >= 0 ? lastBreak + 2 : 0;
+    } else {
+        const lastBreak = text.lastIndexOf('\n\n');
+        safeEnd = lastBreak >= 0 ? lastBreak + 2 : 0;
+    }
+
+    return {
+        committed: text.slice(0, safeEnd),
+        tail: text.slice(safeEnd),
+    };
+});
+
+const markdownCommittedHtml = computed(() => {
+    const committed = streamingSplit.value.committed;
+    if (!committed) return '';
+    // 同 renderHtml 的 LaTeX 兼容处理（\(..\) / \[..\] → $..$ / $$..$$）
+    return committed
+        .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
+        .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+});
+
+const streamingTail = computed(() => streamingSplit.value.tail);
+
 const showTypingSuffix = computed(
     // The suffix is rendered outside mp-html, so it is safe in Markdown mode too.
     () => isTyping.value && typingOptions.value.suffix,
@@ -551,10 +602,17 @@ const startTyping = () => {
 
     if (!typingOptions.value.enabled || props.loading) {
         // loading 状态下不启动打字，避免加载动画和内容逐字展示同时出现。
+        // 仅在值确实变化时写入，避免流式高频 chunk 触发无意义的 reactivity 重算 / mp-html 重渲。
         cursor = props.content.length;
-        renderedContent.value = props.content;
-        isTyping.value = false;
-        progress.value = 100;
+        if (renderedContent.value !== props.content) {
+            renderedContent.value = props.content;
+        }
+        if (isTyping.value) {
+            isTyping.value = false;
+        }
+        if (progress.value !== 100) {
+            progress.value = 100;
+        }
         return;
     }
 
@@ -627,14 +685,14 @@ const handleHtmlError = (event) => {
 };
 
 watch(
-    () => [props.content, props.typing, props.loading],
+    () => [props.content, props.typing, props.loading, props.streaming],
     () => {
         if (!alive.value) {
             alive.value = true;
         }
         startTyping();
     },
-    { immediate: true, deep: true },
+    { immediate: true },
 );
 
 onBeforeUnmount(() => {
@@ -871,6 +929,19 @@ function escapeHtml(value) {
 
 .bubble-text {
     white-space: pre-wrap;
+}
+
+/* 流式尾巴：尚未提交给 mp-html 的增量片段，
+ * 视觉上接续在已渲染段落之后，保持与正文一致的字号/行高，
+ * 段落级 margin-top 让它看起来像新段落，与最终 mp-html 渲染衔接自然。
+ */
+.bubble-text-tail {
+    display: block;
+    margin-top: 8rpx;
+    font-family: inherit;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
+    line-height: 1.72;
+    color: var(--app-text-primary);
 }
 
 .bubble-mp-html {

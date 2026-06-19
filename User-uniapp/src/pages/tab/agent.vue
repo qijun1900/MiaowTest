@@ -72,6 +72,7 @@
                             :is-markdown="msg.role === 'assistant'"
                             :no-style="msg.role === 'assistant'"
                             :loading="msg.pending"
+                            :streaming="msg.isStreaming"
                             :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
                             @finish="handleBubbleFinish(index)"
                         >
