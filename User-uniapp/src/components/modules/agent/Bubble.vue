@@ -1,43 +1,9 @@
 <template>
     <view
-        v-if="alive"
         class="bubble-row"
-        :class="[
-            placement === 'end' ? 'bubble-row-end' : 'bubble-row-start',
-            loading ? 'bubble-row-loading' : '',
-        ]"
+        :class="placement === 'end' ? 'bubble-row-end' : 'bubble-row-start'"
     >
-        <view
-            v-if="shouldShowAvatar"
-            class="bubble-avatar"
-            :class="[
-                avatarShape === 'square' ? 'bubble-avatar-square' : 'bubble-avatar-circle',
-            ]"
-            :style="avatarStyle"
-        >
-            <slot name="avatar">
-                <image
-                    v-if="avatar"
-                    class="bubble-avatar-image"
-                    :src="avatar"
-                    :srcset="avatarSrcSet"
-                    :alt="avatarAlt"
-                    :style="{ objectFit: avatarFit }"
-                    mode="aspectFill"
-                    @error="handleAvatarError"
-                />
-                <uni-icons
-                    v-else
-                    :type="avatarIcon || 'person-filled'"
-                    :size="avatarIconSize"
-                    color="#8b93a7"
-                />
-            </slot>
-        </view>
-
         <view class="bubble-stack" :style="{ maxWidth }">
-            <slot name="header"></slot>
-
             <view v-if="displayImages.length > 0" class="bubble-images">
                 <image
                     v-for="(img, idx) in displayImages"
@@ -68,8 +34,6 @@
             <view
                 class="bubble-box"
                 :class="[
-                    `bubble-${bubbleVariant}`,
-                    shape ? `bubble-shape-${shape}` : '',
                     noStyle ? 'bubble-no-style' : '',
                     placement === 'end' ? 'bubble-box-end' : 'bubble-box-start',
                 ]"
@@ -83,51 +47,29 @@
                     </view>
                 </slot>
 
-                <slot
-                    v-else
-                    name="content"
-                    :content="renderedContent"
-                    :html="renderHtml"
-                    :is-markdown="isMarkdown"
-                    :is-typing="isTyping"
-                    :progress="progress"
-                >
+                <template v-else>
                     <template v-if="shouldRenderMarkdown">
                         <MpHtml
-                            v-for="(html, idx) in committedBlocks"
+                            v-for="(html, idx) in renderBlocks.committed"
                             :key="idx"
                             class="bubble-mp-html"
                             :content="html"
-                            :markdown="isMarkdown"
+                            :markdown="true"
                             :tag-style="htmlTagStyle"
-                            :selectable="selectable"
-                            :preview-img="previewImg"
-                            :show-img-menu="showImgMenu"
-                            :scroll-table="scrollTable"
-                            @load="handleHtmlLoad"
-                            @ready="handleHtmlReady"
-                            @imgtap="handleHtmlImgTap"
-                            @linktap="handleHtmlLinkTap"
-                            @error="handleHtmlError"
                         />
-                        <text v-if="streamingTail" class="bubble-text bubble-text-tail">{{ streamingTail }}</text>
+                        <text v-if="renderBlocks.tail" class="bubble-text bubble-text-tail">{{ renderBlocks.tail }}</text>
                     </template>
                     <text v-else class="bubble-text">{{ renderedContent }}</text>
-                    <text v-if="showTypingSuffix" class="bubble-typing-suffix">
-                        {{ typingOptions.suffix }}
-                    </text>
-                </slot>
+                    <text v-if="showTypingSuffix" class="bubble-typing-suffix">{{ typingOptions.suffix }}</text>
+                </template>
             </view>
-
-            <slot name="footer"></slot>
         </view>
 
-        <!-- 长按下拉菜单 -->
+        <!-- 长按下拉菜单（仅右侧用户消息） -->
         <view v-if="showActionMenu" class="bubble-action-mask" @click.stop="closeActionMenu" @touchmove.stop.prevent></view>
         <view
             v-if="showActionMenu"
-            class="bubble-action-dropdown"
-            :class="placement === 'end' ? 'bubble-action-dropdown-end' : 'bubble-action-dropdown-start'"
+            class="bubble-action-dropdown bubble-action-dropdown-end"
             @click.stop
         >
             <view class="bubble-action-item" @click="handleActionCopy">
@@ -164,182 +106,66 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, ref, useSlots, watch } from "vue";
+/**
+ * Bubble —— Agent 对话气泡。
+ *
+ * 核心难点：mp-html / 小程序 rich-text 在 content prop 变化时会清空并重新解析整段
+ * 富文本节点，高频更新（流式 chunk）下会出现"闪一下、内容消失再出现"。
+ *
+ * 解决方案 —— 按段落分块挂载（committed + tail）：
+ *   committed[] —— 已稳定的段落，每段独立喂给一个 mp-html 实例。
+ *                  字符串确定后再也不会变 → Vue 复用旧实例 → 永不重解析 → 不闪烁。
+ *   tail        —— 流式中正在生成的最后一段，用原生 <text> 平滑增量显示；
+ *                  等下一次出现段落边界 \n\n 再"提交"为新的 mp-html 块。
+ */
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import MpHtml from "../../../uni_modules/mp-html/components/mp-html/mp-html.vue";
 
 const props = defineProps({
     // 气泡正文。typing 开启时不会一次性展示，而是按 step 逐步写入 renderedContent。
-    content: {
-        type: String,
-        default: "",
-    },
-    // 气泡位置：start 表示左侧消息，end 表示右侧消息，样式和头像间距会随之反转。
-    placement: {
-        type: String,
-        default: "start",
-    },
-    // 头像图片地址；优先级高于 avatarIcon。为空时可通过 #avatar 插槽完全自定义头像。
-    avatar: {
-        type: String,
-        default: "",
-    },
-    // 是否展示头像
-    showAvatar: {
-        type: Boolean,
-        default: true,
-    },
-    // 加载态用于 AI 正在思考/请求中，此时展示 loading 插槽或默认三点动画。
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    // 气泡形状：round 为整体圆角，corner 为类似聊天气泡的一角收紧。
-    shape: {
-        type: String,
-        default: null,
-    },
-    // 气泡视觉变体：filled / borderless / outlined / shadow。
-    variant: {
-        type: String,
-        default: "filled",
-    },
-    // 去除组件内置 padding、背景、边框和阴影，方便完全由插槽内容控制样式。
-    noStyle: {
-        type: Boolean,
-        default: false,
-    },
-    // 是否将 content 作为 Markdown 解析渲染，支持常见的 Markdown 语法和 mp-html 插件（highlight、latex 等）。
-    isMarkdown: {
-        type: Boolean,
-        default: false,
-    },
-    // 打字效果配置。true 使用默认速度；对象支持 step--步数 、interval -- 间隔、suffix--后缀修饰。
-    typing: {
-        type: [Boolean, Object],
-        default: false,
-    },
-    // 气泡最大宽度，传入 rpx、px、%、vw 等 uni-app 支持的尺寸字符串。
-    maxWidth: {
-        type: String,
-        default: "500px",
-    },
-    // 以下 avatar-* 属性尽量对齐常见 Bubble API，方便后续迁移或替换组件。
-    avatarSize: {
-        type: String,
-        default: "",
-    },
-    avatarGap: { // 头像与气泡之间的间距，传入尺寸字符串，默认为 12px。
-        type: String,
-        default: "12px",
-    },
-    avatarShape: { // 头像形状，circle（默认）或 square。
-        type: String,
-        default: "",
-    },
-    avatarIcon: { // 头像占位图标，仅在 avatar 为空时显示，传入 uni-icons 的 type 字符串。
-        type: String,
-        default: "",
-    },
-    avatarSrcSet: { // 头像多分辨率资源列表，格式同 img 标签的 srcset 属性，优先级低于 avatar。
-        type: String,
-        default: "",
-    },
-    avatarAlt: { // 头像替代文本，传入字符串会设置在 img 标签的 alt 属性上，优先级低于 avatar。
-        type: String,
-        default: "",
-    },
-    avatarFit: { // 头像图片的 object-fit 样式，传入 cover、contain 等字符串，默认为 cover。
-        type: String,
-        default: "cover",
-    },
-    selectable: { // 是否允许用户选择气泡内的文本，传入布尔值或字符串 "true"/"false"，默认为 true。
-        type: [Boolean, String],
-        default: true,
-    },
-    previewImg: { // 是否开启图片预览功能，传入布尔值或字符串 "true"/"false"，默认为 true。
-        type: [Boolean, String],
-        default: true,
-    },
-    showImgMenu: { // 是否在图片上开启长按菜单，传入布尔值或字符串 "true"/"false"，默认为 true。
-        type: [Boolean, String],
-        default: true,
-    },
-    scrollTable: { // 是否允许表格内容横向滚动，传入布尔值或字符串 "true"/"false"，默认为 true。
-        type: [Boolean, String],
-        default: true,
-    },
-    tagStyle: { // mp-html 的 tag-style 配置项，传入对象覆盖默认样式，适用于 isMarkdown 模式。
-        type: Object,
-        default: () => ({}),
-    },
-    images: {
-        type: Array,
-        default: () => [],
-    },
-    files: {
-        type: Array,
-        default: () => [],
-    },
-    // 是否正处于流式输出过程。开启时强制走纯文本通道（不渲染 mp-html），
-    // 避免 mp-html 每个 chunk 都重新解析导致的闪烁/短暂空白。
-    // 流式结束（streaming 翻回 false）后再切回 mp-html 做最终的 Markdown 渲染，整个过程只切换一次。
-    streaming: {
-        type: Boolean,
-        default: false,
-    },
+    content: { type: String, default: "" },
+    // start 左侧（AI 消息），end 右侧（用户消息）；样式和长按菜单的方向都会反转。
+    placement: { type: String, default: "start" },
+    // AI 思考态：true 时展示 loading 插槽，屏蔽正文渲染，避免 loading 和打字同时出现。
+    loading: { type: Boolean, default: false },
+    // 去掉气泡的内置 padding / 背景 / 边框 / 圆角；AI 消息用裸文字风格时开启。
+    noStyle: { type: Boolean, default: false },
+    // 是否按 Markdown 解析。开启后正文走 mp-html（committed 块）+ <text>（tail）渲染。
+    isMarkdown: { type: Boolean, default: false },
+    // 打字效果：true 走默认速度；对象支持 { step, interval, suffix } 覆盖。
+    // 仅用于非流式回退路径——流式过程不走 typing，所有内容都通过 streaming 通道显示。
+    typing: { type: [Boolean, Object], default: false },
+    // 气泡最大宽度，支持 rpx / px / % / vw 等 uni-app 兼容的尺寸字符串。
+    maxWidth: { type: String, default: "500px" },
+    images: { type: Array, default: () => [] },
+    files: { type: Array, default: () => [] },
+    // 是否处于流式输出中。开启后启用"committed 块 + tail 文本"的分批挂载策略，避免 mp-html 重解析闪烁。
+    streaming: { type: Boolean, default: false },
 });
 
-const emit = defineEmits([
-    // 打字开始。参数是当前 ref 状态快照：renderedContent / isTyping / progress。
-    "start",
-    // 打字完成。typing 为 false 时不会触发，只有真实打字流程结束时触发。
-    "finish",
-    // 每次写入字符后触发，可用于自动滚动到底部或同步外部进度条。
-    "writing",
-    // 头像图片加载失败时触发，父组件可切换默认头像或上报资源错误。
-    "avatarError",
-    // 以下事件透传自 mp-html，只有 isMarkdown 开启并实际渲染 mp-html 时有意义。
-    "htmlLoad",
-    "htmlReady",
-    "htmlImgTap",
-    "htmlLinkTap",
-    "htmlError",
-]);
+// 仅在打字动画走完时触发；流式结束不会触发。父组件用它把 msg.typing 标记复位。
+const emit = defineEmits(["finish"]);
 
-const slots = useSlots();
-
+// ───────── 长按菜单 / 选择文本 ─────────
+// 仅右侧用户消息：AI 消息走外部 AgentActionBar 提供复制/再生成等动作，避免和长按菜单功能重叠。
 const showActionMenu = ref(false);
 const showSelectView = ref(false);
 
 const handleLongPress = () => {
-    if (props.loading) return;
-    if (!props.content) return;
-    if (props.placement !== 'end') return;
+    // loading 中或正文为空时长按无意义；left（AI 侧）走 ActionBar，不在这里弹菜单。
+    if (props.loading || !props.content || props.placement !== 'end') return;
     showActionMenu.value = true;
 };
-
-const closeActionMenu = () => {
-    showActionMenu.value = false;
-};
-
-const closeSelectView = () => {
-    showSelectView.value = false;
-};
+const closeActionMenu = () => { showActionMenu.value = false; };
+const closeSelectView = () => { showSelectView.value = false; };
 
 const handleActionCopy = () => {
     const text = props.content || '';
-    if (!text) {
-        closeActionMenu();
-        return;
-    }
+    if (!text) { closeActionMenu(); return; }
     uni.setClipboardData({
         data: text,
-        success: () => {
-            uni.showToast({ title: '已复制', icon: 'none', position: 'top' });
-        },
-        fail: () => {
-            uni.showToast({ title: '复制失败', icon: 'none' });
-        },
+        success: () => uni.showToast({ title: '已复制', icon: 'none', position: 'top' }),
+        fail: () => uni.showToast({ title: '复制失败', icon: 'none' }),
     });
     closeActionMenu();
     closeSelectView();
@@ -350,23 +176,22 @@ const handleActionSelect = () => {
     showSelectView.value = true;
 };
 
-const getBubbleImageUrl = (img) => {
-    if (!img) return '';
-    return typeof img === 'object' && img.url ? img.url : img;
-};
+// ───────── 图片 / 文件附件 ─────────
+// images 数组里可能是字符串 url，也可能是 { url, name, ... } 对象，兼容历史接口形状。
+const getBubbleImageUrl = (img) =>
+    !img ? '' : (typeof img === 'object' && img.url ? img.url : img);
 
+// 后端有时把非图片附件也混在 images 里（旧数据），这里按扩展名再过滤一遍，
+// 防止 file-only 的 url 被当成图片走 image 组件渲染出 404 缩略图。
 const isImageUrlLike = (img) => {
     const url = String(getBubbleImageUrl(img) || '').toLowerCase().split('?')[0];
-    if (!url) return false;
-    return /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(url);
+    return !!url && /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(url);
 };
 
 const displayImages = computed(() => (props.images || []).filter(isImageUrlLike));
 
 const previewBubbleImage = (index) => {
-    const urls = displayImages.value
-        .map((img) => getBubbleImageUrl(img))
-        .filter(Boolean);
+    const urls = displayImages.value.map(getBubbleImageUrl).filter(Boolean);
     if (!urls.length) return;
     uni.previewImage({ urls, current: urls[index] || urls[0] });
 };
@@ -403,40 +228,19 @@ const getFileMeta = (file, idx) => {
     return FILE_TYPE_MAP.file;
 };
 
-// destroy() 不直接卸载父组件，只让内部根节点 v-if=false，符合 ref 方法”主动销毁”的语义。
-const alive = ref(true);
-// 组件实际正在渲染的内容。普通模式等于 content，打字模式下是 content 的前 N 个字符。
-const renderedContent = ref('');
+// ───────── 打字效果 ─────────
+// 仅服务于"流式失败回退到一次性返回"的场景：父组件拿到完整回复后设 msg.typing=true，
+// 让正文以打字动画出现，弥补失去流式的体验。流式正常路径不会走打字。
+const renderedContent = ref('');   // 当前实际渲染的字符串（typing 模式下是 content 的前 N 个字符）
 const isTyping = ref(false);
-// 打字进度百分比，范围 0-100，便于父组件做进度 UI 或调试展示。
-const progress = ref(0);
-// 只使用 setTimeout / clearTimeout，避免依赖浏览器 DOM API，保证 App、H5、小程序都可运行。
 let timer = null;
-let cursor = 0;
+let cursor = 0;                    // 已写出的字符数
 
 const typingOptions = computed(() => {
-    // false / null / undefined 都视为关闭打字效果。
-    if (!props.typing) {
-        return {
-            enabled: false,
-            step: 1,
-            interval: 30,
-            suffix: "",
-        };
-    }
-
-    if (props.typing === true) {
-        // 默认速度偏轻快，适合聊天回复；需要更慢时传对象覆盖 interval。
-        return {
-            enabled: true,
-            step: 1,
-            interval: 30,
-            suffix: "",
-        };
-    }
-
+    // step / interval 做兜底，防止父组件传 0 / 负数 / NaN 造成 setTimeout 死循环。
+    if (!props.typing) return { enabled: false, step: 1, interval: 30, suffix: "" };
+    if (props.typing === true) return { enabled: true, step: 1, interval: 30, suffix: "" };
     return {
-        // step 越大一次显示字符越多；interval 单位是 ms。这里做兜底避免 0、NaN、负数造成异常。
         enabled: true,
         step: Math.max(1, Number(props.typing.step) || 1),
         interval: Math.max(0, Number(props.typing.interval) || 30),
@@ -444,36 +248,51 @@ const typingOptions = computed(() => {
     };
 });
 
-const shouldShowAvatar = computed(
-    () => props.showAvatar && (props.avatar || props.avatarIcon || slots.avatar),
-);
+// 打字状态下追加的光标后缀（如 "|"）。Markdown 模式下也安全，因为它渲染在 mp-html 之外。
+const showTypingSuffix = computed(() => isTyping.value && typingOptions.value.suffix);
 
-const bubbleVariant = computed(() => {
-    // 传入非法 variant 时回退到 filled，避免样式 class 失控。
-    const variants = ["filled", "borderless", "outlined", "shadow"];
-    return variants.includes(props.variant) ? props.variant : "filled";
-});
+const clearTypingTimer = () => {
+    if (timer) { clearTimeout(timer); timer = null; }
+};
 
-const avatarStyle = computed(() => {
-    // 头像间距根据 placement 自动放在气泡一侧：左侧消息是 marginRight，右侧消息是 marginLeft。
-    const size = props.avatarSize || "36px";
-    const marginKey = props.placement === "end" ? "marginLeft" : "marginRight";
+const writeNext = () => {
+    // 中途被 startTyping 重置（content 变了重启）时停止旧任务的尾部写入。
+    if (!isTyping.value) return;
+    const options = typingOptions.value;
+    cursor = Math.min(props.content.length, cursor + options.step);
+    renderedContent.value = props.content.slice(0, cursor);
+    if (cursor >= props.content.length) {
+        clearTypingTimer();
+        renderedContent.value = props.content;  // 边界兜底，避免最后一步漏字
+        isTyping.value = false;
+        emit("finish");
+        return;
+    }
+    timer = setTimeout(writeNext, options.interval);
+};
 
-    return {
-        width: size,
-        height: size,
-        [marginKey]: props.avatarGap,
-    };
-});
+const startTyping = () => {
+    // content / typing / loading 任一变化都会重入，先清掉上一轮的 timer。
+    clearTypingTimer();
 
-const avatarIconSize = computed(() => {
-    // uni-icons 的 size 是数字，按头像尺寸比例计算一个舒服的默认图标大小。
-    const size = parseInt(props.avatarSize || "36", 10);
-    return Number.isFinite(size) ? Math.max(18, Math.round(size * 0.58)) : 22;
-});
+    // 未开启 typing 或处于 loading 时，直接把完整 content 镜像到 renderedContent。
+    // 脏检查很重要：流式过程中 content 高频变化，每次都写 isTyping=false 会触发
+    // 下游 computed（如 shouldRenderMarkdown / renderBlocks）的无效重算和 mp-html 重渲。
+    if (!typingOptions.value.enabled || props.loading) {
+        cursor = props.content.length;
+        if (renderedContent.value !== props.content) renderedContent.value = props.content;
+        if (isTyping.value) isTyping.value = false;
+        return;
+    }
+    cursor = 0;
+    renderedContent.value = "";
+    isTyping.value = true;
+    timer = setTimeout(writeNext, typingOptions.value.interval);
+};
 
-const htmlTagStyle = computed(() => ({
-    // mp-html 通过 tag-style 控制富文本节点样式，避免 scoped CSS 穿透不稳定。
+// ───────── Markdown 渲染（按块挂载，零闪烁） ─────────
+// 通过 mp-html 的 tag-style 透传节点样式，比 scoped CSS 的 :deep 穿透更可靠（小程序对 :deep 支持不稳）。
+const htmlTagStyle = {
     p: "margin: 8rpx 0; line-height: 1.7;",
     div: "line-height: 1.7;",
     img: "max-width: 100%; border-radius: 8px; margin: 8rpx 0;",
@@ -485,271 +304,76 @@ const htmlTagStyle = computed(() => ({
     code: "padding:2px 5px;border-radius:4px;background:#eef2f7;color:#1f3a8a;",
     span: "line-height:1.7;",
     a: "color:#2563eb;text-decoration:none;",
-    ...props.tagStyle,
-}));
+};
 
-const renderHtml = computed(() => {
-    // 非 Markdown 模式也会做 HTML 转义，避免 content 中的 <script> 或标签被当作富文本执行。
-    if (!props.isMarkdown) {
-        return escapeHtml(renderedContent.value).replace(/\n/g, "<br />");
-    }
-    // Markdown / highlight / latex are handled by mp-html official plugins.
-    // 很多大模型返回的公式使用 \(...\) 或 \[...\]，将其转换为 mp-html 支持的 $...$ 和 $$...$$
-    return renderedContent.value
-        .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
-        .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
-});
+// 打字动画期间用纯 <text> 渲染，避免每写一个字符都让 mp-html 重解析（闪烁源头之一）。
+// 打字结束后 isTyping=false，自动切回 mp-html 完成最终 Markdown 渲染。
+const shouldRenderMarkdown = computed(() => props.isMarkdown && !isTyping.value);
 
-const shouldRenderMarkdown = computed(() => {
-    // 只有在 isMarkdown 开启且正在展示内容时才渲染 mp-html，避免不必要的组件树和事件绑定，提升性能和稳定性。
-    // 即使父组件传了 isMarkdown，关闭 typing 后也不渲染 mp-html，直接展示纯文本，避免不必要的组件树和事件绑定，提升性能和稳定性。
-    return props.isMarkdown && !isTyping.value;
-});
-
-// 流式渲染拆分：把 renderedContent 切成 [committed, tail]
-// committed 喂给 mp-html（只在段落边界 \n\n 或代码块闭合后才推进，避免高频重解析闪烁）
-// tail 用 <text> 平滑增量显示，等待下一次"安全提交"
-const streamingSplit = computed(() => {
+/**
+ * 把 renderedContent 切成 { committed: string[], tail: string }，是整个"零闪烁"策略的核心。
+ *
+ *   committed[] —— 已稳定的段落，每段一个 mp-html 实例（v-for + :key="idx"）。
+ *                   一旦一个段落进入 committed[idx]，它的字符串就再也不会变；
+ *                   Vue 通过稳定 key 复用同一个 mp-html 实例，content prop 没变就不重解析 → 不闪。
+ *   tail        —— 流式中正在生成的最后一段（还没出现 \n\n 收尾）。
+ *                   用原生 <text> 显示，文本节点可以原地追加，没有 rich-text 重解析的概念，也不会闪。
+ *
+ * 切分规则：以段落边界 \n\n 为分隔，但 ``` ... ``` 代码块内部的 \n\n 不算分隔（否则代码块会被切成两段、渲染破碎）。
+ * 非流式（historical / streaming=false）：tail 永远为 ''，全部内容都作为 committed[] 一次性 v-for 挂载。
+ */
+const renderBlocks = computed(() => {
     const text = renderedContent.value || '';
-    // 非流式 / 非 Markdown / 空内容 → 整段都交给 mp-html
-    if (!props.streaming || !props.isMarkdown || !text) {
-        return { committed: text, tail: '' };
-    }
-    // 检测未闭合的 ``` 代码块：代码块内部任何 \n\n 都不能算提交点
-    const fenceCount = (text.match(/```/g) || []).length;
-    const hasOpenFence = fenceCount % 2 === 1;
+    if (!props.isMarkdown || !text) return { committed: [], tail: text };
 
-    let safeEnd = 0;
-    if (hasOpenFence) {
-        const openIdx = text.lastIndexOf('```');
-        const before = text.slice(0, openIdx);
-        const lastBreak = before.lastIndexOf('\n\n');
-        safeEnd = lastBreak >= 0 ? lastBreak + 2 : 0;
-    } else {
-        const lastBreak = text.lastIndexOf('\n\n');
-        safeEnd = lastBreak >= 0 ? lastBreak + 2 : 0;
-    }
-
-    return {
-        committed: text.slice(0, safeEnd),
-        tail: text.slice(safeEnd),
-    };
-});
-
-const transformLatex = (s) =>
-    s.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
-     .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
-
-// 将已稳定的内容按段落边界 \n\n 切成块（代码块 ``` 之间的 \n\n 不切，保持代码块完整）。
-// 每个块用作独立 mp-html 的 content；块一旦生成就再也不会变（committed 是单调追加的前缀），
-// Vue 通过稳定 key 复用旧 mp-html 实例 → 旧块永远不重解析 → 永不闪烁。
-const splitIntoBlocks = (text) => {
-    if (!text) return [];
-    const blocks = [];
-    let cursor = 0;
-    let inFence = false;
+    const all = [];
+    let cur = 0, inFence = false, i = 0;
     const len = text.length;
-    let i = 0;
     while (i < len) {
-        const atLineStart = i === 0 || text[i - 1] === '\n';
-        if (atLineStart && text.substr(i, 3) === '```') {
+        // 行首的 ``` 切换代码块状态。要求 atLineStart 是为了排除文本中作为字面量出现的 ```。
+        if ((i === 0 || text[i - 1] === '\n') && text.substr(i, 3) === '```') {
             inFence = !inFence;
             i += 3;
             continue;
         }
+        // 段落边界：连续 2 个以上换行；代码块内部的换行不算。
         if (!inFence && text[i] === '\n' && text[i + 1] === '\n') {
             let j = i + 2;
-            while (j < len && text[j] === '\n') j++;
-            blocks.push(text.slice(cursor, j));
-            cursor = j;
+            while (j < len && text[j] === '\n') j++;  // 把连续 \n 一并吃掉
+            all.push(text.slice(cur, j));             // 切出的块自带尾部 \n\n，便于后面判断"是否已收尾"
+            cur = j;
             i = j;
             continue;
         }
         i++;
     }
-    if (cursor < len) blocks.push(text.slice(cursor));
-    return blocks;
-};
+    if (cur < len) all.push(text.slice(cur));
 
-const committedBlocks = computed(() => {
-    return splitIntoBlocks(streamingSplit.value.committed).map(transformLatex);
+    // LaTeX 兼容：很多大模型输出用 \(..\) / \[..\]，mp-html 的 latex 插件只认 $..$ / $$..$$。
+    // 注意 String.replace 中 $$ 是转义后的字面 $，所以 $$$$1$$$$ → $$$1$$ 字面输出，即 $$<group1>$$。
+    const toMd = (s) => s
+        .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
+        .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+
+    // 流式中，最后一段如果不以 \n\n 结尾说明它还没"完成"，应当作为 tail。
+    // 边界情况：未闭合的 ``` 代码块只会落在最后一段（前面的 \n\n 在 inFence 时被跳过了），自然进入 tail，
+    // 这样代码块在生成完毕前不会被错误地交给 mp-html 渲染半截 <pre>。
+    if (props.streaming && all.length && !/\n\n$/.test(all[all.length - 1])) {
+        const tail = all.pop();
+        return { committed: all.map(toMd), tail };
+    }
+    return { committed: all.map(toMd), tail: '' };
 });
 
-const streamingTail = computed(() => streamingSplit.value.tail);
-
-const showTypingSuffix = computed(
-    // The suffix is rendered outside mp-html, so it is safe in Markdown mode too.
-    () => isTyping.value && typingOptions.value.suffix,
-);
-
-const clearTypingTimer = () => {
-    // 每次重启、中断、卸载前都清理计时器，防止组件卸载后仍然触发状态更新。
-    if (timer) {
-        clearTimeout(timer);
-        timer = null;
-    }
-};
-
-const updateProgress = () => {
-    // content 为空时直接视为完成，避免除以 0。
-    const total = props.content.length;
-    progress.value = total ? Math.min(100, Math.round((cursor / total) * 100)) : 100;
-};
-
-const finishTyping = () => {
-    // 完成时强制同步完整 content，避免最后一个 step 因边界计算遗漏字符。
-    clearTypingTimer();
-    cursor = props.content.length;
-    renderedContent.value = props.content;
-    isTyping.value = false;
-    progress.value = 100;
-    emit("finish", getRefState());
-};
-
-const writeNext = () => {
-    // interrupt() 会把 isTyping 置为 false；定时回调进来时先检查，避免继续写字。
-    if (!isTyping.value) {
-        return;
-    }
-
-    const options = typingOptions.value;
-    // 每次按 step 截取原始字符串，保证中断、继续、重启都能复用同一份状态。
-    cursor = Math.min(props.content.length, cursor + options.step);
-    renderedContent.value = props.content.slice(0, cursor);
-    updateProgress();
-    emit("writing", getRefState());
-
-    if (cursor >= props.content.length) {
-        finishTyping();
-        return;
-    }
-
-    timer = setTimeout(writeNext, options.interval);
-};
-
-const startTyping = () => {
-    // content、typing 或 loading 变化时都会重新进入这里，因此先清掉旧的打字任务。
-    clearTypingTimer();
-
-    if (!typingOptions.value.enabled || props.loading) {
-        // loading 状态下不启动打字，避免加载动画和内容逐字展示同时出现。
-        // 仅在值确实变化时写入，避免流式高频 chunk 触发无意义的 reactivity 重算 / mp-html 重渲。
-        cursor = props.content.length;
-        if (renderedContent.value !== props.content) {
-            renderedContent.value = props.content;
-        }
-        if (isTyping.value) {
-            isTyping.value = false;
-        }
-        if (progress.value !== 100) {
-            progress.value = 100;
-        }
-        return;
-    }
-
-    cursor = 0;
-    renderedContent.value = "";
-    isTyping.value = true;
-    progress.value = 0;
-    emit("start", getRefState());
-    timer = setTimeout(writeNext, typingOptions.value.interval);
-};
-
-const interrupt = () => {
-    // 只暂停在当前进度，不清空 renderedContent，方便 continue() 接着写。
-    clearTypingTimer();
-    isTyping.value = false;
-    updateProgress();
-};
-
-const continueTyping = () => {
-    // 已完成或未开启 typing 时继续操作无意义，直接忽略。
-    if (!typingOptions.value.enabled || cursor >= props.content.length) {
-        return;
-    }
-    clearTypingTimer();
-    isTyping.value = true;
-    emit("start", getRefState());
-    timer = setTimeout(writeNext, typingOptions.value.interval);
-};
-
-const restart = () => {
-    // 从头重新播放当前 content 的打字效果。
-    startTyping();
-};
-
-const destroy = () => {
-    // 主动销毁后如 content/typing/loading 再变化，watch 会让 alive 恢复为 true 并重新渲染。
-    clearTypingTimer();
-    alive.value = false;
-};
-
-const getRefState = () => ({
-    // 事件统一返回 ref 状态快照，调用侧不用再手动读取组件实例。
-    renderedContent: renderedContent.value,
-    isTyping: isTyping.value,
-    progress: progress.value,
-});
-
-const handleAvatarError = (event) => {
-    emit("avatarError", event);
-};
-
-const handleHtmlLoad = (event) => {
-    emit("htmlLoad", event);
-};
-
-const handleHtmlReady = (event) => {
-    emit("htmlReady", event);
-};
-
-const handleHtmlImgTap = (event) => {
-    emit("htmlImgTap", event);
-};
-
-const handleHtmlLinkTap = (event) => {
-    emit("htmlLinkTap", event);
-};
-
-const handleHtmlError = (event) => {
-    emit("htmlError", event);
-};
-
+// 注意 streaming / isMarkdown 不在 watch 依赖里：它们只影响 renderBlocks 这个 computed，
+// 由 Vue 自动响应；不需要再触发 startTyping，否则会清掉正在播放的打字动画。
 watch(
-    () => [props.content, props.typing, props.loading, props.streaming],
-    () => {
-        if (!alive.value) {
-            alive.value = true;
-        }
-        startTyping();
-    },
+    () => [props.content, props.typing, props.loading],
+    () => { startTyping(); },
     { immediate: true },
 );
 
-onBeforeUnmount(() => {
-    clearTypingTimer();
-});
-
-defineExpose({
-    // 暴露给父组件 ref 使用，方便外部控制 AI 打字过程。
-    interrupt,
-    continue: continueTyping,
-    restart,
-    destroy,
-    renderedContent,
-    isTyping,
-    progress,
-});
-
-function escapeHtml(value) {
-    // 小程序和 App 对富文本安全能力不完全一致，先在组件侧做基础转义更稳。
-    return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
+onBeforeUnmount(clearTypingTimer);
 </script>
 
 <style scoped>
@@ -762,37 +386,7 @@ function escapeHtml(value) {
     position: relative;
 }
 
-.bubble-row-start {
-    justify-content: flex-start;
-}
-
-.bubble-row-end {
-    justify-content: flex-start;
-    flex-direction: row-reverse;
-}
-
-.bubble-avatar {
-    overflow: hidden;
-    background: var(--app-bg-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.bubble-avatar-circle {
-    border-radius: 999rpx;
-}
-
-.bubble-avatar-square {
-    border-radius: 12rpx;
-}
-
-.bubble-avatar-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
+.bubble-row-end { flex-direction: row-reverse; }
 
 .bubble-stack {
     min-width: 0;
@@ -803,21 +397,9 @@ function escapeHtml(value) {
     flex-direction: column;
 }
 
-.bubble-row-end .bubble-stack {
-    align-items: flex-end;
-}
+.bubble-row-end   .bubble-stack { align-items: flex-end; }
+.bubble-row-start .bubble-stack { align-items: flex-start; }
 
-.bubble-row-start .bubble-stack {
-    align-items: flex-start;
-}
-
-/* Claude AI 风格字体栈
- * 关键改动：把 App 端真正可用的具体字体名放在最前面：
- *   - iOS / macOS: -apple-system / BlinkMacSystemFont → SF Pro；中文落到 PingFang SC
- *   - Android: Roboto + Noto Sans CJK SC（Android 6+ 系统字体，避免落到默认衬线）
- *   - Windows: Segoe UI + 微软雅黑
- * Söhne / system-ui 留作 Web/Mac 上的首选项。
- */
 .bubble-box {
     box-sizing: border-box;
     padding: 18rpx 26rpx;
@@ -831,7 +413,6 @@ function escapeHtml(value) {
     line-height: 1.72;
     letter-spacing: 0.2rpx;
     font-weight: 400;
-    /* font-feature-settings: 开启 Söhne / SF / Inter 都支持的现代排版特性 */
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -841,47 +422,17 @@ function escapeHtml(value) {
     -webkit-overflow-scrolling: touch;
     width: fit-content;
     max-width: 100%;
-}
-
-.bubble-box-start {
-    background: var(--app-bg-container);
-    border-radius: 8rpx 26rpx 26rpx;
-}
-
-.bubble-box-end {
-    background: var(--app-brand-light);
-    border-radius: 26rpx 8rpx 26rpx 26rpx;
-}
-
-.bubble-shape-round {
-    border-radius: 28rpx;
-}
-
-.bubble-shape-corner.bubble-box-start {
-    border-radius: 8rpx 26rpx 26rpx;
-}
-
-.bubble-shape-corner.bubble-box-end {
-    border-radius: 26rpx 8rpx 26rpx 26rpx;
-}
-
-.bubble-filled {
     border: 1rpx solid var(--app-border);
 }
 
-.bubble-borderless {
-    border: 0;
-    box-shadow: none;
-}
+.bubble-box-start { background: var(--app-bg-container); border-radius: 8rpx 26rpx 26rpx; }
+.bubble-box-end   { background: var(--app-brand-light);  border-radius: 26rpx 8rpx 26rpx 26rpx; }
 
-.bubble-outlined {
+.bubble-no-style {
+    padding: 0;
     background: transparent;
-    border: 1rpx solid var(--app-border-strong);
-}
-
-.bubble-shadow {
-    border: 1rpx solid var(--app-border);
-    box-shadow: var(--app-shadow-elevated);
+    border: 0;
+    border-radius: 0;
 }
 
 .bubble-images {
@@ -950,22 +501,8 @@ function escapeHtml(value) {
     color: var(--app-text-secondary);
 }
 
-.bubble-no-style {
-    padding: 0;
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-}
+.bubble-text { white-space: pre-wrap; }
 
-.bubble-text {
-    white-space: pre-wrap;
-}
-
-/* 流式尾巴：尚未提交给 mp-html 的增量片段，
- * 视觉上接续在已渲染段落之后，保持与正文一致的字号/行高，
- * 段落级 margin-top 让它看起来像新段落，与最终 mp-html 渲染衔接自然。
- */
 .bubble-text-tail {
     display: block;
     margin-top: 8rpx;
@@ -986,14 +523,10 @@ function escapeHtml(value) {
 }
 
 :deep(.bubble-mp-html > view > view:first-child),
-:deep(.bubble-mp-html > view > text:first-child) {
-    margin-top: 0 !important;
-}
+:deep(.bubble-mp-html > view > text:first-child) { margin-top: 0 !important; }
 
 :deep(.bubble-mp-html > view > view:last-child),
-:deep(.bubble-mp-html > view > text:last-child) {
-    margin-bottom: 0 !important;
-}
+:deep(.bubble-mp-html > view > text:last-child) { margin-bottom: 0 !important; }
 
 .bubble-typing-suffix {
     display: inline;
@@ -1016,74 +549,39 @@ function escapeHtml(value) {
     animation: bubble-loading 1s infinite ease-in-out;
 }
 
-.bubble-loading-dot:nth-child(2) {
-    animation-delay: 0.15s;
-}
-
-.bubble-loading-dot:nth-child(3) {
-    margin-right: 0;
-    animation-delay: 0.3s;
-}
+.bubble-loading-dot:nth-child(2) { animation-delay: 0.15s; }
+.bubble-loading-dot:nth-child(3) { margin-right: 0; animation-delay: 0.3s; }
 
 @keyframes bubble-loading {
-    0%,
-    80%,
-    100% {
-        opacity: 0.35;
-        transform: translateY(0);
-    }
-
-    40% {
-        opacity: 1;
-        transform: translateY(-6rpx);
-    }
+    0%, 80%, 100% { opacity: 0.35; transform: translateY(0); }
+    40%           { opacity: 1;    transform: translateY(-6rpx); }
 }
 
-/* 多设备字号微调：小屏稍紧凑、平板/大屏稍放大，保持阅读舒适度 */
-/* H5 / App 端按屏幕物理宽度判断；小程序中 rpx 已按 750 基线自动缩放，此处主要服务 H5。 */
 @media screen and (max-width: 360px) {
-    .bubble-box {
-        font-size: calc(32rpx * var(--app-font-scale, 1));
-        padding: 16rpx 22rpx;
-        line-height: 1.68;
-    }
-    .bubble-mp-html {
+    .bubble-box, .bubble-mp-html {
         font-size: calc(32rpx * var(--app-font-scale, 1));
         line-height: 1.68;
     }
+    .bubble-box { padding: 16rpx 22rpx; }
 }
 
 @media screen and (min-width: 768px) {
-    .bubble-box {
-        font-size: calc(18px * var(--app-font-scale, 1));
-        padding: 12px 18px;
-        line-height: 1.7;
-    }
-    .bubble-mp-html {
+    .bubble-box, .bubble-mp-html {
         font-size: calc(18px * var(--app-font-scale, 1));
         line-height: 1.7;
     }
+    .bubble-box { padding: 12px 18px; }
 }
 
 @media screen and (min-width: 1024px) {
-    .bubble-box {
-        font-size: calc(18.5px * var(--app-font-scale, 1));
-        line-height: 1.72;
-    }
-    .bubble-mp-html {
+    .bubble-box, .bubble-mp-html {
         font-size: calc(18.5px * var(--app-font-scale, 1));
         line-height: 1.72;
     }
 }
 
-/* ───────── App 端字体优化 ─────────
- * App 端通过 @font-face + uni.loadFontFace 注入了 Inter + Noto Sans SC，
- * 让 iOS / Android 看到完全一致的 Claude 风格字体。
- * 拉丁字符走 Inter；中文落到 Noto Sans SC；缺字时再回退到系统字体。
- */
 /* #ifdef APP-PLUS */
-.bubble-box,
-.bubble-mp-html {
+.bubble-box, .bubble-mp-html {
     font-family: "Inter", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
         "Helvetica Neue", "Roboto", "Microsoft YaHei", sans-serif;
     font-weight: 400;
@@ -1094,10 +592,7 @@ function escapeHtml(value) {
 /* ───────── 长按下拉菜单 ───────── */
 .bubble-action-mask {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     z-index: 998;
     background: transparent;
 }
@@ -1116,13 +611,7 @@ function escapeHtml(value) {
     flex-direction: column;
 }
 
-.bubble-action-dropdown-start {
-    left: 0;
-}
-
-.bubble-action-dropdown-end {
-    right: 0;
-}
+.bubble-action-dropdown-end { right: 0; }
 
 .bubble-action-item {
     display: flex;
@@ -1131,9 +620,7 @@ function escapeHtml(value) {
     padding: 22rpx 28rpx;
 }
 
-.bubble-action-item:active {
-    background-color: var(--app-bg-secondary);
-}
+.bubble-action-item:active { background-color: var(--app-bg-secondary); }
 
 .bubble-action-text {
     font-size: calc(28rpx * var(--app-font-scale, 1));
@@ -1149,10 +636,7 @@ function escapeHtml(value) {
 /* ───────── 选择文本全屏视图 ───────── */
 .bubble-select-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     z-index: 1000;
     background: var(--app-bg-mask);
     display: flex;
@@ -1227,11 +711,6 @@ function escapeHtml(value) {
     font-size: calc(28rpx * var(--app-font-scale, 1));
 }
 
-.bubble-select-btn:active {
-    opacity: 0.85;
-}
-
-.bubble-select-btn text {
-    color: var(--app-bg-container);
-}
+.bubble-select-btn:active { opacity: 0.85; }
+.bubble-select-btn text   { color: var(--app-bg-container); }
 </style>
