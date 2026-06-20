@@ -26,6 +26,31 @@
     </view>
 </template>
 
+<script>
+/**
+ * ThoughtChain 业务常量（必须放在普通 <script> 中，否则 defineProps validator 无法引用）
+ */
+export const TYPE_PRESETS = {
+    thinking:  { icon: '💭', label: '思考',    animation: 'moving'   },
+    analysis:  { icon: '🔍', label: '分析',    animation: 'gradient' },
+    planning:  { icon: '🗂️', label: '规划',    animation: 'dots'     },
+    searching: { icon: '🔎', label: '检索',    animation: 'moving'   },
+    reasoning: { icon: '🧠', label: '推理',    animation: 'gradient' },
+    custom:    { icon: '💡', label: '处理',    animation: 'moving'   },
+};
+
+export const STATUS_MAP = {
+    start:    'pending',
+    thinking: 'pending',
+    pending:  'pending',
+    end:      'complete',
+    complete: 'complete',
+    error:    'error',
+    cancel:   'stop',
+    stop:     'stop',
+};
+</script>
+
 <script setup>
 import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import TChatThinking from '@tdesign/uniapp-chat/chat-thinking/chat-thinking.vue';
@@ -40,26 +65,6 @@ import TChatThinking from '@tdesign/uniapp-chat/chat-thinking/chat-thinking.vue'
  *  - 自动统计耗时并写入标题
  *  - 标题/内容/额外区均可插槽扩展
  */
-
-const TYPE_PRESETS = {
-    thinking:  { icon: '💭', label: '思考',    animation: 'moving'   },
-    analysis:  { icon: '🔍', label: '分析',    animation: 'gradient' },
-    planning:  { icon: '🗂️', label: '规划',    animation: 'dots'     },
-    searching: { icon: '🔎', label: '检索',    animation: 'moving'   },
-    reasoning: { icon: '🧠', label: '推理',    animation: 'gradient' },
-    custom:    { icon: '💡', label: '处理',    animation: 'moving'   },
-};
-
-const STATUS_MAP = {
-    start:    'pending',
-    thinking: 'pending',
-    pending:  'pending',
-    end:      'complete',
-    complete: 'complete',
-    error:    'error',
-    cancel:   'stop',
-    stop:     'stop',
-};
 
 const props = defineProps({
     /** 业务类型，决定默认图标 / 文案 / 动画 */
