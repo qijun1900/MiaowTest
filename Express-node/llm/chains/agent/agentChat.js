@@ -296,8 +296,8 @@ async function runAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus")
  * @returns {Promise<{reply: string, modelName: string}>}
  */
 async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plus", options = {}) {
-  console.log("[streamAgentChain] 开始, model:", modelName, "消息数:", rawMessages.length);
-  const model = ModelFactory.getModel(modelName, 0.7, true);
+  console.log("[streamAgentChain] 开始, model:", modelName, "消息数:", rawMessages.length, "thinking:", !!options.enableThinking);
+  const model = ModelFactory.getModel(modelName, 0.7, true, { enableThinking: !!options.enableThinking });
   const { input, history, hasImages } = await parseMessages(rawMessages);
 
   const { SystemMessage } = require("@langchain/core/messages");
@@ -316,7 +316,7 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
 
   const signal = options.signal;
   const isAborted = () => !!signal?.aborted;
-  const buildAbortedResult = (reply) => {
+  const buildAbortedResult = (reply, reasoning) => {
     const usage = {
       promptTokens: estimatePromptTokens(sysPrompt, history, input),
       completionTokens: estimateTokens(reply),
@@ -324,12 +324,13 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
       estimated: true,
     };
     usage.totalTokens = usage.promptTokens + usage.completionTokens;
-    return { reply, modelName, usage, aborted: true };
+    return { reply, reasoning, modelName, usage, aborted: true };
   };
 
   console.log("[streamAgentChain] 调用 model.stream...");
-  // reply 提到 try 之外,abort 时 catch 才能访问到已累积的内容
+  // reply / reasoning 提到 try 之外,abort 时 catch 才能访问到已累积的内容
   let reply = "";
+  let reasoning = "";
   let tokenCount = 0;
   let usage = null;
   try {
@@ -339,6 +340,12 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
       if (isAborted()) {
         console.log("[streamAgentChain] 用户中止, 已生成长度:", reply.length);
         break;
+      }
+      // 深度思考片段：DashScope / DeepSeek-R1 / QwQ 在 additional_kwargs.reasoning_content
+      const reasoningChunk = chunk?.additional_kwargs?.reasoning_content || "";
+      if (reasoningChunk) {
+        reasoning += reasoningChunk;
+        options.onReasoning?.(reasoningChunk);
       }
       const text = typeof chunk?.content === "string" ? chunk.content : "";
       if (text) {
@@ -351,7 +358,7 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
       if (chunkUsage) usage = chunkUsage;
     }
 
-    if (isAborted()) return buildAbortedResult(reply);
+    if (isAborted()) return buildAbortedResult(reply, reasoning);
 
     if (!usage) {
       usage = {
@@ -363,13 +370,13 @@ async function streamAgentChain(rawMessages, systemPrompt, modelName = "qwen-plu
       usage.totalTokens = usage.promptTokens + usage.completionTokens;
     }
 
-    console.log("[streamAgentChain] 完成, token数:", tokenCount, "总长度:", reply.length, "usage:", usage);
-    return { reply, modelName, usage };
+    console.log("[streamAgentChain] 完成, token数:", tokenCount, "总长度:", reply.length, "推理长度:", reasoning.length, "usage:", usage);
+    return { reply, reasoning, modelName, usage };
   } catch (error) {
     // AbortSignal 触发的中止视作正常停止
     if (isAborted() || error?.name === "AbortError" || /aborted/i.test(error?.message || "")) {
       console.log("[streamAgentChain] 流被中止, 已生成长度:", reply.length);
-      return buildAbortedResult(reply);
+      return buildAbortedResult(reply, reasoning);
     }
     if (isContentModerationError(error)) {
       console.warn("[streamAgentChain] 内容审核拦截:", error.message);

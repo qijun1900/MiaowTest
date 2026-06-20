@@ -69,14 +69,16 @@ export const chatWithAgentStream = ({
     conversationId,
     images,
     files,
+    enableThinking,
     onStart,
     onMessage,
+    onReasoning,
     onDone,
     onError
 }) => {
     return streamRequest({
         url: "/uniappAPI/llm/agent/chat/stream",
-        data: { message, agentKey, conversationId, images, files },
-        callbacks: { onStart, onMessage, onDone, onError },
+        data: { message, agentKey, conversationId, images, files, enableThinking },
+        callbacks: { onStart, onMessage, onReasoning, onDone, onError },
     });
 };

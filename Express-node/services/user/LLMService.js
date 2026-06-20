@@ -153,6 +153,13 @@ async function saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, seque
   const completionTokens = Number(usage?.completionTokens || 0);
   const totalTokens = Number(usage?.totalTokens || promptTokens + completionTokens);
 
+  const reasoning = (typeof aiResponse === "object" && typeof aiResponse?.reasoning === "string")
+    ? aiResponse.reasoning
+    : "";
+  const ext = {};
+  if (usage?.estimated) ext.tokensEstimated = true;
+  if (reasoning) ext.reasoning = reasoning;
+
   await AgentMessageModel.create({
     conversationId: convId,
     Uid: uid,
@@ -166,7 +173,7 @@ async function saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, seque
     promptTokens,
     completionTokens,
     totalTokens,
-    ext: usage?.estimated ? { tokensEstimated: true } : {},
+    ext,
   });
 
   if (totalTokens > 0) {
@@ -231,23 +238,34 @@ const LLMService = {
     agentKey, conversationId,
     images,
     files,
+    enableThinking,
     onStart,
     onToken,
+    onReasoning,
     signal,
   }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
     const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images, files);
 
+    // 仅当 Agent 配置允许时才真正启用深度思考，避免前端误传
+    const thinkingEnabled = !!enableThinking && agentConfig.supportThinking === 1;
+
     // 通知前端：会话已创建/确认，可以开始接收流式数据
     onStart?.({
       conversationId: String(convId),
       modelName: agentConfig.defaultModel || "default",
+      thinking: thinkingEnabled,
     });
 
     const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images, files);
 
-    const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, { onToken, signal });
+    const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, {
+      onToken,
+      onReasoning,
+      enableThinking: thinkingEnabled,
+      signal,
+    });
     const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
 
     maybeGenerateTitle(isNew, userMessage || "[附件消息]", replyText, convId, agentConfig.defaultModel);
@@ -269,7 +287,7 @@ const LLMService = {
   getChatAgents: async () => {
     return AgentDefinitionModel.find(
       { isPublish: 1 },
-      { agentName: 1, agentKey: 1, isMultimodal: 1 }
+      { agentName: 1, agentKey: 1, isMultimodal: 1, supportThinking: 1 }
     ).sort({ sort: 1, createTime: -1 });
   },
 

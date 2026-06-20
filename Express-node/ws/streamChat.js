@@ -84,7 +84,7 @@ function setupStreamChatWS(server) {
 
       if (msg.type !== "chat") return;
 
-      const { message, agentKey, conversationId, images, files } = msg;
+      const { message, agentKey, conversationId, images, files, enableThinking } = msg;
       if ((!message && (!images || !images.length) && (!files || !files.length)) || !agentKey) {
         ws.send(JSON.stringify({ event: "error", data: { message: "缺少必要参数" } }));
         return;
@@ -116,8 +116,10 @@ function setupStreamChatWS(server) {
           conversationId,
           images,
           files,
+          enableThinking,
           onStart: (payload) => sendEvent("start", payload),
           onToken: (content) => sendEvent("message", { content }),
+          onReasoning: (content) => sendEvent("reasoning", { content }),
           signal: currentAC.signal,
         });
         sendEvent("done", { done: true, aborted: currentAC.signal.aborted });

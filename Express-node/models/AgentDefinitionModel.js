@@ -67,6 +67,14 @@ const AgentDefinitionSchema = new mongoose.Schema({
     default: 0,
     enum: [0, 1],
   },
+  supportThinking: {
+    // 是否支持深度思考：0 表示不支持，1 表示支持。
+    // 仅对接 DashScope Qwen3 / DeepSeek-R1 / QwQ 等带 reasoning_content 输出的模型。
+    // 前端据此决定是否展示「思考模式」开关。
+    type: Number,
+    default: 0,
+    enum: [0, 1],
+  },
   sort: {
     // 列表排序值，数字越小越靠前，便于后台人工调整展示顺序。
     type: Number,

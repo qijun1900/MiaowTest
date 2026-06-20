@@ -61,13 +61,13 @@ const LLMController = {
 
     try {
       const uid = extractUid(req);
-      const { message, agentKey, conversationId, images, files } = req.body;
+      const { message, agentKey, conversationId, images, files, enableThinking } = req.body;
 
       if ((!message && (!images || !images.length) && (!files || !files.length)) || !agentKey) {
         return res.status(400).send({ success: false, error: "缺少必要参数" });
       }
 
-      console.log("[SSE] ChatStream 收到请求, uid:", uid, "agentKey:", agentKey);
+      console.log("[SSE] ChatStream 收到请求, uid:", uid, "agentKey:", agentKey, "thinking:", !!enableThinking);
       setupSSEResponse(res);
 
       // 客户端断开连接(用户点击暂停) → 触发 AbortSignal,LangChain stream 主动结束
@@ -90,8 +90,10 @@ const LLMController = {
           conversationId,
           images,
           files,
+          enableThinking,
           onStart: (payload) => sendEvent("start", payload),
           onToken: (content) => sendEvent("message", { content }),
+          onReasoning: (content) => sendEvent("reasoning", { content }),
           signal: ac.signal,
         });
       } finally {

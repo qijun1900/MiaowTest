@@ -8,19 +8,20 @@ import { buildURL, buildHeaders, wsBaseURL, isH5, isMpWeixin } from "./platform"
 import { parseSSEBuffer, decodeChunk } from "./sseParser";
 
 export function streamRequest({ url, data, callbacks }) {
-    const { onStart, onMessage, onDone, onError } = callbacks;
+    const { onStart, onMessage, onReasoning, onDone, onError } = callbacks;
 
     let streamError = null;
     // 用户主动 abort() 时置位;error 事件被吞掉,以便外层把停止当作正常结束处理
     const state = { aborted: false };
 
     const emit = (event, payload) => {
-        // 已中止后,丢弃所有 start/message/error,避免残留 chunk 继续往气泡灌文字
+        // 已中止后,丢弃所有 start/message/reasoning/error,避免残留 chunk 继续往气泡灌文字
         // done 也忽略 —— handleStopStream 已经把 UI 状态收尾过了,再走一次 onDone
         // 会多触发一次震动,且可能覆盖中止后用户开的新流程
         if (state.aborted) return;
         if (event === "start") onStart?.(payload);
         if (event === "message") onMessage?.(payload?.content || "");
+        if (event === "reasoning") onReasoning?.(payload?.content || "");
         if (event === "done") onDone?.(payload);
         if (event === "error") {
             streamError = new Error(payload?.message || "流式请求失败");
@@ -157,6 +158,7 @@ function streamByWebSocket(data, emit, throwIfError, state) {
 
             if (event === "start") emit("start", payload);
             if (event === "message") emit("message", payload);
+            if (event === "reasoning") emit("reasoning", payload);
             if (event === "done") {
                 emit("done", payload);
                 settle(() => { try { throwIfError(); resolve(); } catch (e) { reject(e); } });

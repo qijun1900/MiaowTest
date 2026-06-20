@@ -118,6 +118,13 @@
             {{ scope.row.defaultModel || '默认' }}
           </template>
         </el-table-column>
+        <el-table-column label="能力" width="160" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.isMultimodal === 1" type="success" size="small" style="margin-right: 4px">多模态</el-tag>
+            <el-tag v-if="scope.row.supportThinking === 1" type="warning" size="small">思考</el-tag>
+            <span v-if="scope.row.isMultimodal !== 1 && scope.row.supportThinking !== 1" style="color: #c0c4cc">—</span>
+          </template>
+        </el-table-column>
         <el-table-column label="描述" width="200" :show-overflow-tooltip="true">
           <template #default="scope">
             {{ scope.row.description || "无描述" }}
@@ -207,6 +214,18 @@
                 inactive-text="仅文本"
               />
             </el-form-item>
+            <el-form-item label="深度思考" prop="supportThinking">
+              <el-switch
+                v-model="Form.supportThinking"
+                :active-value="1"
+                :inactive-value="0"
+                active-text="支持思考链"
+                inactive-text="不支持"
+              />
+              <span style="margin-left: 12px; color: #909399; font-size: 12px;">
+                仅对 Qwen3 / DeepSeek-R1 / QwQ 等带 reasoning_content 输出的模型生效
+              </span>
+            </el-form-item>
             <el-form-item label="一句话描述" prop="description">
               <el-input
                 placeholder="简明扼要的说明"
@@ -295,6 +314,7 @@ const Form = reactive({
   capabilities: [],
   isPublish: 0,
   isMultimodal: 0,
+  supportThinking: 0,
   sort: 0,
   creator: appStore.userInfo.username,
 });
@@ -320,6 +340,7 @@ const resetForm = () => {
   Form.capabilities = [];
   Form.isPublish = 0;
   Form.isMultimodal = 0;
+  Form.supportThinking = 0;
   Form.sort = 0;
   isEditMode.value = false;
   currentEditId.value = null;
@@ -373,6 +394,7 @@ const handleEdit = (row) => {
   Form.systemPrompt = row.systemPrompt;
   Form.capabilities = row.capabilities || [];
   Form.isMultimodal = row.isMultimodal || 0;
+  Form.supportThinking = row.supportThinking || 0;
   Form.sort = row.sort || 0;
 };
 

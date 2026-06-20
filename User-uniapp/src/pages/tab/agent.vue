@@ -35,22 +35,12 @@
             @touchstart="onContentTouchStart"
             @touchend="onContentTouchEnd"
         >
-            <view class="content-inner">
+            <view class="content-inner" :style="contentInnerStyle">
                 <WelcomePanel 
                     :show="showWelcomePanel" 
                     @action-click="handleWelcomeActionClick" 
                 />
                 
-                <view style="padding: 24rpx;">
-                    <!-- <ThoughtChain 
-                        status="thinking" 
-                        content="我正在思考如何评估这三个模型的表现...\n首先，我会分析XGBoost的混淆矩阵。\n其次，我会关注SHAP特征重要性。" 
-                        buttonWidth="240rpx"
-                        maxWidth="100%"
-                        :typing="{ step: 1, interval: 50, suffix: '|' }"
-                    /> -->
-                </view>
-
                 <ChatSkeleton v-if="loadingConversationId" />
 
                 <view class="bubble-test-area" v-if="messageList.length > 0">
@@ -60,6 +50,13 @@
                         :id="msg._msgId"
                         class="msg-anchor"
                     >
+                        <ThoughtChain
+                            v-if="msg.role === 'assistant' && (msg.reasoning || msg.thinkingStatus === 'thinking')"
+                            :status="msg.thinkingStatus || 'thinking'"
+                            :content="msg.reasoning || ''"
+                            :auto-collapse="true"
+                            max-width="100%"
+                        />
                         <Bubble
                             :content="msg.content"
                             :images="msg.images || []"
@@ -71,7 +68,7 @@
                             :max-width="msg.role === 'user' ? '650rpx' : '100%'"
                             :is-markdown="msg.role === 'assistant'"
                             :no-style="msg.role === 'assistant'"
-                            :loading="msg.pending"
+                            :loading="msg.pending && !(msg.role === 'assistant' && (msg.thinkingStatus === 'thinking' || msg.reasoning))"
                             :typing="msg.typing ? { step: 5, interval: 15, suffix: '|' } : false"
                             @finish="handleBubbleFinish(index)"
                         >
@@ -122,6 +119,7 @@
                 :pending-images="pendingAttachments"
                 :uploading="isUploading"
                 :show-thinking-toggle="showThinkingToggle"
+                :is-show-thingking-but="currentSupportsThinking"
                 :show-attachment="true"
                 :pending="isAIStreaming"
                 @add-attachment="handleAddAttachment"
@@ -279,7 +277,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import AgentHeader from "../../components/modules/agent/AgentHeader.vue";
 import AgentSender from "../../components/modules/agent/AgentSender.vue";
 import AgentSidebar from "../../components/modules/agent/AgentSidebar.vue";
@@ -391,6 +389,11 @@ const isCurrentMultimodal = computed(() => {
     return !!cur?.isMultimodal;
 });
 
+const currentSupportsThinking = computed(() => {
+    const cur = modelList.value.find((m) => m.value === currentModelKey.value);
+    return !!cur?.supportThinking;
+});
+
 const {
     isRefreshing,
     pullTouchStart: rawPullTouchStart,
@@ -419,7 +422,8 @@ const loadAgentList = async () => {
                 return {
                     label: item.agentName,
                     value: item.agentKey,
-                    isMultimodal: item.isMultimodal === 1
+                    isMultimodal: item.isMultimodal === 1,
+                    supportThinking: item.supportThinking === 1
                 };
             });
             currentModelName.value = list[0]?.agentName || "";
@@ -558,6 +562,16 @@ const containerStyle = computed(() => {
  * · TabBar 可见：bottom 上移 TabBar 高度，避免被遮挡；安全区由 TabBar 承担
  * · TabBar 隐藏 + 键盘收起：bottom=0、加上 safe-area
  */
+/**
+ * 内容区底部留白：
+ * TabBar 可见时，sender 上移了 tabBarHeight 像素，需要额外加上 TabBar 高度，
+ * 否则最后一行 AiDisclaimer 会被悬浮的 sender 输入栏遮挡。
+ */
+const contentInnerStyle = computed(() => {
+    const extra = !keyboardHeight.value && isTabBarVisible.value ? tabBarHeightPx : 0;
+    return { paddingBottom: `calc(260rpx + ${extra}px)` };
+});
+
 const senderAreaStyle = computed(() => {
     const keyboardUp = keyboardHeight.value > 0;
     const tabBarUp = !keyboardUp && isTabBarVisible.value;
@@ -575,6 +589,17 @@ const senderAreaStyle = computed(() => {
 const triggerVibrate = () => {
     uni.vibrateShort({ type: 'light', fail: () => {} });
 };
+
+// 思考模式开启/关闭时给予触感反馈，开启时强度更明显
+watch(thinkingMode, (next, prev) => {
+    if (next === prev) return;
+    if (next) {
+        uni.vibrateShort({ type: 'medium', fail: () => {} });
+        uni.showToast({ title: '已开启深度思考', icon: 'none', position: 'top' });
+    } else {
+        uni.vibrateShort({ type: 'light', fail: () => {} });
+    }
+});
 
 // ─── 事件处理 ──────────────────────────────────────────────────────────────────
 /**
@@ -708,6 +733,11 @@ const handleModelChange = (modelName, modelKey) => {
     currentModelName.value = modelName;
     currentModelKey.value = modelKey;
 
+    // 切换到不支持深度思考的模型时，自动关闭思考模式开关
+    if (!currentSupportsThinking.value && thinkingMode.value) {
+        thinkingMode.value = false;
+    }
+
     // 切换到非多模态模型时，移除已选的图片附件（保留文档）
     if (!isCurrentMultimodal.value && pendingAttachments.value.length > 0) {
         const imgUrls = new Set(getUploadedImages());
@@ -766,6 +796,8 @@ const handleSelectChat = async (chatId) => {
                 content: msg.content,
                 images: msg.ext?.images || [],
                 files: msg.ext?.files || [],
+                reasoning: msg.ext?.reasoning || '',
+                thinkingStatus: msg.ext?.reasoning ? 'complete' : '',
                 typing: false,
                 pending: false,
                 isStreaming: false
@@ -855,12 +887,20 @@ const spacerStyle = computed(() => {
     const ai = lastAIMessage.value;
     // pending 且无内容时：AiThinking 已经在用户消息下方贴着展示，
     // 不需要再加占位，否则会让 AiThinking 下方多出一整屏空白可滚动区。
-    if (ai?.pending && !ai?.content) return { height: '0px' };
+    if (ai?.pending && !ai?.content && !ai?.reasoning) return { height: '0px' };
+    // 思考阶段（有 reasoning 但还没正式回复）：ThoughtChain 已撑起空间，
+    // 继续保留整屏占位会导致用户可以把页面拉到全白屏。直接归 0，
+    // 等正式 content 出现后再走下面的动态估算逻辑。
+    if (ai?.thinkingStatus === 'thinking' && !ai?.content) return { height: '0px' };
     const chars = (ai?.content || '').length;
+    const reasoningChars = (ai?.reasoning || '').length;
     const estimatedLineHeightPx = 25;
     const charsPerLine = 20;
     const lines = chars === 0 ? 1 : Math.ceil(chars / charsPerLine);
-    const estimatedAIHeightPx = 40 + lines * estimatedLineHeightPx;
+    const reasoningLines = reasoningChars === 0 ? 0 : Math.ceil(reasoningChars / charsPerLine);
+    // ThoughtChain header 约 40px，content 行高同正文；正式回复区域基础高度约 40px
+    const reasoningHeightPx = reasoningChars > 0 ? 40 + reasoningLines * estimatedLineHeightPx : 0;
+    const estimatedAIHeightPx = 40 + lines * estimatedLineHeightPx + reasoningHeightPx;
     const target = Math.max(0, scrollViewHeightPx.value - estimatedAIHeightPx);
     return { height: `${target}px` };
 });
@@ -1083,10 +1123,13 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
 
     // 通过 messageList.value 访问，确保拿到的是 Vue 响应式代理
     const aiIndex = messageList.value.length;
+    const useThinking = thinkingMode.value && currentSupportsThinking.value;
     messageList.value.push({
         _msgId: `msg-${++msgIdSeq}`,
         role: 'assistant',
         content: '',
+        reasoning: '',
+        thinkingStatus: useThinking ? 'thinking' : '',
         typing: false,
         pending: true,
         isStreaming: true,
@@ -1127,6 +1170,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                 conversationId: currentConversationId.value,
                 images: sendImages,
                 files: sendFiles,
+                enableThinking: useThinking,
                 onStart: ({ conversationId }) => {
                     if (conversationId) currentConversationId.value = conversationId;
                 },
@@ -1134,13 +1178,30 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                     if (messageList.value[aiIndex].pending) {
                         messageList.value[aiIndex].pending = false;
                     }
+                    // 收到正式回复 → 思考阶段结束
+                    if (messageList.value[aiIndex].thinkingStatus === 'thinking') {
+                        messageList.value[aiIndex].thinkingStatus = 'complete';
+                    }
                     streamBuffer += chunk;
                     flushBuffer();
+                },
+                onReasoning: (chunk) => {
+                    // 推理片段：先显示 ThoughtChain，再等正式回复
+                    if (messageList.value[aiIndex].pending) {
+                        messageList.value[aiIndex].pending = false;
+                    }
+                    if (!messageList.value[aiIndex].thinkingStatus) {
+                        messageList.value[aiIndex].thinkingStatus = 'thinking';
+                    }
+                    messageList.value[aiIndex].reasoning += chunk;
                 },
                 onDone: () => {
                     flushBuffer(true);
                     messageList.value[aiIndex].pending = false;
                     messageList.value[aiIndex].isStreaming = false;
+                    if (messageList.value[aiIndex].thinkingStatus === 'thinking') {
+                        messageList.value[aiIndex].thinkingStatus = 'complete';
+                    }
                     triggerVibrate();
                 },
                 onError: () => {},
@@ -1155,12 +1216,18 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
             flushBuffer(true);
             messageList.value[aiIndex].pending = false;
             messageList.value[aiIndex].isStreaming = false;
+            if (messageList.value[aiIndex].thinkingStatus === 'thinking') {
+                messageList.value[aiIndex].thinkingStatus = userAborted ? 'stop' : 'complete';
+            }
         } catch {
             // 流式失败：已有部分内容或用户主动停止 → 保留;无内容且非主动停止才回退到普通接口
             flushBuffer(true);
             if (userAborted) {
                 messageList.value[aiIndex].pending = false;
                 messageList.value[aiIndex].isStreaming = false;
+                if (messageList.value[aiIndex].thinkingStatus === 'thinking') {
+                    messageList.value[aiIndex].thinkingStatus = 'stop';
+                }
             } else if (!messageList.value[aiIndex].content) {
                 const response = await chatWithAgent({
                     message: text || '',
@@ -1178,6 +1245,10 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                 messageList.value[aiIndex].isStreaming = false;
                 messageList.value[aiIndex].typing = true;
                 messageList.value[aiIndex].content = replyText;
+                // 非流式回退不支持思考输出，清理 ThoughtChain，避免一直显示「思考中」
+                if (messageList.value[aiIndex].thinkingStatus === 'thinking') {
+                    messageList.value[aiIndex].thinkingStatus = '';
+                }
                 triggerVibrate();
             }
         }
@@ -1185,6 +1256,9 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     } catch (error) {
         messageList.value[aiIndex].pending = false;
         messageList.value[aiIndex].isStreaming = false;
+        if (messageList.value[aiIndex].thinkingStatus === 'thinking') {
+            messageList.value[aiIndex].thinkingStatus = 'error';
+        }
         messageList.value[aiIndex].content = '请求失败，请稍后重试。';
         console.error("对话请求失败:", error.message);
     } finally {
@@ -1210,6 +1284,9 @@ const handleStopStream = () => {
     if (last && last.role === 'assistant') {
         last.pending = false;
         last.isStreaming = false;
+        if (last.thinkingStatus === 'thinking') {
+            last.thinkingStatus = 'stop';
+        }
     }
     triggerVibrate();
 };
