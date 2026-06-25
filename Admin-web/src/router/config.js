@@ -16,6 +16,9 @@ import ExamFileManage from "@/views/Exam/ExamFileManage.vue";
 import FileList from "@/views/Resource/FileList.vue";
 import FileUpload from "@/views/Resource/FileUpload.vue";
 import AppVersionManage from "@/views/System/AppVersionManage.vue";
+import KnowledgeManage from "@/views/Knowledge/KnowledgeManage.vue";
+import KnowledgeBaseManage from "@/views/Knowledge/KnowledgeBaseManage.vue";
+import RAGTest from "@/views/Knowledge/RAGTest.vue";
 
 const routes = [
   {
@@ -107,6 +110,21 @@ const routes = [
     path: "/system/appversion",
     name: "AppVersionManage",
     component: AppVersionManage,
+  },
+  {
+    path: "/knowledge/manage",
+    name: "KnowledgeManage",
+    component: KnowledgeManage,
+  },
+  {
+    path: "/knowledge/base",
+    name: "KnowledgeBaseManage",
+    component: KnowledgeBaseManage,
+  },
+  {
+    path: "/knowledge/ragtest",
+    name: "RAGTest",
+    component: RAGTest,
   },
 ];
 export default routes;

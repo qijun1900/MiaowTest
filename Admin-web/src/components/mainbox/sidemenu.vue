@@ -88,6 +88,16 @@
         <span>模型对话</span>
       </el-menu-item>
 
+      <el-sub-menu index="/knowledge-manage">
+        <template #title>
+          <el-icon><Collection /></el-icon>
+          <span>知识库</span>
+        </template>
+        <el-menu-item index="/knowledge/base">知识库管理</el-menu-item>
+        <el-menu-item index="/knowledge/manage">文档管理</el-menu-item>
+        <el-menu-item index="/knowledge/ragtest">RAG 测试</el-menu-item>
+      </el-sub-menu>
+
       <el-sub-menu index="/system-manage">
         <template #title>
           <el-icon><Upload /></el-icon>
@@ -112,6 +122,7 @@ import {
   ChatDotSquare,
   FolderOpened,
   Upload,
+  Collection,
 } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 
