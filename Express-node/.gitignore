@@ -74,6 +74,10 @@ coverage/
 *.sqlite
 *.sqlite3
 
+# Chroma 向量数据库
+data/chroma_db/
+data/chroma_data/
+
 # 备份文件
 *.bak
 *.backup
