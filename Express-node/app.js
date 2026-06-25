@@ -34,6 +34,7 @@ const UserNotesBookRouter = require("./routes/user/NotesBookRouter"); //用户�
 const UserLogRouter = require("./routes/user/LogRouter"); //用户端日志路由
 const UserActivityRouter = require("./routes/user/ActivityRouter"); //用户端活动路由
 const AdminAppVersionRouter = require("./routes/admin/AppVersionRouter"); //Admin版本管理路由模块
+const KnowledgeRouter = require("./routes/admin/KnowledgeRouter"); //知识库路由模块
 const UserAppVersionRouter = require("./routes/user/AppVersionRouter"); //用户端版本检查路由模块
 
 var app = express();
@@ -143,6 +144,7 @@ app.use(FunctionRouter); //功能路由(admin)
 app.use(AdminConsumerRouter); //用户路由(admin)
 app.use(AdminFileRouter); //资源路由(admin)
 app.use(AdminAppVersionRouter); //版本管理路由(admin)
+app.use(KnowledgeRouter); //知识库路由(admin)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
