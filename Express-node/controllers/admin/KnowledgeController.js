@@ -191,6 +191,49 @@ const KnowledgeController = {
     }
   },
 
+  // ==================== 调试工具 ====================
+
+  /** 查看指定知识库中的所有 chunks（用于检查拆分效果） */
+  getChunks: async (req, res) => {
+    try {
+      const { knowledgeBaseId, limit = 50 } = req.query;
+      if (!knowledgeBaseId) {
+        return res.status(400).send({ ActionType: "ERROR", code: 400, message: "缺少参数 knowledgeBaseId" });
+      }
+      const result = await KnowledgeService.getChunksByKB(knowledgeBaseId, Number(limit));
+      res.status(200).send({ ActionType: "OK", code: 200, data: result });
+    } catch (error) {
+      console.error("[KnowledgeController] getChunks error:", error);
+      res.status(500).send({ ActionType: "ERROR", code: 500, message: error.message });
+    }
+  },
+
+  /** 测试检索效果：输入查询文本，返回 Top-K 结果及相似度分数 */
+  testRetrieval: async (req, res) => {
+    try {
+      const { question, knowledgeBaseId, topK = 4 } = req.body;
+      if (!question) {
+        return res.status(400).send({ ActionType: "ERROR", code: 400, message: "请输入查询文本" });
+      }
+      const result = await KnowledgeService.testRetrieval(question, { knowledgeBaseId, topK });
+      res.status(200).send({ ActionType: "OK", code: 200, data: result });
+    } catch (error) {
+      console.error("[KnowledgeController] testRetrieval error:", error);
+      res.status(500).send({ ActionType: "ERROR", code: 500, message: error.message });
+    }
+  },
+
+  /** 获取向量库统计信息 */
+  getVectorStats: async (req, res) => {
+    try {
+      const result = await KnowledgeService.getVectorStats();
+      res.status(200).send({ ActionType: "OK", code: 200, data: result });
+    } catch (error) {
+      console.error("[KnowledgeController] getVectorStats error:", error);
+      res.status(500).send({ ActionType: "ERROR", code: 500, message: error.message });
+    }
+  },
+
   /** RAG 检索增强问答 */
   ragQuery: async (req, res) => {
     try {

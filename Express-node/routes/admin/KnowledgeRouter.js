@@ -18,6 +18,11 @@
  *
  *   RAG：
  *     POST /adminapi/knowledge/rag            检索增强问答
+ *
+ *   调试工具：
+ *     GET  /adminapi/knowledge/chunks         查看知识库中的 chunks（检查拆分效果）
+ *     POST /adminapi/knowledge/test-retrieval 测试检索效果（返回相似度分数）
+ *     GET  /adminapi/knowledge/vector-stats   向量库统计信息
  */
 const express = require("express");
 const KnowledgeController = require("../../controllers/admin/KnowledgeController");
@@ -47,6 +52,11 @@ KnowledgeRouter.post("/adminapi/knowledge/delete", KnowledgeController.deleteDoc
 // 文档-知识库关联管理
 KnowledgeRouter.post("/adminapi/knowledge/add-to-kb", KnowledgeController.addDocToKnowledgeBase);
 KnowledgeRouter.post("/adminapi/knowledge/remove-from-kb", KnowledgeController.removeDocFromKnowledgeBase);
+
+// ==================== 调试工具 ====================
+KnowledgeRouter.get("/adminapi/knowledge/chunks", KnowledgeController.getChunks);
+KnowledgeRouter.post("/adminapi/knowledge/test-retrieval", KnowledgeController.testRetrieval);
+KnowledgeRouter.get("/adminapi/knowledge/vector-stats", KnowledgeController.getVectorStats);
 
 // ==================== RAG 问答 ====================
 KnowledgeRouter.post("/adminapi/knowledge/rag", KnowledgeController.ragQuery);
