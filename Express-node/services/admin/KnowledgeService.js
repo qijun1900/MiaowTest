@@ -25,7 +25,7 @@ const KnowledgeBaseModel = require("../../models/KnowledgeBaseModel");
 const KnowledgeDocModel = require("../../models/KnowledgeDocModel");
 const mongoose = require("mongoose");
 const { parseDocument } = require("../../llm/parser/llamaParseWrapper");
-const { addDocuments, deleteByMetadata, deleteCollection } = require("../../llm/vectorstores/stores/chromaManager");
+const { addDocuments, deleteByMetadata, deleteCollection, getCollection } = require("../../llm/vectorstores/stores/chromaManager");
 const { deleteFileByUrl } = require("../../helpers/ossHelper");
 const { runRAGChain } = require("../../llm/chains/rag/ragChain");
 
@@ -195,6 +195,15 @@ const KnowledgeService = {
       });
       const chunks = await splitter.splitDocuments([langchainDoc]);
 
+      // [调试] 打印拆分结果
+      console.log(`\n========== 文档拆分结果: ${doc.title} ==========`);
+      console.log(`总 chunk 数: ${chunks.length}`);
+      chunks.forEach((c, i) => {
+        console.log(`\n--- Chunk ${i + 1} (长度: ${c.pageContent.length}) ---`);
+        console.log(c.pageContent.substring(0, 200) + (c.pageContent.length > 200 ? "..." : ""));
+      });
+      console.log("========== 拆分结果结束 ==========\n");
+
       // 为每个 chunk 附加 docId，用于后续按文档删除
       chunks.forEach((chunk) => {
         chunk.metadata.docId = doc._id.toString();
@@ -337,6 +346,105 @@ const KnowledgeService = {
     }
 
     return KnowledgeDocModel.deleteOne({ _id: docId });
+  },
+
+  // ==================== 调试工具 ====================
+
+  /**
+   * 查看指定知识库中的所有 chunks
+   * 通过 Chroma API 获取 collection 中的文档、元数据和 ID
+   */
+  async getChunksByKB(kbId, limit = 50) {
+    const kb = await KnowledgeBaseModel.findById(kbId);
+    if (!kb) throw new Error("知识库不存在");
+
+    const col = await getCollection(kb.collectionName);
+    const count = await col.count();
+
+    // Chroma 的 get 方法返回所有文档（不经过 embedding）
+    const results = await col.get({
+      limit,
+      include: ["documents", "metadatas"],
+    });
+
+    const chunks = (results.documents || []).map((content, i) => ({
+      id: results.ids[i],
+      content,
+      metadata: results.metadatas[i] || {},
+      length: content.length,
+    }));
+
+    return {
+      knowledgeBase: { name: kb.name, collectionName: kb.collectionName },
+      totalChunks: count,
+      returnedChunks: chunks.length,
+      chunks,
+    };
+  },
+
+  /**
+   * 测试检索效果：输入查询，返回 Top-K 结果及相似度
+   * 可用于验证检索质量，调整 chunkSize / topK 等参数
+   */
+  async testRetrieval(question, options = {}) {
+    let collectionName;
+    if (options.knowledgeBaseId) {
+      const kb = await KnowledgeBaseModel.findById(options.knowledgeBaseId);
+      if (!kb) throw new Error("指定的知识库不存在");
+      collectionName = kb.collectionName;
+    }
+
+    const { similaritySearch, getCollection: getCol } = require("../../llm/vectorstores/stores/chromaManager");
+    const results = await similaritySearch(question, options.topK || 4, collectionName);
+
+    // 计算相似度百分比（Chroma 返回余弦距离，越小越相似）
+    // 相似度 = 1 - distance（distance 范围通常是 0~2）
+    const formatted = results.map((r, i) => ({
+      rank: i + 1,
+      similarity: Math.max(0, (1 - r.score) * 100).toFixed(1) + "%",
+      distance: r.score.toFixed(4),
+      content: r.content,
+      contentLength: r.content.length,
+      metadata: r.metadata,
+    }));
+
+    return {
+      query: question,
+      topK: options.topK || 4,
+      collectionName: collectionName || "default",
+      results: formatted,
+    };
+  },
+
+  /**
+   * 获取所有向量库统计信息
+   */
+  async getVectorStats() {
+    const kbs = await KnowledgeBaseModel.find({}).lean();
+    const stats = [];
+
+    for (const kb of kbs) {
+      try {
+        const col = await getCollection(kb.collectionName);
+        const count = await col.count();
+        stats.push({
+          name: kb.name,
+          collectionName: kb.collectionName,
+          vectorCount: count,
+          status: "ok",
+        });
+      } catch (err) {
+        stats.push({
+          name: kb.name,
+          collectionName: kb.collectionName,
+          vectorCount: 0,
+          status: "error",
+          error: err.message,
+        });
+      }
+    }
+
+    return stats;
   },
 
   // ==================== RAG 问答 ====================
