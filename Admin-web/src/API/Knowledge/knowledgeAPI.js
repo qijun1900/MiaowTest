@@ -164,6 +164,56 @@ export async function postRAGQuery(question, topK, modelName, knowledgeBaseId) {
   }
 }
 
+// ==================== 调试工具 ====================
+
+/** 查看指定知识库中的所有 chunks（检查拆分效果） */
+export async function getKnowledgeChunks(knowledgeBaseId, limit = 50) {
+  try {
+    const response = await axios.get("/adminapi/knowledge/chunks", {
+      params: { knowledgeBaseId, limit },
+    });
+    if (response.data.code === 200) {
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("getKnowledgeChunks error:", error);
+    throw error;
+  }
+}
+
+/** 测试检索效果：输入查询文本，返回 Top-K 结果及相似度分数 */
+export async function postTestRetrieval(question, knowledgeBaseId, topK = 5) {
+  try {
+    const response = await axios.post("/adminapi/knowledge/test-retrieval", {
+      question,
+      knowledgeBaseId,
+      topK,
+    });
+    if (response.data.ActionType === "OK") {
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("postTestRetrieval error:", error);
+    throw error;
+  }
+}
+
+/** 获取向量库统计信息 */
+export async function getVectorStats() {
+  try {
+    const response = await axios.get("/adminapi/knowledge/vector-stats");
+    if (response.data.code === 200) {
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("getVectorStats error:", error);
+    throw error;
+  }
+}
+
 // ==================== 文档-知识库关联 ====================
 
 /** 将已有文档添加到新知识库（重新解析并入库到新 collection） */
