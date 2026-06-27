@@ -6,84 +6,106 @@
         <el-icon><Setting /></el-icon>
         <span>RAG 配置</span>
       </div>
+
+      <!-- 模式切换 -->
+      <div class="mode-switch">
+        <el-radio-group v-model="viewMode" size="small" style="width: 100%">
+          <el-radio-button value="chat">问答测试</el-radio-button>
+          <el-radio-button value="debug">检索调试</el-radio-button>
+        </el-radio-group>
+      </div>
+
       <RAGSettingsPanel
+        v-if="viewMode === 'chat'"
         :knowledge-bases="knowledgeBases"
         v-model="ragConfig"
         :history="chatHistory"
         @clear-history="handleClearHistory"
       />
+      <div v-else class="sidebar-tip">
+        <el-icon><InfoFilled /></el-icon>
+        <span>在右侧进行检索调试，可查看 Chunks、测试检索效果、查看向量统计</span>
+      </div>
     </aside>
 
-    <!-- 右侧对话区域 -->
+    <!-- 右侧主区域 -->
     <main class="rag-main">
-      <!-- 空态 Welcome -->
-      <div v-show="chatHistory.length === 0" class="rag-welcome-wrapper">
-        <XWelcome
-          icon="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-          title="RAG 知识问答测试"
-          :extra="`当前知识库：${selectedKBName || '全部知识库'}`"
-          description="基于知识库的检索增强生成，输入问题后 AI 将从知识库中检索相关内容并生成回答"
-        />
-      </div>
+      <!-- 问答模式 -->
+      <template v-if="viewMode === 'chat'">
+        <!-- 空态 Welcome -->
+        <div v-show="chatHistory.length === 0" class="rag-welcome-wrapper">
+          <XWelcome
+            icon="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+            title="RAG 知识问答测试"
+            :extra="`当前知识库：${selectedKBName || '全部知识库'}`"
+            description="基于知识库的检索增强生成，输入问题后 AI 将从知识库中检索相关内容并生成回答"
+          />
+        </div>
 
-      <!-- 对话消息列表 -->
-      <div
-        v-show="chatHistory.length > 0"
-        ref="chatContainerRef"
-        class="chat-container"
-      >
-        <div v-for="(msg, index) in chatHistory" :key="index" class="message-group">
-          <!-- 用户消息 -->
-          <XBubble
-            :content="msg.question"
-            placement="end"
-            bubble-header-title="我"
-            :bubble-avatar-src="userAvatar"
-            :typingstep="1"
-            :typinginterval="0"
-            :is-fog="false"
-          />
-          <!-- AI 回答 -->
-          <XBubble
-            :content="msg.answer"
-            placement="start"
-            bubble-header-title="RAG 助手"
-            :is-loading="msg.isLoading"
-            :typingstep="4"
-            :typinginterval="30"
-            typingsuffix=""
-            :is-fog="true"
-          />
-          <!-- 引用来源 -->
-          <div v-if="msg.sources && msg.sources.length > 0" class="sources-wrapper">
-            <div class="sources-header">
-              <el-icon><Link /></el-icon>
-              <span>引用来源（{{ msg.sources.length }} 条）</span>
-            </div>
-            <div class="sources-grid">
-              <RAGSourceCard
-                v-for="(source, sIdx) in msg.sources"
-                :key="sIdx"
-                :source="source"
-                :index="sIdx"
-              />
+        <!-- 对话消息列表 -->
+        <div
+          v-show="chatHistory.length > 0"
+          ref="chatContainerRef"
+          class="chat-container"
+        >
+          <div v-for="(msg, index) in chatHistory" :key="index" class="message-group">
+            <!-- 用户消息 -->
+            <XBubble
+              :content="msg.question"
+              placement="end"
+              bubble-header-title="我"
+              :bubble-avatar-src="userAvatar"
+              :typingstep="1"
+              :typinginterval="0"
+              :is-fog="false"
+            />
+            <!-- AI 回答 -->
+            <XBubble
+              :content="msg.answer"
+              placement="start"
+              bubble-header-title="RAG 助手"
+              :is-loading="msg.isLoading"
+              :typingstep="4"
+              :typinginterval="30"
+              typingsuffix=""
+              :is-fog="true"
+            />
+            <!-- 引用来源 -->
+            <div v-if="msg.sources && msg.sources.length > 0" class="sources-wrapper">
+              <div class="sources-header">
+                <el-icon><Link /></el-icon>
+                <span>引用来源（{{ msg.sources.length }} 条）</span>
+              </div>
+              <div class="sources-grid">
+                <RAGSourceCard
+                  v-for="(source, sIdx) in msg.sources"
+                  :key="sIdx"
+                  :source="source"
+                  :index="sIdx"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 底部输入框 -->
-      <div class="sender-wrapper">
-        <XEditorSender
-          ref="editorRef"
-          placeholder="输入问题，例如：什么是计算机网络？"
-          :iSclearable="true"
-          :is-senderloading="loading"
-          :iSshowPrefixFlog="false"
-          :isShowHeaderFlog="false"
-          @user-submit="handleUserSend"
-        />
-      </div>
+        <!-- 底部输入框 -->
+        <div class="sender-wrapper">
+          <XEditorSender
+            ref="editorRef"
+            placeholder="输入问题，例如：什么是计算机网络？"
+            :iSclearable="true"
+            :is-senderloading="loading"
+            :iSshowPrefixFlog="false"
+            :isShowHeaderFlog="false"
+            @user-submit="handleUserSend"
+          />
+        </div>
+      </template>
+
+      <!-- 调试模式 -->
+      <template v-else>
+        <RetrievalDebugPanel :knowledge-bases="knowledgeBases" />
+      </template>
     </main>
   </div>
 </template>
@@ -91,7 +113,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Setting, Link } from '@element-plus/icons-vue'
+import { Setting, Link, InfoFilled } from '@element-plus/icons-vue'
 import { postRAGQuery, getKnowledgeBaseList } from '@/API/Knowledge/knowledgeAPI'
 import { useAppStore } from '@/stores'
 import formatImageUrl from '@/util/formatImageUrl'
@@ -100,8 +122,10 @@ import XWelcome from '@/components/Element-plus-x/XWelcome.vue'
 import XEditorSender from '@/components/Element-plus-x/XEditorSender .vue'
 import RAGSettingsPanel from '@/components/Knowledge/RAGSettingsPanel.vue'
 import RAGSourceCard from '@/components/Knowledge/RAGSourceCard.vue'
+import RetrievalDebugPanel from '@/components/Knowledge/RetrievalDebugPanel.vue'
 
 const appStore = useAppStore()
+const viewMode = ref('chat')
 const userAvatar = computed(() =>
   appStore.userInfo.avatar
     ? formatImageUrl(appStore.userInfo.avatar)
@@ -226,9 +250,43 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 600;
   color: #303133;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid #ebeef5;
+}
+
+.mode-switch {
+  margin-bottom: 16px;
+}
+
+.mode-switch :deep(.el-radio-group) {
+  display: flex;
+}
+
+.mode-switch :deep(.el-radio-button) {
+  flex: 1;
+}
+
+.mode-switch :deep(.el-radio-button__inner) {
+  width: 100%;
+}
+
+.sidebar-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #909399;
+  line-height: 1.6;
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.sidebar-tip .el-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: #409eff;
 }
 
 /* 右侧主区域 */
