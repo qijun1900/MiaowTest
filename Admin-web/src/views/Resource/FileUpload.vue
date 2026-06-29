@@ -66,9 +66,9 @@ import { FolderAdd } from "@element-plus/icons-vue";
 import { useAppStore } from "@/stores";
 import { getTags } from "@/API/Resource/FileAPI";
 import { useBatchUpload } from "@/composables/useBatchUpload";
-import BatchUploadArea from "@/components/upload/BatchUploadArea.vue";
-import UploadQueueList from "@/components/upload/UploadQueueList.vue";
-import BatchConfigForm from "@/components/upload/BatchConfigForm.vue";
+import BatchUploadArea from "@/components/business/upload/BatchUploadArea.vue";
+import UploadQueueList from "@/components/business/upload/UploadQueueList.vue";
+import BatchConfigForm from "@/components/business/upload/BatchConfigForm.vue";
 
 const appStore = useAppStore();
 const uploadAreaRef = ref();

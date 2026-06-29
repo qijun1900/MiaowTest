@@ -248,16 +248,16 @@ import {
   Delete,
   Message,
 } from "@element-plus/icons-vue";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import { getMessageList } from "../../API/consumer/consumer_messageAPI";
 import formatInfo from "@/util/formatInfo";
 import formatTime from "@/util/formatTime";
 import { handleFeedback, deleteFeedback } from "../../API/consumer/consumer_messageAPI";
 import { ElMessage } from "element-plus";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
 import { useFeedbackFilter } from "@/util/SearchFilter";
 // 动态导入较大的组件
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
 
 // 响应式数据
 const feedbackList = ref([]); // 反馈列表

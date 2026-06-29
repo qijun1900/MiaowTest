@@ -218,7 +218,7 @@ import {
   Files,
   More,
 } from "@element-plus/icons-vue";
-import Dialog from "@/components/ReuseComponents/Dialog .vue";
+import Dialog from "@/components/base/BaseDialog.vue";
 import {
   formatFileSize as formatSize,
   getCategoryLabel,

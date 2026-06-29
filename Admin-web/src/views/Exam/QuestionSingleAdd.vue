@@ -7,10 +7,10 @@
 <script setup>
 import { computed } from "vue";
 import { useAppStore } from "@/stores";
-import Select from "@/components/Exam/Select.vue"; //1
-import Blank from "@/components/Exam/Blank.vue"; //2
-import Judge from "@/components/Exam/Judge.vue"; //3
-import Short from "@/components/Exam/Short.vue"; //4
+import Select from "@/components/business/exam/QuestionTypeSelect.vue"; //1
+import Blank from "@/components/business/exam/QuestionTypeBlank.vue"; //2
+import Judge from "@/components/business/exam/QuestionTypeJudge.vue"; //3
+import Short from "@/components/business/exam/QuestionTypeShort.vue"; //4
 
 const appStore = useAppStore();
 const QuestionType = appStore.examInfo.category; // 题目类型

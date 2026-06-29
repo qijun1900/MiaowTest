@@ -240,19 +240,19 @@
 import { useRoute } from "vue-router";
 import { RefreshRight, Hide, Open } from "@element-plus/icons-vue";
 import { onMounted, ref, defineAsyncComponent, computed } from "vue";
-import SearchFilter from "@/components/FunComponents/SearchFilter.vue";
+import SearchFilter from "@/components/base/SearchFilter.vue";
 import { useTableState } from "@/composables/State/useTableState";
 import { useTableActions } from "@/composables/Action/useTableActions";
 import { useAppStore } from "@/stores";
 import formatTime from "@/util/formatTime";
 import { getCategoryName } from "@/util/formatExamname";
-import Tooltip from "@/components/ReuseComponents/Tooltip.vue";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
-import Select from "@/components/Exam/Select.vue"; //1
-import Blank from "@/components/Exam/Blank.vue"; //2
-import Judge from "@/components/Exam/Judge.vue"; //3
-import Short from "@/components/Exam/Short.vue"; //4
+import Tooltip from "@/components/base/BaseTooltip.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
+import Pagination from "@/components/base/BasePagination.vue";
+import Select from "@/components/business/exam/QuestionTypeSelect.vue"; //1
+import Blank from "@/components/business/exam/QuestionTypeBlank.vue"; //2
+import Judge from "@/components/business/exam/QuestionTypeJudge.vue"; //3
+import Short from "@/components/business/exam/QuestionTypeShort.vue"; //4
 import { ElMessage } from "element-plus";
 import { formatSelectAnswer, isAianswer } from "@/util/formatAnswer";
 import {
@@ -267,8 +267,8 @@ import formatQuestion from "@/util/formatQuestion";
 import { modelappGetQuestionAnalysis } from "@/API/LLM/modelappAPI";
 import { Eleme } from "@element-plus/icons-vue";
 // 动态导入较大的组件
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
-const QuestionPreview = defineAsyncComponent(() => import("@/components/Exam/QuestionPreview.vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
+const QuestionPreview = defineAsyncComponent(() => import("@/components/business/exam/QuestionPreview.vue"));
 
 //UI 状态与方法管理
 const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTableState();

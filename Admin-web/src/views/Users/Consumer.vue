@@ -178,12 +178,12 @@ import {
   GetAuthExamListAPI,
   updateExamAuthStatusAPI,
 } from "../../API/consumer/consumer_manageAPI";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import formatInfo from "@/util/formatInfo";
 import formatTime from "@/util/formatTime";
 import formatImageUrl from "@/util/formatImageUrl";
 import { useConsumerFilter } from "@/util/SearchFilter";
-import Drawer from "@/components/ReuseComponents/Drawer.vue";
+import Drawer from "@/components/base/BaseDrawer.vue";
 
 // 默认头像
 const defaultAvatar = "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png";

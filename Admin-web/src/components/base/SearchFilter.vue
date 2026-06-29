@@ -50,7 +50,7 @@
 </template>
 <script setup>
 import { reactive } from "vue";
-import Tooltip from "@/components/ReuseComponents/Tooltip.vue";
+import Tooltip from "@/components/base/BaseTooltip.vue";
 import { useSearchFilter } from "@/util/SearchFilter";
 import { Search, CloseBold } from "@element-plus/icons-vue";
 

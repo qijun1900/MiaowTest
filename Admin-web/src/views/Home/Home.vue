@@ -83,10 +83,10 @@
   </div>
 </template>
 <script setup>
-import Divider from "@/components/ReuseComponents/Divider.vue";
+import Divider from "@/components/base/BaseDivider.vue";
 import { EditPen, Promotion } from "@element-plus/icons-vue";
-import BarChart from "@/components/Chart/BarChart.vue";
-import PieChart from "@/components/Chart/PieChart.vue";
+import BarChart from "@/components/charts/BarChart.vue";
+import PieChart from "@/components/charts/PieChart.vue";
 import RouterPush from "@/util/RouterPush";
 import { onMounted, ref } from "vue";
 import { getUserList } from "@/API/Users/userAPI"; //API

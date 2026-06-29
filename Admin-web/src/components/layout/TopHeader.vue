@@ -44,7 +44,7 @@ import { onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/index";
 import { User, Expand, Fold, Bell } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
-import PageHeader from "../FunComponents/PageHeader.vue";
+import PageHeader from "../base/PageHeader.vue";
 import { getMessageCount } from "@/API/consumer/consumer_messageAPI";
 
 const router = useRouter();

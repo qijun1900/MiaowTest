@@ -245,13 +245,13 @@
 import { useAppStore } from "@/stores";
 import { onMounted, ref, defineAsyncComponent, reactive } from "vue";
 import formatTime from "@/util/formatTime";
-import SearchFilter from "@/components/FunComponents/SearchFilter.vue";
-import Tooltip from "@/components/ReuseComponents/Tooltip.vue";
+import SearchFilter from "@/components/base/SearchFilter.vue";
+import Tooltip from "@/components/base/BaseTooltip.vue";
 import { RefreshRight, Hide, Open, Plus, View } from "@element-plus/icons-vue";
 import { useTableState } from "@/composables/State/useTableState";
 import { useTableActions } from "@/composables/Action/useTableActions";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import { useRoute } from "vue-router";
 import {
   postAddQuestionTitle,
@@ -263,13 +263,13 @@ import {
   CheckQuestionTitle,
 } from "@/API/Exam/questionTitleAPI";
 import { ElMessage } from "element-plus";
-import Drawer from "@/components/ReuseComponents/Drawer.vue";
+import Drawer from "@/components/base/BaseDrawer.vue";
 import { getCategoryName, getCategoryIcon } from "@/util/formatExamname";
 // 动态导入较大的组件
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
-const QuestionAddList = defineAsyncComponent(() => import("@/components/Exam/QuestionAddList.vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
+const QuestionAddList = defineAsyncComponent(() => import("@/components/business/exam/QuestionAddList.vue"));
 const QuestionCheckList = defineAsyncComponent(
-  () => import("@/components/Exam/QuestionCheckList.vue"),
+  () => import("@/components/business/exam/QuestionCheckList.vue"),
 );
 const appStore = useAppStore();
 const route = useRoute();

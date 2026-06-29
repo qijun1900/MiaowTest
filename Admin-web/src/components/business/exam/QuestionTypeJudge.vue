@@ -1,32 +1,32 @@
 <template>
   <div class="container">
     <el-card shadow="hover" style="border-radius: 10px">
-      <el-form ref="formRef" :model="form" label-position="top">
+      <el-form :model="form" ref="formRef" label-position="top">
         <Divider content="题目题干" />
         <el-form-item
           prop="stem"
           :rules="[{ required: true, message: '题干不能为空', trigger: 'blur' }]"
         >
           <Editor
-            :key="'content-editor'"
+            :key="'stem-editor'"
             @event="handlechangeStem"
-            :height="130"
+            :height="100"
             placeholder="请在此处输入题目题干..."
             :content="form.stem"
           />
         </el-form-item>
         <Divider content="题目答案" />
         <el-form-item
-          prop="content"
-          :rules="[{ required: true, message: '题干不能为空', trigger: 'blur' }]"
+          prop="answer"
+          :rules="[{ required: true, message: '请选择正确答案', trigger: 'blur' }]"
         >
-          <Editor
-            :key="'content-editor'"
-            @event="handlechangeContent"
-            :height="100"
-            placeholder="请在此处输入题目答案..."
-            :content="form.content"
-          />
+          <el-radio-group v-model="form.answer">
+            <div>
+              <el-radio :value="1" size="large">正确</el-radio>
+              <br />
+              <el-radio :value="0" size="large">错误</el-radio>
+            </div>
+          </el-radio-group>
         </el-form-item>
         <el-button type="success" @click="submitForm" :icon="Checked">
           {{ props.isEdit ? "更新题目" : "添加题目" }}
@@ -51,12 +51,12 @@
   </div>
 </template>
 <script setup>
-import { useRoute } from "vue-router";
 import { reactive, ref, watch } from "vue";
-import Divider from "../ReuseComponents/Divider.vue";
-import Editor from "../FunComponents/Editor.vue";
+import { useRoute } from "vue-router";
+import Divider from "../../base/BaseDivider.vue";
+import Editor from "../../editor/RichEditor.vue";
 import { ElMessage } from "element-plus";
-import { shortAPI } from "@/API/Question/ShortAPI";
+import { judgeAPI } from "@/API/Question/JudgeAPI";
 import { Checked } from "@element-plus/icons-vue";
 
 const route = useRoute();
@@ -64,12 +64,12 @@ const formRef = ref();
 const form = reactive({
   examId: route.params.id,
   stem: "",
-  content: "",
+  answer: null, // 正确答案 1:正确 0:错误
   isPublish: 0,
   analysis: "",
   isAIanswer: 0,
-  isAddUserList: 0, //0:不是，1：是
-  Type: 4, // 题目类型
+  isAddUserList: 0,
+  Type: 3, // 题目类型
 });
 // 定义props
 const props = defineProps({
@@ -80,48 +80,43 @@ const props = defineProps({
 const handlechangeStem = (data) => {
   form.stem = data;
 };
-const handlechangeContent = (data) => {
-  form.content = data;
-};
 const handlechangeAnalysis = (data) => {
   form.analysis = data;
 };
 //重置表单
 const resetForm = () => {
   form.stem = "";
-  form.content = "";
-  form.isPublish = 0;
+  form.answer = null;
   form.analysis = "";
   form.isAIanswer = 0;
   form.isAddUserList = 0;
-  form.Type = 4;
 };
 //提交表单
 const submitForm = async () => {
   try {
     if (props.isEdit && props.Data) {
       const _id = props.Data._id;
-      const res = await shortAPI.postUpdateShort(form, _id);
+      const res = await judgeAPI.postUpdateJudge(form, _id);
       if (res.code === 200) {
-        ElMessage.success("更新成功");
+        ElMessage.success("判断题更新成功");
       } else {
-        ElMessage.error("更新失败");
+        ElMessage.error("判断题更新失败");
       }
     } else {
       const valid = await formRef.value.validate();
       if (valid) {
-        const res = await shortAPI.postAddShort(form);
+        const res = await judgeAPI.postAddJudge(form);
         if (res.code === 200) {
-          ElMessage.success("提交成功");
+          ElMessage.success("判断题添加成功");
           resetForm();
         } else {
-          ElMessage.error("提交失败，请稍后重试");
+          ElMessage.error("判断题添加失败");
         }
       }
     }
   } catch (error) {
-    console.error(error);
-    ElMessage.error("提交失败，请稍后重试");
+    ElMessage.error("表单验证失败");
+    console.error("表单验证失败:", error);
   }
 };
 watch(
@@ -130,11 +125,11 @@ watch(
     if (newVal && props.isEdit) {
       const data = newVal;
       form.stem = data.stem;
-      form.content = data.content;
-      form.analysis = data.analysis;
-      form.isAIanswer = data.isAIanswer;
-      form.isAddUserList = data.isAddUserList;
-      form.Type = data.Type || 4;
+      form.answer = data.answer;
+      form.analysis = data.analysis || "";
+      form.isAIanswer = data.isAIanswer || 0;
+      form.isAddUserList = data.isAddUserList || 0;
+      form.Type = data.Type || "";
     }
   },
   { immediate: true },

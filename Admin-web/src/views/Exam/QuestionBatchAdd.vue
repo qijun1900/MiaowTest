@@ -115,22 +115,22 @@
   </div>
 </template>
 <script setup>
-import XEditorSender from "@/components/Element-plus-x/XEditorSender .vue";
+import XEditorSender from "@/components/ai/XEditorSender.vue";
 import { useAppStore } from "@/stores";
 import { getCategoryName } from "@/util/formatExamname";
 import formatTime from "@/util/formatTime";
 import { ref, defineAsyncComponent } from "vue";
-import XWelcome from "@/components/Element-plus-x/XWelcome.vue";
-import XBubble from "@/components/Element-plus-x/XBubble.vue";
+import XWelcome from "@/components/ai/XWelcome.vue";
+import XBubble from "@/components/ai/XBubble.vue";
 import { modelappBatchaddQuestion } from "@/API/LLM/modelappAPI";
 import escconfig from "../../config/esc.config";
 import { useRoute } from "vue-router";
-import QuestionDisplay from "@/components/Exam/QuestionDisplay.vue";
+import QuestionDisplay from "@/components/business/exam/QuestionDisplay.vue";
 import { formatSelectAnswer } from "@/util/formatAnswer";
 import handleLooked from "@/util/CheckInfo";
 
 // 动态导入较大的组件
-const QuestionPreview = defineAsyncComponent(() => import("@/components/Exam/QuestionPreview.vue"));
+const QuestionPreview = defineAsyncComponent(() => import("@/components/business/exam/QuestionPreview.vue"));
 
 const appStore = useAppStore();
 const isSendValue = ref(false); // 是否发送消息

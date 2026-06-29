@@ -150,11 +150,11 @@ import {
 } from "@/API/Knowledge/knowledgeAPI";
 import { useAppStore } from "@/stores";
 import formatTime from "@/util/formatTime";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
 import { defineAsyncComponent } from "vue";
 import { useRouter } from "vue-router";
 
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
 
 const appStore = useAppStore();
 const router = useRouter();

@@ -51,14 +51,14 @@
   </div>
 </template>
 <script setup>
-import XEditorSender from "@/components/Element-plus-x/XEditorSender .vue";
+import XEditorSender from "@/components/ai/XEditorSender.vue";
 import { useAppStore } from "@/stores";
 import { onMounted, ref } from "vue";
-import XWelcome from "@/components/Element-plus-x/XWelcome.vue";
-import XBubble from "@/components/Element-plus-x/XBubble.vue";
+import XWelcome from "@/components/ai/XWelcome.vue";
+import XBubble from "@/components/ai/XBubble.vue";
 import formatImageUrl from "@/util/formatImageUrl";
 import { testChatAPI, getChatAgents } from "@/API/LLM/agentAPI";
-import ElSelect from "@/components/ReuseComponents/ElSelect.vue";
+import ElSelect from "@/components/base/BaseSelect.vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 

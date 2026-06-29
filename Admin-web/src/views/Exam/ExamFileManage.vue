@@ -156,10 +156,10 @@ import {
 } from "@/API/Exam/netDiskAPI.js";
 import { useRoute } from "vue-router";
 import formatTime from "@/util/formatTime";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import { useNetDiskFilter } from "@/util/SearchFilter.js";
 // 动态导入较大的组件
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
 
 const appStore = useAppStore();
 const route = useRoute();

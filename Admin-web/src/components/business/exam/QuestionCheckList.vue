@@ -78,14 +78,14 @@ import {
 import { Search } from "@element-plus/icons-vue";
 import { getCategoryName } from "@/util/formatExamname";
 import { useTableActions } from "@/composables/Action/useTableActions";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
 import { ElMessage } from "element-plus";
-import Select from "@/components/Exam/Select.vue"; //1
-import Blank from "@/components/Exam/Blank.vue"; //2
-import Judge from "@/components/Exam/Judge.vue"; //3
-import Short from "@/components/Exam/Short.vue"; //4
-const QuestionPreview = defineAsyncComponent(() => import("@/components/Exam/QuestionPreview.vue"));
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
+import Select from "@/components/business/exam/QuestionTypeSelect.vue"; //1
+import Blank from "@/components/business/exam/QuestionTypeBlank.vue"; //2
+import Judge from "@/components/business/exam/QuestionTypeJudge.vue"; //3
+import Short from "@/components/business/exam/QuestionTypeShort.vue"; //4
+const QuestionPreview = defineAsyncComponent(() => import("@/components/business/exam/QuestionPreview.vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
 const { selectedRows, handleSelectionChange } = useTableActions();
 
 const tableData = ref([]); // 表格数据

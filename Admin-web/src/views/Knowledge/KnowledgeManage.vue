@@ -262,7 +262,7 @@
 
 <script setup>
 import { RefreshRight, Upload, Search, Grid, VideoPlay, Warning, Plus, Delete, UploadFilled } from "@element-plus/icons-vue";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
@@ -276,10 +276,10 @@ import {
 } from "@/API/Knowledge/knowledgeAPI";
 import { useAppStore } from "@/stores";
 import formatTime from "@/util/formatTime";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
 import { defineAsyncComponent } from "vue";
 
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
 
 const appStore = useAppStore();
 const tableData = ref([]);

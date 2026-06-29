@@ -266,14 +266,14 @@
   </div>
 </template>
 <script setup>
-import SearchFilter from "@/components/FunComponents/SearchFilter.vue";
+import SearchFilter from "@/components/base/SearchFilter.vue";
 import { RefreshRight, Hide, Open } from "@element-plus/icons-vue";
-import Tooltip from "@/components/ReuseComponents/Tooltip.vue";
+import Tooltip from "@/components/base/BaseTooltip.vue";
 import { useTableState } from "@/composables/State/useTableState";
 import { useTableActions } from "@/composables/Action/useTableActions";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
 import { ref, reactive, defineAsyncComponent, onMounted } from "vue";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import { ElMessage } from "element-plus";
 import {
   postAddAgent,
@@ -287,7 +287,7 @@ import { useAppStore } from "@/stores";
 import RouterPush from "@/util/RouterPush";
 
 // 动态导入较大的组件
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
 // UI 状态与方法管理
 const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTableState();
 // 表格数据与方法管理

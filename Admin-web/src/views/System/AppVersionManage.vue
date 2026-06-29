@@ -238,10 +238,10 @@
 import { RefreshRight, Hide, Open } from "@element-plus/icons-vue";
 import { useTableState } from "@/composables/State/useTableState";
 import { useTableActions } from "@/composables/Action/useTableActions";
-import Tooltip from "@/components/ReuseComponents/Tooltip.vue";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
-import SearchFilter from "@/components/FunComponents/SearchFilter.vue";
+import Tooltip from "@/components/base/BaseTooltip.vue";
+import Pagination from "@/components/base/BasePagination.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
+import SearchFilter from "@/components/base/SearchFilter.vue";
 import { ref, defineAsyncComponent, reactive, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import formatTime from "@/util/formatTime";
@@ -254,7 +254,7 @@ import {
   updateVersionStatus,
 } from "@/API/version/versionAPI";
 
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
 
 // UI 状态
 const { showSearch, IsOpenStripe, HandleHideSearch, handleOpenStripe } = useTableState();

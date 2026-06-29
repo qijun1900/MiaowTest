@@ -10,6 +10,6 @@
   </el-container>
 </template>
 <script setup>
-import sidemenu from "@/components/mainbox/sidemenu.vue";
-import topheader from "@/components/mainbox/topheader.vue";
+import sidemenu from "@/components/layout/SideMenu.vue";
+import topheader from "@/components/layout/TopHeader.vue";
 </script>

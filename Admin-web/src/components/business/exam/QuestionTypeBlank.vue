@@ -69,8 +69,8 @@
   </div>
 </template>
 <script setup>
-import Divider from "../ReuseComponents/Divider.vue";
-import Editor from "../FunComponents/Editor.vue";
+import Divider from "../../base/BaseDivider.vue";
+import Editor from "../../editor/RichEditor.vue";
 import { Delete, CirclePlusFilled } from "@element-plus/icons-vue";
 import { reactive, ref, watch } from "vue";
 import { useRoute } from "vue-router";

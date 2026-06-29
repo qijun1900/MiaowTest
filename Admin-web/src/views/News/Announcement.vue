@@ -202,12 +202,12 @@
 <script setup>
 import { RefreshRight, Hide, Open } from "@element-plus/icons-vue";
 import { useTableState } from "@/composables/State/useTableState";
-import Tooltip from "@/components/ReuseComponents/Tooltip.vue";
+import Tooltip from "@/components/base/BaseTooltip.vue";
 import { useTableActions } from "@/composables/Action/useTableActions";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import { ref, defineAsyncComponent, reactive, onMounted, computed, watch } from "vue";
 import { ElMessage } from "element-plus";
-import Editor from "@/components/FunComponents/Editor.vue";
+import Editor from "@/components/editor/RichEditor.vue";
 import {
   postAddAnnouncement,
   getAnnouncementList,
@@ -218,12 +218,12 @@ import {
 } from "@/API/News/announcementAPI"; //APi
 import { useAppStore } from "@/stores";
 import formatTime from "@/util/formatTime";
-import Popconfirm from "@/components/ReuseComponents/Popconfirm.vue";
-import SearchFilter from "@/components/FunComponents/SearchFilter.vue";
+import Popconfirm from "@/components/base/BasePopconfirm.vue";
+import SearchFilter from "@/components/base/SearchFilter.vue";
 import handleLooked from "@/util/CheckInfo";
 // 动态导入较大的组件
-const Dialog = defineAsyncComponent(() => import("@/components/ReuseComponents/Dialog .vue"));
-const Upload = defineAsyncComponent(() => import("@/components/upload/Upload.vue"));
+const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
+const Upload = defineAsyncComponent(() => import("@/components/business/upload/Upload.vue"));
 //store
 const appStore = useAppStore();
 //tableData数据

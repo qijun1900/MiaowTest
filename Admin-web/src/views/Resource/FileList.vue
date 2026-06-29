@@ -51,9 +51,9 @@
 import { ref, onMounted } from "vue";
 import RouterPush from "@/util/RouterPush";
 import { useFileList } from "@/composables/useFileList";
-import FileListTable from "@/components/fileList/FileListTable.vue";
-import FilePreviewPanel from "@/components/fileList/FilePreviewPanel.vue";
-import FileEditDialog from "@/components/fileList/FileEditDialog.vue";
+import FileListTable from "@/components/business/file/FileListTable.vue";
+import FilePreviewPanel from "@/components/business/file/FilePreviewPanel.vue";
+import FileEditDialog from "@/components/business/file/FileEditDialog.vue";
 
 // ========== 使用文件列表组合式函数 ==========
 const {

@@ -162,7 +162,7 @@ import {
   VideoPlay,
   Headset,
 } from "@element-plus/icons-vue";
-import Pagination from "@/components/ReuseComponents/Pagination.vue";
+import Pagination from "@/components/base/BasePagination.vue";
 import { getFileIcon } from "@/util/resourceUtils";
 import {
   getFileIconClass,

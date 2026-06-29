@@ -117,12 +117,12 @@ import { Setting, Link, InfoFilled } from '@element-plus/icons-vue'
 import { postRAGQuery, getKnowledgeBaseList } from '@/API/Knowledge/knowledgeAPI'
 import { useAppStore } from '@/stores'
 import formatImageUrl from '@/util/formatImageUrl'
-import XBubble from '@/components/Element-plus-x/XBubble.vue'
-import XWelcome from '@/components/Element-plus-x/XWelcome.vue'
-import XEditorSender from '@/components/Element-plus-x/XEditorSender .vue'
-import RAGSettingsPanel from '@/components/Knowledge/RAGSettingsPanel.vue'
-import RAGSourceCard from '@/components/Knowledge/RAGSourceCard.vue'
-import RetrievalDebugPanel from '@/components/Knowledge/RetrievalDebugPanel.vue'
+import XBubble from '@/components/ai/XBubble.vue'
+import XWelcome from '@/components/ai/XWelcome.vue'
+import XEditorSender from '@/components/ai/XEditorSender.vue'
+import RAGSettingsPanel from '@/components/business/knowledge/RAGSettingsPanel.vue'
+import RAGSourceCard from '@/components/business/knowledge/RAGSourceCard.vue'
+import RetrievalDebugPanel from '@/components/business/knowledge/RetrievalDebugPanel.vue'
 
 const appStore = useAppStore()
 const viewMode = ref('chat')
@@ -160,6 +160,11 @@ const scrollToBottom = async () => {
 }
 
 const handleUserSend = async (data) => {
+  if (!ragConfig.value.knowledgeBaseId) {
+    ElMessage.warning('请先在左侧选择一个知识库')
+    return
+  }
+
   if (!data || !data.text || !data.text.trim()) {
     ElMessage.warning('请输入问题')
     return
