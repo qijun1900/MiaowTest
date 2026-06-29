@@ -82,6 +82,7 @@
                   :key="sIdx"
                   :source="source"
                   :index="sIdx"
+                  @preview="handleSourcePreview"
                 />
               </div>
             </div>
@@ -108,13 +109,21 @@
       </template>
     </main>
   </div>
+
+  <!-- 文件预览抽屉 -->
+  <FilePreviewDrawer
+    v-model="previewVisible"
+    :file-url="previewFileUrl"
+    :file-name="previewFileName"
+    :file-type="previewFileType"
+  />
 </template>
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Setting, Link, InfoFilled } from '@element-plus/icons-vue'
-import { postRAGQuery, getKnowledgeBaseList } from '@/API/Knowledge/knowledgeAPI'
+import { postRAGQuery, getKnowledgeBaseList, getKnowledgeDocById } from '@/API/Knowledge/knowledgeAPI'
 import { useAppStore } from '@/stores'
 import formatImageUrl from '@/util/formatImageUrl'
 import XBubble from '@/components/ai/XBubble.vue'
@@ -123,6 +132,7 @@ import XEditorSender from '@/components/ai/XEditorSender.vue'
 import RAGSettingsPanel from '@/components/business/knowledge/RAGSettingsPanel.vue'
 import RAGSourceCard from '@/components/business/knowledge/RAGSourceCard.vue'
 import RetrievalDebugPanel from '@/components/business/knowledge/RetrievalDebugPanel.vue'
+import FilePreviewDrawer from '@/components/business/knowledge/FilePreviewDrawer.vue'
 
 const appStore = useAppStore()
 const viewMode = ref('chat')
@@ -145,6 +155,12 @@ const chatHistory = ref([])
 const loading = ref(false)
 const editorRef = ref()
 const chatContainerRef = ref()
+
+// 文件预览
+const previewVisible = ref(false)
+const previewFileUrl = ref('')
+const previewFileName = ref('')
+const previewFileType = ref('')
 
 const selectedKBName = computed(() => {
   if (!ragConfig.value.knowledgeBaseId) return ''
@@ -212,6 +228,23 @@ const handleUserSend = async (data) => {
 
 const handleClearHistory = () => {
   chatHistory.value = []
+}
+
+const handleSourcePreview = async (docId) => {
+  try {
+    const res = await getKnowledgeDocById(docId)
+    if (res && res.data) {
+      previewFileUrl.value = res.data.fileUrl || ''
+      previewFileName.value = res.data.originalName || res.data.title || ''
+      previewFileType.value = res.data.fileType || ''
+      previewVisible.value = true
+    } else {
+      ElMessage.warning('无法获取文档信息')
+    }
+  } catch (error) {
+    ElMessage.error('获取文档信息失败')
+    console.error('handleSourcePreview error:', error)
+  }
 }
 
 const loadKnowledgeBases = async () => {

@@ -159,6 +159,24 @@ const KnowledgeController = {
     res.status(200).send({ ActionType: "OK", code: 200, message: "文档处理已开始，请稍后刷新查看状态" });
   },
 
+  /** 按 ID 查询文档详情（用于文件预览） */
+  getDocument: async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).send({ ActionType: "ERROR", code: 400, message: "无效的文档 ID" });
+      }
+      const doc = await KnowledgeService.getDocumentById(id);
+      if (!doc) {
+        return res.status(404).send({ ActionType: "ERROR", code: 404, message: "文档不存在" });
+      }
+      res.status(200).send({ ActionType: "OK", code: 200, data: doc });
+    } catch (error) {
+      console.error("[KnowledgeController] getDocument error:", error);
+      res.status(500).send({ ActionType: "ERROR", code: 500, message: error.message });
+    }
+  },
+
   /** 分页查询文档列表 */
   getDocumentList: async (req, res) => {
     try {

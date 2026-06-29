@@ -124,9 +124,17 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column label="操作" fixed="right" width="240">
           <template #default="{ row }">
             <div class="action-cell">
+              <el-button
+                type="primary"
+                link
+                size="small"
+                @click="handlePreview(row)"
+              >
+                <el-icon><View /></el-icon>预览
+              </el-button>
               <el-button
                 v-if="row.status === 0 || row.status === 3"
                 type="primary"
@@ -258,10 +266,18 @@
       </div>
     </template>
   </Dialog>
+
+  <!-- 文件预览抽屉 -->
+  <FilePreviewDrawer
+    v-model="previewVisible"
+    :file-url="previewFileUrl"
+    :file-name="previewFileName"
+    :file-type="previewFileType"
+  />
 </template>
 
 <script setup>
-import { RefreshRight, Upload, Search, Grid, VideoPlay, Warning, Plus, Delete, UploadFilled } from "@element-plus/icons-vue";
+import { RefreshRight, Upload, Search, Grid, VideoPlay, Warning, Plus, Delete, UploadFilled, View } from "@element-plus/icons-vue";
 import Pagination from "@/components/base/BasePagination.vue";
 import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
@@ -277,6 +293,7 @@ import {
 import { useAppStore } from "@/stores";
 import formatTime from "@/util/formatTime";
 import Popconfirm from "@/components/base/BasePopconfirm.vue";
+import FilePreviewDrawer from "@/components/business/knowledge/FilePreviewDrawer.vue";
 import { defineAsyncComponent } from "vue";
 
 const Dialog = defineAsyncComponent(() => import("@/components/base/BaseDialog.vue"));
@@ -292,6 +309,12 @@ const IsOpenStripe = ref(true);
 const addToKBVisible = ref(false);
 const addToKBRow = ref(null);
 const addToKBTarget = ref("");
+
+// 文件预览
+const previewVisible = ref(false);
+const previewFileUrl = ref("");
+const previewFileName = ref("");
+const previewFileType = ref("");
 
 const statusText = { 0: "待处理", 1: "处理中", 2: "已完成", 3: "失败" };
 
@@ -394,6 +417,13 @@ const handleConfirmAddToKB = async () => {
 const handleAdd = () => {
   resetForm();
   dialogVisible.value = true;
+};
+
+const handlePreview = (row) => {
+  previewFileUrl.value = row.fileUrl || "";
+  previewFileName.value = row.originalName || row.title || "";
+  previewFileType.value = row.fileType || "";
+  previewVisible.value = true;
 };
 
 const handleConfirm = async () => {

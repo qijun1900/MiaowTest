@@ -110,6 +110,20 @@ export async function getKnowledgeDocList(params) {
   }
 }
 
+/** 按 ID 获取文档详情（用于文件预览） */
+export async function getKnowledgeDocById(id) {
+  try {
+    const response = await axios.get(`/adminapi/knowledge/doc/${id}`);
+    if (response.data.code === 200) {
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("getKnowledgeDocById error:", error);
+    throw error;
+  }
+}
+
 /** 触发文档处理（LlamaParse 解析 → 向量化入库） */
 export async function postProcessKnowledgeDoc(_id) {
   try {

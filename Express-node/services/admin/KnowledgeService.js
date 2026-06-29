@@ -137,6 +137,14 @@ const KnowledgeService = {
   },
 
   /**
+   * 按 ID 查询单个文档详情
+   * 用于前端文件预览等场景
+   */
+  async getDocumentById(docId) {
+    return KnowledgeDocModel.findById(docId);
+  },
+
+  /**
    * 处理文档的核心流程：
    * 1. 从 OSS 下载文件到临时目录
    * 2. LlamaParse 解析为结构化 Markdown（支持表格/图片/图表）

@@ -46,6 +46,7 @@ KnowledgeRouter.post(
 );
 
 KnowledgeRouter.post("/adminapi/knowledge/process", KnowledgeController.processDocument);
+KnowledgeRouter.get("/adminapi/knowledge/doc/:id", KnowledgeController.getDocument);
 KnowledgeRouter.get("/adminapi/knowledge/list", KnowledgeController.getDocumentList);
 KnowledgeRouter.post("/adminapi/knowledge/delete", KnowledgeController.deleteDocument);
 

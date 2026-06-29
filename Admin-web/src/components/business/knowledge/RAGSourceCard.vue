@@ -1,5 +1,5 @@
 <template>
-  <div class="rag-source-card">
+  <div class="rag-source-card" @click="handleClick">
     <div class="source-header">
       <div class="source-title">
         <el-icon class="source-icon"><Document /></el-icon>
@@ -53,6 +53,15 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(['preview'])
+
+const handleClick = () => {
+  const docId = props.source.metadata?.docId
+  if (docId) {
+    emit('preview', docId)
+  }
+}
+
 const expanded = ref(false)
 
 const similarityPercent = computed(() => {
@@ -80,6 +89,7 @@ const isLongContent = computed(() => {
   padding: 12px 16px;
   background: #fafbfc;
   transition: border-color 0.2s;
+  cursor: pointer;
 }
 
 .rag-source-card:hover {
