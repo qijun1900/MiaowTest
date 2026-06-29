@@ -11,6 +11,7 @@ require("dotenv").config();
 
 // 导入增强版数据库管理器
 const { dbManager } = require("../db/db.enhanced.js");
+const { healthCheck: chromaHealthCheck } = require("../llm/vectorstores/stores/chromaManager.js");
 const { printInfoSection, printMiaowBanner } = require("../helpers/consoleHelper");
 
 // 开发环境检测
@@ -138,6 +139,20 @@ async function startApplication() {
     // 连接数据库
     await dbManager.connect();
 
+    // ChromaDB 向量数据库检查
+    const chromaStatus = await chromaHealthCheck();
+    printInfoSection("ChromaDB 向量数据库", [
+      {
+        label: "连接地址",
+        value: process.env.CHROMA_URL || "http://localhost:8000",
+      },
+      {
+        label: "状态",
+        value: chromaStatus.ok ? "正常" : `异常: ${chromaStatus.message}`,
+        tone: chromaStatus.ok ? "success" : "danger",
+      },
+    ]);
+
     // 导入应用模块
     const app = require("../app");
     const debug = require("debug")("project:server");
@@ -162,7 +177,7 @@ async function startApplication() {
     server.listen(port, host);
     server.on("error", (error) => onError(error, port));
     server.on("listening", () =>
-      onListening(server, port, host, isCloudRuntime),
+      onListening(server, port, host, isCloudRuntime, chromaStatus),
     );
 
     // 设置优雅关闭处理
@@ -232,7 +247,7 @@ function onError(error, port) {
 /**
  * HTTP 服务器监听事件处理
  */
-function onListening(server, port, host = "localhost", isCloudRuntime = false) {
+function onListening(server, port, host = "localhost", isCloudRuntime = false, chromaStatus = { ok: false, message: "未检测" }) {
   const addr = server.address();
   const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
 
@@ -250,6 +265,9 @@ function onListening(server, port, host = "localhost", isCloudRuntime = false) {
   }
   console.log(
     `💾 数据库状态: ${dbManager.isHealthy() ? "✅ 健康" : "❌ 异常"}`,
+  );
+  console.log(
+    `🔍 ChromaDB: ${chromaStatus.ok ? "✅ 健康" : "❌ " + chromaStatus.message}`,
   );
 
   if (isDevelopment) {

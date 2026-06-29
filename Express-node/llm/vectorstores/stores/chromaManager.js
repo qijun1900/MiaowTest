@@ -158,10 +158,26 @@ async function similaritySearch(query, k = 4, collectionName) {
   return items;
 }
 
+/**
+ * 检查 ChromaDB 服务是否可达
+ * @returns {Promise<{ok: boolean, message: string}>}
+ */
+async function healthCheck() {
+  try {
+    const res = await fetch(`${CHROMA_URL}/api/v2/heartbeat`, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return { ok: false, message: `HTTP ${res.status}` };
+    await res.json();
+    return { ok: true, message: "连接正常" };
+  } catch (err) {
+    return { ok: false, message: err.message };
+  }
+}
+
 module.exports = {
   getCollection,
   deleteCollection,
   addDocuments,
   deleteByMetadata,
   similaritySearch,
+  healthCheck,
 };
