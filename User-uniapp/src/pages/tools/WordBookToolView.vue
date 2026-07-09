@@ -86,7 +86,7 @@
                         <view v-if="isSelectMode" class="card-checkbox" :class="{ checked: selectedIds.includes(item._id) }">
                             <t-icon
                                 :name="selectedIds.includes(item._id) ? 'check-circle-filled' : 'circle'"
-                                size="28rpx"
+                                size="36rpx"
                                 :color="selectedIds.includes(item._id) ? 'var(--app-brand)' : '#c0c4cc'"
                             ></t-icon>
                         </view>
@@ -243,11 +243,17 @@
 
 <script setup>
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import tPopup from "../../components/core/tPopup.vue";
 import { useNavBarSafeArea } from "../../composables/useNavBarSafeArea";
 import formatTime from "../../util/format/time";
+import {
+    getWordBooksAPI,
+    createWordBookAPI,
+    updateWordBookAPI,
+    batchDeleteWordBooksAPI,
+} from "../../API/Tools/WordBookAPI";
 
 const { safeAreaInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
@@ -275,37 +281,7 @@ const deleteDialogContent = computed(() => {
     return `确定要删除选中的 ${count} 个单词本吗？单词本内的所有单词将一并删除，且无法恢复。`;
 });
 
-// 假数据
-const wordBookList = ref([
-    {
-        _id: "wb_001",
-        title: "CET-4 核心词汇",
-        description: "大学英语四级高频核心词汇，涵盖阅读、听力常见词",
-        wordCount: 126,
-        updatedAt: "2026-07-08T10:30:00.000Z",
-    },
-    {
-        _id: "wb_002",
-        title: "雅思高频词",
-        description: "雅思考试高频词汇整理，助力听说读写",
-        wordCount: 89,
-        updatedAt: "2026-07-07T15:20:00.000Z",
-    },
-    {
-        _id: "wb_003",
-        title: "日语 N2 词汇",
-        description: "日语能力考试 N2 级别必备词汇",
-        wordCount: 213,
-        updatedAt: "2026-07-06T09:00:00.000Z",
-    },
-    {
-        _id: "wb_004",
-        title: "考研英语词汇",
-        description: "考研英语大纲词汇精选",
-        wordCount: 56,
-        updatedAt: "2026-07-05T18:45:00.000Z",
-    },
-]);
+const wordBookList = ref([]);
 
 const formData = ref({
     title: "",
@@ -488,15 +464,15 @@ const handleBatchDelete = async () => {
     if (count === 0) return;
 
     try {
-        // 模拟 API 调用
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        wordBookList.value = wordBookList.value.filter(
-            (book) => !selectedIds.value.includes(book._id),
-        );
-        uni.showToast({ title: `删除成功`, icon: "none",position:"bottom" });
+        const res = await batchDeleteWordBooksAPI(selectedIds.value);
+        if (res.code !== 200) {
+            throw new Error(res.message || "批量删除失败");
+        }
+        uni.showToast({ title: `已删除 ${count} 个单词本`, icon: "none",position:"bottom" });
         exitSelectMode();
+        await fetchWordBooks();
     } catch (error) {
-        uni.showToast({ title: "删除失败，请重试", icon: "none" });
+        uni.showToast({ title: error?.message || "删除失败，请重试", icon: "none", position: "bottom" });
         console.error("批量删除单词本失败:", error);
     } finally {
         showDeleteDialog.value = false;
@@ -542,17 +518,6 @@ const handleTitleInput = () => {
     }
 };
 
-const normalizeTitle = (title = "") => String(title).trim().toLowerCase();
-
-const isDuplicateTitle = (title = "") => {
-    const normalized = normalizeTitle(title);
-    return wordBookList.value.some(
-        (item) =>
-            normalizeTitle(item.title) === normalized &&
-            item._id !== editingId.value,
-    );
-};
-
 const handleSubmit = async () => {
     const title = formData.value.title.trim();
     const description = formData.value.description.trim();
@@ -562,44 +527,38 @@ const handleSubmit = async () => {
         return;
     }
 
-    if (isDuplicateTitle(title)) {
-        validationErrors.value.title = "单词本名称已存在，请更换名称";
-        return;
-    }
-
     submitting.value = true;
     try {
-        // 模拟 API 调用
-        await new Promise((resolve) => setTimeout(resolve, 600));
-
         if (isEditMode.value) {
-            const index = wordBookList.value.findIndex(
-                (item) => item._id === editingId.value,
-            );
-            if (index !== -1) {
-                wordBookList.value[index] = {
-                    ...wordBookList.value[index],
-                    title,
-                    description,
-                    updatedAt: new Date().toISOString(),
-                };
+            const res = await updateWordBookAPI({
+                id: editingId.value,
+                title,
+                description,
+            });
+            if (res.code !== 200) {
+                if (res.code === 409) {
+                    validationErrors.value.title = "单词本名称已存在，请更换名称";
+                    return;
+                }
+                throw new Error(res.message || "保存失败");
             }
             uni.showToast({ title: "保存成功", icon: "success" });
         } else {
-            const newBook = {
-                _id: `wb_${Date.now()}`,
-                title,
-                description,
-                wordCount: 0,
-                updatedAt: new Date().toISOString(),
-            };
-            wordBookList.value.unshift(newBook);
+            const res = await createWordBookAPI({ title, description });
+            if (res.code !== 200) {
+                if (res.code === 409) {
+                    validationErrors.value.title = "单词本名称已存在，请更换名称";
+                    return;
+                }
+                throw new Error(res.message || "创建失败");
+            }
             uni.showToast({ title: "创建成功", icon: "success" });
         }
         handleClosePopup();
+        await fetchWordBooks();
     } catch (error) {
         uni.showToast({
-            title: isEditMode.value ? "保存失败，请重试" : "创建失败，请重试",
+            title: error?.message || (isEditMode.value ? "保存失败，请重试" : "创建失败，请重试"),
             icon: "none",
         });
         console.error("操作失败:", error);
@@ -614,15 +573,40 @@ const handleOpenWordList = (item) => {
     });
 };
 
-onLoad(() => {
+/** 获取单词本列表 */
+const fetchWordBooks = async () => {
     loading.value = true;
-    setTimeout(() => {
+    try {
+        const res = await getWordBooksAPI();
+        if (res.code !== 200) {
+            throw new Error(res.message || "获取单词本失败");
+        }
+        wordBookList.value = Array.isArray(res.data) ? res.data : [];
+    } catch (error) {
+        wordBookList.value = [];
+        uni.showToast({ title: "获取单词本失败", icon: "none", position: "bottom" });
+        console.error("获取单词本失败:", error);
+    } finally {
         loading.value = false;
-    }, 500);
+    }
+};
+
+onLoad(() => {
+    fetchWordBooks();
 });
 
 onShow(() => {
     cardThemes.value = shuffleArray(cardThemePool);
+});
+
+const handleRefreshEvent = () => {
+    fetchWordBooks();
+};
+
+uni.$on("wordBook:refresh", handleRefreshEvent);
+
+onBeforeUnmount(() => {
+    uni.$off("wordBook:refresh", handleRefreshEvent);
 });
 </script>
 
@@ -850,11 +834,11 @@ onShow(() => {
 /* 卡片内复选框 */
 .card-checkbox {
     position: absolute;
-    top: 12rpx;
-    right: 12rpx;
+    top: 14rpx;
+    right: 14rpx;
     z-index: 10;
-    width: 36rpx;
-    height: 36rpx;
+    width: 48rpx;
+    height: 48rpx;
     display: flex;
     align-items: center;
     justify-content: center;
