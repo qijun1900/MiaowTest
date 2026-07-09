@@ -387,6 +387,14 @@
 						"navigationStyle": "custom", //自定义导航栏
 						"scrollIndicator": "none"
 					}
+				},
+				{
+					"path": "WordBookToolView",
+					"style": {
+						"navigationBarTitleText": "喵喵单词本",
+						"navigationStyle": "custom",
+						"scrollIndicator": "none"
+					}
 				}
 			]
 		}

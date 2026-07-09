@@ -71,6 +71,13 @@ const defaultToolsList = [
       path: '/pages/tools/NotesBookToolView',
       needLogin: true
     } ,
+    {
+        title:"喵喵单词本",
+        desc:"单词本工具，帮助你快速记录和管理单词",
+        icon:"/static/tools/tools-words.png",
+        path:"/pages/tools/WordBookToolView",
+        needLogin: true,
+    }
 ];
 
 const toolsList = ref([...defaultToolsList]);
