@@ -1,9 +1,6 @@
 const WordBookModel = require("../../models/WordBookModel");
 const WordListModel = require("../../models/WordListModel");
 
-const escapeRegex = (keyword = "") =>
-  keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
 const WordBookService = {
   /**
    * 获取单词本列表

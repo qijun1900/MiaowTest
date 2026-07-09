@@ -1,6 +1,9 @@
 const WordBookService = require("../../services/user/WordBookService");
 const ActivityService = require("../../services/user/ActivityService");
 
+const isValidObjectId = (value) =>
+  /^[a-f\d]{24}$/i.test(String(value || "").trim());
+
 const WordBookController = {
   getWordBooks: async (req, res) => {
     try {
@@ -23,6 +26,14 @@ const WordBookController = {
     try {
       const { uid } = req.user;
       const { id } = req.query;
+
+      if (!isValidObjectId(id)) {
+        return res.status(200).send({
+          code: 400,
+          message: "id格式不正确",
+        });
+      }
+
       const data = await WordBookService.getWordBookDetail({ uid, id });
 
       if (!data) {
@@ -103,6 +114,13 @@ const WordBookController = {
       const { id, title, description } = req.body;
       const safeTitle = String(title || "").trim();
 
+      if (!isValidObjectId(id)) {
+        return res.status(200).send({
+          code: 400,
+          message: "id格式不正确",
+        });
+      }
+
       if (!safeTitle) {
         return res.status(200).send({
           code: 400,
@@ -150,6 +168,13 @@ const WordBookController = {
       const { uid } = req.user;
       const { id } = req.body;
 
+      if (!isValidObjectId(id)) {
+        return res.status(200).send({
+          code: 400,
+          message: "id格式不正确",
+        });
+      }
+
       const result = await WordBookService.deleteWordBook({ uid, id });
 
       if (!result.success) {
@@ -181,6 +206,13 @@ const WordBookController = {
         return res.status(200).send({
           code: 400,
           message: "请选择要删除的单词本",
+        });
+      }
+
+      if (!ids.every(isValidObjectId)) {
+        return res.status(200).send({
+          code: 400,
+          message: "ids中存在格式不正确的id",
         });
       }
 

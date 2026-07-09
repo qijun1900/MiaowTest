@@ -57,6 +57,8 @@ WordListSchema.pre("save", function (next) {
 });
 
 WordListSchema.index({ Uid: 1, wordBookId: 1, updatedAt: -1 });
+WordListSchema.index({ Uid: 1, wordBookId: 1, isMarked: 1, updatedAt: -1 });
+WordListSchema.index({ Uid: 1, wordBookId: 1, word: 1 });
 
 const WordListModel = mongoose.model("tools_user_word_list", WordListSchema);
 

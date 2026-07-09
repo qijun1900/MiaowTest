@@ -411,6 +411,7 @@ const exitSelectMode = () => {
 };
 
 const toggleSelect = (id) => {
+    if (!id) return;
     const idx = selectedIds.value.indexOf(id);
     if (idx === -1) {
         selectedIds.value = [...selectedIds.value, id];
@@ -459,22 +460,27 @@ const handleDeleteTap = () => {
 };
 
 // ---- 批量删除 ----
+const deleting = ref(false);
+
 const handleBatchDelete = async () => {
     const count = selectedIds.value.length;
-    if (count === 0) return;
+    if (count === 0 || deleting.value) return;
 
+    deleting.value = true;
     try {
         const res = await batchDeleteWordBooksAPI(selectedIds.value);
         if (res.code !== 200) {
             throw new Error(res.message || "批量删除失败");
         }
-        uni.showToast({ title: `已删除 ${count} 个单词本`, icon: "none",position:"bottom" });
+        uni.showToast({ title: `已删除 ${count} 个单词本`, icon: "success" });
+        showDeleteDialog.value = false;
         exitSelectMode();
         await fetchWordBooks();
     } catch (error) {
-        uni.showToast({ title: error?.message || "删除失败，请重试", icon: "none", position: "bottom" });
+        uni.showToast({ title: error?.message || "删除失败，请重试", icon: "none" });
         console.error("批量删除单词本失败:", error);
     } finally {
+        deleting.value = false;
         showDeleteDialog.value = false;
     }
 };
@@ -591,19 +597,26 @@ const fetchWordBooks = async () => {
     }
 };
 
+const themesShuffled = ref(false);
+
 onLoad(() => {
+    uni.$on("wordBook:refresh", handleRefreshEvent);
     fetchWordBooks();
 });
 
 onShow(() => {
-    cardThemes.value = shuffleArray(cardThemePool);
+    if (!themesShuffled.value) {
+        cardThemes.value = shuffleArray(cardThemePool);
+        themesShuffled.value = true;
+    }
+    if (!wordBookList.value.length && !loading.value) {
+        fetchWordBooks();
+    }
 });
 
 const handleRefreshEvent = () => {
     fetchWordBooks();
 };
-
-uni.$on("wordBook:refresh", handleRefreshEvent);
 
 onBeforeUnmount(() => {
     uni.$off("wordBook:refresh", handleRefreshEvent);
