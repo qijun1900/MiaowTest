@@ -422,6 +422,7 @@ const fetchDetailAi = async (type) => {
             detailAiContent.value = "AI 生成失败，请稍后重试";
         }
     } catch (error) {
+        console.error("AI 生成失败:", error);
         detailAiContent.value = "AI 生成失败，请稍后重试";
     } finally {
         detailAiLoading.value = false;
@@ -523,6 +524,7 @@ const handleToggleMarked = async (item) => {
         item.isMarked = res.data?.isMarked ?? !item.isMarked;
         markedCount.value += item.isMarked ? 1 : -1;
     } catch (error) {
+        console.error("收藏切换失败:", error);
         uni.showToast({ title: "操作失败", icon: "none" });
     }
 };

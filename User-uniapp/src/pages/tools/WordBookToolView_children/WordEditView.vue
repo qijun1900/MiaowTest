@@ -253,7 +253,7 @@
 <script setup>
 import ThemeProvider from "../../../components/core/ThemeProvider.vue";
 import ContentRenderer from "../../../components/common/ContentRenderer.vue";
-import { onBeforeUnmount, ref } from "vue";
+import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import {
@@ -266,7 +266,7 @@ import {
     searchExamplesAPI,
 } from "../../../API/Tools/WordListAPI";
 
-const { safeAreaInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
+const { customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
     rightPaddingExtra: 8,
 });
@@ -290,7 +290,7 @@ const submitting = ref(false);
 // ---- 标签 ----
 const showTagInput = ref(false);
 const newTag = ref("");
-const presetTags = ["CET4", "CET6", "考研", "雅思", "托福", "GRE", "日常", "学术"];
+const presetTags = ["CET4", "CET6", "考研", "雅思", "托福", "日常", "学术"];
 
 // ---- AI 智能填充 ----
 const aiLoading = ref(false);
@@ -310,7 +310,6 @@ const selectedExamples = ref(new Set());
 const showAiDetail = ref(false);
 const aiDetailContent = ref("");
 const aiDetailLoading = ref(false);
-let aiAbortController = null;
 
 // ---- AI 智能填充 ----
 const handleAiLookup = async () => {
