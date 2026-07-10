@@ -93,7 +93,7 @@
 
                         <view class="card-aura"></view>
                         <view v-if="!isSelectMode" class="edit-btn" @click.stop="handleEditBook(item)">
-                            <uni-icons type="compose" size="15" color="#8a6d3b"></uni-icons>
+                            <uni-icons type="compose" size="15" color="var(--app-text-secondary)"></uni-icons>
                         </view>
                         <view class="card-top">
                             <view class="count-tag">
@@ -105,7 +105,7 @@
                             <text class="book-desc">{{ item.description }}</text>
                         </view>
                         <view class="card-footer">
-                            <uni-icons type="clock" size="15" color="#9a8a6e"></uni-icons>
+                            <uni-icons type="clock" size="15" color="var(--app-text-secondary)"></uni-icons>
                             <text class="footer-text">{{ item.updatedAtText }}</text>
                             <view class="footer-line"></view>
                             <text class="footer-hint">最近更新</text>
@@ -117,7 +117,7 @@
                         <view class="create-content">
                             <view class="create-icon-wrapper">
                                 <view class="create-icon">
-                                    <uni-icons type="plus" size="40" color="#999"></uni-icons>
+                                    <uni-icons type="plus" size="40" color="var(--app-text-placeholder)"></uni-icons>
                                 </view>
                             </view>
                             <view class="create-text">新建单词本</view>
@@ -385,7 +385,7 @@ const handleBatchDelete = async () => {
         if (res.code !== 200) {
             throw new Error(res.message || "批量删除失败");
         }
-        uni.showToast({ title: `已删除 ${count} 个单词本`, icon: "success" });
+        uni.showToast({ title: `已删除 ${count} 个单词本`, icon: "none" });
         showDeleteDialog.value = false;
         exitSelectMode();
         await fetchWordBooks();
@@ -461,7 +461,7 @@ const handleSubmit = async () => {
                 }
                 throw new Error(res.message || "保存失败");
             }
-            uni.showToast({ title: "保存成功", icon: "success" });
+            uni.showToast({ title: "保存成功", icon: "none" });
         } else {
             const res = await createWordBookAPI({ title, description });
             if (res.code !== 200) {
@@ -471,7 +471,7 @@ const handleSubmit = async () => {
                 }
                 throw new Error(res.message || "创建失败");
             }
-            uni.showToast({ title: "创建成功", icon: "success" });
+            uni.showToast({ title: "创建成功", icon: "none" });
         }
         handleClosePopup();
         await fetchWordBooks();
@@ -881,7 +881,7 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease, background 0.3s ease;
 }
 
 .create-card:active {
@@ -913,7 +913,7 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, background 0.3s ease;
 }
 
 .create-card:active .create-icon {
@@ -1105,7 +1105,7 @@ onBeforeUnmount(() => {
     border-radius: 16rpx;
     padding: 0 20rpx;
     border: 2rpx solid transparent;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .input-wrapper:focus-within {
@@ -1192,7 +1192,7 @@ onBeforeUnmount(() => {
     font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     border: none;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
