@@ -395,6 +395,21 @@
 						"navigationStyle": "custom",
 						"scrollIndicator": "none"
 					}
+				},
+				{
+					"path": "WordBookToolView_children/WordListView",
+					"style": {
+						"navigationBarTitleText": "单词列表",
+						"navigationStyle": "custom",
+						"scrollIndicator": "none"
+					}
+				},
+				{
+					"path": "WordBookToolView_children/WordEditView",
+					"style": {
+						"navigationBarTitleText": "添加单词",
+						"navigationStyle": "custom"
+					}
 				}
 			]
 		}
