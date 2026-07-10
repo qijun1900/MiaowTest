@@ -19,7 +19,7 @@
             </view>
         </view>
 
-        <scroll-view class="main-scroll" scroll-y>
+        <scroll-view class="main-scroll" scroll-y :enable-back-to-top="false" :scroll-with-animation="false" enhanced :show-scrollbar="false">
             <view class="container">
                 <view class="hero">
             <view class="hero-left">
@@ -479,6 +479,7 @@ onBeforeUnmount(() => {
 .main-scroll {
     flex: 1;
     min-height: 0;
+    -webkit-overflow-scrolling: touch;  /* iOS 滚动惯性优化 */
 }
 
 .container {
@@ -552,6 +553,7 @@ onBeforeUnmount(() => {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 24rpx;
+    contain: layout style;  /* 限制重绘范围，优化滚动性能 */
 }
 
 .book-card {
@@ -562,8 +564,9 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
+    will-change: transform;  /* 提示浏览器优化 */
 }
 
 .book-card::before {
@@ -599,8 +602,7 @@ onBeforeUnmount(() => {
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
-    backdrop-filter: blur(10rpx);
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .menu-icon:active {
@@ -619,7 +621,6 @@ onBeforeUnmount(() => {
     font-size: calc(36rpx * var(--app-font-scale, 1));
     font-weight: bold;
     margin-bottom: 32rpx;
-    backdrop-filter: blur(10rpx);
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 1;
@@ -677,7 +678,7 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .create-card::before {
@@ -713,7 +714,7 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, background 0.3s ease;
 }
 
 .create-card:active .create-icon {
@@ -758,7 +759,7 @@ onBeforeUnmount(() => {
     border-radius: 16rpx;
     padding: 0 20rpx;
     border: 2rpx solid transparent;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease, background 0.3s ease;
 }
 
 .input-wrapper:focus-within {
@@ -837,7 +838,7 @@ onBeforeUnmount(() => {
     height: 80rpx;
     border-radius: 50%;
     position: relative;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
     border: 4rpx solid transparent;
@@ -879,7 +880,7 @@ onBeforeUnmount(() => {
     font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     border: none;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
