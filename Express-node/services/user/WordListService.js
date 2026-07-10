@@ -420,16 +420,37 @@ const WordListService = {
       const prompt = wordLookupPrompt(safeWord);
 
       const response = await model.invoke(prompt);
-      const text = String(response?.content || "").trim();
+      const rawText = String(response?.content || "").trim();
 
-      // 尝试解析 JSON
-      let result;
-      try {
-        // 提取 JSON 部分（可能被 markdown 包裹）
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        result = JSON.parse(jsonMatch ? jsonMatch[0] : text);
-      } catch {
-        result = { phonetic: "", meaning: text.slice(0, 200), example: "" };
+      // 从原始文本中提取 JSON 对象（兼容代码块包裹和嵌套情况）
+      let result = { phonetic: "", meaning: "", example: "" };
+
+      // 去掉 ```json ``` 包裹
+      const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+
+      // 用正则提取三个字段（绕过 JSON 解析的各种边界问题）
+      const phoneticMatch = cleaned.match(/"phonetic"\s*:\s*"([^"]*)"/);
+      const exampleMatch = cleaned.match(/"example"\s*:\s*"([^"]*)"/);
+
+      if (phoneticMatch) result.phonetic = phoneticMatch[1];
+      if (exampleMatch) result.example = exampleMatch[1];
+
+      // meaning 可能包含换行符，用更宽松的匹配
+      const meaningMatch = cleaned.match(/"meaning"\s*:\s*"((?:[^"\\]|\\[\s\S])*?)"/);
+      if (meaningMatch) {
+        result.meaning = meaningMatch[1].replace(/\\n/g, "\n").replace(/\\"/g, '"');
+      }
+
+      // 如果正则没提取到，尝试 JSON.parse 作为兜底
+      if (!result.meaning) {
+        try {
+          const parsed = JSON.parse(cleaned);
+          result.phonetic = parsed.phonetic || "";
+          result.meaning = parsed.meaning || "";
+          result.example = parsed.example || "";
+        } catch {
+          result.meaning = cleaned.slice(0, 200);
+        }
       }
 
       return { success: true, data: result };

@@ -8,10 +8,26 @@
  * @returns {string}
  */
 const wordLookupPrompt = (word) =>
-  `You are an English dictionary assistant. For the word "${word}", return ONLY a JSON object (no markdown, no code block) with this exact format:
-{"phonetic":"IPA phonetic transcription","meaning":"concise Chinese definition (1-2 lines)","example":"one natural example sentence"}
+  `You are an English-Chinese dictionary. For the word "${word}", return ONLY a JSON object. No markdown, no code block, no extra text outside the JSON.
 
-If the word is not found, return: {"phonetic":"","meaning":"未找到该单词","example":""}`;
+The JSON must have exactly 3 fields:
+1. "phonetic" — IPA phonetic transcription only (e.g. "/rʌn/"). Nothing else.
+2. "meaning" — Chinese definitions only, grouped by part of speech. No phonetic, no example, no English.
+3. "example" — One natural English example sentence using the word's most common meaning.
+
+Rules for "meaning":
+- Start each part of speech on a new line: "n. 释义" then "v. 释义" etc.
+- Use concise Chinese translations, like a dictionary entry
+- Use "；" to separate multiple senses under the same part of speech
+- DO NOT include phonetic symbols, English words, or example sentences in this field
+
+Example for "run":
+{"phonetic":"/rʌn/","meaning":"v. 跑；运行；经营\nn. 奔跑；路程；一段时间","example":"I run five kilometers every morning."}
+
+Example for "abandon":
+{"phonetic":"/əˈbændən/","meaning":"v. 放弃；抛弃\nn. 放纵；无拘无束","example":"He abandoned his plan to travel abroad."}
+
+If not found: {"phonetic":"","meaning":"未找到该单词","example":""}`;
 
 /**
  * AI 从文本中提取单词 — 返回单词+释义数组（JSON 格式）
