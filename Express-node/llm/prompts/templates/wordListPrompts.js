@@ -1,0 +1,73 @@
+/**
+ * 单词本工具相关 Prompt 模板
+ */
+
+/**
+ * AI 查询单词 — 返回音标、释义、例句（JSON 格式）
+ * @param {string} word - 要查询的英文单词
+ * @returns {string}
+ */
+const wordLookupPrompt = (word) =>
+  `You are an English dictionary assistant. For the word "${word}", return ONLY a JSON object (no markdown, no code block) with this exact format:
+{"phonetic":"IPA phonetic transcription","meaning":"concise Chinese definition (1-2 lines)","example":"one natural example sentence"}
+
+If the word is not found, return: {"phonetic":"","meaning":"未找到该单词","example":""}`;
+
+/**
+ * AI 从文本中提取单词 — 返回单词+释义数组（JSON 格式）
+ * @param {string} text - 用户输入的文本（自动截取前 3000 字符）
+ * @returns {string}
+ */
+const wordExtractPrompt = (text) =>
+  `You are an English vocabulary extractor. Extract all important English words from the following text. For each word, provide a concise Chinese meaning.
+Return ONLY a JSON array (no markdown, no code block) with this format:
+[{"word":"example","meaning":"示例"}]
+
+Rules:
+- Extract only meaningful vocabulary words (nouns, verbs, adjectives, adverbs)
+- Skip common stop words (the, is, at, which, etc.)
+- Skip proper nouns and numbers
+- Maximum 50 words
+- Use base/lemma form (e.g., "abandon" not "abandoned")
+
+Text:
+${text.slice(0, 3000)}`;
+
+/**
+ * AI 生成单词扩展信息（Markdown 格式）
+ * @param {string} word - 要分析的英文单词
+ * @param {string} [type='all'] - 生成类型: 'all' | 'mnemonic' | 'root' | 'synonyms'
+ * @returns {string}
+ */
+const wordDetailPrompt = (word, type = "all") => {
+  const base = `You are an English vocabulary teacher. For the word "${word}", `;
+  const suffix = `\nFormat your response in Markdown. Be concise but helpful. Use Chinese for explanations. Do NOT wrap your response in a code block (no triple backticks). Just return the raw Markdown directly.`;
+
+  const parts = {
+    all: `${base}provide the following:
+
+1. **助记法** - A creative mnemonic or memory trick to remember this word (Chinese explanation)
+2. **词根分析** - Break down the word into roots, prefixes, suffixes and explain each part (Chinese explanation)
+3. **近义词辨析** - List 3-5 English words with similar meanings. For each: the word, its Chinese meaning, and how it differs from "${word}" in usage${suffix}`,
+    mnemonic: `${base}provide a creative mnemonic or memory trick to help remember this word. Use Chinese for the explanation. Be creative and memorable.${suffix}`,
+    root: `${base}break down the word into its roots, prefixes, and suffixes. Explain the origin and meaning of each part in Chinese. Show how the parts combine to form the word's meaning.${suffix}`,
+    synonyms: `${base}list 3-5 English words that have similar meanings. For each word, provide:
+1. The word itself
+2. Its Chinese meaning
+3. A brief explanation of how it differs from "${word}" in usage, formality, or context
+
+Use this format for each synonym:
+**word** — 中文释义
+区别：与"${word}"的用法差异说明
+
+Focus on practical differences that help a learner choose the right word in context.${suffix}`,
+  };
+
+  return parts[type] || parts.all;
+};
+
+module.exports = {
+  wordLookupPrompt,
+  wordExtractPrompt,
+  wordDetailPrompt,
+};
