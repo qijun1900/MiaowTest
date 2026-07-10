@@ -13,7 +13,7 @@
                             <t-icon name="close" size="40rpx" color="var(--app-text-primary)"></t-icon>
                         </view>
                         <view v-else class="nav-action" @click="handleCreateBook">
-                            <t-icon name="add" size="40rpx" color="#e67e22"></t-icon>
+                            <t-icon name="add" size="40rpx" color="var(--app-brand)"></t-icon>
                         </view>
                     </view>
                 </view>
@@ -78,7 +78,7 @@
                         :key="item._id || index"
                         class="wordbook-card"
                         :class="{ 'card-selected': isSelectMode && selectedIds.includes(item._id) }"
-                        :style="[item.cardStyle, { animationDelay: `${index * 70}ms` }]"
+                        :style="{ animationDelay: `${index * 70}ms` }"
                         @click="handleCardClick(item)"
                         @longpress="handleLongPress(item)"
                     >
@@ -91,12 +91,12 @@
                             ></t-icon>
                         </view>
 
-                        <view class="card-aura" :style="item.auraStyle"></view>
+                        <view class="card-aura"></view>
                         <view v-if="!isSelectMode" class="edit-btn" @click.stop="handleEditBook(item)">
                             <uni-icons type="compose" size="15" color="#8a6d3b"></uni-icons>
                         </view>
                         <view class="card-top">
-                            <view class="count-tag" :style="item.tagStyle">
+                            <view class="count-tag">
                                 <text class="count-text">{{ item.wordCount }} 词</text>
                             </view>
                         </view>
@@ -292,102 +292,15 @@ const validationErrors = ref({
     title: "",
 });
 
-// 单词本卡片主题（暖色调，橙/琥珀系）
-const cardThemePool = [
-    {
-        cardStyle: {
-            borderColor: "#f5e6d0",
-            background: "linear-gradient(145deg, #ffffff 0%, #fff9f2 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(180, 140, 80, 0.12)",
-        },
-        tagStyle: { background: "#fff3e0" },
-        auraStyle: {
-            background: "radial-gradient(circle at center, rgba(230, 126, 34, 0.14) 0%, rgba(230, 126, 34, 0) 65%)",
-        },
-    },
-    {
-        cardStyle: {
-            borderColor: "#f0e4d4",
-            background: "linear-gradient(145deg, #ffffff 0%, #fdf6ee 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(170, 130, 70, 0.12)",
-        },
-        tagStyle: { background: "#fcefd5" },
-        auraStyle: {
-            background: "radial-gradient(circle at center, rgba(210, 150, 50, 0.16) 0%, rgba(210, 150, 50, 0) 65%)",
-        },
-    },
-    {
-        cardStyle: {
-            borderColor: "#f2e8d8",
-            background: "linear-gradient(145deg, #ffffff 0%, #faf4ea 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(160, 120, 60, 0.11)",
-        },
-        tagStyle: { background: "#f8edda" },
-        auraStyle: {
-            background: "radial-gradient(circle at center, rgba(190, 140, 60, 0.14) 0%, rgba(190, 140, 60, 0) 65%)",
-        },
-    },
-    {
-        cardStyle: {
-            borderColor: "#efe0cc",
-            background: "linear-gradient(145deg, #ffffff 0%, #fdf5e8 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(175, 135, 75, 0.13)",
-        },
-        tagStyle: { background: "#fbe8c8" },
-        auraStyle: {
-            background: "radial-gradient(circle at center, rgba(220, 160, 70, 0.15) 0%, rgba(220, 160, 70, 0) 65%)",
-        },
-    },
-    {
-        cardStyle: {
-            borderColor: "#f3e5cf",
-            background: "linear-gradient(145deg, #ffffff 0%, #fef8f0 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(165, 125, 65, 0.12)",
-        },
-        tagStyle: { background: "#fdf0d8" },
-        auraStyle: {
-            background: "radial-gradient(circle at center, rgba(200, 145, 55, 0.15) 0%, rgba(200, 145, 55, 0) 65%)",
-        },
-    },
-    {
-        cardStyle: {
-            borderColor: "#ede2d2",
-            background: "linear-gradient(145deg, #ffffff 0%, #faf3e6 85%)",
-            boxShadow: "0 14rpx 34rpx rgba(155, 115, 55, 0.11)",
-        },
-        tagStyle: { background: "#f5e8ce" },
-        auraStyle: {
-            background: "radial-gradient(circle at center, rgba(185, 135, 50, 0.14) 0%, rgba(185, 135, 50, 0) 65%)",
-        },
-    },
-];
-
-const shuffleArray = (arr = []) => {
-    const copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-};
-
-const cardThemes = ref(shuffleArray(cardThemePool));
-
 const decoratedWordBookList = computed(() => {
-    return wordBookList.value.map((item, index) => {
-        const theme = cardThemes.value[index % cardThemes.value.length];
-        return {
-            ...item,
-            wordCount: Number(item.wordCount) || 0,
-            description: item.description || "暂无描述",
-            updatedAtText: item.updatedAt
-                ? formatTime.getTime2(item.updatedAt)
-                : "今天",
-            cardStyle: theme.cardStyle,
-            tagStyle: theme.tagStyle,
-            auraStyle: theme.auraStyle,
-        };
-    });
+    return wordBookList.value.map((item) => ({
+        ...item,
+        wordCount: Number(item.wordCount) || 0,
+        description: item.description || "暂无描述",
+        updatedAtText: item.updatedAt
+            ? formatTime.getTime2(item.updatedAt)
+            : "今天",
+    }));
 });
 
 // ---- 返回 ----
@@ -597,18 +510,12 @@ const fetchWordBooks = async () => {
     }
 };
 
-const themesShuffled = ref(false);
-
 onLoad(() => {
     uni.$on("wordBook:refresh", handleRefreshEvent);
     fetchWordBooks();
 });
 
 onShow(() => {
-    if (!themesShuffled.value) {
-        cardThemes.value = shuffleArray(cardThemePool);
-        themesShuffled.value = true;
-    }
     if (!wordBookList.value.length && !loading.value) {
         fetchWordBooks();
     }
@@ -679,12 +586,12 @@ onBeforeUnmount(() => {
     width: 60rpx;
     height: 60rpx;
     border-radius: 30rpx;
-    border: 2rpx solid #f0e0c8;
+    border: 2rpx solid var(--app-border);
     background: var(--app-bg-container);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4rpx 12rpx rgba(230, 126, 34, 0.1);
+    box-shadow: 0 4rpx 12rpx color-mix(in srgb, var(--app-brand) 10%, transparent);
 }
 
 .nav-action:active {
@@ -768,8 +675,8 @@ onBeforeUnmount(() => {
     width: 14rpx;
     height: 14rpx;
     border-radius: 50%;
-    background: #e67e22;
-    box-shadow: 0 0 0 8rpx rgba(230, 126, 34, 0.14);
+    background: var(--app-brand);
+    box-shadow: 0 0 0 8rpx color-mix(in srgb, var(--app-brand) 14%, transparent);
     flex-shrink: 0;
 }
 
@@ -784,7 +691,7 @@ onBeforeUnmount(() => {
     margin-top: 14rpx;
     display: block;
     font-size: calc(27rpx * var(--app-font-scale, 1));
-    color: #8a7a5e;
+    color: var(--app-text-secondary);
     line-height: 1.45;
 }
 
@@ -792,9 +699,9 @@ onBeforeUnmount(() => {
     flex-shrink: 0;
     background: var(--app-bg-container);
     border-radius: 24rpx;
-    border: 2rpx solid #f0e0c8;
+    border: 2rpx solid var(--app-border);
     padding: 12rpx 18rpx;
-    box-shadow: 0 8rpx 20rpx rgba(160, 130, 80, 0.1);
+    box-shadow: var(--app-shadow-card);
     display: flex;
     align-items: baseline;
     gap: 6rpx;
@@ -803,13 +710,13 @@ onBeforeUnmount(() => {
 
 .hero-stat-value {
     font-size: calc(38rpx * var(--app-font-scale, 1));
-    color: #c07820;
+    color: var(--app-brand);
     font-weight: 700;
 }
 
 .hero-stat-label {
     font-size: calc(24rpx * var(--app-font-scale, 1));
-    color: #a0906e;
+    color: var(--app-text-secondary);
 }
 
 /* 卡片列表 */
@@ -824,7 +731,7 @@ onBeforeUnmount(() => {
 .wordbook-card {
     position: relative;
     border-radius: 34rpx;
-    border: 2rpx solid #f0e0c8;
+    border: 2rpx solid var(--app-border);
     padding: 24rpx;
     min-height: 360rpx;
     display: flex;
@@ -832,6 +739,8 @@ onBeforeUnmount(() => {
     overflow: hidden;
     animation: card-enter 0.5s ease both;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    background: linear-gradient(145deg, var(--app-bg-container) 0%, var(--app-bg-secondary) 85%);
+    box-shadow: var(--app-shadow-card);
 }
 
 .wordbook-card:active {
@@ -869,6 +778,7 @@ onBeforeUnmount(() => {
     height: 320rpx;
     right: -70rpx;
     top: -120rpx;
+    background: radial-gradient(circle at center, color-mix(in srgb, var(--app-brand) 14%, transparent) 0%, transparent 65%);
 }
 
 .card-top {
@@ -887,12 +797,12 @@ onBeforeUnmount(() => {
     width: 52rpx;
     height: 52rpx;
     border-radius: 50%;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 248, 235, 0.92) 100%);
-    border: 1rpx solid rgba(180, 150, 100, 0.3);
+    background: var(--app-bg-container);
+    border: 1rpx solid var(--app-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8rpx 16rpx rgba(140, 110, 60, 0.18);
+    box-shadow: var(--app-shadow-card);
 }
 
 .edit-btn:active {
@@ -903,12 +813,13 @@ onBeforeUnmount(() => {
 .count-tag {
     padding: 8rpx 18rpx;
     border-radius: 999rpx;
-    border: 1rpx solid rgba(180, 150, 100, 0.18);
+    background: var(--app-brand-light);
+    border: 1rpx solid color-mix(in srgb, var(--app-brand) 18%, transparent);
 }
 
 .count-text {
     font-size: calc(23rpx * var(--app-font-scale, 1));
-    color: #b07820;
+    color: var(--app-brand);
     font-weight: 600;
 }
 
@@ -921,7 +832,7 @@ onBeforeUnmount(() => {
 .book-title {
     display: block;
     font-size: calc(36rpx * var(--app-font-scale, 1));
-    color: #3a2a10;
+    color: var(--app-text-primary);
     font-weight: 700;
     line-height: 1.4;
 }
@@ -929,7 +840,7 @@ onBeforeUnmount(() => {
 .book-desc {
     margin-top: 12rpx;
     font-size: calc(27rpx * var(--app-font-scale, 1));
-    color: #7a6a4e;
+    color: var(--app-text-secondary);
     line-height: 1.52;
     display: block;
     min-height: 80rpx;
@@ -947,25 +858,25 @@ onBeforeUnmount(() => {
 
 .footer-text {
     font-size: calc(24rpx * var(--app-font-scale, 1));
-    color: #9a8a6e;
+    color: var(--app-text-secondary);
 }
 
 .footer-line {
     width: 1rpx;
     height: 22rpx;
-    background: #d8cbb8;
+    background: var(--app-border);
     margin: 0 2rpx 0 4rpx;
 }
 
 .footer-hint {
     font-size: calc(22rpx * var(--app-font-scale, 1));
-    color: #a89a7e;
+    color: var(--app-text-placeholder);
 }
 
 /* 新建卡片 */
 .create-card {
     background: var(--app-bg-page) !important;
-    border: 4rpx dashed #ddd;
+    border: 4rpx dashed var(--app-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -997,7 +908,7 @@ onBeforeUnmount(() => {
 .create-icon {
     width: 100rpx;
     height: 100rpx;
-    background: #f5ead8;
+    background: var(--app-bg-secondary);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1199,8 +1110,8 @@ onBeforeUnmount(() => {
 
 .input-wrapper:focus-within {
     background: var(--app-bg-container);
-    border-color: #e67e22;
-    box-shadow: 0 0 0 4rpx rgba(230, 126, 34, 0.1);
+    border-color: var(--app-brand);
+    box-shadow: 0 0 0 4rpx color-mix(in srgb, var(--app-brand) 10%, transparent);
 }
 
 .input-wrapper.has-error {
@@ -1233,8 +1144,8 @@ onBeforeUnmount(() => {
 
 .textarea-wrapper:focus-within {
     background: var(--app-bg-container);
-    border-color: #e67e22;
-    box-shadow: 0 0 0 4rpx rgba(230, 126, 34, 0.1);
+    border-color: var(--app-brand);
+    box-shadow: 0 0 0 4rpx color-mix(in srgb, var(--app-brand) 10%, transparent);
 }
 
 .form-textarea {
@@ -1301,15 +1212,15 @@ onBeforeUnmount(() => {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    background: linear-gradient(135deg, var(--app-brand) 0%, var(--app-brand-hover) 100%);
     color: var(--app-bg-container);
-    box-shadow: 0 8rpx 24rpx rgba(230, 126, 34, 0.32);
+    box-shadow: 0 8rpx 24rpx color-mix(in srgb, var(--app-brand) 32%, transparent);
 }
 
 .btn-submit:active {
-    background: linear-gradient(135deg, #d35400 0%, #c0470a 100%);
+    background: linear-gradient(135deg, var(--app-brand-hover) 0%, var(--app-brand) 100%);
     transform: scale(0.98);
-    box-shadow: 0 4rpx 16rpx rgba(230, 126, 34, 0.22);
+    box-shadow: 0 4rpx 16rpx color-mix(in srgb, var(--app-brand) 22%, transparent);
 }
 
 .btn-submit:disabled,
@@ -1319,7 +1230,8 @@ onBeforeUnmount(() => {
 }
 
 .btn-loading {
-    background: linear-gradient(135deg, #f0a04b 0%, #e89030 100%) !important;
+    background: linear-gradient(135deg, var(--app-brand-hover) 0%, var(--app-brand) 100%) !important;
+    opacity: 0.7;
 }
 
 .btn-spinner {
