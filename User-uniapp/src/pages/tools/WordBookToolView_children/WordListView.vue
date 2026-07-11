@@ -133,12 +133,23 @@
                     <!-- 单词信息 -->
                     <view class="word-main">
                         <view class="word-header">
-                            <text class="word-text">{{ item.word }}</text>
+                            <view v-if="keyword" class="word-text">
+                                <template v-for="(part, pi) in highlightWord(item.word, keyword)" :key="pi">
+                                    <text v-if="part.highlight" class="search-highlight">{{ part.text }}</text>
+                                    <text v-else>{{ part.text }}</text>
+                                </template>
+                            </view>
+                            <text v-else class="word-text">{{ item.word }}</text>
                             <text v-if="item.phonetic" class="phonetic-text">{{ item.phonetic }}</text>
                         </view>
 
                         <!-- 释义：全局显示 或 折叠提示 -->
-                        <text v-if="showAllMeanings" class="meaning-text">{{ item.meaning || '暂无释义' }}</text>
+                        <view v-if="showAllMeanings" class="meaning-text">
+                            <template v-for="(part, pi) in highlightWord(item.meaning || '暂无释义', keyword)" :key="pi">
+                                <text v-if="part.highlight" class="search-highlight">{{ part.text }}</text>
+                                <text v-else>{{ part.text }}</text>
+                            </template>
+                        </view>
                         <text v-else class="meaning-hint">点击查看释义</text>
 
                         <!-- 展开区域 -->
@@ -148,7 +159,12 @@
                             </view>
                             <view v-if="item.example" class="example-box">
                                 <text class="example-label">例句</text>
-                                <text class="example-text">{{ item.example }}</text>
+                                <view class="example-text">
+                                    <template v-for="(part, pi) in highlightWord(item.example, item.word)" :key="pi">
+                                        <text v-if="part.highlight" class="example-highlight">{{ part.text }}</text>
+                                        <text v-else>{{ part.text }}</text>
+                                    </template>
+                                </view>
                             </view>
                             <view v-if="item.tags && item.tags.length" class="tags-row">
                                 <view v-for="tag in item.tags" :key="tag" class="word-tag">
@@ -249,7 +265,12 @@
                         <text class="detail-meaning">{{ detailWord.meaning || '暂无释义' }}</text>
                         <view v-if="detailWord.example" class="detail-example">
                             <text class="detail-example-label">例句</text>
-                            <text class="detail-example-text">{{ detailWord.example }}</text>
+                            <view class="detail-example-text">
+                                <template v-for="(part, pi) in highlightWord(detailWord.example, detailWord.word)" :key="pi">
+                                    <text v-if="part.highlight" class="example-highlight">{{ part.text }}</text>
+                                    <text v-else>{{ part.text }}</text>
+                                </template>
+                            </view>
                         </view>
                     </view>
 
@@ -617,6 +638,26 @@ const confirmDelete = async () => {
     }
 };
 
+// ---- 例句高亮 ----
+const highlightWord = (sentence, word) => {
+    if (!sentence || !word) return [{ text: sentence || "", highlight: false }];
+    const regex = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\w*)`, "gi");
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    while ((match = regex.exec(sentence)) !== null) {
+        if (match.index > lastIndex) {
+            parts.push({ text: sentence.slice(lastIndex, match.index), highlight: false });
+        }
+        parts.push({ text: match[0], highlight: true });
+        lastIndex = regex.lastIndex;
+    }
+    if (lastIndex < sentence.length) {
+        parts.push({ text: sentence.slice(lastIndex), highlight: false });
+    }
+    return parts.length ? parts : [{ text: sentence, highlight: false }];
+};
+
 // ---- 导航 ----
 const handleBack = () => {
     if (isSelectMode.value) {
@@ -865,6 +906,13 @@ onBeforeUnmount(() => {
     color: var(--app-text-secondary);
     line-height: 1.6;
     font-style: italic;
+}
+
+.example-highlight,
+.search-highlight {
+    color: #e67e22;
+    font-weight: 600;
+    font-style: normal;
 }
 
 .tags-row {
