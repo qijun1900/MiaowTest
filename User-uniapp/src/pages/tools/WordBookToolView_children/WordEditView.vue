@@ -221,9 +221,6 @@
 
                     <view v-if="showAiDetail" class="ai-detail-body">
                         <view class="ai-detail-btns">
-                            <view class="ai-detail-btn" @click="fetchAiDetail('all')">
-                                <text>🧠 全部</text>
-                            </view>
                             <view class="ai-detail-btn" @click="fetchAiDetail('mnemonic')">
                                 <text>💡 助记法</text>
                             </view>
@@ -232,6 +229,9 @@
                             </view>
                             <view class="ai-detail-btn" @click="fetchAiDetail('synonyms')">
                                 <text>🔗 近义词</text>
+                            </view>
+                            <view class="ai-detail-btn" @click="fetchAiDetail('similar')">
+                                <text>✏️ 形近词</text>
                             </view>
                         </view>
 
@@ -290,7 +290,7 @@ const submitting = ref(false);
 // ---- 标签 ----
 const showTagInput = ref(false);
 const newTag = ref("");
-const presetTags = ["CET4", "CET6", "考研", "雅思", "托福", "日常", "学术"];
+const presetTags = ["CET4", "CET6", "考研", "雅思", "托福","Text1","Text2","Text3","Text4"];
 
 // ---- AI 智能填充 ----
 const aiLoading = ref(false);

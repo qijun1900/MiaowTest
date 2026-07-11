@@ -260,9 +260,6 @@
                             <text>AI 扩展学习</text>
                         </view>
                         <view class="detail-ai-btns">
-                            <view class="detail-ai-btn" @click="fetchDetailAi('all')">
-                                <text>🧠 全部</text>
-                            </view>
                             <view class="detail-ai-btn" @click="fetchDetailAi('mnemonic')">
                                 <text>💡 助记法</text>
                             </view>
@@ -271,6 +268,9 @@
                             </view>
                             <view class="detail-ai-btn" @click="fetchDetailAi('synonyms')">
                                 <text>🔗 近义词</text>
+                            </view>
+                            <view class="detail-ai-btn" @click="fetchDetailAi('similar')">
+                                <text>✏️ 形近词</text>
                             </view>
                         </view>
                         <view v-if="detailAiContent" class="detail-ai-result">
@@ -1169,16 +1169,16 @@ onBeforeUnmount(() => {
 
 .detail-ai-btns {
     display: flex;
+    flex-wrap: wrap;
     gap: 12rpx;
     margin-bottom: 16rpx;
 }
 
 .detail-ai-btn {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 14rpx 0;
+    padding: 14rpx 24rpx;
     border-radius: 12rpx;
     background: var(--app-bg-container);
     border: 1rpx solid var(--app-border);

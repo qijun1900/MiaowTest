@@ -64,7 +64,8 @@ const wordDetailPrompt = (word, type = "all") => {
 
 1. **助记法** - A creative mnemonic or memory trick to remember this word (Chinese explanation)
 2. **词根分析** - Break down the word into roots, prefixes, suffixes and explain each part (Chinese explanation)
-3. **近义词辨析** - List 3-5 English words with similar meanings. For each: the word, its Chinese meaning, and how it differs from "${word}" in usage${suffix}`,
+3. **近义词辨析** - List 3-5 English words with similar meanings. For each: the word, its Chinese meaning, and how it differs from "${word}" in usage
+4. **形近词** - List 3-5 English words that look similar in spelling but have different meanings. For each: the word, its Chinese meaning, and a tip to distinguish it from "${word}"${suffix}`,
     mnemonic: `${base}provide a creative mnemonic or memory trick to help remember this word. Use Chinese for the explanation. Be creative and memorable.${suffix}`,
     root: `${base}break down the word into its roots, prefixes, and suffixes. Explain the origin and meaning of each part in Chinese. Show how the parts combine to form the word's meaning.${suffix}`,
     synonyms: `${base}list 3-5 English words that have similar meanings. For each word, provide:
@@ -77,6 +78,16 @@ Use this format for each synonym:
 区别：与"${word}"的用法差异说明
 
 Focus on practical differences that help a learner choose the right word in context.${suffix}`,
+    similar: `${base}list 3-5 English words that look similar in spelling to "${word}" but have different meanings. These are words that learners often confuse or mix up. For each word, provide:
+1. The word itself
+2. Its Chinese meaning
+3. A tip to help distinguish it from "${word}" (e.g. a mnemonic, different root, or context clue)
+
+Use this format for each word:
+**word** — 中文释义
+区分：如何与"${word}"区分
+
+Focus on words that are commonly confused due to similar spelling.${suffix}`,
   };
 
   return parts[type] || parts.all;
