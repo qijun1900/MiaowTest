@@ -1,243 +1,395 @@
 <template>
     <ThemeProvider>
-    <view class="page" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
-        <view class="top-wrapper">
-            <view class="custom-navbar" :style="customNavbarStyle">
-                <view class="nav-row" :style="navRowStyle">
-                    <view class="nav-left" @click="handleBack">
-                        <t-icon name="chevron-left" size="44rpx" color="var(--app-text-primary)"></t-icon>
-                    </view>
-                    <text class="nav-title">{{ isSelectMode ? `已选 ${selectedIds.length} 项` : '喵喵单词本' }}</text>
-                    <view class="nav-right">
-                        <view v-if="isSelectMode" class="nav-action" @click="exitSelectMode">
-                            <t-icon name="close" size="40rpx" color="var(--app-text-primary)"></t-icon>
-                        </view>
-                        <view v-else class="nav-action" @click="handleCreateBook">
-                            <t-icon name="add" size="40rpx" color="var(--app-brand)"></t-icon>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </view>
-
-        <scroll-view class="main-scroll" scroll-y>
-            <view class="scroll-content">
-                <view class="bg-blob blob-1"></view>
-                <view class="bg-blob blob-2"></view>
-
-                <!-- Hero 区域 -->
-                <view class="hero" v-if="!isSelectMode">
-                    <view class="hero-left">
-                        <view class="section-header">
-                            <view class="section-dot"></view>
-                            <text class="section-title">所有单词本</text>
-                        </view>
-                        <text class="hero-subtitle">积累词汇，夯实你的语言基础</text>
-                    </view>
-                    <view class="hero-stat">
-                        <text class="hero-stat-value">{{ wordBookList.length }}</text>
-                        <text class="hero-stat-label">个单词本</text>
-                    </view>
-                </view>
-
-                <!-- 选择模式提示条 -->
-                <view v-if="isSelectMode" class="select-hint-bar">
-                    <t-icon name="info-circle" size="32rpx" color="var(--app-brand)"></t-icon>
-                    <text class="select-hint-text">点击卡片可选中或取消，选中后可批量删除</text>
-                </view>
-
-                <!-- 骨架屏 loading -->
-                <view v-if="loading" class="card-list skeleton-list">
-                    <view
-                        v-for="index in skeletonCount"
-                        :key="`skeleton-${index}`"
-                        class="wordbook-card skeleton-card"
-                    >
-                        <view class="skeleton-aura"></view>
-                        <view class="card-top">
-                            <view class="skeleton-pill skeleton-shimmer"></view>
-                        </view>
-                        <view class="card-content skeleton-content">
-                            <view class="skeleton-title skeleton-shimmer"></view>
-                            <view class="skeleton-desc skeleton-shimmer"></view>
-                            <view class="skeleton-desc skeleton-desc-short skeleton-shimmer"></view>
-                        </view>
-                        <view class="card-footer skeleton-footer">
-                            <view class="skeleton-icon skeleton-shimmer"></view>
-                            <view class="skeleton-time skeleton-shimmer"></view>
-                            <view class="skeleton-line"></view>
-                            <view class="skeleton-hint skeleton-shimmer"></view>
-                        </view>
-                    </view>
-                </view>
-
-                <!-- 单词本卡片列表 -->
-                <view class="card-list" v-else>
-                    <view
-                        v-for="(item, index) in decoratedWordBookList"
-                        :key="item._id || index"
-                        class="wordbook-card"
-                        :class="{ 'card-selected': isSelectMode && selectedIds.includes(item._id) }"
-                        :style="{ animationDelay: `${index * 70}ms` }"
-                        @click="handleCardClick(item)"
-                        @longpress="handleLongPress(item)"
-                    >
-                        <!-- 选择模式下的复选框 -->
-                        <view v-if="isSelectMode" class="card-checkbox" :class="{ checked: selectedIds.includes(item._id) }">
+        <view
+            class="page"
+            :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
+        >
+            <view class="top-wrapper">
+                <view class="custom-navbar" :style="customNavbarStyle">
+                    <view class="nav-row" :style="navRowStyle">
+                        <view class="nav-left" @click="handleBack">
                             <t-icon
-                                :name="selectedIds.includes(item._id) ? 'check-circle-filled' : 'circle'"
-                                size="36rpx"
-                                :color="selectedIds.includes(item._id) ? 'var(--app-brand)' : '#c0c4cc'"
+                                name="chevron-left"
+                                size="44rpx"
+                                color="var(--app-text-primary)"
                             ></t-icon>
                         </view>
-
-                        <view class="card-aura"></view>
-                        <view v-if="!isSelectMode" class="edit-btn" @click.stop="handleEditBook(item)">
-                            <uni-icons type="compose" size="15" color="var(--app-text-secondary)"></uni-icons>
-                        </view>
-                        <view class="card-top">
-                            <view class="count-tag">
-                                <text class="count-text">{{ item.wordCount }} 词</text>
+                        <text class="nav-title">{{
+                            isSelectMode
+                                ? `已选 ${selectedIds.length} 项`
+                                : "喵喵单词本"
+                        }}</text>
+                        <view class="nav-right">
+                            <view
+                                v-if="isSelectMode"
+                                class="nav-action"
+                                @click="exitSelectMode"
+                            >
+                                <t-icon
+                                    name="close"
+                                    size="40rpx"
+                                    color="var(--app-text-primary)"
+                                ></t-icon>
+                            </view>
+                            <view
+                                v-else
+                                class="nav-action"
+                                @click="handleCreateBook"
+                            >
+                                <t-icon
+                                    name="add"
+                                    size="40rpx"
+                                    color="var(--app-brand)"
+                                ></t-icon>
                             </view>
                         </view>
-                        <view class="card-content">
-                            <text class="book-title">{{ item.title }}</text>
-                            <text class="book-desc">{{ item.description }}</text>
+                    </view>
+                </view>
+            </view>
+
+            <scroll-view class="main-scroll" scroll-y>
+                <view class="scroll-content">
+                    <view class="bg-blob blob-1"></view>
+                    <view class="bg-blob blob-2"></view>
+
+                    <!-- Hero 区域 -->
+                    <view class="hero" v-if="!isSelectMode">
+                        <view class="hero-left">
+                            <view class="section-header">
+                                <view class="section-dot"></view>
+                                <text class="section-title">所有单词本</text>
+                            </view>
+                            <text class="hero-subtitle"
+                                >积累词汇，夯实你的语言基础</text
+                            >
                         </view>
-                        <view class="card-footer">
-                            <uni-icons type="clock" size="15" color="var(--app-text-secondary)"></uni-icons>
-                            <text class="footer-text">{{ item.updatedAtText }}</text>
-                            <view class="footer-line"></view>
-                            <text class="footer-hint">最近更新</text>
+                        <view class="hero-stat">
+                            <text class="hero-stat-value">{{
+                                wordBookList.length
+                            }}</text>
+                            <text class="hero-stat-label">个单词本</text>
                         </view>
                     </view>
 
-                    <!-- 新建单词本卡片（选择模式下隐藏） -->
-                    <view v-if="!isSelectMode" class="wordbook-card create-card" @click="handleCreateBook">
-                        <view class="create-content">
-                            <view class="create-icon-wrapper">
-                                <view class="create-icon">
-                                    <uni-icons type="plus" size="40" color="var(--app-text-placeholder)"></uni-icons>
+                    <!-- 选择模式提示条 -->
+                    <view v-if="isSelectMode" class="select-hint-bar">
+                        <t-icon
+                            name="info-circle"
+                            size="32rpx"
+                            color="var(--app-brand)"
+                        ></t-icon>
+                        <text class="select-hint-text"
+                            >点击卡片可选中或取消，选中后可批量删除</text
+                        >
+                    </view>
+
+                    <!-- 骨架屏 loading -->
+                    <view v-if="loading" class="card-list skeleton-list">
+                        <view
+                            v-for="index in skeletonCount"
+                            :key="`skeleton-${index}`"
+                            class="wordbook-card skeleton-card"
+                        >
+                            <view class="skeleton-aura"></view>
+                            <view class="card-top">
+                                <view
+                                    class="skeleton-pill skeleton-shimmer"
+                                ></view>
+                            </view>
+                            <view class="card-content skeleton-content">
+                                <view
+                                    class="skeleton-title skeleton-shimmer"
+                                ></view>
+                                <view
+                                    class="skeleton-desc skeleton-shimmer"
+                                ></view>
+                                <view
+                                    class="skeleton-desc skeleton-desc-short skeleton-shimmer"
+                                ></view>
+                            </view>
+                            <view class="card-footer skeleton-footer">
+                                <view
+                                    class="skeleton-icon skeleton-shimmer"
+                                ></view>
+                                <view
+                                    class="skeleton-time skeleton-shimmer"
+                                ></view>
+                                <view class="skeleton-line"></view>
+                                <view
+                                    class="skeleton-hint skeleton-shimmer"
+                                ></view>
+                            </view>
+                        </view>
+                    </view>
+
+                    <!-- 单词本卡片列表 -->
+                    <view class="card-list" v-else>
+                        <view
+                            v-for="(item, index) in decoratedWordBookList"
+                            :key="item._id || index"
+                            class="wordbook-card"
+                            :class="{
+                                'card-selected':
+                                    isSelectMode &&
+                                    selectedIds.includes(item._id),
+                            }"
+                            :style="{ animationDelay: `${index * 70}ms` }"
+                            @click="handleCardClick(item)"
+                            @longpress="handleLongPress(item)"
+                        >
+                            <!-- 选择模式下的复选框 -->
+                            <view
+                                v-if="isSelectMode"
+                                class="card-checkbox"
+                                :class="{
+                                    checked: selectedIds.includes(item._id),
+                                }"
+                            >
+                                <t-icon
+                                    :name="
+                                        selectedIds.includes(item._id)
+                                            ? 'check-circle-filled'
+                                            : 'circle'
+                                    "
+                                    size="36rpx"
+                                    :color="
+                                        selectedIds.includes(item._id)
+                                            ? 'var(--app-brand)'
+                                            : '#c0c4cc'
+                                    "
+                                ></t-icon>
+                            </view>
+
+                            <view class="card-aura"></view>
+                            <view
+                                v-if="!isSelectMode"
+                                class="edit-btn"
+                                @click.stop="handleEditBook(item)"
+                            >
+                                <uni-icons
+                                    type="compose"
+                                    size="15"
+                                    color="var(--app-text-secondary)"
+                                ></uni-icons>
+                            </view>
+                            <view class="card-top">
+                                <view class="count-tag">
+                                    <text class="count-text"
+                                        >{{ item.wordCount }} 词</text
+                                    >
                                 </view>
                             </view>
-                            <view class="create-text">新建单词本</view>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </scroll-view>
-
-        <!-- 选择模式底部操作栏 -->
-        <view v-if="isSelectMode" class="select-bottom-bar" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
-            <view class="select-bar-inner">
-                <view class="select-all-btn" @click="toggleSelectAll">
-                    <t-icon
-                        :name="isAllSelected ? 'check-circle-filled' : 'circle'"
-                        size="40rpx"
-                        :color="isAllSelected ? 'var(--app-brand)' : '#c0c4cc'"
-                    ></t-icon>
-                    <text class="select-all-text">全选</text>
-                </view>
-                <view
-                    class="delete-btn"
-                    :class="{ 'delete-btn-disabled': selectedIds.length === 0 }"
-                    @click="handleDeleteTap"
-                >
-                    <t-icon name="delete" size="28rpx" color="#fff"></t-icon>
-                    <text class="delete-btn-text">删除 ({{ selectedIds.length }})</text>
-                </view>
-            </view>
-        </view>
-
-        <!-- 创建/编辑单词本弹窗 -->
-        <tPopup
-            v-model:show="popupShow"
-            :title="isEditMode ? '编辑单词本' : '创建单词本'"
-            :closeable="true"
-            :overlay="true"
-            @close="handleClosePopup"
-        >
-            <template #popupcontent>
-                <view class="form-container">
-                    <!-- 单词本名称 -->
-                    <view class="form-item">
-                        <view class="form-label">
-                            单词本名称
-                            <text class="required">*</text>
-                        </view>
-                        <view class="input-wrapper" :class="{ 'has-error': validationErrors.title }">
-                            <uni-icons
-                                type="compose"
-                                size="18"
-                                :color="validationErrors.title ? 'var(--app-danger)' : 'var(--app-text-secondary)'"
-                            ></uni-icons>
-                            <input
-                                class="form-input"
-                                :class="{ 'is-error': validationErrors.title }"
-                                v-model="formData.title"
-                                placeholder="请输入单词本名称（最多20个字）"
-                                maxlength="20"
-                                @input="handleTitleInput"
-                            />
-                            <text class="char-count">{{ formData.title.length }}/20</text>
-                        </view>
-                        <view v-if="validationErrors.title" class="form-error">
-                            <uni-icons type="info-filled" size="14" color="var(--app-danger)"></uni-icons>
-                            <text>{{ validationErrors.title }}</text>
-                        </view>
-                    </view>
-
-                    <!-- 描述 -->
-                    <view class="form-item">
-                        <view class="form-label">描述</view>
-                        <view class="textarea-wrapper">
-                            <textarea
-                                class="form-textarea"
-                                v-model="formData.description"
-                                placeholder="可选，简单描述这个单词本"
-                                maxlength="60"
-                            ></textarea>
-                            <text class="char-count description-count">{{ formData.description.length }}/60</text>
-                        </view>
-                    </view>
-
-                    <!-- 按钮组 -->
-                    <view class="form-actions">
-                        <button class="btn btn-cancel" :disabled="submitting" @click="handleClosePopup">
-                            <uni-icons type="closeempty" size="16" color="#666"></uni-icons>
-                            取消
-                        </button>
-                        <button
-                            class="btn btn-submit"
-                            :disabled="submitting"
-                            :class="{ 'btn-loading': submitting }"
-                            @click="handleSubmit"
-                        >
-                            <view v-if="submitting" class="btn-spinner">
-                                <view class="spinner-circle-small"></view>
+                            <view class="card-content">
+                                <text class="book-title">{{ item.title }}</text>
+                                <text class="book-desc">{{
+                                    item.description
+                                }}</text>
                             </view>
-                            <uni-icons v-else type="checkmarkempty" size="16" color="#fff"></uni-icons>
-                            {{ submitting ? (isEditMode ? "保存中..." : "创建中...") : (isEditMode ? "保存" : "创建") }}
-                        </button>
+                            <view class="card-footer">
+                                <uni-icons
+                                    type="clock"
+                                    size="15"
+                                    color="var(--app-text-secondary)"
+                                ></uni-icons>
+                                <text class="footer-text">{{
+                                    item.updatedAtText
+                                }}</text>
+                                <view class="footer-line"></view>
+                                <text class="footer-hint">最近更新</text>
+                            </view>
+                        </view>
+
+                        <!-- 新建单词本卡片（选择模式下隐藏） -->
+                        <view
+                            v-if="!isSelectMode"
+                            class="wordbook-card create-card"
+                            @click="handleCreateBook"
+                        >
+                            <view class="create-content">
+                                <view class="create-icon-wrapper">
+                                    <view class="create-icon">
+                                        <uni-icons
+                                            type="plus"
+                                            size="40"
+                                            color="var(--app-text-placeholder)"
+                                        ></uni-icons>
+                                    </view>
+                                </view>
+                                <view class="create-text">新建单词本</view>
+                            </view>
+                        </view>
                     </view>
                 </view>
-            </template>
-        </tPopup>
+            </scroll-view>
 
-        <!-- 删除确认弹窗 (TDesign Dialog) -->
-        <t-dialog
-            :visible="showDeleteDialog"
-            title="确认删除"
-            :content="deleteDialogContent"
-            :confirm-btn="{ content: '删除', theme: 'danger' }"
-            cancel-btn="取消"
-            :show-overlay="true"
-            :z-index="12000"
-            @confirm="handleBatchDelete"
-            @cancel="showDeleteDialog = false"
-            @close="showDeleteDialog = false"
-        />
-    </view>
+            <!-- 选择模式底部操作栏 -->
+            <view
+                v-if="isSelectMode"
+                class="select-bottom-bar"
+                :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
+            >
+                <view class="select-bar-inner">
+                    <view class="select-all-btn" @click="toggleSelectAll">
+                        <t-icon
+                            :name="
+                                isAllSelected ? 'check-circle-filled' : 'circle'
+                            "
+                            size="40rpx"
+                            :color="
+                                isAllSelected ? 'var(--app-brand)' : '#c0c4cc'
+                            "
+                        ></t-icon>
+                        <text class="select-all-text">全选</text>
+                    </view>
+                    <view
+                        class="delete-btn"
+                        :class="{
+                            'delete-btn-disabled': selectedIds.length === 0,
+                        }"
+                        @click="handleDeleteTap"
+                    >
+                        <t-icon
+                            name="delete"
+                            size="28rpx"
+                            color="#fff"
+                        ></t-icon>
+                        <text class="delete-btn-text"
+                            >删除 ({{ selectedIds.length }})</text
+                        >
+                    </view>
+                </view>
+            </view>
+
+            <!-- 创建/编辑单词本弹窗 -->
+            <tPopup
+                v-model:show="popupShow"
+                :title="isEditMode ? '编辑单词本' : '创建单词本'"
+                :closeable="true"
+                :overlay="true"
+                @close="handleClosePopup"
+            >
+                <template #popupcontent>
+                    <view class="form-container">
+                        <!-- 单词本名称 -->
+                        <view class="form-item">
+                            <view class="form-label">
+                                单词本名称
+                                <text class="required">*</text>
+                            </view>
+                            <view
+                                class="input-wrapper"
+                                :class="{ 'has-error': validationErrors.title }"
+                            >
+                                <uni-icons
+                                    type="compose"
+                                    size="18"
+                                    :color="
+                                        validationErrors.title
+                                            ? 'var(--app-danger)'
+                                            : 'var(--app-text-secondary)'
+                                    "
+                                ></uni-icons>
+                                <input
+                                    class="form-input"
+                                    :class="{
+                                        'is-error': validationErrors.title,
+                                    }"
+                                    v-model="formData.title"
+                                    placeholder="请输入单词本名称（最多20个字）"
+                                    maxlength="20"
+                                    @input="handleTitleInput"
+                                />
+                                <text class="char-count"
+                                    >{{ formData.title.length }}/20</text
+                                >
+                            </view>
+                            <view
+                                v-if="validationErrors.title"
+                                class="form-error"
+                            >
+                                <uni-icons
+                                    type="info-filled"
+                                    size="14"
+                                    color="var(--app-danger)"
+                                ></uni-icons>
+                                <text>{{ validationErrors.title }}</text>
+                            </view>
+                        </view>
+
+                        <!-- 描述 -->
+                        <view class="form-item">
+                            <view class="form-label">描述</view>
+                            <view class="textarea-wrapper">
+                                <textarea
+                                    class="form-textarea"
+                                    v-model="formData.description"
+                                    placeholder="可选，简单描述这个单词本"
+                                    maxlength="60"
+                                ></textarea>
+                                <text class="char-count description-count"
+                                    >{{ formData.description.length }}/60</text
+                                >
+                            </view>
+                        </view>
+
+                        <!-- 按钮组 -->
+                        <view class="form-actions">
+                            <button
+                                class="btn btn-cancel"
+                                :disabled="submitting"
+                                @click="handleClosePopup"
+                            >
+                                <uni-icons
+                                    type="closeempty"
+                                    size="16"
+                                    color="#666"
+                                ></uni-icons>
+                                取消
+                            </button>
+                            <button
+                                class="btn btn-submit"
+                                :disabled="submitting"
+                                :class="{ 'btn-loading': submitting }"
+                                @click="handleSubmit"
+                            >
+                                <view v-if="submitting" class="btn-spinner">
+                                    <view class="spinner-circle-small"></view>
+                                </view>
+                                <uni-icons
+                                    v-else
+                                    type="checkmarkempty"
+                                    size="16"
+                                    color="#fff"
+                                ></uni-icons>
+                                {{
+                                    submitting
+                                        ? isEditMode
+                                            ? "保存中..."
+                                            : "创建中..."
+                                        : isEditMode
+                                          ? "保存"
+                                          : "创建"
+                                }}
+                            </button>
+                        </view>
+                    </view>
+                </template>
+            </tPopup>
+
+            <!-- 删除确认弹窗 (TDesign Dialog) -->
+            <t-dialog
+                :visible="showDeleteDialog"
+                title="确认删除"
+                :content="deleteDialogContent"
+                :confirm-btn="{ content: '删除', theme: 'danger' }"
+                cancel-btn="取消"
+                :show-overlay="true"
+                :z-index="12000"
+                @confirm="handleBatchDelete"
+                @cancel="showDeleteDialog = false"
+                @close="showDeleteDialog = false"
+            />
+        </view>
     </ThemeProvider>
 </template>
 
@@ -273,7 +425,10 @@ const selectedIds = ref([]);
 const showDeleteDialog = ref(false);
 
 const isAllSelected = computed(() => {
-    return wordBookList.value.length > 0 && selectedIds.value.length === wordBookList.value.length;
+    return (
+        wordBookList.value.length > 0 &&
+        selectedIds.value.length === wordBookList.value.length
+    );
 });
 
 const deleteDialogContent = computed(() => {
@@ -390,7 +545,10 @@ const handleBatchDelete = async () => {
         exitSelectMode();
         await fetchWordBooks();
     } catch (error) {
-        uni.showToast({ title: error?.message || "删除失败，请重试", icon: "none" });
+        uni.showToast({
+            title: error?.message || "删除失败，请重试",
+            icon: "none",
+        });
         console.error("批量删除单词本失败:", error);
     } finally {
         deleting.value = false;
@@ -456,7 +614,8 @@ const handleSubmit = async () => {
             });
             if (res.code !== 200) {
                 if (res.code === 409) {
-                    validationErrors.value.title = "单词本名称已存在，请更换名称";
+                    validationErrors.value.title =
+                        "单词本名称已存在，请更换名称";
                     return;
                 }
                 throw new Error(res.message || "保存失败");
@@ -466,7 +625,8 @@ const handleSubmit = async () => {
             const res = await createWordBookAPI({ title, description });
             if (res.code !== 200) {
                 if (res.code === 409) {
-                    validationErrors.value.title = "单词本名称已存在，请更换名称";
+                    validationErrors.value.title =
+                        "单词本名称已存在，请更换名称";
                     return;
                 }
                 throw new Error(res.message || "创建失败");
@@ -477,7 +637,9 @@ const handleSubmit = async () => {
         await fetchWordBooks();
     } catch (error) {
         uni.showToast({
-            title: error?.message || (isEditMode.value ? "保存失败，请重试" : "创建失败，请重试"),
+            title:
+                error?.message ||
+                (isEditMode.value ? "保存失败，请重试" : "创建失败，请重试"),
             icon: "none",
         });
         console.error("操作失败:", error);
@@ -503,7 +665,11 @@ const fetchWordBooks = async () => {
         wordBookList.value = Array.isArray(res.data) ? res.data : [];
     } catch (error) {
         wordBookList.value = [];
-        uni.showToast({ title: "获取单词本失败", icon: "none", position: "bottom" });
+        uni.showToast({
+            title: "获取单词本失败",
+            icon: "none",
+            position: "bottom",
+        });
         console.error("获取单词本失败:", error);
     } finally {
         loading.value = false;
@@ -591,7 +757,8 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4rpx 12rpx color-mix(in srgb, var(--app-brand) 10%, transparent);
+    box-shadow: 0 4rpx 12rpx
+        color-mix(in srgb, var(--app-brand) 10%, transparent);
 }
 
 .nav-action:active {
@@ -609,7 +776,8 @@ onBeforeUnmount(() => {
     background: var(--app-bg-page);
     padding: 26rpx 20rpx calc(46rpx + env(safe-area-inset-bottom));
     overflow: hidden;
-    font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family:
+        "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 /* 背景装饰 */
@@ -624,7 +792,11 @@ onBeforeUnmount(() => {
     height: 360rpx;
     top: -110rpx;
     right: -90rpx;
-    background: radial-gradient(circle, rgba(255, 200, 120, 0.3) 0%, rgba(255, 200, 120, 0) 68%);
+    background: radial-gradient(
+        circle,
+        rgba(255, 200, 120, 0.3) 0%,
+        rgba(255, 200, 120, 0) 68%
+    );
 }
 
 .blob-2 {
@@ -632,7 +804,11 @@ onBeforeUnmount(() => {
     height: 300rpx;
     left: -120rpx;
     top: 280rpx;
-    background: radial-gradient(circle, rgba(255, 220, 170, 0.22) 0%, rgba(255, 220, 170, 0) 70%);
+    background: radial-gradient(
+        circle,
+        rgba(255, 220, 170, 0.22) 0%,
+        rgba(255, 220, 170, 0) 70%
+    );
 }
 
 /* 选择模式提示条 */
@@ -738,8 +914,15 @@ onBeforeUnmount(() => {
     flex-direction: column;
     overflow: hidden;
     animation: card-enter 0.5s ease both;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
-    background: linear-gradient(145deg, var(--app-bg-container) 0%, var(--app-bg-secondary) 85%);
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+    background: linear-gradient(
+        145deg,
+        var(--app-bg-container) 0%,
+        var(--app-bg-secondary) 85%
+    );
     box-shadow: var(--app-shadow-card);
 }
 
@@ -750,7 +933,9 @@ onBeforeUnmount(() => {
 /* 选中态 */
 .wordbook-card.card-selected {
     border-color: var(--app-brand);
-    box-shadow: 0 0 0 4rpx rgba(77, 98, 255, 0.16), 0 14rpx 34rpx rgba(77, 98, 255, 0.12) !important;
+    box-shadow:
+        0 0 0 4rpx rgba(77, 98, 255, 0.16),
+        0 14rpx 34rpx rgba(77, 98, 255, 0.12) !important;
 }
 
 /* 卡片内复选框 */
@@ -778,7 +963,11 @@ onBeforeUnmount(() => {
     height: 320rpx;
     right: -70rpx;
     top: -120rpx;
-    background: radial-gradient(circle at center, color-mix(in srgb, var(--app-brand) 14%, transparent) 0%, transparent 65%);
+    background: radial-gradient(
+        circle at center,
+        color-mix(in srgb, var(--app-brand) 14%, transparent) 0%,
+        transparent 65%
+    );
 }
 
 .card-top {
@@ -881,7 +1070,9 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: border-color 0.3s ease, background 0.3s ease;
+    transition:
+        border-color 0.3s ease,
+        background 0.3s ease;
 }
 
 .create-card:active {
@@ -913,7 +1104,9 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease, background 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        background 0.3s ease;
 }
 
 .create-card:active .create-icon {
@@ -1009,7 +1202,11 @@ onBeforeUnmount(() => {
     right: -72rpx;
     top: -124rpx;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(230, 180, 100, 0.14) 0%, rgba(230, 180, 100, 0) 70%);
+    background: radial-gradient(
+        circle,
+        rgba(230, 180, 100, 0.14) 0%,
+        rgba(230, 180, 100, 0) 70%
+    );
 }
 
 .skeleton-content {
@@ -1069,7 +1266,12 @@ onBeforeUnmount(() => {
 }
 
 .skeleton-shimmer {
-    background: linear-gradient(110deg, rgba(245, 235, 220, 0.95) 8%, rgba(255, 248, 238, 0.95) 18%, rgba(245, 235, 220, 0.95) 33%);
+    background: linear-gradient(
+        110deg,
+        rgba(245, 235, 220, 0.95) 8%,
+        rgba(255, 248, 238, 0.95) 18%,
+        rgba(245, 235, 220, 0.95) 33%
+    );
     background-size: 220% 100%;
     animation: skeleton-shimmer 1.2s ease-in-out infinite;
 }
@@ -1105,7 +1307,9 @@ onBeforeUnmount(() => {
     border-radius: 16rpx;
     padding: 0 20rpx;
     border: 2rpx solid transparent;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 .input-wrapper:focus-within {
@@ -1192,7 +1396,9 @@ onBeforeUnmount(() => {
     font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     border: none;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1212,15 +1418,25 @@ onBeforeUnmount(() => {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, var(--app-brand) 0%, var(--app-brand-hover) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--app-brand) 0%,
+        var(--app-brand-hover) 100%
+    );
     color: var(--app-bg-container);
-    box-shadow: 0 8rpx 24rpx color-mix(in srgb, var(--app-brand) 32%, transparent);
+    box-shadow: 0 8rpx 24rpx
+        color-mix(in srgb, var(--app-brand) 32%, transparent);
 }
 
 .btn-submit:active {
-    background: linear-gradient(135deg, var(--app-brand-hover) 0%, var(--app-brand) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--app-brand-hover) 0%,
+        var(--app-brand) 100%
+    );
     transform: scale(0.98);
-    box-shadow: 0 4rpx 16rpx color-mix(in srgb, var(--app-brand) 22%, transparent);
+    box-shadow: 0 4rpx 16rpx
+        color-mix(in srgb, var(--app-brand) 22%, transparent);
 }
 
 .btn-submit:disabled,
@@ -1230,7 +1446,11 @@ onBeforeUnmount(() => {
 }
 
 .btn-loading {
-    background: linear-gradient(135deg, var(--app-brand-hover) 0%, var(--app-brand) 100%) !important;
+    background: linear-gradient(
+        135deg,
+        var(--app-brand-hover) 0%,
+        var(--app-brand) 100%
+    ) !important;
     opacity: 0.7;
 }
 
@@ -1250,23 +1470,43 @@ onBeforeUnmount(() => {
 }
 
 @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10rpx); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes skeleton-shimmer {
-    from { background-position: 100% 0; }
-    to { background-position: -100% 0; }
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: -100% 0;
+    }
 }
 
 @keyframes card-enter {
-    from { opacity: 0; transform: translateY(12rpx); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media screen and (min-width: 760px) {

@@ -1,111 +1,119 @@
 <template>
     <ThemeProvider>
-    <view
-        class="note-detail-page"
-        :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
-    >
-        <view class="top-wrapper">
-            <view class="custom-navbar" :style="customNavbarStyle">
-                <view class="nav-row" :style="navRowStyle">
-                    <view class="nav-left" @click="handleBack">
-                        <uni-icons
-                            type="left"
-                            size="17"
-                            color="#5f6779"
-                        ></uni-icons>
-                        <text class="nav-left-text">返回</text>
-                    </view>
-
-                    <text class="nav-title">笔记详情</text>
-
-                    <view class="nav-right">
-                        <view class="nav-action" @click="handleEdit">
+        <view
+            class="note-detail-page"
+            :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
+        >
+            <view class="top-wrapper">
+                <view class="custom-navbar" :style="customNavbarStyle">
+                    <view class="nav-row" :style="navRowStyle">
+                        <view class="nav-left" @click="handleBack">
                             <uni-icons
-                                type="compose"
-                                size="15"
+                                type="left"
+                                size="17"
                                 color="#5f6779"
                             ></uni-icons>
+                            <text class="nav-left-text">返回</text>
                         </view>
-                        <view class="nav-action danger" @click="handleDelete">
-                            <uni-icons
-                                type="trash"
-                                size="15"
-                                color="#9f5a5a"
-                            ></uni-icons>
+
+                        <text class="nav-title">笔记详情</text>
+
+                        <view class="nav-right">
+                            <view class="nav-action" @click="handleEdit">
+                                <uni-icons
+                                    type="compose"
+                                    size="15"
+                                    color="#5f6779"
+                                ></uni-icons>
+                            </view>
+                            <view
+                                class="nav-action danger"
+                                @click="handleDelete"
+                            >
+                                <uni-icons
+                                    type="trash"
+                                    size="15"
+                                    color="#9f5a5a"
+                                ></uni-icons>
+                            </view>
                         </view>
                     </view>
                 </view>
             </view>
-        </view>
 
-        <scroll-view class="detail-scroll" scroll-y>
-            <view class="detail-body">
-                <view v-if="isLoading" class="loading-wrap">
-                    <view class="loading-title shimmer"></view>
-                    <view class="loading-meta shimmer"></view>
-                    <view class="loading-line shimmer"></view>
-                    <view class="loading-line shimmer"></view>
-                    <view
-                        class="loading-line loading-line-short shimmer"
-                    ></view>
-                </view>
-
-                <view v-else-if="loadError" class="empty-state">
-                    <uni-icons
-                        type="info"
-                        size="30"
-                        color="#b3b9c9"
-                    ></uni-icons>
-                    <text class="empty-text">加载失败</text>
-                    <text class="empty-desc">{{ loadError }}</text>
-                    <view class="retry-btn" @click="fetchNoteDetail">
-                        <text class="retry-btn-text">重试</text>
+            <scroll-view class="detail-scroll" scroll-y>
+                <view class="detail-body">
+                    <view v-if="isLoading" class="loading-wrap">
+                        <view class="loading-title shimmer"></view>
+                        <view class="loading-meta shimmer"></view>
+                        <view class="loading-line shimmer"></view>
+                        <view class="loading-line shimmer"></view>
+                        <view
+                            class="loading-line loading-line-short shimmer"
+                        ></view>
                     </view>
-                </view>
 
-                <template v-else>
-                    <view class="content-card">
-                        <text class="note-title">{{ detailState.title }}</text>
+                    <view v-else-if="loadError" class="empty-state">
+                        <uni-icons
+                            type="info"
+                            size="30"
+                            color="#b3b9c9"
+                        ></uni-icons>
+                        <text class="empty-text">加载失败</text>
+                        <text class="empty-desc">{{ loadError }}</text>
+                        <view class="retry-btn" @click="fetchNoteDetail">
+                            <text class="retry-btn-text">重试</text>
+                        </view>
+                    </view>
 
-                        <view class="meta-wrap">
-                            <uni-icons
-                                type="clock"
-                                size="13"
-                                color="#8a93aa"
-                            ></uni-icons>
-                            <text class="meta-text">{{
-                                detailState.dateText
+                    <template v-else>
+                        <view class="content-card">
+                            <text class="note-title">{{
+                                detailState.title
                             }}</text>
-                            <text class="meta-divider">·</text>
-                            <text class="meta-text"
-                                >{{ contentLength }} 字</text
-                            >
+
+                            <view class="meta-wrap">
+                                <uni-icons
+                                    type="clock"
+                                    size="13"
+                                    color="#8a93aa"
+                                ></uni-icons>
+                                <text class="meta-text">{{
+                                    detailState.dateText
+                                }}</text>
+                                <text class="meta-divider">·</text>
+                                <text class="meta-text"
+                                    >{{ contentLength }} 字</text
+                                >
+                            </view>
+
+                            <view class="divider"></view>
+
+                            <ContentRenderer
+                                class="detail-render"
+                                :content="detailRenderContent"
+                                :is-markdown="detailState.isMarkdown"
+                            />
                         </view>
 
-                        <view class="divider"></view>
-
-                        <ContentRenderer
-                            class="detail-render"
-                            :content="detailRenderContent"
-                            :is-markdown="detailState.isMarkdown"
-                        />
-                    </view>
-
-                    <view v-if="detailState.tags.length" class="tag-section">
-                        <text class="tag-title">笔记标签</text>
-                        <view class="tag-wrap">
-                            <text
-                                v-for="tag in detailState.tags"
-                                :key="tag"
-                                class="tag-item"
-                                >{{ tag }}</text
-                            >
+                        <view
+                            v-if="detailState.tags.length"
+                            class="tag-section"
+                        >
+                            <text class="tag-title">笔记标签</text>
+                            <view class="tag-wrap">
+                                <text
+                                    v-for="tag in detailState.tags"
+                                    :key="tag"
+                                    class="tag-item"
+                                    >{{ tag }}</text
+                                >
+                            </view>
                         </view>
-                    </view>
-                </template>
-            </view>
-        </scroll-view>
-    </view>
+                    </template>
+                </view>
+            </scroll-view>
+        </view>
     </ThemeProvider>
 </template>
 

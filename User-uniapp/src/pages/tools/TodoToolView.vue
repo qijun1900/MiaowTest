@@ -1,222 +1,231 @@
 <template>
     <ThemeProvider>
-    <CustomNavBar title="TODO" @back="handleNavBack" />
-    <view class="container">
-        <view class="calendar-section">
-            <lxCalendar
-                :value="initialDate"
-                :dot_lists="dotDates"
-                @change="handleChange"
-            />
-        </view>
-        <view class="todos-list">
-            <!-- Loading 状态 -->
-            <view v-if="loading" class="loading-container">
-                <ThemeLoading text="正在加载数据..." />
+        <CustomNavBar title="TODO" @back="handleNavBack" />
+        <view class="container">
+            <view class="calendar-section">
+                <lxCalendar
+                    :value="initialDate"
+                    :dot_lists="dotDates"
+                    @change="handleChange"
+                />
             </view>
-
-            <!-- 空状态 -->
-            <view
-                v-else-if="TodayTODOList.length === 0"
-                class="empty-container"
-            >
-                <t-icon name="calendar" size="80" color="#007aff"></t-icon>
-                <text class="empty-title">暂无待办事项</text>
-                <text class="empty-desc">点击下方 + 按钮创建新的待办事项</text>
-            </view>
-
-            <!-- 待办事项列表头部 -->
-            <view v-else class="todos-container">
-                <view class="todos-header">
-                    <text class="todos-title">{{ selectedDate }} 待办事项</text>
-                    <view class="header-actions">
-                        <view class="progress-info">
-                            <text class="progress-text"
-                                >{{ completedCount }}/{{
-                                    TodayTODOList.length
-                                }}</text
-                            >
-                            <view class="progress-bar">
-                                <view
-                                    class="progress-fill"
-                                    :style="{ width: progressPercentage + '%' }"
-                                ></view>
-                            </view>
-                        </view>
-                        <t-icon
-                            name="refresh"
-                            size="24"
-                            color="#007aff"
-                            @click="refreshTodos"
-                        ></t-icon>
-                    </view>
+            <view class="todos-list">
+                <!-- Loading 状态 -->
+                <view v-if="loading" class="loading-container">
+                    <ThemeLoading text="正在加载数据..." />
                 </view>
 
-                <!-- 完成祝贺提示 -->
+                <!-- 空状态 -->
                 <view
-                    v-if="
-                        progressPercentage === 100 && TodayTODOList.length > 0
-                    "
-                    class="congratulations"
+                    v-else-if="TodayTODOList.length === 0"
+                    class="empty-container"
                 >
-                    <t-icon
-                        name="check-circle-filled"
-                        size="40"
-                        color="#4CAF50"
-                    ></t-icon>
-                    <text class="congratulations-text"
-                        >🎉 恭喜！今日待办事项全部完成！</text
+                    <t-icon name="calendar" size="80" color="#007aff"></t-icon>
+                    <text class="empty-title">暂无待办事项</text>
+                    <text class="empty-desc"
+                        >点击下方 + 按钮创建新的待办事项</text
                     >
                 </view>
 
-                <view
-                    class="todo-item"
-                    v-for="todo in TodayTODOList"
-                    :key="todo._id"
-                    :class="{ completed: todo.isCompleted }"
-                >
-                    <view class="todo-checkbox" @click="toggleTodo(todo)">
+                <!-- 待办事项列表头部 -->
+                <view v-else class="todos-container">
+                    <view class="todos-header">
+                        <text class="todos-title"
+                            >{{ selectedDate }} 待办事项</text
+                        >
+                        <view class="header-actions">
+                            <view class="progress-info">
+                                <text class="progress-text"
+                                    >{{ completedCount }}/{{
+                                        TodayTODOList.length
+                                    }}</text
+                                >
+                                <view class="progress-bar">
+                                    <view
+                                        class="progress-fill"
+                                        :style="{
+                                            width: progressPercentage + '%',
+                                        }"
+                                    ></view>
+                                </view>
+                            </view>
+                            <t-icon
+                                name="refresh"
+                                size="24"
+                                color="#007aff"
+                                @click="refreshTodos"
+                            ></t-icon>
+                        </view>
+                    </view>
+
+                    <!-- 完成祝贺提示 -->
+                    <view
+                        v-if="
+                            progressPercentage === 100 &&
+                            TodayTODOList.length > 0
+                        "
+                        class="congratulations"
+                    >
                         <t-icon
-                            v-if="todo.isCompleted"
                             name="check-circle-filled"
-                            size="28"
+                            size="40"
                             color="#4CAF50"
                         ></t-icon>
-                        <view v-else class="todo-checkbox-circle"></view>
+                        <text class="congratulations-text"
+                            >🎉 恭喜！今日待办事项全部完成！</text
+                        >
                     </view>
 
-                    <view class="todo-content">
-                        <text
-                            class="todo-title"
-                            :class="{ 'completed-text': todo.isCompleted }"
-                        >
-                            {{ todo.title }}
-                        </text>
-                        <text v-if="todo.description" class="todo-desc">
-                            {{ todo.description }}
-                        </text>
-                    </view>
+                    <view
+                        class="todo-item"
+                        v-for="todo in TodayTODOList"
+                        :key="todo._id"
+                        :class="{ completed: todo.isCompleted }"
+                    >
+                        <view class="todo-checkbox" @click="toggleTodo(todo)">
+                            <t-icon
+                                v-if="todo.isCompleted"
+                                name="check-circle-filled"
+                                size="28"
+                                color="#4CAF50"
+                            ></t-icon>
+                            <view v-else class="todo-checkbox-circle"></view>
+                        </view>
 
-                    <view class="todo-actions">
-                        <t-icon
-                            name="edit"
-                            size="20"
-                            color="#007aff"
-                            @click="editTodo(todo)"
-                        >
-                        </t-icon>
-                        <t-icon
-                            name="delete"
-                            size="20"
-                            color="#ff4757"
-                            @click="deleteTodo(todo)"
-                        >
-                        </t-icon>
+                        <view class="todo-content">
+                            <text
+                                class="todo-title"
+                                :class="{ 'completed-text': todo.isCompleted }"
+                            >
+                                {{ todo.title }}
+                            </text>
+                            <text v-if="todo.description" class="todo-desc">
+                                {{ todo.description }}
+                            </text>
+                        </view>
+
+                        <view class="todo-actions">
+                            <t-icon
+                                name="edit"
+                                size="20"
+                                color="#007aff"
+                                @click="editTodo(todo)"
+                            >
+                            </t-icon>
+                            <t-icon
+                                name="delete"
+                                size="20"
+                                color="#ff4757"
+                                @click="deleteTodo(todo)"
+                            >
+                            </t-icon>
+                        </view>
                     </view>
                 </view>
             </view>
-        </view>
-        <!-- 添加按钮 -->
-        <dragButton
-            :show="popupShow === false && showAddButton"
-            :isDock="true"
-            :existTabBar="true"
-            iconType="plusempty"
-            :bottomOffset="100"
-            :popMenu="false"
-            @btnClick="handleBtnClick"
-            @btnRemove="handleHelperRemove"
-        />
-        <!-- 弹窗 -->
-        <tPopup
-            :closeable="false"
-            v-model:show="popupShow"
-            :title="(isEditing ? '编辑' : '新建') + selectedDate + '-TODO'"
-            :overlay="true"
-        >
-            <template #popupcontent>
-                <view class="popup-container">
-                    <!-- 表单内容区域 -->
-                    <view class="form-content">
-                        <!-- 代办标题输入 -->
-                        <view class="form-item">
-                            <view class="head-title-container">
-                                <t-icon
-                                    name="edit"
-                                    color="#007aff"
-                                    size="25"
-                                ></t-icon>
-                                <text class="form-label">代办标题</text>
+            <!-- 添加按钮 -->
+            <dragButton
+                :show="popupShow === false && showAddButton"
+                :isDock="true"
+                :existTabBar="true"
+                iconType="plusempty"
+                :bottomOffset="100"
+                :popMenu="false"
+                @btnClick="handleBtnClick"
+                @btnRemove="handleHelperRemove"
+            />
+            <!-- 弹窗 -->
+            <tPopup
+                :closeable="false"
+                v-model:show="popupShow"
+                :title="(isEditing ? '编辑' : '新建') + selectedDate + '-TODO'"
+                :overlay="true"
+            >
+                <template #popupcontent>
+                    <view class="popup-container">
+                        <!-- 表单内容区域 -->
+                        <view class="form-content">
+                            <!-- 代办标题输入 -->
+                            <view class="form-item">
+                                <view class="head-title-container">
+                                    <t-icon
+                                        name="edit"
+                                        color="#007aff"
+                                        size="25"
+                                    ></t-icon>
+                                    <text class="form-label">代办标题</text>
+                                </view>
+
+                                <input
+                                    v-model="todoForm.title"
+                                    class="form-input"
+                                    placeholder="请输入代办事项标题"
+                                    placeholder-class="placeholder-style"
+                                    @focus="handleInputFocus('title')"
+                                    @blur="handleInputBlur('title')"
+                                />
+                                <text v-if="errors.title" class="error-text">{{
+                                    errors.title
+                                }}</text>
                             </view>
 
-                            <input
-                                v-model="todoForm.title"
-                                class="form-input"
-                                placeholder="请输入代办事项标题"
-                                placeholder-class="placeholder-style"
-                                @focus="handleInputFocus('title')"
-                                @blur="handleInputBlur('title')"
-                            />
-                            <text v-if="errors.title" class="error-text">{{
-                                errors.title
-                            }}</text>
-                        </view>
-
-                        <!-- 代办描述 -->
-                        <view class="form-item">
-                            <view class="head-title-container">
-                                <t-icon
-                                    name="view-list"
-                                    color="#007aff"
-                                    size="25"
-                                ></t-icon>
-                                <text class="form-label"> 详细描述</text>
+                            <!-- 代办描述 -->
+                            <view class="form-item">
+                                <view class="head-title-container">
+                                    <t-icon
+                                        name="view-list"
+                                        color="#007aff"
+                                        size="25"
+                                    ></t-icon>
+                                    <text class="form-label"> 详细描述</text>
+                                </view>
+                                <textarea
+                                    v-model="todoForm.description"
+                                    class="form-textarea"
+                                    placeholder="请输入详细的代办描述（可选）"
+                                    placeholder-class="placeholder-style"
+                                    :maxlength="200"
+                                    @focus="handleInputFocus('description')"
+                                    @blur="handleInputBlur('description')"
+                                />
+                                <view class="textarea-counter">
+                                    <text class="counter-text"
+                                        >{{
+                                            todoForm.description.length
+                                        }}/200</text
+                                    >
+                                </view>
                             </view>
-                            <textarea
-                                v-model="todoForm.description"
-                                class="form-textarea"
-                                placeholder="请输入详细的代办描述（可选）"
-                                placeholder-class="placeholder-style"
-                                :maxlength="200"
-                                @focus="handleInputFocus('description')"
-                                @blur="handleInputBlur('description')"
-                            />
-                            <view class="textarea-counter">
-                                <text class="counter-text"
-                                    >{{ todoForm.description.length }}/200</text
+
+                            <!-- 操作按钮区域 -->
+                            <view class="action-buttons">
+                                <t-button
+                                    class="action-btn cancel-btn"
+                                    variant="outline"
+                                    @click="handleCancel"
                                 >
+                                    取消
+                                </t-button>
+                                <t-button
+                                    class="action-btn save-btn"
+                                    theme="primary"
+                                    :loading="isSaving"
+                                    @click="handleSave"
+                                >
+                                    {{
+                                        isSaving
+                                            ? "保存中..."
+                                            : isEditing
+                                              ? "更新"
+                                              : "保存"
+                                    }}
+                                </t-button>
                             </view>
-                        </view>
-
-                        <!-- 操作按钮区域 -->
-                        <view class="action-buttons">
-                            <t-button
-                                class="action-btn cancel-btn"
-                                variant="outline"
-                                @click="handleCancel"
-                            >
-                                取消
-                            </t-button>
-                            <t-button
-                                class="action-btn save-btn"
-                                theme="primary"
-                                :loading="isSaving"
-                                @click="handleSave"
-                            >
-                                {{
-                                    isSaving
-                                        ? "保存中..."
-                                        : isEditing
-                                          ? "更新"
-                                          : "保存"
-                                }}
-                            </t-button>
                         </view>
                     </view>
-                </view>
-            </template>
-        </tPopup>
-    </view>
+                </template>
+            </tPopup>
+        </view>
     </ThemeProvider>
 </template>
 

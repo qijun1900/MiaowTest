@@ -1,179 +1,274 @@
 <template>
     <ThemeProvider>
-    <view class="page" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
-        <view class="top-wrapper">
-            <view class="custom-navbar" :style="customNavbarStyle">
-                <view class="nav-row" :style="navRowStyle">
-                    <view class="nav-left" @click="handleBack">
-                        <t-icon name="chevron-left" size="44rpx" color="var(--app-text-primary)"></t-icon>
-                    </view>
-                    <text class="nav-title">笔记本</text>
-                    <view class="nav-right">
-                        <view class="nav-action" @click="handleCreateNotebook">
-                            <t-icon name="add" size="40rpx" color="var(--app-brand)"></t-icon>
+        <view
+            class="page"
+            :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
+        >
+            <view class="top-wrapper">
+                <view class="custom-navbar" :style="customNavbarStyle">
+                    <view class="nav-row" :style="navRowStyle">
+                        <view class="nav-left" @click="handleBack">
+                            <t-icon
+                                name="chevron-left"
+                                size="44rpx"
+                                color="var(--app-text-primary)"
+                            ></t-icon>
+                        </view>
+                        <text class="nav-title">笔记本</text>
+                        <view class="nav-right">
+                            <view
+                                class="nav-action"
+                                @click="handleCreateNotebook"
+                            >
+                                <t-icon
+                                    name="add"
+                                    size="40rpx"
+                                    color="var(--app-brand)"
+                                ></t-icon>
+                            </view>
                         </view>
                     </view>
                 </view>
             </view>
-        </view>
 
-        <scroll-view class="main-scroll" scroll-y>
-            <view class="scroll-content">
-                <view class="bg-blob blob-1"></view>
-                <view class="bg-blob blob-2"></view>
+            <scroll-view class="main-scroll" scroll-y>
+                <view class="scroll-content">
+                    <view class="bg-blob blob-1"></view>
+                    <view class="bg-blob blob-2"></view>
 
-                <view class="hero">
-                    <view class="hero-left">
-                        <view class="section-header">
-                            <view class="section-dot"></view>
-                            <text class="section-title">所有笔记本</text>
+                    <view class="hero">
+                        <view class="hero-left">
+                            <view class="section-header">
+                                <view class="section-dot"></view>
+                                <text class="section-title">所有笔记本</text>
+                            </view>
+                            <text class="hero-subtitle"
+                                >整理知识，沉淀你的学习轨迹</text
+                            >
                         </view>
-                        <text class="hero-subtitle">整理知识，沉淀你的学习轨迹</text>
-                    </view>
-                    <view class="hero-stat">
-                        <text class="hero-stat-value">{{ decoratedNotebookList.length }}</text>
-                        <text class="hero-stat-label">个笔记本</text>
-                    </view>
-                </view>
-
-                <view v-if="loading" class="card-list skeleton-list">
-                    <view
-                        v-for="index in skeletonCount"
-                        :key="`skeleton-${index}`"
-                        class="notebook-card skeleton-card"
-                    >
-                        <view class="skeleton-aura"></view>
-                        <view class="card-top">
-                            <view class="skeleton-pill skeleton-shimmer"></view>
-                        </view>
-                        <view class="card-content skeleton-content">
-                            <view class="skeleton-title skeleton-shimmer"></view>
-                            <view class="skeleton-desc skeleton-shimmer"></view>
-                            <view class="skeleton-desc skeleton-desc-short skeleton-shimmer"></view>
-                        </view>
-                        <view class="card-footer skeleton-footer">
-                            <view class="skeleton-icon skeleton-shimmer"></view>
-                            <view class="skeleton-time skeleton-shimmer"></view>
-                            <view class="skeleton-line"></view>
-                            <view class="skeleton-hint skeleton-shimmer"></view>
+                        <view class="hero-stat">
+                            <text class="hero-stat-value">{{
+                                decoratedNotebookList.length
+                            }}</text>
+                            <text class="hero-stat-label">个笔记本</text>
                         </view>
                     </view>
-                </view>
 
-                <view class="card-list" v-else>
-                    <view
-                        v-for="(item, index) in decoratedNotebookList"
-                        :key="item._id || index"
-                        class="notebook-card"
-                        :style="[item.cardStyle, { animationDelay: `${index * 70}ms` }]"
-                        @click="handleOpenNotesList(item)"
-                    >
-                        <view class="card-aura" :style="item.auraStyle"></view>
-                        <view class="edit-btn" @click.stop="handleEditNotebook(item)">
-                            <uni-icons type="compose" size="15" color="#4f6184"></uni-icons>
-                        </view>
-                        <view class="card-top">
-                            <view class="count-tag" :style="item.tagStyle">
-                                <text class="count-text">{{ item.noteCount }} 笔记</text>
+                    <view v-if="loading" class="card-list skeleton-list">
+                        <view
+                            v-for="index in skeletonCount"
+                            :key="`skeleton-${index}`"
+                            class="notebook-card skeleton-card"
+                        >
+                            <view class="skeleton-aura"></view>
+                            <view class="card-top">
+                                <view
+                                    class="skeleton-pill skeleton-shimmer"
+                                ></view>
+                            </view>
+                            <view class="card-content skeleton-content">
+                                <view
+                                    class="skeleton-title skeleton-shimmer"
+                                ></view>
+                                <view
+                                    class="skeleton-desc skeleton-shimmer"
+                                ></view>
+                                <view
+                                    class="skeleton-desc skeleton-desc-short skeleton-shimmer"
+                                ></view>
+                            </view>
+                            <view class="card-footer skeleton-footer">
+                                <view
+                                    class="skeleton-icon skeleton-shimmer"
+                                ></view>
+                                <view
+                                    class="skeleton-time skeleton-shimmer"
+                                ></view>
+                                <view class="skeleton-line"></view>
+                                <view
+                                    class="skeleton-hint skeleton-shimmer"
+                                ></view>
                             </view>
                         </view>
-                        <view class="card-content">
-                            <text class="book-title">{{ item.title }}</text>
-                            <text class="book-desc">{{ item.description }}</text>
-                        </view>
-                        <view class="card-footer">
-                            <uni-icons type="clock" size="15" color="#7d8697"></uni-icons>
-                            <text class="footer-text">{{ item.updatedAtText }}</text>
-                            <view class="footer-line"></view>
-                            <text class="footer-hint">最近更新</text>
-                        </view>
                     </view>
 
-                    <view class="notebook-card create-card" @click="handleCreateNotebook">
-                        <view class="create-content">
-                            <view class="create-icon-wrapper">
-                                <view class="create-icon">
-                                    <uni-icons type="plus" size="40" color="#999"></uni-icons>
+                    <view class="card-list" v-else>
+                        <view
+                            v-for="(item, index) in decoratedNotebookList"
+                            :key="item._id || index"
+                            class="notebook-card"
+                            :style="[
+                                item.cardStyle,
+                                { animationDelay: `${index * 70}ms` },
+                            ]"
+                            @click="handleOpenNotesList(item)"
+                        >
+                            <view
+                                class="card-aura"
+                                :style="item.auraStyle"
+                            ></view>
+                            <view
+                                class="edit-btn"
+                                @click.stop="handleEditNotebook(item)"
+                            >
+                                <uni-icons
+                                    type="compose"
+                                    size="15"
+                                    color="#4f6184"
+                                ></uni-icons>
+                            </view>
+                            <view class="card-top">
+                                <view class="count-tag" :style="item.tagStyle">
+                                    <text class="count-text"
+                                        >{{ item.noteCount }} 笔记</text
+                                    >
                                 </view>
                             </view>
-                            <view class="create-text">新建笔记本</view>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </scroll-view>
-
-        <tPopup
-            v-model:show="popupShow"
-            title="创建笔记本"
-            :closeable="true"
-            :overlay="true"
-            @close="handleClosePopup"
-        >
-            <template #popupcontent>
-                <view class="form-container">
-                    <view class="form-item">
-                        <view class="form-label">
-                            笔记本名称
-                            <text class="required">*</text>
-                        </view>
-                        <view class="input-wrapper" :class="{ 'has-error': validationErrors.title }">
-                            <uni-icons
-                                type="compose"
-                                size="18"
-                                :color="validationErrors.title ? 'var(--app-danger)' : 'var(--app-text-secondary)'"
-                            ></uni-icons>
-                            <input
-                                class="form-input"
-                                :class="{ 'is-error': validationErrors.title }"
-                                v-model="formData.title"
-                                placeholder="请输入笔记本名称（最多20个字）"
-                                maxlength="20"
-                                @input="handleTitleInput"
-                            />
-                            <text class="char-count">{{ formData.title.length }}/20</text>
-                        </view>
-                        <view v-if="validationErrors.title" class="form-error">
-                            <uni-icons type="info-filled" size="14" color="var(--app-danger)"></uni-icons>
-                            <text>{{ validationErrors.title }}</text>
-                        </view>
-                    </view>
-
-                    <view class="form-item">
-                        <view class="form-label">描述</view>
-                        <view class="textarea-wrapper">
-                            <textarea
-                                class="form-textarea"
-                                v-model="formData.description"
-                                placeholder="可选，简单描述这个笔记本"
-                                maxlength="60"
-                            ></textarea>
-                            <text class="char-count description-count">{{ formData.description.length }}/60</text>
-                        </view>
-                    </view>
-
-                    <view class="form-actions">
-                        <button class="btn btn-cancel" :disabled="submitting" @click="handleClosePopup">
-                            <uni-icons type="closeempty" size="16" color="#666"></uni-icons>
-                            取消
-                        </button>
-                        <button
-                            class="btn btn-submit"
-                            :disabled="submitting"
-                            :class="{ 'btn-loading': submitting }"
-                            @click="handleSubmit"
-                        >
-                            <view v-if="submitting" class="btn-spinner">
-                                <view class="spinner-circle-small"></view>
+                            <view class="card-content">
+                                <text class="book-title">{{ item.title }}</text>
+                                <text class="book-desc">{{
+                                    item.description
+                                }}</text>
                             </view>
-                            <uni-icons v-else type="checkmarkempty" size="16" color="#fff"></uni-icons>
-                            {{ submitting ? "创建中..." : "创建" }}
-                        </button>
+                            <view class="card-footer">
+                                <uni-icons
+                                    type="clock"
+                                    size="15"
+                                    color="#7d8697"
+                                ></uni-icons>
+                                <text class="footer-text">{{
+                                    item.updatedAtText
+                                }}</text>
+                                <view class="footer-line"></view>
+                                <text class="footer-hint">最近更新</text>
+                            </view>
+                        </view>
+
+                        <view
+                            class="notebook-card create-card"
+                            @click="handleCreateNotebook"
+                        >
+                            <view class="create-content">
+                                <view class="create-icon-wrapper">
+                                    <view class="create-icon">
+                                        <uni-icons
+                                            type="plus"
+                                            size="40"
+                                            color="#999"
+                                        ></uni-icons>
+                                    </view>
+                                </view>
+                                <view class="create-text">新建笔记本</view>
+                            </view>
+                        </view>
                     </view>
                 </view>
-            </template>
-        </tPopup>
-    </view>
+            </scroll-view>
+
+            <tPopup
+                v-model:show="popupShow"
+                title="创建笔记本"
+                :closeable="true"
+                :overlay="true"
+                @close="handleClosePopup"
+            >
+                <template #popupcontent>
+                    <view class="form-container">
+                        <view class="form-item">
+                            <view class="form-label">
+                                笔记本名称
+                                <text class="required">*</text>
+                            </view>
+                            <view
+                                class="input-wrapper"
+                                :class="{ 'has-error': validationErrors.title }"
+                            >
+                                <uni-icons
+                                    type="compose"
+                                    size="18"
+                                    :color="
+                                        validationErrors.title
+                                            ? 'var(--app-danger)'
+                                            : 'var(--app-text-secondary)'
+                                    "
+                                ></uni-icons>
+                                <input
+                                    class="form-input"
+                                    :class="{
+                                        'is-error': validationErrors.title,
+                                    }"
+                                    v-model="formData.title"
+                                    placeholder="请输入笔记本名称（最多20个字）"
+                                    maxlength="20"
+                                    @input="handleTitleInput"
+                                />
+                                <text class="char-count"
+                                    >{{ formData.title.length }}/20</text
+                                >
+                            </view>
+                            <view
+                                v-if="validationErrors.title"
+                                class="form-error"
+                            >
+                                <uni-icons
+                                    type="info-filled"
+                                    size="14"
+                                    color="var(--app-danger)"
+                                ></uni-icons>
+                                <text>{{ validationErrors.title }}</text>
+                            </view>
+                        </view>
+
+                        <view class="form-item">
+                            <view class="form-label">描述</view>
+                            <view class="textarea-wrapper">
+                                <textarea
+                                    class="form-textarea"
+                                    v-model="formData.description"
+                                    placeholder="可选，简单描述这个笔记本"
+                                    maxlength="60"
+                                ></textarea>
+                                <text class="char-count description-count"
+                                    >{{ formData.description.length }}/60</text
+                                >
+                            </view>
+                        </view>
+
+                        <view class="form-actions">
+                            <button
+                                class="btn btn-cancel"
+                                :disabled="submitting"
+                                @click="handleClosePopup"
+                            >
+                                <uni-icons
+                                    type="closeempty"
+                                    size="16"
+                                    color="#666"
+                                ></uni-icons>
+                                取消
+                            </button>
+                            <button
+                                class="btn btn-submit"
+                                :disabled="submitting"
+                                :class="{ 'btn-loading': submitting }"
+                                @click="handleSubmit"
+                            >
+                                <view v-if="submitting" class="btn-spinner">
+                                    <view class="spinner-circle-small"></view>
+                                </view>
+                                <uni-icons
+                                    v-else
+                                    type="checkmarkempty"
+                                    size="16"
+                                    color="#fff"
+                                ></uni-icons>
+                                {{ submitting ? "创建中..." : "创建" }}
+                            </button>
+                        </view>
+                    </view>
+                </template>
+            </tPopup>
+        </view>
     </ThemeProvider>
 </template>
 
@@ -283,7 +378,11 @@ const fetchNotebooks = async () => {
         notebookList.value = Array.isArray(res.data) ? res.data : [];
     } catch (error) {
         notebookList.value = [];
-        uni.showToast({ title: "获取笔记本失败", icon: "none", position: "bottom" });
+        uni.showToast({
+            title: "获取笔记本失败",
+            icon: "none",
+            position: "bottom",
+        });
         console.error("获取笔记本失败:", error);
     } finally {
         loading.value = false;
@@ -317,7 +416,10 @@ const handleSubmit = async () => {
         if (String(error?.message || "").includes("已存在")) {
             validationErrors.value.title = "笔记本名称已存在，请更换名称";
         }
-        uni.showToast({ title: error?.message || "创建失败，请重试", icon: "none" });
+        uni.showToast({
+            title: error?.message || "创建失败，请重试",
+            icon: "none",
+        });
         console.error("创建笔记本失败:", error);
     } finally {
         submitting.value = false;
@@ -431,7 +533,8 @@ onBeforeUnmount(() => {
     background: var(--app-bg-page);
     padding: 26rpx 20rpx calc(46rpx + env(safe-area-inset-bottom));
     overflow: hidden;
-    font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family:
+        "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 .bg-blob {
@@ -445,7 +548,11 @@ onBeforeUnmount(() => {
     height: 360rpx;
     top: -110rpx;
     right: -90rpx;
-    background: radial-gradient(circle, rgba(255, 211, 158, 0.34) 0%, rgba(255, 211, 158, 0) 68%);
+    background: radial-gradient(
+        circle,
+        rgba(255, 211, 158, 0.34) 0%,
+        rgba(255, 211, 158, 0) 68%
+    );
 }
 
 .blob-2 {
@@ -453,7 +560,11 @@ onBeforeUnmount(() => {
     height: 300rpx;
     left: -120rpx;
     top: 280rpx;
-    background: radial-gradient(circle, rgba(173, 196, 255, 0.24) 0%, rgba(173, 196, 255, 0) 70%);
+    background: radial-gradient(
+        circle,
+        rgba(173, 196, 255, 0.24) 0%,
+        rgba(173, 196, 255, 0) 70%
+    );
 }
 
 .hero {
@@ -568,7 +679,11 @@ onBeforeUnmount(() => {
     width: 52rpx;
     height: 52rpx;
     border-radius: 50%;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.92) 0%, rgba(241, 247, 255, 0.92) 100%);
+    background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.92) 0%,
+        rgba(241, 247, 255, 0.92) 100%
+    );
     border: 1rpx solid rgba(129, 149, 192, 0.35);
     display: flex;
     align-items: center;
@@ -713,7 +828,11 @@ onBeforeUnmount(() => {
     right: -72rpx;
     top: -124rpx;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(131, 147, 255, 0.16) 0%, rgba(131, 147, 255, 0) 70%);
+    background: radial-gradient(
+        circle,
+        rgba(131, 147, 255, 0.16) 0%,
+        rgba(131, 147, 255, 0) 70%
+    );
 }
 
 .skeleton-content {
@@ -773,7 +892,12 @@ onBeforeUnmount(() => {
 }
 
 .skeleton-shimmer {
-    background: linear-gradient(110deg, rgba(233, 238, 250, 0.95) 8%, rgba(248, 251, 255, 0.95) 18%, rgba(233, 238, 250, 0.95) 33%);
+    background: linear-gradient(
+        110deg,
+        rgba(233, 238, 250, 0.95) 8%,
+        rgba(248, 251, 255, 0.95) 18%,
+        rgba(233, 238, 250, 0.95) 33%
+    );
     background-size: 220% 100%;
     animation: skeleton-shimmer 1.2s ease-in-out infinite;
 }
@@ -915,7 +1039,11 @@ onBeforeUnmount(() => {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, var(--app-brand) 0%, var(--app-brand-hover) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--app-brand) 0%,
+        var(--app-brand-hover) 100%
+    );
     color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(77, 98, 255, 0.32);
 }
@@ -952,23 +1080,43 @@ onBeforeUnmount(() => {
 }
 
 @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10rpx); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes skeleton-shimmer {
-    from { background-position: 100% 0; }
-    to { background-position: -100% 0; }
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: -100% 0;
+    }
 }
 
 @keyframes card-enter {
-    from { opacity: 0; transform: translateY(12rpx); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media screen and (min-width: 760px) {

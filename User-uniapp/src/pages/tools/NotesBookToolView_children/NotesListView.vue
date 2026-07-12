@@ -1,198 +1,304 @@
 <template>
     <ThemeProvider>
-  <view class="container" :style="{ paddingTop: navBarInfo.totalHeight + 'px' }">
-    <view class="top-wrapper" :style="{ height: navBarInfo.totalHeight + 'px', paddingTop: navBarInfo.statusBarHeight + 'px' }">
-      <view class="nav-row" :style="{ height: navBarInfo.navBarHeight + 'px' }">
-        <view class="nav-left" @click="handleBack">
-          <t-icon name="chevron-left" size="44rpx" color="var(--app-text-primary)"></t-icon>
-        </view>
-        <text class="nav-title">{{ bookTitle || '笔记列表' }}</text>
-        <view class="nav-right">
-          <view class="nav-action" @click="handleFloatingAddNote">
-            <t-icon name="add" size="40rpx" color="#c89b73"></t-icon>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <view class="fixed-header" :style="{ top: navBarInfo.totalHeight + 'px' }">
-      <view class="search-wrap">
-        <view class="search-box">
-          <uni-icons type="search" size="18" color="#9aa5bc"></uni-icons>
-          <input
-            v-model="searchKeyword"
-            class="search-input"
-            placeholder="搜索笔记..."
-            placeholder-class="search-placeholder"
-            @input="handleSearch"
-          />
-          <uni-icons
-            v-if="searchKeyword"
-            type="clear"
-            size="16"
-            color="#a2acbf"
-            @click="clearSearch"
-          ></uni-icons>
-        </view>
-      </view>
-
-      <view class="toolbar">
-        <view v-if="isLoading" class="result-count-skeleton shimmer"></view>
-        <text v-else class="result-count">共 {{ totalNotes }} 篇笔记</text>
-
-        <view class="toolbar-right">
-          <view v-if="isLoading" class="sort-pill skeleton-pill shimmer"></view>
-          <view v-else class="sort-pill" @click="toggleSort">
-            <uni-icons
-              :type="sortOrder === 'desc' ? 'arrowdown' : 'arrowup'"
-              size="13"
-              color="#5f6d84"
-            ></uni-icons>
-            <text class="sort-pill-text">{{ sortOrderText }}</text>
-          </view>
-
-          <view v-if="isLoading" class="view-btn skeleton-view-btn shimmer"></view>
-          <view v-else class="view-btn" @click="toggleViewMode">
-            <view v-if="!isGridView" class="grid-icon">
-              <view class="grid-dot"></view>
-              <view class="grid-dot"></view>
-              <view class="grid-dot"></view>
-              <view class="grid-dot"></view>
-            </view>
-
-            <view v-else class="list-icon">
-              <view class="list-line"></view>
-              <view class="list-line"></view>
-              <view class="list-line"></view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <view class="list-content">
-      <view v-if="isLoading" class="list-wrap skeleton-list">
         <view
-          v-for="index in 4"
-          :key="`loading-${index}`"
-          class="note-card loading-card"
+            class="container"
+            :style="{ paddingTop: navBarInfo.totalHeight + 'px' }"
         >
-          <view class="card-content">
-            <view class="card-header">
-              <view class="loading-title shimmer"></view>
-              <view class="loading-action shimmer"></view>
-            </view>
-
-            <view class="loading-line shimmer"></view>
-            <view class="loading-line shimmer"></view>
-            <view class="loading-line loading-line-short shimmer"></view>
-            <view class="loading-line loading-line-tiny shimmer"></view>
-
-            <view class="card-footer">
-              <view class="loading-meta shimmer"></view>
-              <view class="tag-wrap">
-                <view class="loading-tag shimmer"></view>
-                <view class="loading-tag loading-tag-small shimmer"></view>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <view v-else-if="filteredNotes.length === 0" class="empty-state">
-        <uni-icons
-          :type="isSearching ? 'search' : 'compose'"
-          size="26"
-          color="#b2bdd3"
-        ></uni-icons>
-        <text class="empty-text">{{ isSearching ? "没有找到匹配的笔记" : "还没有笔记" }}</text>
-        <text class="empty-desc">{{
-          isSearching ? "试试其他关键词" : "点击右下角按钮创建第一篇笔记"
-        }}</text>
-      </view>
-
-      <view v-else :class="['list-wrap', { 'grid-wrap': isGridView }]">
-        <view
-          v-for="item in filteredNotes"
-          :key="item.id"
-          :class="['note-card', { 'grid-note-card': isGridView }]"
-        >
-          <view
-            :class="['card-content', { 'grid-card-content': isGridView }]"
-            @click="handleCheckNote(item)"
-          >
-            <view :class="['card-header', { 'grid-card-header': isGridView }]">
-              <text :class="['note-title', { 'grid-note-title': isGridView }]">{{ item.title }}</text>
-              <view v-if="!isGridView" class="header-actions">
+            <view
+                class="top-wrapper"
+                :style="{
+                    height: navBarInfo.totalHeight + 'px',
+                    paddingTop: navBarInfo.statusBarHeight + 'px',
+                }"
+            >
                 <view
-                  class="pin-btn"
-                  :class="{
-                    'pin-btn-active': item.isPinned,
-                    'pin-btn-disabled': isPinning(item.id),
-                  }"
-                  @click.stop="handleTogglePin(item)"
+                    class="nav-row"
+                    :style="{ height: navBarInfo.navBarHeight + 'px' }"
                 >
-                  <uni-icons
-                    class="pin-btn-icon"
-                    type="map-pin-ellipse"
-                    size="20"
-                    :color="item.isPinned ? '#af7440' : '#9f8b79'"
-                  ></uni-icons>
+                    <view class="nav-left" @click="handleBack">
+                        <t-icon
+                            name="chevron-left"
+                            size="44rpx"
+                            color="var(--app-text-primary)"
+                        ></t-icon>
+                    </view>
+                    <text class="nav-title">{{ bookTitle || "笔记列表" }}</text>
+                    <view class="nav-right">
+                        <view class="nav-action" @click="handleFloatingAddNote">
+                            <t-icon
+                                name="add"
+                                size="40rpx"
+                                color="#c89b73"
+                            ></t-icon>
+                        </view>
+                    </view>
                 </view>
-
-                <view class="edit-btn" @click.stop="handleEditNote(item)">
-                  <uni-icons
-                    type="compose"
-                    size="17"
-                    color="#9f8b79"
-                  ></uni-icons>
-                </view>
-              </view>
             </view>
 
-            <text :class="['note-preview', { 'grid-note-preview': isGridView }]">{{ item.preview }}</text>
+            <view
+                class="fixed-header"
+                :style="{ top: navBarInfo.totalHeight + 'px' }"
+            >
+                <view class="search-wrap">
+                    <view class="search-box">
+                        <uni-icons
+                            type="search"
+                            size="18"
+                            color="#9aa5bc"
+                        ></uni-icons>
+                        <input
+                            v-model="searchKeyword"
+                            class="search-input"
+                            placeholder="搜索笔记..."
+                            placeholder-class="search-placeholder"
+                            @input="handleSearch"
+                        />
+                        <uni-icons
+                            v-if="searchKeyword"
+                            type="clear"
+                            size="16"
+                            color="#a2acbf"
+                            @click="clearSearch"
+                        ></uni-icons>
+                    </view>
+                </view>
 
-            <view :class="['card-footer', { 'grid-card-footer': isGridView }]">
-              <view class="meta-wrap">
-                <uni-icons type="clock" size="13" color="#8a93aa"></uni-icons>
-                <text class="meta-text"
-                  >{{ item.dateText }}</text
-                >
-              </view>
+                <view class="toolbar">
+                    <view
+                        v-if="isLoading"
+                        class="result-count-skeleton shimmer"
+                    ></view>
+                    <text v-else class="result-count"
+                        >共 {{ totalNotes }} 篇笔记</text
+                    >
 
-              <view v-if="!isGridView" class="tag-wrap">
-                <text v-for="tag in item.tags" :key="tag" class="tag-item">{{
-                  tag
-                }}</text>
-              </view>
+                    <view class="toolbar-right">
+                        <view
+                            v-if="isLoading"
+                            class="sort-pill skeleton-pill shimmer"
+                        ></view>
+                        <view v-else class="sort-pill" @click="toggleSort">
+                            <uni-icons
+                                :type="
+                                    sortOrder === 'desc'
+                                        ? 'arrowdown'
+                                        : 'arrowup'
+                                "
+                                size="13"
+                                color="#5f6d84"
+                            ></uni-icons>
+                            <text class="sort-pill-text">{{
+                                sortOrderText
+                            }}</text>
+                        </view>
+
+                        <view
+                            v-if="isLoading"
+                            class="view-btn skeleton-view-btn shimmer"
+                        ></view>
+                        <view v-else class="view-btn" @click="toggleViewMode">
+                            <view v-if="!isGridView" class="grid-icon">
+                                <view class="grid-dot"></view>
+                                <view class="grid-dot"></view>
+                                <view class="grid-dot"></view>
+                                <view class="grid-dot"></view>
+                            </view>
+
+                            <view v-else class="list-icon">
+                                <view class="list-line"></view>
+                                <view class="list-line"></view>
+                                <view class="list-line"></view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
             </view>
-          </view>
-        </view>
-      </view>
 
-      <view v-if="!isLoading && notes.length > 0" class="load-more-container">
-        <view v-if="loadingMore" class="load-more-loading">
-          <view class="load-more-spinner"></view>
-          <text class="load-more-text">加载更多...</text>
-        </view>
-        <text v-else class="load-more-text">{{ hasMore ? "上拉加载更多" : "没有更多了" }}</text>
-      </view>
-    </view>
+            <view class="list-content">
+                <view v-if="isLoading" class="list-wrap skeleton-list">
+                    <view
+                        v-for="index in 4"
+                        :key="`loading-${index}`"
+                        class="note-card loading-card"
+                    >
+                        <view class="card-content">
+                            <view class="card-header">
+                                <view class="loading-title shimmer"></view>
+                                <view class="loading-action shimmer"></view>
+                            </view>
 
-    <dragButton
-      v-model:show="isShowdragButton"
-      butColor="#d0a883"
-      :isDock="true"
-      :existTabBar="true"
-      iconType="plusempty"
-      iconColor="#ffffff"
-      :iconSize="32"
-      :bottomOffset="100"
-      :popMenu="false"
-      :enableLongPressDelete="true"
-      @btnClick="handleFloatingAddNote"
-    />
-  </view>
+                            <view class="loading-line shimmer"></view>
+                            <view class="loading-line shimmer"></view>
+                            <view
+                                class="loading-line loading-line-short shimmer"
+                            ></view>
+                            <view
+                                class="loading-line loading-line-tiny shimmer"
+                            ></view>
+
+                            <view class="card-footer">
+                                <view class="loading-meta shimmer"></view>
+                                <view class="tag-wrap">
+                                    <view class="loading-tag shimmer"></view>
+                                    <view
+                                        class="loading-tag loading-tag-small shimmer"
+                                    ></view>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+
+                <view
+                    v-else-if="filteredNotes.length === 0"
+                    class="empty-state"
+                >
+                    <uni-icons
+                        :type="isSearching ? 'search' : 'compose'"
+                        size="26"
+                        color="#b2bdd3"
+                    ></uni-icons>
+                    <text class="empty-text">{{
+                        isSearching ? "没有找到匹配的笔记" : "还没有笔记"
+                    }}</text>
+                    <text class="empty-desc">{{
+                        isSearching
+                            ? "试试其他关键词"
+                            : "点击右下角按钮创建第一篇笔记"
+                    }}</text>
+                </view>
+
+                <view
+                    v-else
+                    :class="['list-wrap', { 'grid-wrap': isGridView }]"
+                >
+                    <view
+                        v-for="item in filteredNotes"
+                        :key="item.id"
+                        :class="['note-card', { 'grid-note-card': isGridView }]"
+                    >
+                        <view
+                            :class="[
+                                'card-content',
+                                { 'grid-card-content': isGridView },
+                            ]"
+                            @click="handleCheckNote(item)"
+                        >
+                            <view
+                                :class="[
+                                    'card-header',
+                                    { 'grid-card-header': isGridView },
+                                ]"
+                            >
+                                <text
+                                    :class="[
+                                        'note-title',
+                                        { 'grid-note-title': isGridView },
+                                    ]"
+                                    >{{ item.title }}</text
+                                >
+                                <view v-if="!isGridView" class="header-actions">
+                                    <view
+                                        class="pin-btn"
+                                        :class="{
+                                            'pin-btn-active': item.isPinned,
+                                            'pin-btn-disabled': isPinning(
+                                                item.id,
+                                            ),
+                                        }"
+                                        @click.stop="handleTogglePin(item)"
+                                    >
+                                        <uni-icons
+                                            class="pin-btn-icon"
+                                            type="map-pin-ellipse"
+                                            size="20"
+                                            :color="
+                                                item.isPinned
+                                                    ? '#af7440'
+                                                    : '#9f8b79'
+                                            "
+                                        ></uni-icons>
+                                    </view>
+
+                                    <view
+                                        class="edit-btn"
+                                        @click.stop="handleEditNote(item)"
+                                    >
+                                        <uni-icons
+                                            type="compose"
+                                            size="17"
+                                            color="#9f8b79"
+                                        ></uni-icons>
+                                    </view>
+                                </view>
+                            </view>
+
+                            <text
+                                :class="[
+                                    'note-preview',
+                                    { 'grid-note-preview': isGridView },
+                                ]"
+                                >{{ item.preview }}</text
+                            >
+
+                            <view
+                                :class="[
+                                    'card-footer',
+                                    { 'grid-card-footer': isGridView },
+                                ]"
+                            >
+                                <view class="meta-wrap">
+                                    <uni-icons
+                                        type="clock"
+                                        size="13"
+                                        color="#8a93aa"
+                                    ></uni-icons>
+                                    <text class="meta-text">{{
+                                        item.dateText
+                                    }}</text>
+                                </view>
+
+                                <view v-if="!isGridView" class="tag-wrap">
+                                    <text
+                                        v-for="tag in item.tags"
+                                        :key="tag"
+                                        class="tag-item"
+                                        >{{ tag }}</text
+                                    >
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+
+                <view
+                    v-if="!isLoading && notes.length > 0"
+                    class="load-more-container"
+                >
+                    <view v-if="loadingMore" class="load-more-loading">
+                        <view class="load-more-spinner"></view>
+                        <text class="load-more-text">加载更多...</text>
+                    </view>
+                    <text v-else class="load-more-text">{{
+                        hasMore ? "上拉加载更多" : "没有更多了"
+                    }}</text>
+                </view>
+            </view>
+
+            <dragButton
+                v-model:show="isShowdragButton"
+                butColor="#d0a883"
+                :isDock="true"
+                :existTabBar="true"
+                iconType="plusempty"
+                iconColor="#ffffff"
+                :iconSize="32"
+                :bottomOffset="100"
+                :popMenu="false"
+                :enableLongPressDelete="true"
+                @btnClick="handleFloatingAddNote"
+            />
+        </view>
     </ThemeProvider>
 </template>
 
@@ -209,8 +315,8 @@ const { navBarInfo } = useNavBarSafeArea({
 });
 import { normalizeNoteListItem } from "../../../util/note/normalize";
 import {
-  getNotebookNotesAPI,
-  toggleNotebookNotePinAPI,
+    getNotebookNotesAPI,
+    toggleNotebookNotePinAPI,
 } from "../../../API/Tools/NotesBookAPI";
 
 const searchKeyword = ref("");
@@ -230,792 +336,792 @@ const PAGE_SIZE = 12;
 let searchDebounceTimer = null;
 
 const sortOrderText = computed(() =>
-  sortOrder.value === "desc" ? "最近优先" : "最早优先",
+    sortOrder.value === "desc" ? "最近优先" : "最早优先",
 );
 
 const isSearching = computed(() => Boolean(searchKeyword.value.trim()));
 
 const filteredNotes = computed(() => {
-  return [...notes.value].sort((a, b) =>
-    a.isPinned !== b.isPinned
-      ? a.isPinned
-        ? -1
-        : 1
-      : sortOrder.value === "desc"
-        ? b.updatedAt - a.updatedAt
-        : a.updatedAt - b.updatedAt,
-  );
+    return [...notes.value].sort((a, b) =>
+        a.isPinned !== b.isPinned
+            ? a.isPinned
+                ? -1
+                : 1
+            : sortOrder.value === "desc"
+              ? b.updatedAt - a.updatedAt
+              : a.updatedAt - b.updatedAt,
+    );
 });
 
 const isPinning = (id) => pinningNoteIds.value.includes(id);
 
 const setPinningStatus = (id, pending) => {
-  if (pending) {
-    if (!pinningNoteIds.value.includes(id)) {
-      pinningNoteIds.value = [...pinningNoteIds.value, id];
+    if (pending) {
+        if (!pinningNoteIds.value.includes(id)) {
+            pinningNoteIds.value = [...pinningNoteIds.value, id];
+        }
+        return;
     }
-    return;
-  }
 
-  pinningNoteIds.value = pinningNoteIds.value.filter((item) => item !== id);
+    pinningNoteIds.value = pinningNoteIds.value.filter((item) => item !== id);
 };
 
 const mergeNoteList = (oldList, newList) => {
-  const idMap = new Map();
-  [...oldList, ...newList].forEach((item) => {
-    idMap.set(item.id, item);
-  });
-  return Array.from(idMap.values());
+    const idMap = new Map();
+    [...oldList, ...newList].forEach((item) => {
+        idMap.set(item.id, item);
+    });
+    return Array.from(idMap.values());
 };
 
 //获取笔记列表
 const fetchNotes = async ({ append = false } = {}) => {
-  if (!notesBookId.value) return;
-
-  if (append) {
-    if (isLoading.value || loadingMore.value || !hasMore.value) {
-      return;
-    }
-    loadingMore.value = true;
-  } else {
-    if (isLoading.value) {
-      return;
-    }
-    isLoading.value = true;
-  }
-
-  const page = append ? currentPage.value : 1;
-
-  try {
-    const res = await getNotebookNotesAPI(notesBookId.value, {
-      page,
-      pageSize: PAGE_SIZE,
-      keyword: searchKeyword.value.trim(),
-    });
-
-    if (res.code !== 200) {
-      throw new Error(res.message || "获取笔记列表失败");
-    }
-
-    const payload = res.data || {};
-    const list = Array.isArray(payload) ? payload : payload.list || [];
-    const pagination = Array.isArray(payload) ? null : payload.pagination;
-    const normalizedList = list.map(normalizeNoteListItem);
+    if (!notesBookId.value) return;
 
     if (append) {
-      notes.value = mergeNoteList(notes.value, normalizedList);
+        if (isLoading.value || loadingMore.value || !hasMore.value) {
+            return;
+        }
+        loadingMore.value = true;
     } else {
-      notes.value = normalizedList;
+        if (isLoading.value) {
+            return;
+        }
+        isLoading.value = true;
     }
 
-    if (pagination && typeof pagination.total === "number") {
-      totalNotes.value = pagination.total;
-    } else {
-      totalNotes.value = notes.value.length;
-    }
+    const page = append ? currentPage.value : 1;
 
-    if (pagination && typeof pagination.hasMore === "boolean") {
-      hasMore.value = pagination.hasMore;
-    } else {
-      hasMore.value = normalizedList.length >= PAGE_SIZE;
-    }
+    try {
+        const res = await getNotebookNotesAPI(notesBookId.value, {
+            page,
+            pageSize: PAGE_SIZE,
+            keyword: searchKeyword.value.trim(),
+        });
 
-    if (append) {
-      if (hasMore.value) {
-        currentPage.value = page + 1;
-      }
-    } else {
-      currentPage.value = hasMore.value ? 2 : 1;
+        if (res.code !== 200) {
+            throw new Error(res.message || "获取笔记列表失败");
+        }
+
+        const payload = res.data || {};
+        const list = Array.isArray(payload) ? payload : payload.list || [];
+        const pagination = Array.isArray(payload) ? null : payload.pagination;
+        const normalizedList = list.map(normalizeNoteListItem);
+
+        if (append) {
+            notes.value = mergeNoteList(notes.value, normalizedList);
+        } else {
+            notes.value = normalizedList;
+        }
+
+        if (pagination && typeof pagination.total === "number") {
+            totalNotes.value = pagination.total;
+        } else {
+            totalNotes.value = notes.value.length;
+        }
+
+        if (pagination && typeof pagination.hasMore === "boolean") {
+            hasMore.value = pagination.hasMore;
+        } else {
+            hasMore.value = normalizedList.length >= PAGE_SIZE;
+        }
+
+        if (append) {
+            if (hasMore.value) {
+                currentPage.value = page + 1;
+            }
+        } else {
+            currentPage.value = hasMore.value ? 2 : 1;
+        }
+    } catch (error) {
+        console.error("获取笔记列表失败:", error);
+        uni.showToast({
+            title: error?.message || "获取笔记列表失败",
+            icon: "none",
+        });
+    } finally {
+        if (append) {
+            loadingMore.value = false;
+        } else {
+            isLoading.value = false;
+        }
     }
-  } catch (error) {
-    console.error("获取笔记列表失败:", error);
-    uni.showToast({
-      title: error?.message || "获取笔记列表失败",
-      icon: "none",
-    });
-  } finally {
-    if (append) {
-      loadingMore.value = false;
-    } else {
-      isLoading.value = false;
-    }
-  }
 };
 
 const resetAndFetchNotes = () => {
-  hasMore.value = true;
-  currentPage.value = 1;
-  totalNotes.value = 0;
-  notes.value = [];
-  fetchNotes({ append: false });
+    hasMore.value = true;
+    currentPage.value = 1;
+    totalNotes.value = 0;
+    notes.value = [];
+    fetchNotes({ append: false });
 };
 
 const handleSearch = () => {
-  if (searchDebounceTimer) {
-    clearTimeout(searchDebounceTimer);
-  }
+    if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer);
+    }
 
-  searchDebounceTimer = setTimeout(() => {
-    resetAndFetchNotes();
-  }, 300);
+    searchDebounceTimer = setTimeout(() => {
+        resetAndFetchNotes();
+    }, 300);
 };
 
 const clearSearch = () => {
-  searchKeyword.value = "";
-  resetAndFetchNotes();
+    searchKeyword.value = "";
+    resetAndFetchNotes();
 };
 
 const toggleSort = () => {
-  sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
+    sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
 };
 
 const toggleViewMode = () => {
-  isGridView.value = !isGridView.value;
+    isGridView.value = !isGridView.value;
 };
 
 const handleTogglePin = async (item) => {
-  if (!item?.id || !notesBookId.value || isPinning(item.id)) {
-    return;
-  }
-
-  const nextPinned = !item.isPinned;
-  setPinningStatus(item.id, true);
-
-  try {
-    const res = await toggleNotebookNotePinAPI({
-      id: item.id,
-      bookId: notesBookId.value,
-      isPinned: nextPinned,
-    });
-
-    if (res.code !== 200) {
-      throw new Error(res.message || "设置置顶失败");
+    if (!item?.id || !notesBookId.value || isPinning(item.id)) {
+        return;
     }
 
-    const serverPinned =
-      typeof res?.data?.isPinned === "boolean"
-        ? res.data.isPinned
-        : nextPinned;
-    item.isPinned = serverPinned;
+    const nextPinned = !item.isPinned;
+    setPinningStatus(item.id, true);
 
-    uni.showToast({
-      title: serverPinned ? "已置顶" : "已取消置顶",
-      icon: "none",
-      position: "bottom",
-    });
-  } catch (error) {
-    console.error("设置置顶失败:", error);
-    uni.showToast({
-      title: error?.message || "设置置顶失败",
-      icon: "none",
-    });
-  } finally {
-    setPinningStatus(item.id, false);
-  }
+    try {
+        const res = await toggleNotebookNotePinAPI({
+            id: item.id,
+            bookId: notesBookId.value,
+            isPinned: nextPinned,
+        });
+
+        if (res.code !== 200) {
+            throw new Error(res.message || "设置置顶失败");
+        }
+
+        const serverPinned =
+            typeof res?.data?.isPinned === "boolean"
+                ? res.data.isPinned
+                : nextPinned;
+        item.isPinned = serverPinned;
+
+        uni.showToast({
+            title: serverPinned ? "已置顶" : "已取消置顶",
+            icon: "none",
+            position: "bottom",
+        });
+    } catch (error) {
+        console.error("设置置顶失败:", error);
+        uni.showToast({
+            title: error?.message || "设置置顶失败",
+            icon: "none",
+        });
+    } finally {
+        setPinningStatus(item.id, false);
+    }
 };
 
 //编辑/添加笔记（跳转到编辑页，携带笔记ID参数）
 const handleEditNote = (item) => {
-  uni.navigateTo({
-    url: `/pages/tools/NotesBookToolView_children/NoteEditView?bookId=${notesBookId.value}&id=${item.id}`,
-  });
+    uni.navigateTo({
+        url: `/pages/tools/NotesBookToolView_children/NoteEditView?bookId=${notesBookId.value}&id=${item.id}`,
+    });
 };
 
 //查看笔记详情
 const handleCheckNote = (item) => {
-  uni.navigateTo({
-    url: `/pages/tools/NotesBookToolView_children/NoteDetailView?bookId=${notesBookId.value}&id=${item.id}`,
-  });
+    uni.navigateTo({
+        url: `/pages/tools/NotesBookToolView_children/NoteDetailView?bookId=${notesBookId.value}&id=${item.id}`,
+    });
 };
 
 const handleBack = () => {
-  uni.navigateBack();
+    uni.navigateBack();
 };
 
 const handleFloatingAddNote = () => {
-  if (!notesBookId.value) {
-    uni.showToast({
-      title: "笔记本ID无效",
-      icon: "none",
-    });
-    return;
-  }
+    if (!notesBookId.value) {
+        uni.showToast({
+            title: "笔记本ID无效",
+            icon: "none",
+        });
+        return;
+    }
 
-  uni.navigateTo({
-    url: `/pages/tools/NotesBookToolView_children/NoteEditView?bookId=${notesBookId.value}`,
-  });
+    uni.navigateTo({
+        url: `/pages/tools/NotesBookToolView_children/NoteEditView?bookId=${notesBookId.value}`,
+    });
 };
 
 onLoad((options = {}) => {
-  notesBookId.value = String(options.id || options.bookId || "").trim();
-  if (options.title) {
-    bookTitle.value = decodeURIComponent(options.title);
-  }
-  resetAndFetchNotes();
+    notesBookId.value = String(options.id || options.bookId || "").trim();
+    if (options.title) {
+        bookTitle.value = decodeURIComponent(options.title);
+    }
+    resetAndFetchNotes();
 });
 
 onShow(() => {
-  if (!notes.value.length && !isLoading.value) {
-    resetAndFetchNotes();
-  }
+    if (!notes.value.length && !isLoading.value) {
+        resetAndFetchNotes();
+    }
 });
 
 onReachBottom(() => {
-  fetchNotes({ append: true });
+    fetchNotes({ append: true });
 });
 
 const handleRefreshEvent = () => {
-  resetAndFetchNotes();
+    resetAndFetchNotes();
 };
 
 uni.$on("notesBook:refresh", handleRefreshEvent);
 
 onBeforeUnmount(() => {
-  uni.$off("notesBook:refresh", handleRefreshEvent);
+    uni.$off("notesBook:refresh", handleRefreshEvent);
 });
 
 onUnload(() => {
-  if (searchDebounceTimer) {
-    clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = null;
-  }
+    if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = null;
+    }
 });
 </script>
 
 <style scoped>
 .container {
-  min-height: 100vh;
-  box-sizing: border-box;
-  padding: 22rpx 16rpx calc(32rpx + env(safe-area-inset-bottom));
-  background: var(--app-bg-page);
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 22rpx 16rpx calc(32rpx + env(safe-area-inset-bottom));
+    background: var(--app-bg-page);
 }
 
 .top-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 200;
-  background: var(--app-bg-page);
-  border-bottom: 1rpx solid var(--app-border);
-  box-shadow: 0 4rpx 18rpx rgba(132, 112, 95, 0.08);
-  box-sizing: border-box;
-  padding-left: 18rpx;
-  padding-right: 18rpx;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--app-bg-page);
+    border-bottom: 1rpx solid var(--app-border);
+    box-shadow: 0 4rpx 18rpx rgba(132, 112, 95, 0.08);
+    box-sizing: border-box;
+    padding-left: 18rpx;
+    padding-right: 18rpx;
 }
 
 .nav-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .nav-left {
-  width: 80rpx;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
+    width: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 .nav-title {
-  flex: 1;
-  text-align: center;
-  font-size: calc(34rpx * var(--app-font-scale, 1));
-  color: var(--app-text-primary);
-  font-weight: 700;
-  padding: 0 12rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    flex: 1;
+    text-align: center;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
+    color: var(--app-text-primary);
+    font-weight: 700;
+    padding: 0 12rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .nav-right {
-  width: 80rpx;
-  flex-shrink: 0;
-  display: flex;
-  justify-content: flex-end;
+    width: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .nav-action {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 30rpx;
-  border: 2rpx solid var(--app-border);
-  background: var(--app-bg-container);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(208, 168, 131, 0.15);
+    width: 60rpx;
+    height: 60rpx;
+    border-radius: 30rpx;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4rpx 12rpx rgba(208, 168, 131, 0.15);
 }
 
 .nav-action:active {
-  transform: scale(0.93);
+    transform: scale(0.93);
 }
 
 .fixed-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--app-bg-page);
-  padding-top: 2rpx;
-  padding-bottom: 10rpx;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--app-bg-page);
+    padding-top: 2rpx;
+    padding-bottom: 10rpx;
 }
 
 .list-content {
-  padding-top: 12rpx;
+    padding-top: 12rpx;
 }
 
 .search-wrap {
-  margin-bottom: 18rpx;
+    margin-bottom: 18rpx;
 }
 
 .search-box {
-  height: 84rpx;
-  border-radius: 42rpx;
-  border: 2rpx solid #dce6fa;
-  background: var(--app-bg-container);
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  padding: 0 22rpx;
-  box-shadow: 0 8rpx 16rpx rgba(171, 191, 231, 0.2);
+    height: 84rpx;
+    border-radius: 42rpx;
+    border: 2rpx solid #dce6fa;
+    background: var(--app-bg-container);
+    display: flex;
+    align-items: center;
+    gap: 14rpx;
+    padding: 0 22rpx;
+    box-shadow: 0 8rpx 16rpx rgba(171, 191, 231, 0.2);
 }
 
 .search-input {
-  flex: 1;
-  height: 84rpx;
-  font-size: calc(30rpx * var(--app-font-scale, 1));
-  color: #44506a;
+    flex: 1;
+    height: 84rpx;
+    font-size: calc(30rpx * var(--app-font-scale, 1));
+    color: #44506a;
 }
 
 .search-placeholder {
-  color: #99a4bb;
+    color: #99a4bb;
 }
 
 .toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0;
-  padding: 0 2rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding: 0 2rpx;
 }
 
 .result-count {
-  font-size: calc(28rpx * var(--app-font-scale, 1));
-  color: #6b7690;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
+    color: #6b7690;
 }
 
 .result-count-skeleton {
-  width: 210rpx;
-  height: 34rpx;
-  border-radius: 12rpx;
+    width: 210rpx;
+    height: 34rpx;
+    border-radius: 12rpx;
 }
 
 .toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
 }
 
 .sort-pill {
-  height: 62rpx;
-  padding: 0 18rpx;
-  border-radius: 31rpx;
-  border: 2rpx solid #dce4f6;
-  background: var(--app-bg-container);
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
+    height: 62rpx;
+    padding: 0 18rpx;
+    border-radius: 31rpx;
+    border: 2rpx solid #dce4f6;
+    background: var(--app-bg-container);
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
 }
 
 .sort-pill-text {
-  font-size: calc(26rpx * var(--app-font-scale, 1));
-  color: #5f6d84;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
+    color: #5f6d84;
 }
 
 .skeleton-pill {
-  width: 164rpx;
-  padding: 0;
-  border: none;
-  background: var(--app-bg-secondary);
+    width: 164rpx;
+    padding: 0;
+    border: none;
+    background: var(--app-bg-secondary);
 }
 
 .view-btn {
-  width: 62rpx;
-  height: 62rpx;
-  border-radius: 31rpx;
-  border: 2rpx solid #dce4f6;
-  background: var(--app-bg-container);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease;
+    width: 62rpx;
+    height: 62rpx;
+    border-radius: 31rpx;
+    border: 2rpx solid #dce4f6;
+    background: var(--app-bg-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease;
 }
 
 .view-btn:active {
-  transform: scale(0.95);
+    transform: scale(0.95);
 }
 
 .skeleton-view-btn {
-  border: none;
-  background: var(--app-bg-secondary);
+    border: none;
+    background: var(--app-bg-secondary);
 }
 
 .grid-icon {
-  width: 24rpx;
-  height: 24rpx;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4rpx;
+    width: 24rpx;
+    height: 24rpx;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4rpx;
 }
 
 .list-icon {
-  width: 24rpx;
-  height: 24rpx;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4rpx;
+    width: 24rpx;
+    height: 24rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4rpx;
 }
 
 .grid-dot {
-  width: 10rpx;
-  height: 10rpx;
-  border-radius: 3rpx;
-  background: var(--app-text-secondary);
+    width: 10rpx;
+    height: 10rpx;
+    border-radius: 3rpx;
+    background: var(--app-text-secondary);
 }
 
 .list-line {
-  width: 24rpx;
-  height: 4rpx;
-  border-radius: 4rpx;
-  background: var(--app-text-secondary);
+    width: 24rpx;
+    height: 4rpx;
+    border-radius: 4rpx;
+    background: var(--app-text-secondary);
 }
 
 .list-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 24rpx;
 }
 
 .grid-wrap {
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 16rpx;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16rpx;
 }
 
 .skeleton-list {
-  gap: 20rpx;
+    gap: 20rpx;
 }
 
 .load-more-container {
-  padding: 16rpx 0 24rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    padding: 16rpx 0 24rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .load-more-loading {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
 }
 
 .load-more-spinner {
-  width: 24rpx;
-  height: 24rpx;
-  border: 3rpx solid #ead9c9;
-  border-top-color: #c89b73;
-  border-radius: 50%;
-  animation: spinLoadMore 0.8s linear infinite;
+    width: 24rpx;
+    height: 24rpx;
+    border: 3rpx solid #ead9c9;
+    border-top-color: #c89b73;
+    border-radius: 50%;
+    animation: spinLoadMore 0.8s linear infinite;
 }
 
 .load-more-text {
-  font-size: calc(24rpx * var(--app-font-scale, 1));
-  color: #b0a69c;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
+    color: #b0a69c;
 }
 
 @keyframes spinLoadMore {
-  from {
-    transform: rotate(0deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
 
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-card {
-  background: #fffaf5;
-  border-color: #efe4d8;
-  box-shadow: 0 10rpx 24rpx rgba(141, 116, 86, 0.08);
+    background: #fffaf5;
+    border-color: #efe4d8;
+    box-shadow: 0 10rpx 24rpx rgba(141, 116, 86, 0.08);
 }
 
 .loading-title {
-  width: 52%;
-  height: 42rpx;
-  border-radius: 12rpx;
+    width: 52%;
+    height: 42rpx;
+    border-radius: 12rpx;
 }
 
 .loading-action {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 22rpx;
+    width: 44rpx;
+    height: 44rpx;
+    border-radius: 22rpx;
 }
 
 .loading-line {
-  margin-top: 12rpx;
-  height: 28rpx;
-  border-radius: 12rpx;
+    margin-top: 12rpx;
+    height: 28rpx;
+    border-radius: 12rpx;
 }
 
 .loading-line-short {
-  width: 66%;
+    width: 66%;
 }
 
 .loading-line-tiny {
-  width: 48%;
+    width: 48%;
 }
 
 .loading-meta {
-  width: 180rpx;
-  height: 24rpx;
-  border-radius: 10rpx;
+    width: 180rpx;
+    height: 24rpx;
+    border-radius: 10rpx;
 }
 
 .loading-tag {
-  width: 96rpx;
-  height: 34rpx;
-  border-radius: 12rpx;
+    width: 96rpx;
+    height: 34rpx;
+    border-radius: 12rpx;
 }
 
 .loading-tag-small {
-  width: 72rpx;
+    width: 72rpx;
 }
 
 .shimmer {
-  position: relative;
-  overflow: hidden;
-  background: #ede4d8;
+    position: relative;
+    overflow: hidden;
+    background: #ede4d8;
 }
 
 .shimmer::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -140%;
-  width: 140%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.7) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: shimmerMove 1.3s ease-in-out infinite;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -140%;
+    width: 140%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmerMove 1.3s ease-in-out infinite;
 }
 
 @keyframes shimmerMove {
-  to {
-    left: 140%;
-  }
+    to {
+        left: 140%;
+    }
 }
 
 .note-card {
-  display: flex;
-  border-radius: 24rpx;
-  border: 2rpx solid var(--app-border);
-  background: var(--app-bg-container);
-  overflow: hidden;
-  box-shadow: 0 8rpx 18rpx rgba(132, 112, 95, 0.1);
-  transition:
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
+    display: flex;
+    border-radius: 24rpx;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
+    overflow: hidden;
+    box-shadow: 0 8rpx 18rpx rgba(132, 112, 95, 0.1);
+    transition:
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
 }
 
 .grid-note-card {
-  width: calc((100% - 16rpx) / 2);
-  min-width: 0;
-  box-sizing: border-box;
+    width: calc((100% - 16rpx) / 2);
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .card-content {
-  flex: 1;
-  padding: 20rpx 22rpx 20rpx;
+    flex: 1;
+    padding: 20rpx 22rpx 20rpx;
 }
 
 .grid-card-content {
-  padding: 18rpx;
+    padding: 18rpx;
 }
 
 .grid-card-header {
-  gap: 0;
+    gap: 0;
 }
 
 .grid-note-title {
-  font-size: calc(32rpx * var(--app-font-scale, 1));
-  line-height: 1.3;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+    font-size: calc(32rpx * var(--app-font-scale, 1));
+    line-height: 1.3;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12rpx;
-  min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12rpx;
+    min-width: 0;
 }
 
 .header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+    flex-shrink: 0;
 }
 
 .pin-btn {
-  min-width: 86rpx;
-  height: 44rpx;
-  padding: 0 14rpx;
-  border-radius: 22rpx;
-  background: var(--app-bg-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    min-width: 86rpx;
+    height: 44rpx;
+    padding: 0 14rpx;
+    border-radius: 22rpx;
+    background: var(--app-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pin-btn-active {
-  background: #f2e2cf;
+    background: #f2e2cf;
 }
 
 .pin-btn-disabled {
-  opacity: 0.55;
+    opacity: 0.55;
 }
 
 .pin-btn-icon {
-  line-height: 1;
+    line-height: 1;
 }
 
 .note-title {
-  flex: 1 1 0;
-  width: 0;
-  max-width: 100%;
-  display: -webkit-box;
-  font-size: calc(42rpx * var(--app-font-scale, 1));
-  line-height: 1.28;
-  color: var(--app-text-primary);
-  font-weight: 600;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-all;
+    flex: 1 1 0;
+    width: 0;
+    max-width: 100%;
+    display: -webkit-box;
+    font-size: calc(42rpx * var(--app-font-scale, 1));
+    line-height: 1.28;
+    color: var(--app-text-primary);
+    font-weight: 600;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
 }
 
 .edit-btn {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 22rpx;
-  background: var(--app-bg-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 44rpx;
+    height: 44rpx;
+    border-radius: 22rpx;
+    background: var(--app-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .note-preview {
-  margin-top: 12rpx;
-  font-size: calc(33rpx * var(--app-font-scale, 1));
-  line-height: 1.62;
-  color: #635c62;
-  display: -webkit-box;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  min-height: 150rpx;
+    margin-top: 12rpx;
+    font-size: calc(33rpx * var(--app-font-scale, 1));
+    line-height: 1.62;
+    color: #635c62;
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    min-height: 150rpx;
 }
 
 .grid-note-preview {
-  margin-top: 10rpx;
-  font-size: calc(26rpx * var(--app-font-scale, 1));
-  line-height: 1.5;
-  min-height: 112rpx;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
+    margin-top: 10rpx;
+    font-size: calc(26rpx * var(--app-font-scale, 1));
+    line-height: 1.5;
+    min-height: 112rpx;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
 }
 
 .card-footer {
-  margin-top: 14rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
+    margin-top: 14rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16rpx;
 }
 
 .grid-card-footer {
-  margin-top: 12rpx;
-  justify-content: flex-start;
+    margin-top: 12rpx;
+    justify-content: flex-start;
 }
 
 .meta-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    flex-shrink: 0;
 }
 
 .meta-text {
-  font-size: calc(26rpx * var(--app-font-scale, 1));
-  color: var(--app-text-secondary);
+    font-size: calc(26rpx * var(--app-font-scale, 1));
+    color: var(--app-text-secondary);
 }
 
 .tag-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10rpx;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10rpx;
+    flex-wrap: wrap;
 }
 
 .tag-item {
-  background: var(--app-bg-secondary);
-  color: #91898d;
-  padding: 8rpx 14rpx;
-  border-radius: 12rpx;
-  font-size: calc(24rpx * var(--app-font-scale, 1));
-  line-height: 1.1;
+    background: var(--app-bg-secondary);
+    color: #91898d;
+    padding: 8rpx 14rpx;
+    border-radius: 12rpx;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
+    line-height: 1.1;
 }
 
 .empty-state {
-  margin-top: 120rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12rpx;
+    margin-top: 120rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12rpx;
 }
 
 .empty-text {
-  font-size: calc(28rpx * var(--app-font-scale, 1));
-  color: #9ca8bf;
+    font-size: calc(28rpx * var(--app-font-scale, 1));
+    color: #9ca8bf;
 }
 
 .empty-desc {
-  font-size: calc(24rpx * var(--app-font-scale, 1));
-  color: #b2bdd3;
+    font-size: calc(24rpx * var(--app-font-scale, 1));
+    color: #b2bdd3;
 }
 
 :deep(.drag) {
-  width: 110upx;
-  height: 110upx;
-  border: 2rpx solid rgba(255, 255, 255, 0.78);
-  box-shadow:
-    0 12rpx 28rpx rgba(132, 96, 68, 0.34),
-    0 0 0 6rpx rgba(208, 168, 131, 0.24);
+    width: 110upx;
+    height: 110upx;
+    border: 2rpx solid rgba(255, 255, 255, 0.78);
+    box-shadow:
+        0 12rpx 28rpx rgba(132, 96, 68, 0.34),
+        0 0 0 6rpx rgba(208, 168, 131, 0.24);
 }
 </style>

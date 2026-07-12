@@ -1,244 +1,284 @@
 <template>
     <ThemeProvider>
-    <view class="page" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
-        <view class="top-wrapper">
-            <view class="custom-navbar" :style="customNavbarStyle">
-                <view class="nav-row" :style="navRowStyle">
-                    <view class="nav-left" @click="handleBack">
-                        <t-icon name="chevron-left" size="44rpx" color="#1f2a1f"></t-icon>
-                    </view>
-
-                    <text class="nav-title">喵喵错题本</text>
-
-                    <view class="nav-right">
-                        <view class="nav-action" @click="handleCreateBook">
-                            <t-icon name="add" size="40rpx" color="#3fa24b"></t-icon>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </view>
-
-        <scroll-view class="main-scroll" scroll-y :enable-back-to-top="false" :scroll-with-animation="false" enhanced :show-scrollbar="false">
-            <view class="container">
-                <view class="hero">
-            <view class="hero-left">
-                <view class="section-header">
-                    <view class="section-dot"></view>
-                    <text class="section-title">所有错题本</text>
-                </view>
-                <text class="hero-subtitle">归纳错题，追踪你的薄弱环节</text>
-            </view>
-            <view class="hero-stat">
-                <text class="hero-stat-value">{{ wrongBooks.length }}</text>
-                <text class="hero-stat-label">个错题本</text>
-            </view>
-        </view>
-
-        <!-- 加载中状态 -->
-        <view v-if="loading" class="book-list skeleton-list">
-            <view
-                v-for="index in 4"
-                :key="`skeleton-${index}`"
-                class="book-card skeleton-card"
-            >
-                <view class="card-header">
-                    <view class="skeleton-circle shimmer"></view>
-                </view>
-
-                <view class="skeleton-title shimmer"></view>
-                <view class="skeleton-subtitle shimmer"></view>
-
-                <view class="card-footer skeleton-footer">
-                    <view class="skeleton-meta shimmer"></view>
-                </view>
-            </view>
-        </view>
-
-        <!-- 错题本列表 -->
-        <view class="book-list" v-else>
-            <view
-                class="book-card"
-                v-for="book in wrongBooks"
-                :key="book.id"
-                :style="{ backgroundColor: book.color }"
-                @click="handleOpenQuestionList(book)"
-            >
-                <!-- 顶部菜单 -->
-                <view class="card-header">
-                    <view class="menu-icon" @click.stop="handleOpenEdit(book)">
-                        <uni-icons
-                            type="more-filled"
-                            size="20"
-                            color="#fff"
-                        ></uni-icons>
-                    </view>
-                </view>
-
-                <!-- 科目名称 -->
-                <view class="subject-name">{{ book.title }}</view>
-
-                <!-- 年份 -->
-                <view class="year">
-                    <uni-icons
-                        type="calendar"
-                        size="16"
-                        color="rgba(255, 255, 255, 0.9)"
-                    ></uni-icons>
-                    <text>{{ formatTime.getTime2(book.updatedAt) }}</text>
-                </view>
-
-                <!-- 底部统计信息 -->
-                <view class="card-footer">
-                    <view class="stats-item">
-                        <uni-icons
-                            type="list"
-                            size="16"
-                            color="rgba(255, 255, 255, 0.9)"
-                        ></uni-icons>
-                        <text class="stats-text">{{ book.count }} 题</text>
-                    </view>
-                </view>
-            </view>
-
-            <!-- 新建错题本卡片 -->
-            <view class="book-card create-card" @click="handleCreateBook">
-                <view class="create-content">
-                    <view class="create-icon-wrapper">
-                        <view class="create-icon">
-                            <uni-icons
-                                type="plus"
-                                size="40"
-                                color="#999"
-                            ></uni-icons>
-                        </view>
-                    </view>
-                    <view class="create-text">新建错题本</view>
-                </view>
-            </view>
-            </view>
-            </view>
-        </scroll-view>
-
-        <tPopup
-            v-model:show="popupShow"
-            title="创建错题本"
-            :closeable="true"
-            :overlay="true"
-            @close="handleClosePopup"
+        <view
+            class="page"
+            :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
         >
-            <template #popupcontent>
-                <view class="form-container">
-                    <!-- 错题本名称 -->
-                    <view class="form-item">
-                        <view class="form-label">
-                            错题本名称
-                            <text class="required">*</text>
+            <view class="top-wrapper">
+                <view class="custom-navbar" :style="customNavbarStyle">
+                    <view class="nav-row" :style="navRowStyle">
+                        <view class="nav-left" @click="handleBack">
+                            <t-icon
+                                name="chevron-left"
+                                size="44rpx"
+                                color="#1f2a1f"
+                            ></t-icon>
                         </view>
-                        <view
-                            class="input-wrapper"
-                            :class="{ 'has-error': validationErrors.title }"
-                        >
-                            <uni-icons
-                                type="compose"
-                                size="18"
-                                :color="
-                                    validationErrors.title ? '#f44336' : '#999'
-                                "
-                            ></uni-icons>
-                            <input
-                                class="form-input"
-                                :class="{ 'is-error': validationErrors.title }"
-                                v-model="formData.title"
-                                placeholder="请输入错题本名称（最多20个字）"
-                                maxlength="20"
-                                @input="handleTitleInput"
-                            />
-                            <text class="char-count"
-                                >{{ formData.title.length }}/20</text
+
+                        <text class="nav-title">喵喵错题本</text>
+
+                        <view class="nav-right">
+                            <view class="nav-action" @click="handleCreateBook">
+                                <t-icon
+                                    name="add"
+                                    size="40rpx"
+                                    color="#3fa24b"
+                                ></t-icon>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+
+            <scroll-view
+                class="main-scroll"
+                scroll-y
+                :enable-back-to-top="false"
+                :scroll-with-animation="false"
+                enhanced
+                :show-scrollbar="false"
+            >
+                <view class="container">
+                    <view class="hero">
+                        <view class="hero-left">
+                            <view class="section-header">
+                                <view class="section-dot"></view>
+                                <text class="section-title">所有错题本</text>
+                            </view>
+                            <text class="hero-subtitle"
+                                >归纳错题，追踪你的薄弱环节</text
                             >
                         </view>
-                        <view v-if="validationErrors.title" class="form-error">
-                            <uni-icons
-                                type="info-filled"
-                                size="14"
-                                color="#f44336"
-                            ></uni-icons>
-                            <text>{{ validationErrors.title }}</text>
+                        <view class="hero-stat">
+                            <text class="hero-stat-value">{{
+                                wrongBooks.length
+                            }}</text>
+                            <text class="hero-stat-label">个错题本</text>
                         </view>
                     </view>
 
-                    <!-- 颜色选择 -->
-                    <view class="form-item">
-                        <view class="form-label">
-                            选择颜色
-                            <text class="required">*</text>
+                    <!-- 加载中状态 -->
+                    <view v-if="loading" class="book-list skeleton-list">
+                        <view
+                            v-for="index in 4"
+                            :key="`skeleton-${index}`"
+                            class="book-card skeleton-card"
+                        >
+                            <view class="card-header">
+                                <view class="skeleton-circle shimmer"></view>
+                            </view>
+
+                            <view class="skeleton-title shimmer"></view>
+                            <view class="skeleton-subtitle shimmer"></view>
+
+                            <view class="card-footer skeleton-footer">
+                                <view class="skeleton-meta shimmer"></view>
+                            </view>
                         </view>
-                        <view class="color-picker-wrapper">
-                            <scroll-view class="color-scroll" scroll-x>
-                                <view class="color-list">
-                                    <view
-                                        class="color-item"
-                                        v-for="color in displayColorOptions"
-                                        :key="color"
-                                        :style="{ backgroundColor: color }"
-                                        :class="{
-                                            active: formData.color === color,
-                                        }"
-                                        @click="selectColor(color)"
+                    </view>
+
+                    <!-- 错题本列表 -->
+                    <view class="book-list" v-else>
+                        <view
+                            class="book-card"
+                            v-for="book in wrongBooks"
+                            :key="book.id"
+                            :style="{ backgroundColor: book.color }"
+                            @click="handleOpenQuestionList(book)"
+                        >
+                            <!-- 顶部菜单 -->
+                            <view class="card-header">
+                                <view
+                                    class="menu-icon"
+                                    @click.stop="handleOpenEdit(book)"
+                                >
+                                    <uni-icons
+                                        type="more-filled"
+                                        size="20"
+                                        color="#fff"
+                                    ></uni-icons>
+                                </view>
+                            </view>
+
+                            <!-- 科目名称 -->
+                            <view class="subject-name">{{ book.title }}</view>
+
+                            <!-- 年份 -->
+                            <view class="year">
+                                <uni-icons
+                                    type="calendar"
+                                    size="16"
+                                    color="rgba(255, 255, 255, 0.9)"
+                                ></uni-icons>
+                                <text>{{
+                                    formatTime.getTime2(book.updatedAt)
+                                }}</text>
+                            </view>
+
+                            <!-- 底部统计信息 -->
+                            <view class="card-footer">
+                                <view class="stats-item">
+                                    <uni-icons
+                                        type="list"
+                                        size="16"
+                                        color="rgba(255, 255, 255, 0.9)"
+                                    ></uni-icons>
+                                    <text class="stats-text"
+                                        >{{ book.count }} 题</text
                                     >
-                                        <view
-                                            class="color-check"
-                                            v-if="formData.color === color"
-                                        >
-                                            <uni-icons
-                                                type="checkmarkempty"
-                                                size="16"
-                                                color="#fff"
-                                            ></uni-icons>
-                                        </view>
+                                </view>
+                            </view>
+                        </view>
+
+                        <!-- 新建错题本卡片 -->
+                        <view
+                            class="book-card create-card"
+                            @click="handleCreateBook"
+                        >
+                            <view class="create-content">
+                                <view class="create-icon-wrapper">
+                                    <view class="create-icon">
+                                        <uni-icons
+                                            type="plus"
+                                            size="40"
+                                            color="#999"
+                                        ></uni-icons>
                                     </view>
                                 </view>
-                            </scroll-view>
+                                <view class="create-text">新建错题本</view>
+                            </view>
                         </view>
                     </view>
-
-                    <!-- 按钮组 -->
-                    <view class="form-actions">
-                        <button
-                            class="btn btn-cancel"
-                            :disabled="submitting"
-                            @click="handleClosePopup"
-                        >
-                            <uni-icons
-                                type="closeempty"
-                                size="16"
-                                color="#666"
-                            ></uni-icons>
-                            取消
-                        </button>
-                        <button
-                            class="btn btn-submit"
-                            :disabled="submitting"
-                            :class="{ 'btn-loading': submitting }"
-                            @click="handleSubmit"
-                        >
-                            <view v-if="submitting" class="btn-spinner">
-                                <view class="spinner-circle-small"></view>
-                            </view>
-                            <uni-icons
-                                v-else
-                                type="checkmarkempty"
-                                size="16"
-                                color="#fff"
-                            ></uni-icons>
-                            {{ submitting ? "创建中..." : "创建" }}
-                        </button>
-                    </view>
                 </view>
-            </template>
-        </tPopup>
-    </view>
+            </scroll-view>
+
+            <tPopup
+                v-model:show="popupShow"
+                title="创建错题本"
+                :closeable="true"
+                :overlay="true"
+                @close="handleClosePopup"
+            >
+                <template #popupcontent>
+                    <view class="form-container">
+                        <!-- 错题本名称 -->
+                        <view class="form-item">
+                            <view class="form-label">
+                                错题本名称
+                                <text class="required">*</text>
+                            </view>
+                            <view
+                                class="input-wrapper"
+                                :class="{ 'has-error': validationErrors.title }"
+                            >
+                                <uni-icons
+                                    type="compose"
+                                    size="18"
+                                    :color="
+                                        validationErrors.title
+                                            ? '#f44336'
+                                            : '#999'
+                                    "
+                                ></uni-icons>
+                                <input
+                                    class="form-input"
+                                    :class="{
+                                        'is-error': validationErrors.title,
+                                    }"
+                                    v-model="formData.title"
+                                    placeholder="请输入错题本名称（最多20个字）"
+                                    maxlength="20"
+                                    @input="handleTitleInput"
+                                />
+                                <text class="char-count"
+                                    >{{ formData.title.length }}/20</text
+                                >
+                            </view>
+                            <view
+                                v-if="validationErrors.title"
+                                class="form-error"
+                            >
+                                <uni-icons
+                                    type="info-filled"
+                                    size="14"
+                                    color="#f44336"
+                                ></uni-icons>
+                                <text>{{ validationErrors.title }}</text>
+                            </view>
+                        </view>
+
+                        <!-- 颜色选择 -->
+                        <view class="form-item">
+                            <view class="form-label">
+                                选择颜色
+                                <text class="required">*</text>
+                            </view>
+                            <view class="color-picker-wrapper">
+                                <scroll-view class="color-scroll" scroll-x>
+                                    <view class="color-list">
+                                        <view
+                                            class="color-item"
+                                            v-for="color in displayColorOptions"
+                                            :key="color"
+                                            :style="{ backgroundColor: color }"
+                                            :class="{
+                                                active:
+                                                    formData.color === color,
+                                            }"
+                                            @click="selectColor(color)"
+                                        >
+                                            <view
+                                                class="color-check"
+                                                v-if="formData.color === color"
+                                            >
+                                                <uni-icons
+                                                    type="checkmarkempty"
+                                                    size="16"
+                                                    color="#fff"
+                                                ></uni-icons>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </scroll-view>
+                            </view>
+                        </view>
+
+                        <!-- 按钮组 -->
+                        <view class="form-actions">
+                            <button
+                                class="btn btn-cancel"
+                                :disabled="submitting"
+                                @click="handleClosePopup"
+                            >
+                                <uni-icons
+                                    type="closeempty"
+                                    size="16"
+                                    color="#666"
+                                ></uni-icons>
+                                取消
+                            </button>
+                            <button
+                                class="btn btn-submit"
+                                :disabled="submitting"
+                                :class="{ 'btn-loading': submitting }"
+                                @click="handleSubmit"
+                            >
+                                <view v-if="submitting" class="btn-spinner">
+                                    <view class="spinner-circle-small"></view>
+                                </view>
+                                <uni-icons
+                                    v-else
+                                    type="checkmarkempty"
+                                    size="16"
+                                    color="#fff"
+                                ></uni-icons>
+                                {{ submitting ? "创建中..." : "创建" }}
+                            </button>
+                        </view>
+                    </view>
+                </template>
+            </tPopup>
+        </view>
     </ThemeProvider>
 </template>
 
@@ -479,7 +519,7 @@ onBeforeUnmount(() => {
 .main-scroll {
     flex: 1;
     min-height: 0;
-    -webkit-overflow-scrolling: touch;  /* iOS 滚动惯性优化 */
+    -webkit-overflow-scrolling: touch; /* iOS 滚动惯性优化 */
 }
 
 .container {
@@ -553,7 +593,7 @@ onBeforeUnmount(() => {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 24rpx;
-    contain: layout style;  /* 限制重绘范围，优化滚动性能 */
+    contain: layout style; /* 限制重绘范围，优化滚动性能 */
 }
 
 .book-card {
@@ -564,9 +604,11 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
     overflow: hidden;
-    will-change: transform;  /* 提示浏览器优化 */
+    will-change: transform; /* 提示浏览器优化 */
 }
 
 .book-card::before {
@@ -602,7 +644,9 @@ onBeforeUnmount(() => {
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease;
 }
 
 .menu-icon:active {
@@ -678,7 +722,9 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease;
 }
 
 .create-card::before {
@@ -714,7 +760,9 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease, background 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        background 0.3s ease;
 }
 
 .create-card:active .create-icon {
@@ -759,7 +807,9 @@ onBeforeUnmount(() => {
     border-radius: 16rpx;
     padding: 0 20rpx;
     border: 2rpx solid transparent;
-    transition: border-color 0.3s ease, background 0.3s ease;
+    transition:
+        border-color 0.3s ease,
+        background 0.3s ease;
 }
 
 .input-wrapper:focus-within {
@@ -838,7 +888,10 @@ onBeforeUnmount(() => {
     height: 80rpx;
     border-radius: 50%;
     position: relative;
-    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
     box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
     border: 4rpx solid transparent;
@@ -880,7 +933,10 @@ onBeforeUnmount(() => {
     font-size: calc(30rpx * var(--app-font-scale, 1));
     font-weight: 600;
     border: none;
-    transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -888,7 +944,11 @@ onBeforeUnmount(() => {
 }
 
 .btn-cancel {
-    background: linear-gradient(135deg, var(--app-bg-secondary) 0%, #ebebeb 100%);
+    background: linear-gradient(
+        135deg,
+        var(--app-bg-secondary) 0%,
+        #ebebeb 100%
+    );
     color: var(--app-text-secondary);
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
 }

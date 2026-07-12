@@ -1,113 +1,113 @@
 <template>
     <ThemeProvider>
-    <CustomNavBar title="编辑笔记本" @back="handleNavBack" />
-    <view class="container">
-        <view v-if="loading" class="loading-container">
-            <view class="loading-spinner">
-                <view class="spinner-circle"></view>
+        <CustomNavBar title="编辑笔记本" @back="handleNavBack" />
+        <view class="container">
+            <view v-if="loading" class="loading-container">
+                <view class="loading-spinner">
+                    <view class="spinner-circle"></view>
+                </view>
+                <text class="loading-text">加载中...</text>
             </view>
-            <text class="loading-text">加载中...</text>
-        </view>
 
-        <view v-else class="content-wrapper">
-            <view class="form-container">
-                <view class="form-item">
-                    <view class="form-label">
-                        <uni-icons
-                            type="compose"
-                            size="20"
-                            color="#333"
-                            class="label-icon"
-                        ></uni-icons>
-                        笔记本名称
-                        <text class="required">*</text>
-                    </view>
-                    <view
-                        class="input-wrapper"
-                        :class="{ 'has-error': validationErrors.title }"
-                    >
-                        <input
-                            class="form-input"
-                            :class="{ 'is-error': validationErrors.title }"
-                            v-model="formData.title"
-                            placeholder="请输入笔记本名称"
-                            placeholder-class="input-placeholder"
-                            maxlength="20"
-                            @input="handleTitleInput"
-                        />
-                        <text class="char-count"
-                            >{{ formData.title.length }}/20</text
-                        >
-                    </view>
-                    <view v-if="validationErrors.title" class="form-error">
-                        <uni-icons
-                            type="info-filled"
-                            size="14"
-                            color="#f44336"
-                        ></uni-icons>
-                        <text>{{ validationErrors.title }}</text>
-                    </view>
-                </view>
-
-                <view class="form-item">
-                    <view class="form-label">
-                        <uni-icons
-                            type="chat"
-                            size="20"
-                            color="#333"
-                            class="label-icon"
-                        ></uni-icons>
-                        描述
-                    </view>
-                    <view class="textarea-wrapper">
-                        <textarea
-                            class="form-textarea"
-                            v-model="formData.description"
-                            placeholder="可选，简单描述这个笔记本"
-                            maxlength="60"
-                        ></textarea>
-                        <text class="char-count description-count"
-                            >{{ formData.description.length }}/60</text
-                        >
-                    </view>
-                </view>
-
-                <view class="form-actions">
-                    <button
-                        class="btn btn-submit"
-                        :disabled="submitting"
-                        :class="{ 'btn-loading': submitting }"
-                        @click="handleSubmit"
-                    >
-                        <view v-if="submitting" class="btn-spinner">
-                            <view class="spinner-circle-small"></view>
-                        </view>
-                        <block v-else>
+            <view v-else class="content-wrapper">
+                <view class="form-container">
+                    <view class="form-item">
+                        <view class="form-label">
                             <uni-icons
-                                type="checkmarkempty"
+                                type="compose"
                                 size="20"
-                                color="#fff"
+                                color="#333"
+                                class="label-icon"
                             ></uni-icons>
-                            <text>保存修改</text>
-                        </block>
-                    </button>
+                            笔记本名称
+                            <text class="required">*</text>
+                        </view>
+                        <view
+                            class="input-wrapper"
+                            :class="{ 'has-error': validationErrors.title }"
+                        >
+                            <input
+                                class="form-input"
+                                :class="{ 'is-error': validationErrors.title }"
+                                v-model="formData.title"
+                                placeholder="请输入笔记本名称"
+                                placeholder-class="input-placeholder"
+                                maxlength="20"
+                                @input="handleTitleInput"
+                            />
+                            <text class="char-count"
+                                >{{ formData.title.length }}/20</text
+                            >
+                        </view>
+                        <view v-if="validationErrors.title" class="form-error">
+                            <uni-icons
+                                type="info-filled"
+                                size="14"
+                                color="#f44336"
+                            ></uni-icons>
+                            <text>{{ validationErrors.title }}</text>
+                        </view>
+                    </view>
 
-                    <button
-                        class="btn btn-delete"
-                        :disabled="submitting"
-                        @click="handleDelete"
-                    >
-                        <uni-icons
-                            type="trash"
-                            size="20"
-                            color="#f44336"
-                        ></uni-icons>
-                        <text>删除笔记本</text>
-                    </button>
+                    <view class="form-item">
+                        <view class="form-label">
+                            <uni-icons
+                                type="chat"
+                                size="20"
+                                color="#333"
+                                class="label-icon"
+                            ></uni-icons>
+                            描述
+                        </view>
+                        <view class="textarea-wrapper">
+                            <textarea
+                                class="form-textarea"
+                                v-model="formData.description"
+                                placeholder="可选，简单描述这个笔记本"
+                                maxlength="60"
+                            ></textarea>
+                            <text class="char-count description-count"
+                                >{{ formData.description.length }}/60</text
+                            >
+                        </view>
+                    </view>
+
+                    <view class="form-actions">
+                        <button
+                            class="btn btn-submit"
+                            :disabled="submitting"
+                            :class="{ 'btn-loading': submitting }"
+                            @click="handleSubmit"
+                        >
+                            <view v-if="submitting" class="btn-spinner">
+                                <view class="spinner-circle-small"></view>
+                            </view>
+                            <block v-else>
+                                <uni-icons
+                                    type="checkmarkempty"
+                                    size="20"
+                                    color="#fff"
+                                ></uni-icons>
+                                <text>保存修改</text>
+                            </block>
+                        </button>
+
+                        <button
+                            class="btn btn-delete"
+                            :disabled="submitting"
+                            @click="handleDelete"
+                        >
+                            <uni-icons
+                                type="trash"
+                                size="20"
+                                color="#f44336"
+                            ></uni-icons>
+                            <text>删除笔记本</text>
+                        </button>
+                    </view>
                 </view>
             </view>
         </view>
-    </view>
     </ThemeProvider>
 </template>
 
@@ -413,7 +413,11 @@ const handleDelete = () => {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, var(--app-brand) 0%, var(--app-brand-hover) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--app-brand) 0%,
+        var(--app-brand-hover) 100%
+    );
     color: var(--app-bg-container);
     box-shadow: 0 8rpx 24rpx rgba(77, 98, 255, 0.32);
 }

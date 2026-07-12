@@ -1,7 +1,9 @@
 const WordListModel = require("../../models/WordListModel");
 const WordBookModel = require("../../models/WordBookModel");
 const KnowledgeBaseModel = require("../../models/KnowledgeBaseModel");
-const { similaritySearch } = require("../../llm/vectorstores/stores/chromaManager");
+const {
+  similaritySearch,
+} = require("../../llm/vectorstores/stores/chromaManager");
 const ModelFactory = require("../../llm/models/factory");
 const {
   wordLookupPrompt,
@@ -31,7 +33,11 @@ const WordListService = {
         .select({ _id: 1 })
         .lean();
       if (!book) {
-        return { success: false, code: "WORDBOOK_NOT_FOUND", message: "单词本不存在或无权限" };
+        return {
+          success: false,
+          code: "WORDBOOK_NOT_FOUND",
+          message: "单词本不存在或无权限",
+        };
       }
 
       const query = { Uid: uid, wordBookId };
@@ -106,21 +112,28 @@ const WordListService = {
    */
   getWordDetail: async ({ uid, id }) => {
     try {
-      const word = await WordListModel.findOne({ _id: id, Uid: uid }, {
-        _id: 1,
-        wordBookId: 1,
-        word: 1,
-        phonetic: 1,
-        meaning: 1,
-        example: 1,
-        tags: 1,
-        isMarked: 1,
-        updatedAt: 1,
-        createdAt: 1,
-      }).lean();
+      const word = await WordListModel.findOne(
+        { _id: id, Uid: uid },
+        {
+          _id: 1,
+          wordBookId: 1,
+          word: 1,
+          phonetic: 1,
+          meaning: 1,
+          example: 1,
+          tags: 1,
+          isMarked: 1,
+          updatedAt: 1,
+          createdAt: 1,
+        },
+      ).lean();
 
       if (!word) {
-        return { success: false, code: "WORD_NOT_FOUND", message: "单词不存在或无权限" };
+        return {
+          success: false,
+          code: "WORD_NOT_FOUND",
+          message: "单词不存在或无权限",
+        };
       }
 
       return { success: true, data: word };
@@ -133,19 +146,35 @@ const WordListService = {
   /**
    * 添加单词
    */
-  addWord: async ({ uid, wordBookId, word, phonetic = "", meaning = "", example = "", tags = [] }) => {
+  addWord: async ({
+    uid,
+    wordBookId,
+    word,
+    phonetic = "",
+    meaning = "",
+    example = "",
+    tags = [],
+  }) => {
     try {
       // 验证单词本归属
       const book = await WordBookModel.findOne({ _id: wordBookId, Uid: uid })
         .select({ _id: 1 })
         .lean();
       if (!book) {
-        return { success: false, code: "WORDBOOK_NOT_FOUND", message: "单词本不存在或无权限" };
+        return {
+          success: false,
+          code: "WORDBOOK_NOT_FOUND",
+          message: "单词本不存在或无权限",
+        };
       }
 
       const safeWord = String(word || "").trim();
       if (!safeWord) {
-        return { success: false, code: "INVALID_PARAMS", message: "请输入单词" };
+        return {
+          success: false,
+          code: "INVALID_PARAMS",
+          message: "请输入单词",
+        };
       }
 
       // 检查同一单词本内是否重复
@@ -158,11 +187,18 @@ const WordListService = {
         .lean();
 
       if (existing) {
-        return { success: false, code: "DUPLICATE_WORD", message: "该单词已存在于此单词本中" };
+        return {
+          success: false,
+          code: "DUPLICATE_WORD",
+          message: "该单词已存在于此单词本中",
+        };
       }
 
       const safeTags = Array.isArray(tags)
-        ? tags.map((t) => String(t || "").trim()).filter(Boolean).slice(0, 10)
+        ? tags
+            .map((t) => String(t || "").trim())
+            .filter(Boolean)
+            .slice(0, 10)
         : [];
 
       const newWord = await WordListModel.create({
@@ -195,13 +231,21 @@ const WordListService = {
     try {
       const wordDoc = await WordListModel.findOne({ _id: id, Uid: uid });
       if (!wordDoc) {
-        return { success: false, code: "WORD_NOT_FOUND", message: "单词不存在或无权限" };
+        return {
+          success: false,
+          code: "WORD_NOT_FOUND",
+          message: "单词不存在或无权限",
+        };
       }
 
       if (word !== undefined) {
         const safeWord = String(word || "").trim();
         if (!safeWord) {
-          return { success: false, code: "INVALID_PARAMS", message: "单词不能为空" };
+          return {
+            success: false,
+            code: "INVALID_PARAMS",
+            message: "单词不能为空",
+          };
         }
         // 检查重复（排除自身）
         const existing = await WordListModel.findOne({
@@ -213,17 +257,25 @@ const WordListService = {
           .select({ _id: 1 })
           .lean();
         if (existing) {
-          return { success: false, code: "DUPLICATE_WORD", message: "该单词已存在于此单词本中" };
+          return {
+            success: false,
+            code: "DUPLICATE_WORD",
+            message: "该单词已存在于此单词本中",
+          };
         }
         wordDoc.word = safeWord;
       }
 
-      if (phonetic !== undefined) wordDoc.phonetic = String(phonetic || "").trim();
+      if (phonetic !== undefined)
+        wordDoc.phonetic = String(phonetic || "").trim();
       if (meaning !== undefined) wordDoc.meaning = String(meaning || "").trim();
       if (example !== undefined) wordDoc.example = String(example || "").trim();
       if (tags !== undefined) {
         wordDoc.tags = Array.isArray(tags)
-          ? tags.map((t) => String(t || "").trim()).filter(Boolean).slice(0, 10)
+          ? tags
+              .map((t) => String(t || "").trim())
+              .filter(Boolean)
+              .slice(0, 10)
           : [];
       }
 
@@ -252,20 +304,25 @@ const WordListService = {
 
       const result = await WordListModel.deleteOne(query);
       if (result.deletedCount === 0) {
-        return { success: false, code: "WORD_NOT_FOUND", message: "单词不存在或无权限" };
+        return {
+          success: false,
+          code: "WORD_NOT_FOUND",
+          message: "单词不存在或无权限",
+        };
       }
 
       // 更新单词本单词数（最小为 0）
       if (wordBookId) {
-        await WordBookModel.updateOne(
-          { _id: wordBookId, Uid: uid },
-          [{
+        await WordBookModel.updateOne({ _id: wordBookId, Uid: uid }, [
+          {
             $set: {
-              wordCount: { $max: [{ $subtract: [{ $ifNull: ["$wordCount", 0] }, 1] }, 0] },
+              wordCount: {
+                $max: [{ $subtract: [{ $ifNull: ["$wordCount", 0] }, 1] }, 0],
+              },
               updatedAt: "$$NOW",
             },
-          }],
-        );
+          },
+        ]);
       }
 
       return { success: true };
@@ -281,7 +338,11 @@ const WordListService = {
   batchDeleteWords: async ({ uid, ids, wordBookId }) => {
     try {
       if (!Array.isArray(ids) || ids.length === 0) {
-        return { success: false, code: "INVALID_PARAMS", message: "请选择要删除的单词" };
+        return {
+          success: false,
+          code: "INVALID_PARAMS",
+          message: "请选择要删除的单词",
+        };
       }
 
       const query = { _id: { $in: ids }, Uid: uid };
@@ -291,15 +352,24 @@ const WordListService = {
 
       // 更新单词本单词数
       if (wordBookId && result.deletedCount > 0) {
-        await WordBookModel.updateOne(
-          { _id: wordBookId, Uid: uid },
-          [{
+        await WordBookModel.updateOne({ _id: wordBookId, Uid: uid }, [
+          {
             $set: {
-              wordCount: { $max: [{ $subtract: [{ $ifNull: ["$wordCount", 0] }, result.deletedCount] }, 0] },
+              wordCount: {
+                $max: [
+                  {
+                    $subtract: [
+                      { $ifNull: ["$wordCount", 0] },
+                      result.deletedCount,
+                    ],
+                  },
+                  0,
+                ],
+              },
               updatedAt: "$$NOW",
             },
-          }],
-        );
+          },
+        ]);
       }
 
       return { success: true, deletedCount: result.deletedCount };
@@ -318,11 +388,18 @@ const WordListService = {
         .select({ _id: 1, isMarked: 1 })
         .lean();
       if (!word) {
-        return { success: false, code: "WORD_NOT_FOUND", message: "单词不存在或无权限" };
+        return {
+          success: false,
+          code: "WORD_NOT_FOUND",
+          message: "单词不存在或无权限",
+        };
       }
 
       const nextMarked = !word.isMarked;
-      await WordListModel.updateOne({ _id: id, Uid: uid }, { $set: { isMarked: nextMarked } });
+      await WordListModel.updateOne(
+        { _id: id, Uid: uid },
+        { $set: { isMarked: nextMarked } },
+      );
 
       return { success: true, data: { id, isMarked: nextMarked } };
     } catch (error) {
@@ -341,11 +418,19 @@ const WordListService = {
         .select({ _id: 1 })
         .lean();
       if (!book) {
-        return { success: false, code: "WORDBOOK_NOT_FOUND", message: "单词本不存在或无权限" };
+        return {
+          success: false,
+          code: "WORDBOOK_NOT_FOUND",
+          message: "单词本不存在或无权限",
+        };
       }
 
       if (!Array.isArray(words) || words.length === 0) {
-        return { success: false, code: "INVALID_PARAMS", message: "请提供要添加的单词" };
+        return {
+          success: false,
+          code: "INVALID_PARAMS",
+          message: "请提供要添加的单词",
+        };
       }
 
       // 获取已有单词（用于去重）
@@ -353,7 +438,9 @@ const WordListService = {
         { Uid: uid, wordBookId },
         { word: 1 },
       ).lean();
-      const existingSet = new Set(existingWords.map((w) => String(w.word || "").toLowerCase()));
+      const existingSet = new Set(
+        existingWords.map((w) => String(w.word || "").toLowerCase()),
+      );
 
       const toInsert = [];
       const skipped = [];
@@ -368,7 +455,10 @@ const WordListService = {
         }
 
         const safeTags = Array.isArray(item.tags)
-          ? item.tags.map((t) => String(t || "").trim()).filter(Boolean).slice(0, 10)
+          ? item.tags
+              .map((t) => String(t || "").trim())
+              .filter(Boolean)
+              .slice(0, 10)
           : [];
 
         toInsert.push({
@@ -392,7 +482,10 @@ const WordListService = {
         // 更新单词本单词数
         await WordBookModel.updateOne(
           { _id: wordBookId, Uid: uid },
-          { $inc: { wordCount: insertedCount }, $set: { updatedAt: new Date() } },
+          {
+            $inc: { wordCount: insertedCount },
+            $set: { updatedAt: new Date() },
+          },
         );
       }
 
@@ -413,7 +506,11 @@ const WordListService = {
     try {
       const safeWord = String(word || "").trim();
       if (!safeWord) {
-        return { success: false, code: "INVALID_PARAMS", message: "请输入单词" };
+        return {
+          success: false,
+          code: "INVALID_PARAMS",
+          message: "请输入单词",
+        };
       }
 
       const model = ModelFactory.getModel("qwen-plus", 0.3);
@@ -426,7 +523,10 @@ const WordListService = {
       let result = { phonetic: "", meaning: "", example: "" };
 
       // 去掉 ```json ``` 包裹
-      const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+      const cleaned = rawText
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/, "")
+        .trim();
 
       // 用正则提取三个字段（绕过 JSON 解析的各种边界问题）
       const phoneticMatch = cleaned.match(/"phonetic"\s*:\s*"([^"]*)"/);
@@ -436,9 +536,13 @@ const WordListService = {
       if (exampleMatch) result.example = exampleMatch[1];
 
       // meaning 可能包含换行符，用更宽松的匹配
-      const meaningMatch = cleaned.match(/"meaning"\s*:\s*"((?:[^"\\]|\\[\s\S])*?)"/);
+      const meaningMatch = cleaned.match(
+        /"meaning"\s*:\s*"((?:[^"\\]|\\[\s\S])*?)"/,
+      );
       if (meaningMatch) {
-        result.meaning = meaningMatch[1].replace(/\\n/g, "\n").replace(/\\"/g, '"');
+        result.meaning = meaningMatch[1]
+          .replace(/\\n/g, "\n")
+          .replace(/\\"/g, '"');
       }
 
       // 如果正则没提取到，尝试 JSON.parse 作为兜底
@@ -467,7 +571,11 @@ const WordListService = {
     try {
       const safeText = String(text || "").trim();
       if (!safeText) {
-        return { success: false, code: "INVALID_PARAMS", message: "请输入文本" };
+        return {
+          success: false,
+          code: "INVALID_PARAMS",
+          message: "请输入文本",
+        };
       }
 
       const model = ModelFactory.getModel("qwen-plus", 0.3);
@@ -523,7 +631,9 @@ const WordListService = {
     let content = String(response?.content || "").trim();
 
     // 去掉 AI 可能包裹的 ```markdown ... ``` 代码块
-    content = content.replace(/^```(?:markdown)?\s*\n?([\s\S]*?)\n?```$/g, "$1").trim();
+    content = content
+      .replace(/^```(?:markdown)?\s*\n?([\s\S]*?)\n?```$/g, "$1")
+      .trim();
 
     return content;
   },
@@ -533,12 +643,15 @@ const WordListService = {
    */
   getKnowledgeBases: async () => {
     try {
-      const kbs = await KnowledgeBaseModel.find({}, {
-        _id: 1,
-        name: 1,
-        description: 1,
-        collectionName: 1,
-      })
+      const kbs = await KnowledgeBaseModel.find(
+        {},
+        {
+          _id: 1,
+          name: 1,
+          description: 1,
+          collectionName: 1,
+        },
+      )
         .sort({ createTime: -1 })
         .lean();
 
@@ -556,7 +669,11 @@ const WordListService = {
     try {
       const safeWord = String(word || "").trim();
       if (!safeWord) {
-        return { success: false, code: "INVALID_PARAMS", message: "请输入单词" };
+        return {
+          success: false,
+          code: "INVALID_PARAMS",
+          message: "请输入单词",
+        };
       }
 
       // 查找知识库
@@ -564,12 +681,20 @@ const WordListService = {
         .select({ _id: 1, name: 1, collectionName: 1 })
         .lean();
       if (!kb) {
-        return { success: false, code: "KB_NOT_FOUND", message: "知识库不存在" };
+        return {
+          success: false,
+          code: "KB_NOT_FOUND",
+          message: "知识库不存在",
+        };
       }
 
       // 向量检索
       const safeTopK = Math.min(10, Math.max(1, Number(topK) || 5));
-      const results = await similaritySearch(safeWord, safeTopK, kb.collectionName);
+      const results = await similaritySearch(
+        safeWord,
+        safeTopK,
+        kb.collectionName,
+      );
 
       // 过滤并格式化结果
       const examples = (results || [])

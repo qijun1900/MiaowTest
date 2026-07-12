@@ -1,314 +1,574 @@
 <template>
     <ThemeProvider>
-    <view class="page" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
-        <!-- 导航栏 -->
-        <view class="top-wrapper">
-            <view class="custom-navbar" :style="customNavbarStyle">
-                <view class="nav-row" :style="navRowStyle">
-                    <view class="nav-left" @click="handleBack">
-                        <t-icon name="chevron-left" size="44rpx" color="var(--app-text-primary)"></t-icon>
-                    </view>
-                    <text class="nav-title">{{ isSelectMode ? `已选 ${selectedIds.length} 项` : bookTitle }}</text>
-                    <view class="nav-right">
-                        <view v-if="isSelectMode" class="nav-action" @click="exitSelectMode">
-                            <t-icon name="close" size="40rpx" color="var(--app-text-primary)"></t-icon>
+        <view
+            class="page"
+            :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
+        >
+            <!-- 导航栏 -->
+            <view class="top-wrapper">
+                <view class="custom-navbar" :style="customNavbarStyle">
+                    <view class="nav-row" :style="navRowStyle">
+                        <view class="nav-left" @click="handleBack">
+                            <t-icon
+                                name="chevron-left"
+                                size="44rpx"
+                                color="var(--app-text-primary)"
+                            ></t-icon>
                         </view>
-                        <view v-else class="nav-actions">
-                            <view class="nav-action" @click="toggleShowMeanings">
+                        <text class="nav-title">{{
+                            isSelectMode
+                                ? `已选 ${selectedIds.length} 项`
+                                : bookTitle
+                        }}</text>
+                        <view class="nav-right">
+                            <view
+                                v-if="isSelectMode"
+                                class="nav-action"
+                                @click="exitSelectMode"
+                            >
                                 <t-icon
-                                    :name="showAllMeanings ? 'browse' : 'browse-off'"
-                                    size="38rpx"
-                                    :color="showAllMeanings ? 'var(--app-brand)' : 'var(--app-text-secondary)'"
+                                    name="close"
+                                    size="40rpx"
+                                    color="var(--app-text-primary)"
                                 ></t-icon>
                             </view>
-                            <view class="nav-action" @click="handleAddWord">
-                                <t-icon name="add" size="40rpx" color="var(--app-brand)"></t-icon>
+                            <view v-else class="nav-actions">
+                                <view
+                                    class="nav-action"
+                                    @click="toggleShowMeanings"
+                                >
+                                    <t-icon
+                                        :name="
+                                            showAllMeanings
+                                                ? 'browse'
+                                                : 'browse-off'
+                                        "
+                                        size="38rpx"
+                                        :color="
+                                            showAllMeanings
+                                                ? 'var(--app-brand)'
+                                                : 'var(--app-text-secondary)'
+                                        "
+                                    ></t-icon>
+                                </view>
+                                <view class="nav-action" @click="handleAddWord">
+                                    <t-icon
+                                        name="add"
+                                        size="40rpx"
+                                        color="var(--app-brand)"
+                                    ></t-icon>
+                                </view>
                             </view>
                         </view>
                     </view>
                 </view>
             </view>
-        </view>
 
-        <!-- 搜索 + 筛选 -->
-        <view class="filter-section">
-            <view class="search-bar">
-                <t-icon name="search" size="32rpx" color="var(--app-text-placeholder)"></t-icon>
-                <input
-                    class="search-input"
-                    v-model="keyword"
-                    placeholder="搜索单词或释义"
-                    :maxlength="50"
-                    @input="handleSearchInput"
-                />
-                <t-icon
-                    v-if="keyword"
-                    name="close-circle-filled"
-                    size="32rpx"
-                    color="var(--app-text-placeholder)"
-                    @click="clearSearch"
-                ></t-icon>
-            </view>
-            <scroll-view class="filter-tags" scroll-x>
-                <view class="tag-list">
-                    <view
-                        class="filter-tag"
-                        :class="{ active: activeFilter === 'all' }"
-                        @click="setFilter('all')"
-                    >
-                        <text>全部 {{ totalCount }}</text>
-                    </view>
-                    <view
-                        class="filter-tag"
-                        :class="{ active: activeFilter === 'marked' }"
-                        @click="setFilter('marked')"
-                    >
-                        <t-icon name="star-filled" size="24rpx" :color="activeFilter === 'marked' ? 'var(--app-brand)' : 'var(--app-text-secondary)'"></t-icon>
-                        <text>{{ markedCount }}</text>
-                    </view>
-                    <view
-                        v-for="tagItem in tagOptions"
-                        :key="tagItem"
-                        class="filter-tag"
-                        :class="{ active: activeFilter === tagItem }"
-                        @click="setFilter(tagItem)"
-                    >
-                        <text>{{ tagItem }}</text>
-                    </view>
+            <!-- 搜索 + 筛选 -->
+            <view class="filter-section">
+                <view class="search-bar">
+                    <t-icon
+                        name="search"
+                        size="32rpx"
+                        color="var(--app-text-placeholder)"
+                    ></t-icon>
+                    <input
+                        class="search-input"
+                        v-model="keyword"
+                        placeholder="搜索单词或释义"
+                        :maxlength="50"
+                        @input="handleSearchInput"
+                    />
+                    <t-icon
+                        v-if="keyword"
+                        name="close-circle-filled"
+                        size="32rpx"
+                        color="var(--app-text-placeholder)"
+                        @click="clearSearch"
+                    ></t-icon>
                 </view>
-            </scroll-view>
-        </view>
-
-        <!-- 单词列表 -->
-        <scroll-view class="main-scroll" scroll-y @scrolltolower="handleLoadMore">
-            <!-- 骨架屏 -->
-            <view v-if="loading && !wordList.length" class="word-list">
-                <view v-for="i in 6" :key="`skeleton-${i}`" class="word-card skeleton-card">
-                    <view class="skeleton-line skeleton-shimmer" style="width: 40%; height: 36rpx;"></view>
-                    <view class="skeleton-line skeleton-shimmer" style="width: 30%; height: 26rpx; margin-top: 12rpx;"></view>
-                    <view class="skeleton-line skeleton-shimmer" style="width: 60%; height: 26rpx; margin-top: 12rpx;"></view>
-                </view>
-            </view>
-
-            <!-- 空状态 -->
-            <view v-else-if="!loading && !wordList.length" class="empty-state">
-                <t-icon name="book" size="100rpx" color="var(--app-text-placeholder)"></t-icon>
-                <text class="empty-text" v-if="keyword">没有找到匹配的单词</text>
-                <text class="empty-text" v-else-if="activeFilter === 'marked'">还没有收藏的单词</text>
-                <text class="empty-text" v-else>还没有单词</text>
-                <view v-if="!keyword && activeFilter === 'all'" class="empty-btn" @click="handleAddWord">
-                    <t-icon name="add" size="28rpx" color="#fff"></t-icon>
-                    <text>添加单词</text>
-                </view>
+                <scroll-view class="filter-tags" scroll-x>
+                    <view class="tag-list">
+                        <view
+                            class="filter-tag"
+                            :class="{ active: activeFilter === 'all' }"
+                            @click="setFilter('all')"
+                        >
+                            <text>全部 {{ totalCount }}</text>
+                        </view>
+                        <view
+                            class="filter-tag"
+                            :class="{ active: activeFilter === 'marked' }"
+                            @click="setFilter('marked')"
+                        >
+                            <t-icon
+                                name="star-filled"
+                                size="24rpx"
+                                :color="
+                                    activeFilter === 'marked'
+                                        ? 'var(--app-brand)'
+                                        : 'var(--app-text-secondary)'
+                                "
+                            ></t-icon>
+                            <text>{{ markedCount }}</text>
+                        </view>
+                        <view
+                            v-for="tagItem in tagOptions"
+                            :key="tagItem"
+                            class="filter-tag"
+                            :class="{ active: activeFilter === tagItem }"
+                            @click="setFilter(tagItem)"
+                        >
+                            <text>{{ tagItem }}</text>
+                        </view>
+                    </view>
+                </scroll-view>
             </view>
 
-            <!-- 单词卡片列表 -->
-            <view v-else class="word-list">
+            <!-- 单词列表 -->
+            <scroll-view
+                class="main-scroll"
+                scroll-y
+                @scrolltolower="handleLoadMore"
+            >
+                <!-- 骨架屏 -->
+                <view v-if="loading && !wordList.length" class="word-list">
+                    <view
+                        v-for="i in 6"
+                        :key="`skeleton-${i}`"
+                        class="word-card skeleton-card"
+                    >
+                        <view
+                            class="skeleton-line skeleton-shimmer"
+                            style="width: 40%; height: 36rpx"
+                        ></view>
+                        <view
+                            class="skeleton-line skeleton-shimmer"
+                            style="width: 30%; height: 26rpx; margin-top: 12rpx"
+                        ></view>
+                        <view
+                            class="skeleton-line skeleton-shimmer"
+                            style="width: 60%; height: 26rpx; margin-top: 12rpx"
+                        ></view>
+                    </view>
+                </view>
+
+                <!-- 空状态 -->
                 <view
-                    v-for="(item, index) in wordList"
-                    :key="item._id || index"
-                    class="word-card"
-                    :class="{ 'card-selected': isSelectMode && selectedIds.includes(item._id) }"
-                    @click="handleCardClick(item)"
-                    @longpress="handleLongPress(item)"
+                    v-else-if="!loading && !wordList.length"
+                    class="empty-state"
                 >
-                    <!-- 选择模式复选框 -->
-                    <view v-if="isSelectMode" class="card-checkbox">
-                        <t-icon
-                            :name="selectedIds.includes(item._id) ? 'check-circle-filled' : 'circle'"
-                            size="36rpx"
-                            :color="selectedIds.includes(item._id) ? 'var(--app-brand)' : 'var(--app-text-placeholder)'"
-                        ></t-icon>
+                    <t-icon
+                        name="book"
+                        size="100rpx"
+                        color="var(--app-text-placeholder)"
+                    ></t-icon>
+                    <text class="empty-text" v-if="keyword"
+                        >没有找到匹配的单词</text
+                    >
+                    <text
+                        class="empty-text"
+                        v-else-if="activeFilter === 'marked'"
+                        >还没有收藏的单词</text
+                    >
+                    <text class="empty-text" v-else>还没有单词</text>
+                    <view
+                        v-if="!keyword && activeFilter === 'all'"
+                        class="empty-btn"
+                        @click="handleAddWord"
+                    >
+                        <t-icon name="add" size="28rpx" color="#fff"></t-icon>
+                        <text>添加单词</text>
                     </view>
+                </view>
 
-                    <!-- 收藏按钮 -->
-                    <view v-if="!isSelectMode" class="mark-btn" @click.stop="handleToggleMarked(item)">
-                        <t-icon
-                            :name="item.isMarked ? 'star-filled' : 'star'"
-                            size="36rpx"
-                            :color="item.isMarked ? 'var(--app-warning)' : 'var(--app-text-placeholder)'"
-                        ></t-icon>
-                    </view>
+                <!-- 单词卡片列表 -->
+                <view v-else class="word-list">
+                    <view
+                        v-for="(item, index) in wordList"
+                        :key="item._id || index"
+                        class="word-card"
+                        :class="{
+                            'card-selected':
+                                isSelectMode && selectedIds.includes(item._id),
+                        }"
+                        @click="handleCardClick(item)"
+                        @longpress="handleLongPress(item)"
+                    >
+                        <!-- 选择模式复选框 -->
+                        <view v-if="isSelectMode" class="card-checkbox">
+                            <t-icon
+                                :name="
+                                    selectedIds.includes(item._id)
+                                        ? 'check-circle-filled'
+                                        : 'circle'
+                                "
+                                size="36rpx"
+                                :color="
+                                    selectedIds.includes(item._id)
+                                        ? 'var(--app-brand)'
+                                        : 'var(--app-text-placeholder)'
+                                "
+                            ></t-icon>
+                        </view>
 
-                    <!-- 单词信息 -->
-                    <view class="word-main">
-                        <view class="word-header">
-                            <view v-if="keyword" class="word-text">
-                                <template v-for="(part, pi) in highlightWord(item.word, keyword)" :key="pi">
-                                    <text v-if="part.highlight" class="search-highlight">{{ part.text }}</text>
+                        <!-- 收藏按钮 -->
+                        <view
+                            v-if="!isSelectMode"
+                            class="mark-btn"
+                            @click.stop="handleToggleMarked(item)"
+                        >
+                            <t-icon
+                                :name="item.isMarked ? 'star-filled' : 'star'"
+                                size="36rpx"
+                                :color="
+                                    item.isMarked
+                                        ? 'var(--app-warning)'
+                                        : 'var(--app-text-placeholder)'
+                                "
+                            ></t-icon>
+                        </view>
+
+                        <!-- 单词信息 -->
+                        <view class="word-main">
+                            <view class="word-header">
+                                <view v-if="keyword" class="word-text">
+                                    <template
+                                        v-for="(part, pi) in highlightWord(
+                                            item.word,
+                                            keyword,
+                                        )"
+                                        :key="pi"
+                                    >
+                                        <text
+                                            v-if="part.highlight"
+                                            class="search-highlight"
+                                            >{{ part.text }}</text
+                                        >
+                                        <text v-else>{{ part.text }}</text>
+                                    </template>
+                                </view>
+                                <text v-else class="word-text">{{
+                                    item.word
+                                }}</text>
+                                <text
+                                    v-if="item.phonetic"
+                                    class="phonetic-text"
+                                    >{{ item.phonetic }}</text
+                                >
+                            </view>
+
+                            <!-- 释义：全局显示 或 折叠提示 -->
+                            <view v-if="showAllMeanings" class="meaning-text">
+                                <template
+                                    v-for="(part, pi) in highlightWord(
+                                        item.meaning || '暂无释义',
+                                        keyword,
+                                    )"
+                                    :key="pi"
+                                >
+                                    <text
+                                        v-if="part.highlight"
+                                        class="search-highlight"
+                                        >{{ part.text }}</text
+                                    >
                                     <text v-else>{{ part.text }}</text>
                                 </template>
                             </view>
-                            <text v-else class="word-text">{{ item.word }}</text>
-                            <text v-if="item.phonetic" class="phonetic-text">{{ item.phonetic }}</text>
-                        </view>
+                            <text v-else class="meaning-hint"
+                                >点击查看释义</text
+                            >
 
-                        <!-- 释义：全局显示 或 折叠提示 -->
-                        <view v-if="showAllMeanings" class="meaning-text">
-                            <template v-for="(part, pi) in highlightWord(item.meaning || '暂无释义', keyword)" :key="pi">
-                                <text v-if="part.highlight" class="search-highlight">{{ part.text }}</text>
-                                <text v-else>{{ part.text }}</text>
-                            </template>
-                        </view>
-                        <text v-else class="meaning-hint">点击查看释义</text>
-
-                        <!-- 展开区域 -->
-                        <view v-if="expandedId === item._id" class="expand-area">
-                            <view v-if="!showAllMeanings && item.meaning" class="expand-meaning">
-                                <text class="expand-meaning-text">{{ item.meaning }}</text>
+                            <!-- 展开区域 -->
+                            <view
+                                v-if="expandedId === item._id"
+                                class="expand-area"
+                            >
+                                <view
+                                    v-if="!showAllMeanings && item.meaning"
+                                    class="expand-meaning"
+                                >
+                                    <text class="expand-meaning-text">{{
+                                        item.meaning
+                                    }}</text>
+                                </view>
+                                <view v-if="item.example" class="example-box">
+                                    <text class="example-label">例句</text>
+                                    <view class="example-text">
+                                        <template
+                                            v-for="(part, pi) in highlightWord(
+                                                item.example,
+                                                item.word,
+                                            )"
+                                            :key="pi"
+                                        >
+                                            <text
+                                                v-if="part.highlight"
+                                                class="example-highlight"
+                                                >{{ part.text }}</text
+                                            >
+                                            <text v-else>{{ part.text }}</text>
+                                        </template>
+                                    </view>
+                                </view>
+                                <view
+                                    v-if="item.tags && item.tags.length"
+                                    class="tags-row"
+                                >
+                                    <view
+                                        v-for="tag in item.tags"
+                                        :key="tag"
+                                        class="word-tag"
+                                    >
+                                        <text>{{ tag }}</text>
+                                    </view>
+                                </view>
+                                <view class="action-row">
+                                    <view
+                                        class="action-btn"
+                                        @click.stop="handleEditWord(item)"
+                                    >
+                                        <t-icon
+                                            name="edit"
+                                            size="28rpx"
+                                            color="var(--app-brand)"
+                                        ></t-icon>
+                                        <text>编辑</text>
+                                    </view>
+                                    <view
+                                        class="action-btn"
+                                        @click.stop="handleDeleteWord(item)"
+                                    >
+                                        <t-icon
+                                            name="delete"
+                                            size="28rpx"
+                                            color="var(--app-danger)"
+                                        ></t-icon>
+                                        <text>删除</text>
+                                    </view>
+                                    <view
+                                        class="action-btn action-btn-right"
+                                        @click.stop="openDetailPopup(item)"
+                                    >
+                                        <t-icon
+                                            name="info-circle"
+                                            size="28rpx"
+                                            color="var(--app-warning)"
+                                        ></t-icon>
+                                        <text>详情</text>
+                                    </view>
+                                </view>
                             </view>
-                            <view v-if="item.example" class="example-box">
-                                <text class="example-label">例句</text>
-                                <view class="example-text">
-                                    <template v-for="(part, pi) in highlightWord(item.example, item.word)" :key="pi">
-                                        <text v-if="part.highlight" class="example-highlight">{{ part.text }}</text>
+                        </view>
+                    </view>
+
+                    <!-- 加载更多 -->
+                    <view
+                        v-if="loading && wordList.length"
+                        class="loading-more"
+                    >
+                        <view class="loading-spinner"></view>
+                        <text>加载中...</text>
+                    </view>
+                    <view
+                        v-else-if="!hasMore && wordList.length"
+                        class="no-more"
+                    >
+                        <text>— 没有更多了 —</text>
+                    </view>
+                </view>
+            </scroll-view>
+
+            <!-- 选择模式底部操作栏 -->
+            <view
+                v-if="isSelectMode"
+                class="select-bottom-bar"
+                :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }"
+            >
+                <view class="select-bar-inner">
+                    <view class="select-all-btn" @click="toggleSelectAll">
+                        <t-icon
+                            :name="
+                                isAllSelected ? 'check-circle-filled' : 'circle'
+                            "
+                            size="40rpx"
+                            :color="
+                                isAllSelected
+                                    ? 'var(--app-brand)'
+                                    : 'var(--app-text-placeholder)'
+                            "
+                        ></t-icon>
+                        <text class="select-all-text">全选</text>
+                    </view>
+                    <view
+                        class="delete-btn"
+                        :class="{
+                            'delete-btn-disabled':
+                                selectedIds.length === 0 || deleting,
+                        }"
+                        @click="handleBatchDelete"
+                    >
+                        <t-icon
+                            name="delete"
+                            size="28rpx"
+                            color="var(--app-bg-container)"
+                        ></t-icon>
+                        <text class="delete-btn-text"
+                            >删除 ({{ selectedIds.length }})</text
+                        >
+                    </view>
+                </view>
+            </view>
+
+            <!-- 删除确认弹窗 -->
+            <t-dialog
+                :visible="showDeleteDialog"
+                title="确认删除"
+                :content="deleteDialogContent"
+                :confirm-btn="{ content: '删除', theme: 'danger' }"
+                cancel-btn="取消"
+                :show-overlay="true"
+                :z-index="12000"
+                @confirm="confirmDelete"
+                @cancel="showDeleteDialog = false"
+                @close="showDeleteDialog = false"
+            />
+
+            <!-- 单词详情弹窗（可拖拽） -->
+            <view
+                v-if="showDetailPopup"
+                class="detail-overlay"
+                @click.self="closeDetailPopup"
+            >
+                <view
+                    class="detail-sheet"
+                    :class="{ 'detail-sheet-dragging': isDragging }"
+                    :style="{ height: detailSheetHeight + 'vh' }"
+                >
+                    <!-- 拖拽手柄 -->
+                    <view
+                        class="detail-handle"
+                        @touchstart="onHandleTouchStart"
+                        @touchmove.prevent="onHandleTouchMove"
+                        @touchend="onHandleTouchEnd"
+                    >
+                        <view class="detail-handle-bar"></view>
+                    </view>
+
+                    <!-- 关闭按钮 -->
+                    <view class="detail-header">
+                        <view></view>
+                        <t-icon
+                            name="close"
+                            size="40rpx"
+                            color="var(--app-text-secondary)"
+                            @click="closeDetailPopup"
+                        ></t-icon>
+                    </view>
+
+                    <!-- 可滚动内容区 -->
+                    <scroll-view class="detail-scroll" scroll-y>
+                        <!-- 基本信息 -->
+                        <view v-if="detailWord" class="detail-basic">
+                            <view class="detail-word-header">
+                                <text class="detail-word-text">{{
+                                    detailWord.word
+                                }}</text>
+                                <text
+                                    v-if="detailWord.phonetic"
+                                    class="detail-phonetic"
+                                    >{{ detailWord.phonetic }}</text
+                                >
+                            </view>
+                            <text class="detail-meaning">{{
+                                detailWord.meaning || "暂无释义"
+                            }}</text>
+                            <view
+                                v-if="detailWord.example"
+                                class="detail-example"
+                            >
+                                <text class="detail-example-label">例句</text>
+                                <view class="detail-example-text">
+                                    <template
+                                        v-for="(part, pi) in highlightWord(
+                                            detailWord.example,
+                                            detailWord.word,
+                                        )"
+                                        :key="pi"
+                                    >
+                                        <text
+                                            v-if="part.highlight"
+                                            class="example-highlight"
+                                            >{{ part.text }}</text
+                                        >
                                         <text v-else>{{ part.text }}</text>
                                     </template>
                                 </view>
                             </view>
-                            <view v-if="item.tags && item.tags.length" class="tags-row">
-                                <view v-for="tag in item.tags" :key="tag" class="word-tag">
-                                    <text>{{ tag }}</text>
+                        </view>
+
+                        <!-- AI 扩展学习 -->
+                        <view class="detail-ai-section">
+                            <view class="detail-ai-title">
+                                <t-icon
+                                    name="lightbulb"
+                                    size="32rpx"
+                                    color="var(--app-warning)"
+                                ></t-icon>
+                                <text>AI 扩展学习</text>
+                            </view>
+                            <view class="detail-ai-btns">
+                                <view
+                                    class="detail-ai-btn"
+                                    @click="fetchDetailAi('mnemonic')"
+                                >
+                                    <text>💡 助记法</text>
+                                </view>
+                                <view
+                                    class="detail-ai-btn"
+                                    @click="fetchDetailAi('root')"
+                                >
+                                    <text>📖 词根</text>
+                                </view>
+                                <view
+                                    class="detail-ai-btn"
+                                    @click="fetchDetailAi('synonyms')"
+                                >
+                                    <text>🔗 近义词</text>
+                                </view>
+                                <view
+                                    class="detail-ai-btn"
+                                    @click="fetchDetailAi('similar')"
+                                >
+                                    <text>✏️ 形近词</text>
                                 </view>
                             </view>
-                            <view class="action-row">
-                                <view class="action-btn" @click.stop="handleEditWord(item)">
-                                    <t-icon name="edit" size="28rpx" color="var(--app-brand)"></t-icon>
-                                    <text>编辑</text>
-                                </view>
-                                <view class="action-btn" @click.stop="handleDeleteWord(item)">
-                                    <t-icon name="delete" size="28rpx" color="var(--app-danger)"></t-icon>
-                                    <text>删除</text>
-                                </view>
-                                <view class="action-btn action-btn-right" @click.stop="openDetailPopup(item)">
-                                    <t-icon name="info-circle" size="28rpx" color="var(--app-warning)"></t-icon>
-                                    <text>详情</text>
-                                </view>
+                            <view
+                                v-if="detailAiContent"
+                                class="detail-ai-result"
+                            >
+                                <ContentRenderer
+                                    :content="detailAiContent"
+                                    :isMarkdown="true"
+                                />
+                            </view>
+                            <view
+                                v-else-if="detailAiLoading"
+                                class="detail-ai-loading"
+                            >
+                                <view class="loading-spinner"></view>
+                                <text>AI 生成中...</text>
                             </view>
                         </view>
-                    </view>
+
+                        <!-- 底部安全区 -->
+                        <view
+                            :style="{ height: safeAreaInfo.bottom + 20 + 'px' }"
+                        ></view>
+                    </scroll-view>
                 </view>
-
-                <!-- 加载更多 -->
-                <view v-if="loading && wordList.length" class="loading-more">
-                    <view class="loading-spinner"></view>
-                    <text>加载中...</text>
-                </view>
-                <view v-else-if="!hasMore && wordList.length" class="no-more">
-                    <text>— 没有更多了 —</text>
-                </view>
-            </view>
-        </scroll-view>
-
-        <!-- 选择模式底部操作栏 -->
-        <view v-if="isSelectMode" class="select-bottom-bar" :style="{ paddingBottom: safeAreaInfo.bottom + 'px' }">
-            <view class="select-bar-inner">
-                <view class="select-all-btn" @click="toggleSelectAll">
-                    <t-icon
-                        :name="isAllSelected ? 'check-circle-filled' : 'circle'"
-                        size="40rpx"
-                        :color="isAllSelected ? 'var(--app-brand)' : 'var(--app-text-placeholder)'"
-                    ></t-icon>
-                    <text class="select-all-text">全选</text>
-                </view>
-                <view
-                    class="delete-btn"
-                    :class="{ 'delete-btn-disabled': selectedIds.length === 0 || deleting }"
-                    @click="handleBatchDelete"
-                >
-                    <t-icon name="delete" size="28rpx" color="var(--app-bg-container)"></t-icon>
-                    <text class="delete-btn-text">删除 ({{ selectedIds.length }})</text>
-                </view>
-            </view>
-        </view>
-
-        <!-- 删除确认弹窗 -->
-        <t-dialog
-            :visible="showDeleteDialog"
-            title="确认删除"
-            :content="deleteDialogContent"
-            :confirm-btn="{ content: '删除', theme: 'danger' }"
-            cancel-btn="取消"
-            :show-overlay="true"
-            :z-index="12000"
-            @confirm="confirmDelete"
-            @cancel="showDeleteDialog = false"
-            @close="showDeleteDialog = false"
-        />
-
-        <!-- 单词详情弹窗（可拖拽） -->
-        <view v-if="showDetailPopup" class="detail-overlay" @click.self="closeDetailPopup">
-            <view
-                class="detail-sheet"
-                :class="{ 'detail-sheet-dragging': isDragging }"
-                :style="{ height: detailSheetHeight + 'vh' }"
-            >
-                <!-- 拖拽手柄 -->
-                <view class="detail-handle" @touchstart="onHandleTouchStart" @touchmove.prevent="onHandleTouchMove" @touchend="onHandleTouchEnd">
-                    <view class="detail-handle-bar"></view>
-                </view>
-
-                <!-- 关闭按钮 -->
-                <view class="detail-header">
-                    <view></view>
-                    <t-icon name="close" size="40rpx" color="var(--app-text-secondary)" @click="closeDetailPopup"></t-icon>
-                </view>
-
-                <!-- 可滚动内容区 -->
-                <scroll-view class="detail-scroll" scroll-y>
-                    <!-- 基本信息 -->
-                    <view v-if="detailWord" class="detail-basic">
-                        <view class="detail-word-header">
-                            <text class="detail-word-text">{{ detailWord.word }}</text>
-                            <text v-if="detailWord.phonetic" class="detail-phonetic">{{ detailWord.phonetic }}</text>
-                        </view>
-                        <text class="detail-meaning">{{ detailWord.meaning || '暂无释义' }}</text>
-                        <view v-if="detailWord.example" class="detail-example">
-                            <text class="detail-example-label">例句</text>
-                            <view class="detail-example-text">
-                                <template v-for="(part, pi) in highlightWord(detailWord.example, detailWord.word)" :key="pi">
-                                    <text v-if="part.highlight" class="example-highlight">{{ part.text }}</text>
-                                    <text v-else>{{ part.text }}</text>
-                                </template>
-                            </view>
-                        </view>
-                    </view>
-
-                    <!-- AI 扩展学习 -->
-                    <view class="detail-ai-section">
-                        <view class="detail-ai-title">
-                            <t-icon name="lightbulb" size="32rpx" color="var(--app-warning)"></t-icon>
-                            <text>AI 扩展学习</text>
-                        </view>
-                        <view class="detail-ai-btns">
-                            <view class="detail-ai-btn" @click="fetchDetailAi('mnemonic')">
-                                <text>💡 助记法</text>
-                            </view>
-                            <view class="detail-ai-btn" @click="fetchDetailAi('root')">
-                                <text>📖 词根</text>
-                            </view>
-                            <view class="detail-ai-btn" @click="fetchDetailAi('synonyms')">
-                                <text>🔗 近义词</text>
-                            </view>
-                            <view class="detail-ai-btn" @click="fetchDetailAi('similar')">
-                                <text>✏️ 形近词</text>
-                            </view>
-                        </view>
-                        <view v-if="detailAiContent" class="detail-ai-result">
-                            <ContentRenderer :content="detailAiContent" :isMarkdown="true" />
-                        </view>
-                        <view v-else-if="detailAiLoading" class="detail-ai-loading">
-                            <view class="loading-spinner"></view>
-                            <text>AI 生成中...</text>
-                        </view>
-                    </view>
-
-                    <!-- 底部安全区 -->
-                    <view :style="{ height: safeAreaInfo.bottom + 20 + 'px' }"></view>
-                </scroll-view>
             </view>
         </view>
-    </view>
     </ThemeProvider>
 </template>
 
@@ -366,7 +626,10 @@ const showDeleteDialog = ref(false);
 const deleteTarget = ref(null);
 
 const isAllSelected = computed(() => {
-    return wordList.value.length > 0 && selectedIds.value.length === wordList.value.length;
+    return (
+        wordList.value.length > 0 &&
+        selectedIds.value.length === wordList.value.length
+    );
 });
 
 const deleteDialogContent = computed(() => {
@@ -614,19 +877,36 @@ const confirmDelete = async () => {
     deleting.value = true;
     try {
         if (deleteTarget.value) {
-            const res = await deleteWordAPI({ id: deleteTarget.value._id, wordBookId: bookId.value });
+            const res = await deleteWordAPI({
+                id: deleteTarget.value._id,
+                wordBookId: bookId.value,
+            });
             if (res.code !== 200) throw new Error(res.message);
-            wordList.value = wordList.value.filter((w) => w._id !== deleteTarget.value._id);
+            wordList.value = wordList.value.filter(
+                (w) => w._id !== deleteTarget.value._id,
+            );
             totalCount.value = Math.max(0, totalCount.value - 1);
-            if (deleteTarget.value.isMarked) markedCount.value = Math.max(0, markedCount.value - 1);
+            if (deleteTarget.value.isMarked)
+                markedCount.value = Math.max(0, markedCount.value - 1);
             uni.showToast({ title: "删除成功", icon: "success" });
         } else {
-            const res = await batchDeleteWordsAPI({ ids: selectedIds.value, wordBookId: bookId.value });
+            const res = await batchDeleteWordsAPI({
+                ids: selectedIds.value,
+                wordBookId: bookId.value,
+            });
             if (res.code !== 200) throw new Error(res.message);
             const deletedIds = new Set(selectedIds.value);
-            wordList.value = wordList.value.filter((w) => !deletedIds.has(w._id));
-            totalCount.value = Math.max(0, totalCount.value - (res.data?.deletedCount || 0));
-            uni.showToast({ title: `已删除 ${res.data?.deletedCount || 0} 个单词`, icon: "success" });
+            wordList.value = wordList.value.filter(
+                (w) => !deletedIds.has(w._id),
+            );
+            totalCount.value = Math.max(
+                0,
+                totalCount.value - (res.data?.deletedCount || 0),
+            );
+            uni.showToast({
+                title: `已删除 ${res.data?.deletedCount || 0} 个单词`,
+                icon: "success",
+            });
             exitSelectMode();
         }
         showDeleteDialog.value = false;
@@ -641,13 +921,19 @@ const confirmDelete = async () => {
 // ---- 例句高亮 ----
 const highlightWord = (sentence, word) => {
     if (!sentence || !word) return [{ text: sentence || "", highlight: false }];
-    const regex = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\w*)`, "gi");
+    const regex = new RegExp(
+        `(${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\w*)`,
+        "gi",
+    );
     const parts = [];
     let lastIndex = 0;
     let match;
     while ((match = regex.exec(sentence)) !== null) {
         if (match.index > lastIndex) {
-            parts.push({ text: sentence.slice(lastIndex, match.index), highlight: false });
+            parts.push({
+                text: sentence.slice(lastIndex, match.index),
+                highlight: false,
+            });
         }
         parts.push({ text: match[0], highlight: true });
         lastIndex = regex.lastIndex;
@@ -718,11 +1004,37 @@ onBeforeUnmount(() => {
     z-index: 30;
 }
 
-.custom-navbar { padding-left: 18rpx; padding-right: 18rpx; box-sizing: border-box; }
-.nav-row { display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; }
-.nav-left { width: 80rpx; flex-shrink: 0; display: flex; align-items: center; }
-.nav-title { flex: 1; text-align: center; font-size: calc(34rpx * var(--app-font-scale, 1)); color: var(--app-text-primary); font-weight: 700; padding: 0 12rpx; }
-.nav-right { flex-shrink: 0; display: flex; justify-content: flex-end; }
+.custom-navbar {
+    padding-left: 18rpx;
+    padding-right: 18rpx;
+    box-sizing: border-box;
+}
+.nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+.nav-left {
+    width: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
+    color: var(--app-text-primary);
+    font-weight: 700;
+    padding: 0 12rpx;
+}
+.nav-right {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+}
 
 .nav-actions {
     display: flex;
@@ -730,11 +1042,18 @@ onBeforeUnmount(() => {
 }
 
 .nav-action {
-    width: 60rpx; height: 60rpx; border-radius: 30rpx;
-    border: 2rpx solid var(--app-border); background: var(--app-bg-container);
-    display: flex; align-items: center; justify-content: center;
+    width: 60rpx;
+    height: 60rpx;
+    border-radius: 30rpx;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.nav-action:active { transform: scale(0.93); }
+.nav-action:active {
+    transform: scale(0.93);
+}
 
 /* 筛选区 */
 .filter-section {
@@ -777,7 +1096,9 @@ onBeforeUnmount(() => {
     border-radius: 999rpx;
     background: var(--app-bg-secondary);
     border: 1rpx solid transparent;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .filter-tag text {
@@ -797,9 +1118,14 @@ onBeforeUnmount(() => {
 }
 
 /* 列表 */
-.main-scroll { flex: 1; min-height: 0; }
+.main-scroll {
+    flex: 1;
+    min-height: 0;
+}
 
-.word-list { padding: 16rpx 24rpx; }
+.word-list {
+    padding: 16rpx 24rpx;
+}
 
 .word-card {
     position: relative;
@@ -808,10 +1134,15 @@ onBeforeUnmount(() => {
     border: 2rpx solid var(--app-border);
     padding: 24rpx;
     margin-bottom: 16rpx;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
 }
 
-.word-card:active { transform: scale(0.99); }
+.word-card:active {
+    transform: scale(0.99);
+}
 
 .word-card.card-selected {
     border-color: var(--app-brand);
@@ -819,18 +1150,33 @@ onBeforeUnmount(() => {
 }
 
 .card-checkbox {
-    position: absolute; top: 16rpx; right: 16rpx; z-index: 10;
-    width: 48rpx; height: 48rpx;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute;
+    top: 16rpx;
+    right: 16rpx;
+    z-index: 10;
+    width: 48rpx;
+    height: 48rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mark-btn {
-    position: absolute; top: 16rpx; right: 16rpx; z-index: 5;
-    width: 56rpx; height: 56rpx;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute;
+    top: 16rpx;
+    right: 16rpx;
+    z-index: 5;
+    width: 56rpx;
+    height: 56rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.word-main { position: relative; z-index: 1; }
+.word-main {
+    position: relative;
+    z-index: 1;
+}
 
 .word-header {
     display: flex;
@@ -876,8 +1222,14 @@ onBeforeUnmount(() => {
 }
 
 @keyframes fadeSlideDown {
-    from { opacity: 0; transform: translateY(-8rpx); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-8rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .expand-meaning {
@@ -891,7 +1243,9 @@ onBeforeUnmount(() => {
     line-height: 1.5;
 }
 
-.example-box { margin-bottom: 12rpx; }
+.example-box {
+    margin-bottom: 12rpx;
+}
 
 .example-label {
     font-size: calc(22rpx * var(--app-font-scale, 1));
@@ -933,8 +1287,14 @@ onBeforeUnmount(() => {
     color: var(--app-brand);
 }
 
-.action-row { display: flex; gap: 24rpx; align-items: center; }
-.action-btn-right { margin-left: auto; }
+.action-row {
+    display: flex;
+    gap: 24rpx;
+    align-items: center;
+}
+.action-btn-right {
+    margin-left: auto;
+}
 
 .action-btn {
     display: flex;
@@ -949,18 +1309,31 @@ onBeforeUnmount(() => {
 }
 
 /* 骨架屏 */
-.skeleton-card { pointer-events: none; }
-.skeleton-line { border-radius: 8rpx; }
+.skeleton-card {
+    pointer-events: none;
+}
+.skeleton-line {
+    border-radius: 8rpx;
+}
 
 .skeleton-shimmer {
-    background: linear-gradient(110deg, var(--app-bg-secondary) 8%, color-mix(in srgb, var(--app-bg-container) 95%, transparent) 18%, var(--app-bg-secondary) 33%);
+    background: linear-gradient(
+        110deg,
+        var(--app-bg-secondary) 8%,
+        color-mix(in srgb, var(--app-bg-container) 95%, transparent) 18%,
+        var(--app-bg-secondary) 33%
+    );
     background-size: 220% 100%;
     animation: skeleton-shimmer 1.2s ease-in-out infinite;
 }
 
 @keyframes skeleton-shimmer {
-    from { background-position: 100% 0; }
-    to { background-position: -100% 0; }
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: -100% 0;
+    }
 }
 
 /* 空状态 */
@@ -1009,16 +1382,24 @@ onBeforeUnmount(() => {
 }
 
 .loading-spinner {
-    width: 32rpx; height: 32rpx;
+    width: 32rpx;
+    height: 32rpx;
     border: 3rpx solid var(--app-border);
     border-top-color: var(--app-brand);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 
-.no-more { text-align: center; padding: 24rpx; }
+.no-more {
+    text-align: center;
+    padding: 24rpx;
+}
 
 .no-more text {
     font-size: calc(24rpx * var(--app-font-scale, 1));
@@ -1066,14 +1447,26 @@ onBeforeUnmount(() => {
     height: 76rpx;
     padding: 0 36rpx;
     border-radius: 38rpx;
-    background: linear-gradient(135deg, var(--app-danger) 0%, color-mix(in srgb, var(--app-danger) 80%, #000) 100%);
-    box-shadow: 0 6rpx 20rpx color-mix(in srgb, var(--app-danger) 30%, transparent);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(
+        135deg,
+        var(--app-danger) 0%,
+        color-mix(in srgb, var(--app-danger) 80%, #000) 100%
+    );
+    box-shadow: 0 6rpx 20rpx
+        color-mix(in srgb, var(--app-danger) 30%, transparent);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
     flex-shrink: 0;
 }
 
-.delete-btn:active { transform: scale(0.96); }
-.delete-btn-disabled { opacity: 0.45; pointer-events: none; }
+.delete-btn:active {
+    transform: scale(0.96);
+}
+.delete-btn-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
 
 .delete-btn-text {
     font-size: calc(28rpx * var(--app-font-scale, 1));

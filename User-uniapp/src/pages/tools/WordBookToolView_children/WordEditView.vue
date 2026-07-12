@@ -1,252 +1,381 @@
 <template>
     <ThemeProvider>
-    <view class="page">
-        <!-- 导航栏 -->
-        <view class="top-wrapper">
-            <view class="custom-navbar" :style="customNavbarStyle">
-                <view class="nav-row" :style="navRowStyle">
-                    <view class="nav-left" @click="handleBack">
-                        <t-icon name="chevron-left" size="44rpx" color="var(--app-text-primary)"></t-icon>
-                    </view>
-                    <text class="nav-title">{{ isEditMode ? '编辑单词' : '添加单词' }}</text>
-                    <view class="nav-right">
-                        <view class="save-btn" :class="{ 'save-btn-disabled': submitting }" @click="handleSave">
-                            <text>保存</text>
+        <view class="page">
+            <!-- 导航栏 -->
+            <view class="top-wrapper">
+                <view class="custom-navbar" :style="customNavbarStyle">
+                    <view class="nav-row" :style="navRowStyle">
+                        <view class="nav-left" @click="handleBack">
+                            <t-icon
+                                name="chevron-left"
+                                size="44rpx"
+                                color="var(--app-text-primary)"
+                            ></t-icon>
+                        </view>
+                        <text class="nav-title">{{
+                            isEditMode ? "编辑单词" : "添加单词"
+                        }}</text>
+                        <view class="nav-right">
+                            <view
+                                class="save-btn"
+                                :class="{ 'save-btn-disabled': submitting }"
+                                @click="handleSave"
+                            >
+                                <text>保存</text>
+                            </view>
                         </view>
                     </view>
                 </view>
             </view>
-        </view>
 
-        <scroll-view class="main-scroll" scroll-y>
-            <view class="form-container">
-                <!-- 单词输入 + AI 填充 -->
-                <view class="form-item">
-                    <view class="form-label">
-                        单词
-                        <text class="required">*</text>
+            <scroll-view class="main-scroll" scroll-y>
+                <view class="form-container">
+                    <!-- 单词输入 + AI 填充 -->
+                    <view class="form-item">
+                        <view class="form-label">
+                            单词
+                            <text class="required">*</text>
+                        </view>
+                        <view class="word-input-row">
+                            <view
+                                class="input-wrapper word-input-main"
+                                :class="{ 'has-error': errors.word }"
+                            >
+                                <input
+                                    class="form-input"
+                                    v-model="form.word"
+                                    placeholder="输入英文单词"
+                                    :maxlength="60"
+                                    @input="errors.word = ''"
+                                    @confirm="handleAiLookup"
+                                />
+                            </view>
+                            <view
+                                class="ai-fill-btn"
+                                :class="{ 'ai-fill-btn-loading': aiLoading }"
+                                @click="handleAiLookup"
+                            >
+                                <t-icon
+                                    v-if="!aiLoading"
+                                    name="flash"
+                                    size="28rpx"
+                                    color="#fff"
+                                ></t-icon>
+                                <view v-else class="ai-spinner"></view>
+                                <text>{{
+                                    aiLoading ? "查询中" : "AI 填充"
+                                }}</text>
+                            </view>
+                        </view>
+                        <view v-if="errors.word" class="form-error">
+                            <t-icon
+                                name="info-circle"
+                                size="28rpx"
+                                color="var(--app-danger)"
+                            ></t-icon>
+                            <text>{{ errors.word }}</text>
+                        </view>
                     </view>
-                    <view class="word-input-row">
-                        <view class="input-wrapper word-input-main" :class="{ 'has-error': errors.word }">
+
+                    <view class="form-item">
+                        <view class="form-label">音标</view>
+                        <view class="input-wrapper">
                             <input
                                 class="form-input"
-                                v-model="form.word"
-                                placeholder="输入英文单词"
+                                v-model="form.phonetic"
+                                placeholder="如 /əˈbændən/"
                                 :maxlength="60"
-                                @input="errors.word = ''"
-                                @confirm="handleAiLookup"
                             />
                         </view>
+                    </view>
+
+                    <view class="form-item">
+                        <view class="form-label">
+                            释义
+                            <text class="required">*</text>
+                        </view>
                         <view
-                            class="ai-fill-btn"
-                            :class="{ 'ai-fill-btn-loading': aiLoading }"
-                            @click="handleAiLookup"
+                            class="input-wrapper"
+                            :class="{ 'has-error': errors.meaning }"
                         >
-                            <t-icon v-if="!aiLoading" name="flash" size="28rpx" color="#fff"></t-icon>
-                            <view v-else class="ai-spinner"></view>
-                            <text>{{ aiLoading ? '查询中' : 'AI 填充' }}</text>
+                            <input
+                                class="form-input"
+                                v-model="form.meaning"
+                                placeholder="请输入中文释义"
+                                :maxlength="200"
+                                @input="errors.meaning = ''"
+                            />
+                        </view>
+                        <view v-if="errors.meaning" class="form-error">
+                            <t-icon
+                                name="info-circle"
+                                size="28rpx"
+                                color="var(--app-danger)"
+                            ></t-icon>
+                            <text>{{ errors.meaning }}</text>
                         </view>
                     </view>
-                    <view v-if="errors.word" class="form-error">
-                        <t-icon name="info-circle" size="28rpx" color="var(--app-danger)"></t-icon>
-                        <text>{{ errors.word }}</text>
-                    </view>
-                </view>
 
-                <view class="form-item">
-                    <view class="form-label">音标</view>
-                    <view class="input-wrapper">
-                        <input
-                            class="form-input"
-                            v-model="form.phonetic"
-                            placeholder="如 /əˈbændən/"
-                            :maxlength="60"
-                        />
-                    </view>
-                </view>
-
-                <view class="form-item">
-                    <view class="form-label">
-                        释义
-                        <text class="required">*</text>
-                    </view>
-                    <view class="input-wrapper" :class="{ 'has-error': errors.meaning }">
-                        <input
-                            class="form-input"
-                            v-model="form.meaning"
-                            placeholder="请输入中文释义"
-                            :maxlength="200"
-                            @input="errors.meaning = ''"
-                        />
-                    </view>
-                    <view v-if="errors.meaning" class="form-error">
-                        <t-icon name="info-circle" size="28rpx" color="var(--app-danger)"></t-icon>
-                        <text>{{ errors.meaning }}</text>
-                    </view>
-                </view>
-
-                <!-- 例句区域 -->
-                <view class="form-item">
-                    <view class="form-label">例句</view>
-                    <view class="textarea-wrapper">
-                        <textarea
-                            class="form-textarea"
-                            v-model="form.example"
-                            placeholder="请输入或从知识库检索例句"
-                            :maxlength="500"
-                            :auto-height="true"
-                            :max-height="200"
-                        ></textarea>
-                    </view>
-                </view>
-
-                <!-- 知识库检索例句 -->
-                <view class="kb-section">
-                    <view class="kb-header" @click="showKbPanel = !showKbPanel">
-                        <view class="kb-title-row">
-                            <t-icon name="book" size="32rpx" color="var(--app-brand)"></t-icon>
-                            <text class="kb-title">从知识库检索例句</text>
+                    <!-- 例句区域 -->
+                    <view class="form-item">
+                        <view class="form-label">例句</view>
+                        <view class="textarea-wrapper">
+                            <textarea
+                                class="form-textarea"
+                                v-model="form.example"
+                                placeholder="请输入或从知识库检索例句"
+                                :maxlength="500"
+                                :auto-height="true"
+                                :max-height="200"
+                            ></textarea>
                         </view>
-                        <t-icon
-                            :name="showKbPanel ? 'chevron-up' : 'chevron-down'"
-                            size="32rpx"
-                            color="var(--app-text-secondary)"
-                        ></t-icon>
                     </view>
 
-                    <view v-if="showKbPanel" class="kb-body">
-                        <!-- 知识库选择 -->
-                        <view class="kb-select-row">
-                            <text class="kb-select-label">知识库：</text>
-                            <picker :range="kbNames" @change="handleKbChange">
-                                <view class="kb-picker">
-                                    <text class="kb-picker-text">{{ selectedKbName || '请选择知识库' }}</text>
-                                    <t-icon name="chevron-down" size="28rpx" color="var(--app-text-secondary)"></t-icon>
-                                </view>
-                            </picker>
-                        </view>
-
-                        <!-- 检索按钮 -->
+                    <!-- 知识库检索例句 -->
+                    <view class="kb-section">
                         <view
-                            class="kb-search-btn"
-                            :class="{ 'kb-search-btn-disabled': !selectedKbId || kbSearching }"
-                            @click="handleKbSearch"
+                            class="kb-header"
+                            @click="showKbPanel = !showKbPanel"
                         >
-                            <t-icon v-if="!kbSearching" name="search" size="28rpx" color="#fff"></t-icon>
-                            <view v-else class="ai-spinner"></view>
-                            <text>{{ kbSearching ? '检索中...' : '检索例句' }}</text>
+                            <view class="kb-title-row">
+                                <t-icon
+                                    name="book"
+                                    size="32rpx"
+                                    color="var(--app-brand)"
+                                ></t-icon>
+                                <text class="kb-title">从知识库检索例句</text>
+                            </view>
+                            <t-icon
+                                :name="
+                                    showKbPanel ? 'chevron-up' : 'chevron-down'
+                                "
+                                size="32rpx"
+                                color="var(--app-text-secondary)"
+                            ></t-icon>
                         </view>
 
-                        <!-- 检索结果 -->
-                        <view v-if="kbResults.length" class="kb-results">
-                            <text class="kb-results-title">检索结果（点击添加为例句）</text>
+                        <view v-if="showKbPanel" class="kb-body">
+                            <!-- 知识库选择 -->
+                            <view class="kb-select-row">
+                                <text class="kb-select-label">知识库：</text>
+                                <picker
+                                    :range="kbNames"
+                                    @change="handleKbChange"
+                                >
+                                    <view class="kb-picker">
+                                        <text class="kb-picker-text">{{
+                                            selectedKbName || "请选择知识库"
+                                        }}</text>
+                                        <t-icon
+                                            name="chevron-down"
+                                            size="28rpx"
+                                            color="var(--app-text-secondary)"
+                                        ></t-icon>
+                                    </view>
+                                </picker>
+                            </view>
+
+                            <!-- 检索按钮 -->
                             <view
-                                v-for="(result, idx) in kbResults"
-                                :key="idx"
-                                class="kb-result-item"
-                                :class="{ 'kb-result-selected': selectedExamples.has(idx) }"
-                                @click="toggleExampleSelection(idx)"
+                                class="kb-search-btn"
+                                :class="{
+                                    'kb-search-btn-disabled':
+                                        !selectedKbId || kbSearching,
+                                }"
+                                @click="handleKbSearch"
                             >
-                                <view class="kb-result-check">
-                                    <t-icon
-                                        :name="selectedExamples.has(idx) ? 'check-circle-filled' : 'circle'"
-                                        size="32rpx"
-                                        :color="selectedExamples.has(idx) ? 'var(--app-brand)' : 'var(--app-text-placeholder)'"
-                                    ></t-icon>
+                                <t-icon
+                                    v-if="!kbSearching"
+                                    name="search"
+                                    size="28rpx"
+                                    color="#fff"
+                                ></t-icon>
+                                <view v-else class="ai-spinner"></view>
+                                <text>{{
+                                    kbSearching ? "检索中..." : "检索例句"
+                                }}</text>
+                            </view>
+
+                            <!-- 检索结果 -->
+                            <view v-if="kbResults.length" class="kb-results">
+                                <text class="kb-results-title"
+                                    >检索结果（点击添加为例句）</text
+                                >
+                                <view
+                                    v-for="(result, idx) in kbResults"
+                                    :key="idx"
+                                    class="kb-result-item"
+                                    :class="{
+                                        'kb-result-selected':
+                                            selectedExamples.has(idx),
+                                    }"
+                                    @click="toggleExampleSelection(idx)"
+                                >
+                                    <view class="kb-result-check">
+                                        <t-icon
+                                            :name="
+                                                selectedExamples.has(idx)
+                                                    ? 'check-circle-filled'
+                                                    : 'circle'
+                                            "
+                                            size="32rpx"
+                                            :color="
+                                                selectedExamples.has(idx)
+                                                    ? 'var(--app-brand)'
+                                                    : 'var(--app-text-placeholder)'
+                                            "
+                                        ></t-icon>
+                                    </view>
+                                    <view class="kb-result-content">
+                                        <text class="kb-result-text">{{
+                                            result.content
+                                        }}</text>
+                                        <text class="kb-result-source"
+                                            >来源：{{ result.source }}</text
+                                        >
+                                    </view>
                                 </view>
-                                <view class="kb-result-content">
-                                    <text class="kb-result-text">{{ result.content }}</text>
-                                    <text class="kb-result-source">来源：{{ result.source }}</text>
+                                <view
+                                    class="kb-apply-btn"
+                                    @click="applySelectedExamples"
+                                >
+                                    <text>添加选中的例句</text>
                                 </view>
                             </view>
-                            <view class="kb-apply-btn" @click="applySelectedExamples">
-                                <text>添加选中的例句</text>
+
+                            <view
+                                v-else-if="kbSearched && !kbSearching"
+                                class="kb-empty"
+                            >
+                                <text>未找到相关例句，试试其他知识库</text>
                             </view>
                         </view>
+                    </view>
 
-                        <view v-else-if="kbSearched && !kbSearching" class="kb-empty">
-                            <text>未找到相关例句，试试其他知识库</text>
+                    <!-- 标签 -->
+                    <view class="form-item">
+                        <view class="form-label">标签</view>
+                        <view class="tags-editor">
+                            <view
+                                v-for="(tag, idx) in form.tags"
+                                :key="idx"
+                                class="tag-chip"
+                            >
+                                <text>{{ tag }}</text>
+                                <t-icon
+                                    name="close"
+                                    size="28rpx"
+                                    color="var(--app-text-secondary)"
+                                    @click="removeTag(idx)"
+                                ></t-icon>
+                            </view>
+                            <view
+                                v-if="!showTagInput"
+                                class="tag-add-btn"
+                                @click="showTagInput = true"
+                            >
+                                <t-icon
+                                    name="add"
+                                    size="28rpx"
+                                    color="var(--app-brand)"
+                                ></t-icon>
+                                <text>添加</text>
+                            </view>
+                            <input
+                                v-else
+                                class="tag-input"
+                                v-model="newTag"
+                                placeholder="输入标签"
+                                :maxlength="20"
+                                @confirm="addTag"
+                                @blur="addTag"
+                            />
+                        </view>
+                        <view class="preset-tags">
+                            <view
+                                v-for="tag in presetTags"
+                                :key="tag"
+                                class="preset-tag"
+                                :class="{ active: form.tags.includes(tag) }"
+                                @click="togglePresetTag(tag)"
+                            >
+                                <text>{{ tag }}</text>
+                            </view>
                         </view>
                     </view>
-                </view>
 
-                <!-- 标签 -->
-                <view class="form-item">
-                    <view class="form-label">标签</view>
-                    <view class="tags-editor">
-                        <view v-for="(tag, idx) in form.tags" :key="idx" class="tag-chip">
-                            <text>{{ tag }}</text>
-                            <t-icon name="close" size="28rpx" color="var(--app-text-secondary)" @click="removeTag(idx)"></t-icon>
-                        </view>
-                        <view v-if="!showTagInput" class="tag-add-btn" @click="showTagInput = true">
-                            <t-icon name="add" size="28rpx" color="var(--app-brand)"></t-icon>
-                            <text>添加</text>
-                        </view>
-                        <input
-                            v-else
-                            class="tag-input"
-                            v-model="newTag"
-                            placeholder="输入标签"
-                            :maxlength="20"
-                            @confirm="addTag"
-                            @blur="addTag"
-                        />
-                    </view>
-                    <view class="preset-tags">
+                    <!-- AI 扩展信息（仅编辑模式且已有单词时显示） -->
+                    <view v-if="form.word" class="ai-detail-section">
                         <view
-                            v-for="tag in presetTags"
-                            :key="tag"
-                            class="preset-tag"
-                            :class="{ active: form.tags.includes(tag) }"
-                            @click="togglePresetTag(tag)"
+                            class="ai-detail-header"
+                            @click="showAiDetail = !showAiDetail"
                         >
-                            <text>{{ tag }}</text>
+                            <view class="ai-detail-title-row">
+                                <t-icon
+                                    name="lightbulb"
+                                    size="32rpx"
+                                    color="var(--app-warning)"
+                                ></t-icon>
+                                <text class="ai-detail-title">AI 扩展学习</text>
+                            </view>
+                            <t-icon
+                                :name="
+                                    showAiDetail ? 'chevron-up' : 'chevron-down'
+                                "
+                                size="32rpx"
+                                color="var(--app-text-secondary)"
+                            ></t-icon>
+                        </view>
+
+                        <view v-if="showAiDetail" class="ai-detail-body">
+                            <view class="ai-detail-btns">
+                                <view
+                                    class="ai-detail-btn"
+                                    @click="fetchAiDetail('mnemonic')"
+                                >
+                                    <text>💡 助记法</text>
+                                </view>
+                                <view
+                                    class="ai-detail-btn"
+                                    @click="fetchAiDetail('root')"
+                                >
+                                    <text>📖 词根</text>
+                                </view>
+                                <view
+                                    class="ai-detail-btn"
+                                    @click="fetchAiDetail('synonyms')"
+                                >
+                                    <text>🔗 近义词</text>
+                                </view>
+                                <view
+                                    class="ai-detail-btn"
+                                    @click="fetchAiDetail('similar')"
+                                >
+                                    <text>✏️ 形近词</text>
+                                </view>
+                            </view>
+
+                            <view
+                                v-if="aiDetailContent"
+                                class="ai-detail-content"
+                            >
+                                <ContentRenderer
+                                    :content="aiDetailContent"
+                                    :isMarkdown="true"
+                                />
+                            </view>
+                            <view
+                                v-else-if="aiDetailLoading"
+                                class="ai-detail-loading"
+                            >
+                                <view class="ai-spinner"></view>
+                                <text>AI 生成中...</text>
+                            </view>
                         </view>
                     </view>
                 </view>
-
-                <!-- AI 扩展信息（仅编辑模式且已有单词时显示） -->
-                <view v-if="form.word" class="ai-detail-section">
-                    <view class="ai-detail-header" @click="showAiDetail = !showAiDetail">
-                        <view class="ai-detail-title-row">
-                            <t-icon name="lightbulb" size="32rpx" color="var(--app-warning)"></t-icon>
-                            <text class="ai-detail-title">AI 扩展学习</text>
-                        </view>
-                        <t-icon
-                            :name="showAiDetail ? 'chevron-up' : 'chevron-down'"
-                            size="32rpx"
-                            color="var(--app-text-secondary)"
-                        ></t-icon>
-                    </view>
-
-                    <view v-if="showAiDetail" class="ai-detail-body">
-                        <view class="ai-detail-btns">
-                            <view class="ai-detail-btn" @click="fetchAiDetail('mnemonic')">
-                                <text>💡 助记法</text>
-                            </view>
-                            <view class="ai-detail-btn" @click="fetchAiDetail('root')">
-                                <text>📖 词根</text>
-                            </view>
-                            <view class="ai-detail-btn" @click="fetchAiDetail('synonyms')">
-                                <text>🔗 近义词</text>
-                            </view>
-                            <view class="ai-detail-btn" @click="fetchAiDetail('similar')">
-                                <text>✏️ 形近词</text>
-                            </view>
-                        </view>
-
-                        <view v-if="aiDetailContent" class="ai-detail-content">
-                            <ContentRenderer :content="aiDetailContent" :isMarkdown="true" />
-                        </view>
-                        <view v-else-if="aiDetailLoading" class="ai-detail-loading">
-                            <view class="ai-spinner"></view>
-                            <text>AI 生成中...</text>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </scroll-view>
-    </view>
+            </scroll-view>
+        </view>
     </ThemeProvider>
 </template>
 
@@ -290,7 +419,17 @@ const submitting = ref(false);
 // ---- 标签 ----
 const showTagInput = ref(false);
 const newTag = ref("");
-const presetTags = ["CET4", "CET6", "考研", "雅思", "托福","Text1","Text2","Text3","Text4"];
+const presetTags = [
+    "CET4",
+    "CET6",
+    "考研",
+    "雅思",
+    "托福",
+    "Text1",
+    "Text2",
+    "Text3",
+    "Text4",
+];
 
 // ---- AI 智能填充 ----
 const aiLoading = ref(false);
@@ -324,7 +463,8 @@ const handleAiLookup = async () => {
         const data = res.data || {};
         if (data.phonetic) form.value.phonetic = data.phonetic;
         if (data.meaning) form.value.meaning = data.meaning;
-        if (data.example && !form.value.example) form.value.example = data.example;
+        if (data.example && !form.value.example)
+            form.value.example = data.example;
 
         errors.value = { word: "", meaning: "" };
         uni.showToast({ title: "填充成功", icon: "success" });
@@ -374,9 +514,15 @@ const handleKbSearch = async () => {
     selectedExamples.value = new Set();
 
     try {
-        const res = await searchExamplesAPI({ word, kbId: selectedKbId.value, topK: 5 });
+        const res = await searchExamplesAPI({
+            word,
+            kbId: selectedKbId.value,
+            topK: 5,
+        });
         if (res.code !== 200) throw new Error(res.message);
-        kbResults.value = (res.data?.examples || []).filter((r) => r.content && r.content.length > 10);
+        kbResults.value = (res.data?.examples || []).filter(
+            (r) => r.content && r.content.length > 10,
+        );
         kbSearched.value = true;
     } catch (error) {
         uni.showToast({ title: error?.message || "检索失败", icon: "none" });
@@ -413,7 +559,10 @@ const applySelectedExamples = () => {
     form.value.example = existing ? `${existing}\n${newExamples}` : newExamples;
 
     selectedExamples.value = new Set();
-    uni.showToast({ title: `已添加 ${examples.length} 条例句`, icon: "success" });
+    uni.showToast({
+        title: `已添加 ${examples.length} 条例句`,
+        icon: "success",
+    });
 };
 
 // ---- 标签 ----
@@ -527,7 +676,13 @@ const handleSave = async () => {
             setTimeout(() => uni.navigateBack(), 500);
         } else {
             // 创建模式：重置表单继续添加
-            form.value = { word: "", phonetic: "", meaning: "", example: "", tags: [] };
+            form.value = {
+                word: "",
+                phonetic: "",
+                meaning: "",
+                example: "",
+                tags: [],
+            };
         }
     } catch (error) {
         uni.showToast({ title: error?.message || "保存失败", icon: "none" });
@@ -585,11 +740,37 @@ onLoad(async (options) => {
     z-index: 30;
 }
 
-.custom-navbar { padding-left: 18rpx; padding-right: 18rpx; box-sizing: border-box; }
-.nav-row { display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; }
-.nav-left { width: 80rpx; flex-shrink: 0; display: flex; align-items: center; }
-.nav-title { flex: 1; text-align: center; font-size: calc(34rpx * var(--app-font-scale, 1)); color: var(--app-text-primary); font-weight: 700; }
-.nav-right { width: 120rpx; flex-shrink: 0; display: flex; justify-content: flex-end; }
+.custom-navbar {
+    padding-left: 18rpx;
+    padding-right: 18rpx;
+    box-sizing: border-box;
+}
+.nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+.nav-left {
+    width: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: calc(34rpx * var(--app-font-scale, 1));
+    color: var(--app-text-primary);
+    font-weight: 700;
+}
+.nav-right {
+    width: 120rpx;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+}
 
 .save-btn {
     padding: 10rpx 24rpx;
@@ -603,11 +784,19 @@ onLoad(async (options) => {
     font-weight: 600;
 }
 
-.save-btn-disabled { opacity: 0.5; pointer-events: none; }
+.save-btn-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
-.main-scroll { flex: 1; min-height: 0; }
+.main-scroll {
+    flex: 1;
+    min-height: 0;
+}
 
-.form-container { padding: 24rpx; }
+.form-container {
+    padding: 24rpx;
+}
 
 /* 单词输入行 */
 .word-input-row {
@@ -626,7 +815,11 @@ onLoad(async (options) => {
     padding: 0 24rpx;
     height: 80rpx;
     border-radius: 14rpx;
-    background: linear-gradient(135deg, var(--app-brand) 0%, var(--app-brand-hover) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--app-brand) 0%,
+        var(--app-brand-hover) 100%
+    );
     flex-shrink: 0;
 }
 
@@ -637,7 +830,10 @@ onLoad(async (options) => {
     white-space: nowrap;
 }
 
-.ai-fill-btn-loading { opacity: 0.7; pointer-events: none; }
+.ai-fill-btn-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
 
 .ai-spinner {
     width: 28rpx;
@@ -648,10 +844,16 @@ onLoad(async (options) => {
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 /* 表单 */
-.form-item { margin-bottom: 28rpx; }
+.form-item {
+    margin-bottom: 28rpx;
+}
 
 .form-label {
     font-size: calc(28rpx * var(--app-font-scale, 1));
@@ -662,7 +864,10 @@ onLoad(async (options) => {
     align-items: center;
 }
 
-.required { color: var(--app-danger); margin-left: 6rpx; }
+.required {
+    color: var(--app-danger);
+    margin-left: 6rpx;
+}
 
 .input-wrapper {
     display: flex;
@@ -671,7 +876,9 @@ onLoad(async (options) => {
     border-radius: 14rpx;
     padding: 0 20rpx;
     border: 2rpx solid transparent;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .input-wrapper:focus-within {
@@ -682,7 +889,8 @@ onLoad(async (options) => {
 
 .input-wrapper.has-error {
     border-color: var(--app-danger);
-    box-shadow: 0 0 0 4rpx color-mix(in srgb, var(--app-danger) 10%, transparent);
+    box-shadow: 0 0 0 4rpx
+        color-mix(in srgb, var(--app-danger) 10%, transparent);
 }
 
 .form-input {
@@ -697,7 +905,9 @@ onLoad(async (options) => {
     border-radius: 14rpx;
     padding: 16rpx 20rpx;
     border: 2rpx solid transparent;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
 }
 
 .textarea-wrapper:focus-within {
@@ -799,7 +1009,10 @@ onLoad(async (options) => {
     font-weight: 600;
 }
 
-.kb-search-btn-disabled { opacity: 0.5; pointer-events: none; }
+.kb-search-btn-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 .kb-results {
     margin-top: 20rpx;
@@ -820,12 +1033,18 @@ onLoad(async (options) => {
     border-radius: 12rpx;
     margin-bottom: 10rpx;
     border: 2rpx solid transparent;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
 }
 
 .kb-result-item.kb-result-selected {
     border-color: var(--app-brand);
-    background: color-mix(in srgb, var(--app-brand) 5%, var(--app-bg-secondary));
+    background: color-mix(
+        in srgb,
+        var(--app-brand) 5%,
+        var(--app-bg-secondary)
+    );
 }
 
 .kb-result-check {
@@ -857,7 +1076,11 @@ onLoad(async (options) => {
     padding: 14rpx;
     text-align: center;
     border-radius: 12rpx;
-    background: color-mix(in srgb, var(--app-brand) 10%, var(--app-bg-container));
+    background: color-mix(
+        in srgb,
+        var(--app-brand) 10%,
+        var(--app-bg-container)
+    );
     border: 1rpx solid var(--app-brand);
 }
 
@@ -933,7 +1156,9 @@ onLoad(async (options) => {
     border-radius: 999rpx;
     background: var(--app-bg-secondary);
     border: 1rpx solid transparent;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .preset-tag text {

@@ -10,17 +10,28 @@ const WordListController = {
       const { uid } = req.user;
       const wordBookId = String(req.query.wordBookId || "").trim();
       const page = Math.max(1, Number(req.query.page) || 1);
-      const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 20));
+      const pageSize = Math.min(
+        50,
+        Math.max(1, Number(req.query.pageSize) || 20),
+      );
       const keyword = String(req.query.keyword || "").trim();
       const isMarked = req.query.isMarked;
       const tag = String(req.query.tag || "").trim();
 
       if (!isValidObjectId(wordBookId)) {
-        return res.status(200).send({ code: 400, message: "wordBookId格式不正确" });
+        return res
+          .status(200)
+          .send({ code: 400, message: "wordBookId格式不正确" });
       }
 
       const result = await WordListService.getWords({
-        uid, wordBookId, page, pageSize, keyword, isMarked, tag,
+        uid,
+        wordBookId,
+        page,
+        pageSize,
+        keyword,
+        isMarked,
+        tag,
       });
 
       if (!result.success) {
@@ -68,11 +79,19 @@ const WordListController = {
       const { wordBookId, word, phonetic, meaning, example, tags } = req.body;
 
       if (!isValidObjectId(wordBookId)) {
-        return res.status(200).send({ code: 400, message: "wordBookId格式不正确" });
+        return res
+          .status(200)
+          .send({ code: 400, message: "wordBookId格式不正确" });
       }
 
       const result = await WordListService.addWord({
-        uid, wordBookId, word, phonetic, meaning, example, tags,
+        uid,
+        wordBookId,
+        word,
+        phonetic,
+        meaning,
+        example,
+        tags,
       });
 
       if (!result.success) {
@@ -90,7 +109,13 @@ const WordListController = {
         metadata: { wordBookId, word: String(word || "").trim() },
       }).catch((e) => console.error("记录 添加单词 失败", e));
 
-      res.status(200).send({ code: 200, message: "添加成功", data: { _id: result.data?._id } });
+      res
+        .status(200)
+        .send({
+          code: 200,
+          message: "添加成功",
+          data: { _id: result.data?._id },
+        });
     } catch (error) {
       console.error("添加单词失败", error);
       res.status(200).send({ code: 500, message: "添加单词失败" });
@@ -107,7 +132,13 @@ const WordListController = {
       }
 
       const result = await WordListService.updateWord({
-        uid, id, word, phonetic, meaning, example, tags,
+        uid,
+        id,
+        word,
+        phonetic,
+        meaning,
+        example,
+        tags,
       });
 
       if (!result.success) {
@@ -155,14 +186,22 @@ const WordListController = {
       const { ids, wordBookId } = req.body;
 
       if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(200).send({ code: 400, message: "请选择要删除的单词" });
+        return res
+          .status(200)
+          .send({ code: 400, message: "请选择要删除的单词" });
       }
 
       if (!ids.every(isValidObjectId)) {
-        return res.status(200).send({ code: 400, message: "ids中存在格式不正确的id" });
+        return res
+          .status(200)
+          .send({ code: 400, message: "ids中存在格式不正确的id" });
       }
 
-      const result = await WordListService.batchDeleteWords({ uid, ids, wordBookId });
+      const result = await WordListService.batchDeleteWords({
+        uid,
+        ids,
+        wordBookId,
+      });
 
       if (!result.success) {
         return res.status(200).send({ code: 400, message: result.message });
@@ -210,10 +249,16 @@ const WordListController = {
       const { wordBookId, words } = req.body;
 
       if (!isValidObjectId(wordBookId)) {
-        return res.status(200).send({ code: 400, message: "wordBookId格式不正确" });
+        return res
+          .status(200)
+          .send({ code: 400, message: "wordBookId格式不正确" });
       }
 
-      const result = await WordListService.batchAddWords({ uid, wordBookId, words });
+      const result = await WordListService.batchAddWords({
+        uid,
+        wordBookId,
+        words,
+      });
 
       if (!result.success) {
         let code = 400;
