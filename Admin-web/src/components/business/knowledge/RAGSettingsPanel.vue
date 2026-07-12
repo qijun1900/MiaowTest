@@ -1,6 +1,24 @@
 <template>
   <div class="rag-settings-panel">
     <div class="panel-section">
+      <div class="section-title">业务筛选</div>
+      <el-select
+        v-model="localBusinessType"
+        placeholder="全部业务"
+        clearable
+        style="width: 100%"
+        @change="handleBusinessTypeChange"
+      >
+        <el-option
+          v-for="bt in businessTypeOptions"
+          :key="bt"
+          :label="bt"
+          :value="bt"
+        />
+      </el-select>
+    </div>
+
+    <div class="panel-section">
       <div class="section-title">知识库</div>
       <el-select
         :model-value="modelValue.knowledgeBaseId"
@@ -11,7 +29,7 @@
         @update:model-value="updateField('knowledgeBaseId', $event)"
       >
         <el-option
-          v-for="kb in knowledgeBases"
+          v-for="kb in filteredKnowledgeBases"
           :key="kb._id"
           :label="kb.name"
           :value="kb._id"
@@ -100,7 +118,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { ChatDotRound, Delete } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -119,6 +137,24 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'clear-history'])
+
+const localBusinessType = ref('')
+const presetBusinessTypes = ["考试练习", "客服问答", "产品文档", "培训学习", "其他"]
+
+const filteredKnowledgeBases = computed(() => {
+  if (!localBusinessType.value) return props.knowledgeBases
+  return props.knowledgeBases.filter(kb => kb.businessType === localBusinessType.value)
+})
+
+const businessTypeOptions = computed(() => {
+  const existingTypes = props.knowledgeBases.map(kb => kb.businessType).filter(Boolean)
+  return [...new Set([...presetBusinessTypes, ...existingTypes])]
+})
+
+const handleBusinessTypeChange = () => {
+  // 切换业务类型时清空已选知识库
+  updateField('knowledgeBaseId', '')
+}
 
 const historyCount = computed(() => props.history.length)
 

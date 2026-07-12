@@ -36,9 +36,9 @@ const KnowledgeService = {
    * 创建知识库
    * 自动生成唯一的 collectionName 用于 Chroma 隔离
    */
-  async createKnowledgeBase({ name, description, creator }) {
+  async createKnowledgeBase({ name, description, businessType, creator }) {
     const collectionName = `kb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    return KnowledgeBaseModel.create({ name, description, collectionName, creator });
+    return KnowledgeBaseModel.create({ name, description, businessType, collectionName, creator });
   },
 
   /**
@@ -48,17 +48,20 @@ const KnowledgeService = {
   /**
    * 更新知识库名称和描述
    */
-  async updateKnowledgeBase(kbId, { name, description }) {
+  async updateKnowledgeBase(kbId, { name, description, businessType }) {
     const kb = await KnowledgeBaseModel.findById(kbId);
     if (!kb) throw new Error("知识库不存在");
     const update = {};
     if (name !== undefined) update.name = name;
     if (description !== undefined) update.description = description;
+    if (businessType !== undefined) update.businessType = businessType;
     return KnowledgeBaseModel.updateOne({ _id: kbId }, update);
   },
 
-  async listKnowledgeBases() {
-    const bases = await KnowledgeBaseModel.find({}).sort({ createTime: -1 }).lean();
+  async listKnowledgeBases({ businessType } = {}) {
+    const filter = {};
+    if (businessType) filter.businessType = businessType;
+    const bases = await KnowledgeBaseModel.find(filter).sort({ createTime: -1 }).lean();
     // $unwind 展开 knowledgeBaseIds 数组，按 _id 分组计数
     const counts = await KnowledgeDocModel.aggregate([
       { $unwind: "$knowledgeBaseIds" },
@@ -117,9 +120,9 @@ const KnowledgeService = {
 
   /**
    * 分页查询文档列表
-   * 支持按标题模糊搜索和按知识库 ID 筛选
+   * 支持按标题模糊搜索、按知识库 ID 筛选、按业务标识筛选
    */
-  async listDocuments({ page, size, keyword, knowledgeBaseId }) {
+  async listDocuments({ page, size, keyword, knowledgeBaseId, businessType }) {
     const skip = (page - 1) * size;
     const filter = {};
     if (keyword) {
@@ -128,6 +131,15 @@ const KnowledgeService = {
     // MongoDB 会自动匹配数组中包含该 ID 的文档
     if (knowledgeBaseId && mongoose.Types.ObjectId.isValid(knowledgeBaseId)) {
       filter.knowledgeBaseIds = knowledgeBaseId;
+    }
+    // 按业务标识筛选：先查出该业务类型下的所有知识库 ID，再匹配文档
+    if (businessType) {
+      const kbs = await KnowledgeBaseModel.find({ businessType }).select("_id").lean();
+      const kbIds = kbs.map(kb => kb._id);
+      if (kbIds.length === 0) {
+        return { data: [], total: 0 };
+      }
+      filter.knowledgeBaseIds = { $in: kbIds };
     }
     const [data, total] = await Promise.all([
       KnowledgeDocModel.find(filter).sort({ createTime: -1 }).skip(skip).limit(size),

@@ -11,12 +11,13 @@ import upload from "@/util/upload";
 // ==================== 知识库 CRUD ====================
 
 /** 创建知识库 */
-export async function postAddKnowledgeBase(name, description, creator) {
+export async function postAddKnowledgeBase(name, description, creator, businessType = '') {
   try {
     const response = await axios.post("/adminapi/knowledge-base/add", {
       name,
       description,
       creator,
+      businessType,
     });
     if (response.data.ActionType === "OK") {
       return response.data;
@@ -29,9 +30,11 @@ export async function postAddKnowledgeBase(name, description, creator) {
 }
 
 /** 获取知识库列表（含每个知识库的文档数量） */
-export async function getKnowledgeBaseList() {
+export async function getKnowledgeBaseList(businessType) {
   try {
-    const response = await axios.get("/adminapi/knowledge-base/list");
+    const params = {};
+    if (businessType) params.businessType = businessType;
+    const response = await axios.get("/adminapi/knowledge-base/list", { params });
     if (response.data.code === 200) {
       return response.data;
     }
@@ -43,9 +46,9 @@ export async function getKnowledgeBaseList() {
 }
 
 /** 更新知识库名称和描述 */
-export async function postUpdateKnowledgeBase(_id, name, description) {
+export async function postUpdateKnowledgeBase(_id, name, description, businessType) {
   try {
-    const response = await axios.post("/adminapi/knowledge-base/update", { _id, name, description });
+    const response = await axios.post("/adminapi/knowledge-base/update", { _id, name, description, businessType });
     if (response.data.ActionType === "OK") {
       return response.data;
     }

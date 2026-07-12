@@ -16,6 +16,20 @@
     <div class="filter-bar">
       <div class="filter-left">
         <el-select
+          v-model="filterBusinessType"
+          placeholder="全部业务"
+          clearable
+          style="width: 130px"
+          @change="handleBusinessTypeChange"
+        >
+          <el-option
+            v-for="bt in businessTypeOptions"
+            :key="bt"
+            :label="bt"
+            :value="bt"
+          />
+        </el-select>
+        <el-select
           v-model="selectedKB"
           placeholder="全部知识库"
           clearable
@@ -24,7 +38,7 @@
           @change="handleKBChange"
         >
           <el-option
-            v-for="kb in knowledgeBases"
+            v-for="kb in filteredKnowledgeBases"
             :key="kb._id"
             :label="kb.name"
             :value="kb._id"
@@ -305,6 +319,13 @@ const dialogVisible = ref(false);
 const knowledgeBases = ref([]);
 const selectedKB = ref("");
 const keyword = ref("");
+const filterBusinessType = ref("");
+const businessTypeOptions = ref(["考试练习", "客服问答", "产品文档", "培训学习", "其他"]);
+
+const filteredKnowledgeBases = computed(() => {
+  if (!filterBusinessType.value) return knowledgeBases.value;
+  return knowledgeBases.value.filter(kb => kb.businessType === filterBusinessType.value);
+});
 const IsOpenStripe = ref(true);
 const addToKBVisible = ref(false);
 const addToKBRow = ref(null);
@@ -358,11 +379,21 @@ const handleKBChange = () => {
   handleRefreshAnData();
 };
 
+const handleBusinessTypeChange = () => {
+  selectedKB.value = "";
+  currentPage.value = 1;
+  handleRefreshAnData();
+};
+
 const loadKnowledgeBases = async () => {
   try {
     const res = await getKnowledgeBaseList();
     if (res) {
       knowledgeBases.value = res.data;
+      // 动态更新业务标识选项
+      const existingTypes = res.data.map(kb => kb.businessType).filter(Boolean);
+      const merged = new Set([...businessTypeOptions.value, ...existingTypes]);
+      businessTypeOptions.value = [...merged];
     }
   } catch (error) {
     console.error("loadKnowledgeBases error:", error);
@@ -500,6 +531,7 @@ const handleRefreshAnData = async () => {
       size: pageSize.value,
       knowledgeBaseId: selectedKB.value,
       keyword: keyword.value || undefined,
+      businessType: filterBusinessType.value || undefined,
     });
     if (res) {
       tableData.value = res.data.data;

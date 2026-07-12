@@ -7,6 +7,20 @@
         <span class="page-desc">创建和管理知识库，每个知识库对应独立的向量存储空间</span>
       </div>
       <div class="header-right">
+        <el-select
+          v-model="filterBusinessType"
+          placeholder="全部业务"
+          clearable
+          style="width: 150px"
+          @change="loadData"
+        >
+          <el-option
+            v-for="bt in businessTypeOptions"
+            :key="bt"
+            :label="bt"
+            :value="bt"
+          />
+        </el-select>
         <el-button :icon="RefreshRight" circle @click="loadData" :loading="tableLoading" />
         <el-button type="primary" :icon="Plus" @click="handleAdd">新建知识库</el-button>
       </div>
@@ -59,6 +73,9 @@
           <div class="kb-card-body">
             <h3 class="kb-name">{{ kb.name }}</h3>
             <p class="kb-desc">{{ kb.description || '暂无描述' }}</p>
+            <el-tag v-if="kb.businessType" size="small" effect="plain" type="primary" class="kb-business-tag">
+              {{ kb.businessType }}
+            </el-tag>
           </div>
 
           <div class="kb-card-footer">
@@ -133,6 +150,23 @@
             show-word-limit
           />
         </el-form-item>
+        <el-form-item label="业务标识">
+          <el-select
+            v-model="Form.businessType"
+            placeholder="选择或输入业务标识"
+            clearable
+            filterable
+            allow-create
+            style="width: 100%"
+          >
+            <el-option
+              v-for="bt in businessTypeOptions"
+              :key="bt"
+              :label="bt"
+              :value="bt"
+            />
+          </el-select>
+        </el-form-item>
       </el-form>
     </template>
   </Dialog>
@@ -168,7 +202,12 @@ const FormRef = ref();
 const Form = reactive({
   name: "",
   description: "",
+  businessType: "",
 });
+
+const filterBusinessType = ref("");
+
+const businessTypeOptions = ref(["考试练习", "客服问答", "产品文档", "培训学习", "其他"]);
 
 const Formrules = {
   name: [{ required: true, message: "请输入知识库名称", trigger: "blur" }],
@@ -187,6 +226,7 @@ const handleAdd = () => {
   currentEditId.value = null;
   Form.name = "";
   Form.description = "";
+  Form.businessType = "";
   dialogVisible.value = true;
 };
 
@@ -195,6 +235,7 @@ const handleEdit = (row) => {
   currentEditId.value = row._id;
   Form.name = row.name;
   Form.description = row.description || "";
+  Form.businessType = row.businessType || "";
   dialogVisible.value = true;
 };
 
@@ -214,13 +255,13 @@ const handleConfirm = async () => {
     dialogVisible.value = false;
 
     if (isEditMode.value) {
-      const res = await postUpdateKnowledgeBase(currentEditId.value, Form.name, Form.description);
+      const res = await postUpdateKnowledgeBase(currentEditId.value, Form.name, Form.description, Form.businessType);
       if (res) {
         ElMessage.success("更新成功");
         await loadData();
       }
     } else {
-      const res = await postAddKnowledgeBase(Form.name, Form.description, appStore.userInfo.username);
+      const res = await postAddKnowledgeBase(Form.name, Form.description, appStore.userInfo.username, Form.businessType);
       if (res) {
         ElMessage.success("知识库创建成功");
         await loadData();
@@ -246,9 +287,13 @@ const handleDelete = async (row) => {
 const loadData = async () => {
   tableLoading.value = true;
   try {
-    const res = await getKnowledgeBaseList();
+    const res = await getKnowledgeBaseList(filterBusinessType.value || undefined);
     if (res) {
       tableData.value = res.data;
+      // 动态更新业务标识选项（合并已有的 + 预设的）
+      const existingTypes = res.data.map(kb => kb.businessType).filter(Boolean);
+      const merged = new Set([...businessTypeOptions.value, ...existingTypes]);
+      businessTypeOptions.value = [...merged];
     }
   } catch (error) {
     ElMessage.error("获取列表失败");
@@ -393,6 +438,10 @@ onMounted(() => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.kb-business-tag {
+  margin-top: 8px;
 }
 
 .kb-card-footer {

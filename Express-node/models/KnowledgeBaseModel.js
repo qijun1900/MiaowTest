@@ -17,6 +17,7 @@ const mongoose = require("mongoose");
 const KnowledgeBaseSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
+  businessType: { type: String, default: '' },
   collectionName: { type: String, required: true, unique: true },
   creator: String,
   createTime: { type: Date, default: Date.now },

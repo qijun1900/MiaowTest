@@ -12,13 +12,14 @@ const KnowledgeController = {
   /** 创建知识库 */
   createKnowledgeBase: async (req, res) => {
     try {
-      const { name, description } = req.body;
+      const { name, description, businessType } = req.body;
       if (!name) {
         return res.status(400).send({ ActionType: "ERROR", code: 400, message: "请输入知识库名称" });
       }
       const result = await KnowledgeService.createKnowledgeBase({
         name,
         description,
+        businessType,
         creator: req.body.creator || "",
       });
       res.status(200).send({ ActionType: "OK", code: 200, data: result });
@@ -31,14 +32,14 @@ const KnowledgeController = {
   /** 更新知识库名称和描述 */
   updateKnowledgeBase: async (req, res) => {
     try {
-      const { _id, name, description } = req.body;
+      const { _id, name, description, businessType } = req.body;
       if (!_id) {
         return res.status(400).send({ ActionType: "ERROR", code: 400, message: "缺少参数 _id" });
       }
-      if (!name && description === undefined) {
+      if (!name && description === undefined && businessType === undefined) {
         return res.status(400).send({ ActionType: "ERROR", code: 400, message: "请提供要更新的内容" });
       }
-      await KnowledgeService.updateKnowledgeBase(_id, { name, description });
+      await KnowledgeService.updateKnowledgeBase(_id, { name, description, businessType });
       res.status(200).send({ ActionType: "OK", code: 200 });
     } catch (error) {
       console.error("[KnowledgeController] updateKnowledgeBase error:", error);
@@ -49,7 +50,8 @@ const KnowledgeController = {
   /** 获取知识库列表（含文档数量） */
   getKnowledgeBaseList: async (req, res) => {
     try {
-      const result = await KnowledgeService.listKnowledgeBases();
+      const { businessType } = req.query;
+      const result = await KnowledgeService.listKnowledgeBases({ businessType });
       res.status(200).send({ ActionType: "OK", code: 200, data: result });
     } catch (error) {
       console.error("[KnowledgeController] getKnowledgeBaseList error:", error);
@@ -180,12 +182,13 @@ const KnowledgeController = {
   /** 分页查询文档列表 */
   getDocumentList: async (req, res) => {
     try {
-      const { page = 1, size = 20, keyword, knowledgeBaseId } = req.query;
+      const { page = 1, size = 20, keyword, knowledgeBaseId, businessType } = req.query;
       const result = await KnowledgeService.listDocuments({
         page: Number(page),
         size: Number(size),
         keyword,
         knowledgeBaseId,
+        businessType,
       });
       res.status(200).send({ ActionType: "OK", code: 200, data: result });
     } catch (error) {
