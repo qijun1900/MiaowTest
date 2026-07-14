@@ -155,8 +155,18 @@
                         </view>
 
                         <view v-if="showKbPanel" class="kb-body">
+                            <!-- 空态提示 -->
+                            <view v-if="kbList.length === 0" class="kb-empty-state">
+                                <t-icon
+                                    name="info-circle"
+                                    size="40rpx"
+                                    color="var(--app-text-placeholder)"
+                                ></t-icon>
+                                <text class="kb-empty-text">暂无可用的例句知识库</text>
+                            </view>
+
                             <!-- 知识库选择 -->
-                            <view class="kb-select-row">
+                            <view v-else class="kb-select-row">
                                 <text class="kb-select-label">知识库：</text>
                                 <picker
                                     :range="kbNames"
@@ -478,7 +488,7 @@ const handleAiLookup = async () => {
 // ---- 知识库 ----
 const loadKnowledgeBases = async () => {
     try {
-        const res = await getKnowledgeBasesAPI();
+        const res = await getKnowledgeBasesAPI("sentence");
         if (res.code !== 200) return;
         kbList.value = res.data || [];
         kbNames.value = kbList.value.map((kb) => kb.name);
@@ -1098,6 +1108,21 @@ onLoad(async (options) => {
 .kb-empty text {
     font-size: calc(26rpx * var(--app-font-scale, 1));
     color: var(--app-text-secondary);
+}
+
+.kb-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12rpx;
+    padding: 32rpx 24rpx;
+}
+
+.kb-empty-text {
+    font-size: calc(24rpx * var(--app-font-scale, 1));
+    color: var(--app-text-placeholder);
+    text-align: center;
+    line-height: 1.6;
 }
 
 /* 标签 */

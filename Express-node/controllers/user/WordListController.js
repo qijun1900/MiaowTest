@@ -339,7 +339,8 @@ const WordListController = {
 
   getKnowledgeBases: async (req, res) => {
     try {
-      const result = await WordListService.getKnowledgeBases();
+      const { businessType } = req.query;
+      const result = await WordListService.getKnowledgeBases({ businessType });
       res.status(200).send({ code: 200, data: result.data });
     } catch (error) {
       console.error("获取知识库列表失败", error);

@@ -640,16 +640,22 @@ const WordListService = {
 
   /**
    * 获取可用知识库列表
+   * @param {string} [businessType] - 可选，按业务标识筛选
    */
-  getKnowledgeBases: async () => {
+  getKnowledgeBases: async ({ businessType } = {}) => {
     try {
+      const filter = {};
+      if (businessType) {
+        filter.businessType = businessType;
+      }
       const kbs = await KnowledgeBaseModel.find(
-        {},
+        filter,
         {
           _id: 1,
           name: 1,
           description: 1,
           collectionName: 1,
+          businessType: 1,
         },
       )
         .sort({ createTime: -1 })

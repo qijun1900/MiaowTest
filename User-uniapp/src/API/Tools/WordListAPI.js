@@ -194,12 +194,16 @@ export async function aiWordDetailAPI(word, type = "all") {
 
 /**
  * @description 获取可用知识库列表
+ * @param {string} [businessType] - 可选，按业务标识筛选
  */
-export async function getKnowledgeBasesAPI() {
+export async function getKnowledgeBasesAPI(businessType) {
   try {
+    const params = {};
+    if (businessType) params.businessType = businessType;
     return await http({
       url: "/uniappAPI/tools/wordlist/getKnowledgeBases",
       method: "GET",
+      data: params,
     });
   } catch (error) {
     console.error("getKnowledgeBasesAPI 失败", error);
