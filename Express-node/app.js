@@ -31,8 +31,7 @@ const UserResourceRouter = require("./routes/user/ResourceRouter"); //用户资�
 const UserImageRouter = require("./routes/user/ImageRouter"); //用户图片上传删除统一路由模块
 const UserWrongBookRouter = require("./routes/user/WrongBookRouter"); //用户错题本相关路由模块
 const UserNotesBookRouter = require("./routes/user/NotesBookRouter"); //用户笔记本相关路由模块
-const UserWordBookRouter = require("./routes/user/WordBookRouter"); //用户单词本相关路由模块
-const UserWordListRouter = require("./routes/user/WordListRouter"); //用户单词列表相关路由模块
+const UserWordBookRouter = require("./routes/user/WordBookRouter"); //用户单词本相关路由模块（含单词列表路由）
 const UserLogRouter = require("./routes/user/LogRouter"); //用户端日志路由
 const UserActivityRouter = require("./routes/user/ActivityRouter"); //用户端活动路由
 const AdminAppVersionRouter = require("./routes/admin/AppVersionRouter"); //Admin版本管理路由模块
@@ -129,8 +128,7 @@ app.use(UserResourceRouter); //注册资源相关路由(用户端)
 app.use(UserImageRouter); //注册图片上传/删除统一路由(用户端)
 app.use(UserWrongBookRouter); //注册错题本相关路由(用户端)
 app.use(UserNotesBookRouter); //注册笔记本相关路由(用户端)
-app.use(UserWordBookRouter); //注册单词本相关路由(用户端)
-app.use(UserWordListRouter); //注册单词列表相关路由(用户端)
+app.use(UserWordBookRouter); //注册单词本及单词列表相关路由(用户端)
 app.use(UserActivityRouter); //注册用户活动路由(用户端)
 app.use(UserLogRouter); //注册用户端日志路由
 app.use(UserAppVersionRouter); //注册版本检查路由(用户端，无需登录)
