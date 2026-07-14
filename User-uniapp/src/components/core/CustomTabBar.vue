@@ -157,6 +157,9 @@ const tabBarStyle = computed(() => ({
 const handleTabClick = (index) => {
     if (index === props.currentIndex) return;
 
+    // 轻微震动反馈
+    uni.vibrateShort({ type: "light" });
+
     // 触发涟漪效果
     rippleIndex.value = index;
     clearTimeout(rippleTimer);
