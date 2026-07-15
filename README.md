@@ -1,6 +1,6 @@
 # 题喵喵 (MiaowTest)
 
-> 基于 Uni-app + Vue3 + Express + MongoDB + LangChain 的跨平台智能刷题系统
+> 基于 Uni-app + Vue3 + Express + MongoDB + LangChain 的跨平台智能刷题与学习系统
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.0.0-blue.svg" alt="Version">
@@ -10,25 +10,27 @@
   <img src="https://img.shields.io/badge/AI-LangChain%20%2B%20DashScope-ff6b00.svg" alt="AI">
 </p>
 
-## 小程序扫码体验(平台限制AI相关功能展示不了)
+## 小程序扫码体验(平台限制AI相关功能未展示)
 
 <p align="center">
   <img src="https://free.picui.cn/free/2026/04/18/69e3960545c05.jpg" alt="题喵喵微信小程序扫码体验" width="220">
 </p>
 
-## AI界面预览
 
-<p align="center">
-  <img src="https://img.cdn1.vip/i/6a05efeab1ddb_1778773994.webp" alt="预览图1" width="220">
-  <img src="https://img.cdn1.vip/i/6a05efec1a390_1778773996.webp" alt="预览图2" width="220">
-  <img src="https://img.cdn1.vip/i/6a05efed08a10_1778773997.webp" alt="预览图3" width="220">
-  <img src="https://img.cdn1.vip/i/6a05eff065c1c_1778774000.webp" alt="预览图4" width="220">
-</p>
 
 ## 项目概览
 
-题喵喵是一个面向学习与训练场景的全栈答题系统，采用前后端分离与多端统一架构。
-项目包含用户端、管理端和后端 API 三大子系统，支持题库管理、练习统计、错题沉淀、AI 对话、深度思考、流式输出等能力，以及云托管部署。
+题喵喵是一个面向学习与训练场景的跨平台智能刷题系统，基于 **Uni-app + Vue3 + Express + MongoDB + LangChain** 构建，采用前后端分离架构，一套代码覆盖微信小程序、H5、App 等多端。
+
+项目由三大子系统组成：
+
+| 子系统 | 技术栈 | 定位 |
+|--------|--------|------|
+| **用户端** | Uni-app + Vue3 + Pinia + uView Plus | 面向学员的移动端，支持刷题、AI 对话、错题沉淀、学习统计 、多种学习工具|
+| **管理端** | Vue3 + Vite + Element Plus + Pinia | 面向管理者的 Web 后台，支持题库管理、Agent 配置、数据看板 ,知识库检索与管理|
+| **后端服务** | Express + Mongoose + JWT + LangChain | 统一 API 入口，承载鉴权、业务编排、AI 推理、文件存储等核心能力 |
+
+核心亮点：**AI 深度集成** — 基于 LangChain 构建多轮对话链与推理链，支持流式输出（SSE / WebSocket / 分块传输自适应）、深度思考过程展示、会话标题自动生成，并预留 RAG、Agent 工具调用等扩展能力。
 
 - 服务端部署补充：见 [Express-node/CLOUD_DEPLOY.md](Express-node/CLOUD_DEPLOY.md)
 
@@ -52,37 +54,43 @@
 
 ### 用户端 (Uni-app)
 
-- **智能对话 (Mio)**：基于 LangChain 的多轮 AI 对话，支持流式输出（SSE / WebSocket / 小程序分块传输自适应）
-- **深度思考**：接入 DeepSeek-R1 等推理模型，实时展示思考过程与最终答案的分离渲染
-- **会话管理**：会话创建、重命名、删除、收藏、搜索（标题 + 消息预览模糊匹配）
-- **消息分页**：历史消息分页加载，支持骨架屏与竞态防护
-- **刷题与练习**：选择题、填空题、判断题、简答题等题型能力
-- **学习资产**：收藏、错题、词库等可持续复习链路
-- **学习工具**：计时器、TODO、错题本、笔记本等训练辅助模块
-- **账号体系**：登录态管理（邮箱和微信小程序一键登录）、个人信息与学习数据展示
-- **外观系统**：多主题预设（极光蓝 / Claude 暖橙）× 深浅模式（跟随系统 / 浅色 / 深色）× 四档字号（小 / 标准 / 大 / 特大），全局一键切换，偏好持久化
-- **自定义导航**：CustomNavBar（页面顶部）+ CustomTabBar（底部 Tab），支持主题 token 自适应配色
+| 模块 | 功能 |
+|------|------|
+| **AI 对话 (Mio)** | 基于 LangChain 的多轮 AI 对话，支持流式输出（SSE / WebSocket / 小程序分块传输自适应） |
+| **深度思考** | 接入 DeepSeek等推理模型，实时展示思考过程与最终答案的分离渲染 |
+| **会话管理** | 会话创建、重命名、删除、收藏、搜索（标题 + 消息预览模糊匹配） |
+| **消息分页** | 历史消息分页加载，支持骨架屏与竞态防护 |
+| **刷题与练习** | 选择题、填空题、判断题、简答题等题型能力 |
+| **学习资产** | 收藏、错题、词库等可持续复习链路 |
+| **学习工具** | 计时器、TODO、错题本、笔记本等训练辅助模块 |
+| **账号体系** | 登录态管理（邮箱和微信小程序一键登录）、个人信息与学习数据展示 |
+| **外观系统** | 多主题预设（极光蓝 / Claude 暖橙）× 深浅模式（跟随系统 / 浅色 / 深色）× 四档字号（小 / 标准 / 大 / 特大），全局一键切换，偏好持久化 |
+| **自定义导航** | CustomNavBar（页面顶部）+ CustomTabBar（底部 Tab），支持主题 token 自适应配色 |
 
 ### 管理端 (Vue3)
 
-- **Agent 管理**：AI Agent 定义的 CRUD，配置系统提示词、默认模型、能力标签
-- **题库管理**：题目 CRUD、AI 批量一键导入与分类管理
-- **AI 题目分析**：调用 DashScope 百炼应用自动分析题目质量与知识点
-- **用户管理**：账号信息、学习记录、行为统计
-- **数据看板**：图表化展示活跃度、使用趋势等指标
-- **资源管理**：设立静态资源管理中心
+| 模块 | 功能 |
+|------|------|
+| **Agent 管理** | AI Agent 定义的 CRUD，配置系统提示词、默认模型、能力标签 |
+| **题库管理** | 题目 CRUD、AI 批量一键导入与分类管理 |
+| **AI 题目分析** | 调用 DashScope 百炼应用自动分析题目质量与知识点 |
+| **用户管理** | 账号信息、学习记录、行为统计 |
+| **数据看板** | 图表化展示活跃度、使用趋势等指标 |
+| **资源管理** | 设立静态资源管理中心 |
 
 ### 后端服务 (Express)
 
-- **LLM 引擎**：LangChain.js + DashScope（阿里云）统一模型接入层
-- **Agent 链**：多轮对话链（LCEL 管道）、流式 token 回调、会话标题自动生成
-- **推理链**：DeepSeek-R1 等推理模型支持，思考内容与回答内容分离输出
-- **对话持久化**：会话 + 消息双表模型，支持分页、收藏、软删除、token 统计
-- **REST API**：用户端与管理端统一服务入口
-- **认证鉴权**：JWT + 中间件体系（token 刷新、可选鉴权、UID 提取）
-- **数据存储**：MongoDB + Mongoose 数据模型（30+ 模型）
-- **文件能力**：本地上传 + OSS + 云托管文件链路
-- **部署适配**：本地开发、Docker、云托管模式
+| 模块 | 功能 |
+|------|------|
+| **LLM 引擎** | LangChain.js + DashScope（阿里云）统一模型接入层 |
+| **Agent 链** | 多轮对话链（LCEL 管道）、流式 token 回调、会话标题自动生成 |
+| **推理链** | DeepSeek-R1 等推理模型支持，思考内容与回答内容分离输出 |
+| **对话持久化** | 会话 + 消息双表模型，支持分页、收藏、软删除、token 统计 |
+| **REST API** | 用户端与管理端统一服务入口 |
+| **认证鉴权** | JWT + 中间件体系（token 刷新、可选鉴权、UID 提取） |
+| **数据存储** | MongoDB + Mongoose 数据模型（30+ 模型） |
+| **文件能力** | 本地上传 + OSS + 云托管文件链路 |
+| **部署适配** | 本地开发、Docker、云托管模式 |
 
 ## LLM/AI 架构
 
@@ -92,20 +100,27 @@
 
 ```
 llm/
-├── models/factory.js          # ModelFactory — 统一模型工厂（DashScope OpenAI 兼容接口）
+├── index.js                   # 模块入口，统一导出
+├── models/
+│   └── factory.js             # ModelFactory — 统一模型工厂（DashScope OpenAI 兼容接口）
 ├── chains/
-│   ├── conversational/
-│   │   ├── chat.js            # 单轮对话链（无状态）
-│   │   └── deepThink.js       # 推理模型链（DeepSeek-R1/QwQ，思考/回答分离流式输出）
 │   └── agent/
 │       └── agentChat.js       # 多轮 Agent 链（历史解析 + 流式 + 标题生成）
-├── prompts/templates/         # 系统提示词模板（基础对话 / 记忆对话 / 题目生成）
-├── admin/ModelApp/            # DashScope 百炼应用集成（题目分析 / AI 导题）
-├── agents/                    # [规划中] Agent 工具与工作流
-├── memory/                    # [规划中] 对话记忆（缓冲 / 摘要 / 向量）
-├── vectorstores/              # [规划中] 向量存储与检索（RAG）
-├── loaders/                   # [规划中] 文档加载器（PDF / Web / 数据库）
-└── splitters/                 # [规划中] 文本分割器
+├── prompts/
+│   └── templates/
+│       ├── index.js           # 提示词模板入口与注册
+│       └── wordListPrompts.js # 单词本相关提示词模板
+├── admin/
+│   └── ModelApp/
+│       ├── analysis.js        # DashScope 百炼应用 — 题目分析
+│       └── Iaa.js             # DashScope 百炼应用 — AI 导题
+├── vectorstores/
+│   └── stores/
+│       └── chromaManager.js   # ChromaDB 向量存储管理（RAG 基础设施）
+└── examples/                  # 示例与调试脚本
+    ├── testchat.js            # 基础对话测试
+    ├── ThinkChat.js           # 推理模型（DeepThink）测试
+    └── unified-simple.js      # 统一接口简化示例
 ```
 
 ### 对话链路
@@ -121,13 +136,6 @@ llm/
   └── maybeGenerateTitle()       — 异步生成会话标题（fire-and-forget）
 ```
 
-### 支持模型
-
-| 模型 | 用途 | 特点 |
-|------|------|------|
-| qwen-plus | 默认对话模型 | 通用能力强，响应快 |
-| deepseek-r1 | 推理/深度思考 | 思维链推理，支持思考过程展示 |
-| 其他 DashScope 兼容模型 | 按需切换 | 通过 ModelFactory 动态指定 |
 
 ### 前端流式传输
 
@@ -393,10 +401,6 @@ docker compose up -d
 GET /health
 ```
 
-### 云托管部署
-
-云托管细节请参考 [Express-node/CLOUD_DEPLOY.md](Express-node/CLOUD_DEPLOY.md)。
-
 ## 平台支持矩阵
 
 | 平台 | 状态 | 说明 |
@@ -421,12 +425,15 @@ GET /health
 
 | 模块 | 功能 | 状态 |
 |------|------|------|
-| LLM 引擎 | ModelFactory 统一模型工厂（DashScope） | ✅ 已完成 |
-| LLM 引擎 | 单轮对话链（useChat） | ✅ 已完成 |
-| LLM 引擎 | 推理模型链（useDeepThink，DeepSeek-R1） | ✅ 已完成 |
-| LLM 引擎 | 多轮 Agent 链（runAgentChain / streamAgentChain） | ✅ 已完成 |
-| LLM 引擎 | 会话标题自动生成（generateConversationTitle） | ✅ 已完成 |
+| LLM 引擎 | ModelFactory 统一模型工厂（DashScope OpenAI 兼容接口） | ✅ 已完成 |
+| LLM 引擎 | 多轮 Agent 链（agentChat，历史解析 + 流式 + 标题生成） | ✅ 已完成 |
+| LLM 引擎 | RAG 检索增强生成链（ragChain + ChromaDB 向量存储） | ✅ 已完成 |
+| LLM 引擎 | Embedding 向量嵌入模型（embedding.js） | ✅ 已完成 |
+| LLM 引擎 | 文档解析器（LlamaParse Wrapper） | ✅ 已完成 |
+| LLM 引擎 | 提示词模板系统（index + wordListPrompts） | ✅ 已完成 |
 | LLM 引擎 | DashScope 百炼应用集成（题目分析 / AI 导题） | ✅ 已完成 |
+| LLM 引擎 | 工具层（contentBuilder / errorHandler / tokenEstimator） | ✅ 已完成 |
+| LLM 引擎 | 示例与调试脚本（testchat / ThinkChat / unified-simple） | ✅ 已完成 |
 | 用户端 | AI 智能对话页面（Mio） | ✅ 已完成 |
 | 用户端 | 流式输出（SSE / Chunked / WebSocket 自适应） | ✅ 已完成 |
 | 用户端 | 会话管理（创建 / 重命名 / 删除 / 收藏） | ✅ 已完成 |
@@ -441,33 +448,6 @@ GET /health
 | 后端 | Agent 定义管理（CRUD + 发布状态） | ✅ 已完成 |
 | 管理端 | Agent 管理页面 | ✅ 已完成 |
 
-### 近期计划
-
-| 优先级 | 模块 | 功能 | 说明 |
-|--------|------|------|------|
-| P0 | LLM 引擎 | Agent 工具调用（Tool Use） | 接入计算器、搜索等外部工具，支持 function calling |
-| P0 | 用户端 | 对话中图片/文件发送 | 支持多模态输入，图片识别与文件解析 |
-| P1 | LLM 引擎 | 对话记忆模块 | 缓冲记忆 / 摘要记忆 / 向量记忆，提升长对话连贯性 |
-| P1 | LLM 引擎 | RAG 检索增强生成 | 文档加载 → 分割 → 向量化 → 检索 → 注入上下文 |
-| P1 | 用户端 | AI 题目讲解 | 选中题目后调用 AI 生成详细解析与知识点关联 |
-| P1 | 用户端 | AI 错因分析 | 基于错题数据生成个性化错因分析与学习建议 |
-| P2 | LLM 引擎 | 多模型动态切换 | 用户端可选模型（Qwen / DeepSeek / 自定义），管理端配置模型池 |
-| P2 | LLM 引擎 | 向量存储集成 | Milvus / FAISS / 内存向量库，支撑 RAG 和语义搜索 |
-| P2 | 管理端 | AI 数据分析助手 | 自然语言查询学习数据，自动生成分析报告 |
-| P2 | 后端 | AI 调用配额与计费 | 按用户/按模型限制 token 用量，超额降级或提示 |
-
-### 远期规划
-
-| 模块 | 功能 | 说明 |
-|------|------|------|
-| LLM 引擎 | Agent 工作流编排 | 支持多步骤 Agent 工作流（条件分支、循环、并行） |
-| LLM 引擎 | 文档加载器 | PDF / Web / 数据库文档加载，支撑 RAG 知识库构建 |
-| LLM 引擎 | 文本分割器 | 递归分割 / 语义分割，优化长文档检索精度 |
-| 用户端 | AI 学习路径规划 | 基于学习数据自动生成个性化复习计划 |
-| 用户端 | 语音对话 | 接入 ASR/TTS，支持语音交互式学习 |
-| 管理端 | AI 出题助手 | 基于知识点自动生成题目，支持批量导出 |
-| 后端 | 多租户支持 | 数据隔离、独立配置，支持机构级部署 |
-| 运维 | 监控与可观测性 | AI 调用链路追踪、延迟监控、错误告警 |
 
 ## 贡献指南
 
