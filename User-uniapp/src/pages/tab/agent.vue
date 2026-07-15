@@ -112,6 +112,11 @@
             :class="{ 'sender-area-hidden': modelSheetVisible }"
             :style="senderAreaStyle"
         >
+            <SkillBar
+                :skills="skillList"
+                :active-key="activeSkillKey"
+                @select="handleSkillSelect"
+            />
             <AgentSender
                 placeholder="在此处输入内容..."
                 v-model="senderText"
@@ -290,6 +295,7 @@ import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
+import SkillBar from "../../components/modules/agent/SkillBar.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import CustomTabBar from "../../components/core/CustomTabBar.vue";
@@ -351,6 +357,16 @@ const savedBookId = ref("");
 const pendingNoteContent = ref("");
 const pendingNoteUserText = ref("");
 
+// ─── 技能栏 ─────────────────────────────────────────────────────────────────
+const skillList = ref([
+    { key: 'sentence-analyze', label: '长难句分析', icon: 'lightbulb' },
+    { key: 'create-quiz', label: '出题', icon: 'edit-1' },
+    { key: 'explain', label: '概念解释', icon: 'book' },
+    { key: 'study-plan', label: '学习计划', icon: 'calendar-1' },
+    { key: 'analyze', label: '数据分析', icon: 'chart-analytics' },
+]);
+const activeSkillKey = ref('');
+
 // ─── 附件上传组件引用 ────────────────────────────────────────────────────
 const uploaderRef = ref(null);
 
@@ -363,7 +379,11 @@ const {
     clearAll: clearPendingAttachments,
     getUploadedImages,
     getUploadedFiles,
-} = useAgentAttachments({ maxCount: 9, cloudPathPrefix: "user/agent_chat", uploadFormData: { biz: "chat" } });
+} = useAgentAttachments({ 
+        maxCount: 9, 
+        cloudPathPrefix: "user/agent_chat", 
+        uploadFormData: { biz: "chat" }
+    });
 
 const handleFilesChosen = (files) => {
     addFromChosenFiles(files);
@@ -569,7 +589,8 @@ const containerStyle = computed(() => {
  */
 const contentInnerStyle = computed(() => {
     const extra = !keyboardHeight.value && isTabBarVisible.value ? tabBarHeightPx : 0;
-    return { paddingBottom: `calc(260rpx + ${extra}px)` };
+    // 260rpx 基础(sender) + 90rpx 技能栏(SkillBar) + TabBar 占位
+    return { paddingBottom: `calc(350rpx + ${extra}px)` };
 });
 
 const senderAreaStyle = computed(() => {
@@ -935,6 +956,18 @@ const handlePromptSelect = (prompt) => {
     senderText.value = prompt.label;
 };
 
+// ─── 技能栏点击 ────────────────────────────────────────────────────────────
+const handleSkillSelect = (skill) => {
+    if (!skill?.key) return;
+    triggerVibrate();
+    // 再次点击同一技能 → 取消激活
+    if (activeSkillKey.value === skill.key) {
+        activeSkillKey.value = '';
+        return;
+    }
+    activeSkillKey.value = skill.key;
+};
+
 // ─── 保存到笔记本：打开选择弹窗 → 选择 → 保存 ──────────────────────────────
 const handleOpenNotebookPicker = async (content) => {
     if (!isLoggedIn.value) {
@@ -1107,6 +1140,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     }
 
     showWelcomePanel.value = false;
+    activeSkillKey.value = '';
 
     const userMsgId = `msg-${++msgIdSeq}`;
     messageList.value.push({
@@ -1340,8 +1374,8 @@ const handleStopStream = () => {
 }
 
 .content-inner {
-    /* 底部留白让最后一条消息不被悬浮的 sender 输入栏遮住；顶部不留白，间距交给 msg-anchor 统一控制 */
-    padding: 0 0 260rpx;
+    /* 底部留白让最后一条消息不被悬浮的 sender 输入栏 + 技能栏遮住；顶部不留白，间距交给 msg-anchor 统一控制 */
+    padding: 0 0 350rpx;
 }
 
 .bubble-test-area {
@@ -1399,7 +1433,8 @@ const handleStopStream = () => {
 }
 
 /* 恢复内部元素的点击响应，因为外层使用 pointer-events: none */
-.sender-area :deep( .sender-shell ) {
+.sender-area :deep(.sender-shell),
+.sender-area :deep(.skill-bar) {
     pointer-events: auto;
 }
 
