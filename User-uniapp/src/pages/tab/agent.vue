@@ -966,6 +966,55 @@ const handleSkillSelect = (skill) => {
         return;
     }
     activeSkillKey.value = skill.key;
+
+    // 长难句分析：弹出输入方式选择
+    if (skill.key === 'sentence-analyze') {
+        showSentenceAnalyzeSheet();
+    }
+};
+
+// ─── 长难句分析 ──────────────────────────────────────────────────────────────
+const showSentenceAnalyzeSheet = () => {
+    uni.showActionSheet({
+        itemList: ['输入句子', '拍照识别', '从相册选择'],
+        success: ({ tapIndex }) => {
+            handleSentenceAnalyzeAction(tapIndex);
+        },
+        fail: () => {
+            // 用户取消 → 不清除 activeSkillKey，允许再次点击
+        },
+    });
+};
+
+const handleSentenceAnalyzeAction = (actionIndex) => {
+    if (actionIndex === 0) {
+        // 输入句子：用户自己在输入框输入即可
+        return;
+    } else if (actionIndex === 1) {
+        // 拍照
+        if (!isCurrentMultimodal.value) {
+            uni.showToast({ title: '当前模型不支持图片识别', icon: 'none' });
+            return;
+        }
+        // #ifdef H5
+        uploaderRef.value?.pickImage();
+        // #endif
+        // #ifndef H5
+        uploaderRef.value?.pickImage({ sourceType: ['camera'] });
+        // #endif
+    } else if (actionIndex === 2) {
+        // 相册
+        if (!isCurrentMultimodal.value) {
+            uni.showToast({ title: '当前模型不支持图片识别', icon: 'none' });
+            return;
+        }
+        // #ifdef H5
+        uploaderRef.value?.pickImage();
+        // #endif
+        // #ifndef H5
+        uploaderRef.value?.pickImage({ sourceType: ['album'] });
+        // #endif
+    }
 };
 
 // ─── 保存到笔记本：打开选择弹窗 → 选择 → 保存 ──────────────────────────────
