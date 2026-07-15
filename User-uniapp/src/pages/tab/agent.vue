@@ -220,6 +220,17 @@
             </template>
         </tPopup>
 
+        <!-- 长难句分析 输入方式选择 -->
+        <t-action-sheet
+            v-model:visible="sentenceSheetVisible"
+            description="选择输入方式"
+            :items="sentenceOptions"
+            cancel-text="取消"
+            @selected="handleSentenceSheetSelected"
+            @cancel="sentenceSheetVisible = false"
+            @close="sentenceSheetVisible = false"
+        />
+
         <!-- 侧边栏支持手势关闭  -->
         <AgentSidebar
             v-model:show="sidebarVisible"
@@ -982,16 +993,20 @@ const handleSkillSelect = (skill) => {
 };
 
 // ─── 长难句分析 ──────────────────────────────────────────────────────────────
+const sentenceSheetVisible = ref(false);
+const sentenceOptions = [
+    { label: '手动输入', icon: 'edit-1' },
+    { label: '拍照识别', icon: 'camera' },
+    { label: '相册选择', icon: 'image' },
+];
+
 const showSentenceAnalyzeSheet = () => {
-    uni.showActionSheet({
-        itemList: ['输入句子', '拍照识别', '从相册选择'],
-        success: ({ tapIndex }) => {
-            handleSentenceAnalyzeAction(tapIndex);
-        },
-        fail: () => {
-            // 用户取消 → 不清除 activeSkillKey，允许再次点击
-        },
-    });
+    sentenceSheetVisible.value = true;
+};
+
+const handleSentenceSheetSelected = ({ index }) => {
+    sentenceSheetVisible.value = false;
+    handleSentenceAnalyzeAction(index);
 };
 
 /**
@@ -1697,6 +1712,7 @@ const handleStopStream = () => {
     background: rgba(0, 0, 0, 0.45);
     z-index: 9998;
 }
+
 
 .notebook-picker {
     width: 100%;
