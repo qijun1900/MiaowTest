@@ -986,16 +986,29 @@ const showSentenceAnalyzeSheet = () => {
     });
 };
 
+/**
+ * 确保当前模型支持多模态（图片识别）。
+ * 若不支持，自动切换到第一个可用的多模态模型；若没有任何多模态模型，提示用户。
+ * @returns {boolean} 是否就绪
+ */
+const ensureMultimodalModel = () => {
+    if (isCurrentMultimodal.value) return true;
+    const target = modelList.value.find((m) => m.isMultimodal);
+    if (!target) {
+        uni.showToast({ title: '没有可用的图片识别模型', icon: 'none' });
+        return false;
+    }
+    handleModelChange(target.label, target.value);
+    return true;
+};
+
 const handleSentenceAnalyzeAction = (actionIndex) => {
     if (actionIndex === 0) {
         // 输入句子：用户自己在输入框输入即可
         return;
     } else if (actionIndex === 1) {
         // 拍照
-        if (!isCurrentMultimodal.value) {
-            uni.showToast({ title: '当前模型不支持图片识别', icon: 'none' });
-            return;
-        }
+        if (!ensureMultimodalModel()) return;
         // #ifdef H5
         uploaderRef.value?.pickImage();
         // #endif
@@ -1004,10 +1017,7 @@ const handleSentenceAnalyzeAction = (actionIndex) => {
         // #endif
     } else if (actionIndex === 2) {
         // 相册
-        if (!isCurrentMultimodal.value) {
-            uni.showToast({ title: '当前模型不支持图片识别', icon: 'none' });
-            return;
-        }
+        if (!ensureMultimodalModel()) return;
         // #ifdef H5
         uploaderRef.value?.pickImage();
         // #endif
