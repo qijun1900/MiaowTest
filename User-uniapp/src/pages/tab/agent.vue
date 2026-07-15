@@ -50,6 +50,10 @@
                         :id="msg._msgId"
                         class="msg-anchor"
                     >
+                        <view v-if="msg.role === 'assistant' && msg.skillName && !msg.pending" class="msg-skill-tag">
+                            <t-icon name="lightbulb" size="20" color="var(--app-brand)" />
+                            <text class="msg-skill-tag-text">{{ msg.skillName }}</text>
+                        </view>
                         <ThoughtChain
                             v-if="msg.role === 'assistant' && (msg.reasoning || msg.thinkingStatus === 'thinking')"
                             :status="msg.thinkingStatus || 'thinking'"
@@ -366,6 +370,10 @@ const skillList = ref([
     { key: 'analyze', label: '数据分析', icon: 'chart-analytics' },
 ]);
 const activeSkillKey = ref('');
+const activeSkillName = computed(() => {
+    const skill = skillList.value.find((s) => s.key === activeSkillKey.value);
+    return skill?.label || '';
+});
 
 // ─── 附件上传组件引用 ────────────────────────────────────────────────────
 const uploaderRef = ref(null);
@@ -1199,6 +1207,9 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     }
 
     showWelcomePanel.value = false;
+    // 记录当前技能场景，清除激活态
+    const scene = activeSkillKey.value || '';
+    const sceneName = activeSkillName.value || '';
     activeSkillKey.value = '';
 
     const userMsgId = `msg-${++msgIdSeq}`;
@@ -1226,6 +1237,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
         typing: false,
         pending: true,
         isStreaming: true,
+        skillName: scene ? sceneName : '',
     });
     // 将刚发出的用户消息滚到 scroll-view 顶部（紧贴头部下沿），
     // 让 AI 回复在其下方逐字流出，符合主流聊天产品体验
@@ -1264,6 +1276,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                 images: sendImages,
                 files: sendFiles,
                 enableThinking: useThinking,
+                scene,
                 onStart: ({ conversationId }) => {
                     if (conversationId) currentConversationId.value = conversationId;
                 },
@@ -1328,6 +1341,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                     conversationId: currentConversationId.value,
                     images: sendImages,
                     files: sendFiles,
+                    scene,
                 });
                 const resData = response.data || response;
                 if (resData.conversationId) currentConversationId.value = resData.conversationId;
@@ -1469,6 +1483,26 @@ const handleStopStream = () => {
  * ── 底部输入区（悬浮在内容上方）─────────────────────────────────
  * 使用 absolute 定位并贴在容器底部，不占用 flex 空间，使得文字可以滚动到被输入框遮挡的下方
  */
+
+/* ── AI 消息技能标签 ── */
+.msg-skill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8rpx;
+    padding: 6rpx 18rpx;
+    margin-bottom: 8rpx;
+    border-radius: 999rpx;
+    background: var(--app-brand-light);
+    border: 1rpx solid var(--app-brand);
+}
+
+.msg-skill-tag-text {
+    font-size: calc(22rpx * var(--app-font-scale, 1));
+    color: var(--app-brand);
+    font-weight: 600;
+    line-height: 1;
+}
+
 .sender-area {
     position: absolute;
     left: 0;
