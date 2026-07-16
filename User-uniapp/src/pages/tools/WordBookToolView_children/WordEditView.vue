@@ -95,16 +95,18 @@
                             <text class="required">*</text>
                         </view>
                         <view
-                            class="input-wrapper"
+                            class="textarea-wrapper"
                             :class="{ 'has-error': errors.meaning }"
                         >
-                            <input
-                                class="form-input"
+                            <textarea
+                                class="form-textarea"
                                 v-model="form.meaning"
                                 placeholder="请输入中文释义"
                                 :maxlength="200"
+                                :auto-height="true"
+                                :max-height="200"
                                 @input="errors.meaning = ''"
-                            />
+                            ></textarea>
                         </view>
                         <view v-if="errors.meaning" class="form-error">
                             <t-icon
@@ -463,7 +465,11 @@ const aiDetailLoading = ref(false);
 // ---- AI 智能填充 ----
 const handleAiLookup = async () => {
     const word = form.value.word.trim();
-    if (!word || aiLoading.value) return;
+    if (!word) {
+        uni.showToast({ title: "请输入单词", icon: "none",position: "bottom" });
+        return;
+    }
+    if (aiLoading.value) return;
 
     aiLoading.value = true;
     try {
@@ -479,7 +485,7 @@ const handleAiLookup = async () => {
         errors.value = { word: "", meaning: "" };
         uni.showToast({ title: "填充成功", icon: "success" });
     } catch (error) {
-        uni.showToast({ title: error?.message || "AI 查询失败", icon: "none" });
+        uni.showToast({ title: error?.message || "AI 查询失败", icon: "none", position: "bottom" });
     } finally {
         aiLoading.value = false;
     }
@@ -509,11 +515,11 @@ const handleKbChange = (e) => {
 const handleKbSearch = async () => {
     const word = form.value.word.trim();
     if (!word) {
-        uni.showToast({ title: "请先输入单词", icon: "none" });
+        uni.showToast({ title: "请先输入单词", icon: "none", position: "top" });
         return;
     }
     if (!selectedKbId.value) {
-        uni.showToast({ title: "请选择知识库", icon: "none" });
+        uni.showToast({ title: "请选择知识库", icon: "none", position: "top" });
         return;
     }
     if (kbSearching.value) return;
@@ -535,7 +541,7 @@ const handleKbSearch = async () => {
         );
         kbSearched.value = true;
     } catch (error) {
-        uni.showToast({ title: error?.message || "检索失败", icon: "none" });
+        uni.showToast({ title: error?.message || "检索失败", icon: "none", position: "top" });
     } finally {
         kbSearching.value = false;
     }
@@ -553,7 +559,7 @@ const toggleExampleSelection = (idx) => {
 
 const applySelectedExamples = () => {
     if (selectedExamples.value.size === 0) {
-        uni.showToast({ title: "请先选择例句", icon: "none" });
+        uni.showToast({ title: "请先选择例句", icon: "none", position: "top" });
         return;
     }
 
@@ -601,7 +607,7 @@ const togglePresetTag = (tag) => {
 const fetchAiDetail = async (type) => {
     const word = form.value.word.trim();
     if (!word) {
-        uni.showToast({ title: "请先输入单词", icon: "none" });
+        uni.showToast({ title: "请先输入单词", icon: "none", position: "top" });
         return;
     }
     if (aiDetailLoading.value) return;
@@ -923,6 +929,12 @@ onLoad(async (options) => {
 .textarea-wrapper:focus-within {
     background: var(--app-bg-container);
     border-color: var(--app-brand);
+}
+
+.textarea-wrapper.has-error {
+    border-color: var(--app-danger);
+    box-shadow: 0 0 0 4rpx
+        color-mix(in srgb, var(--app-danger) 10%, transparent);
 }
 
 .form-textarea {
