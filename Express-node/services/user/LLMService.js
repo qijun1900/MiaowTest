@@ -3,7 +3,7 @@ const AgentConversationModel = require("../../models/AgentConversationModel");
 const AgentMessageModel = require("../../models/AgentMessageModel");
 const { runAgentChain, streamAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat");
 const { buildAttachmentContext } = require("../../helpers/fileParser");
-const { SCENE_PROMPTS } = require("../../config/scenePrompt.config");
+const { SCENE_PROMPTS } = require("../../llm/prompts/templates/scenePrompts");
 /** 每次送入 LLM 的历史消息上限，防止上下文过长 */
 const HISTORY_MESSAGE_LIMIT = 20;
 
