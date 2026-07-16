@@ -130,14 +130,16 @@ routes/admin/ExamRouter.js
 
 ### LLM / AI Infrastructure (`llm/`)
 
-LangChain-based, configured in `config/llm.config.js` (DashScope by default, OpenAI-compatible).
+LangChain-based, configured in `config/llm.config.js` (DashScope by default, OpenAI-compatible). Entry point: `llm/index.js` exports `runAgentChain`, `streamAgentChain`, `generateConversationTitle`.
 
 - `llm/models/factory.js` — `ModelFactory.getModel()` creates ChatOpenAI instances (reads `DASHSCOPE_API_KEY` from env, **no startup validation**)
 - `llm/chains/conversational/chat.js` — single-turn chain (stateless)
 - `llm/chains/conversational/deepThink.js` — reasoning model chain (DeepSeek-R1, think/answer separation)
 - `llm/chains/agent/agentChat.js` — multi-turn agent chain with history, streaming, auto title generation
+- `llm/chains/rag/ragChain.js` — RAG retrieval chain
 - `llm/admin/ModelApp/` — DashScope Bailian app integration (question analysis / AI import)
-- `llm/prompts/` — system prompts and templates
+- `llm/prompts/templates/` — prompt templates: `scenePrompts.js` (scene-specific prompts), `wordListPrompts.js`
+- `llm/agents/` — reserved directory for future LangChain Agent framework (currently empty: base/, tools/, workflows/)
 
 **Chat flow** (user-facing):
 ```
