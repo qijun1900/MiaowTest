@@ -375,10 +375,6 @@ const pendingNoteUserText = ref("");
 // ─── 技能栏 ─────────────────────────────────────────────────────────────────
 const skillList = ref([
     { key: 'sentence-analyze', label: '长难句分析', icon: 'lightbulb' },
-    { key: 'create-quiz', label: '出题', icon: 'edit-1' },
-    { key: 'explain', label: '概念解释', icon: 'book' },
-    { key: 'study-plan', label: '学习计划', icon: 'calendar-1' },
-    { key: 'analyze', label: '数据分析', icon: 'chart-analytics' },
 ]);
 const activeSkillKey = ref('');
 const activeSkillName = computed(() => {
