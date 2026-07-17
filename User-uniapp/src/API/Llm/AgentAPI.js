@@ -31,8 +31,8 @@ export const fetchConversationMessages = (conversationId) =>
     http({ url: `/uniappAPI/llm/agent/conversations/${conversationId}/messages`, method: "GET" });
 
 /** 非流式对话 */
-export const chatWithAgent = ({ message, agentKey, conversationId, images, files }) =>
-    http({ url: "/uniappAPI/llm/agent/chat", method: "POST", data: { message, agentKey, conversationId, images, files } });
+export const chatWithAgent = ({ message, agentKey, conversationId, images, files, scene }) =>
+    http({ url: "/uniappAPI/llm/agent/chat", method: "POST", data: { message, agentKey, conversationId, images, files, scene } });
 
 /** 重命名会话标题 */
 export const renameConversation = (conversationId, title) =>
@@ -70,6 +70,7 @@ export const chatWithAgentStream = ({
     images,
     files,
     enableThinking,
+    scene,
     onStart,
     onMessage,
     onReasoning,
@@ -78,7 +79,7 @@ export const chatWithAgentStream = ({
 }) => {
     return streamRequest({
         url: "/uniappAPI/llm/agent/chat/stream",
-        data: { message, agentKey, conversationId, images, files, enableThinking },
+        data: { message, agentKey, conversationId, images, files, enableThinking, scene },
         callbacks: { onStart, onMessage, onReasoning, onDone, onError },
     });
 };

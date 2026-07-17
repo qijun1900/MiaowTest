@@ -1,12 +1,17 @@
 <template>
     <view class="sender-shell">
         <slot name="images"></slot>
-        <input
+        <textarea
             class="sender-input"
             :value="modelValue"
             :placeholder="placeholder"
+            :placeholder-style="'font-size: calc(30rpx * var(--app-font-scale, 1)); color: var(--app-text-placeholder);'"
             confirm-type="send"
             :adjust-position="false"
+            auto-height
+            :maxlength="-1"
+            :show-confirm-bar="false"
+            :disable-default-padding="true"
             @focus="handleFocus"
             @blur="handleBlur"
             @input="handleInput"
@@ -160,9 +165,13 @@ const handleStop = () => {
 .sender-input {
     width: 100%;
     min-height: 74rpx;
+    max-height: 300rpx;
     font-size: calc(30rpx * var(--app-font-scale, 1));
     color: var(--app-text-primary);
-    line-height: 1.4;
+    line-height: 1.5;
+    overflow-y: auto;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .sender-tools {

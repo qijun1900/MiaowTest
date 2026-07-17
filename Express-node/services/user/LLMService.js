@@ -2,11 +2,23 @@ const AgentDefinitionModel = require("../../models/AgentDefinitionModel");
 const AgentConversationModel = require("../../models/AgentConversationModel");
 const AgentMessageModel = require("../../models/AgentMessageModel");
 const { runAgentChain, streamAgentChain, generateConversationTitle } = require("../../llm/chains/agent/agentChat");
-const { buildAttachmentContext } = require("../../helpers/fileParser")/** 每次送入 LLM 的历史消息上限，防止上下文过长 */
+const { buildAttachmentContext } = require("../../helpers/fileParser");
+const { SCENE_PROMPTS } = require("../../llm/prompts/templates/scenePrompts");
+/** 每次送入 LLM 的历史消息上限，防止上下文过长 */
 const HISTORY_MESSAGE_LIMIT = 20;
 
 function isImageUrl(url) {
   return /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(String(url || ""));
+}
+
+/**
+ * 根据 scene 在用户消息前拼接场景专用 prompt。
+ * 无 scene 或 scene 未配置时原样返回。
+ */
+function buildSceneMessage(userMessage, scene) {
+  const prompt = SCENE_PROMPTS[scene];
+  if (!prompt) return userMessage;
+  return `${prompt}\n\n以下是用户需要分析的内容：\n${userMessage || ''}`;
 }
 
 // ─── 内部共享方法 ────────────────────────────────────────────────────────────
@@ -212,11 +224,19 @@ const LLMService = {
   /**
    * 非流式对话：用户发消息 → LLM 一次性返回完整回复 → 落库。
    */
-  ChatWithAgentAndSave: async ({ uid, message: userMessage, agentKey, conversationId, images, files }) => {
+  ChatWithAgentAndSave: async ({ uid, message: userMessage, agentKey, conversationId, images, files, scene }) => {
     const agentConfig = await getAgentConfig(agentKey);
     const isNew = !conversationId;
     const { convId, sequence } = await ensureConversation(conversationId, uid, agentKey, agentConfig, userMessage, images, files);
     const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images, files);
+
+    // 场景 prompt 注入：替换最后一条用户消息的内容，保留原始消息在数据库
+    if (scene && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.role === 'user') {
+        lastMsg.content = buildSceneMessage(lastMsg.content, scene);
+      }
+    }
 
     const aiResponse = await runAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel);
     const replyText = await saveAIReply(convId, uid, agentKey, agentConfig, aiResponse, sequence + 1);
@@ -239,6 +259,7 @@ const LLMService = {
     images,
     files,
     enableThinking,
+    scene,
     onStart,
     onToken,
     onReasoning,
@@ -259,6 +280,14 @@ const LLMService = {
     });
 
     const { messages } = await saveUserMessageAndFetchHistory(convId, uid, agentKey, agentConfig, userMessage, sequence, images, files);
+
+    // 场景 prompt 注入：替换最后一条用户消息的内容，保留原始消息在数据库
+    if (scene && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.role === 'user') {
+        lastMsg.content = buildSceneMessage(lastMsg.content, scene);
+      }
+    }
 
     const aiResponse = await streamAgentChain(messages, agentConfig.systemPrompt, agentConfig.defaultModel, {
       onToken,

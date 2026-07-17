@@ -50,6 +50,10 @@
                         :id="msg._msgId"
                         class="msg-anchor"
                     >
+                        <view v-if="msg.role === 'assistant' && msg.skillName && !msg.pending" class="msg-skill-tag">
+                            <t-icon name="lightbulb" size="20" color="var(--app-brand)" />
+                            <text class="msg-skill-tag-text">{{ msg.skillName }}</text>
+                        </view>
                         <ThoughtChain
                             v-if="msg.role === 'assistant' && (msg.reasoning || msg.thinkingStatus === 'thinking')"
                             :status="msg.thinkingStatus || 'thinking'"
@@ -112,6 +116,11 @@
             :class="{ 'sender-area-hidden': modelSheetVisible }"
             :style="senderAreaStyle"
         >
+            <SkillBar
+                :skills="skillList"
+                :active-key="activeSkillKey"
+                @select="handleSkillSelect"
+            />
             <AgentSender
                 placeholder="在此处输入内容..."
                 v-model="senderText"
@@ -211,6 +220,17 @@
             </template>
         </tPopup>
 
+        <!-- 长难句分析 输入方式选择 -->
+        <t-action-sheet
+            v-model:visible="sentenceSheetVisible"
+            description="选择输入方式"
+            :items="sentenceOptions"
+            cancel-text="取消"
+            @selected="handleSentenceSheetSelected"
+            @cancel="sentenceSheetVisible = false"
+            @close="sentenceSheetVisible = false"
+        />
+
         <!-- 侧边栏支持手势关闭  -->
         <AgentSidebar
             v-model:show="sidebarVisible"
@@ -290,6 +310,7 @@ import AiThinking from "../../components/modules/agent/AiThinking.vue";
 import AiDisclaimer from "../../components/modules/agent/AiDisclaimer.vue";
 import ChatSkeleton from "../../components/modules/agent/ChatSkeleton.vue";
 import AgentUploader from "../../components/modules/agent/AgentUploader.vue";
+import SkillBar from "../../components/modules/agent/SkillBar.vue";
 import tPopup from "../../components/core/tPopup.vue";
 import ThemeProvider from "../../components/core/ThemeProvider.vue";
 import CustomTabBar from "../../components/core/CustomTabBar.vue";
@@ -351,6 +372,16 @@ const savedBookId = ref("");
 const pendingNoteContent = ref("");
 const pendingNoteUserText = ref("");
 
+// ─── 技能栏 ─────────────────────────────────────────────────────────────────
+const skillList = ref([
+    { key: 'sentence-analyze', label: '长难句分析', icon: 'lightbulb' },
+]);
+const activeSkillKey = ref('');
+const activeSkillName = computed(() => {
+    const skill = skillList.value.find((s) => s.key === activeSkillKey.value);
+    return skill?.label || '';
+});
+
 // ─── 附件上传组件引用 ────────────────────────────────────────────────────
 const uploaderRef = ref(null);
 
@@ -363,7 +394,11 @@ const {
     clearAll: clearPendingAttachments,
     getUploadedImages,
     getUploadedFiles,
-} = useAgentAttachments({ maxCount: 9, cloudPathPrefix: "user/agent_chat", uploadFormData: { biz: "chat" } });
+} = useAgentAttachments({ 
+        maxCount: 9, 
+        cloudPathPrefix: "user/agent_chat", 
+        uploadFormData: { biz: "chat" }
+    });
 
 const handleFilesChosen = (files) => {
     addFromChosenFiles(files);
@@ -569,7 +604,8 @@ const containerStyle = computed(() => {
  */
 const contentInnerStyle = computed(() => {
     const extra = !keyboardHeight.value && isTabBarVisible.value ? tabBarHeightPx : 0;
-    return { paddingBottom: `calc(260rpx + ${extra}px)` };
+    // 260rpx 基础(sender) + 90rpx 技能栏(SkillBar) + TabBar 占位
+    return { paddingBottom: `calc(350rpx + ${extra}px)` };
 });
 
 const senderAreaStyle = computed(() => {
@@ -935,6 +971,81 @@ const handlePromptSelect = (prompt) => {
     senderText.value = prompt.label;
 };
 
+// ─── 技能栏点击 ────────────────────────────────────────────────────────────
+const handleSkillSelect = (skill) => {
+    if (!skill?.key) return;
+    triggerVibrate();
+    // 再次点击同一技能 → 取消激活
+    if (activeSkillKey.value === skill.key) {
+        activeSkillKey.value = '';
+        return;
+    }
+    activeSkillKey.value = skill.key;
+
+    // 长难句分析：弹出输入方式选择
+    if (skill.key === 'sentence-analyze') {
+        showSentenceAnalyzeSheet();
+    }
+};
+
+// ─── 长难句分析 ──────────────────────────────────────────────────────────────
+const sentenceSheetVisible = ref(false);
+const sentenceOptions = [
+    { label: '手动输入', icon: 'edit-1' },
+    { label: '拍照识别', icon: 'camera' },
+    { label: '相册选择', icon: 'image' },
+];
+
+const showSentenceAnalyzeSheet = () => {
+    sentenceSheetVisible.value = true;
+};
+
+const handleSentenceSheetSelected = ({ index }) => {
+    sentenceSheetVisible.value = false;
+    handleSentenceAnalyzeAction(index);
+};
+
+/**
+ * 确保当前模型支持多模态（图片识别）。
+ * 若不支持，自动切换到第一个可用的多模态模型；若没有任何多模态模型，提示用户。
+ * @returns {boolean} 是否就绪
+ */
+const ensureMultimodalModel = () => {
+    if (isCurrentMultimodal.value) return true;
+    const target = modelList.value.find((m) => m.isMultimodal);
+    if (!target) {
+        uni.showToast({ title: '没有可用的图片识别模型', icon: 'none' });
+        return false;
+    }
+    handleModelChange(target.label, target.value);
+    return true;
+};
+
+const handleSentenceAnalyzeAction = (actionIndex) => {
+    if (actionIndex === 0) {
+        // 输入句子：用户自己在输入框输入即可
+        return;
+    } else if (actionIndex === 1) {
+        // 拍照
+        if (!ensureMultimodalModel()) return;
+        // #ifdef H5
+        uploaderRef.value?.pickImage();
+        // #endif
+        // #ifndef H5
+        uploaderRef.value?.pickImage({ sourceType: ['camera'] });
+        // #endif
+    } else if (actionIndex === 2) {
+        // 相册
+        if (!ensureMultimodalModel()) return;
+        // #ifdef H5
+        uploaderRef.value?.pickImage();
+        // #endif
+        // #ifndef H5
+        uploaderRef.value?.pickImage({ sourceType: ['album'] });
+        // #endif
+    }
+};
+
 // ─── 保存到笔记本：打开选择弹窗 → 选择 → 保存 ──────────────────────────────
 const handleOpenNotebookPicker = async (content) => {
     if (!isLoggedIn.value) {
@@ -1107,6 +1218,10 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
     }
 
     showWelcomePanel.value = false;
+    // 记录当前技能场景，清除激活态
+    const scene = activeSkillKey.value || '';
+    const sceneName = activeSkillName.value || '';
+    activeSkillKey.value = '';
 
     const userMsgId = `msg-${++msgIdSeq}`;
     messageList.value.push({
@@ -1133,6 +1248,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
         typing: false,
         pending: true,
         isStreaming: true,
+        skillName: scene ? sceneName : '',
     });
     // 将刚发出的用户消息滚到 scroll-view 顶部（紧贴头部下沿），
     // 让 AI 回复在其下方逐字流出，符合主流聊天产品体验
@@ -1171,6 +1287,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                 images: sendImages,
                 files: sendFiles,
                 enableThinking: useThinking,
+                scene,
                 onStart: ({ conversationId }) => {
                     if (conversationId) currentConversationId.value = conversationId;
                 },
@@ -1235,6 +1352,7 @@ const handleSenderSubmit = async ({ text, images: existingImages, files: existin
                     conversationId: currentConversationId.value,
                     images: sendImages,
                     files: sendFiles,
+                    scene,
                 });
                 const resData = response.data || response;
                 if (resData.conversationId) currentConversationId.value = resData.conversationId;
@@ -1340,8 +1458,8 @@ const handleStopStream = () => {
 }
 
 .content-inner {
-    /* 底部留白让最后一条消息不被悬浮的 sender 输入栏遮住；顶部不留白，间距交给 msg-anchor 统一控制 */
-    padding: 0 0 260rpx;
+    /* 底部留白让最后一条消息不被悬浮的 sender 输入栏 + 技能栏遮住；顶部不留白，间距交给 msg-anchor 统一控制 */
+    padding: 0 0 350rpx;
 }
 
 .bubble-test-area {
@@ -1376,6 +1494,26 @@ const handleStopStream = () => {
  * ── 底部输入区（悬浮在内容上方）─────────────────────────────────
  * 使用 absolute 定位并贴在容器底部，不占用 flex 空间，使得文字可以滚动到被输入框遮挡的下方
  */
+
+/* ── AI 消息技能标签 ── */
+.msg-skill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8rpx;
+    padding: 6rpx 18rpx;
+    margin-bottom: 8rpx;
+    border-radius: 999rpx;
+    background: var(--app-brand-light);
+    border: 1rpx solid var(--app-brand);
+}
+
+.msg-skill-tag-text {
+    font-size: calc(22rpx * var(--app-font-scale, 1));
+    color: var(--app-brand);
+    font-weight: 600;
+    line-height: 1;
+}
+
 .sender-area {
     position: absolute;
     left: 0;
@@ -1399,7 +1537,8 @@ const handleStopStream = () => {
 }
 
 /* 恢复内部元素的点击响应，因为外层使用 pointer-events: none */
-.sender-area :deep( .sender-shell ) {
+.sender-area :deep(.sender-shell),
+.sender-area :deep(.skill-bar) {
     pointer-events: auto;
 }
 
@@ -1569,6 +1708,7 @@ const handleStopStream = () => {
     background: rgba(0, 0, 0, 0.45);
     z-index: 9998;
 }
+
 
 .notebook-picker {
     width: 100%;

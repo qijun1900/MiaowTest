@@ -102,12 +102,12 @@ const ensureCapacity = () => {
     return true;
 };
 
-const pickImage = () => {
+const pickImage = (options = {}) => {
     if (!ensureCapacity()) return;
     xeRef.value?.upload("image", {
         count: remainCount.value,
         sizeType: ["compressed"],
-        sourceType: ["album", "camera"],
+        sourceType: options.sourceType || ["album", "camera"],
     });
 };
 
