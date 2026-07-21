@@ -410,6 +410,22 @@
 						"navigationBarTitleText": "添加单词",
 						"navigationStyle": "custom"
 					}
+				},
+				{
+					"path": "WordBookToolView_children/WordReviewView",
+					"style": {
+						"navigationBarTitleText": "背单词",
+						"navigationStyle": "custom",
+						"disableScroll": true
+					}
+				},
+				{
+					"path": "WordBookToolView_children/WordReviewResultsView",
+					"style": {
+						"navigationBarTitleText": "复习完成",
+						"navigationStyle": "custom",
+						"scrollIndicator": "none"
+					}
 				}
 			]
 		}

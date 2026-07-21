@@ -197,6 +197,18 @@
                                 <view class="footer-line"></view>
                                 <text class="footer-hint">最近更新</text>
                             </view>
+                            <view
+                                v-if="!isSelectMode"
+                                class="review-btn"
+                                @click.stop="handleOpenReview(item)"
+                            >
+                                <t-icon
+                                    name="education"
+                                    size="28rpx"
+                                    color="var(--app-brand)"
+                                ></t-icon>
+                                <text class="review-btn-text">背单词</text>
+                            </view>
                         </view>
 
                         <!-- 新建单词本卡片（选择模式下隐藏） -->
@@ -389,6 +401,101 @@
                 @cancel="showDeleteDialog = false"
                 @close="showDeleteDialog = false"
             />
+
+            <!-- 复习设置弹窗 -->
+            <tPopup
+                v-model:show="reviewPopupShow"
+                title="复习设置"
+                :closeable="true"
+                :overlay="true"
+            >
+                <template #popupcontent>
+                    <view class="review-popup-content">
+                        <!-- 复习统计概览 -->
+                        <view v-if="currentReviewStats" class="review-stats-bar">
+                            <view class="stat-item">
+                                <text class="stat-value">{{ currentReviewStats.dueWords || 0 }}</text>
+                                <text class="stat-label">待复习</text>
+                            </view>
+                            <view class="stat-divider"></view>
+                            <view class="stat-item">
+                                <text class="stat-value">{{ currentReviewStats.newWords || 0 }}</text>
+                                <text class="stat-label">新词</text>
+                            </view>
+                            <view class="stat-divider"></view>
+                            <view class="stat-item">
+                                <text class="stat-value">{{ currentReviewStats.masteredWords || 0 }}</text>
+                                <text class="stat-label">已掌握</text>
+                            </view>
+                        </view>
+
+                        <!-- 复习模式 -->
+                        <view class="review-section">
+                            <text class="review-section-title">复习模式</text>
+                            <view class="review-mode-grid">
+                                <view
+                                    class="mode-card"
+                                    :class="{ active: reviewMode === 'mixed' }"
+                                    @click="reviewMode = 'mixed'"
+                                >
+                                    <t-icon name="swap" size="40rpx" :color="reviewMode === 'mixed' ? 'var(--app-brand)' : 'var(--app-text-secondary)'"></t-icon>
+                                    <text class="mode-name">混合</text>
+                                    <text class="mode-desc">新词+复习</text>
+                                </view>
+                                <view
+                                    class="mode-card"
+                                    :class="{ active: reviewMode === 'new' }"
+                                    @click="reviewMode = 'new'"
+                                >
+                                    <t-icon name="add-circle" size="40rpx" :color="reviewMode === 'new' ? 'var(--app-brand)' : 'var(--app-text-secondary)'"></t-icon>
+                                    <text class="mode-name">新词</text>
+                                    <text class="mode-desc">未学过的</text>
+                                </view>
+                                <view
+                                    class="mode-card"
+                                    :class="{ active: reviewMode === 'review' }"
+                                    @click="reviewMode = 'review'"
+                                >
+                                    <t-icon name="refresh" size="40rpx" :color="reviewMode === 'review' ? 'var(--app-brand)' : 'var(--app-text-secondary)'"></t-icon>
+                                    <text class="mode-name">复习</text>
+                                    <text class="mode-desc">到期的词</text>
+                                </view>
+                                <view
+                                    class="mode-card"
+                                    :class="{ active: reviewMode === 'marked' }"
+                                    @click="reviewMode = 'marked'"
+                                >
+                                    <t-icon name="star-filled" size="40rpx" :color="reviewMode === 'marked' ? 'var(--app-brand)' : 'var(--app-text-secondary)'"></t-icon>
+                                    <text class="mode-name">收藏</text>
+                                    <text class="mode-desc">仅收藏词</text>
+                                </view>
+                            </view>
+                        </view>
+
+                        <!-- 复习数量 -->
+                        <view class="review-section">
+                            <text class="review-section-title">复习数量</text>
+                            <view class="review-count-grid">
+                                <view
+                                    v-for="count in [10, 20, 30, 50]"
+                                    :key="count"
+                                    class="count-chip"
+                                    :class="{ active: reviewLimit === count }"
+                                    @click="reviewLimit = count"
+                                >
+                                    <text class="count-chip-text">{{ count }}词</text>
+                                </view>
+                            </view>
+                        </view>
+
+                        <!-- 开始按钮 -->
+                        <view class="review-start-btn" @click="handleStartReview">
+                            <t-icon name="education" size="40rpx" color="#fff"></t-icon>
+                            <text class="review-start-text">开始背诵</text>
+                        </view>
+                    </view>
+                </template>
+            </tPopup>
         </view>
     </ThemeProvider>
 </template>
@@ -406,6 +513,7 @@ import {
     updateWordBookAPI,
     batchDeleteWordBooksAPI,
 } from "../../API/Tools/WordBookAPI";
+import { getReviewStatsAPI } from "../../API/Tools/WordReviewAPI";
 
 const { safeAreaInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
     reserveMenuButtonRight: true,
@@ -418,6 +526,13 @@ const submitting = ref(false);
 const isEditMode = ref(false);
 const editingId = ref("");
 const skeletonCount = 6;
+
+// ---- 复习设置 ----
+const reviewPopupShow = ref(false);
+const reviewBook = ref(null); // 当前选择要复习的单词本
+const reviewMode = ref("mixed"); // new|review|mixed|marked
+const reviewLimit = ref(20);
+const reviewStatsMap = ref({}); // { bookId: { dueWords, newWords, ... } }
 
 // ---- 选择模式 ----
 const isSelectMode = ref(false);
@@ -651,6 +766,48 @@ const handleSubmit = async () => {
 const handleOpenWordList = (item) => {
     uni.navigateTo({
         url: `/pages/tools/WordBookToolView_children/WordListView?id=${item._id}&title=${encodeURIComponent(item.title)}`,
+    });
+};
+
+// ---- 复习功能 ----
+const handleOpenReview = (item) => {
+    if (!item || !item._id) return;
+    if (item.wordCount === 0) {
+        uni.showToast({ title: "该单词本暂无单词", icon: "none" });
+        return;
+    }
+    reviewBook.value = item;
+    reviewMode.value = "mixed";
+    reviewLimit.value = 20;
+    reviewPopupShow.value = true;
+
+    // 异步获取复习统计
+    fetchReviewStats(item._id);
+};
+
+const fetchReviewStats = async (bookId) => {
+    try {
+        const res = await getReviewStatsAPI(bookId);
+        if (res.code === 200 && res.data) {
+            reviewStatsMap.value[bookId] = res.data;
+        }
+    } catch (e) {
+        console.error("获取复习统计失败", e);
+    }
+};
+
+const currentReviewStats = computed(() => {
+    if (!reviewBook.value) return null;
+    return reviewStatsMap.value[reviewBook.value._id] || null;
+});
+
+const handleStartReview = () => {
+    if (!reviewBook.value) return;
+    const bookId = reviewBook.value._id;
+    const title = encodeURIComponent(reviewBook.value.title || "");
+    reviewPopupShow.value = false;
+    uni.navigateTo({
+        url: `/pages/tools/WordBookToolView_children/WordReviewView?bookId=${bookId}&title=${title}&mode=${reviewMode.value}&limit=${reviewLimit.value}`,
     });
 };
 
@@ -1524,5 +1681,189 @@ onBeforeUnmount(() => {
         margin-left: auto;
         margin-right: auto;
     }
+}
+
+/* ---- 复习按钮 ---- */
+.review-btn {
+    position: relative;
+    z-index: 1;
+    margin-top: 16rpx;
+    padding-top: 14rpx;
+    border-top: 1rpx solid var(--app-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
+    padding-bottom: 4rpx;
+}
+
+.review-btn-text {
+    font-size: calc(26rpx * var(--app-font-scale, 1));
+    color: var(--app-brand);
+    font-weight: 600;
+}
+
+.review-btn:active {
+    opacity: 0.7;
+}
+
+/* ---- 复习设置弹窗 ---- */
+.review-popup-content {
+    padding: 40rpx;
+}
+
+.review-stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    background: var(--app-bg-secondary);
+    border-radius: 20rpx;
+    padding: 24rpx 0;
+    margin-bottom: 36rpx;
+}
+
+.stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8rpx;
+}
+
+.stat-value {
+    font-size: calc(40rpx * var(--app-font-scale, 1));
+    color: var(--app-brand);
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: calc(24rpx * var(--app-font-scale, 1));
+    color: var(--app-text-secondary);
+}
+
+.stat-divider {
+    width: 1rpx;
+    height: 50rpx;
+    background: var(--app-border);
+}
+
+.review-section {
+    margin-bottom: 36rpx;
+}
+
+.review-section-title {
+    font-size: calc(30rpx * var(--app-font-scale, 1));
+    color: var(--app-text-primary);
+    font-weight: 600;
+    margin-bottom: 20rpx;
+    display: block;
+}
+
+.review-mode-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16rpx;
+}
+
+.mode-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10rpx;
+    padding: 20rpx 8rpx;
+    border-radius: 20rpx;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
+    transition: all 0.2s ease;
+}
+
+.mode-card.active {
+    border-color: var(--app-brand);
+    background: var(--app-brand-light);
+    box-shadow: 0 0 0 4rpx color-mix(in srgb, var(--app-brand) 10%, transparent);
+}
+
+.mode-card:active {
+    transform: scale(0.96);
+}
+
+.mode-name {
+    font-size: calc(26rpx * var(--app-font-scale, 1));
+    color: var(--app-text-primary);
+    font-weight: 600;
+}
+
+.mode-desc {
+    font-size: calc(20rpx * var(--app-font-scale, 1));
+    color: var(--app-text-secondary);
+}
+
+.review-count-grid {
+    display: flex;
+    gap: 16rpx;
+    flex-wrap: wrap;
+}
+
+.count-chip {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80rpx;
+    border-radius: 16rpx;
+    border: 2rpx solid var(--app-border);
+    background: var(--app-bg-container);
+    transition: all 0.2s ease;
+}
+
+.count-chip.active {
+    border-color: var(--app-brand);
+    background: var(--app-brand-light);
+}
+
+.count-chip:active {
+    transform: scale(0.96);
+}
+
+.count-chip-text {
+    font-size: calc(28rpx * var(--app-font-scale, 1));
+    color: var(--app-text-primary);
+    font-weight: 600;
+}
+
+.count-chip.active .count-chip-text {
+    color: var(--app-brand);
+}
+
+.review-start-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12rpx;
+    height: 100rpx;
+    border-radius: 50rpx;
+    background: linear-gradient(
+        135deg,
+        var(--app-brand) 0%,
+        var(--app-brand-hover) 100%
+    );
+    box-shadow: 0 8rpx 24rpx
+        color-mix(in srgb, var(--app-brand) 32%, transparent);
+    margin-top: 20rpx;
+    transition: all 0.2s ease;
+}
+
+.review-start-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 4rpx 16rpx
+        color-mix(in srgb, var(--app-brand) 22%, transparent);
+}
+
+.review-start-text {
+    font-size: calc(32rpx * var(--app-font-scale, 1));
+    color: #fff;
+    font-weight: 700;
 }
 </style>
