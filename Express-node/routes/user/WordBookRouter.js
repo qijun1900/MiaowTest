@@ -1,6 +1,7 @@
 var express = require("express");
 const WordBookController = require("../../controllers/user/WordBookController");
 const WordListController = require("../../controllers/user/WordListController");
+const WordReviewController = require("../../controllers/user/WordReviewController");
 const JWT = require("../../MiddleWares/jwt");
 const requireUid = require("../../MiddleWares/requireUid");
 
@@ -158,6 +159,48 @@ WordBookRouter.post(
   JWT.verifyTokenMiddleware(),
   requireUid,
   WordListController.searchExamples,
+);
+
+// ---- 单词复习 (WordReview) ----
+
+// 获取待复习单词
+WordBookRouter.get(
+  "/uniappAPI/tools/wordreview/getReviewWords",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  WordReviewController.getReviewWords,
+);
+
+// 获取单词本复习统计
+WordBookRouter.get(
+  "/uniappAPI/tools/wordreview/getReviewStats",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  WordReviewController.getReviewStats,
+);
+
+// 提交单个单词的复习结果
+WordBookRouter.post(
+  "/uniappAPI/tools/wordreview/submitReview",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  WordReviewController.submitReview,
+);
+
+// 批量提交复习结果
+WordBookRouter.post(
+  "/uniappAPI/tools/wordreview/batchSubmitReview",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  WordReviewController.batchSubmitReview,
+);
+
+// 重置单词本复习进度
+WordBookRouter.post(
+  "/uniappAPI/tools/wordreview/resetReviewProgress",
+  JWT.verifyTokenMiddleware(),
+  requireUid,
+  WordReviewController.resetReviewProgress,
 );
 
 module.exports = WordBookRouter;
