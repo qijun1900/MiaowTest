@@ -193,7 +193,9 @@
                                 isSelectMode && selectedIds.includes(item._id),
                         }"
                         @click="handleCardClick(item)"
-                        @longpress="handleLongPress(item)"
+                        @touchstart="onCardTouchStart($event, item)"
+                        @touchmove="onCardTouchMove"
+                        @touchend="onCardTouchEnd"
                     >
                         <!-- 选择模式复选框 -->
                         <view v-if="isSelectMode" class="card-checkbox">
@@ -281,7 +283,7 @@
 
                             <!-- 展开区域 -->
                             <view
-                                v-if="expandedId === item._id"
+                                v-if="expandedIds.includes(item._id)"
                                 class="expand-area"
                             >
                                 <view
@@ -612,7 +614,7 @@ let searchTimer = null;
 
 // ---- 释义显示 ----
 const showAllMeanings = ref(false);
-const expandedId = ref("");
+const expandedIds = ref([]); // 支持同时展开多个
 
 const toggleShowMeanings = () => {
     showAllMeanings.value = !showAllMeanings.value;
@@ -795,9 +797,14 @@ const handleLoadMore = () => {
     fetchWords({ append: true });
 };
 
-// ---- 展开/收起 ----
+// ---- 展开/收起（支持多选） ----
 const toggleExpand = (item) => {
-    expandedId.value = expandedId.value === item._id ? "" : item._id;
+    const idx = expandedIds.value.indexOf(item._id);
+    if (idx === -1) {
+        expandedIds.value = [...expandedIds.value, item._id];
+    } else {
+        expandedIds.value = expandedIds.value.filter((id) => id !== item._id);
+    }
 };
 
 // ---- 收藏切换 ----
@@ -851,6 +858,45 @@ const handleLongPress = (item) => {
     } else {
         enterSelectMode(item._id);
     }
+};
+
+// ---- 自定义长按（800ms，滑动取消） ----
+let longPressTimer = null;
+let longPressStartX = 0;
+let longPressStartY = 0;
+const LONG_PRESS_DURATION = 800; // 毫秒
+const LONG_PRESS_MOVE_THRESHOLD = 15; // 移动超过 15px 取消
+
+const clearLongPressTimer = () => {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+};
+
+const onCardTouchStart = (e, item) => {
+    const touch = e.touches[0];
+    longPressStartX = touch.clientX;
+    longPressStartY = touch.clientY;
+    clearLongPressTimer();
+    longPressTimer = setTimeout(() => {
+        longPressTimer = null;
+        handleLongPress(item);
+    }, LONG_PRESS_DURATION);
+};
+
+const onCardTouchMove = (e) => {
+    if (!longPressTimer) return;
+    const touch = e.touches[0];
+    const dx = Math.abs(touch.clientX - longPressStartX);
+    const dy = Math.abs(touch.clientY - longPressStartY);
+    if (dx > LONG_PRESS_MOVE_THRESHOLD || dy > LONG_PRESS_MOVE_THRESHOLD) {
+        clearLongPressTimer();
+    }
+};
+
+const onCardTouchEnd = () => {
+    clearLongPressTimer();
 };
 
 const handleCardClick = (item) => {
