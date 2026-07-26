@@ -114,6 +114,20 @@
                     </view>
                 </view>
             </view>
+
+            <!-- 退出确认弹窗 -->
+            <t-dialog
+                :visible="showBackDialog"
+                title="确认退出"
+                content="退出后本次复习记录将丢失，确定退出吗？"
+                :confirm-btn="{ content: '退出', theme: 'danger' }"
+                cancel-btn="取消"
+                :show-overlay="true"
+                :z-index="12000"
+                @confirm="handleBackConfirm"
+                @cancel="handleBackCancel"
+                @close="handleBackCancel"
+            />
         </view>
     </ThemeProvider>
 </template>
@@ -146,6 +160,7 @@ const isFlipped = ref(false);
 const lastQuality = ref(0); // 当前单词选择的评分（5=认识，其他=不认识/模糊）
 const reviews = ref([]);
 const canProceed = ref(false); // 防止确认按钮被瞬间误触
+const showBackDialog = ref(false);
 
 // ---- 计算属性 ----
 const currentWord = computed(() => {
@@ -314,20 +329,19 @@ const submitReviews = async () => {
 // ---- 返回 ----
 const handleBack = () => {
     if (reviews.value.length > 0 && !submitted.value) {
-        uni.showModal({
-            title: "确认退出",
-            content: "退出后本次复习记录将丢失，确定退出吗？",
-            confirmText: "退出",
-            confirmColor: "var(--app-danger)",
-            success: (res) => {
-                if (res.confirm) {
-                    uni.navigateBack();
-                }
-            },
-        });
+        showBackDialog.value = true;
     } else {
         uni.navigateBack();
     }
+};
+
+const handleBackConfirm = () => {
+    showBackDialog.value = false;
+    uni.navigateBack();
+};
+
+const handleBackCancel = () => {
+    showBackDialog.value = false;
 };
 </script>
 
