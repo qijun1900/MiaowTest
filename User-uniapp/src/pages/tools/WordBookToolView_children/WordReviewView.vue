@@ -79,17 +79,17 @@
                 <view class="bottom-area">
                     <!-- 未翻转：显示三个评价按钮 -->
                     <view v-if="!isFlipped" class="rating-row">
-                        <view class="rating-btn rating-unknown" @click="handleRate(1)">
-                            <view class="rating-badge badge-unknown">不会</view>
-                            <text class="rating-interval">1天后</text>
+                        <view class="rating-btn rating-known" @click="handleRate(5)">
+                            <view class="rating-badge badge-known">认识</view>
+                            <text class="rating-interval">{{ knownInterval }}</text>
                         </view>
                         <view class="rating-btn rating-fuzzy" @click="handleRate(3)">
                             <view class="rating-badge badge-fuzzy">模糊</view>
                             <text class="rating-interval">{{ fuzzyInterval }}</text>
                         </view>
-                        <view class="rating-btn rating-known" @click="handleRate(5)">
-                            <view class="rating-badge badge-known">认识</view>
-                            <text class="rating-interval">{{ knownInterval }}</text>
+                        <view class="rating-btn rating-unknown" @click="handleRate(1)">
+                            <view class="rating-badge badge-unknown">不会</view>
+                            <text class="rating-interval">1天后</text>
                         </view>
                     </view>
 
@@ -101,15 +101,15 @@
                         </view>
                     </view>
 
-                    <!-- 已翻转 + 点了"认识"：显示记错了 + 下一词 -->
+                    <!-- 已翻转 + 点了"认识"：显示下一词 + 记错了 -->
                     <view v-else class="confirm-row">
-                        <view class="confirm-btn confirm-wrong" :class="{ disabled: !canProceed }" @click="canProceed && handleConfirmWrong()">
-                            <t-icon name="close-circle" size="36rpx" color="var(--app-danger)"></t-icon>
-                            <text class="confirm-text">记错了</text>
-                        </view>
                         <view class="confirm-btn confirm-next" :class="{ disabled: !canProceed }" @click="canProceed && handleConfirmNext()">
                             <t-icon name="check-circle" size="36rpx" color="var(--app-success)"></t-icon>
                             <text class="confirm-text">下一词</text>
+                        </view>
+                        <view class="confirm-btn confirm-wrong" :class="{ disabled: !canProceed }" @click="canProceed && handleConfirmWrong()">
+                            <t-icon name="close-circle" size="36rpx" color="var(--app-danger)"></t-icon>
+                            <text class="confirm-text">记错了</text>
                         </view>
                     </view>
                 </view>

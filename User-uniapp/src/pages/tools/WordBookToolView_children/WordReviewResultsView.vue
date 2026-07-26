@@ -72,7 +72,8 @@
                                 v-for="(item, index) in resultData.details"
                                 :key="item.wordId || index"
                                 class="detail-item"
-                                :class="{ 'detail-correct': item.isCorrect, 'detail-wrong': !item.isCorrect }"
+                                :class="{ 'detail-correct': item.isCorrect, 'detail-wrong': !item.isCorrect, expanded: expandedIndex === index }"
+                                @click="toggleExpand(index)"
                             >
                                 <view class="detail-icon">
                                     <t-icon
@@ -86,8 +87,17 @@
                                     <text class="detail-mastery">
                                         {{ getMasteryLabel(item.prevMastery) }} → {{ getMasteryLabel(item.newMastery) }}
                                     </text>
+                                    <!-- 展开后显示释义 -->
+                                    <view v-if="expandedIndex === index && item.meaning" class="detail-meaning-wrapper">
+                                        <view class="detail-divider"></view>
+                                        <text class="detail-meaning">{{ item.meaning }}</text>
+                                    </view>
                                 </view>
-                                <text class="detail-interval">{{ formatIntervalText(item.newInterval) }}</text>
+                                <t-icon
+                                    :name="expandedIndex === index ? 'chevron-up' : 'chevron-down'"
+                                    size="28rpx"
+                                    color="var(--app-text-placeholder)"
+                                ></t-icon>
                             </view>
                         </view>
                     </view>
@@ -116,7 +126,7 @@
 
 <script setup>
 import ThemeProvider from "../../../components/core/ThemeProvider.vue";
-import { ref, computed, onMounted } from "vue";
+import { ref} from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import { MASTERY_LABELS, formatInterval } from "../../../util/sm2Algorithm";
@@ -129,6 +139,7 @@ const { safeAreaInfo, customNavbarStyle, navRowStyle } = useNavBarSafeArea({
 // ---- 路由参数 ----
 const bookId = ref("");
 const bookTitle = ref("");
+const expandedIndex = ref(-1); // 当前展开的单词索引，-1=全部折叠
 const resultData = ref({
     total: 0,
     correctCount: 0,
@@ -150,6 +161,11 @@ onLoad((options) => {
         }
     }
 });
+
+// ---- 展开/折叠 ----
+const toggleExpand = (index) => {
+    expandedIndex.value = expandedIndex.value === index ? -1 : index;
+};
 
 // ---- 辅助函数 ----
 const getWordText = (wordId) => {
@@ -408,6 +424,7 @@ const handleBack = () => {
 
 .detail-icon {
     flex-shrink: 0;
+    padding-top: 4rpx;
 }
 
 .detail-info {
@@ -437,6 +454,42 @@ const handleBack = () => {
     font-size: calc(24rpx * var(--app-font-scale, 1));
     color: var(--app-brand);
     font-weight: 600;
+}
+
+/* 展开状态 */
+.detail-item.expanded {
+    background: var(--app-bg-secondary);
+}
+
+.detail-meaning-wrapper {
+    margin-top: 12rpx;
+    animation: fadeDown 0.25s ease;
+}
+
+.detail-divider {
+    width: 60rpx;
+    height: 3rpx;
+    border-radius: 2rpx;
+    background: var(--app-border);
+    margin-bottom: 10rpx;
+}
+
+.detail-meaning {
+    font-size: calc(26rpx * var(--app-font-scale, 1));
+    color: var(--app-text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ---- 底部操作栏 ---- */
