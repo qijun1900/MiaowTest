@@ -1032,6 +1032,7 @@ onShow(() => {
 onBeforeUnmount(() => {
     uni.$off("wordList:refresh", handleRefreshEvent);
     if (searchTimer) clearTimeout(searchTimer);
+    clearLongPressTimer();
 });
 </script>
 

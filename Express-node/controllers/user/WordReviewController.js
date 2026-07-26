@@ -144,6 +144,33 @@ const WordReviewController = {
           .send({ code: 400, message: "请提供复习结果" });
       }
 
+      if (reviews.length > 100) {
+        return res
+          .status(200)
+          .send({ code: 400, message: "单次最多提交100条" });
+      }
+
+      // 校验每条记录的 wordId 格式
+      const invalidItem = reviews.find(
+        (r) => !r.wordId || !isValidObjectId(r.wordId),
+      );
+      if (invalidItem) {
+        return res
+          .status(200)
+          .send({ code: 400, message: "存在格式不正确的wordId" });
+      }
+
+      // 校验 quality 范围
+      const invalidQuality = reviews.find(
+        (r) => r.quality === undefined || r.quality === null || r.quality < 0 || r.quality > 5,
+      );
+      if (invalidQuality) {
+        return res
+          .status(200)
+          .send({ code: 400, message: "quality评分必须在0-5之间" });
+      }
+      }
+
       const result = await WordReviewService.batchSubmitReview({ uid, reviews });
 
       if (!result.success) {

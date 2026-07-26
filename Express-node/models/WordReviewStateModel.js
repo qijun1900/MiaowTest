@@ -39,6 +39,7 @@ const WordReviewStateSchema = new mongoose.Schema({
     // 当前复习间隔（天）
     type: Number,
     default: 0,
+    min: 0,
   },
   reviewCount: {
     // 总复习次数

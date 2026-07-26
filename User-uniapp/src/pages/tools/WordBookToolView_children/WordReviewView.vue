@@ -134,7 +134,7 @@
 
 <script setup>
 import ThemeProvider from "../../../components/core/ThemeProvider.vue";
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeUnmount } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useNavBarSafeArea } from "../../../composables/useNavBarSafeArea";
 import { getReviewWordsAPI, batchSubmitReviewAPI } from "../../../API/Tools/WordReviewAPI";
@@ -243,6 +243,8 @@ const handleCardTap = () => {
 };
 
 // ---- 评价 ----
+let proceedTimer = null;
+
 const handleRate = (quality) => {
     const word = currentWord.value;
     if (!word || !word._id) return;
@@ -259,18 +261,21 @@ const handleRate = (quality) => {
     uni.vibrateShort({ type: "light" });
 
     // 延迟解锁，等翻转动画结束 + 触摸事件消散
-    setTimeout(() => {
+    if (proceedTimer) clearTimeout(proceedTimer);
+    proceedTimer = setTimeout(() => {
         canProceed.value = true;
+        proceedTimer = null;
     }, 400);
 };
 
 // ---- "记错了"：改为 quality=1 ----
 const handleConfirmWrong = () => {
+    if (!canProceed.value) return; // 双击保护
+    canProceed.value = false;
     const word = currentWord.value;
     if (!word || !word._id) return;
 
     // 移除刚才记录的 quality=5，替换为 quality=1
-    // 从后往前找，兼容不支持 findLastIndex 的环境
     let idx = -1;
     for (let i = reviews.value.length - 1; i >= 0; i--) {
         if (reviews.value[i].wordId === word._id) {
@@ -289,8 +294,18 @@ const handleConfirmWrong = () => {
 
 // ---- "下一词"（认识确认） ----
 const handleConfirmNext = () => {
+    if (!canProceed.value) return; // 双击保护
+    canProceed.value = false;
     goToNext();
 };
+
+// ---- 生命周期清理 ----
+onBeforeUnmount(() => {
+    if (proceedTimer) {
+        clearTimeout(proceedTimer);
+        proceedTimer = null;
+    }
+});
 
 // ---- 切换到下一个单词 ----
 const goToNext = () => {
@@ -306,6 +321,7 @@ const goToNext = () => {
 
 // ---- 提交 ----
 const submitReviews = async () => {
+    if (submitted.value) return; // 防止重复提交
     submitted.value = true;
     try {
         const res = await batchSubmitReviewAPI({ reviews: reviews.value });

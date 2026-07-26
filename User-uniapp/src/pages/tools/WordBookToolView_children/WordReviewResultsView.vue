@@ -195,8 +195,14 @@ const handleReviewAgain = () => {
 };
 
 const handleBack = () => {
-    // 返回到单词本列表（跳过中间的复习页面）
-    uni.navigateBack({ delta: 2 });
+    // 安全计算返回层级，防止页面栈不足
+    const pages = getCurrentPages();
+    const delta = Math.min(2, pages.length - 1);
+    if (delta <= 0) {
+        uni.switchTab({ url: "/pages/tab/tools" });
+    } else {
+        uni.navigateBack({ delta });
+    }
 };
 </script>
 

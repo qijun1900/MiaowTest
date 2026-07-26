@@ -21,20 +21,27 @@ const WordReviewRecordModel = require("../../models/WordReviewRecordModel");
  *   ✅ 认识   → quality=5
  */
 function calculateSM2(currentEF, currentInterval, reviewCount, quality) {
-  let newEF = currentEF;
-  let newInterval = currentInterval;
+  // NaN 防护
+  const safeEF = isNaN(currentEF) ? 2.5 : currentEF;
+  const safeInterval = isNaN(currentInterval) ? 0 : currentInterval;
+  const safeCount = isNaN(reviewCount) ? 0 : reviewCount;
+  const safeQuality = isNaN(quality) ? 0 : Math.min(5, Math.max(0, quality));
 
-  const q = quality;
+  let newEF = safeEF;
+  let newInterval = safeInterval;
+
+  const q = safeQuality;
   const delta = 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02);
-  newEF = Math.max(1.3, currentEF + delta);
+  newEF = Math.max(1.3, safeEF + delta);
 
-  if (quality >= 3) {
-    if (reviewCount === 0) {
+  if (safeQuality >= 3) {
+    if (safeCount === 0) {
       newInterval = 1;
-    } else if (reviewCount === 1) {
+    } else if (safeCount === 1) {
       newInterval = 6;
     } else {
-      newInterval = Math.round(currentInterval * newEF);
+      // 上限 365 天，防止溢出
+      newInterval = Math.min(365, Math.round(safeInterval * newEF));
     }
   } else {
     newInterval = 1;
@@ -242,13 +249,10 @@ const WordReviewService = {
     try {
       const stateBaseQuery = { Uid: uid, wordBookId };
 
-      const [totalWords, newCount, learningCount, familiarCount, masteredCount, dueCount] =
+      const [totalWords, reviewedCount, learningCount, familiarCount, masteredCount, dueCount] =
         await Promise.all([
           WordListModel.countDocuments({ Uid: uid, wordBookId }),
-          // 新词 = 总词数 - 有复习状态的词数
-          WordReviewStateModel.countDocuments(stateBaseQuery).then(
-            (reviewed) => WordListModel.countDocuments({ Uid: uid, wordBookId }).then((total) => total - reviewed),
-          ),
+          WordReviewStateModel.countDocuments(stateBaseQuery),
           WordReviewStateModel.countDocuments({ ...stateBaseQuery, masteryLevel: 1 }),
           WordReviewStateModel.countDocuments({ ...stateBaseQuery, masteryLevel: 2 }),
           WordReviewStateModel.countDocuments({ ...stateBaseQuery, masteryLevel: 3 }),
@@ -258,11 +262,13 @@ const WordReviewService = {
           }),
         ]);
 
+      const newCount = Math.max(0, totalWords - reviewedCount);
+
       return {
         success: true,
         data: {
           totalWords,
-          newWords: Math.max(0, newCount),
+          newWords: newCount,
           learningWords: learningCount,
           familiarWords: familiarCount,
           masteredWords: masteredCount,
