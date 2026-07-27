@@ -169,7 +169,6 @@ const WordReviewController = {
           .status(200)
           .send({ code: 400, message: "quality评分必须在0-5之间" });
       }
-      }
 
       const result = await WordReviewService.batchSubmitReview({ uid, reviews });
 
