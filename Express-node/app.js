@@ -107,6 +107,16 @@ app.use((req, res, next) => {
 app.use(clientDetector); // 使用客户端检测中间件
 app.use(requestTraceLogger); // 注入traceId并自动记录uniapp请求日志
 
+// Swagger API 文档
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+const swaggerConfig = require("./config/swagger");
+const swaggerSpec = swaggerJsdoc(swaggerConfig);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: ".swagger-ui .topbar { display: none }",
+  customSiteTitle: "题喵喵 API 文档",
+}));
+
 // 健康检查路由
 app.get("/health", (req, res) => {
   const { dbManager } = require("./db/db.enhanced");

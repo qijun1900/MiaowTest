@@ -23,7 +23,7 @@
     "compression": "^1.8.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
-    "dotenv": "^17.2.1",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.2.1",
@@ -44,6 +44,8 @@
   },
   "devDependencies": {
     "archiver": "^7.0.1",
-    "node-dev": "^8.0.0"
+    "node-dev": "^8.0.0",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }
